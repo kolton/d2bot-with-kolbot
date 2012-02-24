@@ -1,0 +1,86 @@
+// default.dbj gets executed upon gamejoin
+js_strict(true);
+
+include("json2.js");
+include("NTItemParser.dbl");
+include("OOG.js");
+include("Gambling.js");
+include("common/Attack.js");
+include("common/Cubing.js");
+include("common/Config.js");
+include("common/Loader.js");
+include("common/Misc.js");
+include("common/Pickit.js");
+include("common/Pather.js");
+include("common/Precast.js");
+include("common/Prototypes.js");
+include("common/Runewords.js");
+include("common/Storage.js");
+include("common/Town.js");
+
+function main() {
+	while (!me.gameReady) {
+		delay(100);
+	}
+
+	var i,
+		startTime = getTickCount();
+	
+	if (Gambling.goldFinders.indexOf(me.profile) > -1) {
+		for (i = 0; i < Gambling.gambleGames.length; i += 1) {
+			if (me.gamename.match(Gambling.gambleGames[i])) {
+				Gambling.dropGold();
+				DataFile.updateStats("gold");
+				delay(5000);
+				quit();
+			}
+		}
+	}
+	
+	if (me.getStat(13) < DataFile.getStats().experience) { // check for experience decrease -> log death
+		D2Bot.printToConsole("You died in last game;1");
+		D2Bot.printToConsole("Experience decreased by " + (DataFile.getStats().experience - me.getStat(13)) + ";1");
+		DataFile.updateDeaths();
+	}
+
+	DataFile.updateStats("experience", me.getStat(13));
+	DataFile.updateStats("gold");
+
+	load("tools/Party.js");
+	load("tools/ToolsThread.js");
+
+	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
+	Config.init(true);
+	Pickit.init();
+	Attack.init();
+	Storage.Init();
+	Cubing.init();
+	Runewords.init();
+
+	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
+	Town.getCorpse();
+	Town.clearBelt();
+	Town.clearInventory();
+	Pickit.pickItems();
+
+	// Go
+	Loader.init();
+
+	if (Config.MinGameTime && getTickCount() - startTime < Config.MinGameTime * 1000 && Town.goToTown()) {
+		me.overhead("Stalling for " + Math.round(((startTime + (Config.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
+
+		while (getTickCount() - startTime < Config.MinGameTime * 1000) {
+			me.overhead("Stalling for " + Math.round(((startTime + (Config.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
+			delay(1000);
+		}
+	}
+
+	print("ÿc8Run duration ÿc2" + ((getTickCount() - startTime) / 1000));
+	delay(500);
+	
+	if (Config.LogExperience) {
+		D2Bot.printToConsole("Exp gained: " + (me.getStat(13) - DataFile.getStats().experience) + ";2");
+	}
+	
+	quit();
+}
