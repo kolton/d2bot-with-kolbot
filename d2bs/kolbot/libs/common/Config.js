@@ -42,6 +42,8 @@ var Config = {
 	MercChicken: 0,
 	HealHP: 0,
 	HealMP: 0,
+	TownHP: 0,
+	TownMP: 0,
 
 	// General
 	UseMerc: false,
@@ -69,9 +71,15 @@ var Config = {
 	Gamble: false,
 	GambleItems: [],
 	GambleGoldStart: 0,
-	GambleGoldEnd: 0,
+	GambleGoldStop: 0,
+	MiniShopBot: false,
 
 	LogExperience: false,
+
+	// DClone
+	WaitForSoJ: false,
+	StopOnDClone: false,
+	SoJWaitTime: 0,
 
 	// Attack specific
 	Dodge: false,
@@ -161,5 +169,14 @@ var Config = {
 	BaalHelper: {
 		KillNihlathak: false,
 		FastChaos: false
+	},
+	Corpsefire: {
+		ClearDen: false
+	},
+	Diablo: {
+		Entrance: false
+	},
+	DiabloHelper: {
+		Entrance: false
 	}
 };

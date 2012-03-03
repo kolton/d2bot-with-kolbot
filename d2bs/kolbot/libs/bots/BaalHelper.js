@@ -121,7 +121,7 @@ function BaalHelper() { // experi-mental
 		}
 	}
 
-	if (Config.BaalHelper.FaskChaos) {
+	if (Config.BaalHelper.FastChaos) {
 		include("bots/FastDiablo.js");
 
 		try {
@@ -145,7 +145,7 @@ function BaalHelper() { // experi-mental
 		delay(1000);
 	}
 
-	if (i === 60) {
+	if (i === 180) {
 		throw new Error("No portals to Throne");
 	}
 

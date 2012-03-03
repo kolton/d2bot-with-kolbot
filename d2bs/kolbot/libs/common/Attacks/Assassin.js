@@ -108,7 +108,7 @@ var ClassAttack = {
 			return this.whirlwind(unit, index);
 		}
 
-		if (!me.getState(121)) {
+		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
 				Attack.getIntoPosition(unit, this.skillRange[index], 0x4);
 			}

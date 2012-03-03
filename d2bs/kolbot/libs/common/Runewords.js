@@ -309,12 +309,12 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 				return false;
 			}
 
-			print("ÿc4Runewords: ÿc0Socketing " + items[0].name);
-			D2Bot.printToConsole("Socketing " + items[0].name);
-
 			for (i = 1; i < items.length; i += 1) {
 				this.socketItem(items[0], items[i]);
 			}
+
+			print("ÿc4Runewords: ÿc0Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc./, ""));
+			D2Bot.printToConsole("Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc./, "") + ";3");
 
 			if (NTIPCheckItem(items[0], this.pickitEntries)) {
 				Misc.logItem("Runeword kept", items[0]);
@@ -357,8 +357,8 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 					return false;
 				}
 
-				print("ÿc4Runewords: ÿc0Rerolling " + base.fname.split("\n").reverse().join(" ").replace(/ÿc./, ""));
-				D2Bot.printToConsole("Rerolling " + base.fname.split("\n").reverse().join(" ").replace(/ÿc./, ""));
+				print("ÿc4Runewords: ÿc0Rerolling runeword: " + base.fname.split("\n").reverse().join(" ").replace(/ÿc./, ""));
+				D2Bot.printToConsole("Rerolling runeword:" + base.fname.split("\n").reverse().join(" ").replace(/ÿc./, "") + ";3");
 				transmute();
 				delay(500);
 

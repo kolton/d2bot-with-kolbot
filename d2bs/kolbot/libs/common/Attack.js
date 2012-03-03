@@ -76,6 +76,16 @@ var Attack = {
 				}
 			}
 
+			if (Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100) || Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)) {
+				Town.goToTown();
+				Town.heal();
+				Town.buyPotions();
+				Town.reviveMerc();
+				me.cancel();
+				Town.move("portalspot");
+				Pather.usePortal(null, me.name);
+			}
+			
 			if (ClassAttack.doAttack(target) < 2) {
 				break;
 			}
@@ -172,6 +182,16 @@ var Attack = {
 					}
 				}
 
+				if (Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100) || Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)) {
+					Town.goToTown();
+					Town.heal();
+					Town.buyPotions();
+					Town.reviveMerc();
+					me.cancel();
+					Town.move("portalspot");
+					Pather.usePortal(null, me.name);
+				}
+
 				me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
 				result = ClassAttack.doAttack(target);
 
@@ -250,9 +270,9 @@ var Attack = {
 			sortfunc = this.sortMonsters;
 		}
 
-		monsterList.sort(sortfunc);
-
 		while (monsterList.length > 0) {
+			monsterList.sort(sortfunc);
+
 			target = copyUnit(monsterList[0]);
 
 			if (typeof target.x !== "undefined" && this.checkMonster(target)) {
@@ -270,7 +290,17 @@ var Attack = {
 						}
 					}
 				}
-
+				
+				if (Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100) || Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)) {
+					Town.goToTown();
+					Town.heal();
+					Town.buyPotions();
+					Town.reviveMerc();
+					me.cancel();
+					Town.move("portalspot");
+					Pather.usePortal(null, me.name);
+				}
+				
 				me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
 				result = ClassAttack.doAttack(target);
 
@@ -650,7 +680,7 @@ var Attack = {
 
 		for (n = 0; n < 4; n += 1) {
 			if (n > 0) {
-				distance = Math.round(distance / 2);
+				distance = Math.floor(distance / 2);
 			}
 
 			for (i = 0; i < angles.length; i += 1) {
@@ -672,7 +702,7 @@ var Attack = {
 			}
 
 MainLoop: for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]			
-				for (j = 0; j <= distance; j += 1) {
+				for (j = 1; j < distance; j += 1) {
 					cx = Math.round((Math.cos(coords[i][2] * Math.PI / 180)) * j + unit.x);
 					cy = Math.round((Math.sin(coords[i][2] * Math.PI / 180)) * j + unit.y);
 
@@ -692,8 +722,8 @@ MainLoop: for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i
 			}
 		}
 
-		//print("optimal position my ass");
 		CollMap.reset();
+		print("optimal pos qq. dist: " + getDistance(me, unit) + " red. dist: " + distance);
 
 		return false;
 	}

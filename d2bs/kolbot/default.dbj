@@ -23,9 +23,35 @@ function main() {
 		delay(100);
 	}
 
-	var i,
+	var i, sojPause,
+		sojCounter = 0,
 		startTime = getTickCount();
-	
+
+	function DCloneEvent(mode, param1, param2, name1, name2) {
+		switch (mode) {
+		case 17: // 0x11 - "%Param1 Stones of Jordan Sold to Merchants"
+			if (!Config.WaitForSoJ) {
+				break;
+			}
+
+			D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants;7");
+			sojPause = true;
+			sojCounter = 0;
+
+			break;
+		case 18: // 0x12 - "Diablo Walks the Earth"
+			if (!Config.StopOnDClone) {
+				break;
+			}
+
+			D2Bot.printToConsole("Diablo Walks the Earth;7");
+			removeEventListener("gameevent", DCloneEvent);
+			scriptBroadcast("dclone");
+
+			break;
+		}
+	}
+
 	if (Gambling.goldFinders.indexOf(me.profile) > -1) {
 		for (i = 0; i < Gambling.gambleGames.length; i += 1) {
 			if (me.gamename.match(Gambling.gambleGames[i])) {
@@ -44,8 +70,8 @@ function main() {
 	}
 
 	DataFile.updateStats("experience", me.getStat(13));
-	DataFile.updateStats("gold");
 
+	addEventListener("gameevent", DCloneEvent);
 	load("tools/Party.js");
 	load("tools/ToolsThread.js");
 
@@ -77,10 +103,24 @@ function main() {
 
 	print("ÿc8Run duration ÿc2" + ((getTickCount() - startTime) / 1000));
 	delay(500);
-	
+
 	if (Config.LogExperience) {
 		D2Bot.printToConsole("Exp gained: " + (me.getStat(13) - DataFile.getStats().experience) + ";2");
 	}
-	
+
+	if (sojPause) {
+		Town.goToTown();
+
+		me.maxgametime = 0;
+
+		while (sojCounter < Config.SoJWaitTime) {
+			me.overhead("Waiting for SoJ sales... " + (Config.SoJWaitTime - sojCounter));
+			delay(6e4);
+
+			sojCounter += 1;
+		}
+	}
+
+	DataFile.updateStats("gold");
 	quit();
 }

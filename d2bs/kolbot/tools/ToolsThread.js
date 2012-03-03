@@ -6,8 +6,10 @@ function main() {
 	include("OOG.js");
 	include("common/Config.js");
 	include("common/Cubing.js");
+	include("common/Pather.js");
 	include("common/Prototypes.js");
 	include("common/Runewords.js");
+	include("common/Town.js");
 	print("ÿc3Start ToolsThread script");
 	Config.init();
 
@@ -187,6 +189,22 @@ function main() {
 	}
 
 	addEventListener("gameevent", QuitWithLeader);
+	addEventListener("scriptmsg",
+		function (msg) {
+			switch (msg) {
+			case "dclone":
+				TogglePause();
+				Town.goToTown();
+				showConsole();
+				print("ÿc4Diablo Walks the Earth");
+
+				me.maxgametime = 0;
+
+				break;
+			}
+		}
+		);
+
 	addEventListener("keyup",
 		function (key) {
 			switch (key) {

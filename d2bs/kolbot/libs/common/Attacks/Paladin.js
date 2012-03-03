@@ -45,7 +45,7 @@ var ClassAttack = {
 		index = (unit.spectype & 0x7) ? 1 : 3;
 
 		if (Attack.getResist(unit, this.skillElement[index]) < 100) {
-			if (this.skillRange[index] < 4 && getDistance(me, unit) > 5 && !this.getHammerPosition(unit, true)) {
+			if (this.skillRange[index] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
 				return 1;
 			}
 
@@ -57,7 +57,7 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < 100) {
-			if (this.skillRange[5] < 4 && getDistance(me, unit) > 5 && !this.getHammerPosition(unit, true)) {
+			if (this.skillRange[5] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
 				return 1;
 			}
 
@@ -80,10 +80,26 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
+		var i;
+
 		if (Config.AttackSkill[index] === 112) {
 			if (!this.checkHammerPosition(unit)) {
 				this.getHammerPosition(unit);
 			}
+
+			if (Config.AttackSkill[index + 1] > -1) {
+				Skill.setSkill(Config.AttackSkill[index + 1], 0);
+			}
+
+			for (i = 0; i < 4; i += 1) {
+				Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+				
+				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5) {
+					return true;
+				}
+			}
+
+			return true;
 		} else if (Config.AttackSkill[index] === 101) {
 			Attack.getIntoPosition(unit, this.skillRange[index], 0x2004, true);
 		} else if (getDistance(me, unit) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
@@ -112,7 +128,7 @@ var ClassAttack = {
 		return false;
 	},
 
-	getHammerPosition: function (unit, checkOnly) {
+	getHammerPosition: function (unit) {
 		var i,
 			x = unit.x,
 			y = unit.y,
@@ -122,10 +138,10 @@ var ClassAttack = {
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (Attack.validSpot(positions[i][0], positions[i][1])) {
-				if (checkOnly) {
+				this.reposition(positions[i][0], positions[i][1]);
+
+				if (!checkCollision(me, unit, 0x1)) {
 					return true;
-				} else {
-					return this.reposition(positions[i][0], positions[i][1]);
 				}
 			}
 		}

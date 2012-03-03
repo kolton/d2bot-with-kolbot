@@ -14,7 +14,7 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
 				break;
 			case 126: // Bash
 			case 133: // Double Swing
@@ -23,7 +23,7 @@ var ClassAttack = {
 			case 147: // Frenzy
 			case 152: // Berserk
 			case 232: // Feral Rage
-				this.skillRange[i] = 3;
+				this.skillRange[i] = 2;
 				this.skillHand[i] = 2; // shift bypass
 				break;
 			case 130: // Howl

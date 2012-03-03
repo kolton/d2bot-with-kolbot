@@ -4,6 +4,10 @@ var Pather = {
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 
 	moveTo: function (x, y, retry, clearPath, pop) {
+		if (getDistance(me, x, y) < 2) {
+			return true;
+		}
+
 		if (arguments.length < 2) {
 			throw new Error("moveTo: Function must be called with at least 2 arguments.");
 		}
@@ -111,7 +115,7 @@ var Pather = {
 			}
 		}
 
-		return true;
+		return getDistance(me, x, y) < 4;
 	},
 
 	// TODO: Replace NT functions and constants
@@ -390,7 +394,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 1000) {
+			while (getTickCount() - tick < 3000) {
 				if ((targetArea === null && me.area !== preArea) || me.area === targetArea) {
 					delay(200);
 
@@ -457,7 +461,9 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 				}
 			}
 
-			Town.move("waypoint");
+			if (me.inTown) {
+				Town.move("waypoint");
+			}
 
 			if (getUIFlag(0x14) || !check) {
 				wp.interact(targetArea);
@@ -565,12 +571,16 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 
 		useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
 
-		if (getDistance(me, portal) > 3) {
-			this.moveToUnit(portal, 0, 0, false, useTK);
+		if (useTK) {
+			if (getDistance(me, portal) > 14) {
+				Attack.getIntoPosition(portal, 14, 0x4);
+			}
+		} else if (getDistance(me, portal) > 3) {
+			this.moveToUnit(portal);
 		}
 
 		for (i = 0; i < 5; i += 1) {
-			if (portal.mode !== 2 && !portal.getParent()) { // Arcane Sanctuary, maybe some other portals
+			/*if (portal.mode !== 2 && !portal.getParent()) { // Arcane Sanctuary, maybe some other portals
 				portal.interact();
 
 				tick = getTickCount();
@@ -586,7 +596,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 				}
 
 				continue;
-			}
+			}*/
 
 			if (useTK) {
 				Skill.cast(43, 0, portal);
@@ -606,7 +616,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 				delay(10);
 			}
 
-			this.moveTo(me.x + rand(-1, 1) * 3, me.y + rand(-1, 1) * 3); // In case of client/server desync
+			//this.moveTo(me.x + rand(-1, 1) * 3, me.y + rand(-1, 1) * 3); // In case of client/server desync
 		}
 
 		return false;

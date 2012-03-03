@@ -156,7 +156,7 @@ Unit.prototype.sell = function () {
 	var i, tick,
 		itemCount = me.itemcount;
 
-	for (i = 0; i < 3; i += 1) {
+	for (i = 0; i < 100; i += 1) {
 		this.shop(1);
 
 		tick = getTickCount();
@@ -183,7 +183,11 @@ Unit.prototype.toCursor = function () {
 	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
-		clickItem(0, this);
+		if (this.mode === 1) {
+			clickItem(0, this.bodylocation); // fix for equipped items (cubing viper staff fro example)
+		} else {
+			clickItem(0, this);
+		}
 
 		tick = getTickCount();
 

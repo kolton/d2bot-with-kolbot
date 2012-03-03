@@ -25,7 +25,7 @@ function Gamble() {
 
 		while (needGold) {
 			while (true) {
-				gold = getUnit(4, 523);
+				gold = getUnit(4, 523, 3);
 
 				if (!gold) {
 					break;

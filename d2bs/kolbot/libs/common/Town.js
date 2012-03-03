@@ -31,6 +31,7 @@ var Town = {
 		this.fillTome("tbk");
 		this.buyPotions();
 		this.identify();
+		this.shopItems();
 		this.repair();
 		this.buyKeys();
 		this.gamble();
@@ -41,7 +42,7 @@ var Town = {
 
 		while (getUIFlag(0x08) || getUIFlag(0x1A) || getUIFlag(0x19)) {
 			me.cancel();
-			delay(300)
+			delay(300);
 		}
 	},
 
@@ -60,7 +61,7 @@ var Town = {
 			npc = getUnit(1, this.tasks[me.act - 1][task]);
 		}
 
-		if (!npc || !getUIFlag(0x08) && !npc.openMenu()) {
+		if (!npc || (!getUIFlag(0x08) && !npc.openMenu())) {
 			return false;
 		}
 
@@ -209,11 +210,23 @@ var Town = {
 			return true;
 		}
 
-		var scroll,
+		var scroll, tome,
 			npc = this.initNPC("Shop");
 
 		if (!npc) {
 			return false;
+		}
+
+		if (!me.findItem("tbk", 0, 3)) {
+			tome = npc.getItem("tbk");
+
+			if (tome) {
+				try {
+					tome.buy();
+				} catch (e) {
+					print(e);
+				}
+			}
 		}
 
 		scroll = npc.getItem(code === "tbk" ? "tsc" : "isc");
@@ -262,7 +275,7 @@ var Town = {
 			this.fillTome("ibk");
 		}
 
-		while (list.length > 0) {
+MainLoop: while (list.length > 0) {
 			item = list.shift();
 
 			switch (Pickit.checkItem(item)) {
@@ -282,13 +295,21 @@ var Town = {
 					scroll = npc.getItem("isc");
 
 					if (scroll) {
+						if (!Storage.Inventory.CanFit(scroll)) {
+							try {
+								me.findItem("tbk", 0, 3).sell();
+							} catch (e) {
+								print(e);
+							}
+						}
+
 						scroll.buy();
 					}
 
 					scroll = me.findItem("isc", 0, 3);
 
 					if (!scroll) {
-						return false;
+						break MainLoop;
 					}
 
 					this.identifyItem(item, scroll);
@@ -309,6 +330,10 @@ var Town = {
 
 				break;
 			}
+		}
+
+		if (!me.findItem("tbk", 0, 3)) {
+			this.fillTome("tbk");
 		}
 
 		return true;
@@ -382,12 +407,50 @@ var Town = {
 		return false;
 	},
 
+	shopItems: function () {
+		if (!Config.MiniShopBot) {
+			return true;
+		}
+
+		var i, items,
+			npc = getInteractedNPC();
+
+		if (!npc) {
+			return false;
+		}
+
+		items = npc.getItems();
+
+		if (!items || !items.length) {
+			return false;
+		}
+
+		print("Scanning " + items.length + " items.");
+
+		for (i = 0; i < items.length; i += 1) {
+			if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Pickit.checkItem(items[i]) === 1) {
+				try {
+					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
+						Misc.logItem("Shopped", items[i]);
+						items[i].buy();
+					}
+				} catch (e) {
+					print(e);
+
+					continue;
+				}
+			}
+		}
+
+		return true;
+	},
+
 	gamble: function () {
 		if (!this.needGamble() || !Config.GambleItems.length) {
 			return true;
 		}
 
-		var i, tick, items, npc, newItem,
+		var i, items, npc, newItem,
 			list = [];
 
 		npc = this.initNPC("Gamble");
@@ -491,7 +554,7 @@ var Town = {
 			return false;
 		}
 
-		return true;		
+		return true;
 	},
 
 	needKeys: function () {
@@ -682,7 +745,7 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 		// me.getMerc() might return null if called right after taking a portal, that's why there's retry attempts
 		for (i = 0; i < 3; i += 1) {
 			merc = me.getMerc();
-			
+
 			if (merc && merc.mode !== 0 && merc.mode !== 12) {
 				return false;
 			}
@@ -742,8 +805,8 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 
 		if (stash) {
 			for (i = 0; i < 3; i += 1) {
-				Pather.moveToUnit(stash, 0, 0, false, useTK);
-				
+				//Pather.moveToUnit(stash, 0, 0, false, useTK);
+
 				if (useTK) {
 					Skill.cast(43, 0, stash);
 				} else {
@@ -1000,9 +1063,12 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 			return false;
 		}
 
-		if (!Pather.moveTo(townSpot[0], townSpot[1], 3, false, useTK)) {
-			print("Town.move: failed to move to " + spot); // debug
-			return false;
+		if (useTK) {
+			if (getDistance(me, townSpot[0], townSpot[1]) > 14) {
+				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 14, 0x4);
+			}
+		} else {
+			Pather.moveTo(townSpot[0], townSpot[1], 3);
 		}
 
 		return true;

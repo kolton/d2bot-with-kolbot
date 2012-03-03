@@ -257,7 +257,7 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 
 			for (i = 0; i < 4; i += 1) {
 				// TODO: Change variable
-				if (unit.code.indexOf(Config.BeltColumn[i]) > -1) {
+				if (typeof unit.code === "string" && unit.code.indexOf(Config.BeltColumn[i]) > -1) {
 					needPots += this.beltSize;
 				}
 			}

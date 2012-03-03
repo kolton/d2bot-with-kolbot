@@ -24,7 +24,8 @@ var waitInChatBeforeActionsMax	= 2000;		// max how long to wait before joining c
 var joinChannel = "";
 var games = [];
 var passwords = [];
-var joinDelay = 5500;
+var joinDelay = 1000;
+var friendListQuery = 10; // time in seconds between each "/f l" query. 0 = don't use "/f l"
 
 // DONT EDIT ANYTHING BELOW THIS
 
@@ -33,7 +34,6 @@ const D2BOT_JOIN = 1;
 const D2BOT_GAMEINFO = 2;
 const D2BOT_REQUESTGAME = 3; 
 
-var lastGameMade = getTickCount();
 var lastGameStatus = "ready";
 var nextGameMake = 0;
 var inGameAt = 0;
@@ -48,18 +48,16 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var stallFrequency = 0; //stall after how many games
-var stalldelay = 30; //minutes
 var gameCount = DataFile.getStats().runs + 1;
 var gamePass = "";
 var gameName = "";
 var oldGame = "";
-var gameFirstRun = true; 
 var gameStart;
 var isUp = "no"; 
-var channelTick = getTickCount();
+var channelTick = new Date().getTime();
 var _ingame = false; 
 var retry = 0;
+var fListTick = 0;
 
 function main() {
 	//addEventListener('copydata', RecieveCopyData);
@@ -83,7 +81,7 @@ function main() {
 					oldGame = me.gamename
 					lastGameStatus = "ingame";
 					_ingame = true;
-					gameStart = getTickCount();
+					gameStart = new Date().getTime();
 					me.maxgametime = gameMaxLength * 1000;
 					
 					DataFile.updateStats("runs", gameCount);
@@ -106,43 +104,12 @@ MainSwitch: switch (location) {
 		break;
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
-
-		if (joinChannel !== "") {
-			ControlAction.click(6,27,480,120,20);
-
-			break;
-		}
-
-		if (_ingame) {
-			print("updating runs"); 
-			D2Bot.updateRuns();
-
-			gameCount += 1;
-			lastGameStatus = "ready";
-			_ingame = false;
-		}
-
-		if (!ControlAction.click(6,533,469,120,20)) { // Create
-			break;
-		}
-
-		if (!locationTimeout(5000, location)) { // in case create button gets bugged
-			if (!ControlAction.click(6,652,469,120,20)) { // Join
-				break;
-			}
-
-			if (!ControlAction.click(6,533,469,120,20)) { // Create
-				break;
-			}
-		}
+		ControlAction.click(6,27,480,120,20);
 
 		break;
 	case 2: // Waiting In Line
 		D2Bot.updateStatus("Waiting...");
-
-		if (getTickCount()- lastGameMade > waitInLineTimeout) {
-			ControlAction.click(6,433,433,96,32);
-		}
+		locationTimeout(waitInLineTimeout, location);
 
 		break;
 	case 3: // Lobby Chat
@@ -158,13 +125,21 @@ MainSwitch: switch (location) {
 			retry = 0;
 		}
 
-		if (!chatActionsDone || getTickCount() - channelTick >= 120e3) {
+		if (!chatActionsDone || new Date().getTime() - channelTick >= 120e3) {
 			chatActionsDone = true;
-			channelTick = getTickCount();
+			channelTick = new Date().getTime();
 
-			delay(rand(waitInChatBeforeActionsMin, waitInChatBeforeActionsMax));
-			say("/j " + joinChannel);
-			delay(500);
+			if (joinChannel) {
+				delay(rand(waitInChatBeforeActionsMin, waitInChatBeforeActionsMax));
+				say("/j " + joinChannel);
+				delay(500);
+			}
+		}
+		
+		if (friendListQuery > 0 && new Date().getTime() - fListTick >= friendListQuery * 1000) {
+			say("/f l");
+
+			fListTick = new Date().getTime();
 		}
 
 		if (lastGameStatus === "pending") {
@@ -172,7 +147,7 @@ MainSwitch: switch (location) {
 
 			print("game joining failed " + retry);
 		}
-		
+
 		if (retry >= 3) {
 			print("reset game");
 
@@ -192,7 +167,7 @@ MainSwitch: switch (location) {
 		fullText = lines.join(" ").replace(/\s+/g, " ");
 
 MainLoop: for (n = 0; n < games.length; n += 1) {
-			regex = new RegExp("\\W*" + games[n] + "\\d*", "g");
+			regex = new RegExp("\\W*" + games[n].toLowerCase() + "\\d*", "gi");
 
 			gameName = fullText.match(regex);
 
@@ -213,13 +188,14 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
-		delay(500); 
 
 		if (gameName !== "") {
-			delay(joinDelay + 1);
+			if (joinDelay) {
+				delay(joinDelay);
+			}
+
 			joinGame(gameName, gamePass);
 
-			lastGameMade = getTickCount();
 			lastGameStatus = "pending";
 
 			locationTimeout(createGameTimeout, location);
@@ -231,7 +207,7 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 	case 7: // Channel List
 		break;
 	case 8: // Main Menu
-		D2Bot.updateStatus("Logging In")
+		D2Bot.updateStatus("Logging In");
 		
 		try {
 			login(me.profile);
@@ -241,7 +217,7 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 		
 		break;
 	case 9: // Login
-		D2Bot.updateStatus("Logging In")
+		D2Bot.updateStatus("Logging In");
 
 		try {
 			login(me.profile);
@@ -404,7 +380,6 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 
 		inGameAt = rand(gameDoesNotExistdelayMin, gameDoesNotExistdelayMax);
 
-		setNextGameMake();
 		delay(gameDoesNotExistTimeout ? gameDoesNotExistTimeout : 1);
 
 		break;
@@ -426,37 +401,19 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 	}
 }
 
-function setNextGameMake()
-{
-	lastGameMade = getTickCount();
-	nextGameMake = lastGameMade + createGameThreshold + rand(0-createGameThresholdRandom, createGameThresholdRandom) + inGameAt;
-	inGameAt = 0;
-	chatActionsDone = false;
-}
-
-function outputGameLength()
-{
-	if(inGameAt)
-	{
-		duration = getTickCount() - inGameAt;
-
-		inGameAt = (duration < gameMinLength ? gameMinLength - duration : 0);
-	}
-}
-
 function timeoutDelay(text, time) {
-	var endTime = getTickCount() + time;
+	var endTime = new Date().getTime() + time;
 	
-	while (getTickCount() < endTime) {
-		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+	while (new Date().getTime() < endTime) {
+		D2Bot.updateStatus(text + " (" + Math.floor((endTime - new Date().getTime()) / 1000) + "s)");
 		delay(500);
 	}
 }
 
 function locationTimeout(time, location) {
-	var endtime = getTickCount() + time;
+	var endtime = new Date().getTime() + time;
 
-	while (getLocation() === location && endtime > getTickCount()) {
+	while (getLocation() === location && endtime > new Date().getTime()) {
 		delay(500);
 	}
 

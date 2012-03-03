@@ -1,28 +1,46 @@
-// NOT YET WORKED ON
-
-var gameMaxLength				= 300;    	// seconds
+var gameMaxLength				= 900;    	// seconds
 var gameMinLength				= 50000;	// time in milliseconds, minimum game length, 180 seconds default (1 game/3 minutes)
 var unableToConnectRetry		= 5;		// time in minutes to retry connecting on connection fail (real value is +/- 1 min)
-var realmDownRetry				= 3;		// time in minutes to retry connecting on a realm down (default is 300 minutes)
+var realmDownRetry				= 10;		// time in minutes to retry connecting on a realm down (default is 300 minutes)
 var disconnectedRetry			= 5;		// time in minutes to retry on a disconnection (usually ip ban related)
-var cdkeyInUseRetry				= 2;		// time in minutes to retry on a cdkey in use error message (set to 0 to stop)
+var cdkeyInUseRetry				= 5;		// time in minutes to retry on a cdkey in use error message (set to 0 to stop)
 var connectingToBnetTimeout		= 20000;	// time in milliseconds to wait for a login to time out and click cancel and retry
 var characterScreenTimeout		= 10000;	// time in milliseconds to wait for character screen to appear
 var pleaseWaitTimeout			= 10000;	// time in milliseconds to wait for a please wait popup
 var createGameThreshold			= 5000;		// time in milliseconds to wait between making games
-var createGameThresholdRandom	= 3000;		// time in milliseconds to randomly add +/- to the game create time
+var createGameThresholdRandom	= 0;		// time in milliseconds to randomly add +/- to the game create time
 var createGameTimeout			= 5000;		// time in milliseconds to register a failed to create game
 var waitInLineTimeout			= 60000;	// time in milliseconds to wait in lines for a create game (60 second default)
 var clickdelay					= 500;		// wait X milliseconds before next action after a click event
 var textdelay					= 500;		// wait X milliseconds before next action after inserting text into a textbox
-var clickdelayRandom			= 0;		// random amount of time to add to a click
-var textdelayRandom				= 0;		// random amount of time to add to a text set
+var clickdelayRandom			= 500;		// random amount of time to add to a click
+var textdelayRandom				= 500;		// random amount of time to add to a text set
 var gameDoesNotExistdelayMin	= 60000;	// how long to wait when a Game Does Not Exist occurs - minimum - default 10 minutes
 var gameDoesNotExistdelayMax	= 60000;	// how long to wait when a Game Does Not Exist occurs - maximum - default 15 minutes
 var gameDoesNotExistTimeout		= 30000;	// how long to wait for the dialog to disappear (default 30 seconds, don't change this)
-var waitInChatBeforeActionsMin	= 1000;		// min how long to wait before joining channel
+var waitInChatBeforeActionsMin	= 2000;		// min how long to wait before joining channel
 var waitInChatBeforeActionsMax	= 3000;		// max how long to wait before joining channel
-var leader = "Barb"; // name of profile of who you want to follow 
+
+var joinChannel = "";
+var firstJoinMsg = "";
+
+var switchKeys = false;
+
+/* Join game settings
+	Format: "leader's profile": ["leecher 1 profile", "leecher 2 profile", ...]
+	If you want everyone to join the same leader, use "leader's profile": ["all"]
+	NOTE: Use PROFILE names (profile matches window title), NOT character/account names
+	leader:leecher groups need to be divided by a comma
+	example: 
+		var joinSettings = { 
+			"lead1": ["follow1", "follow2"], 
+			"lead2": ["follow3", "follow4"] 
+		};
+*/
+
+var joinSettings = {
+	"leader1": ["leecher1"]
+};
 
 // DONT EDIT ANYTHING BELOW THIS
 
@@ -31,25 +49,24 @@ const D2BOT_JOIN = 1;
 const D2BOT_GAMEINFO = 2;
 const D2BOT_REQUESTGAME = 3; 
 
-var lastGameMade = getTickCount();
+var leader = "";
 var lastGameStatus = "ready";
-var nextGameMake = 0;
-var inGameAt = 0;
 var chatActionsDone = false;
-var lastGameFailed = false;
 var ConnectFail = false;
 
-var stallFrequency = 0; //stall after how many games
-var stalldelay = 30; //minutes
-var currCount = 0;
-var gameCount = currCount ? (parseInt(currCount.substring(currCount.indexOf("/") + 1), 10) + 1) : 1;
-var gamePass = "";
-var gameName = "";
-var nextGame = "";
-var gameFirstRun = true;
-var gameStart;
-var isUp = "no";
-var _ingame = false;
+include("json2.js");
+include("OOG.js");
+
+if (!FileTools.exists("data/" + me.profile + ".json")) {
+	DataFile.create();
+}
+
+var i, j, ingame, gameStart,
+	stallFrequency = 0, //stall after how many games
+	stalldelay = 30, //minutes
+	gameCount = DataFile.getStats().runs + 1,
+	gamePass = "", gameName = "", nextGame = "",
+	isUp = "no";
 
 function main() {
 	addEventListener('copydata', RecieveCopyData); 
@@ -58,7 +75,7 @@ function main() {
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
-				if (!_ingame) {		
+				if (!ingame) {		
 					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
 						print("leaving game"); 
 						quit();
@@ -68,66 +85,19 @@ function main() {
 					D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
-					_ingame = true;
-					gameStart = getTickCount();
+					ingame = true;
+					gameStart = new Date().getTime();
 					me.maxgametime = gameMaxLength * 1000;
+
+					DataFile.updateStats("runs", gameCount);
 				}
 			}
 
 			delay(1000);
 		}
 
-		if (_ingame) {
-			for (var i = 0; i < 10; i += 1) {
-				delay(1000);
-				
-				if (getLocation() === 1 || getLocation() === 9) {
-					break;
-				}
-			}
-		}
-
 		locationAction(getLocation());
 		delay(1000);
-	}
-}
-
-var ControlAction = {
-	click: function () {
-		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
-
-		if (!control) {
-			return false;
-		}
-
-		delay(clickdelay);
-		control.click(arguments[5], arguments[6]);
-
-		return true;
-	},
-	setText: function () {
-		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
-
-		if (!control) {
-			return false;
-		}
-
-		delay(textdelay);
-		control.setText(arguments[5]);
-		
-		return true;
-	},
-	getText: function () {
-		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
-
-		if (!control) {
-			return false;
-		}
-
-		return control.getText();
-	},
-	clickRealm: function () {
-		return this.click(4, 257, 500, 292, 160, 403, 350 + arguments[0] * 25);
 	}
 }
 
@@ -138,13 +108,19 @@ MainSwitch: switch (location) {
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
 
-		if (_ingame) {
+		if (joinChannel !== "") {
+			ControlAction.click(6,27,480,120,20);
+
+			break;
+		}
+
+		if (ingame) {
 			print("updating runs");
 			D2Bot.updateRuns();
 
-			lastGameStatus = "ready";
 			gameCount += 1;
-			_ingame = false;
+			lastGameStatus = "ready";
+			ingame = false;
 		}
 
 		if (!ControlAction.click(6,652,469,120,20)) { // Join
@@ -164,46 +140,101 @@ MainSwitch: switch (location) {
 		break;
 	case 2: // Waiting In Line
 		D2Bot.updateStatus("Waiting...");
-
-		if (getTickCount()- lastGameMade > waitInLineTimeout) {
-			ControlAction.click(6,433,433,96,32);
-		}
+		locationTimeout(waitInLineTimeout, location);
 
 		break;
 	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby Chat"); 
 
+		if (ingame) {
+			print("updating runs");
+			D2Bot.updateRuns();
+
+			gameCount += 1;
+			lastGameStatus = "ready";
+			ingame = false;
+		}
+
 		if (!chatActionsDone) {
 			chatActionsDone = true;
 			delay(rand(waitInChatBeforeActionsMin, waitInChatBeforeActionsMax));
 		}
+		
+		if (!chatActionsDone) {
+			chatActionsDone = true;
 
-		ControlAction.click(6,533,469,120,20);
+			delay(rand(waitInChatBeforeActionsMin + 1, waitInChatBeforeActionsMax + 1));
+			say("/j " + joinChannel);
+			delay(500);
+
+			if (firstJoinMsg !== "") {
+				say(firstJoinMsg);
+				delay(500);
+			}
+		}
+
+		if (!ControlAction.click(6,652,469,120,20)) { // Join
+			break;
+		}
+
+		if (!locationTimeout(5000, location)) { // in case join button gets bugged
+			if (!ControlAction.click(6,533,469,120,20)) { // Create
+				break;
+			}
+
+			if (!ControlAction.click(6,652,469,120,20)) { // Join
+				break;
+			}
+		}
+
 		break;
 	case 4: // Create Game
 		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
-		D2Bot.requestGame(leader); 
-		delay(500); 
 
-		if (nextGame !== "" && (nextGame != gameName || lastGameStatus === "pending")) {
+		if (!leader) {
+JoinLoop: for (i in joinSettings) {
+				if (typeof i === "string") {
+					for (j = 0; j < joinSettings[i].length; j += 1) {
+						if (joinSettings[i][j] === me.profile || joinSettings[i][j] === "all") {
+							leader = i;
+
+							break JoinLoop;
+						}
+					}
+				}
+			}
+		}
+
+		if (!leader) {
+			break;
+		}
+
+		for (i = 0; i < 5; i += 1) {
+			D2Bot.requestGame(leader);
+
+			if (nextGame !== "") {
+				break;
+			}
+
+			delay(100);
+		}
+
+		if (nextGame !== "" && (nextGame !== gameName || lastGameStatus === "pending")) {
 			ControlAction.setText(1,606,148,155,20, gamePass);
-			delay (100);
 			ControlAction.setText(1,432,148,155,20, nextGame);
-			delay (100);
 
-			if (isUp != "yes") { 
+			if (isUp !== "yes") { 
 				break;
 			}
 
 			print("joining game " + nextGame)
 			ControlAction.click(6,594,433,172,32);
 
-			lastGameMade = getTickCount();
 			gameName = nextGame; 
 			lastGameStatus = "pending";
-			
+
 			locationTimeout(createGameTimeout, location);
 		}
 
@@ -213,23 +244,14 @@ MainSwitch: switch (location) {
 	case 7: // Channel List
 		break;
 	case 8: // Main Menu
-		D2Bot.updateStatus("Logging In")
-		
-		try {
-			login(me.profile);
-		} catch (e) {
-
-		}
-		
-		break;
-
 	case 9: // Login
-		D2Bot.updateStatus("Logging In")
+	case 18: // D2 Splash
+		D2Bot.updateStatus("Logging In");
 		
 		try {
 			login(me.profile);
 		} catch (e) {
-
+			print(e);
 		}
 		
 		break;
@@ -237,7 +259,7 @@ MainSwitch: switch (location) {
 		var i, 
 			string = "",
 			text = ControlAction.getText(4, 199, 377, 402, 140);
-		
+
 		if (text) {
 			for (i = 0; i < text.length; i += 1) {
 				string += text[i];
@@ -259,7 +281,13 @@ MainSwitch: switch (location) {
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey");
-				D2Bot.restart(true);
+
+				if (switchKeys) {
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
 				break;
 			case getLocaleString(5347):
 				D2Bot.updateStatus("Disconnected");
@@ -278,7 +306,7 @@ MainSwitch: switch (location) {
 		while (true) {
 			delay(1000);
 		}
-		
+
 		break;
 	case 11: // Unable To Connect
 		D2Bot.updateStatus("Unable To Connect");
@@ -312,9 +340,13 @@ MainSwitch: switch (location) {
 			break;
 		}
 
-		timeoutDelay("Realm Down", realmDownRetry * 60 * 1000);
-		D2Bot.printToConsole("Realm Down - Changing CD-Key");
-		D2Bot.restart(true);
+		timeoutDelay("Realm Down", realmDownRetry * 6e4);
+
+		if (switchKeys) {
+			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+			D2Bot.restart(true);
+		}
+
 		break;
 	case 14: // Character Select - Disconnected
 		D2Bot.updateStatus("Disconnected");
@@ -330,19 +362,19 @@ MainSwitch: switch (location) {
 
 		break;
 	case 17: // Lobby - Lost Connection - just click okay, since we're toast anyway
+		delay(1000);
 		ControlAction.click(6,351,337,96,32);
-		break;
-	case 18: // D2 Splash		
-		try {
-			login(me.profile);
-		} catch (e) {
-
-		}
-		
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
-		D2Bot.restart(true);
+
+		if (switchKeys) {
+			D2Bot.restart(true);
+		} else {
+			timeoutDelay("CD-Key in use", cdkeyInUseRetry * 6e4);
+			ControlAction.click(6,335,450,128,35);
+		}
+
 		break;
 	case 20: // Single Player - Select Difficulty
 		break;
@@ -353,8 +385,13 @@ MainSwitch: switch (location) {
 
 		break;
 	case 22: // Login - Invalid Cdkey (classic or xpac)
-		D2Bot.printToConsole("Invalid Cdkey");
-		D2Bot.restart(true);
+		if (switchKeys) {
+			D2Bot.printToConsole("Invalid CD-Key");
+			D2Bot.restart(true);
+		} else {
+			timeoutDelay("Invalid CD-Key", cdkeyInUseRetry * 6e4);
+		}
+		
 		break;
 	case 23: // Character Select - Connecting
 		if (!locationTimeout(characterScreenTimeout, location)) {
@@ -377,10 +414,8 @@ MainSwitch: switch (location) {
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.printToConsole("Game doesn't exist");
 
-		inGameAt = rand(gameDoesNotExistdelayMin, gameDoesNotExistdelayMax);
 		lastGameStatus = "ready";
 
-		setNextGameMake();
 		delay(gameDoesNotExistTimeout);
 		break;
 	case 38: // Game is full
@@ -402,50 +437,30 @@ MainSwitch: switch (location) {
 	}
 }
 
-function setNextGameMake()
-{
-	lastGameMade = getTickCount();
-	nextGameMake = lastGameMade + createGameThreshold + rand(0-createGameThresholdRandom, createGameThresholdRandom) + inGameAt;
-	inGameAt = 0;
-	chatActionsDone = false;
-}
-
-function outputGameLength()
-{
-	if(inGameAt)
-	{
-		duration = getTickCount() - inGameAt;
-
-		inGameAt = (duration < gameMinLength ? gameMinLength - duration : 0);
-	}
-}
-
 function timeoutDelay(text, time) {
-	var endTime = getTickCount() + time;
+	var endTime = new Date().getTime() + time;
 	
-	while (getTickCount() < endTime) {
-		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+	while (new Date().getTime() < endTime) {
+		D2Bot.updateStatus(text + " (" + Math.floor((endTime - new Date().getTime()) / 1000) + "s)");
 		delay(500);
 	}
 }
 
 function locationTimeout(time, location) {
-	var endtime = getTickCount() + time;
+	var endtime = new Date().getTime() + time;
 
-	while (getLocation() === location && endtime > getTickCount()) {
+	while (getLocation() === location && endtime > new Date().getTime()) {
 		delay(500);
 	}
 
 	return (getLocation() !== location);
 }
 
-function getRandomString(_length)
-{
+function getRandomString(length) {
 	var _retString = "";
 	var _charSet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-	while(_length--)
-	{
+	while (length--) {
 		_retString += _charSet.charAt(rand(0, _charSet.length-1));
 		delay(1);
 	}
@@ -453,40 +468,7 @@ function getRandomString(_length)
 	return _retString;
 }
 
-var D2Bot = {
-	printToConsole: function(msg) {
-		D2BotSendMessage(null, "D2Bot #", 0, "printToConsole;"+msg);
-	},
-	printToItemLog: function(msg) {
-		D2BotSendMessage(null, "D2Bot #", 0, "printToItemLog;"+msg);
-	},
-	updateStatus: function(msg) {
-		D2BotSendMessage(null, "D2Bot #", 0, "updateStatus;"+msg);
-	},
-	updateRuns: function() {
-		D2BotSendMessage(null, "D2Bot #", 0, "updateRuns");
-	},
-	updateChickens: function() {
-		D2BotSendMessage(null, "D2Bot #", 0, "updateChickens");
-	},
-	requestGameInfo: function() {
-		D2BotSendMessage(null, "D2Bot #", 0, "requestGameInfo");
-	},	
-	restart: function(reset) {
-		D2BotSendMessage(null, "D2Bot #", 0, "restartProfile;"+reset);
-	},	
-	CDKeyInUse: function() {
-		D2BotSendMessage(null, "D2Bot #", 0, "CDKeyInUse");
-	},
-	joinMe: function(window) {
-		D2BotSendMessage(null, window, D2BOT_JOIN, gameName + gameCount+"/"+gamePass+"/"+isUp);
-	},
-	requestGame: function(who) {
-		D2BotSendMessage(null, who, D2BOT_REQUESTGAME, me.profile);
-	}	
-};
-
-function RecieveCopyData(msgID, msg){
+function RecieveCopyData(msgID, msg) {
 	switch(msgID) {
 	case D2BOT_GAMEINFO:
 		print("Recieved Game Info"); 
@@ -499,8 +481,4 @@ function RecieveCopyData(msgID, msg){
 		D2Bot.joinMe(msg); 
 		break;
 	}
-}
-
-function D2BotSendMessage(winclass, hwnd, msgID, msg){
-	sendCopyData(winclass, hwnd, msgID,msg);
 }

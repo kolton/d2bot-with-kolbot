@@ -8,8 +8,6 @@ function Test() {
 			test();
 		}
 	}
-
-	print(Gambling.checkGamblers());
 	
 	addEventListener("keydown", KeyDown);
 	
@@ -19,7 +17,7 @@ function Test() {
 }
 
 function test() {
-	Gambling.dropGold();
+	Town.doChores();
 }
 
 /*function test() {

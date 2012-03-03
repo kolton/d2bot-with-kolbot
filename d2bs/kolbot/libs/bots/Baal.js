@@ -176,6 +176,10 @@ MainLoop: while (true) {
 		delay(500);
 	}
 
+	if (Config.PublicMode) {
+		say("Baal");
+	}
+
 	delay(1000);
 
 	portal = getUnit(2, 563);

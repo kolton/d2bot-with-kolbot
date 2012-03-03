@@ -18,21 +18,21 @@ function AutoBaal() {
 			var i;
 
 			if (nick === leader) { // filter leader messages
-				for (i = 0; i < hotMsg.length; i = i + 1) { // loop through all predefined messages to find a match
+				for (i = 0; i < hotMsg.length; i += 1) { // loop through all predefined messages to find a match
 					if (msg.toLowerCase().indexOf(hotMsg[i].toLowerCase()) > -1) { // leader says a hot tp message
 						hotCheck = true; // safe to enter baal chamber
 						break;
 					}
 				}
 
-				for (i = 0; i < safeMsg.length; i = i + 1) { // loop through all predefined messages to find a match
+				for (i = 0; i < safeMsg.length; i += 1) { // loop through all predefined messages to find a match
 					if (msg.toLowerCase().indexOf(safeMsg[i].toLowerCase()) > -1) { // leader says a safe tp message
 						throneCheck = true; // safe to enter throne
 						break;
 					}
 				}
 
-				for (i = 0; i < baalMsg.length; i = i + 1) { // loop through all predefined messages to find a match
+				for (i = 0; i < baalMsg.length; i += 1) { // loop through all predefined messages to find a match
 					if (msg.toLowerCase().indexOf(baalMsg[i].toLowerCase()) > -1) { // leader says a baal message
 						baalCheck = true; // safe to enter baal chamber
 						break;

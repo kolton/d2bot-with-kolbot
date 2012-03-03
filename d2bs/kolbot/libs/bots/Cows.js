@@ -63,7 +63,7 @@ function Cows() {
 		Precast.doPrecast(true);
 		Pather.moveToPreset(me.area, 1, 737, 8, 8);
 
-		for (i = 0; i < 3; i += 1) {
+		for (i = 0; i < 6; i += 1) {
 			portal = Pather.getPortal(38);
 
 			if (portal) {

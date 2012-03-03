@@ -1,7 +1,9 @@
 var Skill = {
 	cast: function (skillId, hand, x, y) {
-		var timed = [59, 64];
-		
+		if (me.inTown && !this.townSkill(skillId)) {
+			return false;
+		}
+
 		if (!me.getSkill(skillId, 1)) {
 			return false;
 		}
@@ -68,7 +70,7 @@ MainLoop: for (n = 0; n < 3; n += 1) {
 			delay(10);
 		}
 
-		if (timed.indexOf(skillId) > -1) {
+		if (this.isTimed(skillId)) { // account for lag, state 121 doesn't kick in immediately
 			for (i = 0; i < 10; i += 1) {
 				if (me.getState(121)) {
 					break;
@@ -100,6 +102,14 @@ MainLoop: for (n = 0; n < 3; n += 1) {
 		}
 
 		return false;
+	},
+
+	isTimed: function (skillId) {
+		return [15, 25, 27, 51, 56, 62, 59, 64, 121, 225, 229, 234, 244, 249, 250, 223, 228, 247, 275, 277, 268, 279].indexOf(skillId) > -1;
+	},
+	
+	townSkill: function (skillId) {
+		return [32, 40, 43, 50, 52, 58, 60, 68, 75, 85, 94, 117, 221, 222, 226, 227, 235, 236, 237, 246, 247, 258, 267, 268, 277, 278, 279].indexOf(skillId) > -1;
 	}
 };
 

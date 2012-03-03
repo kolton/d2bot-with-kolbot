@@ -1,4 +1,4 @@
-function Diablo() {
+function DiabloHelper() {
 	// sort functions
 	this.entranceSort = function (a, b) {
 		return getDistance(a.x, a.y, 7790, 5544) - getDistance(b.x, b.y, 7790, 5544);
@@ -22,68 +22,25 @@ function Diablo() {
 
 		return 2;
 	};
-	
+
 	this.initLayout = function () {
 		this.vizLayout = this.getLayout(396, 5275);
 		this.seisLayout = this.getLayout(394, 7773);
 		this.infLayout = this.getLayout(392, 7893);
-	}
-	
-	this.openSeal = function (classid) {
-		var i, seal, warn;
-		
-		switch (classid) {
-		case 396:
-		case 394:
-		case 392:
-			warn = true;
-			break;
-		default:
-			warn = false;
-			break;
-		}
-
-		for (i = 0; i < 5; i += 1) {
-			Pather.moveToPreset(me.area, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
-
-			seal = getUnit(2, classid);
-
-			if (!seal) {
-				return false;
-			}
-
-			if (seal.mode) { // for pubbies
-				if (warn) {
-					say("Leave the seals alone you soggy cunt!");
-				}
-
-				return true;
-			}
-
-			warn = false;
-
-			seal.interact();
-			delay(classid === 394 ? 1000 : 500);
-
-			if (!seal.mode) {
-				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
-					Pather.moveTo(seal.x + 15, seal.y);
-				} else {
-					Pather.moveTo(seal.x - 5, seal.y - 5);
-				}
-
-				delay(500);
-			} else {
-				return true;
-			}
-		}
-
-		return false;
 	};
-	
+
 	this.getBoss = function (name) {
-		var i, boss,
+		var i, boss, glow;
+
+		while (true) {
 			glow = getUnit(2, 131);
+
+			if (glow) {
+				break;
+			}
+
+			delay(500);
+		}
 
 		for (i = 0; i < name === "infector of souls" ? 20 : 8; i += 1) {
 			boss = getUnit(1, name);
@@ -100,11 +57,6 @@ function Diablo() {
 
 	this.vizierSeal = function () {
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.starSort);
-
-		if (!this.openSeal(395) || !this.openSeal(396)) {
-			throw new Error("Failed to open Vizier seals.");
-		}
-
 		this.vizLayout === 1 ? Pather.moveTo(7691, 5292) : Pather.moveTo(7695, 5316);
 
 		if (!this.getBoss("grand vizier of chaos")) {
@@ -116,12 +68,7 @@ function Diablo() {
 
 	this.seisSeal = function () {
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.starSort);
-
-		if (!this.openSeal(394)) {
-			throw new Error("Failed to open de Seis seal.");
-		}
-
-		this.seisLayout === 1 ? Pather.moveTo(7771, 5196) : Pather.moveTo(7798, 5186);
+		this.seisLayout === 1 ? Pather.moveTo(7790, 5200) : Pather.moveTo(7798, 5186);
 
 		if (!this.getBoss("lord de seis")) {
 			throw new Error("Failed to kill de Seis");
@@ -132,10 +79,7 @@ function Diablo() {
 
 	this.infectorSeal = function () {
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
-
-		if (!this.openSeal(393) || !this.openSeal(392)) {
-			throw new Error("Failed to open Infector seals.");
-		}
+		this.infLayout === 1 ? Pather.moveTo(7908, 5269) : Pather.moveTo(7932, 5305);
 
 		if (!this.getBoss("infector of souls")) {
 			throw new Error("Failed to kill Infector");
@@ -151,6 +95,16 @@ function Diablo() {
 		while (getTickCount() - tick < 17500) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
+				case 1: // Sorceress
+					if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+						if (me.getState(121)) {
+							delay(500);
+						} else {
+							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+						}
+					}
+
+					break;
 				case 3: // Paladin
 					Skill.setSkill(Config.AttackSkill[2]);
 					Skill.cast(Config.AttackSkill[1], 1);
@@ -188,33 +142,41 @@ function Diablo() {
 	this.starToInfA = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5295, 7919, 5290];
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
 
+	var i;
+	
 	// start
 	Town.doChores();
 	Pather.useWaypoint(107);
 	Precast.doPrecast(true);
+	Pather.useWaypoint(103);
+	Town.move("portalspot");
 
-	if (!Pather.moveTo(7790, 5544)) {
-		throw new Error("Failed to go move to Chaos Sanctuary");
+	for (i = 0; i < 120; i += 1) {
+		if (Pather.usePortal(108, null)) {
+			break;
+		}
+
+		delay(1000);
+	}
+
+	if (i === 120) {
+		throw new Error("No portals to Chaos");
 	}
 
 	this.initLayout();
 
-	if (Config.Diablo.Entrance) {
+	if (Config.DiabloHelper.Entrance) {
 		Attack.clear(35, 0, false, this.entranceSort);
 		Pather.moveTo(7790, 5544);
-		Pather.makePortal();
-		say("entrance tp up");
 		Precast.doPrecast(true);
 		this.followPath(this.entranceToStar, this.entranceSort);
 	} else {
 		Pather.moveTo(7774, 5305);
-		Attack.clear(30, 0, false, this.starSort);
+		Attack.clear(35, 0, false, this.starSort);
 	}
 
 	Pather.moveTo(7774, 5305);
-	Pather.makePortal();
-	say("star tp up");
-	Attack.clear(30, 0, false, this.starSort);
+	Attack.clear(35, 0, false, this.starSort);
 	this.vizierSeal();
 	this.seisSeal();
 	Precast.doPrecast(true);

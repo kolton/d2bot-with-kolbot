@@ -52,10 +52,6 @@ var Precast = new function () {
 	};
 
 	this.doPrecast = function (force) {
-		if (me.inTown) {
-			return;
-		}
-
 		if (!me.getState(51) || force) {
 			this.precastCTA(force);
 		}

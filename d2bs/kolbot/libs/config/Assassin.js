@@ -19,12 +19,16 @@ function LoadConfig() {
 	// Boss/area scripts
 
 	// *** act 1 ***
+	Scripts.Corpsefire = false;
+		Config.Corpsefire.ClearDen = false;
 	Scripts.Mausoleum = false;
 		Config.Mausoleum.KillBloodRaven = true;
 	Scripts.Rakanishu = false;
 		Config.Rakanishu.KillGriswold = true;
 	Scripts.Pit = false;
 		Config.Pit.ClearPit1 = true;
+	Scripts.Treehead = false;
+	Scripts.Smith = false;
 	Scripts.BoneAsh = false;
 	Scripts.Countess = false;
 		Config.Countess.KillGhosts = false;
@@ -32,6 +36,7 @@ function LoadConfig() {
 	Scripts.Cows = false;
 
 	// *** act 2 ***
+	Scripts.Radament = false;
 	Scripts.AncientTunnels = false;
 	Scripts.Duriel = false;
 
@@ -44,9 +49,13 @@ function LoadConfig() {
 
 	// *** act 4 ***
 	Scripts.Izual = false;
+	Scripts.Hephasto = false;
 	Scripts.Vizier = false; // Intended for classic sorc, kills Vizier only.
 	Scripts.FastDiablo = false;
 	Scripts.Diablo = false;
+		Config.Diablo.Entrance = true;
+	Scripts.DiabloHelper = false;
+		Config.DiabloHelper.Entrance = true;
 
 	// *** act 5 ***
 	Scripts.Pindleskin = false;
@@ -55,6 +64,8 @@ function LoadConfig() {
 		Config.Eldritch.OpenChest = true;
 		Config.Eldritch.KillShenk = true;
 		Config.Eldritch.KillDacFarren = true;
+	Scripts.Eyeback = false;
+	Scripts.ThreshSocket = false;
 	Scripts.Abaddon = false;
 	Scripts.Frozenstein = false;
 		Config.Frozenstein.ClearFrozenRiver = true;
@@ -92,6 +103,8 @@ function LoadConfig() {
 	Config.LifeChicken = 30; // Exit game if life is less or equal to designated percent.
 	Config.ManaChicken = 0; // Exit game if mana is less or equal to designated percent.
 	Config.MercChicken = 0; // Exit game if merc's life is less or equal to designated percent.
+	Config.TownHP = 0; // Go to town if life is under designated percent.
+	Config.TownMP = 0; // Go to town if mana is under designated percent.
 
 	/* Inventory lock configuration. !!!READ CAREFULLY!!!
 	 * 0 = item is locked and won't be moved. If item occupies more than one slot, ALL of those slots must be set to 0 to lock it in place.
@@ -129,7 +142,7 @@ function LoadConfig() {
 	Config.PickRange = 40; // Pick radius
 
 	// Gambling config
-	Config.Gamble = true;
+	Config.Gamble = false;
 	Config.GambleGoldStart = 1000000;
 	Config.GambleGoldStop = 500000;
 	
@@ -167,6 +180,29 @@ function LoadConfig() {
 	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
 	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them
 	 */
+	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
+
+	Config.Runewords.push([Runeword.Insight, 255]); // Thresher
+	Config.Runewords.push([Runeword.Insight, 256]); // Cryptic Axe
+
+	Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
+
+	Config.Runewords.push([Runeword.Spirit, 447]); // Monarch
+	Config.Runewords.push([Runeword.Spirit, 498]); // Sacred Targe
+
+	Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
+
+	// General config
+	Config.PublicMode = false; // Controls party invite/accept and town portals for other players.
+	Config.QuitList = []; // List of players to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
+	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
+	Config.OpenChests = false; // Open chests. Controls key buying.
+	Config.MiniShopBot = true; // Scan items in NPC shops.
+	
+	/* Runeword config. All recipes will be available in Templates/Cubing.txt
+	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
+	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them
+	 */
 	Config.MakeRunewords = true; // Set to true to enable runeword making/rerolling
 
 	Config.Runewords.push([Runeword.Insight, 255]); // Thresher
@@ -184,6 +220,7 @@ function LoadConfig() {
 	Config.QuitList = []; // List of players to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
 	Config.OpenChests = false; // Open chests. Controls key buying.
+	Config.MiniShopBot = true; // Scan items in NPC shops.
 
 	/* Attack config
 	 * To disable an attack, set it to -1
