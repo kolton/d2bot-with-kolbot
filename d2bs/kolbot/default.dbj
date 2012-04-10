@@ -30,7 +30,7 @@ function main() {
 	function DCloneEvent(mode, param1, param2, name1, name2) {
 		switch (mode) {
 		case 17: // 0x11 - "%Param1 Stones of Jordan Sold to Merchants"
-			if (!Config.WaitForSoJ) {
+			if (!Config.SoJWaitTime) {
 				break;
 			}
 

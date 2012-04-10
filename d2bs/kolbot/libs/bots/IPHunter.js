@@ -14,7 +14,7 @@ function IPHunter() {
 		}
 	}
 
-	delay(Config.IPHunter.GameLength * 1e3);
+	delay(Config.IPHunter.GameLength * 60e3);
 
 	return true;
 }

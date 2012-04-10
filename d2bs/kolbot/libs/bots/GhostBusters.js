@@ -17,7 +17,7 @@ function GhostBusters() {
 		} while (room.getNext());
 
 		while (rooms.length > 0) {
-			rooms.sort(Attack.sortRooms);
+			rooms.sort(Sort.points);
 			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 15, 2);

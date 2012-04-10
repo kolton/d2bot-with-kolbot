@@ -338,7 +338,6 @@ MainSwitch: switch (location) {
 			break;
 		}
 
-		AntiRD();
 		timeoutDelay("Realm Down", realmDownRetry * 6e4);
 
 		if (switchKeys) {
@@ -432,6 +431,11 @@ MainSwitch: switch (location) {
 		delay(500);
 		ControlAction.click(6,652,469,120,20);
 		break;
+	case 42: // Empty character screen
+		delay(1000);
+		ControlAction.click(6,33,572,128,35);
+
+		break;
 	default:
 		if (location !== undefined) {
 			D2Bot.printToConsole("Unhandled location " + location);
@@ -487,20 +491,4 @@ function RecieveCopyData(msgID, msg){
 			D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp); 
 			break;
 	}
-}
-
-function AntiRD() {
-	D2Bot.printToConsole("Anti RD");
-	delay(1000);
-	ControlAction.clickRealm(2); // asia
-	ControlAction.click(6,264,366,272,35);
-	
-	try {
-		login(me.profile);
-	} catch (e) {
-	
-	}
-	
-	delay(1000);
-	ControlAction.click(6,33,572,128,35);
 }

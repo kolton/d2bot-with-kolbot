@@ -421,6 +421,11 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 		ControlAction.click(6,433,433,96,32);
 
 		break;
+	case 42: // Empty character screen
+		delay(1000);
+		ControlAction.click(6,33,572,128,35);
+
+		break;
 	default:
 		if (location !== undefined) {
 			D2Bot.printToConsole("Unhandled location " + location);

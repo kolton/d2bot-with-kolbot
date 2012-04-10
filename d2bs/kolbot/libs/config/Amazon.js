@@ -19,6 +19,7 @@ function LoadConfig() {
 	// Battle orders script
 	Scripts.BattleOrders = false;
 		Config.BattleOrders.Mode = 0; // 0 = give BO, 1 = get BO
+		Config.BattleOrders.Wait = false; // Idle until the player that received BO leaves.
 
 	// Boss/area scripts
 
@@ -107,7 +108,7 @@ function LoadConfig() {
 		Config.Enchant.GameLength = 20; // in minutes
 	Scripts.IPHunter = false;
 		Config.IPHunter.IPList = []; // list of IPs to look for. example: [165, 201, 64]
-		GameLength = 3; // number of minutes to stay in game if ip wasn't found
+		Config.IPHunter.GameLength = 3; // number of minutes to stay in game if ip wasn't found
 
 
 	// Town settings
@@ -177,7 +178,7 @@ function LoadConfig() {
 	Config.GambleItems.push(418); // Circlet
 	Config.GambleItems.push(419); // Coronet
 	
-	// Cubing config. All recipes will be available in Templates/Cubing.txt
+	// Cubing config. All recipes are available in Templates/Cubing.txt
 	Config.Cubing = false; // Set to true to enable cubing.
 
 	// All ingredients will be auto-picked, for classids check libs/NTItemAlias.dbl
@@ -201,7 +202,7 @@ function LoadConfig() {
 	Config.Recipes.push([Recipe.Socket.Armor, 442]); // Socket Sacred Armor
 	Config.Recipes.push([Recipe.Socket.Armor, 443]); // Socket Archon Plate
 
-	/* Runeword config. All recipes will be available in Templates/Cubing.txt
+	/* Runeword config. All recipes are available in Templates/Runewords.txt
 	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
 	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them
 	 */
@@ -223,12 +224,27 @@ function LoadConfig() {
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
 	Config.OpenChests = false; // Open chests. Controls key buying.
 	Config.MiniShopBot = true; // Scan items in NPC shops.
+	Config.TownCheck = false; // Go to town if out of potions
+
+	// DClone config
+	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth
+	Config.SoJWaitTime = 5; // Time in minutes to wait for another SoJ sale before leaving game.
+
+	// Monster skip config
+	// Skip immune monsters. Possible options: "fire", "cold", "lightning", "poison", "physical", "magic".
+	// You can combine multiple resists with "and", for example - "fire and cold", "physical and cold and poison"
+	Config.SkipImmune = [];
+	// Skip enchanted monsters. Possible options: "extra strong", "extra fast", "cursed", "magic resistant", "fire enchanted", "lightning enchanted", "cold enchanted", "mana burn", "teleportation", "spectral hit", "stone skin", "multiple shots".
+	// You can combine multiple enchantments with "and", for example - "cursed and extra fast", "mana burn and extra strong and lightning enchanted"
+	Config.SkipEnchant = [];
+	// Skip monsters with auras. Possible options: "fanaticism", "might", "holy fire", "blessed aim", "conviction", "holy freeze", "holy shock"
+	Config.SkipAura = [];
 
 	/* Attack config
 	 * To disable an attack, set it to -1
 	 * Skills MUST be POSITIVE numbers. For reference see http://pastebin.com/baShRwWM
 	 */
-	Config.AttackSkill[0] = -1; // Preattack skill. Not implemented yet.
+	Config.AttackSkill[0] = -1; // Preattack skill.
 	Config.AttackSkill[1] = -1; // Primary skill to bosses.
 	Config.AttackSkill[2] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[1] is untimed skill.
 	Config.AttackSkill[3] = -1; // Primary skill to others.
@@ -237,7 +253,7 @@ function LoadConfig() {
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
 
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
-	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum).
+	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
 
 	// Class specific config
 	Config.SummonValkyrie = true; // Summon Valkyrie

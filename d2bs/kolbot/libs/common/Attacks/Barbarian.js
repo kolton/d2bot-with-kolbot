@@ -46,12 +46,28 @@ var ClassAttack = {
 		}
 	},
 
-	doAttack: function (unit) {
+	doAttack: function (unit, preattack) {
+		if (Town.needMerc()) {
+			Town.visitTown();
+		}
+
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+			}
+
+			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
+				return 2;
+			}
+
+			return 3;
+		}
+
 		var index;
 
-		index = (unit.spectype & 0x7) ? 1 : 3;
+		index = (unit.spectype & 0x7) ? 1 : 2;
 
-		if (Attack.getResist(unit, this.skillElement[index]) < 100) {
+		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (Config.Werewolf && !me.getState(139)) {
 				Misc.shapeShift(0);
 			}
@@ -63,15 +79,14 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < 100) {
-			if (!this.doCast(unit, 5)) {
+		if (Config.AttackSkill[3] > -1 && Attack.checkResist(unit, this.skillElement[3])) {
+			if (!this.doCast(unit, 3)) {
 				return 2;
 			}
 
 			return 3;
 		}
 
-		print(unit.name + " immune to attacks.");
 		return 1;
 	},
 
@@ -85,16 +100,14 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
-		var i;
-
 		if (Config.AttackSkill[index] === 151) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
 				Attack.getIntoPosition(unit, this.skillRange[index], 0x1);
 			}
 
 			if (!this.whirlwind(unit, index)) {
-				if (Config.AttackSkill[6] > 0) {
-					index = 6;
+				if (Config.AttackSkill[4] > 0) {
+					index = 4;
 				} else {
 					return false;
 				}
@@ -105,7 +118,7 @@ var ClassAttack = {
 
 		if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
 			// walk short distances instead of tele for melee attacks
-			Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
+			Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)));
 		}
 
 		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
@@ -122,7 +135,8 @@ var ClassAttack = {
 
 		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
 
-MainLoop: for (i = 0; i < angles.length; i += 1) { // get a better spot
+MainLoop:
+		for (i = 0; i < angles.length; i += 1) { // get a better spot
 			for (j = 0; j < 5; j += 1) {
 				coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * j + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * j + unit.y)];
 
@@ -132,7 +146,7 @@ MainLoop: for (i = 0; i < angles.length; i += 1) { // get a better spot
 			}
 
 			if (getDistance(me, coords[0], coords[1]) >= 3) {
-				//me.runwalk = 0;
+				me.runwalk = me.gametype; // just a short way of doing it. classic = 0 where it's better to walk-ww than run-ww
 
 				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 			}
@@ -168,7 +182,8 @@ MainLoop: for (i = 0; i < angles.length; i += 1) { // get a better spot
 		orgX = me.x;
 		orgY = me.y;
 
-MainLoop: for (i = 0; i < 3; i += 1) {
+MainLoop:
+		for (i = 0; i < 3; i += 1) {
 			corpse = getUnit(1, -1, 12);
 
 			if (corpse) {
@@ -203,7 +218,8 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 
 				Precast.weaponSwitch(Config.FindItemSwitch);
 
-	CorpseLoop: for (j = 0; j < 3; j += 1) {
+CorpseLoop:
+				for (j = 0; j < 3; j += 1) {
 					Skill.cast(142, 0, corpse);
 
 					tick = getTickCount();
@@ -239,13 +255,13 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 		}
 
 		if (getDistance(me, unit) <= 25 &&
-			!unit.getState(1) && // freeze
-			!unit.getState(96) && // revive
-			!unit.getState(99) && // redeemed
-			!unit.getState(104) && // nodraw
-			!unit.getState(107) && // shatter
-			!unit.getState(118) // noselect
-			) {
+				!unit.getState(1) && // freeze
+				!unit.getState(96) && // revive
+				!unit.getState(99) && // redeemed
+				!unit.getState(104) && // nodraw
+				!unit.getState(107) && // shatter
+				!unit.getState(118) // noselect
+				) {
 			return true;
 		}
 

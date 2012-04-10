@@ -1,5 +1,5 @@
 function main() {
-	var i, mercHP, LifeMax, ManaMax, ironGolem,
+	var i, mercHP, ironGolem,
 		quitFlag = false,
 		timerLastDrink = [];
 
@@ -22,7 +22,7 @@ function main() {
 	me.chickenmp = -1;
 
 	// General functions
-	function GetPotion(pottype) {
+	this.getPotion = function (pottype) {
 		var i, length,
 			items = me.getItems();
 
@@ -42,9 +42,9 @@ function main() {
 		}
 
 		return false;
-	}
+	};
 
-	function TogglePause() {
+	this.togglePause = function () {
 		var script = getScript("default.dbj");
 
 		if (script) {
@@ -56,16 +56,16 @@ function main() {
 				script.resume();
 			}
 		}
-	}
+	};
 
-	function DrinkPotion(type) {
+	this.drinkPotion = function (type) {
 		var pottype, potion,
 			tNow = getTickCount();
 
 		switch (type) {
 		case 0:
 		case 1:
-			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 1000) || me.getState(type === 0 ? 100 : 106)) {
+			if ((timerLastDrink[type] && (tNow - timerLastDrink[type] < 1000)) || me.getState(type === 0 ? 100 : 106)) {
 				return false;
 			}
 
@@ -102,7 +102,7 @@ function main() {
 			break;
 		}
 
-		potion = GetPotion(pottype);
+		potion = this.getPotion(pottype);
 
 		if (potion) {
 			if (me.mode === 0 || me.mode === 17) {
@@ -121,9 +121,9 @@ function main() {
 		}
 
 		return false;
-	}
-	
-	function GetNearestMonster() {
+	};
+
+	this.getNearestMonster = function () {
 		var gid, distance,
 			monster = getUnit(1),
 			range = 30;
@@ -148,9 +148,9 @@ function main() {
 		}
 
 		return ".";
-	}
-	
-	function GetIronGolem() {
+	};
+
+	this.getIronGolem = function () {
 		var golem = getUnit(1, "iron golem");
 
 		if (!golem) {
@@ -164,21 +164,20 @@ function main() {
 		} while (golem.getNext());
 
 		return false;
-	}
+	};
 
 	// Event functions
-	function RevealArea(area) {
-		var room = getRoom(area),
-			roomsRevealed = [];
+	this.revealArea = function (area) {
+		var room = getRoom(area);
 
 		do {
 			if (room instanceof Room && room.area === area) {
 				room.reveal(true);
 			}
 		} while (room.getNext());
-	}
+	};
 
-	function QuitWithLeader(mode, param1, param2, name1, name2) {
+	this.quitWithLeader = function (mode, param1, param2, name1, name2) {
 		if (mode === 0 || mode === 1 || mode === 3) {
 			print(name1 + (mode === 0 ? " timed out" : " left"));
 
@@ -186,14 +185,14 @@ function main() {
 				quitFlag = true;
 			}
 		}
-	}
+	};
 
-	addEventListener("gameevent", QuitWithLeader);
+	addEventListener("gameevent", this.quitWithLeader);
 	addEventListener("scriptmsg",
 		function (msg) {
 			switch (msg) {
 			case "dclone":
-				TogglePause();
+				this.togglePause();
 				Town.goToTown();
 				showConsole();
 				print("ÿc4Diablo Walks the Earth");
@@ -209,11 +208,13 @@ function main() {
 		function (key) {
 			switch (key) {
 			case 19: // Pause/Break key
-				TogglePause();
+				this.togglePause();
+
 				break;
 			case 123: // F12 key
 				me.overhead("Revealing " + getArea().name);
-				RevealArea(me.area);
+				this.revealArea(me.area);
+
 				break;
 			}
 		}
@@ -225,69 +226,73 @@ function main() {
 
 			continue;
 		}
-		
-		if (Config.UseHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseHP / 100)) {
-			DrinkPotion(0);
-		}
 
-		if (Config.UseRejuvHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseRejuvHP / 100)) {
-			DrinkPotion(2);
-		}
-
-		if (Config.LifeChicken > 0 && !me.inTown && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
-			D2Bot.updateChickens();
-			D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + GetNearestMonster() + ";1");
-
-			me.chickenhp = me.hpmax; // Just to trigger the core chicken
-
-			break;
-		}
-
-		if (Config.UseMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseMP / 100)) {
-			DrinkPotion(1);
-		}
-
-		if (Config.UseRejuvMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseRejuvMP / 100)) {
-			DrinkPotion(2);
-		}
-
-		if (Config.ManaChicken > 0 && !me.inTown && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
-			D2Bot.updateChickens();
-			D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";1");
-
-			me.chickenmp = me.mpmax; // Just to trigger the core chicken
-
-			break;
-		}
-
-		if (me.classid === 2) {
-			if (!ironGolem || !copyUnit(ironGolem)) {
-				ironGolem = GetIronGolem();
+		if (!me.inTown) {
+			if (Config.UseHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseHP / 100)) {
+				this.drinkPotion(0);
 			}
 
-			if (ironGolem && ironGolem.hp <= ironGolem.hpmax * 0.25) {
-				D2Bot.updateChickens();
-				D2Bot.printToConsole("Irom Golem Chicken in " + getArea().name + ";1");
+			if (Config.UseRejuvHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseRejuvHP / 100)) {
+				this.drinkPotion(2);
+			}
 
-				quit();
+			if (Config.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
+				D2Bot.updateChickens();
+				D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + this.getNearestMonster() + ";1");
+
+				me.chickenhp = me.hpmax; // Just to trigger the core chicken
 
 				break;
 			}
-		}
 
-		if (Config.UseMerc && !me.inTown) {
-			mercHP = getMercHP();
+			if (Config.UseMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseMP / 100)) {
+				this.drinkPotion(1);
+			}
 
-			if (mercHP > 0) {
-				if (mercHP < Config.MercChicken) {
-					quit();
-					break;
+			if (Config.UseRejuvMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseRejuvMP / 100)) {
+				this.drinkPotion(2);
+			}
+
+			if (Config.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
+				D2Bot.updateChickens();
+				D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";1");
+
+				me.chickenmp = me.mpmax; // Just to trigger the core chicken
+
+				break;
+			}
+
+			if (Config.IronGolemChicken > 0 && me.classid === 2) {
+				if (!ironGolem || !copyUnit(ironGolem).x) {
+					ironGolem = this.getIronGolem();
 				}
 
-				if (mercHP < Config.UseMercRejuv) {
-					DrinkPotion(4);
-				} else if (mercHP < Config.UseMercHP) {
-					DrinkPotion(3);
+				if (ironGolem) {
+					if (ironGolem.hp <= Math.floor(128 * Config.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
+						D2Bot.updateChickens();
+						D2Bot.printToConsole("Irom Golem Chicken in " + getArea().name + ";1");
+						quit();
+
+						break;
+					}
+				}
+			}
+
+			if (Config.UseMerc) {
+				mercHP = getMercHP();
+
+				if (mercHP > 0) {
+					if (mercHP < Config.MercChicken) {
+						quit();
+
+						break;
+					}
+
+					if (mercHP < Config.UseMercRejuv) {
+						this.drinkPotion(4);
+					} else if (mercHP < Config.UseMercHP) {
+						this.drinkPotion(3);
+					}
 				}
 			}
 		}

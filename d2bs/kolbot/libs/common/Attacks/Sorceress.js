@@ -46,16 +46,27 @@ var ClassAttack = {
 		}
 	},
 
-	doAttack: function (unit) {
-		// TODO: preattack, infinity calc
+	doAttack: function (unit, preattack) {
 		if (Town.needMerc()) {
 			Town.visitTown();
+		}
+
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+			}
+
+			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
+				return 2;
+			}
+
+			return 3;
 		}
 
 		var index, staticRange, timedIndex, untimedIndex;
 
 		// Static
-		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.getResist(unit, "lightning") < 100 && Config.StaticList.indexOf(unit.name) > -1) {
+		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.checkResist(unit, "lightning") && Config.StaticList.indexOf(unit.name) > -1) {
 			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 
 			if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
@@ -72,22 +83,22 @@ var ClassAttack = {
 		index = (unit.spectype & 0x7) ? 1 : 3;
 
 		// Get timed skill
-		if (Attack.getResist(unit, this.skillElement[index]) < 100 && ([56, 59].indexOf(Config.AttackSkill[index]) === -1 || Attack.validSpot(unit.x, unit.y))) { // added a check for blizz/meteor because they can't be cast on invalid spot
+		if (Attack.checkResist(unit, this.skillElement[index]) && ([56, 59].indexOf(Config.AttackSkill[index]) === -1 || Attack.validSpot(unit.x, unit.y))) { // added a check for blizz/meteor because they can't be cast on invalid spot
 			timedIndex = index;
-		} else if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < 100 && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedIndex = 5;
 		}
 
 		// Get untimed skill
-		if (Config.AttackSkill[index + 1] > -1 && Attack.getResist(unit, this.skillElement[index + 1]) < 100 && (Config.AttackSkill[index + 1] !== 42 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
+		if (Config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, this.skillElement[index + 1]) && (Config.AttackSkill[index + 1] !== 42 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
 			untimedIndex = index + 1;
-		} else if (Config.AttackSkill[6] > -1 && Attack.getResist(unit, this.skillElement[6]) < 100 && (Config.AttackSkill[6] !== 42 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
+		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, this.skillElement[6]) && (Config.AttackSkill[6] !== 42 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
 			untimedIndex = 6;
 		}
 
 		if (!timedIndex && !untimedIndex) {
 			// Check if we can merc stomp the boss
-			if (Config.TeleStomp && index === 1 && !!me.getMerc() && Attack.getResist(unit, "physical") < 100) {
+			if (Config.TeleStomp && index === 1 && !!me.getMerc() && Attack.checkResist(unit, "physical")) {
 				if (getDistance(me, unit) > 5) {
 					Pather.moveToUnit(unit);
 				}
@@ -96,7 +107,6 @@ var ClassAttack = {
 				timedIndex = 1;
 				untimedIndex = Config.AttackSkill[2] > -1 ? 2 : false;
 			} else {
-				print(unit.name + " immune to all attacks.");
 				return 1;
 			}
 		}

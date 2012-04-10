@@ -32,14 +32,27 @@ var ClassAttack = {
 	},
 
 	doAttack: function (unit) {
-		// TODO: preattack, merc stomp, better resist check
+		if (Town.needMerc()) {
+			Town.visitTown();
+		}
 
-		var index,
-			resist = 117;
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+			}
+
+			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
+				return 2;
+			}
+
+			return 3;
+		}
+
+		var index;
 
 		index = (unit.spectype & 0x7) ? 1 : 3;
 
-		if (Attack.getResist(unit, this.skillElement[index]) < resist) {
+		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (!this.doCast(unit, index)) {
 				return 2;
 			}
@@ -47,7 +60,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < resist) {
+		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
 			if (!this.doCast(unit, 5)) {
 				return 2;
 			}
@@ -55,7 +68,6 @@ var ClassAttack = {
 			return 3;
 		}
 
-		print(unit.name + " immune to attacks.");
 		return 1;
 	},
 
@@ -72,7 +84,8 @@ var ClassAttack = {
 
 		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[index], 0x4);
+				// walk short distances instead of tele for melee attacks
+				Attack.getIntoPosition(unit, this.skillRange[index], 0x4, this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
 			}
 
 			return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
@@ -80,7 +93,8 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[index + 1] > -1) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index + 1] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4);
+				// walk short distances instead of tele for melee attacks
+				Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4, this.skillRange[index + 1] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
 			}
 
 			return Skill.cast(Config.AttackSkill[index + 1], this.skillHand[index + 1], unit);

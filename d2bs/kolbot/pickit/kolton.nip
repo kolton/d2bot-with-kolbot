@@ -1,5 +1,4 @@
 //Pickit by Kolton
-//crafted items will come later as a separate section
 
 //--------rings----------
 
@@ -799,9 +798,4 @@
 //[name] == crystalsword && [quality] <= superior && [flag] == ethereal # [sockets] == 4
 //[name] == balancedknife && [quality] == magic # [warcriesskilltab] == 3
 [name] == vambraces && [quality] == unique # [itemmagicbonus] > 0
-
-// Tr0uble@jsp
-([name] == gnarledstaff || [name] == battlestaff || [name] == gothicstaff || [name] == cedarstaff || [name] == shillelagh || [name] == elderstaff) && [quality] <= superior # ([sockets] == 0 || [sockets] == 4) && ([skillcoldmastery] > 0 && ([skillblizzard] > 0 && [skillglacialspike] > 0 || [skillfrozenorb] > 0 && [skillenchant]+[skillthunderstorm] > 0) || [skillicebolt] > 0 && [skilliceblast] > 0 && [skillwarmth] > 0)
-([name] == warstaff || [name] == runestaff || [name] == archonstaff) && [quality] <= superior # [sockets] == 4 && ([skillcoldmastery] > 0 && ([skillblizzard] > 0 && [skillglacialspike] > 0 || [skillfrozenorb] > 0 && [skillenchant]+[skillthunderstorm] > 0) || [skillicebolt] > 0 && [skilliceblast] > 0 && [skillwarmth] > 0)
-
 //([name] == crystalsword || [name] == flail || [name] == waraxe || [name] == militarypick) && [quality] <= superior # [sockets] == 5 # [maxquantity] == 1

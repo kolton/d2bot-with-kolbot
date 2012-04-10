@@ -37,14 +37,28 @@ var ClassAttack = {
 		}
 	},
 
-	doAttack: function (unit) {
-		// TODO: preattack, un-ntbot
+	doAttack: function (unit, preattack) {
+		if (Town.needMerc()) {
+			Town.visitTown();
+		}
+
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+			}
+
+			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
+				return 2;
+			}
+
+			return 3;
+		}
 
 		var index;
 
 		index = (unit.spectype & 0x7) ? 1 : 3;
 
-		if (Attack.getResist(unit, this.skillElement[index]) < 100) {
+		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (this.skillRange[index] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
 				return 1;
 			}
@@ -56,7 +70,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < 100) {
+		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
 			if (this.skillRange[5] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
 				return 1;
 			}
@@ -103,7 +117,8 @@ var ClassAttack = {
 		} else if (Config.AttackSkill[index] === 101) {
 			Attack.getIntoPosition(unit, this.skillRange[index], 0x2004, true);
 		} else if (getDistance(me, unit) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-			Attack.getIntoPosition(unit, this.skillRange[index], 0x4);
+			// walk short distances instead of tele for melee attacks
+			Attack.getIntoPosition(unit, this.skillRange[index], 0x4, this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
 		}
 
 		if (Config.AttackSkill[index + 1] > -1) {

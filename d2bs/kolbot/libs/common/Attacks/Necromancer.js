@@ -81,10 +81,21 @@ var ClassAttack = {
 		}
 	},
 
-	doAttack: function (unit) {
-		// TODO: preattack, merc stomp
+	doAttack: function (unit, preattack) {
 		if (Town.needMerc()) {
 			Town.visitTown();
+		}
+
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+			}
+
+			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
+				return 2;
+			}
+
+			return 3;
 		}
 
 		var index;
@@ -115,7 +126,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Attack.getResist(unit, this.skillElement[index]) < 100) {
+		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (!this.doCast(unit, index)) {
 				return 2;
 			}
@@ -129,7 +140,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < 100) {
+		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
 			if (!this.doCast(unit, 5)) {
 				return 2;
 			}
@@ -143,7 +154,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Attack.getResist(unit, "physical") < 100 && me.getMerc()) {
+		if (Attack.checkResist(unit, "physical") && me.getMerc()) {
 			if (Config.TeleStomp && getDistance(me, unit) > 3) {
 				Pather.moveToUnit(unit);
 			}

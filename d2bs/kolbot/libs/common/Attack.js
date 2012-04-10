@@ -2,9 +2,8 @@ var Attack = {
 	classes: ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 	infinity: false,
 
+	// Initialize attacks
 	init: function () {
-		var i, merc, items;
-
 		include("common/CollMap.js");
 
 		if (include("common/Attacks/" + this.classes[me.classid] + ".js")) {
@@ -17,36 +16,64 @@ var Attack = {
 		}
 
 		if (me.gametype === 1) {
-			for (i = 0; !merc && i < 3; i += 1) {
-				merc = me.getMerc();
+			this.checkInfinity();
+		}
+	},
 
-				delay(50);
-			}
+	// Check if player or his merc are using Infinity, and adjust resistance checks based on that
+	checkInfinity: function () {
+		var i, merc, items;
 
-			if (merc) {
-				items = merc.getItems();
+		for (i = 0; !merc && i < 3; i += 1) {
+			merc = me.getMerc();
 
-				if (items) {
-					for (i = 0; i < items.length; i += 1) {
-						if (items[i].getPrefix(20566)) {
-							print("Infinity detected");
+			delay(50);
+		}
 
-							this.infinity = true;
+		// Check merc infinity
 
-							break;
-						}
+		if (merc) {
+			items = merc.getItems();
+
+			if (items) {
+				for (i = 0; i < items.length; i += 1) {
+					if (items[i].getPrefix(20566)) {
+						print("Infinity detected");
+
+						this.infinity = true;
+
+						return true;
 					}
 				}
 			}
 		}
+
+		// Check player infinity
+
+		items = me.findItems(-1, 1);
+
+		if (items) {
+			for (i = 0; i < items.length; i += 1) {
+				if (items[i].getPrefix(20566)) {
+					print("Infinity detected");
+
+					this.infinity = true;
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	},
 
+	// Kill a monster based on its classId
 	kill: function (classId) {
 		if (Config.AttackSkill[1] < 0) {
 			return false;
 		}
 
-		var i, monList, target, 
+		var i, monList, target,
 			attackCount = 0;
 
 		for (i = 0; i < 3; i += 1) {
@@ -76,17 +103,9 @@ var Attack = {
 				}
 			}
 
-			if (Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100) || Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)) {
-				Town.goToTown();
-				Town.heal();
-				Town.buyPotions();
-				Town.reviveMerc();
-				me.cancel();
-				Town.move("portalspot");
-				Pather.usePortal(null, me.name);
-			}
-			
-			if (ClassAttack.doAttack(target) < 2) {
+			Misc.townCheck(true);
+
+			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
 				break;
 			}
 
@@ -100,6 +119,7 @@ var Attack = {
 		return (target.mode === 0 || target.mode === 12);
 	},
 
+	// Clear monsters in a section based on range and spectype or clear monsters around a boss monster
 	clear: function (range, spectype, bossId, sortfunc, pickit) { // probably going to change to passing an object
 		switch (arguments.length) {
 		case 0:
@@ -152,7 +172,7 @@ var Attack = {
 		monsterList = [];
 		dodgeList = [];
 		target = getUnit(1);
-		
+
 		if (target) {
 			do {
 				if (this.checkMonster(target)) {
@@ -160,7 +180,7 @@ var Attack = {
 				}
 			} while (target.getNext());
 		}
-		
+
 		while (monsterList.length > 0) {
 			monsterList.sort(sortfunc);
 
@@ -182,18 +202,10 @@ var Attack = {
 					}
 				}
 
-				if (Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100) || Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)) {
-					Town.goToTown();
-					Town.heal();
-					Town.buyPotions();
-					Town.reviveMerc();
-					me.cancel();
-					Town.move("portalspot");
-					Pather.usePortal(null, me.name);
-				}
-
+				Misc.townCheck(true);
 				me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
-				result = ClassAttack.doAttack(target);
+
+				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				switch (result) {
 				case 1:
@@ -241,6 +253,7 @@ var Attack = {
 		return true;
 	},
 
+	// Filter monsters based on classId, spectype and range
 	getMob: function (classid, spectype, range) {
 		var monsterList = [],
 			monster = getUnit(1, classid);
@@ -260,7 +273,8 @@ var Attack = {
 		return monsterList;
 	},
 
-	clearList: function (list, sortfunc) { // clear an already formed array of monstas
+	// Clear an already formed array of monstas
+	clearList: function (list, sortfunc) {
 		var i, target, result, dodgeList,
 			gidAttack = [],
 			attackCount = 0,
@@ -290,19 +304,11 @@ var Attack = {
 						}
 					}
 				}
-				
-				if (Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100) || Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)) {
-					Town.goToTown();
-					Town.heal();
-					Town.buyPotions();
-					Town.reviveMerc();
-					me.cancel();
-					Town.move("portalspot");
-					Pather.usePortal(null, me.name);
-				}
-				
+
+				Misc.townCheck(true);
 				me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
-				result = ClassAttack.doAttack(target);
+
+				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				switch (result) {
 				case 1:
@@ -350,6 +356,7 @@ var Attack = {
 		return true;
 	},
 
+	// Draw lines around a room on minimap
 	markRoom: function (room, color) {
 		new Line(room.x * 5, room.y * 5, room.x * 5, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5, room.x * 5 + room.xsize, room.y * 5, color, true);
@@ -357,6 +364,7 @@ var Attack = {
 		new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
 	},
 
+	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
 		var room, result, rooms;
 
@@ -377,7 +385,7 @@ var Attack = {
 		} while (room.getNext());
 
 		while (rooms.length > 0) {
-			rooms.sort(this.sortRooms);
+			rooms.sort(Sort.points);
 			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 15, 2);
@@ -399,10 +407,7 @@ var Attack = {
 		return true;
 	},
 
-	sortRooms: function (roomA, roomB) {
-		return getDistance(me, roomA[0], roomA[1]) - getDistance(me, roomB[0], roomB[1]);
-	},
-
+	// Sort monsters based on distance, spectype and classId (summoners are attacked first)
 	sortMonsters: function (unitA, unitB) {
 		var ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
 
@@ -418,7 +423,7 @@ var Attack = {
 			if (unitA.spectype & 0x5) {
 				return -1;
 			}
-			
+
 			if (unitB.spectype & 0x5) {
 				return 1;
 			}
@@ -431,6 +436,7 @@ var Attack = {
 		return 1;
 	},
 
+	// Check if a set of coords is valid/accessable
 	validSpot: function (x, y) {
 		var result;
 
@@ -452,6 +458,7 @@ var Attack = {
 		return true;
 	},
 
+	// Open chests when clearing
 	openChests: function (range) {
 		var i, unit,
 			ids = ["chest", "weaponrack", "armorstand"];
@@ -469,6 +476,7 @@ var Attack = {
 		}
 	},
 
+	// Make a list of monsters that will be monitored for dodging
 	buildDodgeList: function () {
 		var monster = getUnit(1),
 			list = [];
@@ -484,6 +492,7 @@ var Attack = {
 		return list;
 	},
 
+	// Move away from a nearby monster into a more safe position
 	dodge: function (unit, distance, list) {
 		var i, j, coordx, coordy, count,
 			maxcount = 99,
@@ -507,7 +516,7 @@ var Attack = {
 			return true;
 		}
 
-		coords.sort(this.sortRooms);
+		coords.sort(Sort.points);
 
 		for (i = 0; i < coords.length; i += 1) {
 			count = 0;
@@ -540,6 +549,7 @@ var Attack = {
 		return true;
 	},
 
+	// Check if a monster is attackable
 	checkMonster: function (unit) {
 		if (!unit) {
 			return false;
@@ -596,9 +606,152 @@ var Attack = {
 			break;
 		}
 
+		var i, j, rval,
+			tempArray = [];
+
+EnchantLoop: // Skip enchanted monsters
+		for (i = 0; i < Config.SkipEnchant.length; i += 1) {
+			tempArray = Config.SkipEnchant[i].toLowerCase().split(" and ");
+
+			for (j = 0; j < tempArray.length; j += 1) {
+				switch (tempArray[j]) {
+				case "extra strong":
+					tempArray[j] = 5;
+
+					break;
+				case "extra fast":
+					tempArray[j] = 6;
+
+					break;
+				case "cursed":
+					tempArray[j] = 7;
+
+					break;
+				case "magic resistant":
+					tempArray[j] = 8;
+
+					break;
+				case "fire enchanted":
+					tempArray[j] = 9;
+
+					break;
+				case "lightning enchanted":
+					tempArray[j] = 17;
+
+					break;
+				case "cold enchanted":
+					tempArray[j] = 18;
+
+					break;
+				case "mana burn":
+					tempArray[j] = 25;
+
+					break;
+				case "teleportation":
+					tempArray[j] = 26;
+
+					break;
+				case "spectral hit":
+					tempArray[j] = 27;
+
+					break;
+				case "stone skin":
+					tempArray[j] = 28;
+
+					break;
+				case "multiple shots":
+					tempArray[j] = 29;
+
+					break;
+				}
+			}
+
+			for (j = 0; j < tempArray.length; j += 1) {
+				if (!unit.getEnchant(tempArray[j])) {
+					continue EnchantLoop;
+				}
+			}
+
+			//print("ÿc1Skipping " + unit.name + " (enchant skip -" + Config.SkipEnchant[i] + ")");
+
+			return false;
+		}
+
+ImmuneLoop: // Skip immune monsters
+		for (i = 0; i < Config.SkipImmune.length; i += 1) {
+			tempArray = Config.SkipImmune[i].toLowerCase().split(" and ");
+
+			for (j = 0; j < tempArray.length; j += 1) {
+				if (this.checkResist(unit, Config.SkipImmune[i])) { // Infinity calculations are built-in
+					continue ImmuneLoop;
+				}
+			}
+
+			//print("ÿc1Skipping " + unit.name + " (immunity skip -" + Config.SkipImmune[i] + ")");
+
+			return false;
+		}
+
+AuraLoop: // Skip monsters with auras
+		for (i = 0; i < Config.SkipAura.length; i += 1) {
+			rval = true;
+
+			switch (Config.SkipAura[i].toLowerCase()) {
+			case "fanaticism":
+				if (unit.getState(49)) {
+					rval = false;
+				}
+
+				break;
+			case "might":
+				if (unit.getState(33)) {
+					rval = false;
+				}
+
+				break;
+			case "holy fire":
+				if (unit.getState(35)) {
+					rval = false;
+				}
+
+				break;
+			case "blessed aim":
+				if (unit.getState(40)) {
+					rval = false;
+				}
+
+				break;
+			case "conviction":
+				if (unit.getState(28)) {
+					rval = false;
+				}
+
+				break;
+			case "holy freeze":
+				if (unit.getState(43)) {
+					rval = false;
+				}
+
+				break;
+			case "holy shock":
+				if (unit.getState(46)) {
+					rval = false;
+				}
+
+				break;
+			}
+
+			if (!rval) {
+				//print("ÿc1Skipping " + unit.name + " (aura skip -" + Config.SkipAura[i] + ")");
+
+				return false;
+			}
+		}
+
 		return true;
 	},
 
+	// Get element by skill number
 	getSkillElement: function (skillId) {
 		this.elements = ["physical", "fire", "lightning", "magic", "cold", "poison", "none"];
 
@@ -620,6 +773,7 @@ var Attack = {
 		return false;
 	},
 
+	// Get a monster's resistance to specified element
 	getResist: function (unit, type) {
 		if (unit.type === 0) { // player
 			return 0;
@@ -645,6 +799,24 @@ var Attack = {
 		return 100;
 	},
 
+	// Check if a monster is immune to specified attack type
+	checkResist: function (unit, type) {
+		if (unit.type === 0) { // player
+			return 0;
+		}
+
+		if (this.infinity && ["fire", "lightning", "cold"].indexOf(type) > -1) {
+			if (unit.getState(29)) {
+				return this.getResist(unit, type) < 100;
+			} else {
+				return this.getResist(unit, type) < 117;
+			}
+		}
+
+		return this.getResist(unit, type) < 100;
+	},
+
+	// Detect use of bows/crossbows
 	usingBow: function () {
 		var item;
 
@@ -667,6 +839,7 @@ var Attack = {
 		return false;
 	},
 
+	// Find an optimal attack position and move or walk to it
 	getIntoPosition: function (unit, distance, coll, walk) {
 		if (typeof walk === "undefined") {
 			walk = false;
@@ -695,13 +868,14 @@ var Attack = {
 			//print("ÿc9potential spots: ÿc2" + coords.length);
 
 			if (coords.length > 0) {
-				coords.sort(this.sortRooms); // sort angles by final spot distance
+				coords.sort(Sort.points); // sort angles by final spot distance
 			} else { // no good final spots
 				//print("reducing optimal spot range");
 				continue;
 			}
 
-MainLoop: for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]			
+MainLoop:
+			for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
 				for (j = 1; j < distance; j += 1) {
 					cx = Math.round((Math.cos(coords[i][2] * Math.PI / 180)) * j + unit.x);
 					cy = Math.round((Math.sin(coords[i][2] * Math.PI / 180)) * j + unit.y);
@@ -723,7 +897,7 @@ MainLoop: for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i
 		}
 
 		CollMap.reset();
-		print("optimal pos qq. dist: " + getDistance(me, unit) + " red. dist: " + distance);
+		print("optimal pos fail. dist: " + getDistance(me, unit) + " red. dist: " + distance);
 
 		return false;
 	}

@@ -156,7 +156,13 @@ Unit.prototype.sell = function () {
 	var i, tick,
 		itemCount = me.itemcount;
 
-	for (i = 0; i < 100; i += 1) {
+	for (i = 0; i < 5; i += 1) {
+		if (copyUnit(this).x === undefined) {
+			//D2Bot.printToConsole("Unit.sell: Invalidated item unit.;1");
+
+			return false;
+		}
+
 		this.shop(1);
 
 		tick = getTickCount();
@@ -171,6 +177,8 @@ Unit.prototype.sell = function () {
 			delay(10);
 		}
 	}
+
+	//D2Bot.printToConsole("Unit.sell: Sell item failed.;1");
 
 	return false;
 };
@@ -312,7 +320,7 @@ Unit.prototype.getPrefix = function (id) {
 	if (this.hasOwnProperty("prefixnum")) {
 		return this.prefixnum === id;
 	}
-	
+
 	switch (id) {
 	case this.prefixnum1:
 	case this.prefixnum2:

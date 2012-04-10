@@ -4,7 +4,7 @@ function BattleOrders() {
 	Pather.useWaypoint(35); // catacombs
 	Pather.moveTo(me.x + 5, me.y);
 
-	var bo,
+	var bo, leader,
 		count = 0;
 
 	function ChatEvent(nick, msg) {
@@ -14,6 +14,7 @@ function BattleOrders() {
 			removeEventListener("chatmsg", ChatEvent);
 
 			bo = true;
+			leader = nick;
 		}
 	}
 
@@ -54,6 +55,12 @@ MainLoop:
 	}
 
 	Pather.useWaypoint(1);
+
+	if (Config.BattleOrders.Mode === 0 && Config.BattleOrders.Wait) {
+		while (Misc.inMyParty(leader)) {
+			delay(1000);
+		}
+	}
 
 	return true;
 }

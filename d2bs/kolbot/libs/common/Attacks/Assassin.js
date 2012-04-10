@@ -45,14 +45,24 @@ var ClassAttack = {
 		}
 	},
 
-	doAttack: function (unit) {
-		// TODO: preattack, merc stomp, better resist check
+	doAttack: function (unit, preattack) {
 		if (Town.needMerc()) {
 			Town.visitTown();
 		}
 
-		var index, checkTraps,
-			resist = 117;
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+			}
+
+			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
+				return 2;
+			}
+
+			return 3;
+		}
+
+		var index, checkTraps;
 
 		index = (unit.spectype & 0x7) ? 1 : 3;
 		checkTraps = this.checkTraps(unit);
@@ -70,7 +80,7 @@ var ClassAttack = {
 			Skill.cast(264, 0);
 		}
 
-		if (Attack.getResist(unit, this.skillElement[index]) < resist) {
+		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (!this.doCast(unit, index)) {
 				return 2;
 			}
@@ -78,7 +88,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.getResist(unit, this.skillElement[5]) < resist) {
+		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
 			if (!this.doCast(unit, 5)) {
 				return 2;
 			}
@@ -149,7 +159,7 @@ var ClassAttack = {
 	},
 
 	placeTraps: function (unit, amount) {
-		var i, j, 
+		var i, j,
 			traps = 0;
 
 		for (i = -1; i <= 1; i += 1) {
@@ -159,7 +169,7 @@ var ClassAttack = {
 				}
 
 				// unit can be an object with x, y props too, that's why having "mode" prop is checked
-				if (traps >= amount || unit.hasOwnProperty("mode") && (unit.mode === 0 || unit.mode === 12)) {
+				if (traps >= amount || (unit.hasOwnProperty("mode") && (unit.mode === 0 || unit.mode === 12))) {
 					return true;
 				}
 
@@ -187,17 +197,14 @@ var ClassAttack = {
 	},
 
 	whirlwind: function (unit, index) {
-		if (me.mp < 30) {
-			return false;
-		}
-
 		var i, j, coords, angle,
 			//angles = [180, 45, -45, 90, -90]; // Angle offsets
 			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
 
 		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
 
-MainLoop: for (i = 0; i < angles.length; i += 1) { // get a better spot
+MainLoop:
+		for (i = 0; i < angles.length; i += 1) { // get a better spot
 			for (j = 0; j < 5; j += 1) {
 				coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * j + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * j + unit.y)];
 
@@ -207,8 +214,6 @@ MainLoop: for (i = 0; i < angles.length; i += 1) { // get a better spot
 			}
 
 			if (getDistance(me, coords[0], coords[1]) >= 3) {
-				//me.runwalk = 0;
-
 				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 			}
 		}

@@ -58,10 +58,16 @@ var Pather = {
 			path.pop();
 		}
 
+		if (this.useTeleport && Config.TeleSwitch) {
+			Misc.teleSwitch();
+		}
+
 		while (path.length > 0) {
 			if (getUIFlag(0x01) || getUIFlag(0x0C)) {
 				me.cancel();
 			}
+
+			Misc.townCheck(false);
 
 			node = path.shift();
 
@@ -92,7 +98,7 @@ var Pather = {
 			}
 
 			if (fail >= retry) {
-				return false;
+				break;
 			}
 
 			if (clearPath) {
@@ -114,6 +120,10 @@ var Pather = {
 					this.moveTo(node.x, node.y);
 				}
 			}
+		}
+
+		if (this.useTeleport && Config.TeleSwitch) {
+			Precast.weaponSwitch(Misc.oldSwitch);
 		}
 
 		return getDistance(me, x, y) < 4;

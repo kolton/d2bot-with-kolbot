@@ -22,6 +22,7 @@ var Town = {
 		81 // Thawing Potion
 	],
 
+	// Do town chores
 	doChores: function () {
 		if (me.classid === 4 && Config.FindItem) { // weapon switch fix in case last game dropped with item find switch on
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
@@ -46,6 +47,7 @@ var Town = {
 		}
 	},
 
+	// Start a task and return the NPC Unit
 	initNPC: function (task) {
 		var npc = getInteractedNPC();
 
@@ -85,6 +87,7 @@ var Town = {
 		return npc;
 	},
 
+	// Go to a town healer
 	heal: function () {
 		if (!this.needHealing()) {
 			return true;
@@ -97,6 +100,7 @@ var Town = {
 		return true;
 	},
 
+	// Check if healing is needed, based on character config
 	needHealing: function () {
 		if (me.hp * 100 / me.hpmax > Config.HealHP && me.mp * 100 / me.mpmax > Config.HealMP) {
 			return false;
@@ -105,12 +109,25 @@ var Town = {
 		return true;
 	},
 
+	// Buy potions from a NPC
 	buyPotions: function () {
-		if (!this.needPotions()) {
-			return true;
+		var i, j, pot, npc, beltSize, col,
+			emptyColumns = 0,
+			useShift = true;
+
+		col = this.checkColumns();
+		beltSize = Storage.BeltSize();
+
+		// Check if we need to buy potions based on Config.MinColumn
+		for (i = 0; i < 4; i += 1) {
+			if (["hp", "mp"].indexOf(Config.BeltColumn[i]) > -1 && col[i] > (beltSize - Config.MinColumn[i])) {
+				break;
+			}
 		}
 
-		var i, pot, pots, npc, beltSize, neededPots;
+		if (i === 4) {
+			return true;
+		}
 
 		npc = this.initNPC("Shop");
 
@@ -118,51 +135,71 @@ var Town = {
 			return false;
 		}
 
-		beltSize = Storage.BeltSize();
-		neededPots = {hp: 0, mp: 0};
-		pots = me.getItem(-1, 2);
+		for (i = 0; i < 4; i += 1) {
+			switch (Config.BeltColumn[i]) {
+			case "hp":
+			case "mp": // Increase emptyColumns if a buyable column is empty
+				if (col[i] === beltSize) {
+					emptyColumns += 1;
+				}
+
+				break;
+			case "rv": // can't use shift buy if "rv" column is empty
+				if (col[i] === beltSize) {
+					useShift = false;
+				}
+
+				break;
+			}
+		}
 
 		for (i = 0; i < 4; i += 1) {
-			if (Config.BeltColumn[i] === "hp") {
-				neededPots.hp += beltSize;
-			}
+			if (col[i] > 0) {
+				pot = this.getPotion(npc, Config.BeltColumn[i]);
 
-			if (Config.BeltColumn[i] === "mp") {
-				neededPots.mp += beltSize;
-			}
-		}
+				if (pot) {
+					print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
 
-		if (pots) {
-			do {
-				if (pots.code.indexOf("hp") > -1) {
-					neededPots.hp -= 1;
+					// Shift+buy will trigger if there's no empty columns or if only the current column is empty
+					if (useShift && (emptyColumns === 0 || (emptyColumns === 1 && col[i] === beltSize))) {
+						pot.buy(true);
+					} else {
+						for (j = 0; j < col[i]; j += 1) {
+							pot.buy(false);
+						}
+					}
 				}
-
-				if (pots.code.indexOf("mp") > -1) {
-					neededPots.mp -= 1;
-				}
-			} while (pots.getNext());
-		}
-
-		pot = this.getPotion(npc, "hp");
-
-		if (pot) {
-			for (i = 0; i < neededPots.hp; i += 1) {
-				pot.buy();
 			}
-		}
 
-		pot = this.getPotion(npc, "mp");
-
-		if (pot) {
-			for (i = 0; i < neededPots.mp; i += 1) {
-				pot.buy();
+			// Switch to shift+buy on the fly (if possible, happens if 2+ buyable potion columns are empty)
+			if (col[i] === beltSize && emptyColumns > 0) {
+				emptyColumns -= 1;
 			}
+
+			col = this.checkColumns(); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
 		}
 
 		return true;
 	},
 
+	// Return column status (needed potions in each column)
+	checkColumns: function () {
+		var beltSize = Storage.BeltSize(),
+			col = [beltSize, beltSize, beltSize, beltSize],
+			pot = me.getItem(-1, 2); // Mode 2 = in belt
+
+		if (!pot) { // No potions
+			return true;
+		}
+
+		do {
+			col[pot.x % 4] -= 1;
+		} while (pot.getNext());
+
+		return col;
+	},
+
+	// Get the highest potion from current npc
 	getPotion: function (npc, type) {
 		var i, result;
 
@@ -177,28 +214,6 @@ var Town = {
 				if (result) {
 					return result;
 				}
-			}
-		}
-
-		return false;
-	},
-
-	needPotions: function () {
-		var i,
-			col = [0, 0, 0, 0],
-			pot = me.getItem(-1, 2); // Mode 2 = in belt
-
-		if (!pot) { // No potions
-			return true;
-		}
-
-		do {
-			col[pot.x % 4] += 1;
-		} while (pot.getNext());
-
-		for (i = 0; i < 4; i += 1) {
-			if ((["hp", "mp"].indexOf(Config.BeltColumn[i]) > -1) && col[i] < Config.MinColumn[i]) {
-				return true;
 			}
 		}
 
@@ -239,6 +254,7 @@ var Town = {
 			scroll.buy(true);
 		} catch (e) {
 			print(e.message);
+
 			return false;
 		}
 
@@ -275,7 +291,8 @@ var Town = {
 			this.fillTome("ibk");
 		}
 
-MainLoop: while (list.length > 0) {
+MainLoop:
+		while (list.length > 0) {
 			item = list.shift();
 
 			switch (Pickit.checkItem(item)) {
@@ -322,9 +339,11 @@ MainLoop: while (list.length > 0) {
 					break;
 				case -1:
 				case 2:
+				case 3: // just in case
 					break;
 				default:
 					item.sell();
+
 					break;
 				}
 
@@ -340,18 +359,19 @@ MainLoop: while (list.length > 0) {
 	},
 
 	getUnids: function () {
-		var list = [],
-			item = me.getItem(-1, 0);
+		var i,
+			list = [],
+			items = me.getItems();
 
-		if (!item) {
+		if (!items || !items.length) {
 			return false;
 		}
 
-		do {
-			if (item.location === 3 && !item.getFlag(0x10)) {
-				list.push(copyUnit(item));
+		for (i = 0; i < items.length; i += 1) {
+			if (items[i].location === 3 && !items[i].getFlag(0x10)) {
+				list.push(items[i]);
 			}
-		} while (item.getNext());
+		}
 
 		if (!list.length) {
 			return false;
@@ -385,7 +405,7 @@ MainLoop: while (list.length > 0) {
 			return false;
 		}
 
-		delay(me.ping);
+		delay(me.ping + 1);
 
 		for (i = 0; i < 3; i += 1) {
 			if (getCursorType() === 6) {
@@ -394,9 +414,10 @@ MainLoop: while (list.length > 0) {
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 500) {
+			while (getTickCount() - tick < 1000) {
 				if (unit.getFlag(0x10)) {
 					delay(200);
+
 					return true;
 				}
 
@@ -484,13 +505,16 @@ MainLoop: while (list.length > 0) {
 							case 1:
 								Misc.logItem("Gambled", newItem);
 								list.push(newItem.gid);
+
 								break;
 							case 2:
 								list.push(newItem.gid);
 								Cubing.buildLists();
+
 								break;
 							default:
 								newItem.sell();
+
 								break;
 							}
 						}
@@ -551,6 +575,7 @@ MainLoop: while (list.length > 0) {
 			key.buy(true);
 		} catch (e) {
 			print(e.message);
+
 			return false;
 		}
 
@@ -715,7 +740,8 @@ MainLoop: while (list.length > 0) {
 
 		delay(300);
 
-MainLoop: for (i = 0; i < 3; i += 1) {
+MainLoop:
+		for (i = 0; i < 3; i += 1) {
 			npc.useMenu(0x1507);
 
 			tick = getTickCount();
@@ -730,7 +756,7 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 		}
 
 		delay(300);
-		Attack.init();
+		Attack.checkInfinity();
 
 		return !!me.getMerc();
 	},

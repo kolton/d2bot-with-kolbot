@@ -431,6 +431,11 @@ JoinLoop: for (i in joinSettings) {
 		delay(500);
 		ControlAction.click(6,652,469,120,20);
 		break;
+	case 42: // Empty character screen
+		delay(1000);
+		ControlAction.click(6,33,572,128,35);
+
+		break;
 	default:
 		if (location !== undefined) {
 			D2Bot.printToConsole("Unhandled location " + location);

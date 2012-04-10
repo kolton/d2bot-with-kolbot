@@ -50,6 +50,7 @@ var Config = {
 	UseMercHP: 0,
 	UseMercRejuv: 0,
 	MercChicken: 0,
+	IronGolemChicken: 0,
 	HealHP: 0,
 	HealMP: 0,
 	TownHP: 0,
@@ -72,6 +73,9 @@ var Config = {
 	PickitFiles: [],
 	BeltColumn: [],
 	MinColumn: [],
+	SkipEnchant: [],
+	SkipImmune: [],
+	SkipAura: [],
 
 	Cubing: false,
 	Recipes: [],
@@ -83,11 +87,11 @@ var Config = {
 	GambleGoldStart: 0,
 	GambleGoldStop: 0,
 	MiniShopBot: false,
-
+	TeleSwitch: false,
 	LogExperience: false,
+	TownCheck: false,
 
 	// DClone
-	WaitForSoJ: false,
 	StopOnDClone: false,
 	SoJWaitTime: 0,
 
@@ -198,7 +202,8 @@ var Config = {
 		Entrance: false
 	},
 	BattleOrders: {
-		Mode: 0
+		Mode: 0,
+		Wait: false
 	},
 	Enchant: {
 		Trigger: ".chant",
