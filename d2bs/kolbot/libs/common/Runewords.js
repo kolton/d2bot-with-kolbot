@@ -1,4 +1,30 @@
 var Runeword = {
+	// 1.09
+	AncientsPledge: [617, 618, 616], // Ral + Ort + Tal
+	Black: [619, 625, 613], // Thul + Io + Nef
+	Fury: [640, 634, 614], // Jah + Gul + Eth
+	HolyThunder: [614, 617, 618, 616], // Eth + Ral + Ort + Tal
+	Honor: [620, 610, 615, 612, 621], // Amn + El + Ith + Tir + Sol
+	KingsGrace: [620, 617, 619], // Amn + Ral + Thul
+	Leaf: [612, 617], // Tir + Ral
+	Lionheart: [624, 626, 628], // Hel + Lum + Fal
+	Lore: [618, 621], // Ort + Sol
+	Malice: [615, 610, 614], // Ith + El + Eth
+	Melody: [622, 627, 613], // Shael + Ko + Nef
+	Memory: [626, 625, 621, 614], // Lum + Io + Sol + Eth
+	Nadir: [613, 612], // Nef + Tir
+	Radiance: [613, 621, 615], // Nef + Sol + Ith
+	Rhyme: [622, 614], // Shael + Eth
+	Silence: [623, 611, 624, 633, 612, 635], // Dol + Eld + Hel + Ist + Tir + Vex
+	Smoke: [613, 626], // Nef + Lum
+	Stealth: [616, 614], // Tal + Eth
+	Steel: [612, 610], // Tir + El
+	Strength: [620, 612], // Amn + Tir
+	Venom: [616, 623, 632], // Tal + Dol + Mal
+	Wealth: [629, 627, 612], // Lem + Ko + Tir
+	White: [623, 625], // Dol + Io
+	Zephyr: [618, 614], // Ort + Eth
+	// 1.10
 	Beast: [639, 612, 631, 632, 626], // Ber + Tir + Um + Mal + Lum
 	Bramble: [617, 636, 638, 614], // Ral + Ohm + Sur + Eth
 	BreathoftheDying: [635, 624, 610, 611, 642, 614], // Vex + Hel + El + Eld + Zod + Eth
@@ -46,6 +72,14 @@ var Runeword = {
 	Spirit: [616, 619, 618, 620], // Tal + Thul + Ort + Amn
 	VoiceofReason: [629, 627, 610, 611], // Lem + Ko + El + Eld
 	Wrath: [630, 626, 639, 632], // Pul + Lum + Ber + Mal
+	// 1.11
+	Bone: [621, 631, 631], // Sol + Um + Um
+	Enlightenment: [630, 617, 621], // Pul + Ral + Sol
+	Myth: [624, 620, 613], // Hel + Amn + Nef
+	Peace: [622, 619, 620], // Shael + Thul + Amn
+	Principle: [617, 634, 611], // Ral + Gul + Eld
+	Rain: [618, 632, 615], // Ort + Mal + Ith
+	Treachery: [622, 619, 629], // Shael + Thul + Lem
 
 	Test: [624, 624, 624]
 }

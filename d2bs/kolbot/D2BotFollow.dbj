@@ -25,6 +25,7 @@ var joinChannel = "";
 var firstJoinMsg = "";
 
 var switchKeys = false;
+var switchKeyDelay = 0; // time in seconds to delay before switching keys
 
 /* Join game settings
 	Format: "leader's profile": ["leecher 1 profile", "leecher 2 profile", ...]
@@ -283,6 +284,7 @@ JoinLoop: for (i in joinSettings) {
 				D2Bot.printToConsole("Disabled CDKey");
 
 				if (switchKeys) {
+					timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
@@ -344,6 +346,7 @@ JoinLoop: for (i in joinSettings) {
 
 		if (switchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 			D2Bot.restart(true);
 		}
 
@@ -369,6 +372,7 @@ JoinLoop: for (i in joinSettings) {
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
 
 		if (switchKeys) {
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
 			timeoutDelay("CD-Key in use", cdkeyInUseRetry * 6e4);
@@ -387,6 +391,7 @@ JoinLoop: for (i in joinSettings) {
 	case 22: // Login - Invalid Cdkey (classic or xpac)
 		if (switchKeys) {
 			D2Bot.printToConsole("Invalid CD-Key");
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
 			timeoutDelay("Invalid CD-Key", cdkeyInUseRetry * 6e4);

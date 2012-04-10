@@ -24,22 +24,24 @@ function DiabloHelper() {
 	};
 
 	this.initLayout = function () {
-		this.vizLayout = this.getLayout(396, 5275);
-		this.seisLayout = this.getLayout(394, 7773);
-		this.infLayout = this.getLayout(392, 7893);
+		this.vizLayout = this.getLayout(396, 5275); // 1 = "Y", 2 = "L"
+		this.seisLayout = this.getLayout(394, 7773); // 1= "2", 2 = "5"
+		this.infLayout = this.getLayout(392, 7893); // 1 = "I", 2 = "J"
 	};
 
 	this.getBoss = function (name) {
 		var i, boss, glow;
 
 		while (true) {
+			if (!this.preattack(name)) {
+				delay(500);
+			}
+
 			glow = getUnit(2, 131);
 
 			if (glow) {
 				break;
 			}
-
-			delay(500);
 		}
 
 		for (i = 0; i < name === "infector of souls" ? 20 : 8; i += 1) {
@@ -122,6 +124,64 @@ function DiabloHelper() {
 		}
 
 		throw new Error("Diablo not found");
+	};
+
+	this.preattack = function (id) {
+		var coords = [];
+
+		switch (id) {
+		case "grand vizier of chaos":
+			if (this.vizLayout === 1) {
+				coords = [7676, 5295];
+			}
+
+			coords = [7684, 5318];
+
+			break;
+		case "lord de seis":
+			if (this.seisLayout === 1) {
+				coords = [7778, 5216];
+			}
+
+			coords = [7775, 5208];
+
+			break;
+		case "infector of souls":
+			if (this.infLayout === 1) {
+				coords = [7913, 5292];
+			}
+
+			coords = [7915, 5280];
+
+			break;
+		}
+
+		switch (me.classid) {
+		case 1:
+			if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+				if (me.getState(121)) {
+					delay(500);
+				} else {
+					Skill.cast(Config.AttackSkill[1], 0, coords[0], coords[1]);
+				}
+			}
+
+			return true;
+		case 3:
+			break;
+		case 6:
+			if (Config.UseTraps) {
+				check = ClassAttack.checkTraps({x: coords[0], y: coords[1]});
+
+				if (check) {
+					ClassAttack.placeTraps({x: coords[0], y: coords[1]}, 5);
+				}
+			}
+
+			return true;
+		}
+		
+		return false;
 	};
 
 	this.followPath = function (path, sortfunc) {

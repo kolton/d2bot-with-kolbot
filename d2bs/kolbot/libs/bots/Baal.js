@@ -5,12 +5,16 @@ function Baal() {
 		var check;
 
 		switch (me.classid) {
-		case 0:
-			break;
 		case 1:
-			break;
-		case 2:
-			break;
+			if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+				if (me.getState(121)) {
+					delay(500);
+				} else {
+					Skill.cast(Config.AttackSkill[1], 0, 15093, 5029);
+				}
+			}
+
+			return true;
 		case 3: // Paladin
 			if (Config.AttackSkill[3] !== 112) {
 				return false;
@@ -24,9 +28,9 @@ function Baal() {
 				Skill.setSkill(Config.AttackSkill[4], 0);
 			}
 
-			return Skill.cast(Config.AttackSkill[3], 1);
-		case 4:
-			break;
+			Skill.cast(Config.AttackSkill[3], 1);
+
+			return true;
 		case 5:
 			break;
 		case 6:
@@ -34,7 +38,9 @@ function Baal() {
 				check = ClassAttack.checkTraps({x: 15093, y: 5029});
 
 				if (check) {
-					return ClassAttack.placeTraps({x: 15093, y: 5029}, 5);
+					ClassAttack.placeTraps({x: 15093, y: 5029}, 5);
+
+					return true;
 				}
 			}
 
@@ -120,13 +126,13 @@ function Baal() {
 	if (Config.PublicMode) {
 		Pather.moveTo(15113, 5040);
 		Pather.makePortal();
-		say("Hot TP!");
+		say(Config.Baal.HotTPMsg);
 	}
 
 	this.clearThrone();
 
 	if (Config.PublicMode) {
-		say("TP safe!");
+		say(Config.Baal.SafeTPMsg);
 	}
 
 	Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
@@ -177,7 +183,7 @@ MainLoop: while (true) {
 	}
 
 	if (Config.PublicMode) {
-		say("Baal");
+		say(Config.Baal.BaalMsg);
 	}
 
 	delay(1000);
