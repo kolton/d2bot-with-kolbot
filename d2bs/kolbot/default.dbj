@@ -52,6 +52,7 @@ function main() {
 		}
 	}
 
+	// If game name is a part of Gambling System, don't load scripts
 	if (Gambling.goldFinders.indexOf(me.profile) > -1) {
 		for (i = 0; i < Gambling.gambleGames.length; i += 1) {
 			if (me.gamename.match(Gambling.gambleGames[i])) {
@@ -62,7 +63,7 @@ function main() {
 			}
 		}
 	}
-	
+
 	if (me.getStat(13) < DataFile.getStats().experience) { // check for experience decrease -> log death
 		D2Bot.printToConsole("You died in last game;1");
 		D2Bot.printToConsole("Experience decreased by " + (DataFile.getStats().experience - me.getStat(13)) + ";1");
@@ -71,10 +72,6 @@ function main() {
 
 	DataFile.updateStats("experience", me.getStat(13));
 
-	addEventListener("gameevent", DCloneEvent);
-	load("tools/Party.js");
-	load("tools/ToolsThread.js");
-
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
 	Config.init(true);
 	Pickit.init();
@@ -82,6 +79,14 @@ function main() {
 	Storage.Init();
 	Cubing.init();
 	Runewords.init();
+
+	// Load events and threads
+	addEventListener("gameevent", DCloneEvent);
+	load("tools/ToolsThread.js");
+
+	if (Config.PublicMode) {
+		load("tools/Party.js");
+	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
 	Town.getCorpse();
@@ -93,7 +98,7 @@ function main() {
 	Loader.init();
 
 	if (Config.MinGameTime && getTickCount() - startTime < Config.MinGameTime * 1000 && Town.goToTown()) {
-		me.overhead("Stalling for " + Math.round(((startTime + (Config.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
+		Town.goToTown();
 
 		while (getTickCount() - startTime < Config.MinGameTime * 1000) {
 			me.overhead("Stalling for " + Math.round(((startTime + (Config.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
@@ -114,7 +119,7 @@ function main() {
 		me.maxgametime = 0;
 
 		while (sojCounter < Config.SoJWaitTime) {
-			me.overhead("Waiting for SoJ sales... " + (Config.SoJWaitTime - sojCounter));
+			me.overhead("Waiting for SoJ sales... " + (Config.SoJWaitTime - sojCounter) + " min");
 			delay(6e4);
 
 			sojCounter += 1;

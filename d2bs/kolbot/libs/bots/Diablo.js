@@ -27,7 +27,7 @@ function Diablo() {
 		this.vizLayout = this.getLayout(396, 5275);
 		this.seisLayout = this.getLayout(394, 7773);
 		this.infLayout = this.getLayout(392, 7893);
-	}
+	};
 	
 	this.openSeal = function (classid) {
 		var i, seal, warn;
@@ -54,7 +54,7 @@ function Diablo() {
 
 			if (seal.mode) { // for pubbies
 				if (warn) {
-					say("Leave the seals alone you soggy cunt!");
+					say(Config.Diablo.SealWarning);
 				}
 
 				return true;
@@ -203,7 +203,7 @@ function Diablo() {
 		Attack.clear(35, 0, false, this.entranceSort);
 		Pather.moveTo(7790, 5544);
 		Pather.makePortal();
-		say("entrance tp up");
+		say(Config.Diablo.EntranceTP);
 		Precast.doPrecast(true);
 		this.followPath(this.entranceToStar, this.entranceSort);
 	} else {
@@ -213,7 +213,7 @@ function Diablo() {
 
 	Pather.moveTo(7774, 5305);
 	Pather.makePortal();
-	say("star tp up");
+	say(Config.Diablo.StarTP);
 	Attack.clear(30, 0, false, this.starSort);
 	this.vizierSeal();
 	this.seisSeal();

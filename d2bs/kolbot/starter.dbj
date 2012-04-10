@@ -1,3 +1,8 @@
 function main() {
+	include("json2.js");
+	include("OOG.js");
 
+	if (!FileTools.exists("data/" + me.profile + ".json")) {
+		DataFile.create();
+	}
 }

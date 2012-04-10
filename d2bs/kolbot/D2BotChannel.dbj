@@ -1,3 +1,5 @@
+// D2BotChannel starter can join friend-list announcements as well as channel bot announcements
+
 var gameMaxLength				= 900;    	// seconds
 var gameMinLength				= 50000;	// time in milliseconds, minimum game length, 180 seconds default (1 game/3 minutes)
 var unableToConnectRetry		= 5;		// time in minutes to retry connecting on connection fail (real value is +/- 1 min)
@@ -20,6 +22,9 @@ var gameDoesNotExistdelayMax	= 3000;	// how long to wait when a Game Does Not Ex
 var gameDoesNotExistTimeout		= 0;	// how long to wait for the dialog to disappear (default 30 seconds, don't change this)
 var waitInChatBeforeActionsMin	= 1000;		// min how long to wait before joining channel
 var waitInChatBeforeActionsMax	= 2000;		// max how long to wait before joining channel
+
+var switchKeys = false;
+var switchKeyDelay = 0; // time in seconds to delay before switching keys
 
 var joinChannel = "";
 var games = [];
@@ -252,7 +257,14 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey");
-				D2Bot.restart(true);
+
+				if (switchKeys) {
+					timeoutDelay("Key switch delay", switchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
 				break;
 			case getLocaleString(5347):
 				D2Bot.updateStatus("Disconnected");
@@ -305,9 +317,14 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 			break;
 		}
 
-		timeoutDelay("Realm Down", realmDownRetry * 60 * 1000);
-		D2Bot.printToConsole("Realm Down - Changing CD-Key");
-		D2Bot.restart(true);
+		timeoutDelay("Realm Down", realmDownRetry * 6e4);
+
+		if (switchKeys) {
+			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
+			D2Bot.restart(true);
+		}
+
 		break;
 	case 14: // Character Select / Main Menu - Disconnected
 		D2Bot.updateStatus("Disconnected");
@@ -336,7 +353,15 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
-		D2Bot.restart(true);
+
+		if (switchKeys) {
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			timeoutDelay("CD-Key in use", cdkeyInUseRetry * 6e4);
+			ControlAction.click(6,335,450,128,35);
+		}
+
 		break;
 	case 20: // Single Player - Select Difficulty
 		break;
@@ -347,8 +372,14 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 
 		break;
 	case 22: // Login - Invalid Cdkey (classic or xpac)
-		D2Bot.printToConsole("Invalid Cdkey");
-		D2Bot.restart(true);
+		if (switchKeys) {
+			D2Bot.printToConsole("Invalid CD-Key");
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			timeoutDelay("Invalid CD-Key", cdkeyInUseRetry * 6e4);
+		}
+		
 		break;
 	case 23: // Character Select - Connecting
 		if (!locationTimeout(characterScreenTimeout, location)) {

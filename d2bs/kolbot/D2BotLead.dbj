@@ -26,6 +26,7 @@ var firstJoinMsg = "";
 var announceGames = false;
 
 var switchKeys = false;
+var switchKeyDelay = 0; // time in seconds to delay before switching keys
 
 // DONT EDIT ANYTHING BELOW THIS
 
@@ -279,6 +280,7 @@ MainSwitch: switch (location) {
 				D2Bot.printToConsole("Disabled CDKey");
 
 				if (switchKeys) {
+					timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
@@ -341,6 +343,7 @@ MainSwitch: switch (location) {
 
 		if (switchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 			D2Bot.restart(true);
 		}
 
@@ -366,6 +369,7 @@ MainSwitch: switch (location) {
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
 
 		if (switchKeys) {
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
 			timeoutDelay("CD-Key in use", cdkeyInUseRetry * 6e4);
@@ -384,6 +388,7 @@ MainSwitch: switch (location) {
 	case 22: // Login - Invalid Cdkey (classic or xpac)
 		if (switchKeys) {
 			D2Bot.printToConsole("Invalid CD-Key");
+			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
 			timeoutDelay("Invalid CD-Key", cdkeyInUseRetry * 6e4);

@@ -27,6 +27,7 @@ var Pather = {
 			clearPath = false;
 		case 4:
 			pop = false;
+
 			break;
 		}
 
@@ -256,6 +257,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 			clearPath = false;
 		case 4:
 			pop = false;
+
 			break;
 		}
 
@@ -301,7 +303,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 
 	// moveToExit can take a single area or an array of areas as the first argument
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, n, exits, targetExits,
+		var i, j, n, exits, targetExits, coords,
 			dest = {},
 			areas = [];
 

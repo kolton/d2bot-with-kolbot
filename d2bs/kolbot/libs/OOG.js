@@ -40,7 +40,7 @@ var D2Bot = {
 		sendCopyData(null, "D2Bot #", 0, "stop"); //this stops current window
 	},
 	start: function (profile) {
-		SendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
+		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
 	}
 };
 
@@ -170,22 +170,29 @@ var ControlAction = {
 			switch (getLocation()) {
 			case 8: // main menu
 				ControlAction.clickRealm(realms[info.realm]);
-				this.click(6,264,366,272,35);
+				this.click(6,264,366,272,35); // OK
 				break;
 			case 9: // login screen
 				this.setText(1,322,342,162,19, info.account);
 				this.setText(1,322,396,162,19, info.password);
-				this.click(6,264,484,272,35);
+				this.click(6,264,484,272,35); // log in
 				break;
+			case 10: // login error - acc doesn't exist? TODO: handle all login errors
+				this.click(6,335,412,128,35); // OK
+				return false;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
 				break;
 			default:
 				break;
 			}
-			
+
 			delay(500);
 		}
+
+		delay(1000);
+
+		return getLocation() === 12 || getLocation() === 42;
 	},
 
 	makeAccount: function (info) {
@@ -238,6 +245,26 @@ var ControlAction = {
 		return true;
 	},
 
+	findCharacter: function (info) {
+		var control, text;
+
+		if (getLocation() === 12) {
+			control = getControl(4,37,178,200,92);
+
+			if (control) {
+				do {
+					text = control.getText();
+
+					if (text instanceof Array && typeof text[1] === "string" && text[1] === info.charName) {
+						return true;
+					}
+				} while (control.getNext());
+			}
+		}
+
+		return false;
+	},
+
 	loginCharacter: function (info) {
 		var control, text;
 
@@ -250,7 +277,7 @@ var ControlAction = {
 					do {
 						text = control.getText();
 
-						if (text instanceof Array && typeof text[1] === "string" && text[1] === info.name) {
+						if (text instanceof Array && typeof text[1] === "string" && text[1] === info.charName) {
 							control.click();
 							this.click(6,627,572,128,35);
 
@@ -274,6 +301,12 @@ var ControlAction = {
 	},
 
 	makeCharacter: function (info) {
+		if (!info.charClass) {
+			info.charClass = "barbarian";
+		}
+		
+		var clickCoords = [];
+		
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
 			case 12: // character select
@@ -281,11 +314,58 @@ var ControlAction = {
 				this.click(6,33,528,168,60);
 				break;
 			case 29: // select character
-				this.click(2,400,330,88,184);
+				switch (info.charClass) {
+				case "barbarian":
+					clickCoords = [400, 280];
+					break;
+				case "amazon":
+					clickCoords = [100, 280];
+					break;
+				case "necromancer":
+					clickCoords = [300, 290];
+					break;
+				case "sorceress":
+					clickCoords = [620, 270];
+					break;
+				case "assassin":
+					clickCoords = [200, 280];
+					break;
+				case "druid":
+					clickCoords = [700, 280];
+					break;
+				case "paladin":
+					clickCoords = [521, 260];
+					break;
+				}
+
+				// coords:
+				// zon: 100, 280
+				// barb: 400, 280
+				// necro: 300, 290
+				// sin: 200, 280
+				// paladin: 521 260
+				// sorc: 620, 270
+				// druid: 700, 280
+
+				getControl().click(clickCoords[0], clickCoords[1]);
+				delay(500);
+
 				break;
 			case 15: // new character
 				this.setText(1,318,510,157,16, info.charName);
-				// TODO ladder, hardcore
+				
+				if (!this.expansion) {
+					this.click(6,319,540,15,16);
+				}
+				
+				if (!info.ladder) {
+					this.click(6,319,580,15,16);
+				}
+				
+				if (info.hardcore) {
+					this.click(6,319,560,15,16);
+				}
+
 				this.click(6,627,572,128,35);
 				break;
 			default:

@@ -152,9 +152,7 @@
 
 [type] == circlet && [quality] == magic && [flag] != ethereal # ([tohit] >= 120 || [itemtohitpercentperlevel] > 0 || [enhanceddamage] >= 30) && ([maxhp] >= 40 || [hpregen] >= 10 || [frw] == 20) && [itemlevelreq] <= 18
 
-[type] == circlet && [quality] == rare && [flag] != ethereal # [frw] == 20 && [sockets] == 2 && [itemlevelreq] <= 18
-// 3+ useful mods, itemtohitpercentperlevel returns 2 for visionary so it's divided by 2, the rest is divided by minimum wanted amount
-[type] == circlet && [quality] == rare && [flag] != ethereal # ([lightmaxdam]/110 + [tohit]/110 + [enhanceddamage]/25 + [itemtohitpercentperlevel]/2 + [hpregen]/8 + [maxhp]/35 + [maxmana]/35 + [frw]/20 + [sockets]/2 + [maxdamage]/5 + [mindamage]/3 >= 3) && [itemlevelreq] <= 18
+[type] == circlet && [quality] == rare && [flag] != ethereal # [sockets] == 2 && [frw] == 20 && ([tohit] >= 100 || [maxdamage] >= 6 || [maxhp] >= 30 || [maxmana] >= 30 || [lightmaxdam] >= 100 || [hpregen] >= 8) && [itemlevelreq] <= 18
 [type] == circlet && [quality] <= rare && [flag] != ethereal # [poisonandboneskilltab]+[palicombatskilltab]+[fireskilltab]+[trapsskilltab] >= 1 && ([fcr] == 10 || [frw] == 20) && ([maxhp] >= 30 || [hpregen] >= 8 || [maxmana] >= 35 || [sockets] == 2) && [itemlevelreq] <= 18
 [type] == circlet && [quality] == rare && [flag] != ethereal # [poisonandboneskilltab]+[palicombatskilltab]+[fireskilltab]+[trapsskilltab] >= 1 && [fcr] == 10 && [frw] == 20 && [itemlevelreq] <= 18
 
