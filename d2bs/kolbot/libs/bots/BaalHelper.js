@@ -3,12 +3,16 @@ function BaalHelper() { // experi-mental
 		var check;
 
 		switch (me.classid) {
-		case 0:
-			break;
 		case 1:
-			break;
-		case 2:
-			break;
+			if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+				if (me.getState(121)) {
+					delay(500);
+				} else {
+					Skill.cast(Config.AttackSkill[1], 0, 15093, 5029);
+				}
+			}
+
+			return true;
 		case 3: // Paladin
 			if (Config.AttackSkill[3] !== 112) {
 				return false;
@@ -25,8 +29,6 @@ function BaalHelper() { // experi-mental
 			Skill.cast(Config.AttackSkill[3], 1);
 
 			return true;
-		case 4:
-			break;
 		case 5:
 			break;
 		case 6:

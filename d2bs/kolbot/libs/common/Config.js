@@ -4,23 +4,33 @@ var Config = {
 	init: function (notify) {
 		var classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
-		if (!include("config/" + classes[me.classid] + "." + me.charname + ".js")) {
+		if (!FileTools.exists("libs/config/" + classes[me.classid] + "." + me.charname + ".js")) {
 			if (notify) {
 				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!");
 				print("ÿc1Loading default config.");
 			}
 
-			if (!include("config/" + classes[me.classid] + ".js")) {
+			try {
+				include("config/" + classes[me.classid] + ".js");
+			} catch (e) {
 				throw new Error("Failed to load default config.");
 			}
 		}
 
 		try {
+			include("config/" + classes[me.classid] + "." + me.charname + ".js");
+		} catch (e) {
+			throw new Error("Failed to load default config.");
+		}
+
+		try {
 			LoadConfig();
 		} catch (e) {
-			print(e);
+			if (notify) {
+				print("ÿc8Error in " + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + "(line " + e.lineNumber + "): " + e.message);
 
-			throw new Error("Config.init: Error in character config.")
+				throw new Error("Config.init: Error in character config.");
+			}
 		}
 	},
 
@@ -166,6 +176,11 @@ var Config = {
 	Countess: {
 		KillGhosts: false
 	},
+	Baal: {
+		HotTPMsg: "Hot TP!",
+		SafeTPMsg: "TP safe!",
+		BaalMsg: "Baal"
+	},
 	BaalHelper: {
 		KillNihlathak: false,
 		FastChaos: false
@@ -174,9 +189,23 @@ var Config = {
 		ClearDen: false
 	},
 	Diablo: {
-		Entrance: false
+		Entrance: false,
+		SealWarning: "Leave the seals alone!",
+		EntranceTP: "Entrance TP up",
+		StarTP: "Star TP up"
 	},
 	DiabloHelper: {
 		Entrance: false
+	},
+	BattleOrders: {
+		Mode: 0
+	},
+	Enchant: {
+		Trigger: ".chant",
+		GameLength: 20
+	},
+	IPHunter: {
+		IPList: [],
+		GameLength: 3
 	}
 };

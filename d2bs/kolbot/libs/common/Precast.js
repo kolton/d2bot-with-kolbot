@@ -2,6 +2,10 @@ var Precast = new function () {
 	this.haveCTA = -1;
 
 	this.weaponSwitch = function (slot) {
+		if (me.gametype === 0) {
+			return true;
+		}
+
 		var i, tick;
 
 		if (!arguments.length) {

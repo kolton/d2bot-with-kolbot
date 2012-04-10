@@ -16,6 +16,10 @@ function LoadConfig() {
 	// User addon script. Read the description in libs/bots/UserAddon.js
 	Scripts.UserAddon = true; // !!!YOU MUST SET THIS TO FALSE IF YOU WANT TO RUN BOSS/AREA SCRIPTS!!!
 
+	// Battle orders script
+	Scripts.BattleOrders = false;
+		Config.BattleOrders.Mode = 0; // 0 = give BO, 1 = get BO
+
 	// Boss/area scripts
 
 	// *** act 1 ***
@@ -25,6 +29,7 @@ function LoadConfig() {
 		Config.Mausoleum.KillBloodRaven = true;
 	Scripts.Rakanishu = false;
 		Config.Rakanishu.KillGriswold = true;
+	Scripts.Tristram = false;
 	Scripts.Pit = false;
 		Config.Pit.ClearPit1 = true;
 	Scripts.Treehead = false;
@@ -38,12 +43,17 @@ function LoadConfig() {
 	// *** act 2 ***
 	Scripts.Radament = false;
 	Scripts.AncientTunnels = false;
+	Scripts.Summoner = false;
+	Scripts.Tombs = false;
 	Scripts.Duriel = false;
 
 	// *** act 3 ***
+	Scripts.Stormtree = false;
 	Scripts.KurastChests = false;
 		Config.KurastChests.Bazaar = false;
 	Scripts.KurastTemples = false;
+	Scripts.Icehawk = false;
+	Scripts.Endugu = false;
 	Scripts.Travincal = false;
 	Scripts.Mephisto = false;
 
@@ -54,12 +64,16 @@ function LoadConfig() {
 	Scripts.FastDiablo = false;
 	Scripts.Diablo = false;
 		Config.Diablo.Entrance = true;
+		Config.Diablo.SealWarning = "Leave the seals alone!";
+		Config.Diablo.EntranceTP = "Entrance TP up";
+		Config.Diablo.StarTP = "Star TP up";
 	Scripts.DiabloHelper = false;
 		Config.DiabloHelper.Entrance = true;
 
 	// *** act 5 ***
 	Scripts.Pindleskin = false;
 		Config.Pindleskin.KillNihlathak = true;
+	Scripts.Nihlathak = false;
 	Scripts.Eldritch = false;
 		Config.Eldritch.OpenChest = true;
 		Config.Eldritch.KillShenk = true;
@@ -73,6 +87,9 @@ function LoadConfig() {
 	Scripts.Snapchip = false;
 		Config.Snapchip.ClearIcyCellar = true;
 	Scripts.Baal = false;
+		Config.Baal.HotTPMsg = "Hot TP!";
+		Config.Baal.SafeTPMsg = "TP safe!";
+		Config.Baal.BaalMsg = "Baal";
 	Scripts.AutoBaal = false;
 		Config.AutoBaal.FindShrine = false;
 	Scripts.BaalHelper = false;
@@ -83,6 +100,14 @@ function LoadConfig() {
 	Scripts.CrushTele = false; // classic rush teleporter. go to area of interest and press "-" numpad key
 	Scripts.Questing = false; // solves missing quests (skill/stat+shenk)
 	Scripts.Gamble = false; // gamble until out of gold, then wait for more gold at stash
+	Scripts.GhostBusters = false; // kill ghosts in most areas that contain them
+	Scripts.Wakka = false; // walking chaos leecher
+	Scripts.Enchant = false;
+		Config.Enchant.Trigger = ".chant";
+		Config.Enchant.GameLength = 20; // in minutes
+	Scripts.IPHunter = false;
+		Config.IPHunter.IPList = []; // list of IPs to look for. example: [165, 201, 64]
+		GameLength = 3; // number of minutes to stay in game if ip wasn't found
 
 
 	// Town settings
@@ -161,7 +186,7 @@ function LoadConfig() {
 	Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
 	Config.Recipes.push([Recipe.Rune, 633]); // ist -> gul
 	Config.Recipes.push([Recipe.Rune, 634]); // gul -> vex
-	
+
 	Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
 	Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
 	Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
@@ -175,7 +200,7 @@ function LoadConfig() {
 	Config.Recipes.push([Recipe.Socket.Weapon, 256]); // Socket Cryptic Axe
 	Config.Recipes.push([Recipe.Socket.Armor, 442]); // Socket Sacred Armor
 	Config.Recipes.push([Recipe.Socket.Armor, 443]); // Socket Archon Plate
-	
+
 	/* Runeword config. All recipes will be available in Templates/Cubing.txt
 	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
 	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them
@@ -193,7 +218,7 @@ function LoadConfig() {
 	Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
 	// General config
-	Config.PublicMode = false; // Controls party invite/accept and town portals for other players.
+	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
 	Config.QuitList = []; // List of players to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
 	Config.OpenChests = false; // Open chests. Controls key buying.

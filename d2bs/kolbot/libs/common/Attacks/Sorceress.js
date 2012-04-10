@@ -79,9 +79,9 @@ var ClassAttack = {
 		}
 
 		// Get untimed skill
-		if (Config.AttackSkill[index + 1] > -1 && Attack.getResist(unit, this.skillElement[index + 1]) < 100 && (Config.AttackSkill[index + 1] !== 42 || me.gametype === 0 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
+		if (Config.AttackSkill[index + 1] > -1 && Attack.getResist(unit, this.skillElement[index + 1]) < 100 && (Config.AttackSkill[index + 1] !== 42 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
 			untimedIndex = index + 1;
-		} else if (Config.AttackSkill[6] > -1 && Attack.getResist(unit, this.skillElement[6]) < 100 && (Config.AttackSkill[6] !== 42 || me.gametype === 0 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
+		} else if (Config.AttackSkill[6] > -1 && Attack.getResist(unit, this.skillElement[6]) < 100 && (Config.AttackSkill[6] !== 42 || Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic)) {
 			untimedIndex = 6;
 		}
 

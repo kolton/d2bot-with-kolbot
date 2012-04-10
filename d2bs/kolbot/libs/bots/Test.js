@@ -17,7 +17,13 @@ function Test() {
 }
 
 function test() {
-	Town.doChores();
+	while (true) {
+		if (me.getState(121)) {
+			Skill.cast(45, 1, 15101, 5242);
+		} else {
+			Skill.cast(59, 0, 15101, 5242);
+		}
+	}
 }
 
 /*function test() {

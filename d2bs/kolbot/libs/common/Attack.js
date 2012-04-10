@@ -261,7 +261,7 @@ var Attack = {
 	},
 
 	clearList: function (list, sortfunc) { // clear an already formed array of monstas
-		var i, target, result,
+		var i, target, result, dodgeList,
 			gidAttack = [],
 			attackCount = 0,
 			monsterList = list.slice(0);
