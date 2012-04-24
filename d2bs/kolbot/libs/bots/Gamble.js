@@ -1,3 +1,9 @@
+/**
+*	@filename	Gamble.js
+*	@author		kolton
+*	@desc		keep gambling while other players supply you with gold
+*/
+
 function Gamble() {
 	var gold,
 		needGold = false;

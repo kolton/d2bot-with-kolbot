@@ -1,3 +1,9 @@
+/**
+*	@filename	Cows.js
+*	@author		kolton
+*	@desc		clear the Moo Moo Farm without killing the Cow King
+*/
+
 function Cows() {
 	this.buildCowRooms = function () {
 		var i, j, room, kingPreset, badRooms, badRooms2,

@@ -1,3 +1,9 @@
+/**
+*	@filename	CollMap.js
+*	@author		kolton
+*	@desc		manipulate map collision data
+*/
+
 var CollMap = new function () {
 	this.rooms = [];
 	this.maps = [];
@@ -60,5 +66,30 @@ var CollMap = new function () {
 	this.reset = function () {
 		this.rooms = [];
 		this.maps = [];
+	};
+
+	// Check collision between unitA and unitB. true = collision present, false = collision not present
+	// If checking for blocking collisions (0x1, 0x4), true means blocked, false means not blocked
+	this.checkColl = function (unitA, unitB, coll) {
+		var i, k, l, cx, cy, angle, distance;
+
+		angle = Math.round(Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x) * 180 / Math.PI);
+		distance = Math.round(getDistance(unitA, unitB));
+
+MainLoop:
+		for (i = 1; i < distance; i += 1) {
+			cx = Math.round((Math.cos(angle * Math.PI / 180)) * i + unitB.x);
+			cy = Math.round((Math.sin(angle * Math.PI / 180)) * i + unitB.y);
+
+			for (k = cx - 1; k <= cx + 1; k += 1) { // check thicker line
+				for (l = cy - 1; l <= cy + 1; l += 1) {
+					if (this.getColl(k, l) & coll) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	};
 };

@@ -1,4 +1,8 @@
-// Necromancer attack
+/**
+*	@filename	Necromancer.js
+*	@author		kolton
+*	@desc		Necromancer attack sequence
+*/
 
 var ClassAttack = {
 	skillRange: [],
@@ -88,7 +92,9 @@ var ClassAttack = {
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
@@ -104,7 +110,9 @@ var ClassAttack = {
 
 		if (Config.Curse[0] > 0 && this.isCursable(unit) && (unit.spectype & 0x7) && !unit.getState(this.curseState[0])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, 25, 0x4);
+				if (!Attack.getIntoPosition(unit, 25, 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.Curse[0], 0, unit)) {
@@ -116,7 +124,9 @@ var ClassAttack = {
 
 		if (Config.Curse[1] > 0 && this.isCursable(unit) && !(unit.spectype & 0x7) && !unit.getState(this.curseState[1])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, 25, 0x4);
+				if (!Attack.getIntoPosition(unit, 25, 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.Curse[1], 0, unit)) {
@@ -127,7 +137,10 @@ var ClassAttack = {
 		}
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (!this.doCast(unit, index)) {
+			switch (this.doCast(unit, index)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -141,7 +154,10 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
-			if (!this.doCast(unit, 5)) {
+			switch (this.doCast(unit, 5)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -184,7 +200,9 @@ var ClassAttack = {
 		if (Config.AttackSkill[index] === 92) {
 			if (!this.novaTick || getTickCount() - this.novaTick > Config.PoisonNovaDelay) {
 				if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-					Attack.getIntoPosition(unit, this.skillRange[index], 0x4);
+					if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+						return 0;
+					}
 				}
 
 				if (Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit)) {
@@ -197,7 +215,9 @@ var ClassAttack = {
 			}
 		} else if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[index], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+					return 0;
+				}
 			}
 
 			if (Config.AttackSkill[index] === 500) {
@@ -211,7 +231,9 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[index + 1] > -1) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index + 1] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4)) {
+					return 0;
+				}
 			}
 
 			return Skill.cast(Config.AttackSkill[index + 1], this.skillHand[index + 1], unit);
@@ -327,6 +349,8 @@ var ClassAttack = {
 						continue MainLoop;
 					}
 
+					print("Reviving " + corpse.name);
+
 					if (!Skill.cast(95, 0, corpse)) {
 						return false;
 					}
@@ -394,9 +418,9 @@ var ClassAttack = {
 		}
 
 		var baseId = getBaseStat("monstats", unit.classid, "baseid"),
-			badList = [571];
+			badList = [312, 571];
 
-		if (revive && ((unit.spectype & 0x7) || badList.indexOf(unit.classid) > -1 || Config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3)) {
+		if (revive && ((unit.spectype & 0x7) || badList.indexOf(baseId) > -1 || Config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3)) {
 			return false;
 		}
 

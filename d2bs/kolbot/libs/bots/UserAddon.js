@@ -1,11 +1,11 @@
-/* User Addon script for kolbot
- * Author: kolton
- * Description:
- * Allows you to see more information about items, NPCs and players by placing the cursor over them.
- * Shows item level, items in sockets, classid, code and magic item prefix/suffix numbers.
- * Shows monster's classid, HP percent and resistances.
- * Shows other players' gear.
- */
+/**
+*	@filename	UserAddon.js
+*	@author		kolton
+*	@desc		Allows you to see more information about items, NPCs and players by placing the cursor over them.
+*				Shows item level, items in sockets, classid, code and magic item prefix/suffix numbers.
+* 				Shows monster's classid, HP percent and resistances.
+*				Shows other players' gear.
+*/
 
 function UserAddon() {
 	var unit,

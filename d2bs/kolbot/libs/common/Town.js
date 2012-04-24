@@ -1,4 +1,12 @@
+/**
+*	@filename	Town.js
+*	@author		kolton
+*	@desc		do town chores like buying, selling and gambling
+*/
+
 var Town = {
+	sellTimer: getTickCount(), // shop speedup test
+
 	tasks: [
 		{Heal: "akara", Shop: "akara", Gamble: "gheed", Repair: "charsi", Merc: "kashya", Key: "akara"},
 		{Heal: "fara", Shop: "drognan", Gamble: "elzix", Repair: "fara", Merc: "greiz", Key: "lysander"},
@@ -189,7 +197,7 @@ var Town = {
 			pot = me.getItem(-1, 2); // Mode 2 = in belt
 
 		if (!pot) { // No potions
-			return true;
+			return col;
 		}
 
 		do {
@@ -238,8 +246,8 @@ var Town = {
 			if (tome) {
 				try {
 					tome.buy();
-				} catch (e) {
-					print(e);
+				} catch (e1) {
+					print(e1);
 				}
 			}
 		}
@@ -252,8 +260,8 @@ var Town = {
 
 		try {
 			scroll.buy(true);
-		} catch (e) {
-			print(e.message);
+		} catch (e2) {
+			print(e2.message);
 
 			return false;
 		}
@@ -387,6 +395,8 @@ MainLoop:
 			return false;
 		}
 
+		this.sellTimer = getTickCount(); // shop speedup test
+
 		for (i = 0; i < 3; i += 1) {
 			clickItem(1, tome);
 
@@ -405,7 +415,7 @@ MainLoop:
 			return false;
 		}
 
-		delay(me.ping + 1);
+		delay(270);
 
 		for (i = 0; i < 3; i += 1) {
 			if (getCursorType() === 6) {
@@ -414,15 +424,15 @@ MainLoop:
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 1000) {
+			while (getTickCount() - tick < 500) {
 				if (unit.getFlag(0x10)) {
-					delay(200);
-
 					return true;
 				}
 
 				delay(10);
 			}
+
+			delay(300);
 		}
 
 		return false;
@@ -611,9 +621,14 @@ MainLoop:
 			return false;
 		}
 
+		print("Repair trigger: " + repairCheck);
+
 		switch (repairCheck) {
-		case "repair":
+		case "durability":
+		case "charges":
+		case "quantity":
 			me.repair();
+
 			break;
 		case "quiver":
 			bowCheck = Attack.usingBow();
@@ -622,9 +637,11 @@ MainLoop:
 				switch (bowCheck) {
 				case "bow":
 					quiver = npc.getItem("aqv");
+
 					break;
 				case "crossbow":
 					quiver = npc.getItem("cqv");
+
 					break;
 				}
 
@@ -660,11 +677,28 @@ MainLoop:
 
 		do {
 			if (!item.getFlag(0x400000)) { // Skip ethereal items
-				// Durability check
-				durability = item.getStat(72);
+				switch (item.itemType) {
+				// Quantity check
+				case 42: // Throwing knives
+				case 43: // Throwing axes
+				case 44: // Javelins
+				case 87: // Amazon javelins
+					quantity = item.getStat(70);
 
-				if (durability && durability * 100 / item.getStat(73) <= repairPercent) {
-					return "repair";
+					if (quantity && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+						return "quantity";
+					}
+
+					break;
+				// Durability check
+				default:
+					durability = item.getStat(72);
+
+					if (durability && durability * 100 / item.getStat(73) <= repairPercent) {
+						return "durability";
+					}
+
+					break;
 				}
 
 				// Charged item check
@@ -674,27 +708,12 @@ MainLoop:
 					if (charge instanceof Array) {
 						for (i = 0; i < charge.length; i += 1) {
 							if (typeof charge[i] !== "undefined" && charge[i].hasOwnProperty("charges") && charge[i].charges * 100 / charge[i].maxcharges <= repairPercent) {
-								return "repair";
+								return "charges";
 							}
 						}
 					} else if (charge.charges * 100 / charge.maxcharges <= repairPercent) {
-						return "repair";
+						return "charges";
 					}
-				}
-
-				// Quantity check
-				switch (item.itemType) {
-				case 42: // Throwing knives
-				case 43: // Throwing axes
-				case 44: // Javelins
-				case 87: // Amazon javelins
-					quantity = item.getStat(70);
-
-					if (quantity && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
-						return "repair";
-					}
-
-					break;
 				}
 			}
 		} while (item.getNext());

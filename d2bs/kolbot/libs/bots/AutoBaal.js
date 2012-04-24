@@ -1,8 +1,10 @@
-/* 	
-	Universal Baal leecher by Kolton with Autoleader by Ethic
-	Pure leech script for throne and Baal
-	Reenters throne/chamber upon death and picks the corpse back up
-	Make sure you setup safeMsg and baalMsg accordingly
+/**
+*	@filename	Andariel.js
+*	@author		kolton
+*	@desc		Universal Baal leecher by Kolton with Autoleader by Ethic
+*				Pure leech script for throne and Baal
+*				Reenters throne/chamber upon death and picks the corpse back up
+*				Make sure you setup safeMsg and baalMsg accordingly
 */
 
 function AutoBaal() {

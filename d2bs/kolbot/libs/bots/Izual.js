@@ -1,3 +1,9 @@
+/**
+*	@filename	Izual.js
+*	@author		kolton
+*	@desc		kill Izual
+*/
+
 function Izual() {
 	Town.doChores();
 	Pather.useWaypoint(106);

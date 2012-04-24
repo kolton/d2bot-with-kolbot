@@ -1,3 +1,9 @@
+/**
+*	@filename	Smith.js
+*	@author		kolton
+*	@desc		kill the Smith
+*/
+
 function Smith() {
 	Town.doChores();
 	Pather.useWaypoint(27);
@@ -7,7 +13,7 @@ function Smith() {
 		throw new Error("Failed to move to the Smith");
 	}
 
-	Attack.kill("the smith");
+	Attack.kill(getLocaleString(2889)); // The Smith
 	Pickit.pickItems();
 
 	return true;

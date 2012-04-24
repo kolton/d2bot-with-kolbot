@@ -1,3 +1,9 @@
+/**
+*	@filename	Attack.js
+*	@author		kolton
+*	@desc		handle player attacks
+*/
+
 var Attack = {
 	classes: ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 	infinity: false,
@@ -90,7 +96,12 @@ var Attack = {
 			throw new Error("Attack.kill: Target not found");
 		}
 
-		while (attackCount < 300 && this.checkMonster(target)) {
+		if (Config.MFLeader) {
+			Pather.makePortal();
+			say("kill " + classId);
+		}
+
+		while (attackCount < 300 && this.checkMonster(target) && this.skipCheck(target)) {
 			if (Config.Dodge) {
 				if (attackCount % 5 === 0) {
 					monList = this.buildDodgeList();
@@ -121,6 +132,11 @@ var Attack = {
 
 	// Clear monsters in a section based on range and spectype or clear monsters around a boss monster
 	clear: function (range, spectype, bossId, sortfunc, pickit) { // probably going to change to passing an object
+		if (Config.MFLeader && !!bossId) {
+			Pather.makePortal();
+			say("clear " + bossId);
+		}
+
 		switch (arguments.length) {
 		case 0:
 			range = 25;
@@ -175,7 +191,7 @@ var Attack = {
 
 		if (target) {
 			do {
-				if (this.checkMonster(target)) {
+				if (this.checkMonster(target) && this.skipCheck(target)) {
 					monsterList.push(copyUnit(target));
 				}
 			} while (target.getNext());
@@ -213,7 +229,7 @@ var Attack = {
 					break;
 				case 2:
 				case 3:
-					if (!(target.spectype & 0x7)) {
+					if (!(target.spectype & 0x7) && me.area !== 131) {
 						for (i = 0; i < gidAttack.length; i += 1) {
 							if (gidAttack[i].gid === target.gid) {
 								break;
@@ -316,7 +332,7 @@ var Attack = {
 					break;
 				case 2:
 				case 3:
-					if (!(target.spectype & 0x7)) {
+					if (!(target.spectype & 0x7) && me.area !== 131) {
 						for (i = 0; i < gidAttack.length; i += 1) {
 							if (gidAttack[i].gid === target.gid) {
 								break;
@@ -366,6 +382,11 @@ var Attack = {
 
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
+		if (Config.MFLeader) {
+			Pather.makePortal();
+			say("clearlevel " + getArea().name);
+		}
+
 		var room, result, rooms;
 
 		room = getRoom();
@@ -606,6 +627,14 @@ var Attack = {
 			break;
 		}
 
+		return true;
+	},
+
+	skipCheck: function (unit) {
+		if (me.area === 131) {
+			return true;
+		}
+
 		var i, j, rval,
 			tempArray = [];
 
@@ -682,7 +711,7 @@ ImmuneLoop: // Skip immune monsters
 			tempArray = Config.SkipImmune[i].toLowerCase().split(" and ");
 
 			for (j = 0; j < tempArray.length; j += 1) {
-				if (this.checkResist(unit, Config.SkipImmune[i])) { // Infinity calculations are built-in
+				if (this.checkResist(unit, tempArray[j])) { // Infinity calculations are built-in
 					continue ImmuneLoop;
 				}
 			}
@@ -761,7 +790,7 @@ AuraLoop: // Skip monsters with auras
 		case 500: // Summoner
 			return "physical";
 		case 101: // Holy Bolt
-			return "none";
+			return "holybolt"; // no need to use this.elements array because it returns before going over the array
 		}
 
 		var eType = getBaseStat("skills", skillId, "etype");
@@ -794,6 +823,12 @@ AuraLoop: // Skip monsters with auras
 			return unit.getStat(45);
 		case "none":
 			return 0;
+		case "holybolt": // check if a monster is undead
+			if (getBaseStat("monstats", unit.classid, "lUndead") || getBaseStat("monstats", unit.classid, "hUndead")) {
+				return 0;
+			}
+
+			return 100;
 		}
 
 		return 100;
@@ -802,14 +837,14 @@ AuraLoop: // Skip monsters with auras
 	// Check if a monster is immune to specified attack type
 	checkResist: function (unit, type) {
 		if (unit.type === 0) { // player
-			return 0;
+			return true;
 		}
 
 		if (this.infinity && ["fire", "lightning", "cold"].indexOf(type) > -1) {
-			if (unit.getState(29)) {
-				return this.getResist(unit, type) < 100;
-			} else {
+			if (!unit.getState(28)) {
 				return this.getResist(unit, type) < 117;
+			} else {
+				return this.getResist(unit, type) < 100;
 			}
 		}
 
@@ -847,21 +882,22 @@ AuraLoop: // Skip monsters with auras
 
 		var n, i, j, k, l, cx, cy, t,
 			coords = [],
+			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
 			angles = [0, 45, 90, 135, 180, 225, 270, 305];
 
 		t = getTickCount();
 
-		for (n = 0; n < 4; n += 1) {
+		for (n = 0; n < 3; n += 1) {
 			if (n > 0) {
 				distance = Math.floor(distance / 2);
 			}
 
 			for (i = 0; i < angles.length; i += 1) {
-				cx = Math.round((Math.cos(angles[i] * Math.PI / 180)) * distance + unit.x);
-				cy = Math.round((Math.sin(angles[i] * Math.PI / 180)) * distance + unit.y);
+				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
+				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
 				if (!(CollMap.getColl(cx, cy) & 0x1)) {
-					coords.push([cx, cy, angles[i]]);
+					coords.push([cx, cy]);
 				}
 			}
 
@@ -871,33 +907,25 @@ AuraLoop: // Skip monsters with auras
 				coords.sort(Sort.points); // sort angles by final spot distance
 			} else { // no good final spots
 				//print("reducing optimal spot range");
+
 				continue;
 			}
 
 MainLoop:
 			for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
-				for (j = 1; j < distance; j += 1) {
-					cx = Math.round((Math.cos(coords[i][2] * Math.PI / 180)) * j + unit.x);
-					cy = Math.round((Math.sin(coords[i][2] * Math.PI / 180)) * j + unit.y);
-
-					for (k = cx - 1; k <= cx + 1; k += 1) { // check thicker line
-						for (l = cy - 1; l <= cy + 1; l += 1) {
-							if (CollMap.getColl(k, l) & coll) {
-								continue MainLoop;
-							}
-						}
-					}
+				if (CollMap.checkColl(unit, {x: coords[i][0], y: coords[i][1]}, coll)) {
+					continue MainLoop;
 				}
 
 				//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 				CollMap.reset();
 
-				return walk ? Pather.walkTo(cx, cy) : Pather.moveTo(cx, cy);
+				return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1]));
 			}
 		}
 
 		CollMap.reset();
-		print("optimal pos fail. dist: " + getDistance(me, unit) + " red. dist: " + distance);
+		print("optimal pos fail. " + unit.name);
 
 		return false;
 	}

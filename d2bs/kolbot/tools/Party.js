@@ -1,13 +1,27 @@
+/**
+*	@filename	Party.js
+*	@author		kolton
+*	@desc		handle party procedure ingame
+*/
+
 function main() {
+	include("OOG.js");
+	include("json2.js");
 	include("common/Config.js");
 	include("common/Cubing.js");
 	include("common/Runewords.js");
 	Config.init();
 
-	var myPartyId, player, otherParty,
+	var myPartyId, player, otherParty, shitList,
 		partyTick = getTickCount();
 
 	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode > 1 ? "Accept" : "Invite"));
+
+	if (Config.ShitList) {
+		shitList = ShitList.read();
+
+		print(shitList.length + " entries in shit list.");
+	}
 
 	// Main loop
 	while (true) {
@@ -17,12 +31,33 @@ function main() {
 			myPartyId = player.partyid;
 
 			while (player.getNext()) {
-				if (Config.PublicMode === 1) {
+				switch (Config.PublicMode) {
+				case 1:
+					if (getPlayerFlag(me.gid, player.gid, 8)) {
+						if (Config.ShitList && shitList.indexOf(player.name) === -1) {
+							shitList.push(player.name);
+							ShitList.add(player.name);
+						}
+
+						if (player.partyflag === 4) {
+							clickParty(player, 2); // cancel invitation
+							delay(100);
+						}
+
+						break;
+					}
+
+					if (Config.ShitList && shitList.indexOf(player.name) > -1) {
+						break;
+					}
+
 					if (player.partyflag !== 4 && player.partyid === 65535) {
 						clickParty(player, 2);
 						delay(100);
 					}
-				} else {
+
+					break;
+				case 2:
 					if (player.partyid !== 65535 && player.partyid !== myPartyId) {
 						otherParty = player.partyid;
 					}
@@ -31,6 +66,8 @@ function main() {
 						clickParty(player, 2);
 						delay(100);
 					}
+
+					break;
 				}
 			}
 		}

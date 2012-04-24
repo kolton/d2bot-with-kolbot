@@ -1,3 +1,9 @@
+/**
+*	@filename	ToolsThread.js
+*	@author		kolton
+*	@desc		several tools to help the player - potion use, chicken, Diablo clone stop, map reveal, quit with player
+*/
+
 function main() {
 	var i, mercHP, ironGolem,
 		quitFlag = false,
@@ -179,9 +185,9 @@ function main() {
 
 	this.quitWithLeader = function (mode, param1, param2, name1, name2) {
 		if (mode === 0 || mode === 1 || mode === 3) {
-			print(name1 + (mode === 0 ? " timed out" : " left"));
-
 			if (Config.QuitList.indexOf(name1) > -1) {
+				print(name1 + (mode === 0 ? " timed out" : " left"));
+
 				quitFlag = true;
 			}
 		}

@@ -1,3 +1,9 @@
+/**
+*	@filename	Config.js
+*	@author		kolton
+*	@desc		config loading and default config values storage
+*/
+
 var Scripts = {};
 
 var Config = {
@@ -60,12 +66,13 @@ var Config = {
 	UseMerc: false,
 	StashGold: 0,
 	Inventory: [
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	],
 	PublicMode: false,
+	ShitList: false,
 	QuitList: [],
 	RejuvBuffer: 0,
 	PickRange: 40,
@@ -90,6 +97,10 @@ var Config = {
 	TeleSwitch: false,
 	LogExperience: false,
 	TownCheck: false,
+
+	// Anti-hostile
+	AntiHostile: false,
+	HostileAction: 0,
 
 	// DClone
 	StopOnDClone: false,
@@ -145,6 +156,7 @@ var Config = {
 	SummonShadow: false,
 
 	// Script specific
+	MFLeader: false,
 	Mausoleum: {
 		KillBloodRaven: false,
 		ClearCrypt: true

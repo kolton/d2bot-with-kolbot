@@ -29,23 +29,12 @@ var switchKeyDelay = 0; // time in seconds to delay before switching keys
 var joinChannel = "";
 var games = [];
 var passwords = [];
-var joinDelay = 1000;
-var friendListQuery = 10; // time in seconds between each "/f l" query. 0 = don't use "/f l"
+var joinDelay = 5000;
+var friendListQuery = 0; // time in seconds between each "/f l" query. 0 = don't use "/f l"
 
 // DONT EDIT ANYTHING BELOW THIS
 
 // D2BOT Console Command
-const D2BOT_JOIN = 1;
-const D2BOT_GAMEINFO = 2;
-const D2BOT_REQUESTGAME = 3; 
-
-var lastGameStatus = "ready";
-var nextGameMake = 0;
-var inGameAt = 0;
-var chatActionsDone = false;
-var lastGameFailed = false;
-var ConnectFail = false;
-
 include("json2.js");
 include("OOG.js");
 
@@ -53,16 +42,22 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var gameCount = DataFile.getStats().runs + 1;
-var gamePass = "";
-var gameName = "";
-var oldGame = "";
-var gameStart;
-var isUp = "no"; 
-var channelTick = new Date().getTime();
-var _ingame = false; 
-var retry = 0;
-var fListTick = 0;
+var lastGameStatus = "ready",
+	nextGameMake = 0,
+	inGameAt = 0,
+	chatActionsDone = false,
+	lastGameFailed = false,
+	ConnectFail = false,
+	gameCount = DataFile.getStats().runs + 1,
+	gamePass = "",
+	gameName = "",
+	oldGame = "",
+	gameStart,
+	isUp = "no",
+	channelTick = new Date().getTime(),
+	inGame = false,
+	retry = 0,
+	fListTick = 0;
 
 function main() {
 	//addEventListener('copydata', RecieveCopyData);
@@ -74,7 +69,7 @@ function main() {
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				isUp = "yes"; 
 
-				if (!_ingame) {
+				if (!inGame) {
 					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
 						print("leaving game"); 
 						quit();
@@ -85,7 +80,7 @@ function main() {
 
 					oldGame = me.gamename
 					lastGameStatus = "ingame";
-					_ingame = true;
+					inGame = true;
 					gameStart = new Date().getTime();
 					me.maxgametime = gameMaxLength * 1000;
 					
@@ -104,7 +99,8 @@ function main() {
 }
 
 function locationAction(location) {
-MainSwitch: switch (location) {
+MainSwitch:
+	switch (location) {
 	case 0:
 		break;
 	case 1:	// Lobby
@@ -120,13 +116,13 @@ MainSwitch: switch (location) {
 	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby Chat"); 
 
-		if (_ingame) {
+		if (inGame) {
 			print("updating runs"); 
 			D2Bot.updateRuns();
 
 			gameCount += 1;
 			lastGameStatus = "ready";
-			_ingame = false;
+			inGame = false;
 			retry = 0;
 		}
 
@@ -173,7 +169,6 @@ MainSwitch: switch (location) {
 
 MainLoop: for (n = 0; n < games.length; n += 1) {
 			regex = new RegExp("\\W*" + games[n].toLowerCase() + "\\d*", "gi");
-
 			gameName = fullText.match(regex);
 
 			if (gameName) {
@@ -257,6 +252,7 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey");
+				D2Bot.CDKeyDisabled();
 
 				if (switchKeys) {
 					timeoutDelay("Key switch delay", switchKeyDelay * 1000);
@@ -353,6 +349,7 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
+		D2Bot.CDKeyInUse();
 
 		if (switchKeys) {
 			timeoutDelay("Key switch delay", switchKeyDelay * 1000);
@@ -406,7 +403,7 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.updateStatus("Game doesn't exist");
 
-		ControlAction.click(6,533,469,120,20);
+		ControlAction.click(6,652,469,120,20);
 		ControlAction.click(6,433,433,96,32);
 
 		inGameAt = rand(gameDoesNotExistdelayMin, gameDoesNotExistdelayMax);
@@ -417,7 +414,7 @@ MainLoop: for (n = 0; n < games.length; n += 1) {
 	case 38: // Game is full
 		D2Bot.updateStatus("Game is full");
 
-		ControlAction.click(6,533,469,120,20);
+		ControlAction.click(6,652,469,120,20);
 		ControlAction.click(6,433,433,96,32);
 
 		break;

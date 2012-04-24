@@ -282,6 +282,7 @@ JoinLoop: for (i in joinSettings) {
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey");
+				D2Bot.CDKeyDisabled();
 
 				if (switchKeys) {
 					timeoutDelay("Key switch delay", switchKeyDelay * 1000);
@@ -370,6 +371,7 @@ JoinLoop: for (i in joinSettings) {
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
+		D2Bot.CDKeyInUse();
 
 		if (switchKeys) {
 			timeoutDelay("Key switch delay", switchKeyDelay * 1000);

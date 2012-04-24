@@ -1,3 +1,9 @@
+/**
+*	@filename	Cubing.js
+*	@author		kolton
+*	@desc		transmute Horadric Cube recipes
+*/
+
 var Recipe = {
 	Gem: 0,
 	HitPower: {

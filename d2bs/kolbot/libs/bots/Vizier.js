@@ -1,3 +1,9 @@
+/**
+*	@filename	Vizier.js
+*	@author		kolton
+*	@desc		kill Grand Vizier of Chaos
+*/
+
 function Vizier() {
 	var i, tick, seal;
 	

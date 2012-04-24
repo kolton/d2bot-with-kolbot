@@ -1,3 +1,9 @@
+/**
+*	@filename	AncientTunnels.js
+*	@author		kolton
+*	@desc		clear Ancient Tunnels
+*/
+
 function AncientTunnels() {
 	Town.doChores();
 	Pather.useWaypoint(44);

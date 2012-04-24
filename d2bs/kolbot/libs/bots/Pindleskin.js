@@ -1,3 +1,9 @@
+/**
+*	@filename	Pindleskin.js
+*	@author		kolton
+*	@desc		kill Pindleskin and optionally Nihlathak
+*/
+
 function Pindleskin() {
 	Town.goToTown(5);
 	Town.doChores();
@@ -17,7 +23,7 @@ function Pindleskin() {
 		}
 
 		Pather.moveToPreset(me.area, 2, 462, 0, 0, false, true);
-		Attack.kill("nihlathak");
+		Attack.kill(526); // Nihlathak
 		Attack.clear(20);
 	}
 

@@ -1,3 +1,9 @@
+/**
+*	@filename	Nihlathak.js
+*	@author		kolton
+*	@desc		kill Nihlathak
+*/
+
 function Nihlathak() {
 	Town.doChores();
 	Pather.useWaypoint(123);
@@ -8,7 +14,7 @@ function Nihlathak() {
 	}
 
 	Pather.moveToPreset(me.area, 2, 462, 0, 0, false, true);
-	Attack.kill("nihlathak");
+	Attack.kill(526); // Nihlathak
 	Pickit.pickItems();
 
 	return true;

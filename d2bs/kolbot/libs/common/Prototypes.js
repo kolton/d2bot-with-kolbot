@@ -1,4 +1,8 @@
-// TODO: Determine whether to keep this file or move the prototypes to their appropriate sections
+/**
+*	@filename	Prototypes.js
+*	@author		kolton
+*	@desc		various 'Unit' and 'me' prototypes
+*/
 
 // Check if unit is idle
 Unit.prototype.__defineGetter__("idle",
@@ -153,7 +157,7 @@ Unit.prototype.sell = function () {
 		throw new Error("Unit.sell: Must be used in shops.");
 	}
 
-	var i, tick,
+	var i, tick, timer,
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 5; i += 1) {
@@ -169,7 +173,13 @@ Unit.prototype.sell = function () {
 
 		while (getTickCount() - tick < 2000) {
 			if (me.itemcount !== itemCount) {
-				delay(500);
+				//delay(500);
+
+				timer = getTickCount() - Town.sellTimer; // shop speedup test
+
+				if (timer > 0 && timer < 500) {
+					delay(timer);
+				}
 
 				return true;
 			}

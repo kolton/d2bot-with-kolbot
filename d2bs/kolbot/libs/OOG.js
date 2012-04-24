@@ -1,3 +1,9 @@
+/**
+*	@filename	OOG.js
+*	@author		kolton, D3STROY3R
+*	@desc		handle out of game operations like creating characters/accounts, maintaining profile datafiles, d2bot# logging etc.
+*/
+
 var D2Bot = {
 	printToConsole: function (msg) {
 		sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg);
@@ -30,7 +36,7 @@ var D2Bot = {
 	CDKeyDisabled: function () {
 		sendCopyData(null, "D2Bot #", 0, "CDKeyDisabled");
 	},
-	joinMe: function(window, gameName, gameCount, gamePass, isUp) {
+	joinMe: function (window, gameName, gameCount, gamePass, isUp) {
 		sendCopyData(null, window, 1, gameName + gameCount + "/" + gamePass + "/" + isUp);
 	},
 	requestGame: function (who) {
@@ -53,7 +59,8 @@ var DataFile = {
 			experience: 0,
 			deaths: 0,
 			lastArea: "",
-			gold: 0
+			gold: 0,
+			level: 0
 		};
 
 		string = JSON.stringify(obj);
@@ -63,35 +70,44 @@ var DataFile = {
 
 	getStats: function () {
 		var obj, string;
-		
+
+		if (!FileTools.exists("data/" + me.profile + ".json")) {
+			DataFile.create();
+		}
+
 		string = FileTools.readText("data/" + me.profile + ".json");
 		obj = JSON.parse(string);
-		
-		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold};
+
+		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level};
 	},
 
 	updateStats: function (arg, value) {
 		var obj, string;
 
-		string = FileTools.readText("data/" + me.profile + ".json");		
+		string = FileTools.readText("data/" + me.profile + ".json");
 		obj = JSON.parse(string);
 
 		switch (arg) {
 		case "runs":
 			obj.runs = value;
+
 			break;
 		case "experience":
-			obj.experience = value;
+			obj.experience = me.getStat(13);
+			obj.level = me.getStat(12);
+
 			break;
 		case "lastArea":
 			if (obj.lastArea === getArea().name) {
 				return;
 			}
 
-			obj.lastArea = value;
+			obj.lastArea = getArea().name;
+
 			break;
 		case "gold":
 			obj.gold = me.getStat(14) + me.getStat(15);
+
 			break;
 		}
 
@@ -117,7 +133,7 @@ var ControlAction = {
 		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
 
 		if (!control) {
-			print("control not found " + arguments[0] + " " + arguments[1] + " " + arguments[2])
+			print("control not found " + arguments[0] + " " + arguments[1] + " " + arguments[2]);
 			return false;
 		}
 
@@ -138,7 +154,7 @@ var ControlAction = {
 		//delay(textdelay);
 		delay(200);
 		control.setText(arguments[5]);
-		
+
 		return true;
 	},
 
@@ -153,9 +169,9 @@ var ControlAction = {
 	},
 
 	clickRealm: function () {
-		this.click(6,264,391,272,25);
+		this.click(6, 264, 391, 272, 25);
 		this.click(4, 257, 500, 292, 160, 403, 350 + arguments[0] * 25);
-		this.click(6,281,538,96,32);
+		this.click(6, 281, 538, 96, 32);
 	},
 
 	loginAccount: function (info) {
@@ -164,21 +180,21 @@ var ControlAction = {
 			"useast": 1,
 			"asia": 2,
 			"europe": 3
-			};
+		};
 
 		while (getLocation() !== 12 && getLocation() !== 42) {
 			switch (getLocation()) {
 			case 8: // main menu
 				ControlAction.clickRealm(realms[info.realm]);
-				this.click(6,264,366,272,35); // OK
+				this.click(6, 264, 366, 272, 35); // OK
 				break;
 			case 9: // login screen
-				this.setText(1,322,342,162,19, info.account);
-				this.setText(1,322,396,162,19, info.password);
-				this.click(6,264,484,272,35); // log in
+				this.setText(1, 322, 342, 162, 19, info.account);
+				this.setText(1, 322, 396, 162, 19, info.password);
+				this.click(6, 264, 484, 272, 35); // log in
 				break;
 			case 10: // login error - acc doesn't exist? TODO: handle all login errors
-				this.click(6,335,412,128,35); // OK
+				this.click(6, 335, 412, 128, 35); // OK
 				return false;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
@@ -201,37 +217,37 @@ var ControlAction = {
 			"useast": 1,
 			"asia": 2,
 			"europe": 3
-			};
+		};
 
 		while (getLocation() !== 42) {// cycle until in empty char screen
 			switch (getLocation()) {
 			case 8: // main menu
 				ControlAction.clickRealm(realms[info.realm]);
-				this.click(6,264,366,272,35);
+				this.click(6, 264, 366, 272, 35);
 				break;
 			case 9: // login screen
-				this.click(6,264,572,272,35);
+				this.click(6, 264, 572, 272, 35);
 				break;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
 				break;
 			case 31: // ToU
-				this.click(6,525,513,128,35);
+				this.click(6, 525, 513, 128, 35);
 				break;
 			case 32: // new account
-				this.setText(1,322,342,162,19, info.account);
-				this.setText(1,322,396,162,19, info.password);
-				this.setText(1,322,450,162,19, info.password);
-				this.click(6,627,572,128,35);
+				this.setText(1, 322, 342, 162, 19, info.account);
+				this.setText(1, 322, 396, 162, 19, info.password);
+				this.setText(1, 322, 450, 162, 19, info.password);
+				this.click(6, 627, 572, 128, 35);
 				break;
 			case 33: // please read
-				this.click(6,525,513,128,35);
+				this.click(6, 525, 513, 128, 35);
 				break;
 			case 34: // e-mail
-				if (getControl(6,415,412,128,35)) {
-					this.click(6,415,412,128,35);
+				if (getControl(6, 415, 412, 128, 35)) {
+					this.click(6, 415, 412, 128, 35);
 				} else {
-					this.click(6,265,572,272,35);
+					this.click(6, 265, 572, 272, 35);
 				}
 
 				break;
@@ -249,7 +265,7 @@ var ControlAction = {
 		var control, text;
 
 		if (getLocation() === 12) {
-			control = getControl(4,37,178,200,92);
+			control = getControl(4, 37, 178, 200, 92);
 
 			if (control) {
 				do {
@@ -271,7 +287,7 @@ var ControlAction = {
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
 			case 12: // character select
-				control = getControl(4,37,178,200,92);
+				control = getControl(4, 37, 178, 200, 92);
 
 				if (control) {
 					do {
@@ -279,7 +295,7 @@ var ControlAction = {
 
 						if (text instanceof Array && typeof text[1] === "string" && text[1] === info.charName) {
 							control.click();
-							this.click(6,627,572,128,35);
+							this.click(6, 627, 572, 128, 35);
 
 							break;
 						}
@@ -288,7 +304,7 @@ var ControlAction = {
 
 				break;
 			case 42: // empty character select
-				this.click(6,33,572,128,35);
+				this.click(6, 33, 572, 128, 35);
 				break;
 			default:
 				break;
@@ -304,14 +320,14 @@ var ControlAction = {
 		if (!info.charClass) {
 			info.charClass = "barbarian";
 		}
-		
+
 		var clickCoords = [];
-		
+
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
 			case 12: // character select
 			case 42: // empty character select
-				this.click(6,33,528,168,60);
+				this.click(6, 33, 528, 168, 60);
 				break;
 			case 29: // select character
 				switch (info.charClass) {
@@ -352,21 +368,21 @@ var ControlAction = {
 
 				break;
 			case 15: // new character
-				this.setText(1,318,510,157,16, info.charName);
-				
+				this.setText(1, 318, 510, 157, 16, info.charName);
+
 				if (!this.expansion) {
-					this.click(6,319,540,15,16);
-				}
-				
-				if (!info.ladder) {
-					this.click(6,319,580,15,16);
-				}
-				
-				if (info.hardcore) {
-					this.click(6,319,560,15,16);
+					this.click(6, 319, 540, 15, 16);
 				}
 
-				this.click(6,627,572,128,35);
+				if (!info.ladder) {
+					this.click(6, 319, 580, 15, 16);
+				}
+
+				if (info.hardcore) {
+					this.click(6, 319, 560, 15, 16);
+				}
+
+				this.click(6, 627, 572, 128, 35);
 				break;
 			default:
 				break;
@@ -377,4 +393,38 @@ var ControlAction = {
 
 		return true;
 	}
-}
+};
+
+var ShitList = {
+	read: function () {
+		var obj, string;
+
+		if (!FileTools.exists("shitlist.json")) {
+			obj = {
+				shitlist: []
+			};
+
+			string = JSON.stringify(obj);
+
+			FileTools.writeText("shitlist.json", string);
+		}
+
+		string = FileTools.readText("shitlist.json");
+		obj = JSON.parse(string);
+
+		return obj.shitlist;
+	},
+
+	add: function (name) {
+		var obj, string;
+
+		string = FileTools.readText("shitlist.json");
+		obj = JSON.parse(string);
+
+		obj.shitlist.push(name);
+
+		string = JSON.stringify(obj);
+
+		FileTools.writeText("shitlist.json", string);
+	}
+};

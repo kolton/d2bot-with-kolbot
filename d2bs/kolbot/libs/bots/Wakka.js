@@ -1,3 +1,9 @@
+/**
+*	@filename	Wakka.js
+*	@author		kolton
+*	@desc		walking Chaos Sanctuary leecher
+*/
+
 var stopLvl = 99;
 
 function Wakka() {
@@ -265,7 +271,7 @@ function Wakka() {
 						break;
 					}
 					
-					if (this.checkBoss("grand vizier of chaos")) {
+					if (this.checkBoss(getLocaleString(2851))) {
 						if (!tick) {
 							tick = getTickCount();
 						}
@@ -288,7 +294,7 @@ function Wakka() {
 						break;
 					}
 					
-					if (this.checkBoss("lord de seis")) {
+					if (this.checkBoss(getLocaleString(2852))) {
 						if (!tick) {
 							tick = getTickCount();
 						}
@@ -311,7 +317,7 @@ function Wakka() {
 						break;
 					}
 
-					if (this.checkBoss("infector of souls")) {
+					if (this.checkBoss(getLocaleString(2853))) {
 						if (!tick) {
 							tick = getTickCount();
 						}

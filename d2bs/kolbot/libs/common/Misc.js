@@ -1,3 +1,9 @@
+/**
+*	@filename	Misc.js
+*	@author		kolton
+*	@desc		misc library containing Skill, Misc and Sort classes
+*/
+
 var Skill = {
 	// Cast a skill on self, Unit or coords
 	cast: function (skillId, hand, x, y) {
@@ -109,7 +115,7 @@ MainLoop:
 
 	// Timed skills
 	isTimed: function (skillId) {
-		return [15, 25, 27, 51, 56, 62, 59, 64, 121, 225, 229, 234, 244, 249, 250, 223, 228, 247, 275, 277, 268, 279].indexOf(skillId) > -1;
+		return [15, 25, 27, 51, 56, 59, 62, 64, 121, 225, 223, 228, 229, 234, 244, 247, 249, 250, 256, 268, 275, 277, 279].indexOf(skillId) > -1;
 	},
 
 	// Skills that cn be cast in town
@@ -317,10 +323,10 @@ var Misc = {
 	// Log kept item stats in the manager. It's buggy.
 	logItem: function (action, unit) { // hackit to the max
 		var val,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc./, ""),
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""),
 			desc = "";
 
-		desc += (Pickit.itemColor(unit) + unit.fname.split("\n").reverse().join("\n").replace(/ÿc./, "") + "ÿc0");
+		desc += (Pickit.itemColor(unit) + unit.fname.split("\n").reverse().join("\n").replace(/ÿc[0-9!"+<;.*]/, "") + "ÿc0");
 		val = unit.getStat(31);
 
 		if (val) {
@@ -522,5 +528,54 @@ var Sort = {
 	// Sort arrays of x,y coords by comparing distance between the player
 	points: function (a, b) {
 		return getDistance(me, a[0], a[1]) - getDistance(me, b[0], b[1]);
+	}
+};
+
+var Experience = {
+	totalExp: [0, 0, 500, 1500, 3750, 7875, 14175, 22680, 32886, 44396, 57715, 72144, 90180, 112725, 140906, 176132, 220165, 275207, 344008, 430010, 537513, 671891, 839864, 1049830, 1312287, 1640359, 2050449, 2563061, 3203826, 3902260, 4663553, 5493363, 6397855, 7383752, 8458379, 9629723, 10906488, 12298162, 13815086, 15468534, 17270791, 19235252, 21376515, 23710491, 26254525, 29027522, 32050088, 35344686, 38935798, 42850109, 47116709, 51767302, 56836449, 62361819, 68384473, 74949165, 82104680, 89904191, 98405658, 107672256, 117772849, 128782495, 140783010, 153863570, 168121381, 183662396, 200602101, 219066380, 239192444, 261129853, 285041630, 311105466, 339515048, 370481492, 404234916, 441026148, 481128591, 524840254, 572485967, 624419793, 681027665, 742730244, 809986056, 883294891, 963201521, 1050299747, 1145236814, 1248718217, 1361512946, 1484459201, 1618470619, 1764543065, 1923762030, 2097310703, 2286478756, 2492671933, 2717422497, 2962400612, 3229426756, 3520485254, 0, 0],
+	nextExp: [0, 500, 1000, 2250, 4125, 6300, 8505, 10206, 11510, 13319, 14429, 18036, 22545, 28181, 35226, 44033, 55042, 68801, 86002, 107503, 134378, 167973, 209966, 262457, 328072, 410090, 512612, 640765, 698434, 761293, 829810, 904492, 985897, 1074627, 1171344, 1276765, 1391674, 1516924, 1653448, 1802257, 1964461, 2141263, 2333976, 2544034, 2772997, 3022566, 3294598, 3591112, 3914311, 4266600, 4650593, 5069147, 5525370, 6022654, 6564692, 7155515, 7799511, 8501467, 9266598, 10100593, 11009646, 12000515, 13080560, 14257811, 15541015, 16939705, 18464279, 20126064, 21937409, 23911777, 26063836, 28409582, 30966444, 33753424, 36791232, 40102443, 43711663, 47645713, 51933826, 56607872, 61702579, 67255812, 73308835, 79906630, 87098226, 94937067, 103481403, 112794729, 122946255, 134011418, 146072446, 159218965, 173548673, 189168053, 206193177, 224750564, 244978115, 267026144, 291058498, 0, 0],
+
+	// Percent progress into the current level. Format: xx.xx%
+	progress: function () {
+		return me.getStat(12) === 99 ? 0 : (((me.getStat(13) - this.totalExp[me.getStat(12)]) / this.nextExp[me.getStat(12)]) * 100).toFixed(2);
+	},
+
+	// Total experience gained in current run
+	gain: function () {
+		return (me.getStat(13) - DataFile.getStats().experience);
+	},
+
+	// Percent experience gained in current run
+	gainPercent: function () {
+		return me.getStat(12) === 99 ? 0 : (this.gain() * 100 / this.nextExp[me.getStat(12)]).toFixed(6);
+	},
+
+	// Runs until next level
+	runsToLevel: function () {
+		return Math.round(((100 - this.progress()) / 100) * this.nextExp[me.getStat(12)] / this.gain());
+	},
+
+	// Total runs needed for next level (not counting current progress)
+	totalRunsToLevel: function () {
+		return Math.round(this.nextExp[me.getStat(12)] / this.gain());
+	},
+
+	// Log to manager
+	log: function () {
+		var string,
+			gain = this.gain(),
+			progress = this.progress(),
+			runsToLevel = this.runsToLevel(),
+			totalRunsToLevel = this.totalRunsToLevel();
+
+		string = "XP Gain: " + gain + ", Progress: " + me.getStat(12) + " (" + progress + "%), Est. runs until level-up: " + runsToLevel + "/" + totalRunsToLevel;
+
+		if (gain) {
+			D2Bot.printToConsole(string + ";2");
+
+			if (me.getStat(12) > DataFile.getStats().level) {
+				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";3");
+			}
+		}
 	}
 };

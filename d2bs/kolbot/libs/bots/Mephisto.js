@@ -1,3 +1,9 @@
+/**
+*	@filename	Mephisto.js
+*	@author		kolton
+*	@desc		kill Mephisto
+*/
+
 function Mephisto() {
 	this.killMephisto = function () {
 		var i, angle,

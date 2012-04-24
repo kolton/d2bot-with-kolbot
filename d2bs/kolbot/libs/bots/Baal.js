@@ -1,3 +1,9 @@
+/**
+*	@filename	Baal.js
+*	@author		kolton
+*	@desc		clear Throne of Destruction and kill Baal
+*/
+
 function Baal() {
 	var tick, portal;
 
@@ -6,7 +12,7 @@ function Baal() {
 
 		switch (me.classid) {
 		case 1:
-			if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+			if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
 				if (me.getState(121)) {
 					delay(500);
 				} else {
@@ -31,7 +37,13 @@ function Baal() {
 			Skill.cast(Config.AttackSkill[3], 1);
 
 			return true;
-		case 5:
+		case 5: // Druid
+			if (Config.AttackSkill[3] === 245) {
+				Skill.cast(Config.AttackSkill[3], 0, 15093, 5029);
+
+				return true;
+			}
+
 			break;
 		case 6:
 			if (Config.UseTraps) {
@@ -72,6 +84,7 @@ function Baal() {
 					default:
 						Attack.getIntoPosition(monster, 10, 0x4);
 						Attack.clear(15);
+
 						return false;
 					}
 				}
@@ -83,14 +96,14 @@ function Baal() {
 
 	this.clearThrone = function () {
 		var i,
-			pos = [15097, 5054, 15085, 5053, 15085, 5040, 15098, 5040, 15099, 5022, 15086, 5024]
+			pos = [15097, 5054, 15085, 5053, 15085, 5040, 15098, 5040, 15099, 5022, 15086, 5024];
 
 		for (i = 0; i < pos.length; i += 2) {
 			Pather.moveTo(pos[i], pos[i + 1]);
 			Attack.clear(30);
 		}
 	};
-	
+
 	this.checkHydra = function () {
 		var monster = getUnit(1, "hydra");
 
@@ -139,7 +152,8 @@ function Baal() {
 
 	tick = getTickCount();
 
-MainLoop: while (true) {
+MainLoop:
+	while (true) {
 		if (getDistance(me, 15093, me.classid === 3 ? 5029 : 5039) > 3) {
 			Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 		}
@@ -156,13 +170,16 @@ MainLoop: while (true) {
 		case 2:
 		case 4:
 			Attack.clear(40);
+
 			break;
 		case 3:
 			Attack.clear(40);
+
 			this.checkHydra();
 			break;
 		case 5:
 			Attack.clear(40);
+
 			break MainLoop;
 		default:
 			if (!this.preattack()) {
@@ -173,6 +190,7 @@ MainLoop: while (true) {
 		}
 
 		Precast.doPrecast(false);
+		delay(10);
 	}
 
 	Pather.moveTo(15092, 5011);

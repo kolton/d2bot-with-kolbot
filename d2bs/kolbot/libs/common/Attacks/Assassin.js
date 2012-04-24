@@ -1,4 +1,8 @@
-// Assassin attack
+/**
+*	@filename	Assassin.js
+*	@author		kolton
+*	@desc		Assassin attack sequence
+*/
 
 var ClassAttack = {
 	skillRange: [],
@@ -52,7 +56,9 @@ var ClassAttack = {
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
@@ -69,7 +75,9 @@ var ClassAttack = {
 
 		if (checkTraps) {
 			if (Math.round(getDistance(me, unit)) > 20 || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, 20, 0x4);
+				if (!Attack.getIntoPosition(unit, 20, 0x4)) {
+					return 1;
+				}
 			}
 
 			this.placeTraps(unit, checkTraps);
@@ -81,7 +89,10 @@ var ClassAttack = {
 		}
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (!this.doCast(unit, index)) {
+			switch (this.doCast(unit, index)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -89,7 +100,10 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
-			if (!this.doCast(unit, 5)) {
+			switch (this.doCast(unit, 5)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -112,7 +126,9 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[index] === 151) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
-				Attack.getIntoPosition(unit, this.skillRange[index], 0x1);
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x1)) {
+					return 0;
+				}
 			}
 
 			return this.whirlwind(unit, index);
@@ -120,7 +136,9 @@ var ClassAttack = {
 
 		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[index], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+					return 0;
+				}
 			}
 
 			return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
@@ -128,7 +146,9 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[index + 1] > -1) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index + 1] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4)) {
+					return 0;
+				}
 			}
 
 			return Skill.cast(Config.AttackSkill[index + 1], this.skillHand[index + 1], unit);
@@ -162,6 +182,8 @@ var ClassAttack = {
 		var i, j,
 			traps = 0;
 
+		this.lastTrapPos = {x: unit.x, y: unit.y};
+
 		for (i = -1; i <= 1; i += 1) {
 			for (j = -1; j <= 1; j += 1) {
 				if (Math.abs(i) !== Math.abs(j)) { // used for X formation
@@ -173,21 +195,19 @@ var ClassAttack = {
 					return true;
 				}
 
-				if (unit.hasOwnProperty("spectype") && (unit.spectype & 0x5)) {
+				if (unit.hasOwnProperty("classid") && [211, 242, 243, 544].indexOf(unit.classid) > -1) { // Duriel, Mephisto, Diablo, Baal
 					if (traps >= Config.BossTraps.length) {
 						return true;
 					}
 
 					Skill.cast(Config.BossTraps[traps], 0, unit.x + i, unit.y + j);
 				} else {
-					if (traps >= Config.BossTraps.length) {
+					if (traps >= Config.Traps.length) {
 						return true;
 					}
 
 					Skill.cast(Config.Traps[traps], 0, unit.x + i, unit.y + j);
 				}
-
-				this.lastTrapPos = {x: unit.x, y: unit.y};
 
 				traps += 1;
 			}

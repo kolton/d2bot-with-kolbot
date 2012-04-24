@@ -70,7 +70,7 @@ function main() {
 		DataFile.updateDeaths();
 	}
 
-	DataFile.updateStats("experience", me.getStat(13));
+	DataFile.updateStats("experience");
 
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
 	Config.init(true);
@@ -86,6 +86,10 @@ function main() {
 
 	if (Config.PublicMode) {
 		load("tools/Party.js");
+	}
+
+	if (Config.AntiHostile) {
+		load("tools/AntiHostile.js");
 	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
@@ -110,7 +114,7 @@ function main() {
 	delay(500);
 
 	if (Config.LogExperience) {
-		D2Bot.printToConsole("Exp gained: " + (me.getStat(13) - DataFile.getStats().experience) + ";2");
+		Experience.log();
 	}
 
 	if (sojPause) {

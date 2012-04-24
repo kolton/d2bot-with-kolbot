@@ -1,3 +1,9 @@
+/**
+*	@filename	KurastTemples.js
+*	@author		kolton
+*	@desc		clear Kurast Temples
+*/
+
 function KurastTemples() {
 	Town.doChores();
 	Pather.useWaypoint(80);

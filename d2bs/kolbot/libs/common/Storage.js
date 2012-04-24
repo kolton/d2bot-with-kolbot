@@ -1,4 +1,8 @@
-// mBot code
+/**
+*	@filename	Storage.js
+*	@author		McGod, kolton (small kolbot related edits)
+*	@desc		manage inventory, belt, stash, cube
+*/
 
 var Container = function (name, width, height, location) {
 	var h, w;
@@ -80,7 +84,8 @@ var Container = function (name, width, height, location) {
 
 		//Loop buffer looking for spot to place item.
 		for (x = 0; x < this.height - (item.sizey - 1); x += 1) {
-Loop: for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
+Loop:
+			for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
 				//Check if there is something in this spot.
 				if (this.buffer[x][y] > 0) {
 					continue;
@@ -191,7 +196,8 @@ Loop: for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
 			}
 
 			for (h = 0; h < this.height; h += 1) {
-Loop: for (w = 0; w < this.width; w += 1) {
+Loop:
+				for (w = 0; w < this.width; w += 1) {
 					item = this.itemList[this.buffer[h][w] - 1];
 
 					if (!item) {

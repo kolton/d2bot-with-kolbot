@@ -1,3 +1,9 @@
+/**
+*	@filename	Hephasto.js
+*	@author		kolton
+*	@desc		kill Hephasto the Armorer
+*/
+
 function Hephasto() {
 	Town.doChores();
 	Pather.useWaypoint(107);
@@ -7,7 +13,7 @@ function Hephasto() {
 		throw new Error("Failed to move to Hephasto");
 	}
 
-	Attack.kill("hephasto the armorer");
+	Attack.kill(getLocaleString(1067)); // Hephasto The Armorer
 	Pickit.pickItems();
 
 	return true;

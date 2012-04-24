@@ -1,3 +1,9 @@
+/**
+*	@filename	Endugu.js
+*	@author		kolton
+*	@desc		kill Witch Doctor Endugu
+*/
+
 function Endugu() {
 	Town.doChores();
 	Pather.useWaypoint(78);
@@ -7,7 +13,7 @@ function Endugu() {
 		throw new Error("Failed to move to Endugu");
 	}
 
-	Attack.clear(15, 0, "Witch Doctor Endugu");
+	Attack.clear(15, 0, getLocaleString(2867)); // Witch Doctor Endugu
 
 	return true;
 }

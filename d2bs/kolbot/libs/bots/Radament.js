@@ -1,3 +1,9 @@
+/**
+*	@filename	Radament.js
+*	@author		kolton
+*	@desc		kill Radament
+*/
+
 function Radament() {
 	Town.doChores();
 	Pather.useWaypoint(48);
@@ -7,7 +13,7 @@ function Radament() {
 		throw new Error("Failed to move to Radament");
 	}
 
-	Attack.kill("radament");
+	Attack.kill(229); // Radament
 	Pickit.pickItems();
 	Attack.openChests(20);
 

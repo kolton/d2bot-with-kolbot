@@ -221,11 +221,17 @@ function LoadConfig() {
 
 	// General config
 	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
+	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
 	Config.QuitList = []; // List of players to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
 	Config.OpenChests = false; // Open chests. Controls key buying.
 	Config.MiniShopBot = true; // Scan items in NPC shops.
 	Config.TownCheck = false; // Go to town if out of potions
+	Config.LogExperience = false; // Print experience statistics in the manager.
+
+	// Anti-hostile config
+	Config.AntiHostile = false; // Enable anti-hostile
+	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
 
 	// DClone config
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth
@@ -238,7 +244,7 @@ function LoadConfig() {
 	// Skip enchanted monsters. Possible options: "extra strong", "extra fast", "cursed", "magic resistant", "fire enchanted", "lightning enchanted", "cold enchanted", "mana burn", "teleportation", "spectral hit", "stone skin", "multiple shots".
 	// You can combine multiple enchantments with "and", for example - "cursed and extra fast", "mana burn and extra strong and lightning enchanted"
 	Config.SkipEnchant = [];
-	// Skip monsters with auras. Possible options: "fanaticism", "might", "holy fire", "blessed aim", "conviction", "holy freeze", "holy shock"
+	// Skip monsters with auras. Possible options: "fanaticism", "might", "holy fire", "blessed aim", "holy freeze", "holy shock". Conviction is bugged, don't use it.
 	Config.SkipAura = [];
 
 	/* Attack config
@@ -268,4 +274,5 @@ function LoadConfig() {
 	Config.Revives = 0; // Number of revives to raise. Set to "max" to auto detect, set to 0 to disable.
 	Config.PoisonNovaDelay = 2000; // Delay between two Poison Novas
 	Config.ActiveSummon = false; // Raise dead between each attack. If false, it will raise after clearing a spot.
+	Config.ReviveUnstackable = true; // Revive monsters that can move freely after you teleport.
 }

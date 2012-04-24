@@ -1,3 +1,9 @@
+/**
+*	@filename	FastDiablo.js
+*	@author		kolton
+*	@desc		kill seal bosses and Diablo
+*/
+
 function FastDiablo() {
 	var i, tick, seal;
 	
@@ -109,7 +115,7 @@ function FastDiablo() {
 	}
 
 	for (i = 0; i < 10; i += 1) {
-		if (getUnit(1, "infector of souls")) {
+		if (getUnit(1, getLocaleString(2853))) { // Infector of Souls
 			break;
 		}
 

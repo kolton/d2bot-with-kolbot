@@ -1,3 +1,9 @@
+/**
+*	@filename	KurastChests.js
+*	@author		kolton
+*	@desc		open chests in Lower Kurast and optionally Kurast Bazaar
+*/
+
 function KurastChests() {
 	Town.doChores();
 	Pather.useWaypoint(79);

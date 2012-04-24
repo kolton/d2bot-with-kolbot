@@ -1,3 +1,9 @@
+/**
+*	@filename	Pickit.js
+*	@author		kolton
+*	@desc		handle item pickup
+*/
+
 var Pickit = {
 	range: 40,
 	pickList: [],
@@ -37,7 +43,7 @@ var Pickit = {
 			delay(40);
 		}
 
-		var gid, checkedItem, status,
+		var status,
 			item = getUnit(4);
 
 		this.pickList = [];
@@ -55,7 +61,7 @@ var Pickit = {
 		while (this.pickList.length > 0) {
 			item = this.pickList.shift();
 
-			if (!item) {
+			if (!item || !copyUnit(item).x) {
 				continue;
 			}
 
@@ -75,11 +81,13 @@ var Pickit = {
 
 				if (!Town.visitTown()) {
 					print("ÿc7Not enough room for " + item.name);
+
 					return;
 				}
 
 				if (!Storage.Inventory.CanFit(item)) {
 					print("ÿc7Not enough room for " + item.name);
+
 					continue;
 				}
 			}
@@ -99,12 +107,13 @@ var Pickit = {
 			// TODO: Add config option for Telekinesis
 			useTk = me.classid === 1 && me.getSkill(43, 1) && (type === 4 || type === 22 || (type > 75 && type < 82)) && getDistance(me, unit) > 5 && getDistance(me, unit) < 20 && !checkCollision(me, unit, 0x4);
 
-MainLoop: for (i = 0; i < 3; i += 1) {
+MainLoop:
+		for (i = 0; i < 3; i += 1) {
 			while (!me.idle) {
 				delay(40);
 			}
 
-			if (unit.mode !== 3 && unit.mode !== 5) {
+			if ((unit.mode !== 3 && unit.mode !== 5) || !copyUnit(unit).x) { // added invalidated unit check
 				break MainLoop;
 			}
 
@@ -151,8 +160,7 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 
 		if (picked) {
 			print("ÿc7Picked up " + color + name);
-
-			DataFile.updateStats("lastArea", getArea().name);
+			DataFile.updateStats("lastArea");
 
 			switch (status) {
 			case 1:
@@ -164,9 +172,11 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 				break;
 			case 2:
 				Cubing.update(classid);
+
 				break;
 			case 3:
 				Runewords.update(classid, gid);
+
 				break;
 			}
 		}
@@ -256,7 +266,6 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 			needPots = 0;
 
 			for (i = 0; i < 4; i += 1) {
-				// TODO: Change variable
 				if (typeof unit.code === "string" && unit.code.indexOf(Config.BeltColumn[i]) > -1) {
 					needPots += this.beltSize;
 				}
@@ -274,7 +283,6 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 
 			if (needPots < 1) {
 				// For juvs in inventory
-				// TODO: Change var
 				if (Config.RejuvBuffer && unit.itemType === 78) {
 					if (!Storage.Inventory.CanFit(unit)) {
 						return false;
@@ -300,6 +308,7 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 			break;
 		case undefined: // Yes, it does happen
 			print("undefined item (!?)");
+
 			return false;
 		}
 

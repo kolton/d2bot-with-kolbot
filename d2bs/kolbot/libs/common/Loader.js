@@ -1,6 +1,7 @@
-/*
-	Script loader library
-	Based on mBot's Sequencer
+/**
+*	@filename	Loader.js
+*	@author		kolton
+*	@desc		script loader, based on mBot's Sequencer.js
 */
 
 var global = this;

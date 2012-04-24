@@ -1,3 +1,9 @@
+/**
+*	@filename	Rakanishu.js
+*	@author		kolton
+*	@desc		kill Rakanishu and optionally Griswold
+*/
+
 function Rakanishu() {
 	Town.doChores();
 	Pather.useWaypoint(4);
@@ -15,7 +21,7 @@ function Rakanishu() {
 		}
 
 		Pather.moveTo(25149, 5180);
-		Attack.clear(20, 0xF, "griswold");
+		Attack.clear(20, 0xF, 365); // Griswold
 	}
 
 	return true;

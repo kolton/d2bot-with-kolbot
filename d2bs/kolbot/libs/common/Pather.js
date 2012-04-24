@@ -1,3 +1,9 @@
+/**
+*	@filename	Pather.js
+*	@author		kolton
+*	@desc		handle player movement
+*/
+
 var Pather = {
 	walkDistance: 15,
 	teleDistance: 40,
@@ -15,7 +21,7 @@ var Pather = {
 		if (typeof (x) !== "number" || typeof (y) !== "number") {
 			throw new Error("moveTo: Coords must be numbers");
 		}
-	
+
 		if (getUIFlag(0x01) || getUIFlag(0x0C)) {
 			me.cancel();
 		}
@@ -23,15 +29,23 @@ var Pather = {
 		switch (arguments.length) {
 		case 2:
 			retry = 3;
+			clearPath = false;
+			pop = false;
+
+			break;
 		case 3:
 			clearPath = false;
+			pop = false;
+
+			break;
 		case 4:
 			pop = false;
 
 			break;
 		}
 
-		var path, node, mob,
+		var path, mob,
+			node = {x: x, y: y},
 			fail = 0;
 
 		this.useTeleport = !me.inTown && me.getSkill(54, 1);
@@ -126,14 +140,14 @@ var Pather = {
 			Precast.weaponSwitch(Misc.oldSwitch);
 		}
 
-		return getDistance(me, x, y) < 4;
+		return getDistance(me, node.x, node.y) < 4;
 	},
 
-	// TODO: Replace NT functions and constants
 	teleportTo: function (x, y) {
 		var i, tick;
 
-MainLoop: for (i = 0; i < 3; i += 1) {
+MainLoop:
+		for (i = 0; i < 3; i += 1) {
 			Skill.cast(54, 0, x, y);
 
 			tick = getTickCount();
@@ -174,7 +188,8 @@ MainLoop: for (i = 0; i < 3; i += 1) {
 			}
 		}
 
-MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
+MainLoop:
+		while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 			if (me.classid === 3 && Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
@@ -224,7 +239,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 	openDoors: function (x, y) {
 		// Regular doors
 		var i, tick,
-			door = getUnit(2, getLocaleString(3282), 0); // "Door"
+			door = getUnit(2, "door", 0);
 
 		if (door) {
 			do {
@@ -261,10 +276,22 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 		switch (arguments.length) {
 		case 1:
 			offX = 0;
+			offY = 0;
+			clearPath = false;
+			pop = false;
+
+			break;
 		case 2:
 			offY = 0;
+			clearPath = false;
+			pop = false;
+
+			break;
 		case 3:
 			clearPath = false;
+			pop = false;
+
+			break;
 		case 4:
 			pop = false;
 
@@ -293,12 +320,25 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 		switch (arguments.length) {
 		case 3:
 			offX = 0;
+			offY = 0;
+			clearPath = false;
+			pop = false;
+
+			break;
 		case 4:
 			offY = 0;
+			clearPath = false;
+			pop = false;
+
+			break;
 		case 5:
 			clearPath = false;
+			pop = false;
+
+			break;
 		case 6:
 			pop = false;
+
 			break;
 		}
 
@@ -313,7 +353,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 
 	// moveToExit can take a single area or an array of areas as the first argument
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, n, exits, targetExits, coords,
+		var i, j, n, exits, targetExits,
 			dest = {},
 			areas = [];
 
@@ -415,7 +455,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 
 				delay(10);
 			}
-			
+
 			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
 		}
 
@@ -440,13 +480,13 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 			Town.move("waypoint");
 		}
 
-		wp = getUnit(2, getLocaleString(3257)); // "Waypoint"
+		wp = getUnit(2, "waypoint");
 
 		if (!wp) {
 			Town.move("stash");
 			Town.move("waypoint");
 
-			wp = getUnit(2, getLocaleString(3257)); // "Waypoint"
+			wp = getUnit(2, "waypoint");
 
 			if (!wp) {
 				throw new Error("Pather.useWaypoint: Failed to find waypoint.");
@@ -498,6 +538,10 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 			if (i > 1) { // Activate check if we fail direct interact twice
 				check = true;
 			}
+
+			if (i > 2) { // Try to get unstuck
+				Town.move("stash");
+			}
 		}
 
 		throw new Error("Pather.useWaypoint: Failed to use waypoint");
@@ -528,7 +572,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 		/* Check for old portal
 			- Because this function is fast, if there's player's portal already nearby, it's possible it will try to use that one without this check.
 		*/
-		oldPortal = getUnit(2, getLocaleString(3308)); // "Portal"
+		oldPortal = getUnit(2, "portal");
 
 		if (oldPortal) {
 			do {
@@ -547,7 +591,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 				tpTome.interact();
 			}
 
-			portal = getUnit(2, getLocaleString(3308)); // "Portal"
+			portal = getUnit(2, "portal");
 
 			if (portal) {
 				do {
@@ -635,7 +679,7 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 	},
 
 	getPortal: function (targetArea, owner) {
-		var portal = getUnit(2, getLocaleString(3308)); // "Portal"
+		var portal = getUnit(2, "portal");
 
 		if (portal) {
 			do {
@@ -681,7 +725,8 @@ MainLoop: while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 			result = [x, y];
 		}
 
-MainLoop: while (!result && distance < range) {
+MainLoop:
+		while (!result && distance < range) {
 			for (i = -distance; i <= distance; i += 1) {
 				for (j = -distance; j <= distance; j += 1) {
 					// Check outer layer only (skip previously checked)

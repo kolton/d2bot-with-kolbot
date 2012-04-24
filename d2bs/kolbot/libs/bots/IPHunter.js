@@ -1,3 +1,9 @@
+/**
+*	@filename	IPHunter.js
+*	@author		kolton
+*	@desc		search for a "hot" IP and stop if the correct server is found
+*/
+
 function IPHunter() {
 	var ip = me.gameserverip.split(".")[3];
 

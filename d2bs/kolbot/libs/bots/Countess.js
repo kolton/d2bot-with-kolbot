@@ -1,3 +1,9 @@
+/**
+*	@filename	Countess.js
+*	@author		kolton
+*	@desc		kill The Countess and optionally kill Ghosts along the way
+*/
+
 function Countess() {
 	var poi;
 

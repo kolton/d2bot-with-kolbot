@@ -1,3 +1,9 @@
+/**
+*	@filename	DiabloHelper.js
+*	@author		kolton
+*	@desc		help leading player in clearing Chaos Sanctuary and killing Diablo
+*/
+
 function DiabloHelper() {
 	// sort functions
 	this.entranceSort = function (a, b) {
@@ -44,7 +50,7 @@ function DiabloHelper() {
 			}
 		}
 
-		for (i = 0; i < name === "infector of souls" ? 20 : 8; i += 1) {
+		for (i = 0; i < (name === getLocaleString(2853) ? 12 : 10); i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
@@ -61,7 +67,7 @@ function DiabloHelper() {
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.starSort);
 		this.vizLayout === 1 ? Pather.moveTo(7691, 5292) : Pather.moveTo(7695, 5316);
 
-		if (!this.getBoss("grand vizier of chaos")) {
+		if (!this.getBoss(getLocaleString(2851))) {
 			throw new Error("Failed to kill Vizier");
 		}
 
@@ -72,7 +78,7 @@ function DiabloHelper() {
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.starSort);
 		this.seisLayout === 1 ? Pather.moveTo(7790, 5200) : Pather.moveTo(7798, 5186);
 
-		if (!this.getBoss("lord de seis")) {
+		if (!this.getBoss(getLocaleString(2852))) {
 			throw new Error("Failed to kill de Seis");
 		}
 
@@ -91,25 +97,54 @@ function DiabloHelper() {
 	};
 
 	this.diabloPrep = function () {
-		var i,
+		var trapCheck,
 			tick = getTickCount();
 
 		while (getTickCount() - tick < 17500) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
 				case 1: // Sorceress
-					if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+					if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
 						if (me.getState(121)) {
 							delay(500);
 						} else {
 							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
 						}
+
+						break;
 					}
+
+					delay(500);
 
 					break;
 				case 3: // Paladin
 					Skill.setSkill(Config.AttackSkill[2]);
 					Skill.cast(Config.AttackSkill[1], 1);
+
+					break;
+				case 5: // Druid
+					if (Config.AttackSkill[1] === 245) {
+						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+
+						break;
+					}
+
+					delay(500);
+
+					break;
+				case 6: // Assassin
+					if (Config.UseTraps) {
+						trapCheck = ClassAttack.checkTraps({x: 7793, y: 5293});
+
+						if (trapCheck) {
+							ClassAttack.placeTraps({x: 7793, y: 5293, classid: 243}, trapCheck);
+
+							break;
+						}
+					}
+
+					delay(500);
+
 					break;
 				default:
 					delay(500);
@@ -127,7 +162,8 @@ function DiabloHelper() {
 	};
 
 	this.preattack = function (id) {
-		var coords = [];
+		var trapCheck,
+			coords = [];
 
 		switch (id) {
 		case "grand vizier of chaos":
@@ -158,7 +194,7 @@ function DiabloHelper() {
 
 		switch (me.classid) {
 		case 1:
-			if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+			if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
 				if (me.getState(121)) {
 					delay(500);
 				} else {
@@ -171,16 +207,16 @@ function DiabloHelper() {
 			break;
 		case 6:
 			if (Config.UseTraps) {
-				check = ClassAttack.checkTraps({x: coords[0], y: coords[1]});
+				trapCheck = ClassAttack.checkTraps({x: coords[0], y: coords[1]});
 
-				if (check) {
+				if (trapCheck) {
 					ClassAttack.placeTraps({x: coords[0], y: coords[1]}, 5);
 				}
 			}
 
 			return true;
 		}
-		
+
 		return false;
 	};
 
@@ -203,7 +239,7 @@ function DiabloHelper() {
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
 
 	var i;
-	
+
 	// start
 	Town.doChores();
 	Pather.useWaypoint(107);
@@ -227,8 +263,6 @@ function DiabloHelper() {
 
 	if (Config.DiabloHelper.Entrance) {
 		Attack.clear(35, 0, false, this.entranceSort);
-		Pather.moveTo(7790, 5544);
-		Precast.doPrecast(true);
 		this.followPath(this.entranceToStar, this.entranceSort);
 	} else {
 		Pather.moveTo(7774, 5305);
@@ -243,7 +277,7 @@ function DiabloHelper() {
 	this.infectorSeal();
 	Pather.moveTo(7788, 5292);
 	this.diabloPrep();
-	Attack.kill("diablo");
+	Attack.kill(243); // Diablo
 	Pickit.pickItems();
 
 	return true;

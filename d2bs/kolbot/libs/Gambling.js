@@ -1,3 +1,9 @@
+/**
+*	@filename	Gambling.js
+*	@author		kolton
+*	@desc		multi-profile gambling system
+*/
+
 var Gambling = {
 	/*
 ####################################################################################################

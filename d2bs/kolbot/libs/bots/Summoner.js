@@ -1,3 +1,9 @@
+/**
+*	@filename	Summoner.js
+*	@author		kolton
+*	@desc		kill the Summoner
+*/
+
 function Summoner() {
 	Town.doChores();
 	Pather.useWaypoint(74);
@@ -7,7 +13,7 @@ function Summoner() {
 		throw new Error("Failed to move to Summoner");
 	}
 
-	Attack.kill("the summoner");
+	Attack.kill(250); // The Summoner
 	Pickit.pickItems();
 
 	return true;

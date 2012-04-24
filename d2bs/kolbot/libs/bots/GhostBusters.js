@@ -1,4 +1,8 @@
-// who you gonna call?
+/**
+*	@filename	GhostBusters.js
+*	@author		kolton
+*	@desc		who you gonna call?
+*/
 
 function GhostBusters() {
 	this.clearGhosts = function () {

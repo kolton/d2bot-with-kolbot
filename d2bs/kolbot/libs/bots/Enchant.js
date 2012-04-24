@@ -1,4 +1,8 @@
-// maybe make wp configurable
+/**
+*	@filename	Enchant.js
+*	@author		kolton
+*	@desc		Enchant other players on command
+*/
 
 function Enchant() {
 	Town.doChores();

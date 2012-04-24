@@ -1,3 +1,9 @@
+/**
+*	@filename	Precast.js
+*	@author		D3STROY3R, kolton
+*	@desc		handle player prebuff sequence
+*/
+
 var Precast = new function () {
 	this.haveCTA = -1;
 

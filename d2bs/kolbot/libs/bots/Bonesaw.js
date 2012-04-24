@@ -1,3 +1,9 @@
+/**
+*	@filename	Bonesaw.js
+*	@author		kolton
+*	@desc		kill Bonesaw Breaker
+*/
+
 function Bonesaw() {
 	Town.doChores();
 	Pather.useWaypoint(115);

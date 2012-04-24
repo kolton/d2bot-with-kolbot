@@ -1,3 +1,9 @@
+/**
+*	@filename	Tombs.js
+*	@author		kolton
+*	@desc		clear Tal Rasha's Tombs
+*/
+
 function Tombs() {
 	var i;
 

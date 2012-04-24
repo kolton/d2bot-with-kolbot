@@ -1,4 +1,8 @@
-// Barbarian attack
+/**
+*	@filename	Barbarian.js
+*	@author		kolton
+*	@desc		Barbarian attack sequence
+*/
 
 var ClassAttack = {
 	skillRange: [],
@@ -53,7 +57,9 @@ var ClassAttack = {
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
@@ -72,7 +78,10 @@ var ClassAttack = {
 				Misc.shapeShift(0);
 			}
 
-			if (!this.doCast(unit, index)) {
+			switch (this.doCast(unit, index)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -80,7 +89,10 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[3] > -1 && Attack.checkResist(unit, this.skillElement[3])) {
-			if (!this.doCast(unit, 3)) {
+			switch (this.doCast(unit, 3)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -102,7 +114,9 @@ var ClassAttack = {
 	doCast: function (unit, index) {
 		if (Config.AttackSkill[index] === 151) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
-				Attack.getIntoPosition(unit, this.skillRange[index], 0x1);
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x1)) {
+					return 0;
+				}
 			}
 
 			if (!this.whirlwind(unit, index)) {
@@ -118,7 +132,9 @@ var ClassAttack = {
 
 		if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
 			// walk short distances instead of tele for melee attacks
-			Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)));
+			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)))) {
+				return 0;
+			}
 		}
 
 		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);

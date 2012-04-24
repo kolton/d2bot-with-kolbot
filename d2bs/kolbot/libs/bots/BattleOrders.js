@@ -1,4 +1,8 @@
-// maybe make wp configurable
+/**
+*	@filename	BattleOrders.js
+*	@author		kolton
+*	@desc		give or receive Battle Orders buff
+*/
 
 function BattleOrders() {
 	Pather.useWaypoint(35); // catacombs

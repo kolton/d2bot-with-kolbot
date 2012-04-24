@@ -1,3 +1,9 @@
+/**
+*	@filename	Andariel.js
+*	@author		kolton
+*	@desc		kill Andariel
+*/
+
 function Andariel() {
 	Town.doChores();
 	Pather.useWaypoint(35);

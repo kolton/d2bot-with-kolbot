@@ -1,4 +1,8 @@
-// Sorceress attack
+/**
+*	@filename	Sorceress.js
+*	@author		kolton
+*	@desc		Sorceress attack sequence
+*/
 
 var ClassAttack = {
 	skillRange: [],
@@ -30,7 +34,7 @@ var ClassAttack = {
 				break;
 			case 49: // Lightning
 			case 53: // Chain Lightning
-				this.skillRange[i] = 13;
+				this.skillRange[i] = 15;
 				break;
 			case 64: // Frozen Orb
 				this.skillRange[i] = 15;
@@ -53,7 +57,9 @@ var ClassAttack = {
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
@@ -70,7 +76,9 @@ var ClassAttack = {
 			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 
 			if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, staticRange, 0x4);
+				if (!Attack.getIntoPosition(unit, staticRange, 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(42, 0)) {
@@ -111,7 +119,10 @@ var ClassAttack = {
 			}
 		}
 
-		if (!this.doCast(unit, timedIndex, untimedIndex)) {
+		switch (this.doCast(unit, timedIndex, untimedIndex)) {
+		case 0: // total fail
+			return 1;
+		case false: // fail to cast
 			return 2;
 		}
 
@@ -127,7 +138,9 @@ var ClassAttack = {
 
 		if (timed && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[timed], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
+					return 0;
+				}
 			}
 
 			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
@@ -135,7 +148,9 @@ var ClassAttack = {
 
 		if (untimed && Config.AttackSkill[untimed] > -1) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4)) {
+					return 0;
+				}
 			}
 
 			return Skill.cast(Config.AttackSkill[untimed], this.skillHand[untimed], unit);

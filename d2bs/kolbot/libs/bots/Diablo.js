@@ -1,3 +1,9 @@
+/**
+*	@filename	Diablo.js
+*	@author		kolton
+*	@desc		clear Chaos Sanctuary and kill Diablo
+*/
+
 function Diablo() {
 	// sort functions
 	this.entranceSort = function (a, b) {
@@ -85,7 +91,7 @@ function Diablo() {
 		var i, boss,
 			glow = getUnit(2, 131);
 
-		for (i = 0; i < name === "infector of souls" ? 20 : 8; i += 1) {
+		for (i = 0; i < (name === getLocaleString(2853) ? 12 : 10); i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
@@ -99,6 +105,7 @@ function Diablo() {
 	};
 
 	this.vizierSeal = function () {
+		print("Viz layout " + this.vizLayout);
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.starSort);
 
 		if (!this.openSeal(395) || !this.openSeal(396)) {
@@ -107,7 +114,7 @@ function Diablo() {
 
 		this.vizLayout === 1 ? Pather.moveTo(7691, 5292) : Pather.moveTo(7695, 5316);
 
-		if (!this.getBoss("grand vizier of chaos")) {
+		if (!this.getBoss(getLocaleString(2851))) {
 			throw new Error("Failed to kill Vizier");
 		}
 
@@ -115,6 +122,7 @@ function Diablo() {
 	};
 
 	this.seisSeal = function () {
+		print("Seis layout " + this.seisLayout);
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.starSort);
 
 		if (!this.openSeal(394)) {
@@ -123,7 +131,7 @@ function Diablo() {
 
 		this.seisLayout === 1 ? Pather.moveTo(7771, 5196) : Pather.moveTo(7798, 5186);
 
-		if (!this.getBoss("lord de seis")) {
+		if (!this.getBoss(getLocaleString(2852))) {
 			throw new Error("Failed to kill de Seis");
 		}
 
@@ -131,13 +139,16 @@ function Diablo() {
 	};
 
 	this.infectorSeal = function () {
+		print("Inf layout " + this.infLayout);
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
 
 		if (!this.openSeal(393) || !this.openSeal(392)) {
 			throw new Error("Failed to open Infector seals.");
 		}
 
-		if (!this.getBoss("infector of souls")) {
+		this.infLayout === 1 ? delay(1) : Pather.moveTo(7928, 5295); // temp
+
+		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
 		}
 
@@ -151,9 +162,48 @@ function Diablo() {
 		while (getTickCount() - tick < 17500) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
+				case 1: // Sorceress
+					if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
+						if (me.getState(121)) {
+							delay(500);
+						} else {
+							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+						}
+
+						break;
+					}
+
+					delay(500);
+					
+					break;
 				case 3: // Paladin
 					Skill.setSkill(Config.AttackSkill[2]);
 					Skill.cast(Config.AttackSkill[1], 1);
+
+					break;
+				case 5: // Druid
+					if (Config.AttackSkill[1] === 245) {
+						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+						
+						break;
+					}
+
+					delay(500);
+					
+					break;
+				case 6: // Assassin
+					if (Config.UseTraps) {
+						trapCheck = ClassAttack.checkTraps({x: 7793, y: 5293});
+
+						if (trapCheck) {
+							ClassAttack.placeTraps({x: 7793, y: 5293, classid: 243}, trapCheck);
+
+							break;
+						}
+					}
+
+					delay(500);
+					
 					break;
 				default:
 					delay(500);
@@ -208,7 +258,7 @@ function Diablo() {
 		this.followPath(this.entranceToStar, this.entranceSort);
 	} else {
 		Pather.moveTo(7774, 5305);
-		Attack.clear(30, 0, false, this.starSort);
+		Attack.clear(15, 0, false, this.starSort);
 	}
 
 	Pather.moveTo(7774, 5305);
@@ -221,7 +271,7 @@ function Diablo() {
 	this.infectorSeal();
 	Pather.moveTo(7788, 5292);
 	this.diabloPrep();
-	Attack.kill("diablo");
+	Attack.kill(243); // Diablo
 	Pickit.pickItems();
 
 	return true;

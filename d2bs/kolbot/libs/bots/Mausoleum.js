@@ -1,3 +1,9 @@
+/**
+*	@filename	Mausoleum.js
+*	@author		kolton
+*	@desc		clear Mausoleum
+*/
+
 function Mausoleum() {
 	Town.doChores();
 	Pather.useWaypoint(3);
@@ -9,7 +15,7 @@ function Mausoleum() {
 
 	if (Config.Mausoleum.KillBloodRaven) {
 		Pather.moveToPreset(17, 1, 805);
-		Attack.kill("blood raven");
+		Attack.kill(getLocaleString(3111)); // Blood Raven
 		Pickit.pickItems();
 	}
 

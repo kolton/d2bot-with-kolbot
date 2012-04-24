@@ -1,10 +1,16 @@
+/**
+*	@filename	BaalHelper.js
+*	@author		kolton
+*	@desc		help the leading player in clearing Throne of Destruction and killing Baal
+*/
+
 function BaalHelper() { // experi-mental
 	this.preattack = function () {
 		var check;
 
 		switch (me.classid) {
 		case 1:
-			if ([56, 59, 64].indexOf(Config.AttackSkill[1])) {
+			if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
 				if (me.getState(121)) {
 					delay(500);
 				} else {
@@ -29,9 +35,15 @@ function BaalHelper() { // experi-mental
 			Skill.cast(Config.AttackSkill[3], 1);
 
 			return true;
-		case 5:
+		case 5: // Druid
+			if (Config.AttackSkill[3] === 245) {
+				Skill.cast(Config.AttackSkill[3], 0, 15093, 5029);
+
+				return true;
+			}
+
 			break;
-		case 6:
+		case 6: // Assassin
 			if (Config.UseTraps) {
 				check = ClassAttack.checkTraps({x: 15093, y: 5029});
 
@@ -81,14 +93,14 @@ function BaalHelper() { // experi-mental
 
 	this.clearThrone = function () {
 		var i,
-			pos = [15097, 5054, 15085, 5053, 15085, 5040, 15098, 5040, 15099, 5022, 15086, 5024]
+			pos = [15097, 5054, 15085, 5053, 15085, 5040, 15098, 5040, 15099, 5022, 15086, 5024];
 
 		for (i = 0; i < pos.length; i += 2) {
 			Pather.moveTo(pos[i], pos[i + 1]);
 			Attack.clear(30);
 		}
 	};
-	
+
 	this.checkHydra = function () {
 		var monster = getUnit(1, "hydra");
 
@@ -137,6 +149,7 @@ function BaalHelper() { // experi-mental
 	var i, tick, portal;
 
 	Town.goToTown(5);
+	Town.doChores();
 	Town.move("portalspot");
 
 	for (i = 0; i < 180; i += 1) {
@@ -157,7 +170,8 @@ function BaalHelper() { // experi-mental
 
 	tick = getTickCount();
 
-MainLoop: while (true) {
+MainLoop:
+	while (true) {
 		if (getDistance(me, 15093, me.classid === 3 ? 5029 : 5039) > 3) {
 			Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 		}
@@ -169,25 +183,32 @@ MainLoop: while (true) {
 		switch (this.checkThrone()) {
 		case 1:
 			Attack.clear(40);
+			Precast.doPrecast(true);
 			break;
 		case 2:
 		case 4:
 			Attack.clear(40);
+
 			break;
 		case 3:
 			Attack.clear(40);
+
 			this.checkHydra();
 			break;
 		case 5:
 			Attack.clear(40);
+
 			break MainLoop;
 		default:
-			this.preattack();
+			if (!this.preattack()) {
+				delay(100);
+			}
+
 			break;
 		}
 
 		Precast.doPrecast(false);
-		delay(100);
+		delay(10);
 	}
 
 	Pather.moveTo(15092, 5011);

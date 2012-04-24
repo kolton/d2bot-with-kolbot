@@ -1,3 +1,9 @@
+/**
+*	@filename	Tristram.js
+*	@author		kolton
+*	@desc		clear Tristram
+*/
+
 function Tristram() {
 	if (!me.getQuest(4, 0)) {
 		throw new Error("You don't have the Cain quest");

@@ -1,4 +1,8 @@
-// Paladin attack
+/**
+*	@filename	Paladin.js
+*	@author		kolton
+*	@desc		Paladin attack sequence
+*/
 
 var ClassAttack = {
 	skillRange: [],
@@ -44,7 +48,9 @@ var ClassAttack = {
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				Attack.getIntoPosition(unit, this.skillRange[0], 0x4);
+				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
+					return 1;
+				}
 			}
 
 			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
@@ -63,7 +69,10 @@ var ClassAttack = {
 				return 1;
 			}
 
-			if (!this.doCast(unit, index)) {
+			switch (this.doCast(unit, index)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -75,7 +84,10 @@ var ClassAttack = {
 				return 1;
 			}
 
-			if (!this.doCast(unit, 5)) {
+			switch (this.doCast(unit, 5)) {
+			case 0: // total fail
+				return 1;
+			case false: // fail to cast
 				return 2;
 			}
 
@@ -99,6 +111,10 @@ var ClassAttack = {
 		if (Config.AttackSkill[index] === 112) {
 			if (!this.checkHammerPosition(unit)) {
 				this.getHammerPosition(unit);
+
+				if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
+					return false;
+				}
 			}
 
 			if (Config.AttackSkill[index + 1] > -1) {
@@ -107,7 +123,7 @@ var ClassAttack = {
 
 			for (i = 0; i < 4; i += 1) {
 				Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
-				
+
 				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5) {
 					return true;
 				}
@@ -115,10 +131,18 @@ var ClassAttack = {
 
 			return true;
 		} else if (Config.AttackSkill[index] === 101) {
-			Attack.getIntoPosition(unit, this.skillRange[index], 0x2004, true);
+			CollMap.reset();
+
+			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || CollMap.checkColl(me, unit, 0x2004)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x2004, true)) {
+					return 0;
+				}
+			}
 		} else if (getDistance(me, unit) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
 			// walk short distances instead of tele for melee attacks
-			Attack.getIntoPosition(unit, this.skillRange[index], 0x4, this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
+			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+				return 0;
+			}
 		}
 
 		if (Config.AttackSkill[index + 1] > -1) {
@@ -132,7 +156,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 1, y + 1], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
+			positions = [[x + 2, y + 1], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (getDistance(me, positions[i][0], positions[i][1]) < 2) {
@@ -147,7 +171,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 1, y + 1], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
+			positions = [[x + 2, y + 1], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
 
 		//positions.sort(Attack.sortRooms);
 
@@ -169,7 +193,7 @@ var ClassAttack = {
 			delay(40);
 		}
 
-		if (me.gametype === 1 || getDistance(me, x, y) > 2) {
+		if (me.gametype === 1 || getDistance(me, x, y) > 1) {
 			return Pather.moveTo(x, y, 1);
 		}
 

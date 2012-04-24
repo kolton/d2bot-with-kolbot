@@ -188,7 +188,7 @@ MainSwitch: switch (location) {
 
 			delay(rand(waitInChatBeforeActionsMin + 1, waitInChatBeforeActionsMax + 1));
 			say("/j " + joinChannel);
-			delay(500);
+			delay(2000);
 
 			if (firstJoinMsg !== "") {
 				say(firstJoinMsg);
@@ -197,6 +197,7 @@ MainSwitch: switch (location) {
 		}
 
 		if (announceGames) {
+			delay(1000);
 			say("Next game is " + gameName + gameCount + (gamePass === "" ? "" : "//" + gamePass));
 		}
 
@@ -278,6 +279,7 @@ MainSwitch: switch (location) {
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey");
+				D2Bot.CDKeyDisabled();
 
 				if (switchKeys) {
 					timeoutDelay("Key switch delay", switchKeyDelay * 1000);
@@ -366,6 +368,7 @@ MainSwitch: switch (location) {
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4,158,310,485,40));
+		D2Bot.CDKeyInUse();
 
 		if (switchKeys) {
 			timeoutDelay("Key switch delay", switchKeyDelay * 1000);

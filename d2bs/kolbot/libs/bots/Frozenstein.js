@@ -1,3 +1,9 @@
+/**
+*	@filename	Frozenstein.js
+*	@author		kolton
+*	@desc		kill Frozensteinand optionally clear Frozen River
+*/
+
 function Frozenstein() {
 	Town.doChores();
 	Pather.useWaypoint(113);

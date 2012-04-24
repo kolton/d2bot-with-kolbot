@@ -1,3 +1,9 @@
+/**
+*	@filename	Abaddon.js
+*	@author		kolton
+*	@desc		clear Abaddon
+*/
+
 function Abaddon() {
 	Town.doChores();
 	Pather.useWaypoint(111);

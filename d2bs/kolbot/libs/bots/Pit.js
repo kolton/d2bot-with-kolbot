@@ -1,3 +1,9 @@
+/**
+*	@filename	Pit.js
+*	@author		kolton
+*	@desc		clear Pit
+*/
+
 function Pit() {
 	Town.doChores();
 	Pather.useWaypoint(6);

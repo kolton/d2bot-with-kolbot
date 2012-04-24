@@ -1,3 +1,9 @@
+/**
+*	@filename	Runewords.js
+*	@author		kolton
+*	@desc		make and reroll runewords
+*/
+
 var Runeword = {
 	// 1.09
 	AncientsPledge: [617, 618, 616], // Ral + Ort + Tal

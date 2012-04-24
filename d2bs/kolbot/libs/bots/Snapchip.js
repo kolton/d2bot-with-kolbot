@@ -1,4 +1,8 @@
-// Snapchip Shatter - superunique in Icy Cellar
+/**
+*	@filename	Snapchip.js
+*	@author		kolton
+*	@desc		kill Snapchip and optionally clear Icy Cellar
+*/
 
 function Snapchip() {
 	Town.doChores();
