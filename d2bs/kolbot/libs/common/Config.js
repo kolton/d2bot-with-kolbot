@@ -63,6 +63,7 @@ var Config = {
 	TownMP: 0,
 
 	// General
+	LastMessage: "",
 	UseMerc: false,
 	StashGold: 0,
 	Inventory: [
@@ -136,6 +137,7 @@ var Config = {
 	Vigor: false,
 
 	// Barbarian specific
+	BOSwitch: 0,
 	FindItem: false,
 	FindItemSwitch: 1,
 
@@ -224,5 +226,8 @@ var Config = {
 	IPHunter: {
 		IPList: [],
 		GameLength: 3
+	},
+	Follower: {
+		Leader: ""
 	}
 };

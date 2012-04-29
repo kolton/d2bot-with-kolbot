@@ -23,14 +23,10 @@ function main() {
 	include("common/Storage.js");
 	include("common/Town.js");
 
-	// Init config and attacks
-	Config.init();
-	Attack.init();
-	Storage.Init();
-
 	// Variables and functions
 	var i, player, findTrigger, attackCount,
-		hostiles = [];
+		hostiles = [],
+		prevPos = {};
 
 	// Filps the 'find' trigger - allows the main loop to scan for hostiles
 	this.hostileEvent = function (mode, param1, param2, name1, name2) {
@@ -70,6 +66,28 @@ function main() {
 		}
 	};
 
+	// Init config and attacks
+	Config.init();
+	Attack.init();
+	Storage.Init();
+
+	// Attack sequence adjustments
+	switch (me.classid) {
+	case 1: // Sorceress - increase skill range
+		if ([47, 49, 53, 56, 59].indexOf(Config.AttackSkill[1]) > -1) {
+			ClassAttack.skillRange[1] = 40;
+			ClassAttack.skillRange[2] = 40;
+		}
+
+		break;
+	case 6: // Assassin - use Mind Blast with trapsins
+		if (me.getSkill(273, 1) && [251, 256].indexOf(Config.AttackSkill[1]) > -1) {
+			Config.AttackSkill[1] = 273; // Mind Blast
+		}
+
+		break;
+	}
+
 	addEventListener("gameevent", this.hostileEvent);
 	print("ÿc2Anti-Hostile thread loaded.");
 	this.findHostiles();
@@ -99,6 +117,8 @@ function main() {
 						}
 
 						// Kill the hostile player
+						prevPos = {x: me.x, y: me.y};
+
 						this.togglePause();
 
 						Config.UseMerc = false; // Don't go revive the merc mid-fight
@@ -109,12 +129,24 @@ function main() {
 								break;
 							}
 
+							switch (me.classid) {
+							case 1: // Sorceress
+								if (ClassAttack.skillRange[1] > 20 && getDistance(me, player) < 30) {
+									print(ClassAttack.skillRange[1]);
+									
+									Attack.getIntoPosition(player, ClassAttack.skillRange[1], 0x4);
+								}
+
+								break;
+							}
+
 							ClassAttack.doAttack(player, false);
 
 							attackCount += 1;
 
 							if (player.mode === 0 || player.mode === 17) {
 								D2Bot.printToConsole(player.name + " has been neutralized.;3");
+								hideConsole();
 								delay(500);
 								takeScreenshot();
 
@@ -122,16 +154,13 @@ function main() {
 							}
 						}
 
-						if (me.area === 131) {
-							Pather.moveTo(15093, 5029);
-						}
-
+						Pather.moveTo(prevPos.x, prevPos.y);
 						this.togglePause();
 					}
 				} while (player.getNext()); // cycle through eventual corpses
 			}
 		}
-		
+
 		delay(500);
 	}
 }

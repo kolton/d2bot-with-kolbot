@@ -106,7 +106,7 @@ var ClassAttack = {
 
 		var index;
 
-		index = (unit.spectype & 0x7) ? 1 : 3;
+		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
 		if (Config.Curse[0] > 0 && this.isCursable(unit) && (unit.spectype & 0x7) && !unit.getState(this.curseState[0])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {

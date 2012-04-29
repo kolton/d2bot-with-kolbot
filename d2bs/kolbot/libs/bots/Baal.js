@@ -16,7 +16,7 @@ function Baal() {
 				if (me.getState(121)) {
 					delay(500);
 				} else {
-					Skill.cast(Config.AttackSkill[1], 0, 15093, 5029);
+					Skill.cast(Config.AttackSkill[1], 0, 15093, 5024);
 				}
 			}
 
@@ -142,6 +142,7 @@ function Baal() {
 		say(Config.Baal.HotTPMsg);
 	}
 
+	Attack.clear(15);
 	this.clearThrone();
 
 	if (Config.PublicMode) {

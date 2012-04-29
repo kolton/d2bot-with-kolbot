@@ -1,0 +1,8 @@
+// just a simple gold/pot pickit
+
+[name] == gold
+[type] == healingpotion
+[type] == manapotion
+[type] == rejuvpotion
+
+[quality] >= magic # [strength] > 100

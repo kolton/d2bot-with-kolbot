@@ -5,6 +5,7 @@
 */
 
 var Pather = {
+	teleport: true,
 	walkDistance: 15,
 	teleDistance: 40,
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
@@ -48,7 +49,7 @@ var Pather = {
 			node = {x: x, y: y},
 			fail = 0;
 
-		this.useTeleport = !me.inTown && me.getSkill(54, 1);
+		this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1);
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -664,7 +665,7 @@ MainLoop:
 
 			while (getTickCount() - tick < 1000) {
 				if (me.area !== preArea) {
-					delay(200);
+					delay(300);
 
 					return true;
 				}

@@ -71,7 +71,7 @@ var ClassAttack = {
 
 		var index;
 
-		index = (unit.spectype & 0x7) ? 1 : 2;
+		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 2;
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (Config.Werewolf && !me.getState(139)) {

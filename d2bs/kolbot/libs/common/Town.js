@@ -328,6 +328,7 @@ MainLoop:
 							}
 						}
 
+						delay(500);
 						scroll.buy();
 					}
 
@@ -1025,7 +1026,7 @@ MainLoop:
 			this.act[1].spot.lysander = [5118, 5104];
 			this.act[1].spot.greiz = [5033, 5053];
 			this.act[1].spot.elzix = [5032, 5102];
-			this.act[1].spot.palace = [5055, 5142];
+			this.act[1].spot.palace = [5088, 5153];
 			this.act[1].spot.sewers = [5221, 5181];
 			this.act[1].spot.meshif = [5205, 5058];
 			this.act[1].spot.drognan = [5097, 5035];

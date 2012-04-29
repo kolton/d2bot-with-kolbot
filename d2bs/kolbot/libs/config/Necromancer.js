@@ -109,6 +109,8 @@ function LoadConfig() {
 	Scripts.IPHunter = false;
 		Config.IPHunter.IPList = []; // list of IPs to look for. example: [165, 201, 64]
 		Config.IPHunter.GameLength = 3; // number of minutes to stay in game if ip wasn't found
+	Scripts.Follower = false; // follower script, most commonly used in ladder reset. lots of features
+		Config.Follower.Leader = ""; // leader's ingame name
 
 
 	// Town settings
@@ -221,6 +223,7 @@ function LoadConfig() {
 
 	// General config
 	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
+	Config.LastMessage = ""; // Message to say at the end of the run.
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
 	Config.QuitList = []; // List of players to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.

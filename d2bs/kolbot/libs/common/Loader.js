@@ -34,6 +34,7 @@ var Loader = {
 			throw new Error("You don't have any valid scripts in bots folder.");
 		}
 
+ScriptLoop:
 		for (i in Scripts) {
 			if (this.scriptList.indexOf(i) > -1) {
 				if (!Scripts[i]) {
@@ -54,7 +55,7 @@ var Loader = {
 					} catch (e) {
 						print("ÿc1Loader: Failed to go to town, skipping to next script.");
 
-						continue;
+						continue ScriptLoop;
 					}
 				}
 

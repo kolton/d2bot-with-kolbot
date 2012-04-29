@@ -56,7 +56,7 @@ var ClassAttack = {
 
 		var index;
 
-		index = (unit.spectype & 0x7) ? 1 : 3;
+		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
 			switch (this.doCast(unit, index)) {

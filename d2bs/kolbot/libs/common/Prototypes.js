@@ -25,6 +25,13 @@ Unit.prototype.__defineGetter__("inTown",
 		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
 	}
 	);
+	
+// Check if party unit is in town
+Party.prototype.__defineGetter__("inTown",
+	function () {
+		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
+	}
+	);
 
 Unit.prototype.__defineGetter__("attacking",
 	function () {

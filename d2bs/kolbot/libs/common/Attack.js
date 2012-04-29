@@ -79,7 +79,7 @@ var Attack = {
 			return false;
 		}
 
-		var i, monList, target,
+		var i, dodgeList, target,
 			attackCount = 0;
 
 		for (i = 0; i < 3; i += 1) {
@@ -104,13 +104,15 @@ var Attack = {
 		while (attackCount < 300 && this.checkMonster(target) && this.skipCheck(target)) {
 			if (Config.Dodge) {
 				if (attackCount % 5 === 0) {
-					monList = this.buildDodgeList();
+					dodgeList = this.buildDodgeList();
 				}
 
-				monList.sort(Sort.units);
+				if (dodgeList.length) {
+					dodgeList.sort(Sort.units);
 
-				if (getDistance(me, monList[0]) < 10) {
-					this.dodge(target, 15, monList);
+					if (getDistance(me, dodgeList[0]) < 10) {
+						this.dodge(target, 15, dodgeList);
+					}
 				}
 			}
 
@@ -140,14 +142,33 @@ var Attack = {
 		switch (arguments.length) {
 		case 0:
 			range = 25;
+			spectype = 0;
+			bossId = false;
+			sortfunc = false;
+			pickit = true;
+
+			break;
 		case 1:
 			spectype = 0;
+			bossId = false;
+			sortfunc = false;
+			pickit = true;
+
+			break;
 		case 2:
 			bossId = false;
+			sortfunc = false;
+			pickit = true;
+
+			break;
 		case 3:
 			sortfunc = false;
+			pickit = true;
+
+			break;
 		case 4:
 			pickit = true;
+
 			break;
 		}
 
@@ -159,7 +180,7 @@ var Attack = {
 			gidAttack = [],
 			attackCount = 0;
 
-		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
+		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[me.classid === 4 ? 2 : 3] < 0) {
 			return false;
 		}
 
@@ -260,9 +281,9 @@ var Attack = {
 		}
 
 		ClassAttack.afterAttack();
+		this.openChests(range);
 
-		if (pickit) {
-			this.openChests(range);
+		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
 		}
 
@@ -499,12 +520,13 @@ var Attack = {
 
 	// Make a list of monsters that will be monitored for dodging
 	buildDodgeList: function () {
-		var monster = getUnit(1),
+		var ignoreList = [243, 544],
+			monster = getUnit(1),
 			list = [];
 
 		if (monster) {
 			do {
-				if (this.checkMonster(monster)) {
+				if (ignoreList.indexOf(monster.classid) === -1 && this.checkMonster(monster)) {
 					list.push(copyUnit(monster));
 				}
 			} while (monster.getNext());
@@ -602,6 +624,8 @@ var Attack = {
 		case 112:
 		case 113:
 		case 114:
+		case 179: // An evil force - cow (lol)
+			return false;
 		case 608:
 			if (unit.mode === 8) { // Flying
 				return false;

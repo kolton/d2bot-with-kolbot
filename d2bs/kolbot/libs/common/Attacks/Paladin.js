@@ -28,6 +28,8 @@ var ClassAttack = {
 				this.skillRange[i] = 3;
 				break;
 			case 101: // Holy Bolt
+				this.skillRange[i] = 5;
+				break;
 			case 107: // Charge
 				this.skillRange[i] = 10;
 				break;
@@ -62,7 +64,7 @@ var ClassAttack = {
 
 		var index;
 
-		index = (unit.spectype & 0x7) ? 1 : 3;
+		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
 			if (this.skillRange[index] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {

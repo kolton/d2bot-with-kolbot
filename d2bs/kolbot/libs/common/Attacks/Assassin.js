@@ -70,7 +70,7 @@ var ClassAttack = {
 
 		var index, checkTraps;
 
-		index = (unit.spectype & 0x7) ? 1 : 3;
+		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 		checkTraps = this.checkTraps(unit);
 
 		if (checkTraps) {

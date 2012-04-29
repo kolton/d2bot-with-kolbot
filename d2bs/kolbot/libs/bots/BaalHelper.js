@@ -14,7 +14,7 @@ function BaalHelper() { // experi-mental
 				if (me.getState(121)) {
 					delay(500);
 				} else {
-					Skill.cast(Config.AttackSkill[1], 0, 15093, 5029);
+					Skill.cast(Config.AttackSkill[1], 0, 15093, 5024);
 				}
 			}
 
@@ -150,6 +150,13 @@ function BaalHelper() { // experi-mental
 
 	Town.goToTown(5);
 	Town.doChores();
+
+	if (!me.getState(32)) {
+		Pather.useWaypoint(129);
+		Precast.doPrecast(true);
+		Pather.useWaypoint(109);
+	}
+
 	Town.move("portalspot");
 
 	for (i = 0; i < 180; i += 1) {
@@ -165,6 +172,7 @@ function BaalHelper() { // experi-mental
 	}
 
 	Precast.doPrecast(false);
+	Attack.clear(15);
 	this.clearThrone();
 	Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 

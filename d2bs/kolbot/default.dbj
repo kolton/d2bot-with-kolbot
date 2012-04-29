@@ -101,12 +101,16 @@ function main() {
 	// Go
 	Loader.init();
 
-	if (Config.MinGameTime && getTickCount() - startTime < Config.MinGameTime * 1000 && Town.goToTown()) {
-		Town.goToTown();
+	if (Config.MinGameTime && getTickCount() - startTime < Config.MinGameTime * 1000) {
+		try {
+			Town.goToTown();
 
-		while (getTickCount() - startTime < Config.MinGameTime * 1000) {
-			me.overhead("Stalling for " + Math.round(((startTime + (Config.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
-			delay(1000);
+			while (getTickCount() - startTime < Config.MinGameTime * 1000) {
+				me.overhead("Stalling for " + Math.round(((startTime + (Config.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
+				delay(1000);
+			}
+		} catch (e1) {
+			print(e1);
 		}
 	}
 
@@ -118,16 +122,24 @@ function main() {
 	}
 
 	if (sojPause) {
-		Town.goToTown();
+		try {
+			Town.goToTown();
 
-		me.maxgametime = 0;
+			me.maxgametime = 0;
 
-		while (sojCounter < Config.SoJWaitTime) {
-			me.overhead("Waiting for SoJ sales... " + (Config.SoJWaitTime - sojCounter) + " min");
-			delay(6e4);
+			while (sojCounter < Config.SoJWaitTime) {
+				me.overhead("Waiting for SoJ sales... " + (Config.SoJWaitTime - sojCounter) + " min");
+				delay(6e4);
 
-			sojCounter += 1;
+				sojCounter += 1;
+			}
+		} catch (e2) {
+			print(e2);
 		}
+	}
+
+	if (Config.LastMessage) {
+		say(Config.LastMessage);
 	}
 
 	DataFile.updateStats("gold");

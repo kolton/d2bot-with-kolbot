@@ -5,6 +5,7 @@
 */
 
 var Precast = new function () {
+	this.curHP = 0;
 	this.haveCTA = -1;
 
 	this.weaponSwitch = function (slot) {
@@ -62,7 +63,9 @@ var Precast = new function () {
 	};
 
 	this.doPrecast = function (force) {
-		if (!me.getState(51) || force) {
+		var buffSummons = false;
+
+		if (!me.getState(32) || force) {
 			this.precastCTA(force);
 		}
 
@@ -82,7 +85,7 @@ var Precast = new function () {
 				Skill.cast(58, 0); // Energy Shield
 			}
 
-			if (!me.getState(88) && !me.getState(10) && !me.getState(20) || force) {
+			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
 				if (!Skill.cast(50, 0)) { // Shiver Armor
 					if (!Skill.cast(60, 0)) { // Chilling Armor
 						Skill.cast(40, 0); // Frozen Armor
@@ -122,16 +125,12 @@ var Precast = new function () {
 
 			break;
 		case 4: // Barbarian
-			if (!me.getState(51) || force) {
+			if (!me.getState(32) || force || me.hpmax < this.curHP) {
+				Precast.weaponSwitch(Config.BOSwitch);
 				Skill.cast(155, 0); // Battle Command
-			}
-
-			if (!me.getState(32) || force) {
 				Skill.cast(149, 0); // Battle Orders
-			}
-
-			if (!me.getState(26) || force) {
 				Skill.cast(138, 0); // Shout
+				Precast.weaponSwitch(Math.abs(Config.BOSwitch - 1));
 			}
 
 			break;
@@ -147,47 +146,63 @@ var Precast = new function () {
 			switch (Config.SummonAnimal) {
 			case 1:
 			case "Spirit Wolf":
-				this.summon(227); // Summon Spirit Wolf
+				buffSummons = this.summon(227) || buffSummons; // Summon Spirit Wolf
+
 				break;
 			case 2:
 			case "Dire Wolf":
-				this.summon(237); // Summon Dire Wolf
+				buffSummons = this.summon(237) || buffSummons; // Summon Dire Wolf
+
 				break;
 			case 3:
 			case "Grizzly":
-				this.summon(247); // Summon Grizzly
-				break
+				buffSummons = this.summon(247) || buffSummons; // Summon Grizzly
+
+				break;
 			}
 
 			switch (Config.SummonVine) {
 			case 1:
 			case "Poison Creeper":
-				this.summon(222); // Poison Creeper
+				buffSummons = this.summon(222) || buffSummons; // Poison Creeper
+
+				break;
 			case 2:
 			case "Carrion Vine":
-				this.summon(231); // Carrion Vine
+				buffSummons = this.summon(231) || buffSummons; // Carrion Vine
+
+				break;
 			case 3:
 			case "Solar Creeper":
-				this.summon(241); // Solar Creeper
+				buffSummons = this.summon(241) || buffSummons; // Solar Creeper
+
+				break;
 			}
 
 			switch (Config.SummonSpirit) {
 			case 1:
 			case "Oak Sage":
-				this.summon(226); // Oak Sage
+				buffSummons = this.summon(226) || buffSummons; // Oak Sage
+
 				break;
 			case 2:
 			case "Heart of Wolverine":
-				this.summon(236); // Heart of Wolverine
+				buffSummons = this.summon(236) || buffSummons; // Heart of Wolverine
+
 				break;
 			case 3:
 			case "Solar Creeper":
-				this.summon(241); // Solar Creeper
+				buffSummons = this.summon(241) || buffSummons; // Solar Creeper
+
 				break;
 			}
 
 			if (!me.getState(144) || force) {
 				Skill.cast(250, 0); // Hurricane
+			}
+
+			if (buffSummons) {
+				this.precastCTA(force);
 			}
 
 			break;
@@ -221,6 +236,8 @@ var Precast = new function () {
 
 			break;
 		}
+
+		this.curHP = this.curHP || me.hpmax;
 	};
 
 	this.BOSwitch = function () {
@@ -231,7 +248,8 @@ var Precast = new function () {
 			item = me.getItem(-1, 1);
 
 			if (item) {
-MainLoop: do {
+MainLoop:
+				do {
 					if (item.getPrefix(20519)) { // Call to Arms
 						switch (item.bodylocation) {
 						case 4:
@@ -262,7 +280,7 @@ MainLoop: do {
 			return false;
 		}
 
-		var minion,
+		var minion, rv,
 			count = 1;
 
 		switch (skillId) {
@@ -315,10 +333,12 @@ MainLoop: do {
 		}
 
 		while (me.getMinionCount(minion) < count) {
+			rv = true;
+
 			Skill.cast(skillId, 0);
 			delay(200);
 		}
 
-		return true;
+		return !!rv;
 	};
 };
