@@ -3,47 +3,38 @@
 *	@author		kolton
 *	@desc		Allows you to see more information about items, NPCs and players by placing the cursor over them.
 *				Shows item level, items in sockets, classid, code and magic item prefix/suffix numbers.
-* 				Shows monster's classid, HP percent and resistances.
+*				Shows monster's classid, HP percent and resistances.
 *				Shows other players' gear.
 */
 
 function UserAddon() {
-	var unit,
+	var i, unit,
+		flags = [0x1, 0x2, 0x3, 0x4, 0x5, 0xf, 0x18, 0x19, 0xc, 0x9],
 		title = new Text(":: kolbot user addon ::", 400, 525, 4, 13, 2);
 
+	if (!Config.FastPick) { // Make sure the item event is loaded
+		addEventListener("itemaction", this.itemEvent);
+	}
+
 	while (true) {
-		if (getUIFlag(0x03) || getUIFlag(0x05) || (getUIFlag(0x1) || getUIFlag(0x04)) && (getUIFlag(0x2) || getUIFlag(0xf)) || getUIFlag(0x19) || getUIFlag(0x0c) || getUIFlag(0x09) || getUIFlag(0x05) || getUIFlag(0x18)) {
-			title.visible = false;
-		} else if (getUIFlag(0x1) || getUIFlag(0x04)) {
-			if (!title.visible) {
-				title.visible = true;
-			}
+		for (i = 0; i < flags.length; i += 1) {
+			if (getUIFlag(flags[i])) {
+				title.visible = false;
 
-			if (title.x !== 272) {
-				title.x = 272;
-			}
-		} else if (getUIFlag(0x2) || getUIFlag(0xf)) {
-			if (!title.visible) {
-				title.visible = true;
-			}
-
-			if (title.x !== 529) {
-				title.x = 529;
-			}
-		} else {
-			if (!title.visible) {
-				title.visible = true;
-			}
-
-			if (title.x !== 400) {
-				title.x = 400;
+				break;
 			}
 		}
+
+		if (!title.visible && i === flags.length) {
+			title.visible = true;
+		}
+		
+		Pickit.fastPick();
 
 		unit = getUnit(101);
 
 		UnitInfo.createInfo(unit);
-		delay(20);
+		delay(10);
 	}
 }
 
@@ -56,26 +47,30 @@ var UnitInfo = new function () {
 	this.createInfo = function (unit) {
 		if (typeof unit === "undefined") {
 			this.remove();
-			
+
 			return;
 		}
 
 		switch (unit.type) {
 		case 0:
 			this.playerInfo(unit);
+
+			break;
 		case 1:
 			this.monsterInfo(unit);
+
 			break;
 		case 4:
 			this.itemInfo(unit);
+
 			break;
 		}
-	}
+	};
 
 	this.playerInfo = function (unit) {
 		var i, items, string,
 			frameXsize = 0,
-			frameYsize = 20, 
+			frameYsize = 20,
 			quality = ["ÿc0", "ÿc0", "ÿc0", "ÿc0", "ÿc3", "ÿc2", "ÿc9", "ÿc4", "ÿc8"];
 
 		if (!this.currentGid) {
@@ -92,9 +87,9 @@ var UnitInfo = new function () {
 		}
 
 		this.hooks.push(new Text("Classid: ÿc0" + unit.classid, this.x, this.y, 4, 13, 2));
-		
+
 		items = unit.getItems(-1, 1);
-		
+
 		if (items) {
 			this.hooks.push(new Text("Equipped items:", this.x, this.y + 15, 4, 13, 2));
 			frameYsize += 15;
@@ -122,11 +117,10 @@ var UnitInfo = new function () {
 		this.hooks.push(new Frame(this.x, this.y - 15, Math.round(frameXsize * 7.5), frameYsize, 2));
 
 		this.hooks[this.hooks.length - 2].zorder = 0;
-	}
+	};
 
 	this.monsterInfo = function (unit) {
-		var i,
-			frameYsize = 125;
+		var frameYsize = 125;
 
 		if (!this.currentGid) {
 			this.currentGid = unit.gid;
@@ -142,7 +136,7 @@ var UnitInfo = new function () {
 		}
 
 		this.hooks.push(new Text("Classid: ÿc0" + unit.classid, this.x, this.y, 4, 13, 2));
-		this.hooks.push(new Text("HP percent: ÿc0" + Math.round(unit.hp * 100 / unit.hpmax), this.x, this.y + 15, 4, 13, 2));
+		this.hooks.push(new Text("HP percent: ÿc0" + Math.round(unit.hp * 100 / 128), this.x, this.y + 15, 4, 13, 2));
 		this.hooks.push(new Text("Fire resist: ÿc0" + unit.getStat(39), this.x, this.y + 30, 4, 13, 2));
 		this.hooks.push(new Text("Cold resist: ÿc0" + unit.getStat(43), this.x, this.y + 45, 4, 13, 2));
 		this.hooks.push(new Text("Lightning resist: ÿc0" + unit.getStat(41), this.x, this.y + 60, 4, 13, 2));
@@ -156,7 +150,7 @@ var UnitInfo = new function () {
 		this.hooks.push(new Frame(this.x, this.y - 15, 140, frameYsize, 2));
 
 		this.hooks[this.hooks.length - 2].zorder = 0;
-	}
+	};
 
 	this.itemInfo = function (unit) {
 		var i = 0,
@@ -188,7 +182,7 @@ var UnitInfo = new function () {
 
 			for (i = 0; i < this.socketedItems.length; i += 1) {
 				this.hooks.push(new Text(this.socketedItems[i].fname.split("\n").reverse().join(" "), this.x, this.y + (i + 4) * 15, 0, 13, 2));
-				
+
 				frameYsize += 15;
 			}
 		}
@@ -204,7 +198,7 @@ var UnitInfo = new function () {
 		this.hooks.push(new Frame(this.x, this.y - 15, 120, frameYsize, 2));
 
 		this.hooks[this.hooks.length - 2].zorder = 0;
-	}
+	};
 
 	this.remove = function () {
 		while (this.hooks.length > 0) {
@@ -212,5 +206,5 @@ var UnitInfo = new function () {
 		}
 
 		this.cleared = true;
-	}
-}
+	};
+};

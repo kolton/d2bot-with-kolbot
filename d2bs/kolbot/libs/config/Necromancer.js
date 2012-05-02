@@ -57,6 +57,7 @@ function LoadConfig() {
 	Scripts.Endugu = false;
 	Scripts.Travincal = false;
 	Scripts.Mephisto = false;
+		Config.Mephisto.MoatTrick = false;
 
 	// *** act 4 ***
 	Scripts.Izual = false;
@@ -169,6 +170,7 @@ function LoadConfig() {
 	Config.PickitFiles.push("kolton.nip"); // Pickit filenames in /pickit/ folder
 	Config.PickitFiles.push("LLD.nip");
 	Config.PickRange = 40; // Pick radius
+	Config.FastPick = false; // Check and pick items between attacks
 
 	// Gambling config
 	Config.Gamble = false;

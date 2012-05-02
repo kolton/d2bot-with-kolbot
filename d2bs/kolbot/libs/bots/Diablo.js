@@ -244,7 +244,7 @@ function Diablo() {
 	Precast.doPrecast(true);
 
 	if (!Pather.moveTo(7790, 5544)) {
-		throw new Error("Failed to go move to Chaos Sanctuary");
+		throw new Error("Failed to move to Chaos Sanctuary");
 	}
 
 	this.initLayout();

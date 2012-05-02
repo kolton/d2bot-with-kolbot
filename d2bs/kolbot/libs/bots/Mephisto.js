@@ -40,7 +40,67 @@ function Mephisto() {
 		}
 
 		return (meph.mode === 0 || meph.mode === 12);
-	}
+	};
+
+	this.moat = function () {
+		var count, distance, mephisto;
+
+		count = 0;
+
+		delay(350);
+		Pather.moveTo(17563, 8072);
+
+		mephisto = getUnit(1, 242);
+
+		if (!mephisto) {
+			throw new Error("Mephisto not found.");
+		}
+
+		delay(350);
+		Pather.moveTo(17575, 8086);
+		delay(350);
+		Pather.moveTo(17584, 8091);
+		delay(1200);
+		Pather.moveTo(17600, 8095);
+		delay(550);
+		Pather.moveTo(17610, 8094);
+		delay(2500);
+		Attack.clear(10);
+		Pather.moveTo(17610, 8094);
+
+		distance = getDistance(me, mephisto);
+
+		while (distance > 27) {
+			count += 1;
+
+			Pather.moveTo(17600, 8095);
+			delay(150);
+			Pather.moveTo(17584, 8091);
+			delay(150);
+			Pather.moveTo(17575, 8086);
+			delay(150);
+			Pather.moveTo(17563, 8072);
+			delay(350);
+			Pather.moveTo(17575, 8086);
+			delay(350);
+			Pather.moveTo(17584, 8091);
+			delay(1200);
+			Pather.moveTo(17600, 8095);
+			delay(550);
+			Pather.moveTo(17610, 8094);
+			delay(2500);
+			Attack.clear(10);
+			Pather.moveTo(17610, 8094);
+
+			distance = getDistance(me, mephisto);
+
+			if (count >= 5) {
+				throw new Error("Failed to lure Mephisto.");
+			}
+		}
+
+		return true;
+	};
 
 	Town.doChores();
 	Pather.useWaypoint(101);
@@ -53,15 +113,20 @@ function Mephisto() {
 	Pather.moveTo(17566, 8069);
 
 	if (me.classid === 1) {
-		this.killMephisto();
+		if (Config.Mephisto.MoatTrick) {
+			this.moat();
+			Attack.kill(242); // Mephisto
+		} else {
+			this.killMephisto();
+		}
 	} else {
 		Attack.kill(242); // Mephisto
 	}
 
 	Pickit.pickItems();
-	Pather.moveTo(17590, 8068);
+	/*Pather.moveTo(17590, 8068);
 	delay(1500);
-	Pather.usePortal(null);
+	Pather.usePortal(null);*/
 
 	return true;
 }

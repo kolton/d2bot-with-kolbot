@@ -551,6 +551,11 @@ function Follower() {
 
 	addEventListener("chatmsg", this.chatEvent);
 
+	// Override config values that use TP
+	Config.TownCheck = false;
+	Config.TownHP = 0;
+	Config.TownMP = 0;
+
 	for (i = 0; i < 20; i += 1) {
 		leader = this.getLeader(Config.Follower.Leader);
 
@@ -592,7 +597,7 @@ function Follower() {
 
 		if (!me.inTown) {
 			if (!leaderUnit) {
-				leaderUnit = this.getLeaderUnit(Cinfig.Follower.Leader);
+				leaderUnit = this.getLeaderUnit(Config.Follower.Leader);
 
 				if (leaderUnit) {
 					say("Leader unit found.");

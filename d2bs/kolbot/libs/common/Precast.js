@@ -30,7 +30,7 @@ var Precast = new function () {
 
 			while (getTickCount() - tick < 2000) {
 				if (me.weaponswitch === slot) {
-					delay(me.ping);
+					delay(me.ping + 1);
 
 					return true;
 				}
@@ -296,7 +296,7 @@ MainLoop:
 			break;
 		case 221: // Raven
 			minion = 10;
-			count = 5;
+			count = Math.min(me.getSkill(221, 1), 5);
 
 			break;
 		case 226: // Oak Sage
@@ -313,12 +313,12 @@ MainLoop:
 			break;
 		case 227: // Spirit Wolf
 			minion = 11;
-			count = 5;
+			count = Math.min(me.getSkill(227, 1), 5);
 
 			break;
 		case 237: // Dire Wolf
 			minion = 12;
-			count = 3;
+			count = Math.min(me.getSkill(237, 1), 3);
 
 			break;
 		case 247: // Grizzly

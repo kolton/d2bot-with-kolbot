@@ -44,7 +44,7 @@ var ClassAttack = {
 				this.skillRange[i] = 3;
 				break;
 			default: // Every other skill
-				this.skillRange[i] = 20;
+				this.skillRange[i] = 25;
 				break;
 			}
 		}

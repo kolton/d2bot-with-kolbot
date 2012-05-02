@@ -313,5 +313,22 @@ MainLoop:
 		}
 
 		return true;
+	},
+
+	fastPick: function () {
+		var item, gid, status;
+
+		while (gidList.length > 0) {
+			gid = gidList.shift();
+			item = getUnit(4, -1, -1, gid);
+
+			if (item && (item.mode === 3 || item.mode === 5) && getDistance(me, item) <= this.range) {
+				status = this.checkItem(item);
+
+				if (status && this.canPick(item)) {
+					this.pickItem(item, status);
+				}
+			}
+		}
 	}
 };

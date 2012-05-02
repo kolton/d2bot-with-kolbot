@@ -271,6 +271,10 @@ var Attack = {
 
 					attackCount += 1;
 
+					if (target.mode === 0 || target.mode === 12) {
+						Pickit.fastPick();
+					}
+
 					break;
 				default:
 					return false;

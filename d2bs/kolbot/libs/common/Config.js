@@ -77,6 +77,7 @@ var Config = {
 	QuitList: [],
 	RejuvBuffer: 0,
 	PickRange: 40,
+	FastPick: false,
 	OpenChests: false,
 	PickitFiles: [],
 	BeltColumn: [],
@@ -229,5 +230,8 @@ var Config = {
 	},
 	Follower: {
 		Leader: ""
+	},
+	Mephisto: {
+		MoatTrick: false
 	}
 };

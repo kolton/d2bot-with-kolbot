@@ -1,3 +1,5 @@
+// Blank starter used for testin
+
 function main() {
 	include("json2.js");
 	include("OOG.js");
