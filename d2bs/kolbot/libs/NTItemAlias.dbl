@@ -893,8 +893,17 @@ _NTIPAliasStat["itemlevelreqpct"]=94;
 _NTIPAliasStat["lastblockframe"]=95;
 _NTIPAliasStat["itemfastermovevelocity"]=96;	_NTIPAliasStat["frw"]=96;
 
+// oskill
 _NTIPAliasStat["itemnonclassskill"]=97;
+// Amazon
 _NTIPAliasStat["plusskillguidedarrow"]=[97,22];
+// Sorceress
+_NTIPAliasStat["plusskillteleport"]=[97,54];
+// Barbarian
+_NTIPAliasStat["plusskillbattleorders"]=[97,149];
+_NTIPAliasStat["plusskillbattlecommand"]=[97,155];
+_NTIPAliasStat["plusskillbattlecry"]=[97,146];
+// Druid
 _NTIPAliasStat["plusskillwerewolf"]=[97,223];
 _NTIPAliasStat["plusskillshapeshifting"]=[97,224];	_NTIPAliasStat["plusskilllycanthropy"]=[97,224];
 _NTIPAliasStat["plusskillsummonspiritwolf"]=[97,227];

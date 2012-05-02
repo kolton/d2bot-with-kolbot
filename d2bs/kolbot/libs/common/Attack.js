@@ -219,6 +219,7 @@ var Attack = {
 		}
 
 		while (monsterList.length > 0) {
+			monsterList.sort(Sort.units);
 			monsterList.sort(sortfunc);
 
 			target = copyUnit(monsterList[0]);
@@ -326,6 +327,7 @@ var Attack = {
 		}
 
 		while (monsterList.length > 0) {
+			monsterList.sort(Sort.units);
 			monsterList.sort(sortfunc);
 
 			target = copyUnit(monsterList[0]);
@@ -473,10 +475,6 @@ var Attack = {
 			if (unitB.spectype & 0x5) {
 				return 1;
 			}
-		}
-
-		if (getDistance(me, unitA) < getDistance(me, unitB)) {
-			return -1;
 		}
 
 		return 1;
@@ -908,7 +906,7 @@ AuraLoop: // Skip monsters with auras
 			walk = false;
 		}
 
-		var n, i, j, k, l, cx, cy, t,
+		var n, i, cx, cy, t,
 			coords = [],
 			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
 			angles = [0, 45, 90, 135, 180, 225, 270, 305];

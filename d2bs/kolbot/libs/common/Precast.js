@@ -5,7 +5,6 @@
 */
 
 var Precast = new function () {
-	this.curHP = 0;
 	this.haveCTA = -1;
 
 	this.weaponSwitch = function (slot) {
@@ -125,12 +124,18 @@ var Precast = new function () {
 
 			break;
 		case 4: // Barbarian
-			if (!me.getState(32) || force || me.hpmax < this.curHP) {
-				Precast.weaponSwitch(Config.BOSwitch);
+			if (!me.getState(32) || force) {
+				if (Config.BOSwitch) {
+					Precast.weaponSwitch(Config.BOSwitch);
+				}
+
 				Skill.cast(155, 0); // Battle Command
 				Skill.cast(149, 0); // Battle Orders
 				Skill.cast(138, 0); // Shout
-				Precast.weaponSwitch(Math.abs(Config.BOSwitch - 1));
+
+				if (Config.BOSwitch) {
+					Precast.weaponSwitch(Math.abs(Config.BOSwitch - 1));
+				}
 			}
 
 			break;
@@ -236,15 +241,12 @@ var Precast = new function () {
 
 			break;
 		}
-
-		this.curHP = this.curHP || me.hpmax;
 	};
 
 	this.BOSwitch = function () {
 		var item;
 
 		if (this.haveCTA < 0) {
-			this.haveCTA = 0;
 			item = me.getItem(-1, 1);
 
 			if (item) {
@@ -268,7 +270,7 @@ MainLoop:
 			}
 		}
 
-		if (this.haveCTA > 0) {
+		if (this.haveCTA > -1) {
 			return this.weaponSwitch(this.haveCTA);
 		}
 

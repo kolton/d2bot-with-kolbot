@@ -5,7 +5,6 @@
 */
 
 var Pickit = {
-	range: 40,
 	pickList: [],
 	beltSize: 1,
 	ignoreLog: [4, 5, 6, 22, 41, 76, 77, 78, 79, 80, 81], // Ignored item types for item logging
@@ -37,21 +36,28 @@ var Pickit = {
 	},
 
 	pickItems: function () {
+		function ItemStats(unit) {
+			this.classid = unit.classid;
+			this.x = unit.x;
+			this.y = unit.y;
+			this.gid = unit.gid;
+		}
+
+		var status, gid, item;
+
 		Town.clearBelt();
 
 		while (!me.idle) {
 			delay(40);
 		}
 
-		var status,
-			item = getUnit(4);
-
+		item = getUnit(4);
 		this.pickList = [];
 
 		if (item) {
 			do {
-				if ((item.mode === 3 || item.mode === 5) && getDistance(me, item) <= this.range) {
-					this.pickList.push(copyUnit(item));
+				if ((item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
+					this.pickList.push(new ItemStats(item));
 				}
 			} while (item.getNext());
 		}
@@ -59,41 +65,37 @@ var Pickit = {
 		this.pickList.sort(this.sortItems);
 
 		while (this.pickList.length > 0) {
-			item = this.pickList.shift();
+			gid = this.pickList.shift().gid;
 
-			if (!item || !copyUnit(item).x) {
-				continue;
-			}
+			if (gid) {
+				item = getUnit(4, -1, -1, gid);
 
-			status = this.checkItem(item);
+				if (item) {
+					status = this.checkItem(item);
 
-			if (!status) {
-				continue;
-			}
+					if (status && this.canPick(item)) {
+						// Check room, don't check gold, scrolls and potions
+						if (!Storage.Inventory.CanFit(item) && [4, 22, 76, 77, 78].indexOf(item.itemType) === -1) {
+							print("ÿc7Trying to make room for " + item.name);
 
-			if (!this.canPick(item)) {
-				continue;
-			}
+							if (!Town.visitTown()) {
+								print("ÿc7Not enough room for " + item.name);
 
-			// Check room, don't check gold, scrolls and potions
-			if (!Storage.Inventory.CanFit(item) && [4, 22, 76, 77, 78].indexOf(item.itemType) === -1) {
-				print("ÿc7Trying to make room for " + item.name);
+								return false;
+							}
+						}
 
-				if (!Town.visitTown()) {
-					print("ÿc7Not enough room for " + item.name);
-
-					return;
-				}
-
-				if (!Storage.Inventory.CanFit(item)) {
-					print("ÿc7Not enough room for " + item.name);
-
-					continue;
+						if (Storage.Inventory.CanFit(item)) {
+							this.pickItem(item, status);
+						} else {
+							print("ÿc7Not enough room for " + item.name);
+						}
+					}
 				}
 			}
-
-			this.pickItem(item, status);
 		}
+
+		return true;
 	},
 
 	pickItem: function (unit, status) {
@@ -217,7 +219,7 @@ MainLoop:
 	sortItems: function (unitA, unitB) {
 		// TODO: Add some kind of advanced sorting
 
-		return getDistance(me, unitA) - getDistance(me, unitB);
+		return getDistance(me, unitA.x, unitA.y) - getDistance(me, unitB.x, unitB.y);
 	},
 
 	canPick: function (unit) {
@@ -322,7 +324,7 @@ MainLoop:
 			gid = gidList.shift();
 			item = getUnit(4, -1, -1, gid);
 
-			if (item && (item.mode === 3 || item.mode === 5) && getDistance(me, item) <= this.range) {
+			if (item && (item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
 				status = this.checkItem(item);
 
 				if (status && this.canPick(item)) {

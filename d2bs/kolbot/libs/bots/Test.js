@@ -27,5 +27,5 @@ function Test() {
 }
 
 function test() {
-	pickPotions(20);
+	Attack.clear(20);
 }

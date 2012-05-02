@@ -230,7 +230,7 @@ function Follower() {
 
 	// Change act after completing last act quest
 	this.changeAct = function (act) {
-		var npc, preArea;
+		var npc, preArea, target;
 
 		preArea = me.area;
 
@@ -293,8 +293,14 @@ function Follower() {
 				Pather.usePortal(102, null);
 			}
 
-			Pather.moveTo(17590, 8070);
 			delay(1500);
+
+			target = getUnit(2, 342);
+
+			if (target) {
+				Pather.moveTo(target.x - 3, target.y - 1);
+			}
+
 			Pather.usePortal(null);
 
 			break;

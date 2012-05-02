@@ -32,7 +32,7 @@ var Town = {
 
 	// Do town chores
 	doChores: function () {
-		if (me.classid === 4 && Config.FindItem) { // weapon switch fix in case last game dropped with item find switch on
+		if (me.classid === 4 && Config.FindItem && Config.FindItemSwitch) { // weapon switch fix in case last game dropped with item find switch on
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
 

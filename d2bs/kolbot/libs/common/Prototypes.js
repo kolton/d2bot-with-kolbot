@@ -25,7 +25,7 @@ Unit.prototype.__defineGetter__("inTown",
 		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
 	}
 	);
-	
+
 // Check if party unit is in town
 Party.prototype.__defineGetter__("inTown",
 	function () {
@@ -270,10 +270,18 @@ me.findItem = function (id, mode, loc) {
 	switch (arguments.length) {
 	case 0:
 		id = -1;
+		mode = -1;
+		loc = false;
+
+		break;
 	case 1:
 		mode = -1;
+		loc = false;
+
+		break;
 	case 2:
 		loc = false;
+
 		break;
 	}
 
@@ -302,10 +310,18 @@ me.findItems = function (id, mode, loc) {
 	switch (arguments.length) {
 	case 0:
 		id = -1;
+		mode = -1;
+		loc = false;
+
+		break;
 	case 1:
 		mode = -1;
+		loc = false;
+
+		break;
 	case 2:
 		loc = false;
+
 		break;
 	}
 

@@ -23,7 +23,7 @@ var Pather = {
 			throw new Error("moveTo: Coords must be numbers");
 		}
 
-		if (getUIFlag(0x01) || getUIFlag(0x0C)) {
+		if (getUIFlag(0x01) || getUIFlag(0x02) || getUIFlag(0x04) || getUIFlag(0x16) || getUIFlag(0x0C) || getUIFlag(0x0F)) {
 			me.cancel();
 		}
 
@@ -78,7 +78,7 @@ var Pather = {
 		}
 
 		while (path.length > 0) {
-			if (getUIFlag(0x01) || getUIFlag(0x0C)) {
+			if (getUIFlag(0x01) || getUIFlag(0x02) || getUIFlag(0x04) || getUIFlag(0x16) || getUIFlag(0x0C) || getUIFlag(0x0F)) {
 				me.cancel();
 			}
 
@@ -554,19 +554,13 @@ MainLoop:
 		}
 
 		var i, portal, oldPortal, oldGid,
-			tpTome = me.getItem("tbk");
+			tpTome = me.findItem("tbk", 0, 3);
 
 		if (!tpTome) {
 			throw new Error("makePortal: No TP tomes.");
 		}
 
-		while (tpTome.location !== 3) { // Cycle through tomes if we didn't get one in inventory
-			if (!tpTome.getNext()) {
-				break;
-			}
-		}
-
-		if (tpTome.location !== 3 || !tpTome.getStat(70)) {
+		if (!tpTome.getStat(70)) {
 			throw new Error("makePortal: No scrolls.");
 		}
 
