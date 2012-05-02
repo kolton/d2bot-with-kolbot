@@ -18,6 +18,8 @@ include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
 
+var gidList = []; // fast pickit
+
 function main() {
 	while (!me.gameReady) {
 		delay(100);
@@ -27,7 +29,7 @@ function main() {
 		sojCounter = 0,
 		startTime = getTickCount();
 
-	function DCloneEvent(mode, param1, param2, name1, name2) {
+	this.dcloneEvent = function (mode, param1, param2, name1, name2) {
 		switch (mode) {
 		case 17: // 0x11 - "%Param1 Stones of Jordan Sold to Merchants"
 			if (!Config.SoJWaitTime) {
@@ -50,7 +52,13 @@ function main() {
 
 			break;
 		}
-	}
+	};
+	
+	this.itemEvent = function (gid, mode, code, global) {
+		if (gid > 0 && mode === 0) {
+			gidList.push(gid);
+		}
+	};
 
 	// If game name is a part of Gambling System, don't load scripts
 	if (Gambling.goldFinders.indexOf(me.profile) > -1) {
@@ -81,7 +89,7 @@ function main() {
 	Runewords.init();
 
 	// Load events and threads
-	addEventListener("gameevent", DCloneEvent);
+	addEventListener("gameevent", this.dcloneEvent);
 	load("tools/ToolsThread.js");
 
 	if (Config.PublicMode) {
@@ -90,6 +98,11 @@ function main() {
 
 	if (Config.AntiHostile) {
 		load("tools/AntiHostile.js");
+	}
+
+	if (Config.FastPick) {
+		print("ÿc2Fast pickit active.");
+		addEventListener("itemaction", this.itemEvent);
 	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
