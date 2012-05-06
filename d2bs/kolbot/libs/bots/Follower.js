@@ -55,10 +55,14 @@ function Follower() {
 
 	// Get leader's Party Unit
 	this.getLeader = function (name) {
-		var player = getParty(name);
+		var player = getParty();
 
 		if (player) {
-			return player;
+			do {
+				if (player.name === name) {
+					return player;
+				}
+			} while (player.getNext());
 		}
 
 		return false;
@@ -69,7 +73,11 @@ function Follower() {
 		var player = getUnit(0, name);
 
 		if (player) {
-			return player;
+			do {
+				if (player.mode !== 0 && player.mode !== 17) {
+					return player;
+				}
+			} while (player.getNext());
 		}
 
 		return false;
@@ -352,6 +360,10 @@ function Follower() {
 	};
 
 	this.pickPotions = function (range) {
+		if (me.mode === 17) {
+			return false;
+		}
+
 		Town.clearBelt();
 
 		while (!me.idle) {
@@ -391,6 +403,8 @@ function Follower() {
 
 			Pickit.pickItem(item, status);
 		}
+
+		return true;
 	};
 
 	this.openContainers = function (range) {
@@ -430,7 +444,7 @@ function Follower() {
 	};
 
 	this.chatEvent = function (nick, msg) {
-		if (nick === Config.Follower.Leader) {
+		if (msg && nick === Config.Follower.Leader) {
 			switch (msg) {
 			case "tele":
 			case me.name + " tele":
@@ -504,6 +518,12 @@ function Follower() {
 				}
 
 				break;
+			case "r":
+				if (me.mode === 17) {
+					me.revive();
+				}
+
+				break;
 			default:
 				if (me.classid === 3 && msg.indexOf("aura ") > -1) {
 					piece = msg.split(" ")[0];
@@ -561,6 +581,7 @@ function Follower() {
 	Config.TownCheck = false;
 	Config.TownHP = 0;
 	Config.TownMP = 0;
+	charClass = classes[me.classid];
 
 	for (i = 0; i < 20; i += 1) {
 		leader = this.getLeader(Config.Follower.Leader);
@@ -587,12 +608,14 @@ function Follower() {
 	say("Partied.");
 	Town.move("portalspot");
 
-	charClass = classes[me.classid];
-
 	// Main Loop
 	while (Misc.inMyParty(Config.Follower.Leader)) {
 		if (me.mode === 17) {
-			me.revive();
+			while (!me.inTown) {
+				me.revive();
+				delay(1000);
+			}
+			
 			Town.move("portalspot");
 			say("I'm alive!");
 		}
@@ -602,7 +625,7 @@ function Follower() {
 		}
 
 		if (!me.inTown) {
-			if (!leaderUnit) {
+			if (!leaderUnit || !copyUnit(leaderUnit).x) {
 				leaderUnit = this.getLeaderUnit(Config.Follower.Leader);
 
 				if (leaderUnit) {
@@ -723,7 +746,9 @@ WPLoop:
 
 			break;
 		case "c":
-			Town.getCorpse();
+			if (!me.inTown) {
+				Town.getCorpse();
+			}
 
 			break;
 		case "p":
@@ -733,6 +758,8 @@ WPLoop:
 			if (openContainers) {
 				this.openContainers(20);
 			}
+
+			say("Done picking.");
 
 			break;
 		case "1":
@@ -805,7 +832,7 @@ WPLoop:
 
 		action = "";
 
-		delay(50);
+		delay(100);
 	}
 
 	return true;

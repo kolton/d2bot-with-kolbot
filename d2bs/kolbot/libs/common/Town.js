@@ -4,15 +4,42 @@
 *	@desc		do town chores like buying, selling and gambling
 */
 
+var NPC = {
+	Akara: getLocaleString(2892).toLowerCase(),
+	Gheed: getLocaleString(2891).toLowerCase(),
+	Charsi: getLocaleString(2894).toLowerCase(),
+	Kashya: getLocaleString(2893).toLowerCase(),
+
+	Fara: getLocaleString(3025).toLowerCase(),
+	Drognan: getLocaleString(3023).toLowerCase(),
+	Elzix: getLocaleString(3030).toLowerCase(),
+	Greiz: getLocaleString(3031).toLowerCase(),
+	Lysander: getLocaleString(3026).toLowerCase(),
+
+	Ormus: getLocaleString(1011).toLowerCase(),
+	Alkor: getLocaleString(1010).toLowerCase(),
+	Hratli: getLocaleString(1009).toLowerCase(),
+	Asheara: getLocaleString(1008).toLowerCase(),
+
+	Jamella: getLocaleString(1016).toLowerCase(),
+	Halbu: getLocaleString(1017).toLowerCase(),
+	Tyrael: getLocaleString(1013).toLowerCase(),
+
+	Malah: getLocaleString(22478).toLowerCase(),
+	Anya: getLocaleString(22477).toLowerCase(),
+	Larzuk: getLocaleString(22476).toLowerCase(),
+	"Qual-Kehk": getLocaleString(22480).toLowerCase()
+};
+
 var Town = {
 	sellTimer: getTickCount(), // shop speedup test
 
 	tasks: [
-		{Heal: "akara", Shop: "akara", Gamble: "gheed", Repair: "charsi", Merc: "kashya", Key: "akara"},
-		{Heal: "fara", Shop: "drognan", Gamble: "elzix", Repair: "fara", Merc: "greiz", Key: "lysander"},
-		{Heal: "ormus", Shop: "ormus", Gamble: "alkor", Repair: "hratli", Merc: "asheara", Key: "hratli"},
-		{Heal: "jamella", Shop: "jamella", Gamble: "jamella", Repair: "halbu", Merc: "tyrael", Key: "jamella"},
-		{Heal: "malah", Shop: "malah", Gamble: "anya", Repair: "larzuk", Merc: "qual-kehk", Key: "malah"}
+		{Heal: NPC.Akara, Shop: NPC.Akara, Gamble: NPC.Gheed, Repair: NPC.Charsi, Merc: NPC.Kashya, Key: NPC.Akara},
+		{Heal: NPC.Fara, Shop: NPC.Drognan, Gamble: NPC.Elzix, Repair: NPC.Fara, Merc: NPC.Greiz, Key: NPC.Lysander},
+		{Heal: NPC.Ormus, Shop: NPC.Ormus, Gamble: NPC.Alkor, Repair: NPC.Hratli, Merc: NPC.Asheara, Key: NPC.Hratli},
+		{Heal: NPC.Jamella, Shop: NPC.Jamella, Gamble: NPC.Jamella, Repair: NPC.Halbu, Merc: NPC.Tyrael, Key: NPC.Jamella},
+		{Heal: NPC.Malah, Shop: NPC.Malah, Gamble: NPC.Anya, Repair: NPC.Larzuk, Merc: NPC["Qual-Kehk"], Key: NPC.Malah}
 	],
 
 	ignoredItemTypes: [ // Items that won't be stashed
@@ -468,8 +495,6 @@ MainLoop:
 					}
 				} catch (e) {
 					print(e);
-
-					continue;
 				}
 			}
 		}
@@ -876,30 +901,81 @@ MainLoop:
 	},
 
 	getCorpse: function () {
-		var i, corpse, gid;
+		var corpse,
+			list = [];
 
-		corpse = getUnit(0, me.name, 17);
+		corpse = getUnit(0);
 
 		if (corpse) {
-			gid = corpse.gid;
-
 			do {
-				for (i = 0; i < 5; i += 1) {
-					corpse.interact();
-
-					if (!getUnit(0, me.name, 17, gid)) {
-						break;
-					}
-
-					delay(500);
+				if (corpse.name === me.name && corpse.mode === 17 && getDistance(me, corpse) <= 20) {
+					list.push(copyUnit(corpse));
 				}
 			} while (corpse.getNext());
 		}
 
-		corpse = getUnit(0, me.name, 17);
+		while (list.length > 0) {
+			corpse = list.shift();
 
-		if (corpse) {
-			throw new Error("Town.getCorpse: Failed to get the corpse");
+			Pather.moveToUnit(corpse);
+			corpse.interact();
+			delay(500);
+		}
+
+		if (me.gametype === 0) {
+			this.checkShard();
+		}
+
+		return true;
+	},
+
+	checkShard: function () {
+		var shard,
+			check = {left: false, right: false},
+			item = me.getItem("bld", 0);
+
+		if (item) {
+			do {
+				if (item.location === 3 && item.quality === 7) {
+					shard = copyUnit(item);
+
+					break;
+				}
+			} while (item.getNext());
+		}
+
+		if (!shard) {
+			return true;
+		}
+
+		item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				if (item.bodylocation === 4) {
+					check.right = true;
+				}
+
+				if (item.bodylocation === 5) {
+					check.left = true;
+				}
+			} while (item.getNext());
+		}
+
+		if (!check.right) {
+			shard.toCursor();
+
+			while (me.itemoncursor) {
+				clickItem(0, 4);
+				delay(500);
+			}
+		} else if (!check.left) {
+			shard.toCursor();
+
+			while (me.itemoncursor) {
+				clickItem(0, 5);
+				delay(500);
+			}
 		}
 
 		return true;
@@ -1010,10 +1086,10 @@ MainLoop:
 			this.act[0].spot.stash = [fire[0] - 7, fire[1] - 12];
 			this.act[0].spot.warriv = [fire[0] - 5, fire[1] - 2];
 			this.act[0].spot.cain = [fire[0] + 6, fire[1] - 5];
-			this.act[0].spot.kashya = [fire[0] + 14, fire[1] - 4];
-			this.act[0].spot.akara = [fire[0] + 56, fire[1] - 30];
-			this.act[0].spot.charsi = [fire[0] - 39, fire[1] - 25];
-			this.act[0].spot.gheed = [fire[0] - 34, fire[1] + 36];
+			this.act[0].spot[NPC.Kashya] = [fire[0] + 14, fire[1] - 4];
+			this.act[0].spot[NPC.Akara] = [fire[0] + 56, fire[1] - 30];
+			this.act[0].spot[NPC.Charsi] = [fire[0] - 39, fire[1] - 25];
+			this.act[0].spot[NPC.Gheed] = [fire[0] - 34, fire[1] + 36];
 			this.act[0].spot.portalspot = [fire[0] + 10, fire[1] + 18];
 			this.act[0].spot.waypoint = [wp.roomx * 5 + wp.x, wp.roomy * 5 + wp.y];
 			this.act[0].initialized = true;
@@ -1021,15 +1097,15 @@ MainLoop:
 			break;
 		case 2:
 			this.act[1].spot = {};
-			this.act[1].spot.fara = [5124, 5082];
+			this.act[1].spot[NPC.Fara] = [5124, 5082];
 			this.act[1].spot.cain = [5124, 5082];
-			this.act[1].spot.lysander = [5118, 5104];
-			this.act[1].spot.greiz = [5033, 5053];
-			this.act[1].spot.elzix = [5032, 5102];
+			this.act[1].spot[NPC.Lysander] = [5118, 5104];
+			this.act[1].spot[NPC.Greiz] = [5033, 5053];
+			this.act[1].spot[NPC.Elzix] = [5032, 5102];
 			this.act[1].spot.palace = [5088, 5153];
 			this.act[1].spot.sewers = [5221, 5181];
 			this.act[1].spot.meshif = [5205, 5058];
-			this.act[1].spot.drognan = [5097, 5035];
+			this.act[1].spot[NPC.Drognan] = [5097, 5035];
 			this.act[1].spot.atma = [5140, 5055];
 			this.act[1].spot.warriv = [5152, 5201];
 			this.act[1].spot.portalspot = [5168, 5055];
@@ -1041,10 +1117,10 @@ MainLoop:
 		case 3:
 			this.act[2].spot = {};
 			this.act[2].spot.meshif = [5118, 5168];
-			this.act[2].spot.hratli = [5223, 5048];
-			this.act[2].spot.ormus = [5129, 5093];
-			this.act[2].spot.asheara = [5043, 5093];
-			this.act[2].spot.alkor = [5083, 5016];
+			this.act[2].spot[NPC.Hratli] = [5223, 5048];
+			this.act[2].spot[NPC.Ormus] = [5129, 5093];
+			this.act[2].spot[NPC.Asheara] = [5043, 5093];
+			this.act[2].spot[NPC.Alkor] = [5083, 5016];
 			this.act[2].spot.cain = [5148, 5066];
 			this.act[2].spot.stash = [5144, 5059];
 			this.act[2].spot.portalspot = [5156, 5063];
@@ -1055,9 +1131,9 @@ MainLoop:
 		case 4:
 			this.act[3].spot = {};
 			this.act[3].spot.cain = [5027, 5027];
-			this.act[3].spot.halbu = [5089, 5031];
-			this.act[3].spot.tyrael = [5027, 5027];
-			this.act[3].spot.jamella = [5088, 5054];
+			this.act[3].spot[NPC.Halbu] = [5089, 5031];
+			this.act[3].spot[NPC.Tyrael] = [5027, 5027];
+			this.act[3].spot[NPC.Jamella] = [5088, 5054];
 			this.act[3].spot.stash = [5022, 5040];
 			this.act[3].spot.portalspot = [5045, 5042];
 			this.act[3].spot.waypoint = [5043, 5018];
@@ -1068,11 +1144,11 @@ MainLoop:
 			this.act[4].spot = {};
 			this.act[4].spot.portalspot = [5097, 5024];
 			this.act[4].spot.stash = [5129, 5061];
-			this.act[4].spot.larzuk = [5141, 5045];
-			this.act[4].spot.malah = [5078, 5029];
+			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
+			this.act[4].spot[NPC.Malah] = [5078, 5029];
 			this.act[4].spot.cain = [5119, 5061];
-			this.act[4].spot["qual-kehk"] = [5066, 5083]; // derp
-			this.act[4].spot.anya = [5112, 5120];
+			this.act[4].spot[NPC["Qual-Kehk"]] = [5066, 5083];
+			this.act[4].spot[NPC.Anya] = [5112, 5120];
 			this.act[4].spot.portal = [5118, 5120];
 			this.act[4].spot.waypoint = [5113, 5068];
 			this.act[4].spot.nihlathak = [5071, 5111];

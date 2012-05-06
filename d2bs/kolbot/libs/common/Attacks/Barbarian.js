@@ -19,6 +19,7 @@ var ClassAttack = {
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
+				this.skillHand[i] = 2; // shift bypass
 				break;
 			case 126: // Bash
 			case 133: // Double Swing

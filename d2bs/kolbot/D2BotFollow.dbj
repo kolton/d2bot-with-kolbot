@@ -1,7 +1,7 @@
-var gameMaxLength				= 900;    	// seconds
+var gameMaxLength				= 0;    	// seconds
 var gameMinLength				= 50000;	// time in milliseconds, minimum game length, 180 seconds default (1 game/3 minutes)
 var unableToConnectRetry		= 5;		// time in minutes to retry connecting on connection fail (real value is +/- 1 min)
-var realmDownRetry				= 10;		// time in minutes to retry connecting on a realm down (default is 300 minutes)
+var realmDownRetry				= 3;		// time in minutes to retry connecting on a realm down (default is 300 minutes)
 var disconnectedRetry			= 5;		// time in minutes to retry on a disconnection (usually ip ban related)
 var cdkeyInUseRetry				= 5;		// time in minutes to retry on a cdkey in use error message (set to 0 to stop)
 var connectingToBnetTimeout		= 20000;	// time in milliseconds to wait for a login to time out and click cancel and retry

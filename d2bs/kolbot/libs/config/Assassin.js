@@ -21,6 +21,14 @@ function LoadConfig() {
 		Config.BattleOrders.Mode = 0; // 0 = give BO, 1 = get BO
 		Config.BattleOrders.Wait = false; // Idle until the player that received BO leaves.
 
+	/* Team MF system (experimental)
+	 * Run the same boss or area with more than one character.
+	 * Supports most single boss or clear area scripts like Andariel, Duriel, Mephisto, Mausoleum
+	 * Leader runs normal scripts, helper runs only Scripts.MFHelper.
+	 */
+	Config.MFLeader = false; // Set to true for the MF LEADER. The leader runs normal scripts, but he'll now drop a town portal before killing.
+	Scripts.MFHelper = false; // Set to true for MF HELPER. The helper enters the leader's portal and helps kill/clear. The helper DOES NOT RUN ANY OTHER SCRIPTS!
+
 	// Boss/area scripts
 
 	// *** act 1 ***
@@ -30,6 +38,7 @@ function LoadConfig() {
 		Config.Mausoleum.KillBloodRaven = true;
 	Scripts.Rakanishu = false;
 		Config.Rakanishu.KillGriswold = true;
+	Scripts.Coldcrow = false;
 	Scripts.Tristram = false;
 	Scripts.Pit = false;
 		Config.Pit.ClearPit1 = true;

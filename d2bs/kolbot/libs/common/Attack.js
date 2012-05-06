@@ -219,6 +219,10 @@ var Attack = {
 		}
 
 		while (monsterList.length > 0) {
+			if (me.mode === 17) {
+				return false;
+			}
+
 			monsterList.sort(Sort.units);
 			monsterList.sort(sortfunc);
 

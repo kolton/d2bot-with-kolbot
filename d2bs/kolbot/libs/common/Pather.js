@@ -82,8 +82,6 @@ var Pather = {
 				me.cancel();
 			}
 
-			Misc.townCheck(false);
-
 			node = path.shift();
 
 			/* Right now getPath's first node is our own position so it's not necessary to take it into account
@@ -135,6 +133,10 @@ var Pather = {
 					this.moveTo(node.x, node.y);
 				}
 			}
+
+			if (Misc.townCheck(false)) {
+				this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1);
+			}
 		}
 
 		if (this.useTeleport && Config.TeleSwitch) {
@@ -149,7 +151,12 @@ var Pather = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			Skill.cast(54, 0, x, y);
+			if (typeof me.castXY === "function") {
+				Skill.setSkill(54, 0);
+				me.castXY(0, x, y);
+			} else {
+				Skill.cast(54, 0, x, y);
+			}
 
 			tick = getTickCount();
 

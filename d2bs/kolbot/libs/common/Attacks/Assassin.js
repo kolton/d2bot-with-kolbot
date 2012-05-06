@@ -20,6 +20,7 @@ var ClassAttack = {
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillHand[i] = 2; // shift bypass
 				break;
 			case 251: // Fire Blast
 			case 256: // Shock Web

@@ -10,9 +10,9 @@ function Test() {
 			c = true;
 		}
 	}
-	
+
 	addEventListener("keydown", KeyDown);
-	
+
 	while (true) {
 		if (c) {
 			test();
@@ -27,5 +27,5 @@ function Test() {
 }
 
 function test() {
-	Attack.clear(20);
+	
 }

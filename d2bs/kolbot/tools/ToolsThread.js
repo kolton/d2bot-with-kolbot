@@ -39,6 +39,7 @@ function main() {
 		for (i = 0, length = items.length; i < length; i = i + 1) {
 			if (pottype === 78 && items[i].mode === 0 && items[i].location === 3 && items[i].itemType === 78) {
 				print("ÿc2Drinking rejuventation potion from inventory.");
+
 				return copyUnit(items[i]);
 			}
 

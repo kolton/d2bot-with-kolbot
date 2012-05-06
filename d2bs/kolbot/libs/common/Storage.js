@@ -272,6 +272,10 @@ var Storage = new function () {
 		this.Cube.Reset();
 		var item = me.getItem();
 
+		if (!item) {
+			return false;
+		}
+		
 		do {
 			switch (item.location) {
 			case 3:

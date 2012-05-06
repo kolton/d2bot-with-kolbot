@@ -106,10 +106,13 @@ function main() {
 	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
-	Town.getCorpse();
-	Town.clearBelt();
-	Town.clearInventory();
-	Pickit.pickItems();
+
+	if (!Scripts.UserAddon) { // block user addon from doint automated stuff
+		Town.getCorpse();
+		Town.clearBelt();
+		Town.clearInventory();
+		Pickit.pickItems();
+	}
 
 	// Go
 	Loader.init();

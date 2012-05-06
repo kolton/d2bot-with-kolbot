@@ -21,11 +21,14 @@
 include("NTItemAlias.dbl"); 
 
 var _NTIP_CheckList = new Array(); 
+var stringArray = [];
 
 function NTIPOpenFile(filepath) 
 {
 	var _nipfile; 
 	var _line; 
+	var string;
+	var count = 0;
 
 	_nipfile = File.open(filepath, 0); 
 
@@ -34,10 +37,14 @@ function NTIPOpenFile(filepath)
 
 	while(!_nipfile.eof) 
 	{
-		_line = NTIPParseLineInt(_nipfile.readLine()); 
+		string = _nipfile.readLine();
+		_line = NTIPParseLineInt(string); 
+		count += 1;
 
-		if(_line) 
+		if (_line) {
 			_NTIP_CheckList.push(_line); 
+			stringArray.push({string: string, count: count, file: filepath});
+		}
 	}
 
 	_nipfile.close(); 
@@ -56,20 +63,45 @@ function NTIPCheckItem(item, list)
 	var _result = 0; 
 
 	_identified = item.getFlag(0x10);
-
+	
 	for(i = 0 ; i < list.length ; i++) 
 	{
-		if(list[i][0].length > 0) 
-		{
-			if(eval(list[i][0])) 
+		try {
+			if(list[i][0].length > 0) 
 			{
-				if(list[i][1].length > 0) 
+				if(eval(list[i][0])) 
 				{
-					if(eval(list[i][1])) 
+					if(list[i][1].length > 0) 
+					{
+						if(eval(list[i][1])) 
+						{
+							if(list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) 
+							{
+								if(NTIP_CheckQuantityOwned(list[i][0],list[i][1], false) < list[i][2]["MaxQuantity"]) 
+								{
+									//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)); 
+									return 1; 
+								}
+								else 
+								{
+									//print("I already have enough of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)+" in my stash!"); 
+									return 0; 
+								}
+							}
+							else 
+							{
+								//print("No maximum for this item"); 
+								return 1; 
+							}
+						}
+						else if(!_identified && _result == 0) 
+							_result = -1;
+					}
+					else 
 					{
 						if(list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) 
 						{
-							if(NTIP_CheckQuantityOwned(list[i][0],list[i][1], false) < list[i][2]["MaxQuantity"]) 
+							if(NTIP_CheckQuantityOwned(list[i][0], null, false) < list[i][2]["MaxQuantity"]) 
 							{
 								//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)); 
 								return 1; 
@@ -86,14 +118,15 @@ function NTIPCheckItem(item, list)
 							return 1; 
 						}
 					}
-					else if(!_identified && _result == 0) 
-						_result = -1;
 				}
-				else 
+			}
+			else if(list[i][1].length > 0) 
+			{
+				if(eval(list[i][1])) 
 				{
 					if(list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) 
 					{
-						if(NTIP_CheckQuantityOwned(list[i][0], null, false) < list[i][2]["MaxQuantity"]) 
+						if(NTIP_CheckQuantityOwned(null, list[i][1], false) < list[i][2]["MaxQuantity"]) 
 						{
 							//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)); 
 							return 1; 
@@ -106,36 +139,22 @@ function NTIPCheckItem(item, list)
 					}
 					else 
 					{
-						//print("No maximum for this item"); 
 						return 1; 
 					}
 				}
+				else if(!_identified && _result == 0) 
+					_result = -1; 
 			}
-		}
-		else if(list[i][1].length > 0) 
-		{
-			if(eval(list[i][1])) 
-			{
-				if(list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) 
-				{
-					if(NTIP_CheckQuantityOwned(null, list[i][1], false) < list[i][2]["MaxQuantity"]) 
-					{
-						//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)); 
-						return 1; 
-					}
-					else 
-					{
-						//print("I already have enough of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)+" in my stash!"); 
-						return 0; 
-					}
-				}
-				else 
-				{
-					return 1; 
-				}
+		} catch (pickError) {
+			showConsole();
+
+			if (arguments.length === 1) {
+				print("ÿc1Pickit error! Line # ÿc2" + stringArray[i].count + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
+
+				_NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
+			} else {
+				print("ÿc1Pickit error in runeword config!");
 			}
-			else if(!_identified && _result == 0) 
-				_result = -1; 
 		}
 	}
 
@@ -274,19 +293,44 @@ function NTIPParseLineInt(input)
 				switch(_section[i][0]) 
 				{
 				case 't': 
-					_result[0] += _NTIPAliasType[_keyword]; 
+					if (typeof _NTIPAliasType[_keyword] === "undefined") {
+						_result[0] += "false";
+					} else {
+						_result[0] += _NTIPAliasType[_keyword]; 
+					}
+
 					break; 
 				case 'n': 
-					_result[0] += _NTIPAliasClassID[_keyword]; 
+					if (typeof _NTIPAliasClassID[_keyword] === "undefined") {
+						_result[0] += "false";
+					} else {
+						_result[0] += _NTIPAliasClassID[_keyword]; 
+					}
+					
 					break; 
 				case 'c': 
-					_result[0] += _NTIPAliasClass[_keyword]; 
+					if (typeof _NTIPAliasClass[_keyword] === "undefined") {
+						_result[0] += "false";
+					} else {
+						_result[0] += _NTIPAliasClass[_keyword]; 
+					}
+					
 					break; 
 				case 'q': 
-					_result[0] += _NTIPAliasQuality[_keyword]; 
+					if (typeof _NTIPAliasQuality[_keyword] === "undefined") {
+						_result[0] += "false";
+					} else {
+						_result[0] += _NTIPAliasQuality[_keyword]; 
+					}
+					
 					break; 
 				case 'f': 
-					_result[0] += _NTIPAliasFlag[_keyword] + ")"; 
+					if (typeof _NTIPAliasFlag[_keyword] === "undefined") {
+						_result[0] += "false)";
+					} else {
+						_result[0] += _NTIPAliasFlag[_keyword] + ")"; 
+					}
+
 					break; 
 				}
 			}
@@ -314,22 +358,17 @@ function NTIPParseLineInt(input)
 			_end = _section[i].indexOf("]"); 
 			_keyword = _section[i].substring(0, _end); 
 
-			if(_keyword == "description")
-			{
-				var _string = _section[i].split("\"")[1];
-				_result[1] += "item.location == 3 && ";
-				_result[1] += "item.description.replace(/ |;|\t/g, \"\").toLowerCase().indexOf(\"" + _string + "\") > -1";
-				_result[1] += _section[i].split("\"")[2];
-			}
-			else
-			{
-				if(isNaN(_keyword)) 
+			if (isNaN(_keyword)) {
+				if (typeof _NTIPAliasStat[_keyword] === "undefined") {
+					_result[1] += "false";
+				} else {
 					_result[1] += "item.getStat(" + _NTIPAliasStat[_keyword] + ")"; 
-				else 
-					_result[1] += "item.getStat(" + _keyword + ")"; 
-
-				_result[1] += _section[i].substring(_end+1); 
+				}
+			} else {
+				_result[1] += "item.getStat(" + _keyword + ")";
 			}
+
+			_result[1] += _section[i].substring(_end+1); 
 		}
 	}
 	else 

@@ -124,14 +124,22 @@ var Precast = new function () {
 
 			break;
 		case 4: // Barbarian
-			if (!me.getState(32) || force) {
+			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
 				if (Config.BOSwitch) {
 					Precast.weaponSwitch(Config.BOSwitch);
 				}
 
-				Skill.cast(155, 0); // Battle Command
-				Skill.cast(149, 0); // Battle Orders
-				Skill.cast(138, 0); // Shout
+				if (!me.getState(51) || force) {
+					Skill.cast(155, 0); // Battle Command
+				}
+				
+				if (!me.getState(32) || force) {
+					Skill.cast(149, 0); // Battle Orders
+				}
+					
+				if (!me.getState(26) || force) {
+					Skill.cast(138, 0); // Shout
+				}
 
 				if (Config.BOSwitch) {
 					Precast.weaponSwitch(Math.abs(Config.BOSwitch - 1));

@@ -19,6 +19,7 @@ var ClassAttack = {
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillHand[i] = 2; // shift bypass
 				break;
 			case 96: // Sacrifice
 			case 97: // Smite
@@ -158,7 +159,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 2, y + 1], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
+			positions = [[x + 2, y + 2], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (getDistance(me, positions[i][0], positions[i][1]) < 2) {
@@ -173,7 +174,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 2, y + 1], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
+			positions = [[x + 2, y + 2], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
 
 		//positions.sort(Attack.sortRooms);
 
