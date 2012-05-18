@@ -133,7 +133,7 @@ function main() {
 							case 1: // Sorceress
 								if (ClassAttack.skillRange[1] > 20 && getDistance(me, player) < 30) {
 									print(ClassAttack.skillRange[1]);
-									
+
 									Attack.getIntoPosition(player, ClassAttack.skillRange[1], 0x4);
 								}
 

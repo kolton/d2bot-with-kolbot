@@ -21,10 +21,6 @@ include("common/Town.js");
 var gidList = []; // fast pickit
 
 function main() {
-	while (!me.gameReady) {
-		delay(100);
-	}
-
 	var i, sojPause,
 		sojCounter = 0,
 		startTime = getTickCount();
@@ -47,13 +43,13 @@ function main() {
 			}
 
 			D2Bot.printToConsole("Diablo Walks the Earth;7");
-			removeEventListener("gameevent", DCloneEvent);
+			removeEventListener("gameevent", this.dcloneEvent);
 			scriptBroadcast("dclone");
 
 			break;
 		}
 	};
-	
+
 	this.itemEvent = function (gid, mode, code, global) {
 		if (gid > 0 && mode === 0) {
 			gidList.push(gid);
@@ -72,14 +68,6 @@ function main() {
 		}
 	}
 
-	if (me.getStat(13) < DataFile.getStats().experience) { // check for experience decrease -> log death
-		D2Bot.printToConsole("You died in last game;1");
-		D2Bot.printToConsole("Experience decreased by " + (DataFile.getStats().experience - me.getStat(13)) + ";1");
-		DataFile.updateDeaths();
-	}
-
-	DataFile.updateStats("experience");
-
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
 	Config.init(true);
 	Pickit.init();
@@ -87,6 +75,16 @@ function main() {
 	Storage.Init();
 	Cubing.init();
 	Runewords.init();
+
+	me.maxgametime = Config.MaxGameTime * 1000;
+
+	if (me.getStat(13) < DataFile.getStats().experience) { // check for experience decrease -> log death
+		D2Bot.printToConsole("You died in last game;1");
+		D2Bot.printToConsole("Experience decreased by " + (DataFile.getStats().experience - me.getStat(13)) + ";1");
+		DataFile.updateDeaths();
+	}
+
+	DataFile.updateStats("experience");
 
 	// Load events and threads
 	addEventListener("gameevent", this.dcloneEvent);
@@ -106,8 +104,7 @@ function main() {
 	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
-
-	if (!Scripts.UserAddon) { // block user addon from doint automated stuff
+	if (!Scripts.UserAddon) {
 		Town.getCorpse();
 		Town.clearBelt();
 		Town.clearInventory();
@@ -131,9 +128,10 @@ function main() {
 	}
 
 	print("ÿc8Run duration ÿc2" + ((getTickCount() - startTime) / 1000));
-	delay(500);
+	DataFile.updateStats("gold");
 
 	if (Config.LogExperience) {
+		delay(500);
 		Experience.log();
 	}
 
@@ -158,6 +156,5 @@ function main() {
 		say(Config.LastMessage);
 	}
 
-	DataFile.updateStats("gold");
 	quit();
 }

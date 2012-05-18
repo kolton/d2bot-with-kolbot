@@ -44,7 +44,7 @@ var Attack = {
 			if (items) {
 				for (i = 0; i < items.length; i += 1) {
 					if (items[i].getPrefix(20566)) {
-						print("Infinity detected");
+						//print("Infinity detected");
 
 						this.infinity = true;
 
@@ -61,7 +61,7 @@ var Attack = {
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
 				if (items[i].getPrefix(20566)) {
-					print("Infinity detected");
+					//print("Infinity detected");
 
 					this.infinity = true;
 
@@ -79,7 +79,8 @@ var Attack = {
 			return false;
 		}
 
-		var i, dodgeList, target,
+		var i, target,
+			dodgeList = [],
 			attackCount = 0;
 
 		for (i = 0; i < 3; i += 1) {
@@ -110,7 +111,7 @@ var Attack = {
 				if (dodgeList.length) {
 					dodgeList.sort(Sort.units);
 
-					if (getDistance(me, dodgeList[0]) < 10) {
+					if (getDistance(me, dodgeList[0]) < 13) {
 						this.dodge(target, 15, dodgeList);
 					}
 				}
@@ -176,7 +177,8 @@ var Attack = {
 			throw new Error("Attack.clear: range must be a number.");
 		}
 
-		var i, boss, orgx, orgy, target, result, monsterList, dodgeList,
+		var i, boss, orgx, orgy, target, result, monsterList,
+			dodgeList = [],
 			gidAttack = [],
 			attackCount = 0;
 
@@ -207,7 +209,6 @@ var Attack = {
 		}
 
 		monsterList = [];
-		dodgeList = [];
 		target = getUnit(1);
 
 		if (target) {
@@ -237,7 +238,7 @@ var Attack = {
 					if (attackCount > 0 && dodgeList.length > 0) {
 						dodgeList.sort(Sort.units);
 
-						if (getDistance(me, dodgeList[0]) < 8) {
+						if (getDistance(me, dodgeList[0]) < 13) {
 							//this.dodge(dodgeList[0], 15, dodgeList);
 							this.dodge(target, 15, dodgeList);
 						}
@@ -245,7 +246,7 @@ var Attack = {
 				}
 
 				Misc.townCheck(true);
-				me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
+				//me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
 
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
@@ -321,7 +322,8 @@ var Attack = {
 
 	// Clear an already formed array of monstas
 	clearList: function (list, sortfunc) {
-		var i, target, result, dodgeList,
+		var i, target, result,
+			dodgeList = [],
 			gidAttack = [],
 			attackCount = 0,
 			monsterList = list.slice(0);
@@ -345,7 +347,7 @@ var Attack = {
 					if (attackCount > 0 && dodgeList.length > 0) {
 						dodgeList.sort(Sort.units);
 
-						if (getDistance(me, dodgeList[0]) < 8) {
+						if (getDistance(me, dodgeList[0]) < 13) {
 							//this.dodge(dodgeList[0], 15, dodgeList);
 							this.dodge(target, 15, dodgeList);
 						}
@@ -353,7 +355,7 @@ var Attack = {
 				}
 
 				Misc.townCheck(true);
-				me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
+				//me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
 
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
@@ -404,12 +406,12 @@ var Attack = {
 	},
 
 	// Draw lines around a room on minimap
-	markRoom: function (room, color) {
+	/*markRoom: function (room, color) {
 		new Line(room.x * 5, room.y * 5, room.x * 5, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5, room.x * 5 + room.xsize, room.y * 5, color, true);
 		new Line(room.x * 5 + room.xsize, room.y * 5, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
-	},
+	},*/
 
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
@@ -418,7 +420,11 @@ var Attack = {
 			say("clearlevel " + getArea().name);
 		}
 
-		var room, result, rooms;
+		var room, result, rooms, myRoom;
+
+		function RoomSort(a, b) {
+			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
+		}
 
 		room = getRoom();
 
@@ -437,8 +443,23 @@ var Attack = {
 		} while (room.getNext());
 
 		while (rooms.length > 0) {
-			rooms.sort(Sort.points);
+			// get the first room + initialize myRoom var
+			if (!myRoom) {
+				room = getRoom(me.x, me.y);
+			}
+
+			if (room) {
+				if (room instanceof Array) { // use previous room to calculate distance
+					myRoom = [room[0], room[1]];
+				} else { // create a new room to calculate distance (first room, done only once)
+					myRoom = [room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2];
+				}
+			}
+
+			rooms.sort(RoomSort);
 			room = rooms.shift();
+
+			//print("myroom: " + myRoom[0] + ", " + myRoom[1] + " nextroom: " + room[0] + ", " + room[1]);
 
 			result = Pather.getNearestWalkable(room[0], room[1], 15, 2);
 
@@ -547,13 +568,14 @@ var Attack = {
 			maxcount = 99,
 			coords = [],
 			goodCoords = [],
-			angles = [45, 90, 135, 180, 225, 270, 305, 360];
+			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
+			angles = [0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180];
 
 		// step 1 - build possible dodge positions based on angles
 
 		for (i = 0; i < angles.length; i = i + 1) {
-			coordx = Math.round((Math.cos(angles[i] * Math.PI / 180)) * distance + unit.x);
-			coordy = Math.round((Math.sin(angles[i] * Math.PI / 180)) * distance + unit.y);
+			coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
+			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
 			if (this.validSpot(coordx, coordy)) {
 				coords.push([coordx, coordy]);
@@ -562,6 +584,7 @@ var Attack = {
 
 		if (coords.length === 0) { // no valid positions - don't move
 			me.overhead("Can't dodge :(");
+
 			return true;
 		}
 
@@ -571,7 +594,7 @@ var Attack = {
 			count = 0;
 
 			for (j = 0; j < list.length; j += 1) {
-				if (list[j].hp > 0 && getDistance(list[j].x, list[j].y, coords[i][0], coords[i][1]) < 10) {
+				if (list[j].hp > 0 && getDistance(list[j].x, list[j].y, coords[i][0], coords[i][1]) < 13) {
 					count += 1;
 				}
 			}
@@ -587,12 +610,12 @@ var Attack = {
 		}
 
 		if (goodCoords.length > 0) { // just in case goodCoords is empty (shouldn't happen)
-			if (getDistance(me, goodCoords[0], goodCoords[1]) < 5) { // close enough
+			if (getDistance(me, goodCoords[0], goodCoords[1]) < 4) { // close enough
 				return true;
 			}
 
 			me.overhead("Dodge!");
-			Pather.moveTo(goodCoords[0], goodCoords[1], 1);
+			Pather.moveTo(goodCoords[0], goodCoords[1], 3);
 		}
 
 		return true;
@@ -926,7 +949,8 @@ AuraLoop: // Skip monsters with auras
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				if (!(CollMap.getColl(cx, cy) & 0x1)) {
+				//if (!(CollMap.getColl(cx, cy) & 0x1)) {
+				if (this.validSpot(cx, cy)) {
 					coords.push([cx, cy]);
 				}
 			}
@@ -935,27 +959,20 @@ AuraLoop: // Skip monsters with auras
 
 			if (coords.length > 0) {
 				coords.sort(Sort.points); // sort angles by final spot distance
-			} else { // no good final spots
-				//print("reducing optimal spot range");
 
-				continue;
-			}
+				for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
+					if (!CollMap.checkColl(unit, {x: coords[i][0], y: coords[i][1]}, coll)) {
+						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
+						CollMap.reset();
 
-MainLoop:
-			for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
-				if (CollMap.checkColl(unit, {x: coords[i][0], y: coords[i][1]}, coll)) {
-					continue MainLoop;
+						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1]));
+					}
 				}
-
-				//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
-				CollMap.reset();
-
-				return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1]));
 			}
 		}
 
 		CollMap.reset();
-		print("optimal pos fail. " + unit.name);
+		//print("optimal pos fail.");
 
 		return false;
 	}

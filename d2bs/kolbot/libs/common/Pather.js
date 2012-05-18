@@ -107,7 +107,7 @@ var Pather = {
 
 				fail += 1;
 
-				print("move retry " + fail);
+				//print("move retry " + fail);
 			}
 
 			if (fail >= retry) {
@@ -151,9 +151,9 @@ var Pather = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			if (typeof me.castXY === "function") {
+			if (typeof castXY === "function") {
 				Skill.setSkill(54, 0);
-				me.castXY(0, x, y);
+				castXY(0, x, y);
 			} else {
 				Skill.cast(54, 0, x, y);
 			}
@@ -251,7 +251,7 @@ MainLoop:
 
 		if (door) {
 			do {
-				if (getDistance(door, x, y) < 4 || getDistance(me, door) < 4) { // TODO: Adjust to optimal distances
+				if (getDistance(door, x, y) < 4 && getDistance(me, door) < 9 || getDistance(me, door) < 4) { // TODO: Adjust to optimal distances
 					for (i = 0; i < 3; i += 1) {
 						door.interact();
 
@@ -396,9 +396,9 @@ MainLoop:
 
 							for (n = 0; n < targetExits.length; n += 1) {
 								if (targetExits[n].target === me.area) { // TODO: Add getNearestRoom back in
-									dest.distance = getDistance(me, targetExits[n]);
-									dest.x = targetExits[n].x - Math.round((dest.distance - 10) * (targetExits[n].x - me.x) / dest.distance);
-									dest.y = targetExits[n].y - Math.round((dest.distance - 10) * (targetExits[n].y - me.y) / dest.distance);
+									dest.angle = Math.round(Math.atan2(exits[j].y - targetExits[n].y, exits[j].x - targetExits[n].x) * 180 / Math.PI);
+									dest.x = Math.round((Math.cos((dest.angle + 180) * Math.PI / 180)) * 10 + targetExits[n].x);
+									dest.y = Math.round((Math.sin((dest.angle + 180) * Math.PI / 180)) * 10 + targetExits[n].y);
 
 									/*if (!this.moveToUnit(targetExits[n])) {
 										return false;
@@ -456,7 +456,7 @@ MainLoop:
 
 			while (getTickCount() - tick < 3000) {
 				if ((targetArea === null && me.area !== preArea) || me.area === targetArea) {
-					delay(200);
+					delay(400);
 
 					return true;
 				}
@@ -532,7 +532,7 @@ MainLoop:
 
 				while (getTickCount() - tick < 2000) {
 					if (me.area === targetArea) {
-						delay(200);
+						delay(500);
 
 						return true;
 					}

@@ -45,7 +45,7 @@ var ClassAttack = {
 	},
 
 	doAttack: function (unit, preattack) {
-		if (Town.needMerc()) {
+		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
@@ -112,6 +112,16 @@ var ClassAttack = {
 		var i;
 
 		if (Config.AttackSkill[index] === 112) {
+			if (unit.classid === 691) {
+				Attack.getIntoPosition(unit, 15, 0x4);
+
+				if (Config.AttackSkill[index + 1] > -1) {
+					Skill.setSkill(Config.AttackSkill[index + 1], 0);
+				}
+
+				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+			}
+
 			if (!this.checkHammerPosition(unit)) {
 				this.getHammerPosition(unit);
 
@@ -124,7 +134,7 @@ var ClassAttack = {
 				Skill.setSkill(Config.AttackSkill[index + 1], 0);
 			}
 
-			for (i = 0; i < 4; i += 1) {
+			for (i = 0; i < 3; i += 1) {
 				Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
 
 				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5) {
@@ -159,7 +169,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 2, y + 2], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
+			positions = [[x + 1, y + 1], [x - 1, y - 1], [x + 2, y]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (getDistance(me, positions[i][0], positions[i][1]) < 2) {
@@ -174,9 +184,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 2, y + 2], [x + 2, y + 3], [x + 1, y + 3], [x - 5, y - 1]];
-
-		//positions.sort(Attack.sortRooms);
+			positions = [[x + 1, y + 1], [x - 1, y - 1], [x + 2, y]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (Attack.validSpot(positions[i][0], positions[i][1])) {
@@ -196,11 +204,13 @@ var ClassAttack = {
 			delay(40);
 		}
 
-		if (me.gametype === 1 || getDistance(me, x, y) > 1) {
-			return Pather.moveTo(x, y, 1);
-		}
+		if (getDistance(me, x, y) > 1) {
+			if (me.gametype === 1) {
+				return Pather.moveTo(x, y, 1);
+			}
 
-		me.move(x, y);
+			me.move(x, y);
+		}
 
 		while (!me.idle) {
 			delay(40);

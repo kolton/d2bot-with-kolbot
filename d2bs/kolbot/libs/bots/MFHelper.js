@@ -63,6 +63,7 @@ MainLoop:
 			switch (true) {
 			case command.indexOf("kill") > -1:
 				print("Received command: kill");
+				delay(500);
 
 				split = command.split("kill ")[1];
 				
@@ -80,6 +81,8 @@ MainLoop:
 					print(killerror);
 				}
 
+				delay(1000);
+
 				if (!me.inTown && !Pather.usePortal(null, player.name)) {
 					Town.goToTown();
 				}
@@ -87,9 +90,11 @@ MainLoop:
 				break;
 			case command.indexOf("clearlevel") > -1:
 				print("Received command: clearlevel");
+				delay(500);
 				Pather.usePortal(player.area, player.name);
 				Precast.doPrecast(false);
 				Attack.clearLevel(Config.ClearType);
+				delay(1000);
 
 				if (!Pather.usePortal(null, player.name)) {
 					Town.goToTown();
@@ -98,6 +103,7 @@ MainLoop:
 				break;
 			case command.indexOf("clear") > -1:
 				print("Received command: clear");
+				delay(500);
 
 				split = command.split("clear ")[1]
 
@@ -113,6 +119,8 @@ MainLoop:
 				} catch (killerror) {
 					print(killerror);
 				}
+
+				delay(1000);
 
 				if (!me.inTown && !Pather.usePortal(null, player.name)) {
 					Town.goToTown();

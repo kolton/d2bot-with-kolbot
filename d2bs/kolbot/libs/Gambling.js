@@ -29,9 +29,9 @@ var Gambling = {
 		Once set up properly, the gold finders will run their own games and join gamblers' games when they're out of gold.
 	*/
 
-	goldFinders: [], // don't remove the comma
-	gamblers: [], // don't remove the comma
-	gambleGames: [], // don't remove the comma
+	goldFinders: [""], // don't remove the comma
+	gamblers: [""], // don't remove the comma
+	gambleGames: [""], // don't remove the comma
 
 	minGold: 200000, // don't remove the comma
 

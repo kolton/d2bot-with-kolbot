@@ -1,6 +1,8 @@
+// experimental script
+
 function Rushee() {
 	var quester, leader, target,
-		leaderName = "kolx-a",
+		leaderName = "",
 		action = "";
 
 	this.findLeader = function (name) {
@@ -411,7 +413,8 @@ function Rushee() {
 				this.checkQuestMonster(243);
 				
 				if (me.gametype === 0) {
-					quitGame();
+					//quitGame();
+					quit();
 				} else {
 					if (me.mode === 17) {
 						me.revive();

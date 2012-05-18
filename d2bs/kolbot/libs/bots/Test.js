@@ -4,13 +4,11 @@ function Test() {
 	var c;
 
 	function KeyDown(key) {
-		//print(key);
-		
 		if (key === 45) {
 			c = true;
 		}
 	}
-
+	
 	addEventListener("keydown", KeyDown);
 
 	while (true) {
@@ -19,13 +17,11 @@ function Test() {
 			
 			c = false;
 		}
-		
-		Pickit.fastPick();
-		
+
 		delay(10);
 	}
 }
 
 function test() {
-	
+	Attack.clear(30);
 }
