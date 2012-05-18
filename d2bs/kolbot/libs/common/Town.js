@@ -1071,9 +1071,11 @@ MainLoop:
 			corpse = getUnit(0, me.name, 17);
 
 			if (corpse && getDistance(me, corpse) <= 20) {
-				Pather.moveToUnit(corpse);
-				corpse.interact();
-				delay(500);
+				while (copyUnit(corpse).x) {
+					Pather.moveToUnit(corpse, rand(-2, 2), rand(-2, 2));
+					corpse.interact();
+					delay(500);
+				}
 			}
 		}
 
