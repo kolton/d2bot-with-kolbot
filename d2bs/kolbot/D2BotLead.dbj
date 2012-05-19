@@ -25,6 +25,7 @@ var StarterConfig = {
 include("json2.js");
 include("OOG.js");
 include("gambling.js");
+load("tools/heartbeat.js");
 
 var D2BOT_JOIN = 1,
 	D2BOT_GAMEINFO = 2,
