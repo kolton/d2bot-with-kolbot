@@ -16,18 +16,13 @@ function LoadConfig() {
 	// User addon script. Read the description in libs/bots/UserAddon.js
 	Scripts.UserAddon = true; // !!!YOU MUST SET THIS TO FALSE IF YOU WANT TO RUN BOSS/AREA SCRIPTS!!!
 
-	// Battle orders script
+	// Battle orders script - Use this for 2+ characters (for example BO barb + sorc)
 	Scripts.BattleOrders = false;
 		Config.BattleOrders.Mode = 0; // 0 = give BO, 1 = get BO
 		Config.BattleOrders.Wait = false; // Idle until the player that received BO leaves.
 
-	/* Team MF system (experimental)
-	 * Run the same boss or area with more than one character.
-	 * Supports most single boss or clear area scripts like Andariel, Duriel, Mephisto, Mausoleum
-	 * Leader runs normal scripts, helper runs only Scripts.MFHelper.
-	 */
-	Config.MFLeader = false; // Set to true for the MF LEADER. The leader runs normal scripts, but he'll now drop a town portal before killing.
-	Scripts.MFHelper = false; // Set to true for MF HELPER. The helper enters the leader's portal and helps kill/clear. The helper DOES NOT RUN ANY OTHER SCRIPTS!
+	// Team MF system
+	Config.MFLeader = false; // Set to true if you have one or more MFHelpers. Opens TP and gives commands when doing normal MF runs.
 
 	// Boss/area scripts
 
@@ -35,7 +30,8 @@ function LoadConfig() {
 	Scripts.Corpsefire = false;
 		Config.Corpsefire.ClearDen = false;
 	Scripts.Mausoleum = false;
-		Config.Mausoleum.KillBloodRaven = true;
+		Config.Mausoleum.KillBloodRaven = false;
+		Config.Mausoleum.ClearCrypt = false;
 	Scripts.Rakanishu = false;
 		Config.Rakanishu.KillGriswold = true;
 	Scripts.Coldcrow = false;
@@ -60,7 +56,10 @@ function LoadConfig() {
 	// *** act 3 ***
 	Scripts.Stormtree = false;
 	Scripts.KurastChests = false;
+		Config.KurastChests.LowerKurast = true;
 		Config.KurastChests.Bazaar = false;
+		Config.KurastChests.Sewers1 = false;
+		Config.KurastChests.Sewers2 = false;
 	Scripts.KurastTemples = false;
 	Scripts.Icehawk = false;
 	Scripts.Endugu = false;
@@ -74,17 +73,17 @@ function LoadConfig() {
 	Scripts.Vizier = false; // Intended for classic sorc, kills Vizier only.
 	Scripts.FastDiablo = false;
 	Scripts.Diablo = false;
-		Config.Diablo.Entrance = true;
+		Config.Diablo.Entrance = true; // Start from entrance
 		Config.Diablo.SealWarning = "Leave the seals alone!";
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
-	Scripts.DiabloHelper = false;
-		Config.DiabloHelper.Entrance = true;
 
 	// *** act 5 ***
 	Scripts.Pindleskin = false;
 		Config.Pindleskin.KillNihlathak = true;
+		Config.Pindleskin.ViperQuit = false; // End script if Tomb Vipers are found.
 	Scripts.Nihlathak = false;
+		Config.Nihlathak.ViperQuit = false; // End script if Tomb Vipers are found.
 	Scripts.Eldritch = false;
 		Config.Eldritch.OpenChest = true;
 		Config.Eldritch.KillShenk = true;
@@ -101,32 +100,50 @@ function LoadConfig() {
 		Config.Baal.HotTPMsg = "Hot TP!";
 		Config.Baal.SafeTPMsg = "TP safe!";
 		Config.Baal.BaalMsg = "Baal";
-	Scripts.AutoBaal = false;
-		Config.AutoBaal.FindShrine = false;
+		Config.Baal.DollQuit = false; // End script if Dolls (Undead Soul Killers) are found.
+
+	/* ### leeching section ###
+	* Unless stated otherwise, leader's character name isn't needed on order to run.
+	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)
+	*/
+
+	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
+	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
+	Scripts.DiabloHelper = false; // Chaos helper, kills monsters and doesn't open seals on its own.
+		Config.DiabloHelper.Entrance = true; // Start from entrance
+	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
+		Config.AutoBaal.FindShrine = false; // Find shrine when hot tp message is sent. You can change messages in AutoBaal.js
 	Scripts.BaalHelper = false;
-		Config.BaalHelper.KillNihlathak = false;
-		Config.BaalHelper.FastChaos = false;
+		Config.BaalHelper.KillNihlathak = false; // Kill Nihlathak before going to Throne
+		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
+		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
+	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
+		Config.Follower.Leader = ""; // Leader's ingame name. This only applies to Follower script
+
+	Config.QuitList = []; // List of character names to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 
 	// *** special scripts ***
+	Scripts.Rusher = false; // Rush bot alpha version (no questing yet, only rushing), for a list of commands, see Rusher.js
 	Scripts.CrushTele = false; // classic rush teleporter. go to area of interest and press "-" numpad key
 	Scripts.Questing = false; // solves missing quests (skill/stat+shenk)
-	Scripts.Gamble = false; // gamble until out of gold, then wait for more gold at stash
-	Scripts.GhostBusters = false; // kill ghosts in most areas that contain them
-	Scripts.Wakka = false; // walking chaos leecher
+	Scripts.Gamble = false; // Gambling system, other characters will mule gold into your game so you can gamble infinitely. See Gambling.js
+	Scripts.GhostBusters = false; // Kill ghosts in most areas that contain them
 	Scripts.Enchant = false;
 		Config.Enchant.Trigger = ".chant";
-		Config.Enchant.GameLength = 20; // in minutes
+		Config.Enchant.GameLength = 20; // Game length in minutes
 	Scripts.IPHunter = false;
-		Config.IPHunter.IPList = []; // list of IPs to look for. example: [165, 201, 64]
-		Config.IPHunter.GameLength = 3; // number of minutes to stay in game if ip wasn't found
-	Scripts.Follower = false; // follower script, most commonly used in ladder reset. lots of features
-		Config.Follower.Leader = ""; // leader's ingame name
-
+		Config.IPHunter.IPList = []; // List of IPs to look for. example: [165, 201, 64]
+		Config.IPHunter.GameLength = 3; // Number of minutes to stay in game if ip wasn't found
+	Scripts.ShopBot = false; // Fast waypoint-based shopbot, alpha version
+		Config.ShopBot.ShopNPC = "Anya"; // Only Anya for now
+		// Scan only selected classids for maximum speed. See libs/config/templates/ShopBot.txt
+		Config.ShopBot.ScanIDs = [187, 188, 194, 195, 326, 327, 338, 373, 397, 443, 449];
 
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
 	Config.HealMP = 0; // Go to a healer if under designated percent of mana.
-	Config.UseMerc = true; // Revive merc if he/she dies. This is ignored and always false in d2classic.
+	Config.UseMerc = true; // Use merc. This is ignored and always false in d2classic.
+	Config.MercWatch = false; // Instant merc revive during battle.
 
 	// Potion settings
 	Config.UseHP = 75; // Drink a healing potion if life is under designated percent.
@@ -179,6 +196,12 @@ function LoadConfig() {
 	Config.PickitFiles.push("LLD.nip");
 	Config.PickRange = 40; // Pick radius
 	Config.FastPick = false; // Check and pick items between attacks
+
+	// Item identification settings
+	Config.CainID.Enable = false; // Identify items at Cain
+	Config.CainID.MinGold = 2500000; // Minimum gold (stash + character) to have in order to use Cain.
+	Config.CainID.MinUnids = 3; // Minimum number of unid items in order to use Cain.
+	Config.FieldID = false; // Identify items in the field instead of going to town.
 
 	// Gambling config
 	Config.Gamble = false;
@@ -235,8 +258,8 @@ function LoadConfig() {
 	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
 	Config.LastMessage = ""; // Message to say at the end of the run.
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
-	Config.QuitList = []; // List of players to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
+	Config.MaxGameTime = 0; // Maximum game time in seconds. Quit game when limit is reached.
 	Config.TeleSwitch = false; // Switch to slot II when teleporting more than 1 node.
 	Config.OpenChests = false; // Open chests. Controls key buying.
 	Config.MiniShopBot = true; // Scan items in NPC shops.
@@ -249,7 +272,7 @@ function LoadConfig() {
 
 	// DClone config
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth
-	Config.SoJWaitTime = 5; // Time in minutes to wait for another SoJ sale before leaving game.
+	Config.SoJWaitTime = 5; // Time in minutes to wait for another SoJ sale before leaving game. 0 = disabled
 
 	// Monster skip config
 	// Skip immune monsters. Possible options: "fire", "cold", "lightning", "poison", "physical", "magic".
@@ -270,7 +293,7 @@ function LoadConfig() {
 	Config.AttackSkill[1] = -1; // Primary skill to bosses.
 	Config.AttackSkill[2] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[1] is untimed skill.
 	Config.AttackSkill[3] = -1; // Primary skill to others.
-	Config.AttackSkill[4] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[3] is untimed skill.
+	Config.AttackSkill[4] = -1; // Primary untimed skill to others. Keep at -1 if Config.AttackSkill[3] is untimed skill.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
 

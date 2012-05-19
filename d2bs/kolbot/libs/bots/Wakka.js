@@ -94,7 +94,7 @@ function Wakka() {
 	this.getCoords = function () {
 		this.vizCoords = this.getLayout(396, 5275) === 1 ? [7707, 5274] : [7708, 5298];
 		this.seisCoords = this.getLayout(394, 7773) === 1 ? [7812, 5223] : [7809, 5193];
-		this.infCoords = this.getLayout(392, 7893) === 1 ? [7860, 5314] : [7882, 5306];
+		this.infCoords = this.getLayout(392, 7893) === 1 ? [7868, 5294] : [7882, 5306];
 	};
 
 	this.checkBoss = function (name) {
@@ -214,7 +214,8 @@ function Wakka() {
 		return true;
 	};
 
-	var i, safeTP, portal, viz, seis, inf, vizClear, seisClear, infClear, path, tick,
+	// start
+	var i, safeTP, portal, viz, seis, inf, vizClear, seisClear, infClear, path, tick, diablo,
 		minDist = 40,
 		maxDist = 80,
 		leaderUnit = null,
@@ -329,6 +330,12 @@ function Wakka() {
 				}
 
 				Pather.moveTo(7767, 5263);
+
+				diablo = getUnit(1, 243);
+
+				if (diablo && (diablo.mode === 0 || diablo.mode === 12)) {
+					return true;
+				}
 
 				break;
 			}

@@ -757,7 +757,7 @@ _NTIPAliasClassID["bey"]=651;  _NTIPAliasClassID["baal'seye"]=651;
 _NTIPAliasClassID["mbr"]=652;  _NTIPAliasClassID["mephisto'sbrain"]=652;
 _NTIPAliasClassID["toa"]=653;  _NTIPAliasClassID["tokenofabsolution"]=653;
 _NTIPAliasClassID["tes"]=654;  _NTIPAliasClassID["twistedessenceofsuffering"]=654;
-_NTIPAliasClassID["ceh"]=655;  _NTIPAliasClassID["chargedessenseofhatred"]=655;
+_NTIPAliasClassID["ceh"]=655;  _NTIPAliasClassID["chargedessenceofhatred"]=655;
 _NTIPAliasClassID["bet"]=656;  _NTIPAliasClassID["burningessenceofterror"]=656;
 _NTIPAliasClassID["fed"]=657;  _NTIPAliasClassID["festeringessenceofdestruction"]=657;
 _NTIPAliasClassID["std"]=658;  _NTIPAliasClassID["standardofheroes"]=658;

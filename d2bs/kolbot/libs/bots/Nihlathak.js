@@ -14,6 +14,13 @@ function Nihlathak() {
 	}
 
 	Pather.moveToPreset(me.area, 2, 462, 0, 0, false, true);
+
+	if (Config.Nihlathak.ViperQuit && getUnit(1, 597)) {
+		print("Tomb Vipers found.");
+
+		return true;
+	}
+
 	Attack.kill(526); // Nihlathak
 	Pickit.pickItems();
 

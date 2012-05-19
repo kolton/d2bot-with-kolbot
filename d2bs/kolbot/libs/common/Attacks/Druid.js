@@ -53,7 +53,7 @@ var ClassAttack = {
 	},
 
 	doAttack: function (unit, preattack) {
-		if (Town.needMerc()) {
+		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 

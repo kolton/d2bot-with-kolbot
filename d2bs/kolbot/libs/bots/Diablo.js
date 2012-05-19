@@ -28,16 +28,16 @@ function Diablo() {
 
 		return 2;
 	};
-	
+
 	this.initLayout = function () {
 		this.vizLayout = this.getLayout(396, 5275);
 		this.seisLayout = this.getLayout(394, 7773);
 		this.infLayout = this.getLayout(392, 7893);
 	};
-	
+
 	this.openSeal = function (classid) {
 		var i, seal, warn;
-		
+
 		switch (classid) {
 		case 396:
 		case 394:
@@ -86,7 +86,7 @@ function Diablo() {
 
 		return false;
 	};
-	
+
 	this.getBoss = function (name) {
 		var i, boss,
 			glow = getUnit(2, 131);
@@ -112,7 +112,11 @@ function Diablo() {
 			throw new Error("Failed to open Vizier seals.");
 		}
 
-		this.vizLayout === 1 ? Pather.moveTo(7691, 5292) : Pather.moveTo(7695, 5316);
+		if (this.vizLayout === 1) {
+			Pather.moveTo(7691, 5292);
+		} else {
+			Pather.moveTo(7695, 5316);
+		}
 
 		if (!this.getBoss(getLocaleString(2851))) {
 			throw new Error("Failed to kill Vizier");
@@ -129,7 +133,11 @@ function Diablo() {
 			throw new Error("Failed to open de Seis seal.");
 		}
 
-		this.seisLayout === 1 ? Pather.moveTo(7771, 5196) : Pather.moveTo(7798, 5186);
+		if (this.seisLayout === 1) {
+			Pather.moveTo(7771, 5196);
+		} else {
+			Pather.moveTo(7798, 5186);
+		}
 
 		if (!this.getBoss(getLocaleString(2852))) {
 			throw new Error("Failed to kill de Seis");
@@ -142,21 +150,29 @@ function Diablo() {
 		print("Inf layout " + this.infLayout);
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
 
-		if (!this.openSeal(393) || !this.openSeal(392)) {
+		if (!this.openSeal(392)) {
 			throw new Error("Failed to open Infector seals.");
 		}
 
-		this.infLayout === 1 ? delay(1) : Pather.moveTo(7928, 5295); // temp
+		if (this.infLayout === 1) {
+			delay(1);
+		} else {
+			Pather.moveTo(7928, 5295); // temp
+		}
 
 		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
+		}
+		
+		if (!this.openSeal(393)) {
+			throw new Error("Failed to open Infector seals.");
 		}
 
 		return true;
 	};
 
 	this.diabloPrep = function () {
-		var i,
+		var trapCheck,
 			tick = getTickCount();
 
 		while (getTickCount() - tick < 17500) {
@@ -174,7 +190,7 @@ function Diablo() {
 					}
 
 					delay(500);
-					
+
 					break;
 				case 3: // Paladin
 					Skill.setSkill(Config.AttackSkill[2]);
@@ -184,12 +200,12 @@ function Diablo() {
 				case 5: // Druid
 					if (Config.AttackSkill[1] === 245) {
 						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
-						
+
 						break;
 					}
 
 					delay(500);
-					
+
 					break;
 				case 6: // Assassin
 					if (Config.UseTraps) {
@@ -203,7 +219,7 @@ function Diablo() {
 					}
 
 					delay(500);
-					
+
 					break;
 				default:
 					delay(500);

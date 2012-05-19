@@ -1,0 +1,7 @@
+[name] == greaterhealingpotion
+[name] == superhealingpotion
+[name] == greatermanapotion
+[name] == supermanapotion
+[name] == rejuvenationpotion
+[name] == fullrejuvenationpotion
+[name] == gold # [gold] >= 2000

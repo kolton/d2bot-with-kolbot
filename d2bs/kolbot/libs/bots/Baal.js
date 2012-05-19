@@ -45,7 +45,7 @@ function Baal() {
 			}
 
 			break;
-		case 6:
+		case 6: // Assassin
 			if (Config.UseTraps) {
 				check = ClassAttack.checkTraps({x: 15093, y: 5029});
 
@@ -95,8 +95,25 @@ function Baal() {
 	};
 
 	this.clearThrone = function () {
-		var i,
+		var i, monster,
+			monList = [],
 			pos = [15097, 5054, 15085, 5053, 15085, 5040, 15098, 5040, 15099, 5022, 15086, 5024];
+
+		if (Config.AvoidDolls) {
+			monster = getUnit(1, 691);
+
+			if (monster) {
+				do {
+					if (monster.x >= 15072 && monster.x <= 15118 && monster.y >= 5002 && monster.y <= 5079 && Attack.checkMonster(monster) && Attack.skipCheck(monster)) {
+						monList.push(copyUnit(monster));
+					}
+				} while (monster.getNext());
+			}
+
+			if (monList.length) {
+				Attack.clearList(monList);
+			}
+		}
 
 		for (i = 0; i < pos.length; i += 2) {
 			Pather.moveTo(pos[i], pos[i + 1]);
@@ -136,10 +153,17 @@ function Baal() {
 		throw new Error("Failed to move to Throne of Destruction.");
 	}
 
+	Pather.moveTo(15113, 5040);
+
 	if (Config.PublicMode) {
-		Pather.moveTo(15113, 5040);
 		Pather.makePortal();
 		say(Config.Baal.HotTPMsg);
+	}
+
+	if (Config.Baal.DollQuit && getUnit(1, 691)) {
+		print("Soul Killers found.");
+
+		return true;
 	}
 
 	Attack.clear(15);
@@ -149,9 +173,8 @@ function Baal() {
 		say(Config.Baal.SafeTPMsg);
 	}
 
-	Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
-
 	tick = getTickCount();
+	Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 
 MainLoop:
 	while (true) {
@@ -166,23 +189,44 @@ MainLoop:
 		switch (this.checkThrone()) {
 		case 1:
 			Attack.clear(40);
+
+			tick = getTickCount();
+
 			Precast.doPrecast(true);
+
 			break;
 		case 2:
+			Attack.clear(40);
+
+			tick = getTickCount();
+
+			break;
 		case 4:
 			Attack.clear(40);
+
+			tick = getTickCount();
 
 			break;
 		case 3:
 			Attack.clear(40);
-
 			this.checkHydra();
+
+			tick = getTickCount();
+
 			break;
 		case 5:
 			Attack.clear(40);
 
 			break MainLoop;
 		default:
+			if (getTickCount() - tick < 7e3) {
+				if (me.getState(2)) {
+					Skill.setSkill(109, 0);
+				}
+
+				break;
+			}
+
 			if (!this.preattack()) {
 				delay(100);
 			}

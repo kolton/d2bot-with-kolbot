@@ -203,7 +203,7 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 2, 0)) {
+			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit)) {
 				unit.interact();
 			}
 
@@ -505,7 +505,14 @@ var Misc = {
 			Town.reviveMerc();
 			me.cancel();
 			Town.move("portalspot");
-			Pather.usePortal(null, me.name);
+
+			if (!Pather.usePortal(null, me.name)) {
+				throw new Error("Misc.townCheck: Failed to use portal.");
+			}
+
+			if (Config.PublicMode) {
+				Pather.makePortal();
+			}
 
 			return true;
 		}

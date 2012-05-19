@@ -26,7 +26,7 @@ var Loader = {
 	},
 
 	loadScripts: function () {
-		var i;
+		var i, townCheck;
 
 		if (!this.scriptList.length) {
 			showConsole();
@@ -36,35 +36,31 @@ var Loader = {
 
 ScriptLoop:
 		for (i in Scripts) {
-			if (this.scriptList.indexOf(i) > -1) {
-				if (!Scripts[i]) {
-					continue;
-				}
-
+			if (Scripts.hasOwnProperty(i) && this.scriptList.indexOf(i) > -1 && Scripts[i]) {
 				include("bots/" + i + ".js");
 
-				if (typeof (global[i]) !== "function") {
-					print("ÿc1Loader: Error in script, skipping;");
-
-					continue;
-				}
-
-				if (i !== "Test") {
-					try {
-						Town.goToTown();
-					} catch (e) {
-						print("ÿc1Loader: Failed to go to town, skipping to next script.");
-
-						continue ScriptLoop;
+				if (typeof (global[i]) === "function") {
+					if (i !== "Test") {
+						try {
+							townCheck = Town.goToTown();
+						} catch (e1) {
+							print("ÿc1Loader: Failed to go to town, skipping to next script.");
+						}
+					} else {
+						townCheck = true;
 					}
-				}
 
-				try {
-					print("ÿc2Starting script: ÿc9" + i);
-					global[i]();
-				} catch (e) {
-					showConsole();
-					print("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + ") : ÿc1" + e.message);
+					if (townCheck) {
+						try {
+							print("ÿc2Starting script: ÿc9" + i);
+							global[i]();
+						} catch (e) {
+							showConsole();
+							print("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + ") : ÿc1" + e.message);
+						}
+					}
+				} else {
+					print("ÿc1Loader: Error in script, skipping;");
 				}
 			}
 		}

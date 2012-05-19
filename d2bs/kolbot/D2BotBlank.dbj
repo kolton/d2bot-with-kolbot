@@ -9,6 +9,7 @@ var isUp = "no";
 function main() {
 	include("json2.js");
 	include("OOG.js");
+	load("tools/heartbeat.js");
 	
 	addEventListener('copydata', RecieveCopyData);
 

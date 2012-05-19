@@ -52,7 +52,7 @@ var ClassAttack = {
 	},
 
 	doAttack: function (unit, preattack) {
-		if (Town.needMerc()) {
+		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
@@ -133,7 +133,7 @@ var ClassAttack = {
 
 		if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
 			// walk short distances instead of tele for melee attacks
-			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)))) {
+			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x7)))) {
 				return 0;
 			}
 		}
@@ -146,7 +146,7 @@ var ClassAttack = {
 			return false;
 		}
 
-		var i, j, coords, angle,
+		var i, coords, angle,
 			//angles = [180, 45, -45, 90, -90]; // Angle offsets
 			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
 
@@ -154,18 +154,14 @@ var ClassAttack = {
 
 MainLoop:
 		for (i = 0; i < angles.length; i += 1) { // get a better spot
-			for (j = 0; j < 5; j += 1) {
-				coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * j + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * j + unit.y)];
+			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 3 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 3 + unit.y)];
 
-				if (CollMap.getColl(coords[0], coords[1]) & 0x1) {
-					continue MainLoop;
+			if (!CollMap.checkColl(unit, {x: coords[0], y: coords[1]})) {
+				if (getDistance(me, coords[0], coords[1]) >= 3) {
+					//me.runwalk = me.gametype;
+
+					return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 				}
-			}
-
-			if (getDistance(me, coords[0], coords[1]) >= 3) {
-				me.runwalk = me.gametype; // just a short way of doing it. classic = 0 where it's better to walk-ww than run-ww
-
-				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 			}
 		}
 
@@ -179,7 +175,9 @@ MainLoop:
 
 		if (monster) {
 			do {
-				if (Attack.checkMonster(monster) && getDistance(me, monster) <= range && !checkCollision(me, monster, 0x4)) {
+				if (Attack.checkMonster(monster) && getDistance(me, monster) <= range && !checkCollision(me, monster, 0x4) &&
+						// Account for attackable monsters
+						(Attack.checkResist(monster, this.skillElement[(monster.spectype & 0xF) ? 1 : 2]) || (Config.AttackSkill[3] > -1 && Attack.checkResist(monster, this.skillElement[3])))) {
 					return true;
 				}
 			} while (monster.getNext());
@@ -219,39 +217,35 @@ MainLoop:
 
 					Attack.clear(15);
 
-					i = -1;
-
-					continue MainLoop;
+					break MainLoop;
 				}
 
 				corpseList.sort(Sort.units);
 
 				corpse = corpseList.shift();
 
-				if (!this.checkCorpse(corpse)) {
-					continue;
-				}
+				if (this.checkCorpse(corpse)) {
+					if (getDistance(me, corpse) > 9 || checkCollision(me, corpse, 0x1)) {
+						Pather.moveToUnit(corpse);
+					}
 
-				if (getDistance(me, corpse) > 9 || checkCollision(me, corpse, 0x1)) {
-					Pather.moveToUnit(corpse);
-				}
-
-				if (Config.FindItemSwitch) {
-					Precast.weaponSwitch(Config.FindItemSwitch - 1);
-				}
+					if (Config.FindItemSwitch) {
+						Precast.weaponSwitch(Config.FindItemSwitch - 1);
+					}
 
 CorpseLoop:
-				for (j = 0; j < 3; j += 1) {
-					Skill.cast(142, 0, corpse);
+					for (j = 0; j < 3; j += 1) {
+						Skill.cast(142, 0, corpse);
 
-					tick = getTickCount();
+						tick = getTickCount();
 
-					while (getTickCount() - tick < 1000) {
-						if (corpse.getState(118)) {
-							break CorpseLoop;
+						while (getTickCount() - tick < 1000) {
+							if (corpse.getState(118)) {
+								break CorpseLoop;
+							}
+
+							delay(10);
 						}
-
-						delay(10);
 					}
 				}
 			}
