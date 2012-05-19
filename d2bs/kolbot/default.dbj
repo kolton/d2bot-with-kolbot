@@ -21,6 +21,10 @@ include("common/Town.js");
 var gidList = []; // fast pickit
 
 function main() {
+	if (!getScript("tools/heartbeat.js")) {
+		load("tools/heartbeat.js");
+	}
+
 	var i, sojPause,
 		sojCounter = 0,
 		startTime = getTickCount();

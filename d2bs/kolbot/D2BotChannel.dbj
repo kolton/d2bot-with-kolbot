@@ -4,8 +4,8 @@ var StarterConfig = {
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
 	// D2BotChannel settings
-	Games: [], // List of games to look for. Example: Games: ["some baal-", "chaos run-"],
-	Passwords: [], // List of game passwords. Each array in Games array should have a matching element in Passwords. Use "" for blank pw.
+	Games: [""], // List of games to look for. Example: Games: ["some baal-", "chaos run-"],
+	Passwords: [""], // List of game passwords. Each array in Games array should have a matching element in Passwords. Use "" for blank pw.
 	JoinDelay: 5, // Seconds to wait between announcement and clicking join
 	FriendListQuery: 0, // Seconds between "/f l" retries. 0 = disable
 
@@ -26,6 +26,7 @@ var StarterConfig = {
 // No touchy!
 include("json2.js");
 include("OOG.js");
+load("tools/heartbeat.js");
 
 var lastGameStatus = "ready",
 	nextGameMake = 0,

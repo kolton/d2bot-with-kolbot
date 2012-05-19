@@ -36,6 +36,7 @@ var JoinSettings = {
 // No touchy!
 include("json2.js");
 include("OOG.js");
+load("tools/heartbeat.js");
 
 var i, j, ingame, gameStart, difficulty,
 	leader = "",

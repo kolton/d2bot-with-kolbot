@@ -201,6 +201,7 @@ function LoadConfig() {
 	Config.CainID.Enable = false; // Identify items at Cain
 	Config.CainID.MinGold = 2500000; // Minimum gold (stash + character) to have in order to use Cain.
 	Config.CainID.MinUnids = 3; // Minimum number of unid items in order to use Cain.
+	Config.FieldID = false; // Identify items in the field instead of going to town.
 
 	// Gambling config
 	Config.Gamble = false;
