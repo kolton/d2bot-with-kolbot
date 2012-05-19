@@ -89,7 +89,7 @@ function DiabloHelper() {
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
 		this.infLayout === 1 ? Pather.moveTo(7908, 5269) : Pather.moveTo(7932, 5305);
 
-		if (!this.getBoss("infector of souls")) {
+		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
 		}
 
@@ -166,7 +166,7 @@ function DiabloHelper() {
 			coords = [];
 
 		switch (id) {
-		case "grand vizier of chaos":
+		case getLocaleString(2851):
 			if (this.vizLayout === 1) {
 				coords = [7676, 5295];
 			}
@@ -174,7 +174,7 @@ function DiabloHelper() {
 			coords = [7684, 5318];
 
 			break;
-		case "lord de seis":
+		case getLocaleString(2852):
 			if (this.seisLayout === 1) {
 				coords = [7778, 5216];
 			}
@@ -182,7 +182,7 @@ function DiabloHelper() {
 			coords = [7775, 5208];
 
 			break;
-		case "infector of souls":
+		case getLocaleString(2853):
 			if (this.infLayout === 1) {
 				coords = [7913, 5292];
 			}

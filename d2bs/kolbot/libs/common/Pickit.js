@@ -43,7 +43,7 @@ var Pickit = {
 			this.gid = unit.gid;
 		}
 
-		var status, gid, item;
+		var status, gid, item, canFit;
 
 		Town.clearBelt();
 
@@ -75,7 +75,15 @@ var Pickit = {
 
 					if (status && this.canPick(item)) {
 						// Check room, don't check gold, scrolls and potions
-						if (!Storage.Inventory.CanFit(item) && [4, 22, 76, 77, 78].indexOf(item.itemType) === -1) {
+						canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
+						
+						if (!canFit) {
+							if (Config.FieldID && Town.fieldID()) {
+								canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
+							}
+						}
+						
+						if (!canFit) {
 							print("ÿc7Trying to make room for " + item.name);
 
 							if (!Town.visitTown()) {
@@ -85,7 +93,7 @@ var Pickit = {
 							}
 						}
 
-						if (Storage.Inventory.CanFit(item)) {
+						if (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1) {
 							this.pickItem(item, status);
 						} else {
 							print("ÿc7Not enough room for " + item.name);
@@ -157,7 +165,7 @@ MainLoop:
 				delay(10);
 			}
 
-			print("pick retry");
+			//print("pick retry");
 		}
 
 		if (picked) {
@@ -327,10 +335,12 @@ MainLoop:
 			if (item && (item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
 				status = this.checkItem(item);
 
-				if (status && this.canPick(item)) {
+				if (status && this.canPick(item) && (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1)) {
 					this.pickItem(item, status);
 				}
 			}
 		}
+
+		return true;
 	}
 };

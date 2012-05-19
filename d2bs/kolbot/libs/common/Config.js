@@ -25,15 +25,15 @@ var Config = {
 
 		try {
 			include("config/" + classes[me.classid] + "." + me.charname + ".js");
-		} catch (e) {
+		} catch (e1) {
 			throw new Error("Failed to load default config.");
 		}
 
 		try {
 			LoadConfig();
-		} catch (e) {
+		} catch (e2) {
 			if (notify) {
-				print("ÿc8Error in " + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + "(line " + e.lineNumber + "): " + e.message);
+				print("ÿc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
 
 				throw new Error("Config.init: Error in character config.");
 			}
@@ -45,6 +45,7 @@ var Config = {
 	PickDelay: 0,
 	AreaDelay: 0,
 	MinGameTime: 0,
+	MaxGameTime: 0,
 
 	// Healing and chicken
 	LifeChicken: 0,
@@ -65,7 +66,14 @@ var Config = {
 	// General
 	LastMessage: "",
 	UseMerc: false,
+	MercWatch: false,
 	StashGold: 0,
+	FieldID: false,
+	CainID: {
+		Enable: false,
+		MinGold: 0,
+		MinUnids: 0
+	},
 	Inventory: [
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -136,6 +144,7 @@ var Config = {
 	// Paladin speficic
 	Redemption: [0, 0],
 	Vigor: false,
+	AvoidDolls: false,
 
 	// Barbarian specific
 	BOSwitch: 0,
@@ -162,7 +171,7 @@ var Config = {
 	MFLeader: false,
 	Mausoleum: {
 		KillBloodRaven: false,
-		ClearCrypt: true
+		ClearCrypt: false
 	},
 	Eldritch: {
 		OpenChest: false,
@@ -171,7 +180,11 @@ var Config = {
 		KillDacFarren: false
 	},
 	Pindleskin: {
-		KillNihlathak: false
+		KillNihlathak: false,
+		ViperQuit: false
+	},
+	Nihlathak: {
+		ViperQuit: false
 	},
 	Pit: {
 		ClearPath: false,
@@ -190,7 +203,10 @@ var Config = {
 		FindShrine: false
 	},
 	KurastChests: {
-		Bazaar: false
+		LowerKurast: false,
+		Bazaar: false,
+		Sewers1: false,
+		Sewers2: false
 	},
 	Countess: {
 		KillGhosts: false
@@ -198,11 +214,13 @@ var Config = {
 	Baal: {
 		HotTPMsg: "Hot TP!",
 		SafeTPMsg: "TP safe!",
-		BaalMsg: "Baal"
+		BaalMsg: "Baal",
+		DollQuit: false
 	},
 	BaalHelper: {
 		KillNihlathak: false,
-		FastChaos: false
+		FastChaos: false,
+		DollQuit: false
 	},
 	Corpsefire: {
 		ClearDen: false
@@ -233,5 +251,9 @@ var Config = {
 	},
 	Mephisto: {
 		MoatTrick: false
+	},
+	ShopBot: {
+		ScanIDs: [],
+		ShopNPC: "anya"
 	}
 };

@@ -62,20 +62,20 @@ Unit.prototype.openMenu = function () {
 
 		this.interact();
 
-		for (j = 0; j < 100; j += 1) {
-			if (j % 20 === 0) {
+		for (j = 0; j < 40; j += 1) {
+			if (j % 8 === 0) {
 				me.cancel();
 				delay(300);
 				this.interact();
 			}
 
 			if (getUIFlag(0x08)) {
-				delay(250 + me.ping);
+				delay(600);
 
 				return true;
 			}
 
-			delay(10);
+			delay(25);
 		}
 	}
 
@@ -100,18 +100,20 @@ Unit.prototype.startTrade = function (mode) {
 			continue;
 		}
 
+		delay(10);
 		this.useMenu(menuId);
+		delay(10);
 
 		tick = getTickCount();
 
 		while (getTickCount() - tick < 1000) {
 			if (getUIFlag(0x0C) && this.itemcount > 0) {
-				delay(400);
+				delay(200);
 
 				return true;
 			}
 
-			delay(10);
+			delay(25);
 		}
 
 		me.cancel();
@@ -155,6 +157,7 @@ Unit.prototype.buy = function (shiftBuy) {
 	return false;
 };
 
+// You MUST use a delay after Unit.sell() if using custom scripts. delay(500) works best, dynamic delay is used when identifying/selling (500 - item id time)
 Unit.prototype.sell = function () {
 	if (this.type !== 4) { // Check if it's an item we want to buy
 		throw new Error("Unit.sell: Must be used on items.");
@@ -168,12 +171,6 @@ Unit.prototype.sell = function () {
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 5; i += 1) {
-		if (copyUnit(this).x === undefined) {
-			//D2Bot.printToConsole("Unit.sell: Invalidated item unit.;1");
-
-			return false;
-		}
-
 		this.shop(1);
 
 		tick = getTickCount();
@@ -181,12 +178,6 @@ Unit.prototype.sell = function () {
 		while (getTickCount() - tick < 2000) {
 			if (me.itemcount !== itemCount) {
 				//delay(500);
-
-				timer = getTickCount() - Town.sellTimer; // shop speedup test
-
-				if (timer > 0 && timer < 500) {
-					delay(timer);
-				}
 
 				return true;
 			}
@@ -350,30 +341,34 @@ me.findItems = function (id, mode, loc) {
 };
 
 Unit.prototype.getPrefix = function (id) {
-	if (this.hasOwnProperty("prefixnum")) {
+	if (typeof this.prefixnum === "number") {
 		return this.prefixnum === id;
 	}
 
-	switch (id) {
-	case this.prefixnum1:
-	case this.prefixnum2:
-	case this.prefixnum3:
-		return true;
+	var i,
+		prefixList = this.prefixnum;
+
+	for (i = 0; i < prefixList.length; i += 1) {
+		if (id === prefixList[i]) {
+			return true;
+		}
 	}
 
 	return false;
 };
 
 Unit.prototype.getSuffix = function (id) {
-	if (this.hasOwnProperty("suffixnum")) {
+	if (typeof this.suffixnum === "number") {
 		return this.suffixnum === id;
 	}
 
-	switch (id) {
-	case this.suffixnum1:
-	case this.suffixnum2:
-	case this.suffixnum3:
-		return true;
+	var i,
+		suffixList = this.suffixnum;
+
+	for (i = 0; i < suffixList.length; i += 1) {
+		if (id === suffixList[i]) {
+			return true;
+		}
 	}
 
 	return false;

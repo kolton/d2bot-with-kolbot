@@ -8,6 +8,7 @@ var ClassAttack = {
 	skillRange: [],
 	skillHand: [],
 	skillElement: [],
+	bowCheck: false,
 
 	init: function () {
 		var i;
@@ -24,20 +25,24 @@ var ClassAttack = {
 			case 10: // Jab
 			case 14: // Power Strike
 			case 19: // Impale
-			case 24: // Charged Strike
 			case 30: // Fend
 			case 34: // Lightning Strike
 				this.skillRange[i] = 3;
+				break;
+			case 24: // Charged Strike
+				this.skillRange[i] = 15;
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
 				break;
 			}
 		}
+		
+		this.bowCheck = Attack.usingBow();
 	},
 
 	doAttack: function (unit, preattack) {
-		if (Town.needMerc()) {
+		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
@@ -80,6 +85,16 @@ var ClassAttack = {
 
 			return 3;
 		}
+		
+		if (Config.TeleStomp && me.getMerc() && Attack.checkResist(unit, "physical")) {
+			if (getDistance(me, unit) > 4) {
+				Pather.moveToUnit(unit);
+			}
+
+			delay(300);
+
+			return 3;
+		}
 
 		return 1;
 	},
@@ -94,6 +109,24 @@ var ClassAttack = {
 
 	doCast: function (unit, index) {
 		var i;
+
+		// arrow/bolt check
+		if (this.bowCheck) {
+			switch (this.bowCheck) {
+			case "bow":
+				if (!me.getItem("aqv", 1)) {
+					Town.visitTown();
+				}
+
+				break;
+			case "crossbow":
+				if (!me.getItem("cqv", 1)) {
+					Town.visitTown();
+				}
+
+				break;
+			}
+		}
 
 		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {

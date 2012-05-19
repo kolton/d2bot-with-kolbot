@@ -13,7 +13,7 @@ function AutoBaal() {
 		baalMsg = ["baal", "submortal"], // baal message - casing doesn't matter
 		hotMsg = ["hot"], // used for shrine hunt
 	// internal variables
-		i, baalCheck, throneCheck, hotCheck, leader, suspect, solofail, portal;
+		i, baalCheck, throneCheck, hotCheck, leader, suspect, solofail, portal, baal;
 
 	addEventListener('chatmsg', // chat event, listen to what leader says
 		function (nick, msg) { // handler function
@@ -133,6 +133,12 @@ function AutoBaal() {
 				}
 
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
+			}
+
+			baal = getUnit(1, 544);
+
+			if (baal && (baal.mode === 0 || baal.mode === 12)) {
+				break;
 			}
 
 			if (me.mode === 17) { // death check

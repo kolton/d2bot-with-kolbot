@@ -23,6 +23,13 @@ function Pindleskin() {
 		}
 
 		Pather.moveToPreset(me.area, 2, 462, 0, 0, false, true);
+
+		if (Config.Pindleskin.ViperQuit && getUnit(1, 597)) {
+			print("Tomb Vipers found.");
+
+			return true;
+		}
+
 		Attack.kill(526); // Nihlathak
 		Attack.clear(20);
 	}

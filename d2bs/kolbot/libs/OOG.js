@@ -47,6 +47,9 @@ var D2Bot = {
 	},
 	start: function (profile) {
 		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
+	},
+ 	updateCount: function () {
+		sendCopyData(null, "D2Bot #", 0, "updateCount"); 
 	}
 };
 

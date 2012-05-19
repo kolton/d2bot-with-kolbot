@@ -6,7 +6,7 @@
 
 function Mephisto() {
 	this.killMephisto = function () {
-		var i, angle,
+		var i, angle, angles,
 			pos = {},
 			attackCount = 0,
 			meph = getUnit(1, 242);
@@ -15,16 +15,26 @@ function Mephisto() {
 			throw new Error("Mephisto not found!");
 		}
 
-		while (attackCount < 300 && Attack.checkMonster(meph)) {
-			if (getUnit(3, 276)) {
-				angle = Math.round(Math.atan2(me.y - meph.y, me.x - meph.x) * 180 / Math.PI);
+		if (Config.MFLeader) {
+			Pather.makePortal();
+			say("kill " + meph.classid);
+		}
 
-				for (i = 30; i < 360; i += 30) {
-					pos.dist = Math.round(getDistance(me, meph));
-					pos.x = Math.round((Math.cos((angle + i) * Math.PI / 180)) * pos.dist + meph.x);
-					pos.y = Math.round((Math.sin((angle + i) * Math.PI / 180)) * pos.dist + meph.y);
+		while (attackCount < 300 && Attack.checkMonster(meph)) {
+			//if (getUnit(3, 276)) {
+			if (meph.mode === 5) {
+			//if (attackCount % 2 === 0) {
+				angle = Math.round(Math.atan2(me.y - meph.y, me.x - meph.x) * 180 / Math.PI);
+				angles = me.y > meph.y ? [-30, -60, -90] : [30, 60, 90];
+				
+				for (i = 0; i < angles.length; i += 1) {
+					//pos.dist = Math.round(getDistance(me, meph));
+					pos.dist = 18;
+					pos.x = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * pos.dist + meph.x);
+					pos.y = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * pos.dist + meph.y);
 
 					if (Attack.validSpot(pos.x, pos.y)) {
+						me.overhead("move, bitch!");
 						Pather.moveTo(pos.x, pos.y);
 
 						break;

@@ -9,11 +9,30 @@
 
 function UserAddon() {
 	var i, unit,
+		classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 		flags = [0x1, 0x2, 0x3, 0x4, 0x5, 0xf, 0x18, 0x19, 0xc, 0x9],
 		title = new Text(":: kolbot user addon ::", 400, 525, 4, 13, 2);
 
+	this.keyEvent = function (key) {
+		switch (key) {
+		case 32:
+			FileTools.copy("libs/config/" + classes[me.classid] + ".js", "libs/config/" + classes[me.classid] + "." + me.name + ".js");
+			D2Bot.printToConsole("libs/config/" + classes[me.classid] + "." + me.name + ".js has been created.");
+			D2Bot.printToConsole("Please configure your bot and start it again.");
+			D2Bot.stop();
+
+			break;
+		}
+	};
+
 	if (!Config.FastPick) { // Make sure the item event is loaded
 		addEventListener("itemaction", this.itemEvent);
+	}
+
+	if (!FileTools.exists("libs/config/" + classes[me.classid] + "." + me.name + ".js")) {
+		showConsole();
+		print("ÿc4UserAddonÿc0: Press HOME and then press SPACE if you want to create character config.");
+		addEventListener("keyup", this.keyEvent);
 	}
 
 	while (true) {
@@ -28,7 +47,7 @@ function UserAddon() {
 		if (!title.visible && i === flags.length) {
 			title.visible = true;
 		}
-		
+
 		Pickit.fastPick();
 
 		unit = getUnit(101);
@@ -98,7 +117,7 @@ var UnitInfo = new function () {
 				if (items[i].getFlag(0x4000000)) {
 					string = items[i].fname.split("\n")[1] + "ÿc0 " + items[i].fname.split("\n")[0];
 				} else {
-					string = quality[items[i].quality] + (items[i].quality > 4 ? items[i].fname.split("\n")[1].replace("ÿc4", "") : items[i].name);
+					string = quality[items[i].quality] + (items[i].quality > 4 && items[i].getFlag(0x10) ? items[i].fname.split("\n")[1].replace("ÿc4", "") : items[i].name);
 				}
 
 				this.hooks.push(new Text(string, this.x, this.y + (i + 2) * 15, 0, 13, 2));

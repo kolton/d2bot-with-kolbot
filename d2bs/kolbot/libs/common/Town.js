@@ -65,6 +65,11 @@ var Town = {
 
 		this.heal();
 		this.fillTome("tbk");
+
+		if (Config.FieldID) {
+			this.fillTome("ibk");
+		}
+
 		this.buyPotions();
 		this.identify();
 		this.shopItems();
@@ -74,7 +79,7 @@ var Town = {
 		this.reviveMerc();
 		Cubing.doCubing();
 		Runewords.makeRunewords();
-		this.stash();
+		this.stash(true);
 
 		while (getUIFlag(0x08) || getUIFlag(0x1A) || getUIFlag(0x19)) {
 			me.cancel();
@@ -193,7 +198,7 @@ var Town = {
 				pot = this.getPotion(npc, Config.BeltColumn[i]);
 
 				if (pot) {
-					print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
+					//print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
 
 					// Shift+buy will trigger if there's no empty columns or if only the current column is empty
 					if (useShift && (emptyColumns === 0 || (emptyColumns === 1 && col[i] === beltSize))) {
@@ -256,6 +261,8 @@ var Town = {
 	},
 
 	fillTome: function (code) {
+		delay(500);
+
 		if (this.checkScrolls(code) >= 10) {
 			return true;
 		}
@@ -307,8 +314,14 @@ var Town = {
 	},
 
 	identify: function () {
-		var item, tome, scroll, npc,
-			list = this.getUnids();
+		var item, tome, scroll, npc, list, timer, tpTome,
+			tpTomePos = {};
+
+		if (this.cainID()) {
+			return true;
+		}
+
+		list = this.getUnids();
 
 		if (!list) {
 			return false;
@@ -348,10 +361,13 @@ MainLoop:
 
 					if (scroll) {
 						if (!Storage.Inventory.CanFit(scroll)) {
-							try {
-								me.findItem("tbk", 0, 3).sell();
-							} catch (e) {
-								print(e);
+							tpTome = me.findItem("tbk", 0, 3);
+
+							if (tpTome) {
+								tpTomePos = {x: tpTome.x, y: tpTome.y};
+
+								tpTome.sell();
+								delay(500);
 							}
 						}
 
@@ -380,6 +396,14 @@ MainLoop:
 				default:
 					item.sell();
 
+					timer = getTickCount() - this.sellTimer; // shop speedup test
+
+					//print("sell timer: " + timer);
+
+					if (timer > 0 && timer < 500) {
+						delay(timer);
+					}
+
 					break;
 				}
 
@@ -389,7 +413,137 @@ MainLoop:
 
 		if (!me.findItem("tbk", 0, 3)) {
 			this.fillTome("tbk");
+
+			tpTome = me.findItem("tbk", 0, 3);
+
+			if (tpTome) {
+				if (tpTome.x !== tpTomePos.x || tpTome.y !== tpTomePos.y) {
+					if (tpTome.toCursor()) {
+						clickItem(0, tpTomePos.x, tpTomePos.y, 3);
+						delay(300);
+					}
+				}
+			}
 		}
+
+		return true;
+	},
+
+	cainID: function () {
+		if (!Config.CainID.Enable) {
+			return false;
+		}
+
+		// Check if we're already in a shop. It would be pointless to go to Cain if so.
+		var i, cain, unids,
+			npc = getInteractedNPC();
+
+		if (npc && npc.name.toLowerCase() === this.tasks[me.act - 1].Shop) {
+			return false;
+		}
+
+		// Check if we may use Cain - minimum gold
+		if (me.getStat(14) + me.getStat(15) < Config.CainID.MinGold) {
+			//print("Can't use Cain - not enough gold.");
+
+			return false;
+		}
+
+		me.cancel();
+		this.stash(false);
+
+		unids = this.getUnids();
+
+		if (unids) {
+			// Check if we may use Cain - number of unid items
+			if (unids.length < Config.CainID.MinUnids) {
+				//print("Can't use Cain - not enough unid items.");
+
+				return false;
+			}
+
+			// Check if we may use Cain - kept unid items
+			for (i = 0; i < unids.length; i += 1) {
+				if (Pickit.checkItem(unids[i]) > 0) {
+					//print("Can't use Cain - can't id a valid item.");
+
+					return false;
+				}
+			}
+
+			this.move("cain");
+
+			cain = getUnit(1, getLocaleString(2890));
+
+			if (!cain) {
+				return false;
+			}
+
+			if (cain && cain.openMenu()) {
+				delay(10);
+				cain.useMenu(0x0FB4);
+				delay(500);
+				me.cancel();
+			}
+
+			for (i = 0; i < unids.length; i += 1) {
+				switch (Pickit.checkItem(unids[i])) {
+				case 0:
+					unids[i].drop();
+
+					break;
+				case 1:
+					Misc.logItem("Kept", unids[i]);
+
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		return true;
+	},
+
+	fieldID: function () { // not exactly a town function but whateva
+		var list, tome, item;
+
+		list = this.getUnids();
+
+		if (!list) {
+			return false;
+		}
+
+		tome = me.findItem("ibk", 0, 3);
+
+		if (!tome || tome.getStat(70) < list.length) {
+			return false;
+		}
+
+		while (list.length > 0) {
+			item = list.shift();
+
+			if (Pickit.checkItem(item) === -1) { // unid item that should be identified
+				this.identifyItem(item, tome);
+				delay(me.ping + 1);
+
+				switch (Pickit.checkItem(item)) {
+				case 0:
+					item.drop();
+
+					break;
+				case 1:
+					Misc.logItem("Field Kept", item);
+
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		delay(200);
+		me.cancel();
 
 		return true;
 	},
@@ -454,6 +608,8 @@ MainLoop:
 
 			while (getTickCount() - tick < 500) {
 				if (unit.getFlag(0x10)) {
+					delay(50);
+
 					return true;
 				}
 
@@ -484,7 +640,7 @@ MainLoop:
 			return false;
 		}
 
-		print("Scanning " + items.length + " items.");
+		print("ÿc4MiniShopBotÿc0: Scanning " + items.length + " items.");
 
 		for (i = 0; i < items.length; i += 1) {
 			if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Pickit.checkItem(items[i]) === 1) {
@@ -550,6 +706,7 @@ MainLoop:
 								break;
 							default:
 								newItem.sell();
+								delay(500);
 
 								break;
 							}
@@ -647,7 +804,7 @@ MainLoop:
 			return false;
 		}
 
-		print("Repair trigger: " + repairCheck);
+		//print("Repair trigger: " + repairCheck);
 
 		switch (repairCheck) {
 		case "durability":
@@ -676,6 +833,7 @@ MainLoop:
 
 					if (myQuiver) {
 						myQuiver.sell();
+						delay(500);
 					}
 
 					quiver.buy();
@@ -711,7 +869,7 @@ MainLoop:
 				case 87: // Amazon javelins
 					quantity = item.getStat(70);
 
-					if (quantity && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+					if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
 						return "quantity";
 					}
 
@@ -720,7 +878,7 @@ MainLoop:
 				default:
 					durability = item.getStat(72);
 
-					if (durability && durability * 100 / item.getStat(73) <= repairPercent) {
+					if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
 						return "durability";
 					}
 
@@ -763,7 +921,7 @@ MainLoop:
 
 			quantity = quiver.getStat(70);
 
-			if (quantity && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= repairPercent) {
+			if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= repairPercent) {
 				return "quiver";
 			}
 		}
@@ -831,7 +989,11 @@ MainLoop:
 		return true;
 	},
 
-	stash: function () {
+	stash: function (stashGold) {
+		if (!arguments.length) {
+			stashGold = true;
+		}
+
 		if (!this.needStash()) {
 			return true;
 		}
@@ -848,10 +1010,12 @@ MainLoop:
 		}
 
 		// Stash gold
-		if (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5 && this.openStash()) {
-			gold(me.getStat(14), 3);
-			delay(500);
-			me.cancel();
+		if (stashGold) {
+			if (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5 && this.openStash()) {
+				gold(me.getStat(14), 3);
+				delay(500);
+				me.cancel();
+			}
 		}
 
 		return true;
@@ -901,25 +1065,18 @@ MainLoop:
 	},
 
 	getCorpse: function () {
-		var corpse,
-			list = [];
+		var i, corpse;
 
-		corpse = getUnit(0);
+		for (i = 0; i < 3; i += 1) {
+			corpse = getUnit(0, me.name, 17);
 
-		if (corpse) {
-			do {
-				if (corpse.name === me.name && corpse.mode === 17 && getDistance(me, corpse) <= 20) {
-					list.push(copyUnit(corpse));
+			if (corpse && getDistance(me, corpse) <= 20) {
+				while (copyUnit(corpse).x) {
+					Pather.moveToUnit(corpse, rand(-2, 2), rand(-2, 2));
+					corpse.interact();
+					delay(500);
 				}
-			} while (corpse.getNext());
-		}
-
-		while (list.length > 0) {
-			corpse = list.shift();
-
-			Pather.moveToUnit(corpse);
-			corpse.interact();
-			delay(500);
+			}
 		}
 
 		if (me.gametype === 0) {
@@ -1068,7 +1225,7 @@ MainLoop:
 
 	act : [{}, {}, {}, {}, {}],
 	initialize: function () {
-		print("Initialize town " + me.act);
+		//print("Initialize town " + me.act);
 
 		switch (me.act) {
 		case 1:
@@ -1169,7 +1326,7 @@ MainLoop:
 			delay(40);
 		}
 
-		var townSpot,
+		var townSpot, temp,
 			useTK = me.classid === 1 && me.getSkill(43, 1) && ["stash", "portalspot", "waypoint"].indexOf(spot) > -1;
 
 		if (!this.act[me.act - 1].initialized) {
@@ -1177,19 +1334,30 @@ MainLoop:
 		}
 
 		if (typeof (this.act[me.act - 1].spot[spot]) === "object") {
-			print("Moving to " + spot + " from " + me.x + " " + me.y);
+			//print("Moving to " + spot + " from " + me.x + " " + me.y);
+
 			townSpot = this.act[me.act - 1].spot[spot];
 		} else {
-			print("ÿc1Invalid town spot: " + spot);
+			//print("ÿc1Invalid town spot: " + spot);
 
 			return false;
 		}
 
+		//temp = Pather.getNearestWalkable(townSpot[0], townSpot[1], 6, 1);
+
 		if (useTK) {
 			if (getDistance(me, townSpot[0], townSpot[1]) > 14) {
-				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 14, 0x4);
+				if (temp) {
+					Attack.getIntoPosition({x: temp[0], y: temp[1]}, 14, 0x4);
+				}
+
+				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
 			}
 		} else {
+			if (temp) {
+				Pather.moveTo(temp[0], temp[1], 3);
+			}
+
 			Pather.moveTo(townSpot[0], townSpot[1], 3);
 		}
 

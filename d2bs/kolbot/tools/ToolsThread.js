@@ -228,12 +228,6 @@ function main() {
 		);
 
 	while (me.ingame) {
-		if (!me.gameReady) {
-			delay(200);
-
-			continue;
-		}
-
 		if (!me.inTown) {
 			if (Config.UseHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseHP / 100)) {
 				this.drinkPotion(0);
