@@ -9,7 +9,8 @@ function ShopBot() {
 		var i, j;
 
 		for (i = 0; i < path.length; i += 2) {
-			Pather.moveTo(path[i], path[i + 1]);
+			Pather.moveTo(path[i] - 3, path[i + 1] - 3);
+
 			moveNPC(npc, path[i], path[i + 1]);
 
 			for (j = 0; j < leadTimeout; j += 1) {
@@ -110,7 +111,7 @@ function ShopBot() {
 	case "anya":
 		wpArea = 129;
 		town = 109;
-		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5068];
+		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5070];
 
 		if (!Town.goToTown(5) || !Town.move(NPC.Anya)) {
 			throw new Error("Failed to get to NPC");

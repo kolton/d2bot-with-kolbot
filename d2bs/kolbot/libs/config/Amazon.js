@@ -66,6 +66,7 @@ function LoadConfig() {
 	Scripts.Travincal = false;
 	Scripts.Mephisto = false;
 		Config.Mephisto.MoatTrick = false;
+		Config.Mephisto.KillCouncil = false;
 
 	// *** act 4 ***
 	Scripts.Izual = false;

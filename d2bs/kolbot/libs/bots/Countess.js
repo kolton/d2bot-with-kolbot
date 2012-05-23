@@ -5,14 +5,20 @@
 */
 
 function Countess() {
-	var poi;
+	var i, poi;
 
 	Town.doChores();
 	Pather.useWaypoint(6);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true)) {
-		throw new Error("Failed to move to Tower Cellar level 5");
+	for (i = 0; i < 6; i += 1) {
+		if (!Pather.moveToExit(20 + i, true)) {
+			throw new Error("Failed to move to Countess");
+		}
+
+		if (Config.OpenChests) {
+			Misc.openChestsInArea();
+		}
 	}
 
 	poi = getPresetUnit(me.area, 2, 580);
@@ -31,6 +37,10 @@ function Countess() {
 	}
 
 	Attack.clear(20, 0, getLocaleString(2875)); // The Countess
+
+	if (Config.OpenChests) {
+		Misc.openChestsInArea();
+	}
 
 	return true;
 }

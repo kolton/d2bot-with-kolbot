@@ -5,7 +5,13 @@
 */
 
 function BattleOrders() {
-	Pather.useWaypoint(35); // catacombs
+	try {
+		Pather.useWaypoint(35); // catacombs
+	} catch (wperror) {
+		print(wperror);
+		quit();
+	}
+
 	Pather.moveTo(me.x + 5, me.y);
 
 	var bo, leader,

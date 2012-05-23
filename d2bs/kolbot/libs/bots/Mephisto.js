@@ -1,6 +1,6 @@
 /**
 *	@filename	Mephisto.js
-*	@author		kolton
+*	@author		kolton, njomnjomnjom
 *	@desc		kill Mephisto
 */
 
@@ -26,7 +26,7 @@ function Mephisto() {
 			//if (attackCount % 2 === 0) {
 				angle = Math.round(Math.atan2(me.y - meph.y, me.x - meph.x) * 180 / Math.PI);
 				angles = me.y > meph.y ? [-30, -60, -90] : [30, 60, 90];
-				
+
 				for (i = 0; i < angles.length; i += 1) {
 					//pos.dist = Math.round(getDistance(me, meph));
 					pos.dist = 18;
@@ -112,12 +112,49 @@ function Mephisto() {
 		return true;
 	};
 
+	this.killCouncil = function () {
+		//left maffer
+		Pather.moveTo(17600, 8125);
+
+		if (getUnit(1, getLocaleString(2858))) {
+			Attack.kill(getLocaleString(2858));
+			Attack.clear(15, 0, getLocaleString(2858));
+		}
+
+		//right voidbringer
+		Pather.moveTo(17600, 8015);
+
+		if (getUnit(1, getLocaleString(2859))) {
+			Attack.kill(getLocaleString(2859));
+			Attack.clear(15, 0, getLocaleString(2859));
+		}
+
+		//middle bremm
+		Pather.moveTo(17635, 8070);
+
+		if (getUnit(1, getLocaleString(2861))) {
+			Attack.kill(getLocaleString(2861));
+			Attack.clear(15, 0, getLocaleString(2861));
+		}
+	};
+
 	Town.doChores();
 	Pather.useWaypoint(101);
 	Precast.doPrecast(true);
 
 	if (!Pather.moveToExit(102, true)) {
 		throw new Error("Failed to move to Durance Level 3");
+	}
+
+	if (Config.Mephisto.KillCouncil) {
+		this.killCouncil();
+	}
+	
+	if (Config.OpenChests) {
+		Pather.moveTo(17572, 8011);
+		Attack.openChests(5);
+		Pather.moveTo(17572, 8125);
+		Attack.openChests(5);
 	}
 
 	Pather.moveTo(17566, 8069);

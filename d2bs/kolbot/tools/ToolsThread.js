@@ -184,17 +184,6 @@ function main() {
 		} while (room.getNext());
 	};
 
-	this.quitWithLeader = function (mode, param1, param2, name1, name2) {
-		if (mode === 0 || mode === 1 || mode === 3) {
-			if (Config.QuitList.indexOf(name1) > -1) {
-				print(name1 + (mode === 0 ? " timed out" : " left"));
-
-				quitFlag = true;
-			}
-		}
-	};
-
-	addEventListener("gameevent", this.quitWithLeader);
 	addEventListener("scriptmsg",
 		function (msg) {
 			switch (msg) {

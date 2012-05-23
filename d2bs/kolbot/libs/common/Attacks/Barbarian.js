@@ -103,9 +103,12 @@ var ClassAttack = {
 		return 1;
 	},
 
-	afterAttack: function () {
+	afterAttack: function (pickit) {
 		Precast.doPrecast(false);
-		this.findItem(me.area === 83 ? 60 : 20);
+
+		if (pickit) {
+			this.findItem(me.area === 83 ? 60 : 20);
+		}
 
 		if (me.getState(139)) {
 			Misc.unShift();
@@ -175,9 +178,9 @@ MainLoop:
 
 		if (monster) {
 			do {
-				if (Attack.checkMonster(monster) && getDistance(me, monster) <= range && !checkCollision(me, monster, 0x4) &&
-						// Account for attackable monsters
-						(Attack.checkResist(monster, this.skillElement[(monster.spectype & 0xF) ? 1 : 2]) || (Config.AttackSkill[3] > -1 && Attack.checkResist(monster, this.skillElement[3])))) {
+				if (getDistance(me, monster) <= range && Attack.checkMonster(monster) && !checkCollision(me, monster, 0x4) &&
+						(Attack.checkResist(monster, this.skillElement[(monster.spectype & 0x7) ? 1 : 2]) ||
+						(Config.AttackSkill[3] > -1 && Attack.checkResist(monster, this.skillElement[3])))) {
 					return true;
 				}
 			} while (monster.getNext());
@@ -191,7 +194,7 @@ MainLoop:
 			return false;
 		}
 
-		var i, j, tick, corpse, orgX, orgY,
+		var i, j, tick, corpse, orgX, orgY, retry,
 			corpseList = [];
 
 		orgX = me.x;
@@ -210,12 +213,14 @@ MainLoop:
 			}
 
 			while (corpseList.length > 0) {
-				if (this.checkCloseMonsters(15)) {
+				if (this.checkCloseMonsters(5)) {
 					if (Config.FindItemSwitch) {
 						Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 					}
 
-					Attack.clear(15);
+					Attack.clear(10, false, false, false, false);
+
+					retry = true;
 
 					break MainLoop;
 				}
@@ -249,6 +254,10 @@ CorpseLoop:
 					}
 				}
 			}
+		}
+
+		if (retry) {
+			return this.findItem(me.area === 83 ? 60 : 20);
 		}
 
 		if (Config.FindItemSwitch) {

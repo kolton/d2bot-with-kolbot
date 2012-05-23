@@ -49,7 +49,7 @@ var Pather = {
 			node = {x: x, y: y},
 			fail = 0;
 
-		this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1);
+		this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1) && (me.classid === 1 || this.checkEnigma());
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -144,6 +144,21 @@ var Pather = {
 		}
 
 		return getDistance(me, node.x, node.y) < 4;
+	},
+
+	// tele charged items can cause C/I when not using enigma, this check prevents that
+	checkEnigma: function () {
+		var item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				if (item.getPrefix(20539)) {
+					return true;
+				}
+			} while (item.getNext());
+		}
+
+		return false;
 	},
 
 	teleportTo: function (x, y) {

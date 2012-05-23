@@ -221,15 +221,6 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 			return true;
 		}
 
-		// this code will be able to limit base item pickup
-		/*if (unit.quality < 4 && NTIPCheckItem(unit)) {
-			for (i = 0; i < Config.Runewords.length; i += 1) {
-				if (this.getBase(Config.Runewords[i][0], unit)) {
-					return true;
-				}
-			}
-		}*/
-
 		return false;
 	},
 

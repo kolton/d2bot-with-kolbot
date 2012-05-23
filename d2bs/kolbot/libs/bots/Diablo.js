@@ -91,7 +91,7 @@ function Diablo() {
 		var i, boss,
 			glow = getUnit(2, 131);
 
-		for (i = 0; i < (name === getLocaleString(2853) ? 12 : 10); i += 1) {
+		for (i = 0; i < (name === getLocaleString(2853) ? 14 : 12); i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
