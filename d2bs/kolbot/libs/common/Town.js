@@ -1406,8 +1406,8 @@ MainLoop:
 		this.doChores();
 		this.move("portalspot");
 
-		if (!Pather.usePortal(preArea, me.name)) {
-			return false;
+		if (!Pather.usePortal(preArea, me.name)) { // this part is essential
+			throw new Error("Town.VisitTown: Failed to go back from town.");
 		}
 
 		if (Config.PublicMode) {

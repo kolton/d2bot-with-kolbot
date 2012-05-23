@@ -29,8 +29,17 @@ function main() {
 		sojCounter = 0,
 		startTime = getTickCount();
 
-	this.dcloneEvent = function (mode, param1, param2, name1, name2) {
+	this.gameEvent = function (mode, param1, param2, name1, name2) {
 		switch (mode) {
+		case 0:
+		case 1:
+		case 3:
+			if (Config.QuitList.indexOf(name1) > -1) {
+				print(name1 + (mode === 0 ? " timed out" : " left"));
+				quit();
+			}
+
+			break;
 		case 17: // 0x11 - "%Param1 Stones of Jordan Sold to Merchants"
 			if (!Config.SoJWaitTime) {
 				break;
@@ -47,7 +56,7 @@ function main() {
 			}
 
 			D2Bot.printToConsole("Diablo Walks the Earth;7");
-			removeEventListener("gameevent", this.dcloneEvent);
+			removeEventListener("gameevent", this.gameEvent);
 			scriptBroadcast("dclone");
 
 			break;
@@ -91,7 +100,7 @@ function main() {
 	DataFile.updateStats("experience");
 
 	// Load events and threads
-	addEventListener("gameevent", this.dcloneEvent);
+	addEventListener("gameevent", this.gameEvent);
 	load("tools/ToolsThread.js");
 
 	if (Config.PublicMode) {
@@ -108,7 +117,7 @@ function main() {
 	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
-	if (!Scripts.UserAddon) {
+	if (!Scripts.UserAddon && !Scripts.Test) {
 		Town.getCorpse();
 		Town.clearBelt();
 		Town.clearInventory();

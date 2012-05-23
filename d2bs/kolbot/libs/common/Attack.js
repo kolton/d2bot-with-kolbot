@@ -290,7 +290,7 @@ var Attack = {
 			}
 		}
 
-		ClassAttack.afterAttack();
+		ClassAttack.afterAttack(pickit);
 		this.openChests(range);
 
 		if (attackCount > 0 && pickit) {
@@ -395,10 +395,10 @@ var Attack = {
 			}
 		}
 
-		ClassAttack.afterAttack();
+		ClassAttack.afterAttack(pickit);
 		this.openChests(30);
 
-		if (attackCount > 0) {
+		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
 		}
 
@@ -529,6 +529,10 @@ var Attack = {
 
 	// Open chests when clearing
 	openChests: function (range) {
+		if (!Config.OpenChests) {
+			return false;
+		}
+
 		var i, unit,
 			ids = ["chest", "weaponrack", "armorstand"];
 
@@ -543,6 +547,8 @@ var Attack = {
 				} while (unit.getNext());
 			}
 		}
+
+		return true;
 	},
 
 	// Make a list of monsters that will be monitored for dodging
