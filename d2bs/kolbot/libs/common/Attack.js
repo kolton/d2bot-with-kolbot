@@ -395,10 +395,10 @@ var Attack = {
 			}
 		}
 
-		ClassAttack.afterAttack(pickit);
+		ClassAttack.afterAttack(true);
 		this.openChests(30);
 
-		if (attackCount > 0 && pickit) {
+		if (attackCount > 0) {
 			Pickit.pickItems();
 		}
 
