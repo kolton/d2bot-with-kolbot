@@ -9,12 +9,23 @@ function Summoner() {
 	Pather.useWaypoint(74);
 	Precast.doPrecast(true);
 
+	if (Config.Summoner.FireEye) {
+		if (!Pather.usePortal(null)) {
+			throw new Error("Failed to move to Fire Eye");
+		}
+
+		Attack.clear(15, 0, getLocaleString(2885)); // Fire Eye
+
+		if (!Pather.usePortal(null)) {
+			throw new Error("Failed to move to Summoner");
+		}
+	}
+
 	if (!Pather.moveToPreset(me.area, 2, 357)) {
 		throw new Error("Failed to move to Summoner");
 	}
 
-	Attack.kill(250); // The Summoner
-	Pickit.pickItems();
+	Attack.clear(15, 0, 250); // The Summoner
 
 	return true;
 }

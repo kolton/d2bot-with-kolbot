@@ -358,7 +358,7 @@ var Cubing = {
 	neededIngredients: [], // What we need
 
 	buildLists: function () {
-		var i, j, k, items, temp,
+		var i, j, k, items,
 			subRecipes = [];
 
 		this.validIngredients = [];
@@ -366,9 +366,10 @@ var Cubing = {
 		items = me.findItems(-1, 0);
 
 		for (i = 0; i < this.recipes.length; i += 1) {
-IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
+IngredientLoop:
+			for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 				for (k = 0; k < items.length; k += 1) {
-					if ((this.recipes[i].Ingredients[j] === "pgem" && [566, 586, 601].indexOf(items[k].classid) > -1 || items[k].classid === this.recipes[i].Ingredients[j]) && this.validItem(items[k], this.recipes[i])) {
+					if (((this.recipes[i].Ingredients[j] === "pgem" && [566, 586, 601].indexOf(items[k].classid) > -1) || items[k].classid === this.recipes[i].Ingredients[j]) && this.validItem(items[k], this.recipes[i])) {
 						// push the item's info into the valid ingredients array. this will be used to find items when checking recipes
 						this.validIngredients.push({classid: items[k].classid, gid: items[k].gid});
 						// Remove from item list to prevent counting the same item more than once
@@ -430,7 +431,7 @@ IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 		}
 	},
 
-	update: function (classid) { // TODO: expand or remove
+	update: function () { // TODO: expand or remove
 		Cubing.buildLists();
 	},
 
@@ -441,7 +442,7 @@ IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 
 		for (i = 0; i < recipe.Ingredients.length; i += 1) {
 			for (j = 0; j < this.validIngredients.length; j += 1) {
-				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 && (this.validIngredients[j].classid === recipe.Ingredients[i] || recipe.Ingredients[i] === "pgem" && [566, 586, 601].indexOf(this.validIngredients[j].classid) > -1)) {
+				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 && (this.validIngredients[j].classid === recipe.Ingredients[i] || (recipe.Ingredients[i] === "pgem" && [566, 586, 601].indexOf(this.validIngredients[j].classid) > -1))) {
 					item = me.getItem(this.validIngredients[j].classid, -1, this.validIngredients[j].gid);
 
 					if (item) {
@@ -471,7 +472,7 @@ IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 		}
 
 		var i;
-		
+
 		for (i = 0; i < this.neededIngredients.length; i += 1) {
 			if (unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe)) {
 				return true;
@@ -499,7 +500,7 @@ IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 
 	validItem: function (unit, recipe) {
 		// Gems and runes
-		if (unit.itemType >= 96 && unit.itemType <= 102 || unit.itemType === 74) {
+		if ((unit.itemType >= 96 && unit.itemType <= 102) || unit.itemType === 74) {
 			if (!recipe.Enabled && recipe.Ingredients[0] !== unit.classid && recipe.Ingredients[1] !== unit.classid) {
 				return false;
 			}
@@ -572,14 +573,14 @@ IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 
 			if (items) {
 				// If cube isn't open, attempt to open stash (the function returns true if stash is already open)
-				if (!getUIFlag(0x1a) && !Town.openStash() || !this.emptyCube()) {
-					return false
+				if ((!getUIFlag(0x1a) && !Town.openStash()) || !this.emptyCube()) {
+					return false;
 				}
 
 				i = -1;
 
 				while (items.length) {
-					string += (" " + items[0].name)
+					string += (" " + items[0].name);
 					Storage.Cube.MoveTo(items[0]);
 					items.shift();
 				}
@@ -618,7 +619,7 @@ IngredientLoop: for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 
 		while (getUIFlag(0x1A) || getUIFlag(0x19)) {
 			me.cancel();
-			delay(300)
+			delay(300);
 		}
 
 		return true;

@@ -1,0 +1,327 @@
+var muler, mulerStatus,
+	makeNext = false,
+	status = "loading";
+
+// Mule Data object manipulates external mule datafile
+var MuleData = {
+	// create a new mule datafile
+	create: function () {
+		var obj, string;
+
+		obj = {
+			account: "",
+			accNum: 0,
+			character: "",
+			charNum: 0,
+			fullChars: []
+		};
+
+		string = JSON.stringify(obj);
+
+		FileTools.writeText("AutoMule." + AutoMule.realm + ".json", string);
+	},
+
+	// read data from the mule datafile and return the data object
+	read: function () {
+		var obj, string;
+
+		string = FileTools.readText("AutoMule." + AutoMule.realm + ".json");
+		obj = JSON.parse(string);
+
+		return obj;
+	},
+
+	// write a data object to the mule datafile
+	write: function (obj) {
+		var string = JSON.stringify(obj);
+
+		FileTools.writeText("AutoMule." + AutoMule.realm + ".json", string);
+	}
+};
+
+// stash picked items
+function stashItems() {
+	var i,
+		items = me.getItems();
+
+	for (i = 0; i < items.length; i += 1) {
+		if (items[i].mode === 0 && items[i].location === 3) {
+			Storage.Stash.MoveTo(items[i]);
+		}
+	}
+
+	return true;
+}
+
+// pick items from ground
+function pickItems() {
+	var canFit, item,
+		rval = "done",
+		list = [];
+
+	while (true) {
+		if (mulerStatus === "done") {
+			item = getUnit(4, -1, 3); // item, on ground
+
+			if (item) {
+				do {
+					list.push(copyUnit(item));
+				} while (item.getNext());
+			}
+
+			while (list.length > 0) {
+				item = list.shift();
+				canFit = Storage.Inventory.CanFit(item);
+
+				if (!canFit) {
+					stashItems();
+
+					canFit = Storage.Inventory.CanFit(item);
+				}
+
+				if (canFit) {
+					Pickit.pickItem(item);
+				} else {
+					rval = "next";
+				}
+			}
+
+			break;
+		} else {
+			sendCopyData(null, muler, 0, "report");
+		}
+
+		delay(1000);
+	}
+
+	return rval;
+}
+
+// muler/mule communication function
+function CopyDataEvent(mode, msg) {
+	// mode check instead of msg check because of crashes
+	switch (mode) {
+	case 0: // mule request
+		sendCopyData(null, msg, 0, status);
+
+		muler = msg;
+
+		break;
+	case 1: // begin item pickup
+		status = "begin";
+
+		break;
+	case 2: // get muler's status
+		mulerStatus = msg;
+
+		break;
+	}
+}
+
+// set next account - increase account number in mule datafile
+function nextAccount() {
+	var obj = MuleData.read();
+
+	obj.accNum = obj.accNum + 1;
+	obj.account = AutoMule.accountPrefix + obj.accNum;
+	obj.character = "";
+	obj.charNum = 0;
+	obj.fullChars = [];
+
+	MuleData.write(obj);
+
+	return obj.account;
+}
+
+// set next character - increase character number in mule datafile
+function nextChar() {
+	var i, num,
+		charSuffix = "",
+		charNumbers = "abcdefghijklmnopqrstuvwxyz",
+		obj = MuleData.read();
+
+	num = obj.accNum.toString();
+
+	for (i = 0; i < num.length; i += 1) {
+		charSuffix += charNumbers[parseInt(num[i], 10) - 1];
+	}
+
+	obj.charNum = obj.charNum + 1;
+	charSuffix += charNumbers[obj.charNum - 1];
+	obj.character = AutoMule.charPrefix + charSuffix;
+
+	MuleData.write(obj);
+
+	return obj.character;
+}
+
+include("json2.js");
+include("oog.js");
+include("automule.js");
+include("common/storage.js");
+include("common/pickit.js");
+include("common/town.js");
+include("common/pather.js");
+include("common/misc.js");
+include("common/config.js");
+include("common/prototypes.js");
+load("tools/heartbeat.js");
+
+addEventListener("copydata", CopyDataEvent);
+
+function main() {
+	var obj;
+
+	// ugly solution to uglier problem - pickItem area update
+	if (!FileTools.exists("data/" + me.profile + ".json")) {
+		DataFile.create();
+	}
+
+	// create mule datafile if it doesn't exist
+	if (!FileTools.exists("AutoMule." + AutoMule.realm + ".json")) {
+		MuleData.create();
+	}
+
+	while (true) {
+		if (me.gameReady) {
+			if (status === "loading") {
+				status = "ready";
+
+				Storage.Init();
+			}
+
+			while (status !== "begin") {
+				delay(500);
+			}
+
+			me.overhead("begin");
+
+			switch (pickItems()) {
+			// done picking, tell the muler to leave game and kill mule profile
+			case "done":
+				sendCopyData(null, muler, 0, "quit");
+				delay(500);
+				D2Bot.stop();
+
+				break;
+			// can't fit more items, get to next character or account
+			case "next":
+				makeNext = true;
+				obj = MuleData.read();
+
+				obj.fullChars.push(me.name);
+				MuleData.write(obj);
+				nextChar();
+				quit();
+
+				break;
+			}
+		}
+
+		locationAction(getLocation());
+		delay(1000);
+	}
+}
+
+function locationAction(location) {
+	var obj, info;
+
+	switch (location) {
+	case 1:
+	case 3:
+	case 4:
+		if (makeNext) {
+			ControlAction.click(6, 693, 490, 80, 20);
+
+			break;
+		}
+
+		delay(2000);
+		createGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
+		delay(2000);
+
+		break;
+	case 5:
+		delay(2000);
+		joinGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
+		delay(2000);
+
+		break;
+	case 8: // menu
+	case 9: // login
+		if (makeNext) {
+			makeNext = false;
+		}
+
+		obj = MuleData.read();
+
+		if (!obj.account || obj.account.indexOf(AutoMule.accountPrefix) < 0) {
+			nextAccount();
+
+			obj = MuleData.read();
+		}
+
+		info = {
+			realm: AutoMule.realm,
+			account: obj.account,
+			password: AutoMule.accountPassword
+		};
+
+		if (!ControlAction.loginAccount(info)) {
+			ControlAction.makeAccount(info);
+			FileTools.writeText("mules/" + info.account + ".txt", "");
+		}
+
+		break;
+	case 18: // splash
+		ControlAction.click();
+
+		break;
+	case 12: // char select
+	case 42: // empty char screen
+		obj = MuleData.read();
+
+		if (makeNext) {
+			if (obj.fullChars.length === 8) {
+				ControlAction.click(6, 33, 572, 128, 35);
+				nextAccount();
+
+				break;
+			}
+
+			makeNext = false;
+		}
+
+		if (!obj.character || obj.character.indexOf(AutoMule.charPrefix) < 0) {
+			nextChar();
+
+			obj = MuleData.read();
+		}
+
+		info = {
+			account: obj.account,
+			charName: obj.character,
+			ladder: AutoMule.ladder,
+			hardcore: AutoMule.hardcore,
+			expansion: AutoMule.expansion,
+			charClass: "amazon"
+		};
+
+		if (ControlAction.findCharacter(info)) {
+			ControlAction.loginCharacter(info);
+		} else {
+			ControlAction.makeCharacter(info);
+			FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
+		}
+
+		break;
+	case 26: // game already exists
+		ControlAction.click(6, 652, 469, 120, 20); // Join
+
+		break;
+	case 30: // charname already exists
+		// todo
+
+		break;
+	}
+}

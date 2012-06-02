@@ -14,7 +14,7 @@ var Precast = new function () {
 
 		var i, tick;
 
-		if (!arguments.length) {
+		if (typeof slot === "undefined") {
 			slot = me.weaponswitch === 0 ? 1 : 0;
 		} else if (me.weaponswitch === slot) {
 			return true;
@@ -132,11 +132,11 @@ var Precast = new function () {
 				if (!me.getState(51) || force) {
 					Skill.cast(155, 0); // Battle Command
 				}
-				
+
 				if (!me.getState(32) || force) {
 					Skill.cast(149, 0); // Battle Orders
 				}
-					
+
 				if (!me.getState(26) || force) {
 					Skill.cast(138, 0); // Shout
 				}

@@ -105,7 +105,7 @@ var ClassAttack = {
 			return 3;
 		}
 
-		if (me.getState(144) && Attack.checkResist(unit, "cold") || Config.TeleStomp && me.getMerc() && Attack.checkResist(unit, "physical")) {
+		if ((me.getState(144) && Attack.checkResist(unit, "cold")) || (Config.TeleStomp && me.getMerc() && Attack.checkResist(unit, "physical"))) {
 			if (getDistance(me, unit) > 4) {
 				Pather.moveToUnit(unit);
 			}

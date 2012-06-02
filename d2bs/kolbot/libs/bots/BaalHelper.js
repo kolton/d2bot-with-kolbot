@@ -265,26 +265,32 @@ MainLoop:
 		delay(10);
 	}
 
-	Pather.moveTo(15092, 5011);
-	Precast.doPrecast(false);
+	if (Config.BaalHelper.KillBaal) {
+		Pather.moveTo(15092, 5011);
+		Precast.doPrecast(false);
 
-	while (getUnit(1, 543)) {
-		delay(500);
-	}
+		while (getUnit(1, 543)) {
+			delay(500);
+		}
 
-	delay(1000);
+		delay(1000);
 
-	portal = getUnit(2, 563);
+		portal = getUnit(2, 563);
 
-	if (portal) {
-		Pather.usePortal(null, null, portal);
+		if (portal) {
+			Pather.usePortal(null, null, portal);
+		} else {
+			throw new Error("Couldn't find portal.");
+		}
+
+		Pather.moveTo(15134, 5923);
+		Attack.kill(544); // Baal
+		Pickit.pickItems();
 	} else {
-		throw new Error("Couldn't find portal.");
+		while (true) {
+			delay(500);
+		}
 	}
-
-	Pather.moveTo(15134, 5923);
-	Attack.kill(544); // Baal
-	Pickit.pickItems();
 
 	return true;
 }

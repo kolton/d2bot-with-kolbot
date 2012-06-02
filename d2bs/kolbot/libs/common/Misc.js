@@ -15,18 +15,21 @@ var Skill = {
 			return false;
 		}
 
-		if (!arguments.length) {
+		if (typeof skillId === "undefined") {
 			throw new Error("Skill.cast: Must supply a skill ID");
 		}
 
 		var i, n, clickType, shift;
 
-		if (arguments.length === 1) {
+		if (typeof hand === "undefined") {
 			hand = 0;
 		}
 
-		if (arguments.length < 3) {
+		if (typeof x === "undefined") {
 			x = me.x;
+		}
+
+		if (typeof y === "undefined") {
 			y = me.y;
 		}
 
@@ -51,7 +54,7 @@ var Skill = {
 
 MainLoop:
 		for (n = 0; n < 3; n += 1) {
-			if (arguments.length === 3) {
+			if (typeof x === "object") {
 				clickMap(clickType, shift, x);
 			} else {
 				clickMap(clickType, shift, x, y);
@@ -59,7 +62,7 @@ MainLoop:
 
 			delay(30);
 
-			if (arguments.length === 3) {
+			if (typeof x === "object") {
 				clickMap(clickType + 2, shift, x);
 			} else {
 				clickMap(clickType + 2, shift, x, y);
@@ -97,7 +100,7 @@ MainLoop:
 			return false;
 		}
 
-		if (arguments.length < 2) {
+		if (typeof hand === "undefined") {
 			hand = 0;
 		}
 
@@ -203,7 +206,7 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit)) {
+			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 2, 0)) {
 				unit.interact();
 			}
 

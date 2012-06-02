@@ -37,7 +37,7 @@ var ClassAttack = {
 				break;
 			}
 		}
-		
+
 		this.bowCheck = Attack.usingBow();
 	},
 
@@ -85,7 +85,7 @@ var ClassAttack = {
 
 			return 3;
 		}
-		
+
 		if (Config.TeleStomp && me.getMerc() && Attack.checkResist(unit, "physical")) {
 			if (getDistance(me, unit) > 4) {
 				Pather.moveToUnit(unit);

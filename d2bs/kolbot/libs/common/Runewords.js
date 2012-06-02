@@ -57,7 +57,7 @@ var Runeword = {
 	Wind: [638, 610], // Sur + El
 	Brand: [640, 637, 632, 634], // Jah + Lo + Mal + Gul
 	Death: [624, 610, 635, 618, 634], // Hel + El + Vex + Ort + Gul
-	Destruction:[635, 637, 639, 640, 627], // Vex + Lo + Ber + Jah + Ko
+	Destruction: [635, 637, 639, 640, 627], // Vex + Lo + Ber + Jah + Ko
 	Dragon: [638, 637, 621], // Sur + Lo + Sol
 	Dream: [625, 640, 630], // Io + Jah + Pul
 	Edge: [612, 616, 620], // Tir + Tal + Amn
@@ -66,7 +66,7 @@ var Runeword = {
 	Grief: [614, 612, 637, 632, 617], // Eth + Tir + Lo + Mal + Ral
 	Harmony: [612, 615, 621, 627], // Tir + Ith + Sol + Ko
 	Ice: [620, 622, 640, 637], // Amn + Shael + Jah + Lo
-	Infinity: [639, 632, 639, 633], // Ber + Mal + Ber + Ist
+	"Infinity": [639, 632, 639, 633], // Ber + Mal + Ber + Ist
 	Insight: [617, 612, 616, 621], // Ral + Tir + Tal + Sol
 	LastWish: [640, 632, 640, 638, 640, 639], // Jah + Mal + Jah + Sur + Jah + Ber
 	Lawbringer: [620, 629, 627], // Amn + Lem + Ko
@@ -88,7 +88,7 @@ var Runeword = {
 	Treachery: [622, 619, 629], // Shael + Thul + Lem
 
 	Test: [624, 624, 624]
-}
+};
 
 var Runewords = {
 	needList: [],
@@ -126,7 +126,8 @@ var Runewords = {
 			}
 
 			if (this.getBase(Config.Runewords[i][0], Config.Runewords[i][1])) {
-RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
+RuneLoop:
+				for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 					for (k = 0; k < items.length; k += 1) {
 						if (items[k].classid === Config.Runewords[i][0][j]) {
 							this.validGids.push(items[k].gid);
@@ -157,6 +158,8 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 
 			this.needList.push(624);
 		}
+
+		print(this.needList);
 	},
 
 	update: function (classid, gid) {
@@ -186,7 +189,8 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 			if (base) {
 				itemList.push(base); // push the base
 
-RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
+RuneLoop:
+				for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 					for (k = 0; k < items.length; k += 1) {
 						if (items[k].classid === Config.Runewords[i][0][j]) { // rune matched
 							itemList.push(items[k]); // push into the item list
@@ -214,8 +218,6 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 		if (!Config.MakeRunewords) {
 			return false;
 		}
-
-		var i;
 
 		if (unit.itemType === 74 && this.needList.indexOf(unit.classid) > -1) { // rune
 			return true;
@@ -344,8 +346,8 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 				this.socketItem(items[0], items[i]);
 			}
 
-			print("ÿc4Runewords: ÿc0Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc./, ""));
-			D2Bot.printToConsole("Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc./, "") + ";3");
+			print("ÿc4Runewords: ÿc0Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""));
+			D2Bot.printToConsole("Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "") + ";3");
 
 			if (NTIPCheckItem(items[0], this.pickitEntries)) {
 				Misc.logItem("Runeword kept", items[0]);
@@ -375,7 +377,7 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 				scroll = this.getScroll();
 
 				// failed to get scroll or open stash most likely means we're stuck somewhere in town, so it's better to return false
-				if (!scroll || !Town.openStash() || !Cubing.emptyCube()) { 
+				if (!scroll || !Town.openStash() || !Cubing.emptyCube()) {
 					return false;
 				}
 
@@ -388,8 +390,8 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 					return false;
 				}
 
-				print("ÿc4Runewords: ÿc0Rerolling runeword: " + base.fname.split("\n").reverse().join(" ").replace(/ÿc./, ""));
-				D2Bot.printToConsole("Rerolling runeword:" + base.fname.split("\n").reverse().join(" ").replace(/ÿc./, "") + ";3");
+				print("ÿc4Runewords: ÿc0Rerolling runeword: " + base.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""));
+				D2Bot.printToConsole("Rerolling runeword:" + base.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "") + ";3");
 				transmute();
 				delay(500);
 
@@ -403,7 +405,7 @@ RuneLoop: for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 
 		while (getUIFlag(0x1A) || getUIFlag(0x19)) {
 			me.cancel();
-			delay(300)
+			delay(300);
 		}
 
 		return true;

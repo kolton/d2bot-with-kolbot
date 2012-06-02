@@ -149,7 +149,7 @@ var ClassAttack = {
 			return false;
 		}
 
-		var i, coords, angle,
+		var i, j, coords, angle,
 			//angles = [180, 45, -45, 90, -90]; // Angle offsets
 			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
 
@@ -157,14 +157,16 @@ var ClassAttack = {
 
 MainLoop:
 		for (i = 0; i < angles.length; i += 1) { // get a better spot
-			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 3 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 3 + unit.y)];
+			for (j = 0; j < 5; j += 1) {
+				coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * j + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * j + unit.y)];
 
-			if (!CollMap.checkColl(unit, {x: coords[0], y: coords[1]})) {
-				if (getDistance(me, coords[0], coords[1]) >= 3) {
-					//me.runwalk = me.gametype;
-
-					return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
+				if (CollMap.getColl(coords[0], coords[1]) & 0x1) {
+					continue MainLoop;
 				}
+			}
+
+			if (getDistance(me, coords[0], coords[1]) >= 3) {
+				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 			}
 		}
 

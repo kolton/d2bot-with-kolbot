@@ -50,6 +50,7 @@ function LoadConfig() {
 	Scripts.Radament = false;
 	Scripts.AncientTunnels = false;
 	Scripts.Summoner = false;
+		Config.Summoner.FireEye = false; // Kill Fire Eye
 	Scripts.Tombs = false;
 	Scripts.Duriel = false;
 
@@ -102,6 +103,7 @@ function LoadConfig() {
 		Config.Baal.SafeTPMsg = "TP safe!";
 		Config.Baal.BaalMsg = "Baal";
 		Config.Baal.DollQuit = false; // End script if Dolls (Undead Soul Killers) are found.
+		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
 
 	/* ### leeching section ###
 	* Unless stated otherwise, leader's character name isn't needed on order to run.
@@ -118,6 +120,7 @@ function LoadConfig() {
 		Config.BaalHelper.KillNihlathak = false; // Kill Nihlathak before going to Throne
 		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
+		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 		Config.Follower.Leader = ""; // Leader's ingame name. This only applies to Follower script
 

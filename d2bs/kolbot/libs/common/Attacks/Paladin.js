@@ -143,7 +143,9 @@ var ClassAttack = {
 			}
 
 			return true;
-		} else if (Config.AttackSkill[index] === 101) {
+		}
+
+		if (Config.AttackSkill[index] === 101) {
 			CollMap.reset();
 
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || CollMap.checkColl(me, unit, 0x2004)) {

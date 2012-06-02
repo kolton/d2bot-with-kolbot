@@ -5,14 +5,17 @@
 */
 
 function BattleOrders() {
+	Town.doChores();
+
 	try {
 		Pather.useWaypoint(35); // catacombs
 	} catch (wperror) {
-		print(wperror);
+		showConsole();
+		print("ÿc1Failed to take waypoint.");
 		quit();
 	}
 
-	Pather.moveTo(me.x + 5, me.y);
+	Pather.moveTo(me.x + 6, me.y + 6);
 
 	var bo, leader,
 		count = 0;
@@ -53,7 +56,9 @@ MainLoop:
 			}
 
 			if (count > 60) { // 30 seconds with no bo
-				throw new Error("Failed to get BO");
+				showConsole();
+				print("ÿc1Failed to get BO");
+				quit();
 			}
 
 			break;
