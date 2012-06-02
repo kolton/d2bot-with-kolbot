@@ -43,7 +43,7 @@ var ClassAttack = {
 			}
 		}
 
-		for (i = 0 ; i < Config.Curse.length ; i+= 1) {
+		for (i = 0; i < Config.Curse.length; i += 1) {
 			switch (Config.Curse[i]) {
 			case 0: //nothing
 				this.curseState[i] = 0;
@@ -208,7 +208,7 @@ var ClassAttack = {
 
 				if (Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit)) {
 					this.novaTick = getTickCount();
-					
+
 					return true;
 				}
 
@@ -223,7 +223,7 @@ var ClassAttack = {
 
 			if (Config.AttackSkill[index] === 500) {
 				delay(300);
-				
+
 				return true;
 			}
 
@@ -312,7 +312,8 @@ var ClassAttack = {
 				} while (corpse.getNext());
 			}
 
-			MainLoop : while (corpseList.length > 0) {
+MainLoop:
+			while (corpseList.length > 0) {
 				corpse = corpseList.shift();
 
 				if (me.getMinionCount(4) < maxSkeletons) {
@@ -414,14 +415,14 @@ var ClassAttack = {
 			return false;
 		}
 
-		if (arguments.length < 2) {
+		if (typeof revive === "undefined") {
 			revive = false;
 		}
 
 		var baseId = getBaseStat("monstats", unit.classid, "baseid"),
 			badList = [312, 571];
 
-		if (revive && ((unit.spectype & 0x7) || badList.indexOf(baseId) > -1 || Config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3)) {
+		if (revive && ((unit.spectype & 0x7) || badList.indexOf(baseId) > -1 || (Config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3))) {
 			return false;
 		}
 
@@ -429,14 +430,14 @@ var ClassAttack = {
 			return false;
 		}
 
-		if (getDistance(me, unit) <= 25 && !checkCollision(me, unit, 0x4) && 
-			!unit.getState(1) && // freeze
-			!unit.getState(96) && // revive
-			!unit.getState(99) && // redeemed
-			!unit.getState(104) && // nodraw
-			!unit.getState(107) && // shatter
-			!unit.getState(118) // noselect
-			) {
+		if (getDistance(me, unit) <= 25 && !checkCollision(me, unit, 0x4) &&
+				!unit.getState(1) && // freeze
+				!unit.getState(96) && // revive
+				!unit.getState(99) && // redeemed
+				!unit.getState(104) && // nodraw
+				!unit.getState(107) && // shatter
+				!unit.getState(118) // noselect
+				) {
 			return true;
 		}
 

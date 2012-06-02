@@ -76,14 +76,12 @@ var Pickit = {
 					if (status && this.canPick(item)) {
 						// Check room, don't check gold, scrolls and potions
 						canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
-						
-						if (!canFit) {
-							if (Config.FieldID && Town.fieldID()) {
-								canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
-							}
+
+						if (!canFit && Config.FieldID && Town.fieldID()) {
+							canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
 						}
-						
-						if (!canFit) {
+
+						if (!canFit && this.canMakeRoom()) {
 							print("ÿc7Trying to make room for " + item.name);
 
 							if (!Town.visitTown()) {
@@ -91,12 +89,19 @@ var Pickit = {
 
 								return false;
 							}
+
+							canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
 						}
 
-						if (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1) {
+						if (canFit) {
 							this.pickItem(item, status);
 						} else {
 							print("ÿc7Not enough room for " + item.name);
+
+							if (Automule.enabledProfiles.indexOf(me.profile) > -1) {
+								scriptBroadcast("mule");
+								quit();
+							}
 						}
 					}
 				}
@@ -104,6 +109,31 @@ var Pickit = {
 		}
 
 		return true;
+	},
+
+	// check if we can even free up the inventory
+	canMakeRoom: function () {
+		var i,
+			items = Storage.Inventory.Compare(Config.Inventory);
+
+		if (items) {
+			for (i = 0; i < items.length; i += 1) {
+				switch (this.checkItem(items[i])) {
+				case -1: // item needs to be identified
+					return true;
+				case 0:	// shouldn't happen
+					Town.clearInventory();
+
+					return true;
+				default: // check if a kept item can be stashed
+					if (Storage.Stash.CanFit(items[i])) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	},
 
 	pickItem: function (unit, status) {

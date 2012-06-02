@@ -4,6 +4,7 @@ js_strict(true);
 include("json2.js");
 include("NTItemParser.dbl");
 include("OOG.js");
+include("AutoMule.js");
 include("Gambling.js");
 include("common/Attack.js");
 include("common/Cubing.js");
@@ -23,6 +24,16 @@ var gidList = []; // fast pickit
 function main() {
 	if (!getScript("tools/heartbeat.js")) {
 		load("tools/heartbeat.js");
+	}
+
+	// wait until game is ready
+	while (!me.gameReady) {
+		delay(50);
+	}
+
+	// don't load default for mules
+	if (me.profile === AutoMule.muleProfile) {
+		return;
 	}
 
 	var i, sojPause,
@@ -88,6 +99,9 @@ function main() {
 	Storage.Init();
 	Cubing.init();
 	Runewords.init();
+
+	// override default action if in mule game
+	AutoMule.inGameCheck();
 
 	me.maxgametime = Config.MaxGameTime * 1000;
 

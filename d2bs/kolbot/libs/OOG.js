@@ -48,8 +48,8 @@ var D2Bot = {
 	start: function (profile) {
 		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
 	},
- 	updateCount: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateCount"); 
+	updateCount: function () {
+		sendCopyData(null, "D2Bot #", 0, "updateCount");
 	}
 };
 
@@ -178,6 +178,8 @@ var ControlAction = {
 	},
 
 	loginAccount: function (info) {
+		me.blockMouse = true;
+
 		var realms = {
 			"uswest": 0,
 			"useast": 1,
@@ -198,6 +200,9 @@ var ControlAction = {
 				break;
 			case 10: // login error - acc doesn't exist? TODO: handle all login errors
 				this.click(6, 335, 412, 128, 35); // OK
+
+				me.blockMouse = false;
+
 				return false;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
@@ -211,10 +216,14 @@ var ControlAction = {
 
 		delay(1000);
 
+		me.blockMouse = false;
+
 		return getLocation() === 12 || getLocation() === 42;
 	},
 
 	makeAccount: function (info) {
+		me.blockMouse = true;
+
 		var realms = {
 			"uswest": 0,
 			"useast": 1,
@@ -261,6 +270,8 @@ var ControlAction = {
 			delay(500);
 		}
 
+		me.blockMouse = false;
+
 		return true;
 	},
 
@@ -284,7 +295,53 @@ var ControlAction = {
 		return false;
 	},
 
+	// get all characters
+	getCharacters: function () {
+		var control, text,
+			list = [];
+
+		if (getLocation() === 12) {
+			control = getControl(4, 37, 178, 200, 92);
+
+			if (control) {
+				do {
+					text = control.getText();
+
+					if (text instanceof Array && typeof text[1] === "string") {
+						list.push(text[1]);
+					}
+				} while (control.getNext());
+			}
+		}
+
+		return list;
+	},
+	
+	// get character position
+	getPosition: function () {
+		var control, text,
+			position = 0;
+
+		if (getLocation() === 12) {
+			control = getControl(4, 37, 178, 200, 92);
+
+			if (control) {
+				do {
+					text = control.getText();
+
+					if (text instanceof Array && typeof text[1] === "string") {
+						position += 1;
+					}
+				} while (control.getNext());
+			}
+		}
+
+		return position;
+	},
+
 	loginCharacter: function (info) {
+		me.blockMouse = true;
+
 		var control, text;
 
 		while (getLocation() !== 1) { // cycle until in lobby
@@ -316,10 +373,14 @@ var ControlAction = {
 			delay(500);
 		}
 
+		me.blockMouse = false;
+
 		return true;
 	},
 
 	makeCharacter: function (info) {
+		me.blockMouse = true;
+
 		if (!info.charClass) {
 			info.charClass = "barbarian";
 		}
@@ -373,7 +434,7 @@ var ControlAction = {
 			case 15: // new character
 				this.setText(1, 318, 510, 157, 16, info.charName);
 
-				if (!this.expansion) {
+				if (!info.expansion) {
 					this.click(6, 319, 540, 15, 16);
 				}
 
@@ -393,6 +454,8 @@ var ControlAction = {
 
 			delay(500);
 		}
+
+		me.blockMouse = false;
 
 		return true;
 	}

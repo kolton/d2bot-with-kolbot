@@ -215,12 +215,14 @@ var Config = {
 		HotTPMsg: "Hot TP!",
 		SafeTPMsg: "TP safe!",
 		BaalMsg: "Baal",
-		DollQuit: false
+		DollQuit: false,
+		KillBaal: false
 	},
 	BaalHelper: {
 		KillNihlathak: false,
 		FastChaos: false,
-		DollQuit: false
+		DollQuit: false,
+		KillBaal: false
 	},
 	Corpsefire: {
 		ClearDen: false
@@ -250,10 +252,14 @@ var Config = {
 		Leader: ""
 	},
 	Mephisto: {
-		MoatTrick: false
+		MoatTrick: false,
+		KillCouncil: false
 	},
 	ShopBot: {
 		ScanIDs: [],
 		ShopNPC: "anya"
+	},
+	Summoner: {
+		FireEye: false
 	}
 };

@@ -96,27 +96,25 @@ Unit.prototype.startTrade = function (mode) {
 		menuId = mode === "Gamble" ? 0x0D46 : mode === "Repair" ? 0x0D06 : 0x0D44;
 
 	for (i = 0; i < 3; i += 1) {
-		if (!this.openMenu()) {
-			continue;
-		}
+		if (this.openMenu()) {
+			delay(10);
+			this.useMenu(menuId);
+			delay(10);
 
-		delay(10);
-		this.useMenu(menuId);
-		delay(10);
+			tick = getTickCount();
 
-		tick = getTickCount();
+			while (getTickCount() - tick < 1000) {
+				if (getUIFlag(0x0C) && this.itemcount > 0) {
+					delay(200);
 
-		while (getTickCount() - tick < 1000) {
-			if (getUIFlag(0x0C) && this.itemcount > 0) {
-				delay(200);
+					return true;
+				}
 
-				return true;
+				delay(25);
 			}
 
-			delay(25);
+			me.cancel();
 		}
-
-		me.cancel();
 	}
 
 	return false;
@@ -167,7 +165,7 @@ Unit.prototype.sell = function () {
 		throw new Error("Unit.sell: Must be used in shops.");
 	}
 
-	var i, tick, timer,
+	var i, tick,
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 5; i += 1) {
@@ -258,22 +256,16 @@ me.findItem = function (id, mode, loc) {
 		throw new Error("Unit.findItem: Must be used on PCs or NPCs.");
 	}
 
-	switch (arguments.length) {
-	case 0:
+	if (typeof id === "undefined") {
 		id = -1;
+	}
+
+	if (typeof mode === "undefined") {
 		mode = -1;
-		loc = false;
+	}
 
-		break;
-	case 1:
-		mode = -1;
+	if (typeof loc === "undefined") {
 		loc = false;
-
-		break;
-	case 2:
-		loc = false;
-
-		break;
 	}
 
 	var item = this.getItem(id, mode);
@@ -298,22 +290,16 @@ me.findItem = function (id, mode, loc) {
 };
 
 me.findItems = function (id, mode, loc) {
-	switch (arguments.length) {
-	case 0:
+	if (typeof id === "undefined") {
 		id = -1;
+	}
+
+	if (typeof mode === "undefined") {
 		mode = -1;
-		loc = false;
+	}
 
-		break;
-	case 1:
-		mode = -1;
+	if (typeof loc === "undefined") {
 		loc = false;
-
-		break;
-	case 2:
-		loc = false;
-
-		break;
 	}
 
 	var list = [],

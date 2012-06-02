@@ -140,37 +140,24 @@ var Attack = {
 			say("clear " + bossId);
 		}
 
-		switch (arguments.length) {
-		case 0:
+		if (typeof range === "undefined") {
 			range = 25;
+		}
+
+		if (typeof spectype === "undefined") {
 			spectype = 0;
+		}
+
+		if (typeof bossId === "undefined") {
 			bossId = false;
+		}
+
+		if (typeof sortfunc === "undefined") {
 			sortfunc = false;
-			pickit = true;
+		}
 
-			break;
-		case 1:
-			spectype = 0;
-			bossId = false;
-			sortfunc = false;
+		if (typeof pickit === "undefined") {
 			pickit = true;
-
-			break;
-		case 2:
-			bossId = false;
-			sortfunc = false;
-			pickit = true;
-
-			break;
-		case 3:
-			sortfunc = false;
-			pickit = true;
-
-			break;
-		case 4:
-			pickit = true;
-
-			break;
 		}
 
 		if (typeof (range) !== "number") {
@@ -432,7 +419,7 @@ var Attack = {
 			return false;
 		}
 
-		if (arguments.length < 1) {
+		if (typeof spectype === "undefined") {
 			spectype = 0;
 		}
 
@@ -902,9 +889,9 @@ AuraLoop: // Skip monsters with auras
 		if (this.infinity && ["fire", "lightning", "cold"].indexOf(type) > -1) {
 			if (!unit.getState(28)) {
 				return this.getResist(unit, type) < 117;
-			} else {
-				return this.getResist(unit, type) < 100;
 			}
+
+			return this.getResist(unit, type) < 100;
 		}
 
 		return this.getResist(unit, type) < 100;

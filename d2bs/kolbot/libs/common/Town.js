@@ -687,7 +687,11 @@ MainLoop:
 
 			if (items) {
 				for (i = 0; i < items.length; i += 1) {
-					if (Config.GambleItems.indexOf(items[i].classid) > -1 && Storage.Inventory.CanFit(items[i])) {
+					if (Config.GambleItems.indexOf(items[i].classid) > -1) {
+						if (!Storage.Inventory.CanFit(items[i])) {
+							return false;
+						}
+
 						items[i].buy();
 
 						newItem = this.getGambledItem(list);
@@ -990,7 +994,7 @@ MainLoop:
 	},
 
 	stash: function (stashGold) {
-		if (!arguments.length) {
+		if (typeof stashGold === "undefined") {
 			stashGold = true;
 		}
 
@@ -1365,10 +1369,6 @@ MainLoop:
 	},
 
 	goToTown: function (act) {
-		if (!act) {
-			act = me.act;
-		}
-
 		var towns = [1, 40, 75, 103, 109];
 
 		if (!me.inTown) {
@@ -1377,7 +1377,7 @@ MainLoop:
 			}
 		}
 
-		if (arguments.length < 1) {
+		if (typeof act === "undefined") {
 			return true;
 		}
 

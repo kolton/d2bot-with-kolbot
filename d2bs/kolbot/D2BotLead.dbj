@@ -24,6 +24,7 @@ var StarterConfig = {
 // No touchy!
 include("json2.js");
 include("OOG.js");
+include("automule.js");
 include("gambling.js");
 load("tools/heartbeat.js");
 
@@ -40,6 +41,7 @@ var D2BOT_JOIN = 1,
 	gameStart,
 	isUp = "no",
 	nextGame = "",
+	muleTrigger = false,
 	ingame = false;
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -95,8 +97,19 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
+function ScriptMsgEvent(msg) {
+	switch (msg) {
+	case "mule":
+		muleTrigger = true;
+
+		break;
+	}
+}
+
 function main() {
 	addEventListener('copydata', RecieveCopyData);
+	addEventListener('scriptmsg', ScriptMsgEvent);
+	
 	delay(rand(1, 2) * 1000);
 	D2Bot.requestGameInfo();
 
@@ -149,6 +162,14 @@ MainSwitch:
 		}
 
 		if (ingame) {
+			// ### automule ###
+			if (muleTrigger) {
+				AutoMule.outOfGameCheck();
+
+				muleTrigger = false;
+			}
+			// ### automule end ###
+
 			print("updating runs");
 			D2Bot.updateRuns();
 
@@ -198,6 +219,14 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby Chat");
 
 		if (ingame) {
+			// ### automule ###
+			if (muleTrigger) {
+				AutoMule.outOfGameCheck();
+
+				muleTrigger = false;
+			}
+			// ### automule end ###
+
 			print("updating runs");
 			D2Bot.updateRuns();
 
@@ -265,6 +294,9 @@ MainSwitch:
 		}
 
 		if (lastGameStatus === "pending") {
+			D2Bot.printToConsole("Failed to create game");
+			timeoutDelay("FTJ delay", StarterConfig.MinGameTime * 1e3);
+
 			gameCount += 1;
 		}
 

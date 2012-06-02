@@ -325,7 +325,7 @@
 //          ==white==
 
 //[name] >= thresher && [name] <= greatpoleaxe && [quality] == normal && [flag] == ethereal # [sockets] == 0 # [maxquantity] == 1 // for socketing
-[type] == polearm && [quality] <= superior && [flag] == ethereal && [class] == elite # [sockets] == 4 && [enhanceddamage] == 15
+[type] == polearm && [quality] <= superior && [flag] == ethereal && [class] == elite # [sockets] == 4
 [name] == colossusvoulge && [quality] <= superior && [flag] == ethereal # ([sockets] == 0 || [sockets] == 4) && [enhanceddamage] == 15
 
 //          ==unique==

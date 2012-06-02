@@ -15,7 +15,7 @@ var Pather = {
 			return true;
 		}
 
-		if (arguments.length < 2) {
+		if (typeof x === "undefined" || typeof y === "undefined") {
 			throw new Error("moveTo: Function must be called with at least 2 arguments.");
 		}
 
@@ -27,22 +27,16 @@ var Pather = {
 			me.cancel();
 		}
 
-		switch (arguments.length) {
-		case 2:
+		if (typeof retry === "undefined") {
 			retry = 3;
+		}
+
+		if (typeof clearPath === "undefined") {
 			clearPath = false;
-			pop = false;
+		}
 
-			break;
-		case 3:
-			clearPath = false;
+		if (typeof pop === "undefined") {
 			pop = false;
-
-			break;
-		case 4:
-			pop = false;
-
-			break;
 		}
 
 		var path, mob,
@@ -87,55 +81,53 @@ var Pather = {
 			/* Right now getPath's first node is our own position so it's not necessary to take it into account
 				This will be removed if getPath changes
 			*/
-			if (this.useTeleport && getDistance(me, node) < 2) {
-				continue;
-			}
+			if (!this.useTeleport || getDistance(me, node) > 2) {
+				if (!(this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y))) {
+					// Reduce node distance in new path
+					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? 30 : 10);
 
-			if (!(this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y))) {
-				// Reduce node distance in new path
-				path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? 30 : 10);
+					if (!path) {
+						throw new Error("moveTo: Failed to generate path.");
+					}
 
-				if (!path) {
-					throw new Error("moveTo: Failed to generate path.");
+					path.reverse();
+
+					if (fail === 2 && !this.useTeleport) {
+						Attack.clear(5);
+					}
+
+					fail += 1;
+
+					//print("move retry " + fail);
 				}
 
-				path.reverse();
-
-				if (fail === 2 && !this.useTeleport) {
-					Attack.clear(5);
+				if (fail >= retry) {
+					break;
 				}
 
-				fail += 1;
+				if (clearPath) {
+					Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
 
-				//print("move retry " + fail);
-			}
-
-			if (fail >= retry) {
-				break;
-			}
-
-			if (clearPath) {
-				Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
-
-				if (getDistance(me, node.x, node.y) > 4) {
-					this.moveTo(node.x, node.y);
-				}
-			}
-
-			if (Config.Countess.KillGhosts) { // TODO: expand&improve
-				mob = Attack.getMob("ghost", 0, 30);
-
-				if (mob) {
-					Attack.clearList(mob);
+					if (getDistance(me, node.x, node.y) > 4) {
+						this.moveTo(node.x, node.y);
+					}
 				}
 
-				if (getDistance(me, node.x, node.y) > 4) {
-					this.moveTo(node.x, node.y);
-				}
-			}
+				if (Config.Countess.KillGhosts) { // TODO: expand&improve
+					mob = Attack.getMob("ghost", 0, 30);
 
-			if (Misc.townCheck(false)) {
-				this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1);
+					if (mob) {
+						Attack.clearList(mob);
+					}
+
+					if (getDistance(me, node.x, node.y) > 4) {
+						this.moveTo(node.x, node.y);
+					}
+				}
+
+				if (Misc.townCheck(false)) {
+					this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1);
+				}
 			}
 		}
 
@@ -211,7 +203,6 @@ MainLoop:
 			}
 		}
 
-MainLoop:
 		while (getDistance(me, x, y) > 3 && me.mode !== 17) {
 			if (me.classid === 3 && Config.Vigor) {
 				Skill.setSkill(115, 0);
@@ -226,9 +217,10 @@ MainLoop:
 			attemptCount += 1;
 			nTimer = getTickCount();
 
+ModeLoop:
 			while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
 				if (me.mode === 17) {
-					break MainLoop;
+					return false;
 				}
 
 				if ((getTickCount() - nTimer) > 500) {
@@ -240,7 +232,7 @@ MainLoop:
 
 					this.walkTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1)); // recursion motherfuckers
 
-					continue MainLoop;
+					break ModeLoop;
 				}
 
 				delay(40);
@@ -266,7 +258,7 @@ MainLoop:
 
 		if (door) {
 			do {
-				if (getDistance(door, x, y) < 4 && getDistance(me, door) < 9 || getDistance(me, door) < 4) { // TODO: Adjust to optimal distances
+				if ((getDistance(door, x, y) < 4 && getDistance(me, door) < 9) || getDistance(me, door) < 4) { // TODO: Adjust to optimal distances
 					for (i = 0; i < 3; i += 1) {
 						door.interact();
 
@@ -296,29 +288,20 @@ MainLoop:
 		If you want to go to a preset unit based on its area, type and id, use Pather.moveToPreset().
 	*/
 	moveToUnit: function (unit, offX, offY, clearPath, pop) { // Maybe use range instead of XY offset
-		switch (arguments.length) {
-		case 1:
+		if (typeof offX === "undefined") {
 			offX = 0;
+		}
+
+		if (typeof offY === "undefined") {
 			offY = 0;
+		}
+
+		if (typeof clearPath === "undefined") {
 			clearPath = false;
-			pop = false;
+		}
 
-			break;
-		case 2:
-			offY = 0;
-			clearPath = false;
+		if (typeof pop === "undefined") {
 			pop = false;
-
-			break;
-		case 3:
-			clearPath = false;
-			pop = false;
-
-			break;
-		case 4:
-			pop = false;
-
-			break;
 		}
 
 		if (!unit || !unit.hasOwnProperty("x") || !unit.hasOwnProperty("y")) {
@@ -336,33 +319,24 @@ MainLoop:
 		This function finds the preset unit based on its area, unitType and unitId and then moves to it.
 	*/
 	moveToPreset: function (area, unitType, unitId, offX, offY, clearPath, pop) {
-		if (arguments.length < 3) {
+		if (typeof area === "undefined" || typeof unitType === "undefined" || typeof unitId === "undefined") {
 			throw new Error("moveToPreset: Invalid parameters.");
 		}
 
-		switch (arguments.length) {
-		case 3:
+		if (typeof offX === "undefined") {
 			offX = 0;
+		}
+
+		if (typeof offY === "undefined") {
 			offY = 0;
+		}
+
+		if (typeof clearPath === "undefined") {
 			clearPath = false;
-			pop = false;
+		}
 
-			break;
-		case 4:
-			offY = 0;
-			clearPath = false;
+		if (typeof pop === "undefined") {
 			pop = false;
-
-			break;
-		case 5:
-			clearPath = false;
-			pop = false;
-
-			break;
-		case 6:
-			pop = false;
-
-			break;
 		}
 
 		var presetUnit = getPresetUnit(area, unitType, unitId);
@@ -376,8 +350,7 @@ MainLoop:
 
 	// moveToExit can take a single area or an array of areas as the first argument
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, n, exits, targetExits,
-			dest = {},
+		var i, j, exits, myRoom, targetRoom,
 			areas = [];
 
 		if (targetArea instanceof Array) {
@@ -403,31 +376,27 @@ MainLoop:
 					if (use || i < areas.length - 1) {
 						switch (exits[j].type) {
 						case 1:
-							targetExits = getArea(areas[i]).exits;
+							myRoom = getRoom(me.x, me.y);
+							myRoom = [myRoom.x * 5 + myRoom.xsize / 2, myRoom.y * 5 + myRoom.ysize / 2];
+							targetRoom = this.getNearestRoom(areas[i]);
 
-							if (!targetExits || !targetExits.length) {
-								return false;
+							if (targetRoom[0] > myRoom[0]) {
+								return this.moveTo(me.x + 10, me.y);
 							}
 
-							for (n = 0; n < targetExits.length; n += 1) {
-								if (targetExits[n].target === me.area) { // TODO: Add getNearestRoom back in
-									dest.angle = Math.round(Math.atan2(exits[j].y - targetExits[n].y, exits[j].x - targetExits[n].x) * 180 / Math.PI);
-									dest.x = Math.round((Math.cos((dest.angle + 180) * Math.PI / 180)) * 10 + targetExits[n].x);
-									dest.y = Math.round((Math.sin((dest.angle + 180) * Math.PI / 180)) * 10 + targetExits[n].y);
-
-									/*if (!this.moveToUnit(targetExits[n])) {
-										return false;
-									}*/
-
-									if (!this.moveTo(dest.x, dest.y, 3)) {
-										return false;
-									}
-
-									break;
-								}
+							if (targetRoom[0] < myRoom[0]) {
+								return this.moveTo(me.x - 10, me.y);
 							}
 
-							break;
+							if (targetRoom[1] > myRoom[1]) {
+								return this.moveTo(me.x, me.y + 10);
+							}
+
+							if (targetRoom[1] < myRoom[1]) {
+								return this.moveTo(me.x, me.y - 10);
+							}
+
+							return false;
 						case 2:
 							if (!this.useUnit(5, exits[j].tileid, areas[i])) {
 								return false;
@@ -443,6 +412,28 @@ MainLoop:
 		}
 
 		return true;
+	},
+
+	getNearestRoom: function (area) {
+		var x, y, dist,
+			room = getRoom(area),
+			minDist = 1000;
+
+		if (!room) {
+			return false;
+		}
+
+		do {
+			dist = getDistance(me, room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2);
+
+			if (dist < minDist) {
+				x = room.x * 5 + room.xsize / 2;
+				y = room.y * 5 + room.ysize / 2;
+				minDist = dist;
+			}
+		} while (room.getNext());
+
+		return [x, y];
 	},
 
 	useUnit: function (type, id, targetArea) {
@@ -644,37 +635,33 @@ MainLoop:
 
 		useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
 
-		if (useTK) {
-			if (getDistance(me, portal) > 14) {
-				Attack.getIntoPosition(portal, 14, 0x4);
-			}
-		} else if (getDistance(me, portal) > 3) {
-			this.moveToUnit(portal);
-		}
-
 		for (i = 0; i < 5; i += 1) {
-			/*if (portal.mode !== 2 && !portal.getParent()) { // Arcane Sanctuary, maybe some other portals
+			if (useTK) {
+				if (getDistance(me, portal) > 13) {
+					Attack.getIntoPosition(portal, 13, 0x4);
+				}
+
+				Skill.cast(43, 0, portal);
+			} else {
+				if (getDistance(me, portal) > 3) {
+					this.moveToUnit(portal);
+				}
+
+				portal.interact();
+			}
+
+			if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary, maybe some other portals
 				portal.interact();
 
 				tick = getTickCount();
 
-				while (getTickCount() - tick < 1000) {
+				while (getTickCount() - tick < 2000) {
 					if (portal.mode === 2) {
-						i = 0;
-
 						break;
 					}
 
 					delay(10);
 				}
-
-				continue;
-			}*/
-
-			if (useTK) {
-				Skill.cast(43, 0, portal);
-			} else {
-				portal.interact();
 			}
 
 			tick = getTickCount();
@@ -687,6 +674,10 @@ MainLoop:
 				}
 
 				delay(10);
+			}
+
+			if (i > 1) {
+				useTK = false;
 			}
 
 			//this.moveTo(me.x + rand(-1, 1) * 3, me.y + rand(-1, 1) * 3); // In case of client/server desync
@@ -714,7 +705,7 @@ MainLoop:
 						}
 
 						break;
-					default: // Pather.usePortal(null, owner) - any blue portal belonging to owner OR Pather.usePortal(area, owner) - blue portal mathcing area and owner
+					default: // Pather.usePortal(null, owner) - any blue portal belonging to owner OR Pather.usePortal(area, owner) - blue portal matching area and owner
 						if (portal.getParent() === owner && (owner === me.name || Misc.inMyParty(owner))) {
 							return copyUnit(portal);
 						}
@@ -747,14 +738,12 @@ MainLoop:
 			for (i = -distance; i <= distance; i += 1) {
 				for (j = -distance; j <= distance; j += 1) {
 					// Check outer layer only (skip previously checked)
-					if (Math.abs(i) < Math.abs(distance) && Math.abs(j) < Math.abs(distance)) {
-						continue;
-					}
+					if (Math.abs(i) >= Math.abs(distance) || Math.abs(j) >= Math.abs(distance)) {
+						if (this.checkSpot(x + i, y + j)) {
+							result = [x + i, y + j];
 
-					if (this.checkSpot(x + i, y + j)) {
-						result = [x + i, y + j];
-
-						break MainLoop;
+							break MainLoop;
+						}
 					}
 				}
 			}
