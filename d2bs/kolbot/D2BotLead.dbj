@@ -167,6 +167,8 @@ MainSwitch:
 				AutoMule.outOfGameCheck();
 
 				muleTrigger = false;
+
+				break;
 			}
 			// ### automule end ###
 
@@ -224,6 +226,8 @@ MainSwitch:
 				AutoMule.outOfGameCheck();
 
 				muleTrigger = false;
+
+				break;
 			}
 			// ### automule end ###
 
