@@ -96,7 +96,7 @@ MainLoop:
 			default:
 				failCount += 1;
 
-				if (failCount >= 30) {
+				if (failCount >= 45) {
 					D2Bot.printToConsole("No response from mule profile.");
 
 					break MainLoop;
