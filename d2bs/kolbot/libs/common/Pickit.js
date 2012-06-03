@@ -98,7 +98,7 @@ var Pickit = {
 						} else {
 							print("ÿc7Not enough room for " + item.name);
 
-							if (Automule.enabledProfiles.indexOf(me.profile) > -1) {
+							if (AutoMule.enabledProfiles.indexOf(me.profile) > -1) {
 								scriptBroadcast("mule");
 								quit();
 							}
