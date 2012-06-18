@@ -50,6 +50,9 @@ var D2Bot = {
 	},
 	updateCount: function () {
 		sendCopyData(null, "D2Bot #", 0, "updateCount");
+	},
+	shoutGlobal: function (msg, mode) {
+		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");
 	}
 };
 
@@ -236,24 +239,30 @@ var ControlAction = {
 			case 8: // main menu
 				ControlAction.clickRealm(realms[info.realm]);
 				this.click(6, 264, 366, 272, 35);
+
 				break;
 			case 9: // login screen
 				this.click(6, 264, 572, 272, 35);
+
 				break;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
+
 				break;
 			case 31: // ToU
 				this.click(6, 525, 513, 128, 35);
+
 				break;
 			case 32: // new account
 				this.setText(1, 322, 342, 162, 19, info.account);
 				this.setText(1, 322, 396, 162, 19, info.password);
 				this.setText(1, 322, 450, 162, 19, info.password);
 				this.click(6, 627, 572, 128, 35);
+
 				break;
 			case 33: // please read
 				this.click(6, 525, 513, 128, 35);
+
 				break;
 			case 34: // e-mail
 				if (getControl(6, 415, 412, 128, 35)) {
@@ -432,21 +441,26 @@ var ControlAction = {
 
 				break;
 			case 15: // new character
-				this.setText(1, 318, 510, 157, 16, info.charName);
+				if (getControl(6, 421, 337, 96, 32)) { // hardcore char warning
+					this.click(6, 421, 337, 96, 32);
+				} else {
+					this.setText(1, 318, 510, 157, 16, info.charName);
 
-				if (!info.expansion) {
-					this.click(6, 319, 540, 15, 16);
+					if (!info.expansion) {
+						this.click(6, 319, 540, 15, 16);
+					}
+
+					if (!info.ladder) {
+						this.click(6, 319, 580, 15, 16);
+					}
+
+					if (info.hardcore) {
+						this.click(6, 319, 560, 15, 16);
+					}
+
+					this.click(6, 627, 572, 128, 35);
 				}
 
-				if (!info.ladder) {
-					this.click(6, 319, 580, 15, 16);
-				}
-
-				if (info.hardcore) {
-					this.click(6, 319, 560, 15, 16);
-				}
-
-				this.click(6, 627, 572, 128, 35);
 				break;
 			default:
 				break;

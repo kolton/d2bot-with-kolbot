@@ -380,7 +380,11 @@ ModeLoop:
 							myRoom = [myRoom.x * 5 + myRoom.xsize / 2, myRoom.y * 5 + myRoom.ysize / 2];
 							targetRoom = this.getNearestRoom(areas[i]);
 
-							if (targetRoom[0] > myRoom[0]) {
+							this.moveTo(targetRoom[0], targetRoom[1], 0);
+							
+							break;
+
+							/*if (targetRoom[0] > myRoom[0]) {
 								return this.moveTo(me.x + 10, me.y);
 							}
 
@@ -396,7 +400,7 @@ ModeLoop:
 								return this.moveTo(me.x, me.y - 10);
 							}
 
-							return false;
+							return false;*/
 						case 2:
 							if (!this.useUnit(5, exits[j].tileid, areas[i])) {
 								return false;
