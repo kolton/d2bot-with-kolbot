@@ -10,8 +10,6 @@ var Attack = {
 
 	// Initialize attacks
 	init: function () {
-		include("common/CollMap.js");
-
 		if (include("common/Attacks/" + this.classes[me.classid] + ".js")) {
 			ClassAttack.init();
 		}
