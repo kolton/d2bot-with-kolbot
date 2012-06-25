@@ -1,6 +1,8 @@
 var StarterConfig = {
 	MinGameTime: 180, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
 	CreateGameDelay: 5, // Seconds to wait before creating a new game
+	ResetCount: 99, // Reset game count back to 1 every X games.
+	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
 
 	JoinChannel: "", // Name of the channel to join
 	FirstJoinMessage: "", // Message to say when first joining a channel, usually ".login"
@@ -146,7 +148,7 @@ function main() {
 }
 
 function locationAction(location) {
-	var i, string, text, gambleGame;
+	var i, control, string, text, gambleGame;
 
 MainSwitch:
 	switch (location) {
@@ -162,6 +164,10 @@ MainSwitch:
 		}
 
 		if (ingame) {
+			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
+				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
+			}
+
 			// ### automule ###
 			if (muleTrigger) {
 				AutoMule.outOfGameCheck();
@@ -178,10 +184,6 @@ MainSwitch:
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
-
-			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
-				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
-			}
 		}
 
 		// #### experimental gambling system start ####
@@ -221,6 +223,10 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby Chat");
 
 		if (ingame) {
+			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
+				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
+			}
+
 			// ### automule ###
 			if (muleTrigger) {
 				AutoMule.outOfGameCheck();
@@ -237,10 +243,6 @@ MainSwitch:
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
-
-			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
-				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
-			}
 		}
 
 		// #### experimental gambling system start ####
@@ -292,6 +294,24 @@ MainSwitch:
 	case 4: // Create Game
 		D2Bot.updateStatus("Creating Game");
 
+		control = getControl(1, 657, 342, 27, 20);
+
+		if (typeof StarterConfig.CharacterDifference === "number") {
+			if (control.disabled === 4) {
+				ControlAction.click(6, 431, 341, 15, 16);
+			}
+
+			ControlAction.setText(1, 657, 342, 27, 20, StarterConfig.CharacterDifference.toString());
+		} else if (StarterConfig.CharacterDifference === false && control.disabled === 5) {
+			ControlAction.click(6, 431, 341, 15, 16);
+		}
+
+		if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
+			gameCount = 1;
+
+			DataFile.updateStats("runs", gameCount);
+		}
+
 		while (!gameName) {
 			D2Bot.requestGameInfo();
 			delay(500);
@@ -310,6 +330,7 @@ MainSwitch:
 		lastGameStatus = "pending";
 
 		locationTimeout(5000, location);
+
 		break;
 	case 5: // Join Game
 		break;
