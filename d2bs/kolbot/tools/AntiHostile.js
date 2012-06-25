@@ -4,25 +4,27 @@
 *	@desc		handle hostile threats
 */
 
-function main() {
-	// Include libraries
-	include("json2.js");
-	include("NTItemParser.dbl");
-	include("OOG.js");
-	include("Gambling.js");
-	include("common/Attack.js");
-	include("common/Cubing.js");
-	include("common/Config.js");
-	include("common/Loader.js");
-	include("common/Misc.js");
-	include("common/Pickit.js");
-	include("common/Pather.js");
-	include("common/Precast.js");
-	include("common/Prototypes.js");
-	include("common/Runewords.js");
-	include("common/Storage.js");
-	include("common/Town.js");
+js_strict(true);
 
+include("json2.js");
+include("NTItemParser.dbl");
+include("OOG.js");
+include("Gambling.js");
+include("common/Attack.js");
+include("common/Cubing.js");
+include("common/Config.js");
+include("common/CollMap.js");
+include("common/Loader.js");
+include("common/Misc.js");
+include("common/Pickit.js");
+include("common/Pather.js");
+include("common/Precast.js");
+include("common/Prototypes.js");
+include("common/Runewords.js");
+include("common/Storage.js");
+include("common/Town.js");
+
+function main() {
 	// Variables and functions
 	var i, player, findTrigger, attackCount,
 		hostiles = [],
