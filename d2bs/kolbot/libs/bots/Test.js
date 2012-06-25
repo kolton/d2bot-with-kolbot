@@ -31,5 +31,10 @@ function Test() {
 }
 
 function test() {
-	print(Pather.moveToExit(me.area + 1, true))
+	var t = getTickCount();
+
+	Pickit.init();
+	
+	print(getTickCount() - t);
 }
+
