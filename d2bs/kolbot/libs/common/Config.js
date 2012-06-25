@@ -241,7 +241,7 @@ var Config = {
 		Wait: false
 	},
 	Enchant: {
-		Trigger: ".chant",
+		Triggers: ["chant", "cows", "wps"],
 		GameLength: 20
 	},
 	IPHunter: {

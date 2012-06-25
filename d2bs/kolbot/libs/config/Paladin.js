@@ -133,7 +133,7 @@ function LoadConfig() {
 	Scripts.Gamble = false; // Gambling system, other characters will mule gold into your game so you can gamble infinitely. See Gambling.js
 	Scripts.GhostBusters = false; // Kill ghosts in most areas that contain them
 	Scripts.Enchant = false;
-		Config.Enchant.Trigger = ".chant";
+		Config.Enchant.Triggers = ["chant", "cows", "wps"]; // Chat commands for enchant, cow level and waypoint giving
 		Config.Enchant.GameLength = 20; // Game length in minutes
 	Scripts.IPHunter = false;
 		Config.IPHunter.IPList = []; // List of IPs to look for. example: [165, 201, 64]
