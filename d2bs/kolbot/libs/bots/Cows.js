@@ -33,13 +33,35 @@ function Cows() {
 
 		return finalRooms;
 	};
-	
+
 	this.clearCowLevel = function () {
-		var room, result,
+		if (Config.MFLeader) {
+			Pather.makePortal();
+			say("cows");
+		}
+
+		var room, result, myRoom,
 			rooms = this.buildCowRooms();
 
-		while (rooms.length) {
-			rooms.sort(Sort.points);
+		function RoomSort(a, b) {
+			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
+		}
+
+		while (rooms.length > 0) {
+			// get the first room + initialize myRoom var
+			if (!myRoom) {
+				room = getRoom(me.x, me.y);
+			}
+
+			if (room) {
+				if (room instanceof Array) { // use previous room to calculate distance
+					myRoom = [room[0], room[1]];
+				} else { // create a new room to calculate distance (first room, done only once)
+					myRoom = [room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2];
+				}
+			}
+
+			rooms.sort(RoomSort);
 			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 10, 2);
@@ -47,7 +69,7 @@ function Cows() {
 			if (result) {
 				Pather.moveTo(result[0], result[1], 3);
 
-				if (!Attack.clear(25)) {
+				if (!Attack.clear(30)) {
 					return false;
 				}
 			}
@@ -176,6 +198,29 @@ function Cows() {
 	var leg, tome;
 
 	// we can begin now
+	if (me.getQuest(4, 10)) { // king dead or cain not saved
+		throw new Error("Already killed the Cow King.");
+	}
+
+	if (!me.getQuest(4, 0)) {
+		throw new Error("Cain quest incomplete");
+	}
+
+	switch (me.gametype) {
+	case 0: // classic
+		if (!me.getQuest(26, 0)) { // diablo not completed
+			throw new Error("Diablo quest incomplete.");
+		}
+
+		break;
+	case 1: // expansion
+		if (!me.getQuest(40, 0)) { // baal not completed
+			throw new Error("Baal quest incomplete.");
+		}
+
+		break;
+	}
+
 	Town.doChores();
 
 	leg = this.getLeg();

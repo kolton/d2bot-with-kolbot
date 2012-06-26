@@ -1,3 +1,9 @@
+/**
+*	@filename	MFHelper.js
+*	@author		kolton
+*	@desc		help another player kill bosses or clear areas
+*/
+
 function MFHelper() {
 	var player, playerAct, split,
 		oldCommand = "",
@@ -38,6 +44,76 @@ function MFHelper() {
 		return false;
 	};
 
+	this.buildCowRooms = function () {
+		var i, j, room, kingPreset, badRooms, badRooms2,
+			finalRooms = [],
+			indexes = [];
+
+		kingPreset = getPresetUnit(me.area, 1, 773);
+		badRooms = getRoom(kingPreset.roomx * 5 + kingPreset.x, kingPreset.roomy * 5 + kingPreset.y).getNearby();
+
+		for (i = 0; i < badRooms.length; i += 1) {
+			badRooms2 = badRooms[i].getNearby();
+
+			for (j = 0; j < badRooms2.length; j += 1) {
+				if (indexes.indexOf(badRooms2[j].x + "" + badRooms2[j].y) === -1) {
+					indexes.push(badRooms2[j].x + "" + badRooms2[j].y);
+				}
+			}
+		}
+
+		room = getRoom();
+
+		do {
+			if (indexes.indexOf(room.x + "" + room.y) === -1) {
+				finalRooms.push([room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2]);
+			}
+		} while (room.getNext());
+
+		return finalRooms;
+	};
+
+	this.clearCowLevel = function () {
+		var room, result, myRoom,
+			rooms = this.buildCowRooms();
+
+		function RoomSort(a, b) {
+			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
+		}
+
+		while (rooms.length > 0) {
+			// get the first room + initialize myRoom var
+			if (!myRoom) {
+				room = getRoom(me.x, me.y);
+			}
+
+			if (room) {
+				if (room instanceof Array) { // use previous room to calculate distance
+					myRoom = [room[0], room[1]];
+				} else { // create a new room to calculate distance (first room, done only once)
+					myRoom = [room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2];
+				}
+			}
+
+			rooms.sort(RoomSort);
+			room = rooms.shift();
+
+			result = Pather.getNearestWalkable(room[0], room[1], 10, 2);
+
+			if (result) {
+				Pather.moveTo(result[0], result[1], 3);
+
+				if (!Attack.clear(30)) {
+					return false;
+				}
+			}
+		}
+
+		CollMap.reset();
+
+		return true;
+	};
+
 	addEventListener("chatmsg", ChatEvent);
 	Town.doChores();
 	Town.move("portalspot");
@@ -67,7 +143,12 @@ MainLoop:
 
 				split = command.split("kill ")[1];
 				
-				Pather.usePortal(player.area, player.name);
+				if (!Pather.usePortal(player.area, player.name)) {
+					me.overhead("Failed to use TP");
+
+					break;
+				}
+
 				Precast.doPrecast(false);
 
 				try {
@@ -91,10 +172,16 @@ MainLoop:
 			case command.indexOf("clearlevel") > -1:
 				print("Received command: clearlevel");
 				delay(500);
-				Pather.usePortal(player.area, player.name);
+
+				if (!Pather.usePortal(player.area, player.name)) {
+					me.overhead("Failed to use TP");
+
+					break;
+				}
+
 				Precast.doPrecast(false);
 				Attack.clearLevel(Config.ClearType);
-				delay(1000);
+				Precast.doPrecast(true);
 
 				if (!Pather.usePortal(null, player.name)) {
 					Town.goToTown();
@@ -107,7 +194,12 @@ MainLoop:
 
 				split = command.split("clear ")[1]
 
-				Pather.usePortal(player.area, player.name);
+				if (!Pather.usePortal(player.area, player.name)) {
+					me.overhead("Failed to use TP");
+
+					break;
+				}
+
 				Precast.doPrecast(false);
 
 				try {
@@ -129,6 +221,25 @@ MainLoop:
 				break;
 			case command.indexOf("quit") > -1:
 				break MainLoop;
+			case command.indexOf("cows") > -1:
+				print("Received command: clear cows");
+				delay(500);
+
+				if (!Pather.usePortal(39)) {
+					me.overhead("Failed to use the portal");
+
+					break;
+				}
+
+				Precast.doPrecast(false);
+				this.clearCowLevel();
+				delay(1000);
+
+				if (!Pather.usePortal(null, player.name)) {
+					Town.goToTown();
+				}
+
+				break;
 			}
 		}
 
