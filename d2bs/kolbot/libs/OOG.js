@@ -195,11 +195,13 @@ var ControlAction = {
 			case 8: // main menu
 				ControlAction.clickRealm(realms[info.realm]);
 				this.click(6, 264, 366, 272, 35); // OK
+
 				break;
 			case 9: // login screen
 				this.setText(1, 322, 342, 162, 19, info.account);
 				this.setText(1, 322, 396, 162, 19, info.password);
 				this.click(6, 264, 484, 272, 35); // log in
+
 				break;
 			case 10: // login error - acc doesn't exist? TODO: handle all login errors
 				this.click(6, 335, 412, 128, 35); // OK
@@ -209,6 +211,7 @@ var ControlAction = {
 				return false;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
+
 				break;
 			default:
 				break;
@@ -325,7 +328,7 @@ var ControlAction = {
 
 		return list;
 	},
-	
+
 	// get character position
 	getPosition: function () {
 		var control, text,
@@ -401,29 +404,37 @@ var ControlAction = {
 			case 12: // character select
 			case 42: // empty character select
 				this.click(6, 33, 528, 168, 60);
+
 				break;
 			case 29: // select character
 				switch (info.charClass) {
 				case "barbarian":
 					clickCoords = [400, 280];
+
 					break;
 				case "amazon":
 					clickCoords = [100, 280];
+
 					break;
 				case "necromancer":
 					clickCoords = [300, 290];
+
 					break;
 				case "sorceress":
 					clickCoords = [620, 270];
+
 					break;
 				case "assassin":
 					clickCoords = [200, 280];
+
 					break;
 				case "druid":
 					clickCoords = [700, 280];
+
 					break;
 				case "paladin":
 					clickCoords = [521, 260];
+
 					break;
 				}
 
@@ -462,6 +473,12 @@ var ControlAction = {
 				}
 
 				break;
+			case 30: // char name exists
+				ControlAction.click(6, 351, 337, 96, 32);
+
+				me.blockMouse = false;
+
+				return false;
 			default:
 				break;
 			}
