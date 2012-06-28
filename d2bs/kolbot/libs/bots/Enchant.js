@@ -16,6 +16,12 @@ function Enchant() {
 
 		unit = getUnit(0, nick);
 
+		if (!unit) {
+			say("Get closer.");
+
+			return false;
+		}
+
 		if (unit) {
 			do {
 				if (unit.mode !== 0 && unit.mode !== 17) { // player is alive
@@ -293,7 +299,7 @@ MainLoop:
 
 	while (true) {
 		while (greet.length > 0) {
-			say("/w " + greet.shift() + " Welcome to my chant games! For a list of commands say 'help'");
+			say("Welcome, " + greet.shift() + "! For a list of commands say 'help'");
 		}
 
 		if (command) {
@@ -324,8 +330,9 @@ MainLoop:
 
 		command = "";
 
-		if (getTickCount() - me.gamestarttime >= Config.Enchant.GameLength * 1e6) {
+		if (getTickCount() - me.gamestarttime >= Config.Enchant.GameLength * 6e4) {
 			say("Next Game!");
+			delay(1000);
 
 			break;
 		}
