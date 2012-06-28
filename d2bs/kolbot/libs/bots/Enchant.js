@@ -5,6 +5,10 @@
 */
 
 function Enchant() {
+	var command, busy, hostile,
+		wpNicks = {},
+		greet = [];
+
 	this.enchant = function (nick) {
 		var unit;
 
@@ -189,8 +193,43 @@ function Enchant() {
 		return false;
 	};
 
+	this.getWpNick = function (nick) {
+		if (wpNicks.hasOwnProperty(nick)) {
+			if (wpNicks[nick].requests > 4) {
+				return "maxrequests";
+			}
+
+			if (getTickCount() - wpNicks[nick].timer < 60000) {
+				return "mintime";
+			}
+
+			return true;
+		}
+
+		return false;
+	};
+
+	this.addWpNick = function (nick) {
+		wpNicks[nick] = {timer: getTickCount(), requests: 0};
+	};
+
 	this.giveWps = function (nick) {
 		var i, act, timeout, wpList;
+
+		switch (this.getWpNick(nick)) {
+		case "maxrequests":
+			say(nick + ", you have spent all your waypoint requests for this game.");
+
+			return false;
+		case "mintime":
+			say(nick + ", you may request waypoints every 60 seconds.");
+
+			return false;
+		case false:
+			this.addWpNick(nick);
+
+			break;
+		}
 
 		act = this.getPlayerAct(nick);
 
@@ -219,6 +258,10 @@ function Enchant() {
 
 MainLoop:
 		for (i = 0; i < wpList.length; i += 1) {
+			if (this.checkHostiles()) {
+				break;
+			}
+
 			try {
 				Pather.useWaypoint(wpList[i], true);
 				Pather.makePortal();
@@ -248,6 +291,9 @@ MainLoop:
 		Town.doChores();
 		Town.move("portalspot");
 
+		wpNicks[nick].requests += 1;
+		wpNicks[nick].timer = getTickCount();
+
 		return true;
 	};
 
@@ -259,11 +305,17 @@ MainLoop:
 				if (unit.name === name) {
 					if (unit.area <= 39) {
 						return 1;
-					} else if (unit.area >= 40 && unit.area <= 74) {
+					}
+
+					if (unit.area >= 40 && unit.area <= 74) {
 						return 2;
-					} else if (unit.area >= 75 && unit.area <= 102) {
+					}
+
+					if (unit.area >= 75 && unit.area <= 102) {
 						return 3;
-					} else if (unit.area >= 103 && unit.area <= 108) {
+					}
+
+					if (unit.area >= 103 && unit.area <= 108) {
 						return 4;
 					}
 
@@ -275,8 +327,19 @@ MainLoop:
 		return false;
 	};
 
-	var command,
-		greet = [];
+	this.checkHostiles = function () {
+		var party = getParty();
+
+		if (party) {
+			do {
+				if (party.name !== me.name && getPlayerFlag(me.gid, party.gid, 8)) {
+					return party.name;
+				}
+			} while (party.getNext());
+		}
+
+		return false;
+	};
 
 	function ChatEvent(nick, msg) {
 		command = [msg, nick];
@@ -285,7 +348,9 @@ MainLoop:
 	function GreetEvent(mode, param1, param2, name1, name2) {
 		switch (mode) {
 		case 0x02:
-			greet.push(name1);
+			if (!busy) {
+				greet.push(name1);
+			}
 
 			break;
 		}
@@ -310,6 +375,14 @@ MainLoop:
 
 				break;
 			case "cows":
+				hostile = this.checkHostiles();
+
+				if (hostile) {
+					say("Command disabled because " + hostile + " is a transvestite.");
+
+					break;
+				}
+
 				if (!this.openPortal()) {
 					say("Failed to open cow portal");
 				}
@@ -322,7 +395,19 @@ MainLoop:
 
 				break;
 			case "wps":
+				hostile = this.checkHostiles();
+
+				if (hostile) {
+					say("Command disabled because " + hostile + " is a transvestite.");
+
+					break;
+				}
+
+				busy = true;
+
 				this.giveWps(command[1]);
+
+				busy = false;
 
 				break;
 			}

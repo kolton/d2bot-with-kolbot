@@ -187,6 +187,7 @@ function main() {
 			if (status === "loading") {
 				status = "ready";
 
+				D2Bot.printToConsole("In mule game.");
 				Storage.Init();
 			}
 
@@ -201,6 +202,7 @@ function main() {
 			case "done":
 				sendCopyData(null, muler, 0, "quit");
 				delay(500);
+				D2Bot.printToConsole("Done muling.");
 				D2Bot.stop();
 
 				break;
@@ -212,6 +214,7 @@ function main() {
 				obj.fullChars.push(me.name);
 				MuleData.write(obj);
 				nextChar();
+				D2Bot.printToConsole("Mule full, getting next character.");
 				quit();
 
 				break;
@@ -229,13 +232,16 @@ function locationAction(location) {
 	switch (location) {
 	case 1:
 	case 3:
-	case 4:
 		if (makeNext) {
 			ControlAction.click(6, 693, 490, 80, 20);
 
 			break;
 		}
 
+		ControlAction.click(6, 652, 469, 120, 20); // Join
+
+		break;
+	case 4:
 		delay(2000);
 		createGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
 		delay(2000);
@@ -270,6 +276,7 @@ function locationAction(location) {
 		if (!ControlAction.loginAccount(info)) {
 			ControlAction.makeAccount(info);
 			FileTools.writeText("mules/" + info.account + ".txt", "");
+			D2Bot.printToConsole("Made account: " + info.account);
 		}
 
 		break;
@@ -278,6 +285,8 @@ function locationAction(location) {
 
 		break;
 	case 12: // char select
+	case 15: // new character (selected)
+	case 29: // new character (list)
 	case 42: // empty char screen
 		obj = MuleData.read();
 
@@ -310,8 +319,14 @@ function locationAction(location) {
 		if (ControlAction.findCharacter(info)) {
 			ControlAction.loginCharacter(info);
 		} else {
-			ControlAction.makeCharacter(info);
+			if (!ControlAction.makeCharacter(info)) {
+				nextChar();
+
+				break;
+			}
+
 			FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
+			D2Bot.printToConsole("Made character: " + info.charName);
 		}
 
 		break;
@@ -319,8 +334,12 @@ function locationAction(location) {
 		ControlAction.click(6, 652, 469, 120, 20); // Join
 
 		break;
+	case 28: // Lobby - Game Does Not Exist
+		ControlAction.click(6, 533, 469, 120, 20);
+
+		break;
 	case 30: // charname already exists
-		// todo
+		ControlAction.click(6, 351, 337, 96, 32);
 
 		break;
 	}
