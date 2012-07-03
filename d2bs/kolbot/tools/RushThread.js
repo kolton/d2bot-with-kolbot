@@ -85,7 +85,7 @@ function main() {
 			delay(250);
 		}
 
-		Attack.kill("andariel");
+		Attack.kill(156);
 		Pather.moveTo(22587, 9577);
 		Pather.usePortal(null, me.name);
 		say("a2");
@@ -239,7 +239,7 @@ function main() {
 			delay(250);
 		}
 
-		Attack.clear(15, 0, "the summoner");
+		Attack.clear(15, 0, 250);
 
 		while (this.playerIn()) {
 			delay(250);
@@ -298,7 +298,7 @@ function main() {
 		}
 
 		Pather.useUnit(2, 100, 73);
-		Attack.kill("duriel");
+		Attack.kill(211);
 		// duriel's cave is... awkward. it allows tele only to specific spots
 		Pather.moveTo(22629, 15712);
 		Pather.moveTo(22612, 15709);
@@ -379,7 +379,7 @@ function main() {
 			delay(250);
 		}
 
-		Attack.kill("mephisto");
+		Attack.kill(242);
 		say("a4");
 		Pather.moveTo(17591, 8070);
 		delay(2000);
@@ -552,9 +552,9 @@ function main() {
 			delay(500);
 		}
 
-		Attack.kill("diablo");
+		Attack.kill(243);
 
-		if (!Pather.makePortal(null, me.name)) {
+		if (!Pather.usePortal(null, me.name)) {
 			Town.goToTown();
 		}
 
