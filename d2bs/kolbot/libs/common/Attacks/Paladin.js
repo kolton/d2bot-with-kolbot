@@ -123,7 +123,11 @@ var ClassAttack = {
 			}
 
 			if (!this.checkHammerPosition(unit)) {
-				this.getHammerPosition(unit);
+				if (!this.getHammerPosition(unit)) {
+					print("can't get to " + unit.name);
+
+					return 0;
+				}
 
 				if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
 					return false;
@@ -138,7 +142,7 @@ var ClassAttack = {
 				Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
 
 				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5) {
-					return true;
+					break;
 				}
 			}
 
@@ -171,10 +175,10 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 1, y + 1], [x - 1, y - 1], [x + 2, y]];
+			positions = [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 4, y]];
 
 		for (i = 0; i < positions.length; i += 1) {
-			if (getDistance(me, positions[i][0], positions[i][1]) < 2) {
+			if (getDistance(me, positions[i][0], positions[i][1]) < 1) {
 				return true;
 			}
 		}
@@ -186,7 +190,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 1, y + 1], [x - 1, y - 1], [x + 2, y]];
+			positions = [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 4, y]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (Attack.validSpot(positions[i][0], positions[i][1])) {
@@ -206,12 +210,17 @@ var ClassAttack = {
 			delay(40);
 		}
 
-		if (getDistance(me, x, y) > 1) {
-			if (me.gametype === 1) {
-				return Pather.moveTo(x, y, 1);
+		if (getDistance(me, x, y) > 0) {
+			if (typeof this.enigma === "undefined") {
+				this.enigma = Pather.checkEnigma();
 			}
 
-			me.move(x, y);
+			if (Pather.teleport && !me.inTown && me.getSkill(54, 1) && (me.classid === 1 || this.enigma)) {
+				//Pather.teleportTo(x, y);
+				Skill.cast(54, 0, x, y);
+			} else {
+				me.move(x, y);
+			}
 		}
 
 		while (!me.idle) {

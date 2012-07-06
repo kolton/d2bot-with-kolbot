@@ -193,7 +193,7 @@ var Misc = {
 		return false;
 	},
 
-	// OPen a chest Unit
+	// Open a chest Unit
 	openChest: function (unit) {
 		if (!unit || unit.mode || unit.x === 12526 || unit.x === 12565) { // Skip invalid, opened and Countess chests
 			return false;
@@ -325,23 +325,136 @@ var Misc = {
 
 	// Log kept item stats in the manager. It's buggy.
 	logItem: function (action, unit) { // hackit to the max
-		var val,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""),
+		var val, code,
+			color = -1,
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, ""),
 			desc = "";
 
-		desc += (Pickit.itemColor(unit) + unit.fname.split("\n").reverse().join("\n").replace(/ÿc[0-9!"+<;.*]/, "") + "ÿc0");
-		val = unit.getStat(31);
-
-		if (val) {
-			desc += ("\nDefense: " + val);
+		if (unit.getFlag(0x4000000)) { // runeword
+			desc += ("ÿc4" + unit.fname.split("\n").reverse().join("\nÿc5").replace(/ÿc[0-9!"+<;.*]/, "") + "ÿc0");
+		} else {
+			desc += (Pickit.itemColor(unit, false) + unit.fname.split("\n").reverse().join("\n").replace(/ÿc[0-9!"+<;.*]/, "") + "ÿc0");
 		}
 
-		if (unit.getStat(21)) {
-			desc += ("\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
-		}
+		switch (unit.itemType) {
+		case 2: // shield
+		case 69: // voodoo shield
+		case 70: // paladin shield
+			val = unit.getStat(31);
 
-		if (unit.getStat(23)) {
-			desc += ("\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
+			if (val) {
+				desc += ("\nDefense: " + val);
+			}
+
+			val = 20 + unit.getStat(20);
+
+			switch (me.classid) {
+			case 0:
+			case 4:
+			case 6:
+				val += 5;
+
+				break;
+			case 3:
+				val += 10;
+
+				break;
+			}
+
+			desc += ("\nChance to Block: ÿc3" + Math.min(val, 75) + "%ÿc0");
+
+			if (unit.getStat(72)) {
+				desc += ("\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
+			}
+
+			color = unit.getColor();
+
+			break;
+		case 3: // armor
+		case 37: // helm
+		case 71: // primal helm
+		case 72: // pelt
+		case 75: // circlet
+		case 15: // boots
+		case 16: // belt
+		case 19: // gloves
+			val = unit.getStat(31);
+
+			if (val) {
+				desc += ("\nDefense: " + val);
+			}
+
+			if (unit.getStat(72)) {
+				desc += ("\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
+			}
+
+			color = unit.getColor();
+
+			break;
+		// weapons
+		case 24:
+		case 25:
+		case 26:
+		case 28:
+		case 29:
+		case 30:
+		case 31:
+		case 32:
+		case 33:
+		case 34:
+		case 36:
+		case 67: // handtohand - claws with no staffmods
+		case 68:
+		case 86:
+		case 87:
+		case 88: // assassinclaw - claws with staffmods
+			if (unit.getStat(21)) {
+				desc += ("\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
+			}
+
+			if (unit.getStat(23)) {
+				desc += ("\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
+			}
+
+			if (unit.getStat(72)) {
+				desc += ("\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
+			}
+
+			color = unit.getColor();
+
+			break;
+		// missile
+		case 27:
+		case 35:
+		case 85:
+			if (unit.getStat(23)) {
+				desc += ("\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
+			}
+
+			color = unit.getColor();
+
+			break;
+		// throwing
+		case 42:
+		case 43:
+		case 44:
+			if (unit.getStat(21)) {
+				desc += ("\nThrow Damage: " + unit.getStat(159) + " to " + unit.getStat(160));
+			}
+
+			if (unit.getStat(21)) {
+				desc += ("\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
+			}
+
+			if (unit.getStat(70)) {
+				desc += ("\nQuantity: " + unit.getStat(70));
+			}
+
+			color = unit.getColor();
+
+			break;
+		default:
+			break;
 		}
 
 		val = getBaseStat("items", unit.classid, 52);
@@ -358,34 +471,40 @@ var Misc = {
 
 		val = unit.getStat(92);
 
-		if (val) {
+		if (val > 1 && unit.getFlag(0x10)) {
 			desc += ("\nRequired Level: " + val);
 		}
 
 		desc += ("ÿc3" + unit.description.split("\n").reverse().join("\n") + "ÿc0");
+
+		if (unit.getFlag(0x400000)) {
+			desc += "\nÿc3Ethereal (Cannot be Repaired)ÿc0";
+		}
+
 		val = unit.getStat(194);
 
 		if (val) {
-			desc += ("\nSockets: " + val);
+			desc += ((unit.getFlag(0x400000) ? "ÿc3, " : "\nÿc3") + "Socketed (" + val + ")ÿc0");
 		}
 
 		if (!unit.getFlag(0x10)) {
 			desc += "\nÿc1Unidentifiedÿc0";
 		}
 
-		if (unit.getFlag(0x400000)) {
-			desc += "\nÿc3Etherealÿc0";
-		}
-
 		desc += ("\nItem Level: " + unit.ilvl);
 
-		val = DataFile.getStats().lastArea;
+		if (action === "Kept") {
+			val = DataFile.getStats().lastArea;
 
-		if (val) {
-			desc += ("\nArea: " + val);
+			if (val) {
+				desc += ("\nArea: " + val);
+			}
 		}
 
-		D2Bot.printToItemLog(action + " " + name + "$" + desc);
+		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
+		code = code.replace(" ", "");
+
+		D2Bot.printToItemLog(action + " " + name, desc, code, 0, color);
 	},
 
 	// Change into werewolf or werebear
@@ -455,10 +574,6 @@ var Misc = {
 			needhp = true,
 			needmp = true;
 
-		if (tpchicken && ((Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) || (Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
-			check = true;
-		}
-
 		if (Config.TownCheck && !me.inTown) {
 			if (Config.BeltColumn.indexOf("hp") > -1) {
 				potion = me.getItem(-1, 2); // belt item
@@ -501,6 +616,10 @@ var Misc = {
 			}
 		}
 
+		/*if (tpchicken && ((Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) || (Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
+			check = true;
+		}
+
 		if (check) {
 			Town.goToTown();
 			Town.heal();
@@ -518,7 +637,7 @@ var Misc = {
 			}
 
 			return true;
-		}
+		}*/
 
 		return false;
 	}

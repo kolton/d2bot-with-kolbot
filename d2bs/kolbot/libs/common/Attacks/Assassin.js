@@ -21,30 +21,36 @@ var ClassAttack = {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 251: // Fire Blast
 			case 256: // Shock Web
 			case 257: // Blade Sentinel
 			case 266: // Blade Fury
 				this.skillRange[i] = 15;
+
 				break;
 			case 255: // Dragon Talon
 			case 260: // Dragon Claw
 			case 270: // Dragon Tail
 				this.skillRange[i] = 3;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 273: // Mind Blast
 			case 253: // Psychic Hammer
 			case 275: // Dragon Flight
 				this.skillRange[i] = 20;
+
 				break;
 			// oskills
 			case 151: // Whirlwind
 				this.skillRange[i] = 10;
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
+
 				break;
 			}
 		}
@@ -76,7 +82,7 @@ var ClassAttack = {
 
 		if (checkTraps) {
 			if (Math.round(getDistance(me, unit)) > 20 || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, 20, 0x4)) {
+				if (!Attack.getIntoPosition(unit, 20, 0x4) || checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
 					return 1;
 				}
 			}

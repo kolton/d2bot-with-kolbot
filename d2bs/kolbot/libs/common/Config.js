@@ -8,9 +8,14 @@ var Scripts = {};
 
 var Config = {
 	init: function (notify) {
-		var classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
+		var prefix = "",
+			classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
-		if (!FileTools.exists("libs/config/" + classes[me.classid] + "." + me.charname + ".js")) {
+		if (FileTools.exists("libs/config/" + me.realm + "." + classes[me.classid] + "." + me.charname + ".js")) {
+			prefix = me.realm + ".";
+		}
+
+		if (!FileTools.exists("libs/config/" + prefix + classes[me.classid] + "." + me.charname + ".js")) {
 			if (notify) {
 				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!");
 				print("ÿc1Loading default config.");
@@ -24,9 +29,9 @@ var Config = {
 		}
 
 		try {
-			include("config/" + classes[me.classid] + "." + me.charname + ".js");
+			include("config/" + prefix + classes[me.classid] + "." + me.charname + ".js");
 		} catch (e1) {
-			throw new Error("Failed to load default config.");
+			throw new Error("Failed to load character config.");
 		}
 
 		try {

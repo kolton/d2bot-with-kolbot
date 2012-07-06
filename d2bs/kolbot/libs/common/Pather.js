@@ -11,6 +11,10 @@ var Pather = {
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 
 	moveTo: function (x, y, retry, clearPath, pop) {
+		if (typeof this.enigma === "undefined") {
+			this.enigma = this.checkEnigma();
+		}
+
 		if (getDistance(me, x, y) < 2) {
 			return true;
 		}
@@ -43,7 +47,7 @@ var Pather = {
 			node = {x: x, y: y},
 			fail = 0;
 
-		this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1) && (me.classid === 1 || this.checkEnigma());
+		this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1) && (me.classid === 1 || this.enigma);
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -230,7 +234,7 @@ ModeLoop:
 						return false;
 					}
 
-					this.walkTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1)); // recursion motherfuckers
+					me.move(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1));
 
 					break ModeLoop;
 				}
@@ -651,7 +655,8 @@ ModeLoop:
 					this.moveToUnit(portal);
 				}
 
-				portal.interact();
+				//portal.interact();
+				sendPacket(1, 0x13, 4, 2, 4, portal.gid);
 			}
 
 			if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary, maybe some other portals

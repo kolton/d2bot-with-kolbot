@@ -195,12 +195,13 @@ function NTIP_CheckQuantityOwned(item_type, item_stats, check_inventory_too)
 
 function NTIPParseLineInt(input)
 {
-	var i;
+	var i, property;
 	var _start, _end;
 	var _section, _keyword;
 	var _result;
 
 	_end = input.indexOf("//");
+
 	if(_end != -1)
 		input = input.substring(0, _end);
 
@@ -220,22 +221,30 @@ function NTIPParseLineInt(input)
 		for(i = 1 ; i < _section.length ; i++)
 		{
 			_end = _section[i].indexOf("]") + 1;
+			property = _section[i].substring(0, _end - 1);
 
-			switch(_section[i][0])
-			{
-			case 't':
+			switch (property) {
+			case 'color':
+				_result[0] += "item.getColor()";
+
+				break;
+			case 'type':
 				_result[0] += "item.itemType";
+
 				break;
-			case 'n':
+			case 'name':
 				_result[0] += "item.classid";
+
 				break;
-			case 'c':
+			case 'class':
 				_result[0] += "item.itemclass";
+
 				break;
-			case 'q':
+			case 'quality':
 				_result[0] += "item.quality";
+
 				break;
-			case 'f':
+			case 'flag':
 				if(_section[i][_end] == '!')
 					_result[0] += "!item.getFlag(";
 				else
@@ -244,10 +253,11 @@ function NTIPParseLineInt(input)
 				_end += 2;
 
 				break;
-			case 'l':
+			case 'level':
 				_result[0] += "item.ilvl";
+
 				break;
-			case 'p':
+			case 'prefix':
 				//_result[0] += "item.prefixnum";
 				if(_section[i][_end] == '!')
 					_result[0] += "!item.getPrefix(";
@@ -257,7 +267,7 @@ function NTIPParseLineInt(input)
 				_end += 2;
 
 				break;
-			case 's':
+			case 'suffix':
 				//_result[0] += "item.suffixnum";
 				if(_section[i][_end] == '!')
 					_result[0] += "!item.getSuffix(";
@@ -269,6 +279,7 @@ function NTIPParseLineInt(input)
 				break;
 			default:
 				print("Unknown Keyword : " + input);
+
 				break;
 			}
 
@@ -287,12 +298,18 @@ function NTIPParseLineInt(input)
 			}
 
 			_keyword = _section[i].substring(_start, _end);
+			
+			if (isNaN(_keyword)) {
+				switch (property) {
+				case 'color':
+					if (typeof _NTIPAliasColor[_keyword] === "undefined") {
+						_result[0] += "false";
+					} else {
+						_result[0] += _NTIPAliasColor[_keyword];
+					}
 
-			if(isNaN(_keyword))
-			{
-				switch(_section[i][0])
-				{
-				case 't':
+					break;
+				case 'type':
 					if (typeof _NTIPAliasType[_keyword] === "undefined") {
 						_result[0] += "false";
 					} else {
@@ -300,7 +317,7 @@ function NTIPParseLineInt(input)
 					}
 
 					break;
-				case 'n':
+				case 'name':
 					if (typeof _NTIPAliasClassID[_keyword] === "undefined") {
 						_result[0] += "false";
 					} else {
@@ -308,7 +325,7 @@ function NTIPParseLineInt(input)
 					}
 
 					break;
-				case 'c':
+				case 'class':
 					if (typeof _NTIPAliasClass[_keyword] === "undefined") {
 						_result[0] += "false";
 					} else {
@@ -316,7 +333,7 @@ function NTIPParseLineInt(input)
 					}
 
 					break;
-				case 'q':
+				case 'quality':
 					if (typeof _NTIPAliasQuality[_keyword] === "undefined") {
 						_result[0] += "false";
 					} else {
@@ -324,7 +341,7 @@ function NTIPParseLineInt(input)
 					}
 
 					break;
-				case 'f':
+				case 'flag':
 					if (typeof _NTIPAliasFlag[_keyword] === "undefined") {
 						_result[0] += "false)";
 					} else {
@@ -333,13 +350,12 @@ function NTIPParseLineInt(input)
 
 					break;
 				}
-			}
-			else
-			{
-				if(_section[i][0] == 'f' || _section[i][0] == 'p' || _section[i][0] == 's')
+			} else {
+				if (property == 'flag' || property == 'prefix' || property == 'suffix') {
 					_result[0] += _keyword + ")";
-				else
+				} else {
 					_result[0] += _keyword;
+				}
 			}
 
 			_result[0] += _section[i].substring(_end);
@@ -425,3 +441,175 @@ Unit.prototype.__defineGetter__('itemclass',
 		}
 	}
 );
+
+/*
+	0 = Black
+	1 = White
+	2 = Orange
+	
+	3 = Light Yellow
+	4 = Light Red
+	5 = Light Gold
+	6 = Light Blue
+	7 = Light Purple
+	
+	8 = Crystal Blue
+	9 = Crystal Red
+	10 = Crystal Green
+	
+	11 = Dark Yellow
+	12 = Dark Red
+	13 = Dark Gold
+	14 = Dark Green
+	15 = Dark Blue
+*/
+
+Unit.prototype.getColor = function () {
+	var i,
+		colors = {
+			"Saintly": 13,
+			"Holy": 13,
+			"Godly": 13,
+			"Visionary": 1,
+			"Glowing": 3,
+			"Mnemonic": 8,
+			"Psychic": 5,
+			"Veteran's": 5,
+			"of the Mammoth": 9,
+			"of Frost Shield": 6,
+			"of Nova Shield": 8,
+			"Faithful": 1,
+			"Dragon's": 8,
+			"of Spikes": 2,
+			"of Razors": 2,
+			"of Swords": 2,
+			"of Stability": 11,
+			"of the Colosuss": 9,
+			"of the Squid": 9,
+			"of Defiance": 12,
+			"of the Titan": 13,
+			"Vulpine": 8,
+			"Shimmering	": 7,
+			"Rainbow": 7,
+			"Scintillating": 7,
+			"Prismatic": 7,
+			"Warden's": 5,
+			"Hawk Branded": 5,
+			"Commander's": 5,
+			"Priest's": 10,
+			"Caretaker's": 5,
+			"Terrene": 5,
+			"Feral": 5,
+			"Hierophant's": 10,
+			"Resonant": 5,
+			"Raging	": 5,
+			"Veteran's": 5,
+			"Berserker's": 10,
+			"Blighting": 5,
+			"Noxious": 5,
+			"Mojo": 5,
+			"Necromancer's": 10,
+			"Sensei's": 5,
+			"Bowyer's": 5,
+			"Gymnastic": 5,
+			"Spearmaiden's": 5,
+			"Athlete's": 5,
+			"Archer's": 5,
+			"Kenshi's": 5,
+			"Lancer's": 5,
+			//"of Alacrity": 11, // on gloves, conflicts with weapons
+			"of Wealth": 5,
+			"of Fortune": 5,
+			"of Luck": 5,
+			"Charged": 5,
+			"Blazing": 5,
+			"Freezing": 5,
+			"Trickster's": 5,
+			"Witch-hunter's": 10,
+			"Arch-Angel's": 10,
+			"Valkyrie's": 10,
+			"of Perfection": 13,
+			"of Regrowth": 9,
+			"of Atlas": 13,
+			"Massive": 13,
+			"Savage": 13,
+			"Merciless": 13,
+			"Ferocious": 0,
+			"Grinding": 1,
+			"Cruel": 0,
+			"Gold": 5,
+			"Platinum": 5,
+			"Meteoric": 5,
+			"Strange": 5,
+			"Weird": 5,
+			"Knight's": 13,
+			"Lord's": 13,
+			"Fool's": 1,
+			"King's": 13,
+			"Master's": 13,
+			"Elysian": 13,
+			"Snowy": 6,
+			"Shivering": 6,
+			"Boreal": 6,
+			"Hibernal": 6,
+			"Fiery": 12,
+			"Smoldering": 12,
+			"Smoking": 12,
+			"Flaming": 12,
+			"Condensing": 12,
+			"Static": 3,
+			"Glowing": 3,
+			"Buzzing": 3,
+			"Arcing": 3,
+			"Shocking": 3,
+			"Septic": 14,
+			"Foul": 14,
+			"Corrosive": 14,
+			"Toxic": 14,
+			"Pestilent": 14,
+			"of Quickness": 11,
+			"of the Glacier": 15,
+			"of Winter": 15,
+			"of Burning": 12,
+			"of Incineration": 12,
+			"of Thunder": 11,
+			"of Storms": 11,
+			"of Carnage": 0,
+			"of Slaughter": 0,
+			"of Butchery": 0,
+			"of Evisceration": 0,
+			"of Performance": 0,
+			"of Transcendence": 0,
+			"of Pestilence": 14,
+			"of Anthrax": 14,
+			"of the Locust": 9,
+			"of the Lamprey": 9,
+			"of the Wraith": 9,
+			"of the Vampire": 9,
+			"of the Giant": 13,
+			"of Icebolt": 6,
+			"of Nova": 8,
+			"Screaming": 2,
+			"Howling": 2,
+			"Wailing": 2,
+			"Sapphire": 6,
+			"Ruby": 4,
+			"Amber": 3,
+			"Emerald": 10,
+			"of Wizardry": 13
+		};
+
+	for (i = 0; i < this.suffixes.length; i += 1) {
+		if (colors.hasOwnProperty(this.suffixes[i])) {
+			return colors[this.suffixes[i]];
+		}
+	}
+
+	for (i = 0; i < this.prefixes.length; i += 1) {
+		if (colors.hasOwnProperty(this.prefixes[i])) {
+			return colors[this.prefixes[i]];
+		}
+	}
+
+	return -1;
+}

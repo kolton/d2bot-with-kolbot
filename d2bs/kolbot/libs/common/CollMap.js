@@ -70,13 +70,13 @@ var CollMap = new function () {
 
 	// Check collision between unitA and unitB. true = collision present, false = collision not present
 	// If checking for blocking collisions (0x1, 0x4), true means blocked, false means not blocked
+
 	this.checkColl = function (unitA, unitB, coll) {
 		var i, k, l, cx, cy, angle, distance;
 
 		angle = Math.round(Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x) * 180 / Math.PI);
 		distance = Math.round(getDistance(unitA, unitB));
 
-MainLoop:
 		for (i = 1; i < distance; i += 1) {
 			cx = Math.round((Math.cos(angle * Math.PI / 180)) * i + unitB.x);
 			cy = Math.round((Math.sin(angle * Math.PI / 180)) * i + unitB.y);
@@ -92,4 +92,24 @@ MainLoop:
 
 		return false;
 	};
+
+	/*this.checkColl = function (unitA, unitB, coll) {
+		var i, x, y, a, b,
+			lineLength = Math.sqrt((unitA.x - unitB.x) * (unitA.x - unitB.x) + (unitA.y - unitB.y) * (unitA.y - unitB.y));
+
+		for (i = 0; i < lineLength; i += 1) {
+			x = Math.round(unitA.x + (unitB.x - unitA.x) * i / lineLength);
+			y = Math.round(unitA.y + (unitB.y - unitA.y) * i / lineLength);
+
+			for (a = x - 1; a <= x + 1; a += 1) {
+				for (b = y - 1; b <= y + 1; b += 1) {
+					if (this.getColl(a, b) & coll) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	};*/
 };

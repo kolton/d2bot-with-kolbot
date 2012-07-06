@@ -1,8 +1,8 @@
 var AutoMule = {
-	muleProfile: "", // The name of mule profile in d2bot#. It will be started and stopped when needed.
-	accountPrefix: "", // Account prefix. Numbers added automatically when making accounts.
-	accountPassword: "", // Account password.
-	charPrefix: "", // Character prefix. Suffix added automatically when making characters.
+	muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
+	accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
+	accountPassword: "",  // Account password.
+	charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
 	realm: "", // Available options: "useast", "uswest", "europe", "asia"
 	expansion: true,
 	ladder: true,
@@ -24,6 +24,8 @@ var AutoMule = {
 			return false;
 		}
 
+		D2Bot.printToConsole("In mule game.");
+
 		var status = "muling";
 
 		function DropStatusEvent(mode, msg) {
@@ -42,7 +44,7 @@ var AutoMule = {
 		print("ÿc4AutoMuleÿc0: In mule game.");
 		addEventListener("copydata", DropStatusEvent);
 
-		if (!Town.goToTown(1) || !Town.move("stash")) {
+		if (!Town.goToTown(1)) {
 			throw new Error("Failed to go to stash in act 1");
 		}
 
@@ -76,6 +78,7 @@ var AutoMule = {
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
+		D2Bot.printToConsole("Starting mule profile: " + this.muleProfile);
 		D2Bot.start(this.muleProfile);
 
 MainLoop:

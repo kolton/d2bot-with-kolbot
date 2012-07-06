@@ -5,20 +5,19 @@
 */
 
 function Enchant() {
-	var command, busy, hostile,
+	var command, hostile, nick,
+		shitList = [],
 		wpNicks = {},
 		greet = [];
 
 	this.enchant = function (nick) {
-		var unit;
-
 		if (!Misc.inMyParty(nick)) {
 			say("Accept party invite, noob.");
 
 			return false;
 		}
 
-		unit = getUnit(0, nick);
+		var unit = getUnit(0, nick);
 
 		if (!unit) {
 			say("Get closer.");
@@ -98,6 +97,8 @@ function Enchant() {
 			}
 		}
 
+		Town.goToTown();
+
 		return false;
 	};
 
@@ -137,7 +138,13 @@ function Enchant() {
 		return false;
 	};
 
-	this.openPortal = function () {
+	this.openPortal = function (nick) {
+		if (!Misc.inMyParty(nick)) {
+			say("Accept party invite, noob.");
+
+			return true;
+		}
+
 		if (Pather.getPortal(39)) {
 			return true;
 		}
@@ -214,6 +221,12 @@ function Enchant() {
 	};
 
 	this.giveWps = function (nick) {
+		if (!Misc.inMyParty(nick)) {
+			say("Accept party invite, noob.");
+
+			return false;
+		}
+
 		var i, act, timeout, wpList;
 
 		switch (this.getWpNick(nick)) {
@@ -328,17 +341,22 @@ MainLoop:
 	};
 
 	this.checkHostiles = function () {
-		var party = getParty();
+		var rval = false,
+			party = getParty();
 
 		if (party) {
 			do {
 				if (party.name !== me.name && getPlayerFlag(me.gid, party.gid, 8)) {
-					return party.name;
+					rval = true;
+
+					if (Config.ShitList && shitList.indexOf(party.name) === -1) {
+						shitList.push(party.name);
+					}
 				}
 			} while (party.getNext());
 		}
 
-		return false;
+		return rval;
 	};
 
 	function ChatEvent(nick, msg) {
@@ -348,12 +366,16 @@ MainLoop:
 	function GreetEvent(mode, param1, param2, name1, name2) {
 		switch (mode) {
 		case 0x02:
-			if (!busy) {
+			if (me.inTown && me.mode === 5) { // idle in town
 				greet.push(name1);
 			}
 
 			break;
 		}
+	}
+
+	if (Config.ShitList) {
+		shitList = ShitList.read();
 	}
 
 	addEventListener("chatmsg", ChatEvent);
@@ -364,50 +386,78 @@ MainLoop:
 
 	while (true) {
 		while (greet.length > 0) {
-			say("Welcome, " + greet.shift() + "! For a list of commands say 'help'");
+			nick  = greet.shift();
+
+			if (shitList.indexOf(nick) === -1) {
+				say("Welcome, " + nick + "! For a list of commands say 'help'");
+			}
 		}
 
 		if (command) {
 			switch (command[0].toLowerCase()) {
 			case "help":
-				say("Commands:");
-				say("Chant: " + Config.Enchant.Triggers[0] + "| Open cow level: " + Config.Enchant.Triggers[1] + "| Give waypoints: " + Config.Enchant.Triggers[2]);
+				this.checkHostiles();
 
-				break;
-			case "cows":
-				hostile = this.checkHostiles();
-
-				if (hostile) {
-					say("Command disabled because " + hostile + " is a transvestite.");
+				if (shitList.indexOf(command[1]) > -1) {
+					say("No " + command[0] + " for the shitlisted.");
 
 					break;
 				}
 
-				if (!this.openPortal()) {
+				say("Commands:");
+				say("Chant: " + Config.Enchant.Triggers[0] + "| Open cow level: " + Config.Enchant.Triggers[1] + "| Give waypoints: " + Config.Enchant.Triggers[2]);
+
+				break;
+			case Config.Enchant.Triggers[0].toLowerCase(): // chant
+				this.checkHostiles();
+
+				if (shitList.indexOf(command[1]) > -1) {
+					say("No chant for the shitlisted.");
+
+					break;
+				}
+
+				this.enchant(command[1]);
+
+				break;
+			case Config.Enchant.Triggers[1].toLowerCase(): // cows
+				hostile = this.checkHostiles();
+
+				if (shitList.indexOf(command[1]) > -1) {
+					say("No cows for the shitlisted.");
+
+					break;
+				}
+
+				if (hostile) {
+					say("Command disabled because of hostiles.");
+
+					break;
+				}
+
+				if (!this.openPortal(command[1])) {
 					say("Failed to open cow portal");
 				}
 
 				me.cancel();
 
 				break;
-			case "chant":
-				this.enchant(command[1]);
-
-				break;
-			case "wps":
+			case Config.Enchant.Triggers[2].toLowerCase(): // wps
 				hostile = this.checkHostiles();
 
-				if (hostile) {
-					say("Command disabled because " + hostile + " is a transvestite.");
+				if (shitList.indexOf(command[1]) > -1) {
+					say("No waypoints for the shitlisted.");
 
 					break;
 				}
 
-				busy = true;
+				if (hostile) {
+					say("Command disabled because of hostiles.");
+
+					break;
+				}
 
 				this.giveWps(command[1]);
-
-				busy = false;
 
 				break;
 			}
@@ -416,7 +466,7 @@ MainLoop:
 		command = "";
 
 		if (getTickCount() - me.gamestarttime >= Config.Enchant.GameLength * 6e4) {
-			say("Next Game!");
+			say("Use kolbot or die!");
 			delay(1000);
 
 			break;

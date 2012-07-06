@@ -15,10 +15,6 @@ function Countess() {
 		if (!Pather.moveToExit(20 + i, true)) {
 			throw new Error("Failed to move to Countess");
 		}
-
-		if (Config.OpenChests) {
-			Misc.openChestsInArea();
-		}
 	}
 
 	poi = getPresetUnit(me.area, 2, 580);

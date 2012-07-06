@@ -1,26 +1,17 @@
 var StarterConfig = {
-	MinGameTime: 180, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
-	CreateGameDelay: 5, // Seconds to wait before creating a new game
-	ResetCount: 99, // Reset game count back to 1 every X games.
-	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
-
-	JoinChannel: "", // Name of the channel to join
-	FirstJoinMessage: "", // Message to say when first joining a channel, usually ".login"
-	AnnounceGames: false, // Announce next game in channel
-	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
+	MinGameTime: 0, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
+	CreateGameDelay: 2, // Seconds to wait before creating a new game
 
 	SwitchKeys: true, // Set to true to switch keys when they're in use, banned or after realm down
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
 	CrashDelay: 60, // Seconds to wait after a d2 window crash
-	FTJDelay: 60, // Seconds to wait after failing to create a game
 	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
 	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
 	PleaseWaitTimeout: 10, // Seconds to wait before cancelling the 'Please Wait...' screen
-	WaitInLineTimeout: 60, // Seconds to wait before cancelling the 'Waiting in Line...' screen
-	GameDoesNotExistTimeout: 30 // Seconds to wait before cancelling the 'Game does not exist.' screen
+	WaitInLineTimeout: 60 // Seconds to wait before cancelling the 'Waiting in Line...' screen
 };
 
 
@@ -28,44 +19,33 @@ var StarterConfig = {
 // No touchy!
 include("json2.js");
 include("OOG.js");
-include("automule.js");
+include("MuleLogger.js");
 include("gambling.js");
 load("tools/heartbeat.js");
 
-var D2BOT_JOIN = 1,
-	D2BOT_GAMEINFO = 2,
-	D2BOT_REQUESTGAME = 3,
-	crashed = false,
+var crashed = false,
 	lastGameStatus = "ready",
-	chatActionsDone = false,
 	connectFail = false,
 	firstLogin = false,
-	gameCount = DataFile.getStats().runs + 1,
-	gamePass = "",
-	gameName = "",
 	difficulty,
 	gameStart,
-	isUp = "no",
-	nextGame = "",
-	muleTrigger = false,
+	accounts = [],
+	chars = [],
+	index = 0,
+	currAcc, charList,
 	ingame = false;
 
-if (!FileTools.exists("data/" + me.profile + ".json")) {
-	DataFile.create();
+function parseInfo() {
+	for (var i in MuleLogger.LogAccounts) {
+		if (MuleLogger.LogAccounts.hasOwnProperty(i) && typeof i === "string") {
+			accounts.push(i);
+			chars.push(MuleLogger.LogAccounts[i]);
+		}
+	}
 }
 
-function ReceiveCopyData(msgID, msg) {
+function RecieveCopyData(msgID, msg) {
 	switch (msgID) {
-	case D2BOT_GAMEINFO:
-		print("Recieved Game Info");
-		[gameName, gamePass, difficulty] = msg.split('/');
-		break;
-	case D2BOT_JOIN:
-		[nextGame, gamePass, isUp] = msg.split('/');
-		break;
-	case D2BOT_REQUESTGAME:
-		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
-		break;
 	case 4:
 		if (msg === "@error") {
 			crashed = true;
@@ -109,53 +89,30 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
-function ScriptMsgEvent(msg) {
-	switch (msg) {
-	case "mule":
-		muleTrigger = true;
-
-		break;
-	}
-}
-
 function main() {
-	addEventListener('copydata', ReceiveCopyData);
-	addEventListener('scriptmsg', ScriptMsgEvent);
-	delay(rand(2, 3) * 1000);
-	D2Bot.requestGameInfo();
+	addEventListener('copydata', RecieveCopyData);
 	D2Bot.getLastError();
+	parseInfo();
 
 	if (crashed) {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
-		D2Bot.updateRuns();
 	}
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
-				isUp = "yes";
-
 				if (!ingame) {
-					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
-						print("leaving game");
-						quit();
-					}
-
 					print("Updating Status");
 					D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
 					gameStart = getTickCount();
-
-					DataFile.updateStats("runs", gameCount);
 				}
 			}
 
 			delay(1000);
 		}
-
-		isUp = "no";
 
 		locationAction(getLocation());
 		delay(1000);
@@ -170,60 +127,35 @@ MainSwitch:
 	case 0:
 		break;
 	case 1:	// Lobby
+	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby");
-
-		if (StarterConfig.JoinChannel !== "") {
-			ControlAction.click(6, 27, 480, 120, 20);
-
-			break;
-		}
 
 		if (ingame) {
 			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
 				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
 			}
 
-			// ### automule ###
-			if (muleTrigger) {
-				AutoMule.outOfGameCheck();
-
-				muleTrigger = false;
-
-				break;
-			}
-			// ### automule end ###
-
 			print("updating runs");
 			D2Bot.updateRuns();
 
-			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
-		}
 
-		// #### experimental gambling system start ####
-		gambleGame = Gambling.checkGamblers();
-
-		if (gambleGame && DataFile.getStats().gold > Gambling.minGold) {
-			delay(3000);
-			joinGame(gambleGame[0], gambleGame[1]);
-			delay(1000);
-			locationTimeout(5000, location);
+			ControlAction.click(6, 693, 490, 80, 20);
 
 			break;
 		}
-		// #### experimental gambling system end ####
 
-		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+		if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
 			break;
 		}
 
-		if (!locationTimeout(5000, location)) { // in case create button gets bugged
-			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+		if (!locationTimeout(5000, location)) { // in case join button gets bugged
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
 				break;
 			}
 
-			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
 				break;
 			}
 		}
@@ -234,113 +166,17 @@ MainSwitch:
 		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
 
 		break;
-	case 3: // Lobby Chat
-		D2Bot.updateStatus("Lobby Chat");
-
-		if (ingame) {
-			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
-				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
-			}
-
-			// ### automule ###
-			if (muleTrigger) {
-				AutoMule.outOfGameCheck();
-
-				muleTrigger = false;
-
-				break;
-			}
-			// ### automule end ###
-
-			print("updating runs");
-			D2Bot.updateRuns();
-
-			gameCount += 1;
-			lastGameStatus = "ready";
-			ingame = false;
-		}
-
-		// #### experimental gambling system start ####
-		gambleGame = Gambling.checkGamblers();
-
-		if (gambleGame && DataFile.getStats().gold > Gambling.minGold) {
-			delay(3000);
-			joinGame(gambleGame[0], gambleGame[1]);
-			delay(1000);
-			locationTimeout(5000, location);
-
-			break;
-		}
-		// #### experimental gambling system end ####
-
-		if (!chatActionsDone) {
-			chatActionsDone = true;
-
-			timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-			say("/j " + StarterConfig.JoinChannel);
-			delay(1000);
-
-			if (StarterConfig.FirstJoinMessage !== "") {
-				say(StarterConfig.FirstJoinMessage);
-				delay(500);
-			}
-		}
-
-		if (StarterConfig.AnnounceGames) {
-			delay(1000);
-			say("Next game is " + gameName + gameCount + (gamePass === "" ? "" : "//" + gamePass));
-		}
-
-		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
-			break;
-		}
-
-		if (!locationTimeout(5000, location)) { // in case create button gets bugged
-			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
-				break;
-			}
-
-			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
-				break;
-			}
-		}
-
-		break;
 	case 4: // Create Game
 		D2Bot.updateStatus("Creating Game");
 
 		control = getControl(1, 657, 342, 27, 20);
 
-		if (typeof StarterConfig.CharacterDifference === "number") {
-			if (control.disabled === 4) {
-				ControlAction.click(6, 431, 341, 15, 16);
-			}
-
-			ControlAction.setText(1, 657, 342, 27, 20, StarterConfig.CharacterDifference.toString());
-		} else if (StarterConfig.CharacterDifference === false && control.disabled === 5) {
+		if (control.disabled === 5) {
 			ControlAction.click(6, 431, 341, 15, 16);
 		}
 
-		if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
-			gameCount = 1;
-
-			DataFile.updateStats("runs", gameCount);
-		}
-
-		while (!gameName) {
-			D2Bot.requestGameInfo();
-			delay(500);
-		}
-
-		if (lastGameStatus === "pending") {
-			D2Bot.printToConsole("Failed to create game");
-			timeoutDelay("FTJ delay", StarterConfig.FTJDelay * 1e3);
-
-			gameCount += 1;
-		}
-
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
-		createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
+		createGame(MuleLogger.LogGame[0], MuleLogger.LogGame[1], 0);
 
 		lastGameStatus = "pending";
 
@@ -348,6 +184,13 @@ MainSwitch:
 
 		break;
 	case 5: // Join Game
+		timeoutDelay("Join Game Delay", StarterConfig.CreateGameDelay * 1e3);
+		joinGame(MuleLogger.LogGame[0], MuleLogger.LogGame[1]);
+
+		lastGameStatus = "pending";
+
+		locationTimeout(5000, location);
+
 		break;
 	case 6: // Ladder
 		break;
@@ -356,21 +199,18 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
-		if (firstLogin) { // multiple realm botting fix in case of R/D or disconnect
-			ControlAction.click(6, 33, 572, 128, 35);
-		}
+		if (!accounts.length) {
+			D2Bot.printToConsole("Done logging mules!");
+			D2Bot.stop();
 
-		if (!firstLogin) {
-			firstLogin = true;
+			break;
 		}
+	
+		currAcc = accounts.shift();
+		currAcc = currAcc.split("/");
+		charList = chars.shift();
 
-		D2Bot.updateStatus("Logging In");
-
-		try {
-			login(me.profile);
-		} catch (e) {
-			print(e);
-		}
+		ControlAction.loginAccount({account: currAcc[0], password: currAcc[1]});
 
 		break;
 	case 10: // Login Error
@@ -390,10 +230,12 @@ MainSwitch:
 			case getLocaleString(5207):
 				D2Bot.updateStatus("Invalid Password");
 				D2Bot.printToConsole("Invalid Password");
+
 				break;
 			case getLocaleString(5208):
 				D2Bot.updateStatus("Invalid Account");
 				D2Bot.printToConsole("Invalid Account");
+
 				break;
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
@@ -412,10 +254,12 @@ MainSwitch:
 				D2Bot.updateStatus("Disconnected");
 				D2Bot.printToConsole("Disconnected");
 				ControlAction.click(6, 335, 412, 128, 35);
+
 				break MainSwitch;
 			default:
 				D2Bot.updateStatus("Login Error");
 				D2Bot.printToConsole("Login Error - " + string);
+
 				break;
 			}
 		}
@@ -444,11 +288,21 @@ MainSwitch:
 
 		break;
 	case 12: // Character Select
-		try {
-			login(me.profile);
-		} catch (e2) {
+		if (!charList.length) {
+			ControlAction.click(6, 33, 572, 128, 35);
 
+			break;
 		}
+
+		var currChar;
+
+		if (charList[0] === "all") {
+			charList = ControlAction.getCharacters();
+		}
+
+		currChar = charList.shift();
+
+		ControlAction.loginCharacter({charName: currChar});
 
 		break;
 	case 13: // Realm Down - Character Select screen
@@ -461,7 +315,6 @@ MainSwitch:
 
 		updateCount();
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
-		D2Bot.CDKeyRD();
 
 		if (StarterConfig.SwitchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
@@ -536,19 +389,13 @@ MainSwitch:
 
 		break;
 	case 26: // Lobby - Game Name Exists
-		gameCount += 1;
+		ControlAction.click(6, 652, 469, 120, 20);
 
-		delay(500);
-		ControlAction.click(6, 533, 469, 120, 20);
 		break;
 	case 27: // Gateway Select
 		break;
 	case 28: // Lobby - Game Does Not Exist
-		D2Bot.printToConsole("Game doesn't exist");
-
-		lastGameStatus = "ready";
-
-		locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location);
+		ControlAction.click(6, 533, 469, 120, 20);
 
 		break;
 	case 38: // Game is full
@@ -558,6 +405,7 @@ MainSwitch:
 
 		delay(500);
 		ControlAction.click(6, 652, 469, 120, 20);
+
 		break;
 	case 42: // Empty character screen
 		delay(1000);
