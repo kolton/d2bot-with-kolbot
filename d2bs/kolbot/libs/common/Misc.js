@@ -618,7 +618,7 @@ var Misc = {
 
 		/*if (tpchicken && ((Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) || (Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
 			check = true;
-		}
+		}*/
 
 		if (check) {
 			Town.goToTown();
@@ -637,7 +637,7 @@ var Misc = {
 			}
 
 			return true;
-		}*/
+		}
 
 		return false;
 	}
