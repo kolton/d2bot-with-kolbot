@@ -263,7 +263,7 @@ var Town = {
 	fillTome: function (code) {
 		delay(500);
 
-		if (this.checkScrolls(code) >= 10) {
+		if (this.checkScrolls(code) >= 13) {
 			return true;
 		}
 

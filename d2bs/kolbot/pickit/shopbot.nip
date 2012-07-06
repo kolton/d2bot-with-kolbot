@@ -1,12 +1,16 @@
 // Use only this pickit when running Scripts.ShopBot for maximum speed
 // Comment out the lines for items you don't want to scan
 
-[name] == greatertalons && [quality] == magic # ([assassinskills] == 2 || [trapsskilltab] == 3) && [skilllightningsentry] == 3 // 5/6LS GT
-([name] == greatertalons || [name] == runictalons) && [quality] == magic # [itemtohitperlevel] > 15 && [ias] >= 30 && [skilllightningsentry] == 3 // fool's ias LS claw
-([name] == greatertalons || [name] == runictalons) && [quality] == magic # [sockets] == 3 && [ias] >= 30 // 3os ias claw
-[type] == handtohand && [quality] == magic # ([assassinskills] == 2 || [trapsskilltab] == 3) && [skilllightningsentry] == 3 // 5/6LS any claw (gt/rt/sq/ss)
-[type] == handtohand && [quality] == magic # [shadowdisciplinesskilltab] == 3 && ([skillfade] == 3 || [skillvenom] == 3) // prebuff 6 venom or 6 fade claw
-([name] == lightplate || [name] == mageplate) && [quality] == magic # [sockets] == 3 && [maxhp] == 80 && [itemlevelreq] <= 30 // LLD
-([name] == ancientarmor || [name] == archonplate) && [quality] == magic # [sockets] == 4 && ([maxhp] >= 95 || [fhr] == 24) // 4os/95+ life or 4os/24fhr armor
-[name] == barbedshield && [quality] == magic # [palicombatskilltab] == 2 && [fbr] == 30 // LLD
-[type] == gloves && [quality] == magic # [javelinandspearskilltab] == 3 && [ias] == 20 // 3/20 gloves
+//[name] == greatertalons && [quality] == magic # ([assassinskills] == 2 || [trapsskilltab] == 3) && [skilllightningsentry] == 3 // 5/6LS GT
+//([name] == greatertalons || [name] == runictalons) && [quality] == magic # [itemtohitperlevel] > 15 && [ias] >= 30 && [skilllightningsentry] == 3 // fool's ias LS claw
+//([name] == greatertalons || [name] == runictalons) && [quality] == magic # [sockets] == 3 && [ias] >= 30 // 3os ias claw
+//[type] == handtohand && [quality] == magic # ([assassinskills] == 2 || [trapsskilltab] == 3) && [skilllightningsentry] == 3 // 5/6LS any claw (gt/rt/sq/ss)
+//[type] == handtohand && [quality] == magic # [shadowdisciplinesskilltab] == 3 && ([skillfade] == 3 || [skillvenom] == 3) // prebuff 6 venom or 6 fade claw
+//([name] == lightplate || [name] == mageplate) && [quality] == magic # [sockets] == 3 && [maxhp] == 80 && [itemlevelreq] <= 30 // LLD
+//([name] == ancientarmor || [name] == archonplate) && [quality] == magic # [sockets] == 4 && ([maxhp] >= 95 || [fhr] == 24) // 4os/95+ life or 4os/24fhr armor
+//[name] == barbedshield && [quality] == magic # [palicombatskilltab] == 2 && [fbr] == 30 // LLD
+//[type] == gloves && [quality] == magic # [javelinandspearskilltab] == 3 && [ias] == 20 // 3/20 gloves
+
+[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
+[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
+[type] == staff # [sorceressskills] == 2 && [skillenchant] == 3

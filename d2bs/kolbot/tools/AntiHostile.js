@@ -112,7 +112,7 @@ function main() {
 
 			if (player) {
 				do {
-					if (player.mode !== 0 && player.mode !== 17 && getPlayerFlag(me.gid, player.gid, 8) && !player.inTown) {
+					if (player.mode !== 0 && player.mode !== 17 && getPlayerFlag(me.gid, player.gid, 8) && !player.inTown && !me.inTown) {
 						// Quit if hostile player is nearby
 						if (Config.HostileAction === 1) {
 							quit();
@@ -163,6 +163,6 @@ function main() {
 			}
 		}
 
-		delay(500);
+		delay(200);
 	}
 }

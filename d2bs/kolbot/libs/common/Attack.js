@@ -81,14 +81,14 @@ var Attack = {
 			dodgeList = [],
 			attackCount = 0;
 
-		for (i = 0; i < 3; i += 1) {
+		for (i = 0; i < 5; i += 1) {
 			target = getUnit(1, classId);
 
 			if (target) {
 				break;
 			}
 
-			delay(50);
+			delay(200);
 		}
 
 		if (!target) {
@@ -110,7 +110,7 @@ var Attack = {
 					dodgeList.sort(Sort.units);
 
 					if (getDistance(me, dodgeList[0]) < 13) {
-						this.dodge(target, 15, dodgeList);
+						this.dodge(target, 20, dodgeList);
 					}
 				}
 			}
@@ -225,7 +225,7 @@ var Attack = {
 
 						if (getDistance(me, dodgeList[0]) < 13) {
 							//this.dodge(dodgeList[0], 15, dodgeList);
-							this.dodge(target, 15, dodgeList);
+							this.dodge(target, 20, dodgeList);
 						}
 					}
 				}
@@ -238,6 +238,7 @@ var Attack = {
 				switch (result) {
 				case 1:
 					monsterList.shift();
+
 					break;
 				case 2:
 				case 3:
@@ -254,8 +255,8 @@ var Attack = {
 
 						gidAttack[i].attacks += 1;
 
-						if (gidAttack[i].attacks > 12) {
-							print("ÿc1Skipping " + target.name);
+						if (gidAttack[i].attacks > 15) {
+							print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 							monsterList.shift();
 						}
 					}
@@ -334,7 +335,7 @@ var Attack = {
 
 						if (getDistance(me, dodgeList[0]) < 13) {
 							//this.dodge(dodgeList[0], 15, dodgeList);
-							this.dodge(target, 15, dodgeList);
+							this.dodge(target, 20, dodgeList);
 						}
 					}
 				}
@@ -363,8 +364,8 @@ var Attack = {
 
 						gidAttack[i].attacks += 1;
 
-						if (gidAttack[i].attacks > 12) {
-							print("ÿc1Skipping " + target.name);
+						if (gidAttack[i].attacks > 15) {
+							print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 							monsterList.shift();
 						}
 					}
@@ -745,8 +746,6 @@ EnchantLoop: // Skip enchanted monsters
 				}
 			}
 
-			//print("ÿc1Skipping " + unit.name + " (enchant skip -" + Config.SkipEnchant[i] + ")");
-
 			return false;
 		}
 
@@ -759,8 +758,6 @@ ImmuneLoop: // Skip immune monsters
 					continue ImmuneLoop;
 				}
 			}
-
-			//print("ÿc1Skipping " + unit.name + " (immunity skip -" + Config.SkipImmune[i] + ")");
 
 			return false;
 		}
@@ -815,8 +812,6 @@ AuraLoop: // Skip monsters with auras
 			}
 
 			if (!rval) {
-				//print("ÿc1Skipping " + unit.name + " (aura skip -" + Config.SkipAura[i] + ")");
-
 				return false;
 			}
 		}

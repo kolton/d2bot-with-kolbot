@@ -121,10 +121,8 @@ var Pickit = {
 				switch (this.checkItem(items[i])) {
 				case -1: // item needs to be identified
 					return true;
-				case 0:	// shouldn't happen
-					Town.clearInventory();
-
-					return true;
+				case 0:
+					break;
 				default: // check if a kept item can be stashed
 					if (Storage.Stash.CanFit(items[i])) {
 						return true;
@@ -224,18 +222,24 @@ MainLoop:
 		return true;
 	},
 
-	itemColor: function (unit) {
-		switch (unit.itemType) {
-		case 4: // gold
-			return "ÿc4";
-		case 74: // runes
-			return "ÿc8";
-		case 76: // healing potions
-			return "ÿc1";
-		case 77: // mana potions
-			return "ÿc3";
-		case 78: // juvs
-			return "ÿc;";
+	itemColor: function (unit, type) {
+		if (typeof type === "undefined") {
+			type = true;
+		}
+
+		if (type) {
+			switch (unit.itemType) {
+			case 4: // gold
+				return "ÿc4";
+			case 74: // runes
+				return "ÿc8";
+			case 76: // healing potions
+				return "ÿc1";
+			case 77: // mana potions
+				return "ÿc3";
+			case 78: // juvs
+				return "ÿc;";
+			}
 		}
 
 		switch (unit.quality) {

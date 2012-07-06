@@ -49,7 +49,8 @@ function Vizier() {
 		delay(250);
 	}
 
-	Attack.clear(10, 0, getLocaleString(2851)); // Grand Vizier of Chaos
+	Attack.kill(getLocaleString(2851)); // Grand Vizier of Chaos
+	Pickit.pickItems();
 
 	return true;
 }

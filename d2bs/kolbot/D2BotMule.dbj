@@ -143,11 +143,11 @@ function nextChar() {
 	num = obj.accNum.toString();
 
 	for (i = 0; i < num.length; i += 1) {
-		charSuffix += charNumbers[parseInt(num[i], 10) - 1];
+		charSuffix += charNumbers[parseInt(num[i], 10)];
 	}
 
+	charSuffix += charNumbers[obj.charNum];
 	obj.charNum = obj.charNum + 1;
-	charSuffix += charNumbers[obj.charNum - 1];
 	obj.character = AutoMule.charPrefix + charSuffix;
 
 	MuleData.write(obj);

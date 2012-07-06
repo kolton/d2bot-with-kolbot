@@ -6,6 +6,7 @@ include("NTItemParser.dbl");
 include("OOG.js");
 include("AutoMule.js");
 include("Gambling.js");
+include("MuleLogger.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/CollMap.js");
@@ -34,6 +35,19 @@ function main() {
 
 	// don't load default for mules
 	if (me.profile === AutoMule.muleProfile) {
+		return;
+	}
+
+	// mule logger stuff
+	if (me.gamename.toLowerCase() === MuleLogger.LogGame[0].toLowerCase()) {
+		MuleLogger.logChar();
+
+		while ((getTickCount() - me.gamestarttime) < MuleLogger.IngameTime * 1000) {
+			delay(1000);
+		}
+
+		quit();
+
 		return;
 	}
 
@@ -117,6 +131,7 @@ function main() {
 	// Load events and threads
 	addEventListener("gameevent", this.gameEvent);
 	load("tools/ToolsThread.js");
+	load("tools/TownChicken.js");
 
 	if (Config.PublicMode) {
 		load("tools/Party.js");

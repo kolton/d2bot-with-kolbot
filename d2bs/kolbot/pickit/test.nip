@@ -1,1 +1,5 @@
-[quality] >= magic
+//[quality] >= magic
+[quality] == rare && [color] == crystalblue
+[quality] == rare && [color] == white
+//[color] == Crystal Blue
+//[name] == greatertalons # [assassinskills] == 2

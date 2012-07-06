@@ -5,11 +5,18 @@
 */
 
 var D2Bot = {
-	printToConsole: function (msg) {
-		sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg);
+	printToConsole: function (msg, color) {
+		if (arguments.length < 2) {
+			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg);
+		} else {
+			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg + ";" + color);
+		}
 	},
-	printToItemLog: function (msg) {
-		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg);
+	printToItemLog: function (msg, tooltip, code, color1, color2) {
+		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);
+	},
+	saveItem: function (filename, tooltip, code, color1, color2) {
+		sendCopyData(null, "D2Bot #", 0, "saveItem;" + filename + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);
 	},
 	updateStatus: function (msg) {
 		sendCopyData(null, "D2Bot #", 0, "updateStatus;" + msg);
@@ -36,6 +43,9 @@ var D2Bot = {
 	CDKeyDisabled: function () {
 		sendCopyData(null, "D2Bot #", 0, "CDKeyDisabled");
 	},
+	CDKeyRD: function () {
+		sendCopyData(null, "D2Bot #", 0, "CDKeyRD");
+	},
 	joinMe: function (window, gameName, gameCount, gamePass, isUp) {
 		sendCopyData(null, window, 1, gameName + gameCount + "/" + gamePass + "/" + isUp);
 	},
@@ -49,13 +59,19 @@ var D2Bot = {
 		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
 	},
 	updateCount: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateCount");
+		sendCopyData(null, "D2Bot #", 0, "updateCount;" + getIP());
 	},
 	shoutGlobal: function (msg, mode) {
 		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");
+	},
+	getLastError: function () {
+		sendCopyData(null, "D2Bot #", 0, "getLastError");
+		delay(500);
+	},
+	heartBeat: function () {
+		sendCopyData(null, "D2Bot #", 0, "heartBeat");
 	}
 };
-
 var DataFile = {
 	create: function () {
 		var obj, string;
@@ -135,23 +151,23 @@ var DataFile = {
 };
 
 var ControlAction = {
-	click: function () {
-		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+	click: function (type, x, y, xsize, ysize, targetx, targety) {
+		var control = getControl(type, x, y, xsize, ysize);
 
 		if (!control) {
-			print("control not found " + arguments[0] + " " + arguments[1] + " " + arguments[2]);
+			print("control not found " + type + " " + x + " " + y);
 			return false;
 		}
 
 		//delay(clickdelay);
 		delay(200);
-		control.click(arguments[5], arguments[6]);
+		control.click(targetx, targety);
 
 		return true;
 	},
 
-	setText: function () {
-		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+	setText: function (type, x, y, xsize, ysize, text) {
+		var control = getControl(type, x, y, xsize, ysize);
 
 		if (!control) {
 			return false;
@@ -159,13 +175,13 @@ var ControlAction = {
 
 		//delay(textdelay);
 		delay(200);
-		control.setText(arguments[5]);
+		control.setText(text);
 
 		return true;
 	},
 
-	getText: function () {
-		var control = getControl(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+	getText: function (type, x, y, xsize, ysize) {
+		var control = getControl(type, x, y, xsize, ysize);
 
 		if (!control) {
 			return false;
@@ -174,9 +190,9 @@ var ControlAction = {
 		return control.getText();
 	},
 
-	clickRealm: function () {
+	clickRealm: function (realm) {
 		this.click(6, 264, 391, 272, 25);
-		this.click(4, 257, 500, 292, 160, 403, 350 + arguments[0] * 25);
+		this.click(4, 257, 500, 292, 160, 403, 350 + realm * 25);
 		this.click(6, 281, 538, 96, 32);
 	},
 
@@ -193,8 +209,11 @@ var ControlAction = {
 		while (getLocation() !== 12 && getLocation() !== 42) {
 			switch (getLocation()) {
 			case 8: // main menu
-				ControlAction.clickRealm(realms[info.realm]);
-				this.click(6, 264, 366, 272, 35); // OK
+				if (info.realm) {
+					ControlAction.clickRealm(realms[info.realm]);					
+				}
+
+				this.click(6, 264, 366, 272, 35);
 
 				break;
 			case 9: // login screen
@@ -203,9 +222,7 @@ var ControlAction = {
 				this.click(6, 264, 484, 272, 35); // log in
 
 				break;
-			case 10: // login error - acc doesn't exist? TODO: handle all login errors
-				this.click(6, 335, 412, 128, 35); // OK
-
+			case 10: // login error - let the starter handle it
 				me.blockMouse = false;
 
 				return false;

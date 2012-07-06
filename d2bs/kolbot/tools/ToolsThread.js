@@ -230,7 +230,8 @@ function main() {
 				D2Bot.updateChickens();
 				D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + this.getNearestMonster() + ";1");
 
-				me.chickenhp = me.hpmax; // Just to trigger the core chicken
+				//me.chickenhp = me.hpmax; // Just to trigger the core chicken
+				quit();
 
 				break;
 			}
@@ -247,7 +248,8 @@ function main() {
 				D2Bot.updateChickens();
 				D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";1");
 
-				me.chickenmp = me.mpmax; // Just to trigger the core chicken
+				//me.chickenmp = me.mpmax; // Just to trigger the core chicken
+				quit();
 
 				break;
 			}

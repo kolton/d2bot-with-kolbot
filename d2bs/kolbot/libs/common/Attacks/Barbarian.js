@@ -30,19 +30,24 @@ var ClassAttack = {
 			case 232: // Feral Rage
 				this.skillRange[i] = 2;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 130: // Howl
 				this.skillRange[i] = 10;
+
 				break;
 			case 146: // Battle Cry
 			case 154: // War Cry
 				this.skillRange[i] = 5;
+
 				break;
 			case 151: // Whirlwind
 				this.skillRange[i] = 10;
+
 				break;
 			case 132: // Leap
 				this.skillRange[i] = 10; // TODO: Calculation
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
@@ -145,10 +150,6 @@ var ClassAttack = {
 	},
 
 	whirlwind: function (unit, index) {
-		if (me.mp < 30) {
-			return false;
-		}
-
 		var i, j, coords, angle,
 			//angles = [180, 45, -45, 90, -90]; // Angle offsets
 			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets

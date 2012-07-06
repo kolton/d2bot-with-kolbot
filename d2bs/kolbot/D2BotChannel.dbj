@@ -12,6 +12,7 @@ var StarterConfig = {
 	SwitchKeys: true, // Set to true to switch keys when they're in use, banned or after realm down
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
+	CrashDelay: 60, // Seconds to wait after a d2 window crash
 	RealmDownDelay: 10, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
@@ -31,6 +32,7 @@ load("tools/heartbeat.js");
 var lastGameStatus = "ready",
 	nextGameMake = 0,
 	inGameAt = 0,
+	crashed,
 	chatActionsDone = false,
 	lastGameFailed = false,
 	connectFail = false,
@@ -47,6 +49,17 @@ var lastGameStatus = "ready",
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
+}
+
+function ReceiveCopyData(msgID, msg) {
+	switch (msgID) {
+	case 4:
+		if (msg === "@error") {
+			crashed = true;
+		}
+
+		break;
+	}
 }
 
 function timeoutDelay(text, time) {
@@ -68,8 +81,30 @@ function locationTimeout(time, location) {
 	return (getLocation() !== location);
 }
 
+function updateCount() {
+	D2Bot.updateCount();
+	delay(1000);
+	ControlAction.click(6, 264, 366, 272, 35);
+
+	try {
+		login(me.profile);
+	} catch (e) {
+
+	}
+
+	delay(1000);
+	ControlAction.click(6, 33, 572, 128, 35);
+}
+
 function main() {
+	addEventListener('copydata', ReceiveCopyData);
 	delay(rand(1, 2) * 1000);
+	D2Bot.getLastError();
+
+	if (crashed) {
+		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
+		D2Bot.updateRuns();
+	}
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -310,7 +345,9 @@ MainLoop:
 			break;
 		}
 
+		updateCount();
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
+		D2Bot.CDKeyRD();
 
 		if (StarterConfig.SwitchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");

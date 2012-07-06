@@ -25,7 +25,12 @@ var ClassAttack = {
 				this.skillRange[i] = 6;
 				break;
 			case 42: // Static Field
-				this.skillRange[i] = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
+				if (me.gametype) {
+					this.skillRange[i] = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
+				} else {
+					this.skillRange[i] = 25;
+				}
+
 				break;
 			case 44: // Frost Nova
 				this.skillRange[i] = 5;
@@ -108,13 +113,18 @@ var ClassAttack = {
 		if (!timedIndex && !untimedIndex) {
 			// Check if we can merc stomp the boss
 			if (Config.TeleStomp && index === 1 && !!me.getMerc() && Attack.checkResist(unit, "physical")) {
-				if (getDistance(me, unit) > 5) {
-					Pather.moveToUnit(unit);
-				}
-
 				// Spam attacks
 				timedIndex = 1;
 				untimedIndex = Config.AttackSkill[2] > -1 ? 2 : false;
+
+				// dirty override until a good solution presents itself
+				while (Attack.checkMonster(unit)) {
+					if (getDistance(me, unit) > 5) {
+						Pather.moveToUnit(unit);
+					}
+
+					this.doCast(unit, timedIndex, untimedIndex);
+				}
 			} else {
 				return 1;
 			}

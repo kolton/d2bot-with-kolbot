@@ -117,20 +117,20 @@
 //------ boots ------
 
 [name] == boots && [quality] == unique
-[name] == greaves && [quality] == unique # # [maxquantity] == 1
+//[name] == greaves && [quality] == unique # # [maxquantity] == 1
 //[name] == lightplatedboots && [quality] == unique # [enhanceddefense] == 60
 
 //------ gloves ------
 
 //[name] == heavygloves && [quality] == unique # [enhanceddefense] == 20
 //[name] == gauntlets && [quality] == unique //# [enhanceddefense] == 20
-//[name] == lightgauntlets && [quality] == unique //# [enhanceddefense] == 30
+[name] == lightgauntlets && [quality] == unique //# [enhanceddefense] == 30
 //[name] == chaingloves && [quality] == unique # [itemmagicbonus] == 40
 
 //------ helms ------
 
 [name] == skullcap && [quality] == unique # [itemmagicbonus] >= 50
-//[name] == skullcap && [quality] == unique # # [maxquantity] == 1
+[name] == skullcap && [quality] == unique # # [maxquantity] == 1
 
 //------ weapons ------
 
@@ -143,6 +143,9 @@
 //[name] == kiteshield && [quality] == unique # [enhanceddefense] == 100
 [name] == gothicshield && [quality] == unique # [fireresist] >= 50
 //[name] == gothicshield && [quality] == unique
+
+//------- bows -------
+//[name] == longbow && [quality] == unique
 
 //	=====================================================================================================================
 //	=== SET =============================================================================================================
@@ -184,6 +187,8 @@
 //------ Cleglaw's Brace ------
 
 //------ Death's Disguise ------
+//[name] == leathergloves && [quality] == set
+[name] == sash && [quality] == set
 
 //------ Hsarus' Defense ------
 
@@ -213,8 +218,8 @@
 [name] == greaterhealingpotion
 [name] == supermanapotion
 [name] == superhealingpotion
-//[Name] == RejuvenationPotion
-//[Name] == FullRejuvenationPotion
+[Name] == RejuvenationPotion
+[Name] == FullRejuvenationPotion
 
 //[name] == ringmail && [quality] == set # # [maxquantity] == 1
 //[name] == Sabre && [quality] == set # # [maxquantity] == 1
@@ -255,3 +260,6 @@
 [type] == amulet && [quality] == rare # [sorceressskills]+[paladinskills] >= 1 && [fireresist]+[lightresist]+[coldresist]+[poisonresist] >= 64
 [type] == belt && [name] >= platedbelt && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
 [type] == armor && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
+
+[type] == boots && [quality] == rare # ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2 && [itemmagicbonus] >= 20
+[name] == heavybelt && [quality] == unique

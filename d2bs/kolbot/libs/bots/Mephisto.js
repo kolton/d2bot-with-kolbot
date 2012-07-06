@@ -164,7 +164,8 @@ function Mephisto() {
 			this.moat();
 			Attack.kill(242); // Mephisto
 		} else {
-			this.killMephisto();
+			//this.killMephisto();
+			Attack.kill(242); // Mephisto
 		}
 	} else {
 		Attack.kill(242); // Mephisto

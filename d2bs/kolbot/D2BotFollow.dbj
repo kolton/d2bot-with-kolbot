@@ -6,7 +6,8 @@ var StarterConfig = {
 	SwitchKeys: true, // Set to true to switch keys when they're in use, banned or after realm down
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
-	RealmDownDelay: 10, // Minutes to wait after getting Realm Down message
+	CrashDelay: 60, // Seconds to wait after a d2 window crash
+	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
 	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
@@ -38,7 +39,7 @@ include("json2.js");
 include("OOG.js");
 load("tools/heartbeat.js");
 
-var i, j, ingame, gameStart, difficulty,
+var i, j, ingame, gameStart, difficulty, crashed,
 	leader = "",
 	lastGameStatus = "ready",
 	chatActionsDone = false,
@@ -73,7 +74,22 @@ function locationTimeout(time, location) {
 	return (getLocation() !== location);
 }
 
-function RecieveCopyData(msgID, msg) {
+function updateCount() {
+	D2Bot.updateCount();
+	delay(1000);
+	ControlAction.click(6, 264, 366, 272, 35);
+
+	try {
+		login(me.profile);
+	} catch (e) {
+
+	}
+
+	delay(1000);
+	ControlAction.click(6, 33, 572, 128, 35);
+}
+
+function ReceiveCopyData(msgID, msg) {
 	switch (msgID) {
 	case D2BOT_GAMEINFO:
 		print("Recieved Game Info");
@@ -83,14 +99,26 @@ function RecieveCopyData(msgID, msg) {
 		[nextGame, gamePass, isUp] = msg.split('/');
 		break;
 	case D2BOT_REQUESTGAME:
-		D2Bot.joinMe(msg);
+		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
+		break;
+	case 4:
+		if (msg === "@error") {
+			crashed = true;
+		}
+
 		break;
 	}
 }
 
 function main() {
-	addEventListener('copydata', RecieveCopyData);
+	addEventListener('copydata', ReceiveCopyData);
 	delay(rand(1, 2) * 1000);
+	D2Bot.getLastError();
+
+	if (crashed) {
+		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
+		D2Bot.updateRuns();
+	}
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -352,7 +380,9 @@ JoinLoop:
 			break;
 		}
 
+		updateCount();
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
+		D2Bot.CDKeyRD();
 
 		if (StarterConfig.SwitchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");

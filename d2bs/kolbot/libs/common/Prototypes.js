@@ -327,12 +327,12 @@ me.findItems = function (id, mode, loc) {
 };
 
 Unit.prototype.getPrefix = function (id) {
-	if (typeof this.prefixnum === "number") {
+	if (typeof this.prefixnums !== "object") {
 		return this.prefixnum === id;
 	}
 
 	var i,
-		prefixList = this.prefixnum;
+		prefixList = this.prefixnums;
 
 	for (i = 0; i < prefixList.length; i += 1) {
 		if (id === prefixList[i]) {
@@ -344,12 +344,12 @@ Unit.prototype.getPrefix = function (id) {
 };
 
 Unit.prototype.getSuffix = function (id) {
-	if (typeof this.suffixnum === "number") {
+	if (typeof this.suffixnums !== "object") {
 		return this.suffixnum === id;
 	}
 
 	var i,
-		suffixList = this.suffixnum;
+		suffixList = this.suffixnums;
 
 	for (i = 0; i < suffixList.length; i += 1) {
 		if (id === suffixList[i]) {

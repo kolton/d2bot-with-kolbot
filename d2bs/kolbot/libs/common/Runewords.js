@@ -158,8 +158,6 @@ RuneLoop:
 
 			this.needList.push(624);
 		}
-
-		print(this.needList);
 	},
 
 	update: function (classid, gid) {

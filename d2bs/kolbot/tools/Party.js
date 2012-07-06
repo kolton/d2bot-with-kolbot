@@ -35,6 +35,7 @@ function main() {
 				case 1:
 					if (getPlayerFlag(me.gid, player.gid, 8)) {
 						if (Config.ShitList && shitList.indexOf(player.name) === -1) {
+							say(player.name + " has been shitlisted.");
 							shitList.push(player.name);
 							ShitList.add(player.name);
 						}

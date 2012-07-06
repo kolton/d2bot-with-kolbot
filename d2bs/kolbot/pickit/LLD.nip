@@ -29,7 +29,7 @@
 [type] == amulet && [quality] == rare # [poisonandboneskilltab]+[fireskilltab]+[trapsskilltab]+[palicombatskilltab]+[coldskilltab]+[lightningskilltab]+[elementalskilltab] == 2 && [fcr] == 10 && [maxhp]+[maxmana] >= 50 && [itemlevelreq] <= 30
 [type] == amulet && [quality] == rare # [amazonskills]+[barbarianskills] == 1 && [maxhp] >= 40 && ([hpregen] >= 6 || [maxmana] >= 60) && [itemlevelreq] <= 30
 
-//[name] == amulet && [quality] == set # itemdamagetomana == 20 && itemlightradius == 3 // Angelic Wngs
+//[name] == amulet && [quality] == set # [itemdamagetomana] == 20 && [itemlightradius] == 3 // Angelic Wngs
 
 //---vlld-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@
 [name] == warscepter && [quality] <= superior && [flag] != ethereal # ([sockets] == 0 || [sockets] == 5) && [skillcharge]+[skillconcentration] >= 6 && [itemlevelreq] <= 18
 [name] == warscepter && [quality] <= superior  && [flag] != ethereal# ([sockets] == 0 || [sockets] == 5) && [skilldefiance]+[skillsacrifice] >= 6 && [itemlevelreq] <= 9
 
-[name] == stagbow && [quality] == superior # ([sockets] == 0 || [sockets] == 5) && [enhanceddamage] == 15 && [bowandcrossbowskilltab] == 3
+[name] == stagbow && [quality] == superior # ([sockets] == 0 || [sockets] == 5) && [enhanceddamage] == 15 && [tohit] == 3 && [bowandcrossbowskilltab] == 3
 ([name] == throwingspear || [name] == warjavelin) && [quality] <= rare && [flag] == ethereal # [enhanceddamage] > 50 && [itemreplenishquantity] > 0 && [itemlevelreq] <= 18
 ([name] == bonewand || [name] == grimwand) && [quality] == magic # [poisonandboneskilltab] == 1 && [fcr] == 10 && [skillbonespear] == 3 && [itemlevelreq] <= 18
 ([name] == bonewand || [name] == grimwand) && [quality] == rare # [poisonandboneskilltab] == 1 && [fcr] == 10 && [skillbonespear] == 3 && [sockets] == 2 && [itemlevelreq] <= 18

@@ -31,10 +31,5 @@ function Test() {
 }
 
 function test() {
-	var t = getTickCount();
-
-	Pickit.init();
 	
-	print(getTickCount() - t);
 }
-
