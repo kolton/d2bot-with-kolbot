@@ -3,7 +3,6 @@ var StarterConfig = {
 	FirstJoinMessage: "", // Message to say when first joining a channel, usually ".login"
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
-	SwitchKeys: true, // Set to true to switch keys when they're in use, banned or after realm down
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
 	CrashDelay: 60, // Seconds to wait after a d2 window crash
@@ -29,7 +28,7 @@ var StarterConfig = {
 */
 
 var JoinSettings = {
-	"leader": ["leecher"]
+	"Leader": ["Leecher"]
 };
 
 
@@ -326,7 +325,7 @@ JoinLoop:
 				D2Bot.printToConsole("Disabled CDKey");
 				D2Bot.CDKeyDisabled();
 
-				if (StarterConfig.SwitchKeys) {
+				if (keyswap) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
@@ -381,7 +380,7 @@ JoinLoop:
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 		D2Bot.CDKeyRD();
 
-		if (StarterConfig.SwitchKeys) {
+		if (keyswap) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
@@ -409,7 +408,7 @@ JoinLoop:
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 		D2Bot.CDKeyInUse();
 
-		if (StarterConfig.SwitchKeys) {
+		if (keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
@@ -427,7 +426,7 @@ JoinLoop:
 
 		break;
 	case 22: // Login - Invalid Cdkey (classic or xpac)
-		if (StarterConfig.SwitchKeys) {
+		if (keyswap) {
 			D2Bot.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
