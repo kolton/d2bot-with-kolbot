@@ -132,8 +132,6 @@ var Attack = {
 			attackCount += 1;
 		}
 
-		CollMap.reset();
-
 		return (target.mode === 0 || target.mode === 12);
 	},
 
@@ -288,8 +286,6 @@ var Attack = {
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
 		}
-		
-		CollMap.reset();
 
 		return true;
 	},
@@ -468,8 +464,6 @@ var Attack = {
 				this.markRoom(getRoom(room[0], room[1]), 0x62);
 			}*/
 		}
-
-		CollMap.reset();
 
 		return true;
 	},
@@ -945,7 +939,6 @@ AuraLoop: // Skip monsters with auras
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				//if (!(CollMap.getColl(cx, cy) & 0x1)) {
 				if (this.validSpot(cx, cy)) {
 					coords.push([cx, cy]);
 				}
@@ -958,6 +951,7 @@ AuraLoop: // Skip monsters with auras
 
 				for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
 					if (!CollMap.checkColl(unit, {x: coords[i][0], y: coords[i][1]}, coll)) {
+						CollMap.reset();
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1], 1));
@@ -967,6 +961,7 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		//print("optimal pos fail.");
+		CollMap.reset();
 
 		return false;
 	}

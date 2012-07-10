@@ -159,6 +159,7 @@ include("json2.js");
 include("oog.js");
 include("automule.js");
 include("mulelogger.js");
+include("NTItemParser.dbl");
 include("common/storage.js");
 include("common/pickit.js");
 include("common/town.js");
