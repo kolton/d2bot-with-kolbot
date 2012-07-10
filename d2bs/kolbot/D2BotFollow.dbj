@@ -29,7 +29,7 @@ var StarterConfig = {
 */
 
 var JoinSettings = {
-	"leader": ["follower"]
+	"leader": ["leecher"]
 };
 
 
@@ -39,16 +39,13 @@ include("json2.js");
 include("OOG.js");
 load("tools/heartbeat.js");
 
-var i, j, ingame, gameStart, difficulty, crashed,
+var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
+	gamePass = "",
+	gameName = "",
+	nextGame = "",
 	leader = "",
 	lastGameStatus = "ready",
-	chatActionsDone = false,
-	connectFail = false,
-	D2BOT_JOIN = 1,
-	D2BOT_GAMEINFO = 2,
-	D2BOT_REQUESTGAME = 3,
 	gameCount = DataFile.getStats().runs + 1,
-	gamePass = "", gameName = "", nextGame = "",
 	isUp = "no";
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -91,20 +88,20 @@ function updateCount() {
 
 function ReceiveCopyData(msgID, msg) {
 	switch (msgID) {
-	case D2BOT_GAMEINFO:
+	case 2: // game info
 		print("Recieved Game Info");
-		[gameName, gamePass, difficulty] = msg.split('/');
+
+		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
+		keyswap = parseInt(keyswap, 10);
+		rdblocker = parseInt(rdblocker, 10);
+
 		break;
-	case D2BOT_JOIN:
+	case 1: // join
 		[nextGame, gamePass, isUp] = msg.split('/');
+
 		break;
-	case D2BOT_REQUESTGAME:
+	case 3: // request game
 		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
-		break;
-	case 4:
-		if (msg === "@error") {
-			crashed = true;
-		}
 
 		break;
 	}
@@ -113,9 +110,9 @@ function ReceiveCopyData(msgID, msg) {
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 	delay(rand(1, 2) * 1000);
-	D2Bot.getLastError();
+	D2Bot.requestGameInfo();
 
-	if (crashed) {
+	if (error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
@@ -460,21 +457,26 @@ JoinLoop:
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.printToConsole("Game doesn't exist");
 
-		lastGameStatus = "ready";
+		if (rdblocker) {
+			D2Bot.printToConsole("CDKey is probably flagged.");
 
-		if (!locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location)) {
-			ControlAction.click(6, 652, 469, 120, 20);
-			ControlAction.click(6, 433, 433, 96, 32);
+			if (keyswap) {
+				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			}
+		} else {
+			locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location);
 		}
+
+		lastGameStatus = "ready";
 
 		break;
 	case 38: // Game is full
 		D2Bot.printToConsole("Game is full");
+		ControlAction.click(6, 652, 469, 120, 20);
 
 		lastGameStatus = "ready";
 
-		delay(500);
-		ControlAction.click(6, 652, 469, 120, 20);
 		break;
 	case 42: // Empty character screen
 		delay(1000);

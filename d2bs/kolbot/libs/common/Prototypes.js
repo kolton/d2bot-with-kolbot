@@ -63,14 +63,14 @@ Unit.prototype.openMenu = function () {
 		this.interact();
 
 		for (j = 0; j < 40; j += 1) {
-			if (j % 8 === 0) {
+			if (j % 10 === 0) {
 				me.cancel();
 				delay(300);
 				this.interact();
 			}
 
 			if (getUIFlag(0x08)) {
-				delay(600);
+				delay(900);
 
 				return true;
 			}
@@ -183,8 +183,6 @@ Unit.prototype.sell = function () {
 			delay(10);
 		}
 	}
-
-	//D2Bot.printToConsole("Unit.sell: Sell item failed.;1");
 
 	return false;
 };

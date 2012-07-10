@@ -29,7 +29,7 @@
 
 //------ armor ------
 
-[type] == armor && [quality] == rare # [maxhp] >= 50 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
+//[type] == armor && [quality] == rare # [maxhp] >= 50 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
 [type] == armor && [quality] == rare # [fhr] == 24 && [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
 [name] == ornateplate && [quality] == rare # [enhanceddefense] >= 90 && ([itemreqpercent] < 0 || [maxhp] > 30 || [strength] >= 10)
 [name] == mageplate && [quality] == rare # [enhanceddefense] >= 70 && [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
@@ -124,13 +124,13 @@
 
 //[name] == heavygloves && [quality] == unique # [enhanceddefense] == 20
 //[name] == gauntlets && [quality] == unique //# [enhanceddefense] == 20
-[name] == lightgauntlets && [quality] == unique //# [enhanceddefense] == 30
+//[name] == lightgauntlets && [quality] == unique //# [enhanceddefense] == 30
 //[name] == chaingloves && [quality] == unique # [itemmagicbonus] == 40
 
 //------ helms ------
 
 [name] == skullcap && [quality] == unique # [itemmagicbonus] >= 50
-[name] == skullcap && [quality] == unique # # [maxquantity] == 1
+//[name] == skullcap && [quality] == unique # # [maxquantity] == 1
 
 //------ weapons ------
 
@@ -246,7 +246,7 @@
 
 //ladder reset
 
-[type] == ring && [quality] == rare # [fcr] == 10 && [maxmana] >= 40
+//[type] == ring && [quality] == rare # [fcr] == 10 && [maxmana] >= 40
 
 [type] == armor && [quality] >= magic && [class] == exceptional # [strength] > 100
 [type] == helm && [quality] >= magic && [class] == exceptional # [strength] > 100
@@ -257,9 +257,9 @@
 
 //[name] == flawlessskull
 //[name] == flawlessdiamond
-[type] == amulet && [quality] == rare # [sorceressskills]+[paladinskills] >= 1 && [fireresist]+[lightresist]+[coldresist]+[poisonresist] >= 64
+//[type] == amulet && [quality] == rare # [sorceressskills]+[paladinskills] >= 1 && [fireresist]+[lightresist]+[coldresist]+[poisonresist] >= 64
 [type] == belt && [name] >= platedbelt && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
-[type] == armor && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
+//[type] == armor && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
 
 [type] == boots && [quality] == rare # ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2 && [itemmagicbonus] >= 20
-[name] == heavybelt && [quality] == unique
+//[name] == heavybelt && [quality] == unique

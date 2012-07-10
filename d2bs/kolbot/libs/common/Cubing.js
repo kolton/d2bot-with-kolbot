@@ -542,7 +542,7 @@ IngredientLoop:
 		}
 
 		if (recipe.Index === Recipe.Reroll.Magic) {
-			if (unit.quality === 4 && Math.floor((me.charlvl + unit.ilvl) / 2) >= recipe.Level && NTIPCheckItem(unit) === 0) {
+			if (unit.quality === 4 && unit.ilvl >= recipe.Level && NTIPCheckItem(unit) === 0) {
 				return true;
 			}
 		}

@@ -44,7 +44,7 @@ function main() {
 		if (party) {
 			do {
 				if (party.name !== me.name && getPlayerFlag(me.gid, party.gid, 8) && hostiles.indexOf(party.name) === -1) {
-					D2Bot.printToConsole(party.name + " has declared hostility.;6");
+					D2Bot.printToConsole(party.name + " has declared hostility.;8");
 					hostiles.push(party.name);
 				}
 			} while (party.getNext());
@@ -147,7 +147,7 @@ function main() {
 							attackCount += 1;
 
 							if (player.mode === 0 || player.mode === 17) {
-								D2Bot.printToConsole(player.name + " has been neutralized.;3");
+								D2Bot.printToConsole(player.name + " has been neutralized.;4");
 								hideConsole();
 								delay(500);
 								takeScreenshot();

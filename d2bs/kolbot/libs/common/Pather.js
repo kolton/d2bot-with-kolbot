@@ -384,8 +384,8 @@ ModeLoop:
 							myRoom = [myRoom.x * 5 + myRoom.xsize / 2, myRoom.y * 5 + myRoom.ysize / 2];
 							targetRoom = this.getNearestRoom(areas[i]);
 
-							this.moveTo(targetRoom[0], targetRoom[1], 0);
-							
+							this.moveTo(targetRoom[0], targetRoom[1]);
+
 							break;
 
 							/*if (targetRoom[0] > myRoom[0]) {
@@ -440,6 +440,14 @@ ModeLoop:
 				minDist = dist;
 			}
 		} while (room.getNext());
+
+		room = getRoom(area, x, y);
+
+		if (room) {
+			CollMap.addRoom(room);
+
+			return this.getNearestWalkable(x, y, 20, 4);
+		}
 
 		return [x, y];
 	},

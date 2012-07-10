@@ -77,7 +77,7 @@ var Attack = {
 			return false;
 		}
 
-		var i, target,
+		var i, target, test,
 			dodgeList = [],
 			attackCount = 0;
 
@@ -108,9 +108,13 @@ var Attack = {
 
 				if (dodgeList.length) {
 					dodgeList.sort(Sort.units);
+					
+					if (typeof test === "undefined") {
+						test = {x: target.x, y: target.y};
+					}
 
 					if (getDistance(me, dodgeList[0]) < 13) {
-						this.dodge(target, 20, dodgeList);
+						this.dodge(test, 15, dodgeList);
 					}
 				}
 			}
@@ -127,6 +131,8 @@ var Attack = {
 
 			attackCount += 1;
 		}
+
+		CollMap.reset();
 
 		return (target.mode === 0 || target.mode === 12);
 	},
@@ -282,6 +288,8 @@ var Attack = {
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
 		}
+		
+		CollMap.reset();
 
 		return true;
 	},
@@ -392,12 +400,12 @@ var Attack = {
 	},
 
 	// Draw lines around a room on minimap
-	/*markRoom: function (room, color) {
+	markRoom: function (room, color) {
 		new Line(room.x * 5, room.y * 5, room.x * 5, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5, room.x * 5 + room.xsize, room.y * 5, color, true);
 		new Line(room.x * 5 + room.xsize, room.y * 5, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
-	},*/
+	},
 
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
@@ -557,6 +565,7 @@ var Attack = {
 	// Move away from a nearby monster into a more safe position
 	dodge: function (unit, distance, list) {
 		var i, j, coordx, coordy, count,
+			t = getTickCount(),
 			maxcount = 99,
 			coords = [],
 			goodCoords = [],
@@ -606,8 +615,9 @@ var Attack = {
 				return true;
 			}
 
+			//print("ÿc2dodge calc time: ÿc9" + (getTickCount() - t));
 			me.overhead("Dodge!");
-			Pather.moveTo(goodCoords[0], goodCoords[1], 3);
+			Pather.moveTo(goodCoords[0], goodCoords[1], 1);
 		}
 
 		return true;
@@ -948,16 +958,14 @@ AuraLoop: // Skip monsters with auras
 
 				for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
 					if (!CollMap.checkColl(unit, {x: coords[i][0], y: coords[i][1]}, coll)) {
-						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
-						CollMap.reset();
+						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1]));
+						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1], 1));
 					}
 				}
 			}
 		}
 
-		CollMap.reset();
 		//print("optimal pos fail.");
 
 		return false;

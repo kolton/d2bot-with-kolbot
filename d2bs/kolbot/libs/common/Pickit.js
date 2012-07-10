@@ -70,7 +70,7 @@ var Pickit = {
 			if (gid) {
 				item = getUnit(4, -1, -1, gid);
 
-				if (item) {
+				if (item && (item.mode === 3 || item.mode === 5)) {
 					status = this.checkItem(item);
 
 					if (status && this.canPick(item)) {

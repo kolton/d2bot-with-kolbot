@@ -23,20 +23,18 @@ include("MuleLogger.js");
 include("gambling.js");
 load("tools/heartbeat.js");
 
-var crashed = false,
+var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, currAcc, charList,
+	gamePass = "",
+	gameName = "",
+	nextGame = "",
 	lastGameStatus = "ready",
-	connectFail = false,
-	firstLogin = false,
-	difficulty,
-	gameStart,
 	accounts = [],
-	chars = [],
-	index = 0,
-	currAcc, charList,
-	ingame = false;
+	chars = [];
 
 function parseInfo() {
-	for (var i in MuleLogger.LogAccounts) {
+	var i;
+
+	for (i in MuleLogger.LogAccounts) {
 		if (MuleLogger.LogAccounts.hasOwnProperty(i) && typeof i === "string") {
 			accounts.push(i);
 			chars.push(MuleLogger.LogAccounts[i]);
@@ -44,12 +42,14 @@ function parseInfo() {
 	}
 }
 
-function RecieveCopyData(msgID, msg) {
+function ReceiveCopyData(msgID, msg) {
 	switch (msgID) {
-	case 4:
-		if (msg === "@error") {
-			crashed = true;
-		}
+	case 2: // game info
+		print("Recieved Game Info");
+
+		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
+		keyswap = parseInt(keyswap, 10);
+		rdblocker = parseInt(rdblocker, 10);
 
 		break;
 	}
@@ -90,12 +90,13 @@ function updateCount() {
 }
 
 function main() {
-	addEventListener('copydata', RecieveCopyData);
-	D2Bot.getLastError();
+	addEventListener('copydata', ReceiveCopyData);
+	D2Bot.requestGameInfo();
 	parseInfo();
 
-	if (crashed) {
+	if (error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
+		D2Bot.updateRuns();
 	}
 
 	while (true) {
@@ -120,7 +121,7 @@ function main() {
 }
 
 function locationAction(location) {
-	var i, control, string, text, gambleGame;
+	var i, control, string, text, currChar;
 
 MainSwitch:
 	switch (location) {
@@ -205,12 +206,12 @@ MainSwitch:
 
 			break;
 		}
-	
+
 		currAcc = accounts.shift();
 		currAcc = currAcc.split("/");
 		charList = chars.shift();
 
-		ControlAction.loginAccount({account: currAcc[0], password: currAcc[1]});
+		ControlAction.loginAccount({account: currAcc[0], password: currAcc[1], realm: currAcc[2]});
 
 		break;
 	case 10: // Login Error
@@ -293,8 +294,6 @@ MainSwitch:
 
 			break;
 		}
-
-		var currChar;
 
 		if (charList[0] === "all") {
 			charList = ControlAction.getCharacters();
