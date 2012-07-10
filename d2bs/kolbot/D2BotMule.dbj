@@ -158,6 +158,7 @@ function nextChar() {
 include("json2.js");
 include("oog.js");
 include("automule.js");
+include("mulelogger.js");
 include("common/storage.js");
 include("common/pickit.js");
 include("common/town.js");
@@ -201,6 +202,7 @@ function main() {
 			// done picking, tell the muler to leave game and kill mule profile
 			case "done":
 				sendCopyData(null, muler, 0, "quit");
+				MuleLogger.logChar();
 				delay(500);
 				D2Bot.printToConsole("Done muling.");
 				D2Bot.stop();
@@ -275,7 +277,7 @@ function locationAction(location) {
 
 		if (!ControlAction.loginAccount(info)) {
 			ControlAction.makeAccount(info);
-			FileTools.writeText("mules/" + info.account + ".txt", "");
+			//FileTools.writeText("mules/" + info.account + ".txt", "");
 			D2Bot.printToConsole("Made account: " + info.account);
 		}
 
@@ -319,13 +321,20 @@ function locationAction(location) {
 		if (ControlAction.findCharacter(info)) {
 			ControlAction.loginCharacter(info);
 		} else {
+			if (ControlAction.getCharacters().length >= 8) { // premade account that's already full
+				ControlAction.click(6, 33, 572, 128, 35);
+				nextAccount();
+
+				break;
+			}
+
 			if (!ControlAction.makeCharacter(info)) {
 				nextChar();
 
 				break;
 			}
 
-			FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
+			//FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
 			D2Bot.printToConsole("Made character: " + info.charName);
 		}
 

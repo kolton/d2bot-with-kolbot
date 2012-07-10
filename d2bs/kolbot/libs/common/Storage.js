@@ -66,6 +66,10 @@ var Container = function (name, width, height, location) {
 	 *	Checks to see if we can fit the item in the buffer.
 	 */
 	this.CanFit = function (item) {
+		if (copyUnit(item).x === undefined) {
+			return true;
+		}
+
 		return (!!this.FindSpot(item));
 	};
 

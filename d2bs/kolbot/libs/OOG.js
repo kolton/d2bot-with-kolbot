@@ -64,10 +64,6 @@ var D2Bot = {
 	shoutGlobal: function (msg, mode) {
 		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");
 	},
-	getLastError: function () {
-		sendCopyData(null, "D2Bot #", 0, "getLastError");
-		delay(500);
-	},
 	heartBeat: function () {
 		sendCopyData(null, "D2Bot #", 0, "heartBeat");
 	}
@@ -223,6 +219,8 @@ var ControlAction = {
 
 				break;
 			case 10: // login error - let the starter handle it
+				ControlAction.click(6, 335, 412, 128, 35);
+
 				me.blockMouse = false;
 
 				return false;

@@ -31,5 +31,5 @@ function Test() {
 }
 
 function test() {
-	
+	Misc.logItem("Test", getUnit(101));
 }

@@ -9,6 +9,13 @@ var CollMap = new function () {
 	this.maps = [];
 
 	this.addRoom = function (x, y) {
+		if (x instanceof Room) {
+			this.rooms.push(x);
+			this.maps.push(x.getCollision());
+			
+			return true;
+		}
+
 		var room = getRoom(x, y);
 
 		if (room instanceof Room && this.coordsInRoom(x, y, room)) {

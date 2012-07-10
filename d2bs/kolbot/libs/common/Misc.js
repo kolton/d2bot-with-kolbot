@@ -503,6 +503,10 @@ var Misc = {
 
 		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
 		code = code.replace(" ", "");
+		
+		if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
+			code += (unit.gfx + 1);
+		}
 
 		D2Bot.printToItemLog(action + " " + name, desc, code, 0, color);
 	},
@@ -700,10 +704,10 @@ var Experience = {
 		string = "XP Gain: " + gain + ", Progress: " + me.getStat(12) + " (" + progress + "%), Est. runs until level-up: " + runsToLevel + "/" + totalRunsToLevel;
 
 		if (gain) {
-			D2Bot.printToConsole(string + ";2");
+			D2Bot.printToConsole(string + ";4");
 
 			if (me.getStat(12) > DataFile.getStats().level) {
-				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";3");
+				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";5");
 			}
 		}
 	}

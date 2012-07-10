@@ -228,7 +228,7 @@ function main() {
 
 			if (Config.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
 				D2Bot.updateChickens();
-				D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + this.getNearestMonster() + ";1");
+				D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + this.getNearestMonster() + ";9");
 
 				//me.chickenhp = me.hpmax; // Just to trigger the core chicken
 				quit();
@@ -246,7 +246,7 @@ function main() {
 
 			if (Config.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
 				D2Bot.updateChickens();
-				D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";1");
+				D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";9");
 
 				//me.chickenmp = me.mpmax; // Just to trigger the core chicken
 				quit();
@@ -262,7 +262,7 @@ function main() {
 				if (ironGolem) {
 					if (ironGolem.hp <= Math.floor(128 * Config.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
 						D2Bot.updateChickens();
-						D2Bot.printToConsole("Irom Golem Chicken in " + getArea().name + ";1");
+						D2Bot.printToConsole("Irom Golem Chicken in " + getArea().name + ";9");
 						quit();
 
 						break;
@@ -275,6 +275,7 @@ function main() {
 
 				if (mercHP > 0) {
 					if (mercHP < Config.MercChicken) {
+						D2Bot.printToConsole("Merc Golem Chicken in " + getArea().name + ";9");
 						quit();
 
 						break;

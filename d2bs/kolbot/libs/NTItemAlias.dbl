@@ -784,22 +784,22 @@ _NTIPAliasFlag["runeword"]=0x4000000;
 
 // rare item colors
 var _NTIPAliasColor = {};
-_NTIPAliasColor["black"] = 0;
-_NTIPAliasColor["white"] = 1;
-_NTIPAliasColor["orange"] = 2;
-_NTIPAliasColor["lightyellow"] = 3;
-_NTIPAliasColor["lightred"] = 4;
-_NTIPAliasColor["lightgold"] = 5;
-_NTIPAliasColor["lightblue"] = 6;
-_NTIPAliasColor["lightpurple"] = 7;
-_NTIPAliasColor["crystalblue"] = 8;
+_NTIPAliasColor["black"] = 3;
+_NTIPAliasColor["white"] = 20;
+_NTIPAliasColor["orange"] = 19;
+_NTIPAliasColor["lightyellow"] = 13;
+_NTIPAliasColor["lightred"] = 7;
+_NTIPAliasColor["lightgold"] = 14;
+_NTIPAliasColor["lightblue"] = 4;
+_NTIPAliasColor["lightpurple"] = 17;
+_NTIPAliasColor["crystalblue"] = 6;
 _NTIPAliasColor["crystalred"] = 9;
-_NTIPAliasColor["crystalgreen"] = 10;
-_NTIPAliasColor["darkyellow"] = 11;
-_NTIPAliasColor["darkred"] = 12;
-_NTIPAliasColor["darkgold"] = 13;
-_NTIPAliasColor["darkgreen"] = 14;
-_NTIPAliasColor["darkblue"] = 15;
+_NTIPAliasColor["crystalgreen"] = 12;
+_NTIPAliasColor["darkyellow"] = 15;
+_NTIPAliasColor["darkred"] = 8;
+_NTIPAliasColor["darkgold"] = 16;
+_NTIPAliasColor["darkgreen"] = 11;
+_NTIPAliasColor["darkblue"] = 5;
 
 var _NTIPAliasStat = new Array();
 _NTIPAliasStat["strength"]=0;

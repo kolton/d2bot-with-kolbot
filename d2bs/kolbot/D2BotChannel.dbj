@@ -29,21 +29,14 @@ include("json2.js");
 include("OOG.js");
 load("tools/heartbeat.js");
 
-var lastGameStatus = "ready",
-	nextGameMake = 0,
-	inGameAt = 0,
-	crashed,
-	chatActionsDone = false,
-	lastGameFailed = false,
-	connectFail = false,
+var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
+	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
 	gamePass = "",
 	gameName = "",
 	oldGame = "",
-	gameStart,
 	isUp = "no",
 	channelTick = getTickCount(),
-	inGame = false,
 	retry = 0,
 	fListTick = 0;
 
@@ -53,10 +46,20 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 
 function ReceiveCopyData(msgID, msg) {
 	switch (msgID) {
-	case 4:
-		if (msg === "@error") {
-			crashed = true;
-		}
+	case 2: // game info
+		print("Recieved Game Info");
+
+		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
+		keyswap = parseInt(keyswap, 10);
+		rdblocker = parseInt(rdblocker, 10);
+
+		break;
+	case 1: // join
+		[nextGame, gamePass, isUp] = msg.split('/');
+
+		break;
+	case 3: // request game
+		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
 
 		break;
 	}
@@ -99,9 +102,9 @@ function updateCount() {
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 	delay(rand(1, 2) * 1000);
-	D2Bot.getLastError();
+	D2Bot.requestGameInfo();
 
-	if (crashed) {
+	if (error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}

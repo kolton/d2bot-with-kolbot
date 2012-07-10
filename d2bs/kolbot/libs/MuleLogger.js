@@ -1,14 +1,16 @@
 var MuleLogger = {
 	LogAccounts: {
 		/* Format: 
-			"account1/password1": ["charname1", "charname2 etc"],
-			"account2/password2": ["charnameX", "charnameY etc"],
-			"account3/password3": ["all"]
+			"account1/password1/realm": ["charname1", "charname2 etc"],
+			"account2/password2/realm": ["charnameX", "charnameY etc"],
+			"account3/password3/realm": ["all"]
 
-			To log a full account, put "accountname/password": ["all"]
+			To log a full account, put "accountname/password/realm": ["all"]
+
+			realm = useast, uswest, europe or asia
 		*/
 
-		"account/password": ["all"]
+		"account/password/realm": ["character"]
 	},
 
 	LogGame: ["muleloggame", "password"], // ["gamename", "password"]
@@ -28,7 +30,7 @@ var MuleLogger = {
 		if (unit.getFlag(0x4000000)) { // runeword
 			desc += ("\\xffc4" + unit.fname.split("\n").reverse().join("\\n\\xffc5").replace(/ÿc[0-9!"+<;.*]/, "") + "\\xffc0");
 		} else {
-			desc += (Pickit.itemColor(unit, false) + unit.fname.split("\n").reverse().join("\\n").replace(/ÿc[0-9!"+<;.*]/, "") + "\\xffc0");
+			desc += (Pickit.itemColor(unit, false).replace("ÿ", "\\xff") + unit.fname.split("\n").reverse().join("\\n").replace(/ÿc[0-9!"+<;.*]/, "") + "\\xffc0");
 		}
 
 		switch (unit.itemType) {
@@ -190,6 +192,11 @@ var MuleLogger = {
 
 		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
 		code = code.replace(" ", "");
+
+		if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
+			code += (unit.gfx + 1);
+		}
+
 		rval = (name + "$" + desc + "$" + code + ";" + 0 + ";" + color);
 
 		return rval;

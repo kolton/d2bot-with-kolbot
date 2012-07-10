@@ -9,7 +9,7 @@ var AutoMule = {
 	hardcore: false,
 
 	// Game name and password of the mule game
-	muleGameName: ["", ""], // ["gamename", "password"]
+	muleGameName: ["mulegame", "mulepass"], // ["gamename", "password"]
 
 	// List of profiles that will mule items
 	enabledProfiles: [""],
@@ -87,7 +87,7 @@ MainLoop:
 			delay(1000);
 
 			switch (status) {
-			case "busy":
+			case "begin":
 				D2Bot.printToConsole("Mule profile is busy");
 
 				break MainLoop;

@@ -121,8 +121,8 @@ function main() {
 	me.maxgametime = Config.MaxGameTime * 1000;
 
 	if (me.getStat(13) < DataFile.getStats().experience) { // check for experience decrease -> log death
-		D2Bot.printToConsole("You died in last game;1");
-		D2Bot.printToConsole("Experience decreased by " + (DataFile.getStats().experience - me.getStat(13)) + ";1");
+		D2Bot.printToConsole("You died in last game;9");
+		D2Bot.printToConsole("Experience decreased by " + (DataFile.getStats().experience - me.getStat(13)) + ";9");
 		DataFile.updateDeaths();
 	}
 
