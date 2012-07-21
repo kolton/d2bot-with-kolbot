@@ -391,7 +391,7 @@ function Follower() {
 				continue;
 			}
 
-			status = Pickit.checkItem(item);
+			status = Pickit.checkItem(item).result;
 
 			if (!status) {
 				continue;

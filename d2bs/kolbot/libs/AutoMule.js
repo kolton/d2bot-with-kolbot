@@ -132,7 +132,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]) > 0 && items[i].classid !== 549 &&
+				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
@@ -153,7 +153,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]) > 0 && items[i].classid !== 549 &&
+				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
