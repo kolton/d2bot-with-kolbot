@@ -29,6 +29,7 @@ var D2Bot = {
 	},
 	requestGameInfo: function () {
 		sendCopyData(null, "D2Bot #", 0, "requestGameInfo");
+		delay(500);
 	},
 	restart: function (reset) {
 		if (arguments.length > 0) {

@@ -113,7 +113,7 @@ function main() {
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				isUp = "yes";
 
-				if (!inGame) {
+				if (!ingame) {
 					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
 						print("leaving game");
 						quit();
@@ -124,7 +124,7 @@ function main() {
 
 					oldGame = me.gamename;
 					lastGameStatus = "ingame";
-					inGame = true;
+					ingame = true;
 					gameStart = getTickCount();
 
 					DataFile.updateStats("runs", gameCount);
@@ -161,13 +161,13 @@ MainSwitch:
 	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby Chat");
 
-		if (inGame) {
+		if (ingame) {
 			print("updating runs");
 			D2Bot.updateRuns();
 
 			gameCount += 1;
 			lastGameStatus = "ready";
-			inGame = false;
+			ingame = false;
 			retry = 0;
 		}
 

@@ -553,6 +553,10 @@ ModeLoop:
 				tick = getTickCount();
 
 				while (getTickCount() - tick < 2000) {
+					while (!me.gameReady) {
+						delay(100);
+					}
+
 					if (me.area === targetArea) {
 						delay(500);
 

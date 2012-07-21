@@ -13,4 +13,4 @@
 
 [type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
 [type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
-[type] == staff # [sorceressskills] == 2 && [skillenchant] == 3
+//[type] == staff # [sorceressskills] == 2 && [skillenchant] == 3

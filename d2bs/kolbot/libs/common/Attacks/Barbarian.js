@@ -167,9 +167,13 @@ MainLoop:
 			}
 
 			if (getDistance(me, coords[0], coords[1]) >= 3) {
+				CollMap.reset();
+
 				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 			}
 		}
+
+		CollMap.reset();
 
 		return false;
 	},

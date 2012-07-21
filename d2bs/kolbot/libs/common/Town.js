@@ -314,7 +314,7 @@ var Town = {
 	},
 
 	identify: function () {
-		var item, tome, scroll, npc, list, timer, tpTome,
+		var item, tome, scroll, npc, list, timer, tpTome, result,
 			tpTomePos = {};
 
 		if (this.cainID()) {
@@ -342,12 +342,12 @@ var Town = {
 MainLoop:
 		while (list.length > 0) {
 			item = list.shift();
+			result = Pickit.checkItem(item);
 
-			switch (Pickit.checkItem(item)) {
+			switch (result.result) {
 			case 1:
 				if (item.getFlag(0x10)) {
-					//D2Bot.printToItemLog("Kept " + item.fname.split("\n").reverse().join(" "));
-					Misc.logItem("Kept", item);
+					Misc.logItem("Kept", item, result.line);
 				}
 
 				break;
@@ -384,10 +384,11 @@ MainLoop:
 					this.identifyItem(item, scroll);
 				}
 
-				switch (Pickit.checkItem(item)) {
+				result = Pickit.checkItem(item);
+
+				switch (result.result) {
 				case 1:
-					//D2Bot.printToItemLog("Kept " + item.fname.split("\n").reverse().join(" "));
-					Misc.logItem("Kept", item);
+					Misc.logItem("Kept", item, result.line);
 					break;
 				case -1:
 				case 2:
@@ -435,7 +436,7 @@ MainLoop:
 		}
 
 		// Check if we're already in a shop. It would be pointless to go to Cain if so.
-		var i, cain, unids,
+		var i, cain, unids, result,
 			npc = getInteractedNPC();
 
 		if (npc && npc.name.toLowerCase() === this.tasks[me.act - 1].Shop) {
@@ -464,7 +465,7 @@ MainLoop:
 
 			// Check if we may use Cain - kept unid items
 			for (i = 0; i < unids.length; i += 1) {
-				if (Pickit.checkItem(unids[i]) > 0) {
+				if (Pickit.checkItem(unids[i]).result > 0) {
 					//print("Can't use Cain - can't id a valid item.");
 
 					return false;
@@ -487,13 +488,15 @@ MainLoop:
 			}
 
 			for (i = 0; i < unids.length; i += 1) {
-				switch (Pickit.checkItem(unids[i])) {
+				result = Pickit.checkItem(unids[i]);
+
+				switch (result.result) {
 				case 0:
 					unids[i].drop();
 
 					break;
 				case 1:
-					Misc.logItem("Kept", unids[i]);
+					Misc.logItem("Kept", unids[i], result.line);
 
 					break;
 				default:
@@ -506,7 +509,7 @@ MainLoop:
 	},
 
 	fieldID: function () { // not exactly a town function but whateva
-		var list, tome, item;
+		var list, tome, item, result;
 
 		list = this.getUnids();
 
@@ -522,18 +525,21 @@ MainLoop:
 
 		while (list.length > 0) {
 			item = list.shift();
+			result = Pickit.checkItem(item);
 
-			if (Pickit.checkItem(item) === -1) { // unid item that should be identified
+			if (result.result === -1) { // unid item that should be identified
 				this.identifyItem(item, tome);
 				delay(me.ping + 1);
 
-				switch (Pickit.checkItem(item)) {
+				result = Pickit.checkItem(item);
+
+				switch (result.result) {
 				case 0:
 					item.drop();
 
 					break;
 				case 1:
-					Misc.logItem("Field Kept", item);
+					Misc.logItem("Field Kept", item, result.line);
 
 					break;
 				default:
@@ -627,7 +633,7 @@ MainLoop:
 			return true;
 		}
 
-		var i, items,
+		var i, items, result,
 			npc = getInteractedNPC();
 
 		if (!npc) {
@@ -643,14 +649,18 @@ MainLoop:
 		print("ÿc4MiniShopBotÿc0: Scanning " + items.length + " items.");
 
 		for (i = 0; i < items.length; i += 1) {
-			if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Pickit.checkItem(items[i]) === 1) {
-				try {
-					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
-						Misc.logItem("Shopped", items[i]);
-						items[i].buy();
+			if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1) {
+				result = Pickit.checkItem(items[i]);
+
+				if (result.result === 1) {
+					try {
+						if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
+							Misc.logItem("Shopped", items[i], result.line);
+							items[i].buy();
+						}
+					} catch (e) {
+						print(e);
 					}
-				} catch (e) {
-					print(e);
 				}
 			}
 		}
@@ -663,7 +673,7 @@ MainLoop:
 			return true;
 		}
 
-		var i, items, npc, newItem,
+		var i, items, npc, newItem, result,
 			list = [];
 
 		npc = this.initNPC("Gamble");
@@ -697,9 +707,11 @@ MainLoop:
 						newItem = this.getGambledItem(list);
 
 						if (newItem) {
-							switch (Pickit.checkItem(newItem)) {
+							result = Pickit.checkItem(newItem);
+
+							switch (result.result) {
 							case 1:
-								Misc.logItem("Gambled", newItem);
+								Misc.logItem("Gambled", newItem, result.line);
 								list.push(newItem.gid);
 
 								break;
@@ -1007,7 +1019,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && (Pickit.checkItem(items[i]) > 0 || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
+				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && (Pickit.checkItem(items[i]).result > 0 || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
 					Storage.Stash.MoveTo(items[i]);
 				}
 			}
@@ -1215,7 +1227,7 @@ MainLoop:
 		items = Storage.Inventory.Compare(Config.Inventory);
 
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if ([18, 41, 78].indexOf(items[i].itemType) === -1 && Pickit.checkItem(items[i]) === 0 && !Cubing.keepItem(items[i]) && !Runewords.keepItem(items[i])) {
+			if ([18, 41, 78].indexOf(items[i].itemType) === -1 && Pickit.checkItem(items[i]).result === 0 && !Cubing.keepItem(items[i]) && !Runewords.keepItem(items[i])) {
 				try {
 					items[i].drop();
 				} catch (e) {

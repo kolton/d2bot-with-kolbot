@@ -565,7 +565,7 @@ IngredientLoop:
 			return false;
 		}
 
-		var i, j, items, string;
+		var i, j, items, string, result;
 
 		for (i = 0; i < this.recipes.length; i += 1) {
 			string = "Transmuting";
@@ -598,12 +598,14 @@ IngredientLoop:
 
 				if (items) {
 					for (j = 0; j < items.length; j += 1) {
-						switch (Pickit.checkItem(items[j])) {
+						result = Pickit.checkItem(items[j]);
+
+						switch (result.result) {
 						case 0:
 							items[j].drop();
 							break;
 						case 1:
-							Misc.logItem("Cubing kept", items[j]);
+							Misc.logItem("Cubing kept", items[j], result.line);
 							break;
 						}
 					}

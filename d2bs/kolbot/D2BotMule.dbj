@@ -89,6 +89,7 @@ function pickItems() {
 			break;
 		} else {
 			sendCopyData(null, muler, 0, "report");
+			//D2Bot.shoutGlobal("report", 0);
 		}
 
 		delay(1000);
@@ -97,14 +98,30 @@ function pickItems() {
 	return rval;
 }
 
+// on some systems, copydata is sent in all lowercase...
+function GetMuler(msg) {
+	var i;
+
+	for (i = 0; i < AutoMule.enabledProfiles.length; i += 1) {
+		if (msg.toLowerCase() === AutoMule.enabledProfiles[i].toLowerCase()) {
+			return AutoMule.enabledProfiles[i];
+		}
+	}
+
+	return "";
+}
+
 // muler/mule communication function
 function CopyDataEvent(mode, msg) {
 	// mode check instead of msg check because of crashes
 	switch (mode) {
 	case 0: // mule request
-		sendCopyData(null, msg, 0, status);
-
-		muler = msg;
+		if (!muler) {
+			muler = GetMuler(msg);
+		} else {
+			sendCopyData(null, muler, 0, status);
+			//D2Bot.shoutGlobal(status, 0);
+		}
 
 		break;
 	case 1: // begin item pickup
@@ -203,6 +220,7 @@ function main() {
 			// done picking, tell the muler to leave game and kill mule profile
 			case "done":
 				sendCopyData(null, muler, 0, "quit");
+				//D2Bot.shoutGlobal("quit", 0);
 				MuleLogger.logChar();
 				delay(500);
 				D2Bot.printToConsole("Done muling.");
@@ -211,6 +229,8 @@ function main() {
 				break;
 			// can't fit more items, get to next character or account
 			case "next":
+				MuleLogger.logChar();
+				delay(500);
 				makeNext = true;
 				obj = MuleData.read();
 
