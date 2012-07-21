@@ -324,7 +324,7 @@ var Misc = {
 	},
 
 	// Log kept item stats in the manager. It's buggy.
-	logItem: function (action, unit) { // hackit to the max
+	logItem: function (action, unit, keptLine) { // hackit to the max
 		var val, code,
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, ""),
@@ -503,9 +503,13 @@ var Misc = {
 
 		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
 		code = code.replace(" ", "");
-		
+
 		if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
 			code += (unit.gfx + 1);
+		}
+
+		if (keptLine) {
+			desc += ("\nLine: " + keptLine);
 		}
 
 		D2Bot.printToItemLog(action + " " + name, desc, code, 0, color);

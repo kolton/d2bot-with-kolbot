@@ -109,8 +109,6 @@ function MFHelper() {
 			}
 		}
 
-		CollMap.reset();
-
 		return true;
 	};
 

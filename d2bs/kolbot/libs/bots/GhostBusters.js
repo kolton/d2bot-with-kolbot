@@ -46,8 +46,6 @@ function GhostBusters() {
 			}
 		}
 
-		CollMap.reset();
-
 		return true;
 	};
 

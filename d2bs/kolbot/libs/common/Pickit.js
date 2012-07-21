@@ -22,14 +22,14 @@ var Pickit = {
 	},
 
 	checkItem: function (unit) {
-		var result = NTIPCheckItem(unit);
+		var result = NTIPCheckItem(unit, false, true);
 
 		if (Cubing.checkItem(unit)) {
-			return 2;
+			return {result: 2, line: null};
 		}
 
 		if (Runewords.checkItem(unit)) {
-			return 3;
+			return {result: 3, line: null};
 		}
 
 		return result;
@@ -43,7 +43,7 @@ var Pickit = {
 			this.gid = unit.gid;
 		}
 
-		var status, gid, item, canFit;
+		var status, gid, item, canFit, keptLine;
 
 		Town.clearBelt();
 
@@ -73,7 +73,7 @@ var Pickit = {
 				if (item && (item.mode === 3 || item.mode === 5)) {
 					status = this.checkItem(item);
 
-					if (status && this.canPick(item)) {
+					if (status.result && this.canPick(item)) {
 						// Check room, don't check gold, scrolls and potions
 						canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
 
@@ -94,7 +94,7 @@ var Pickit = {
 						}
 
 						if (canFit) {
-							this.pickItem(item, status);
+							this.pickItem(item, status.result, status.line);
 						} else {
 							print("ÿc7Not enough room for " + item.name);
 
@@ -118,7 +118,7 @@ var Pickit = {
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				switch (this.checkItem(items[i])) {
+				switch (this.checkItem(items[i]).result) {
 				case -1: // item needs to be identified
 					return true;
 				case 0:
@@ -134,7 +134,7 @@ var Pickit = {
 		return false;
 	},
 
-	pickItem: function (unit, status) {
+	pickItem: function (unit, status, keptLine) {
 		var i, picked, tick,
 			classid = unit.classid,
 			gid = unit.gid,
@@ -203,8 +203,7 @@ MainLoop:
 			switch (status) {
 			case 1:
 				if (this.ignoreLog.indexOf(type) === -1) {
-					//D2Bot.printToItemLog("Kept " + name);
-					Misc.logItem("Kept", unit);
+					Misc.logItem("Kept", unit, keptLine);
 				}
 
 				break;
@@ -369,8 +368,8 @@ MainLoop:
 			if (item && (item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
 				status = this.checkItem(item);
 
-				if (status && this.canPick(item) && (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1)) {
-					this.pickItem(item, status);
+				if (status.result && this.canPick(item) && (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1)) {
+					this.pickItem(item, status, status.line);
 				}
 			}
 		}

@@ -65,7 +65,7 @@ Unit.prototype.openMenu = function () {
 		for (j = 0; j < 40; j += 1) {
 			if (j % 10 === 0) {
 				me.cancel();
-				delay(300);
+				delay(400);
 				this.interact();
 			}
 

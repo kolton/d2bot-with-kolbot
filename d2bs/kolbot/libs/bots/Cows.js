@@ -75,8 +75,6 @@ function Cows() {
 			}
 		}
 
-		CollMap.reset();
-
 		return true;
 	};
 	

@@ -12,11 +12,10 @@ function Test() {
 	}
 
 	addEventListener("keydown", KeyDown);
+	addEventListener("copydata", CopyDataEvent);
 
 	function CopyDataEvent(mode, msg) {
-		if (msg) {			
-			return;
-		}
+		print(msg);
 	}
 
 	while (true) {
@@ -31,5 +30,5 @@ function Test() {
 }
 
 function test() {
-	Misc.logItem("Test", getUnit(101));
+	Pickit.pickItems();
 }
