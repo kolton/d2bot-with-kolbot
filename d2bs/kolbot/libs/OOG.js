@@ -12,8 +12,11 @@ var D2Bot = {
 			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg + ";" + color);
 		}
 	},
-	printToItemLog: function (msg, tooltip, code, color1, color2) {
-		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);
+	printToItemLog: function (msg, tooltip, code, color1, color2, header, gid) {
+		header = header || "";
+		gid = gid || "";
+
+		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg + "$" + tooltip + "$" + code + "$" + header + "$" + gid + ";" + color1 + ";" + color2 + ";" + header);
 	},
 	saveItem: function (filename, tooltip, code, color1, color2) {
 		sendCopyData(null, "D2Bot #", 0, "saveItem;" + filename + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);

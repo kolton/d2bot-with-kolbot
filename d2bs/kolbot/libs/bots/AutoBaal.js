@@ -82,6 +82,7 @@ function AutoBaal() {
 		while (Misc.inMyParty(leader)) { // do our stuff while partied
 			if (hotCheck && Config.AutoBaal.FindShrine) {
 				Pather.useWaypoint(4);
+				Precast.doPrecast(true);
 
 				for (i = 4; i > 1; i -= 1) {
 					if (Misc.getShrinesInArea(i, 15)) {

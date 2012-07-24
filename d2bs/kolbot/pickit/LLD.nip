@@ -209,8 +209,8 @@
 //[name] == leathergloves && [quality] == set # [defense] == 3 // Death's Hand, perfect defense
 //[name] == wargauntlets && [quality] == set # [defense] == 118 // Immortal King's Forge, perfect defense
 
-[name] == heavygloves && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 20 // Bloodfist
-[name] == lightgauntlets && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 30 // Magefist
+//[name] == heavygloves && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 20 // Bloodfist
+//[name] == lightgauntlets && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 30 // Magefist
 //[name] == gauntlets && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 20 // Frostburn
 
 [type] == gloves && [quality] == rare && [flag] != ethereal # [javelinandspearskilltab] == 2 && [ias] == 10 && [hpregen] >= 5 && [itemlevelreq] <= 30

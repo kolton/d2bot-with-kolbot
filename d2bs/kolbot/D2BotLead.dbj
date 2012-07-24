@@ -328,10 +328,9 @@ MainSwitch:
 
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
 		createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
+		locationTimeout(5000, location);
 
 		lastGameStatus = "pending";
-
-		locationTimeout(5000, location);
 
 		break;
 	case 5: // Join Game

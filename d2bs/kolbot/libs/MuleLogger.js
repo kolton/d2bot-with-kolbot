@@ -22,6 +22,7 @@ var MuleLogger = {
 	// don't edit
 	getItemDesc: function (unit) {
 		var val, code,
+			header = "",
 			rval = "",
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, ""),
@@ -197,7 +198,11 @@ var MuleLogger = {
 			code += (unit.gfx + 1);
 		}
 
-		rval = (name + "$" + desc + "$" + code + ";" + 0 + ";" + color);
+		if (me.account) {
+			header = me.account + " / " + me.name;
+		}
+
+		rval = (name + "$" + desc + "$" + code + "$" + header + "$" + unit.gid + ";" + 0 + ";" + color);
 
 		return rval;
 	},

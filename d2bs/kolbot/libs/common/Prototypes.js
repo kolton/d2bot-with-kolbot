@@ -250,10 +250,6 @@ Unit.prototype.drop = function () {
 };
 
 me.findItem = function (id, mode, loc) {
-	if (this.type > 1) {
-		throw new Error("Unit.findItem: Must be used on PCs or NPCs.");
-	}
-
 	if (typeof id === "undefined") {
 		id = -1;
 	}
@@ -266,7 +262,7 @@ me.findItem = function (id, mode, loc) {
 		loc = false;
 	}
 
-	var item = this.getItem(id, mode);
+	var item = me.getItem(id, mode);
 
 	if (!item) {
 		return false;

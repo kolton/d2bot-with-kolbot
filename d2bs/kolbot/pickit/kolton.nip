@@ -753,7 +753,7 @@
 
 [type] == amulet && [quality] == crafted # [assassinskills] == 2 && [fcr] >= 15
 [type] == amulet && [quality] == crafted # [druidskills] == 2 && [fcr] >= 18
-[type] == amulet && [quality] == crafted # [itemaddclassskills] >= 2 && ([fcr] >= 20 || [strength]+[dexterity] >= 25 || [maxhp]+[maxmana] >= 50)
+[type] == amulet && [quality] == crafted # [amazonskills]+[paladinskills]+[druidskills]+[assassinskills]+[barbarianskills]+[necromancerskills]+[sorceressskills] >= 2 && ([fcr] >= 20 || [strength]+[dexterity] >= 25 || [maxhp]+[maxmana] >= 50)
 
 [name] == jewel && [quality] == rare # [fireresist] >= 35
 [type] == boots && [quality] == crafted # [maxmana] >= 40 && [itemmaxmanapercent] >= 4

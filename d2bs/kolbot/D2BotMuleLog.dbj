@@ -171,8 +171,8 @@ MainSwitch:
 
 		control = getControl(1, 657, 342, 27, 20);
 
-		if (control.disabled === 5) {
-			ControlAction.click(6, 431, 341, 15, 16);
+		if (control && control.disabled === 5) {
+			ControlAction.click(6, 431, 341, 15, 16); // remove level restriction
 		}
 
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
@@ -184,6 +184,7 @@ MainSwitch:
 
 		break;
 	case 5: // Join Game
+		D2Bot.updateStatus("Join Game");
 		timeoutDelay("Join Game Delay", StarterConfig.CreateGameDelay * 1e3);
 		joinGame(MuleLogger.LogGame[0], MuleLogger.LogGame[1]);
 

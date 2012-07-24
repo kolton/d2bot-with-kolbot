@@ -317,4 +317,5 @@ function LoadConfig() {
 	Config.PoisonNovaDelay = 2000; // Delay between two Poison Novas
 	Config.ActiveSummon = false; // Raise dead between each attack. If false, it will raise after clearing a spot.
 	Config.ReviveUnstackable = true; // Revive monsters that can move freely after you teleport.
+	Config.IronGolemChicken = 30; // Exit game if Iron Golem's life is less or equal to designated percent.
 }
