@@ -99,7 +99,7 @@ function pickItems() {
 }
 
 // on some systems, copydata is sent in all lowercase...
-function GetMuler(msg) {
+function getMuler(msg) {
 	var i;
 
 	for (i = 0; i < AutoMule.enabledProfiles.length; i += 1) {
@@ -120,7 +120,7 @@ function ReceiveCopyData(mode, msg) {
 	case 2: // game info
 		print("Recieved Game Info");
 
-		keyswap = parseInt(msg.split('/')[4]);
+		keyswap = parseInt(msg.split('/')[4], 10);
 
 		break;
 	case 3: // request game
@@ -129,7 +129,7 @@ function ReceiveCopyData(mode, msg) {
 	// automule specific
 	case 10: // mule request
 		if (!muler) {
-			muler = GetMuler(msg);
+			muler = getMuler(msg);
 		} else {
 			sendCopyData(null, muler, 0, status);
 			//D2Bot.shoutGlobal(status, 0);
@@ -182,6 +182,25 @@ function nextChar() {
 	MuleData.write(obj);
 
 	return obj.character;
+}
+
+function locationTimeout(time, location) {
+	var endtime = getTickCount() + time;
+
+	while (getLocation() === location && endtime > getTickCount()) {
+		delay(500);
+	}
+
+	return (getLocation() !== location);
+}
+
+function timeoutDelay(text, time) {
+	var endTime = getTickCount() + time;
+
+	while (getTickCount() < endTime) {
+		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+		delay(500);
+	}
 }
 
 include("json2.js");
@@ -262,8 +281,9 @@ function main() {
 }
 
 function locationAction(location) {
-	var obj, info, control;
+	var i, obj, info, control, string, text;
 
+MainSwitch:
 	switch (location) {
 	case 1:
 	case 3:
@@ -352,7 +372,6 @@ function locationAction(location) {
 				D2Bot.CDKeyDisabled();
 
 				if (keyswap) {
-					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
