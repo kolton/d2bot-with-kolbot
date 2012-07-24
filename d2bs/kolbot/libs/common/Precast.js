@@ -204,8 +204,8 @@ var Precast = new function () {
 
 				break;
 			case 3:
-			case "Solar Creeper":
-				buffSummons = this.summon(241) || buffSummons; // Solar Creeper
+			case "Spirit of Barbs":
+				buffSummons = this.summon(246) || buffSummons; // Spirit of Barbs
 
 				break;
 			}

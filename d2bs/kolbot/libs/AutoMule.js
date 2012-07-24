@@ -9,9 +9,9 @@ var AutoMule = {
 	hardcore: false,
 
 	// Game name and password of the mule game
-	muleGameName: ["mulegame", "mulepass"], // ["gamename", "password"]
+	muleGameName: ["mule", "pw"], // ["gamename", "password"]
 
-	// List of profiles that will mule items
+	// List of profiles that will mule items. Casing matters!
 	enabledProfiles: [""],
 
 
@@ -31,7 +31,7 @@ var AutoMule = {
 		function DropStatusEvent(mode, msg) {
 			switch (msg) {
 			case "report": // reply to status request
-				sendCopyData(null, AutoMule.muleProfile, 2, status);
+				sendCopyData(null, AutoMule.muleProfile, 12, status);
 				
 				break;
 			case "quit": // quit command
@@ -48,7 +48,7 @@ var AutoMule = {
 			throw new Error("Failed to go to stash in act 1");
 		}
 
-		sendCopyData(null, this.muleProfile, 1, "begin");
+		sendCopyData(null, this.muleProfile, 11, "begin");
 		this.dropStuff();
 
 		status = "done";
@@ -83,7 +83,7 @@ var AutoMule = {
 
 MainLoop:
 		while (true) {
-			sendCopyData(null, this.muleProfile, 0, me.profile);
+			sendCopyData(null, this.muleProfile, 10, me.profile);
 			delay(1000);
 
 			switch (status) {

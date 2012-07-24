@@ -26,15 +26,12 @@ var StarterConfig = {
 // No touchy!
 include("json2.js");
 include("OOG.js");
+include("automule.js");
 load("tools/heartbeat.js");
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
+var gameName, gamePass, oldGame, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
-	gamePass = "",
-	gameName = "",
-	oldGame = "",
-	isUp = "no",
 	channelTick = getTickCount(),
 	retry = 0,
 	fListTick = 0;
@@ -48,18 +45,14 @@ function ReceiveCopyData(msgID, msg) {
 	case 2: // game info
 		print("Recieved Game Info");
 
-		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
-		keyswap = parseInt(keyswap, 10);
-		rdblocker = parseInt(rdblocker, 10);
+		error = msg.split('/')[3];
+		keyswap = parseInt(msg.split('/')[4], 10);
+		rdblocker = parseInt(msg.split('/')[5], 10);
 
 		break;
 	case 1: // join
-		[nextGame, gamePass, isUp] = msg.split('/');
-
 		break;
 	case 3: // request game
-		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
-
 		break;
 	}
 }
@@ -98,8 +91,18 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
+function ScriptMsgEvent(msg) {
+	switch (msg) {
+	case "mule":
+		muleTrigger = true;
+
+		break;
+	}
+}
+
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
+	addEventListener('scriptmsg', ScriptMsgEvent);
 	delay(rand(1, 2) * 1000);
 	D2Bot.requestGameInfo();
 
@@ -162,6 +165,16 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby Chat");
 
 		if (ingame) {
+			// ### automule ###
+			if (muleTrigger) {
+				AutoMule.outOfGameCheck();
+
+				muleTrigger = false;
+
+				break;
+			}
+			// ### automule end ###
+
 			print("updating runs");
 			D2Bot.updateRuns();
 

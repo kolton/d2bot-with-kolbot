@@ -36,6 +36,7 @@ var JoinSettings = {
 // No touchy!
 include("json2.js");
 include("OOG.js");
+include("automule.js");
 load("tools/heartbeat.js");
 
 var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
@@ -85,6 +86,15 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
+function ScriptMsgEvent(msg) {
+	switch (msg) {
+	case "mule":
+		muleTrigger = true;
+
+		break;
+	}
+}
+
 function ReceiveCopyData(msgID, msg) {
 	switch (msgID) {
 	case 2: // game info
@@ -108,6 +118,7 @@ function ReceiveCopyData(msgID, msg) {
 
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
+	addEventListener('scriptmsg', ScriptMsgEvent);
 	delay(rand(1, 2) * 1000);
 	D2Bot.requestGameInfo();
 
@@ -161,6 +172,16 @@ MainSwitch:
 		}
 
 		if (ingame) {
+			// ### automule ###
+			if (muleTrigger) {
+				AutoMule.outOfGameCheck();
+
+				muleTrigger = false;
+
+				break;
+			}
+			// ### automule end ###
+
 			print("updating runs");
 			D2Bot.updateRuns();
 
@@ -193,6 +214,16 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby Chat");
 
 		if (ingame) {
+			// ### automule ###
+			if (muleTrigger) {
+				AutoMule.outOfGameCheck();
+
+				muleTrigger = false;
+
+				break;
+			}
+			// ### automule end ###
+
 			print("updating runs");
 			D2Bot.updateRuns();
 

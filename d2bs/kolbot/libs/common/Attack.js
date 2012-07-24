@@ -35,7 +35,6 @@ var Attack = {
 		}
 
 		// Check merc infinity
-
 		if (merc) {
 			items = merc.getItems();
 
@@ -53,7 +52,6 @@ var Attack = {
 		}
 
 		// Check player infinity
-
 		items = me.findItems(-1, 1);
 
 		if (items) {
@@ -81,12 +79,8 @@ var Attack = {
 			dodgeList = [],
 			attackCount = 0;
 
-		for (i = 0; i < 5; i += 1) {
+		for (i = 0; !target && i < 5; i += 1) {
 			target = getUnit(1, classId);
-
-			if (target) {
-				break;
-			}
 
 			delay(200);
 		}
@@ -180,10 +174,10 @@ var Attack = {
 		}
 
 		if (bossId) {
-			for (i = 0; !boss && i < 3; i += 1) {
+			for (i = 0; !boss && i < 5; i += 1) {
 				boss = getUnit(1, bossId);
 
-				delay(50);
+				delay(200);
 			}
 
 			if (!boss) {

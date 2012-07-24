@@ -1,4 +1,4 @@
-var muler, mulerStatus,
+var muler, mulerStatus, keyswap,
 	makeNext = false,
 	status = "loading";
 
@@ -112,10 +112,22 @@ function GetMuler(msg) {
 }
 
 // muler/mule communication function
-function CopyDataEvent(mode, msg) {
+function ReceiveCopyData(mode, msg) {
 	// mode check instead of msg check because of crashes
 	switch (mode) {
-	case 0: // mule request
+	case 1: // join
+		break;
+	case 2: // game info
+		print("Recieved Game Info");
+
+		keyswap = parseInt(msg.split('/')[4]);
+
+		break;
+	case 3: // request game
+		break;
+
+	// automule specific
+	case 10: // mule request
 		if (!muler) {
 			muler = GetMuler(msg);
 		} else {
@@ -124,11 +136,11 @@ function CopyDataEvent(mode, msg) {
 		}
 
 		break;
-	case 1: // begin item pickup
+	case 11: // begin item pickup
 		status = "begin";
 
 		break;
-	case 2: // get muler's status
+	case 12: // get muler's status
 		mulerStatus = msg;
 
 		break;
@@ -186,7 +198,7 @@ include("common/config.js");
 include("common/prototypes.js");
 load("tools/heartbeat.js");
 
-addEventListener("copydata", CopyDataEvent);
+addEventListener("copydata", ReceiveCopyData);
 
 function main() {
 	var obj;
@@ -250,7 +262,7 @@ function main() {
 }
 
 function locationAction(location) {
-	var obj, info;
+	var obj, info, control;
 
 	switch (location) {
 	case 1:
@@ -264,16 +276,25 @@ function locationAction(location) {
 		ControlAction.click(6, 652, 469, 120, 20); // Join
 
 		break;
-	case 4:
+	case 4: // Create Game
+		D2Bot.updateStatus("Creating Game");
+
+		control = getControl(1, 657, 342, 27, 20);
+
+		if (control && control.disabled === 5) {
+			ControlAction.click(6, 431, 341, 15, 16); // remove level restriction
+		}
+
 		delay(2000);
 		createGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
-		delay(2000);
+		locationTimeout(5000, location);
 
 		break;
-	case 5:
+	case 5: // Join Game
+		D2Bot.updateStatus("Join Game");
 		delay(2000);
 		joinGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
-		delay(2000);
+		locationTimeout(5000, location);
 
 		break;
 	case 8: // menu
@@ -300,6 +321,60 @@ function locationAction(location) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
 			D2Bot.printToConsole("Made account: " + info.account);
+		}
+
+		break;
+	case 10: // Login Error
+		string = "";
+		text = ControlAction.getText(4, 199, 377, 402, 140);
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+
+			switch (string) {
+			case getLocaleString(5207):
+				D2Bot.updateStatus("Invalid Password");
+				D2Bot.printToConsole("Invalid Password");
+				break;
+			case getLocaleString(5208):
+				D2Bot.updateStatus("Invalid Account");
+				D2Bot.printToConsole("Invalid Account");
+				break;
+			case getLocaleString(5199):
+				D2Bot.updateStatus("Disabled CDKey");
+				D2Bot.printToConsole("Disabled CDKey");
+				D2Bot.CDKeyDisabled();
+
+				if (keyswap) {
+					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(5347):
+				D2Bot.updateStatus("Disconnected");
+				D2Bot.printToConsole("Disconnected");
+				ControlAction.click(6, 335, 412, 128, 35);
+				break MainSwitch;
+			default:
+				D2Bot.updateStatus("Login Error");
+				D2Bot.printToConsole("Login Error - " + string);
+				break;
+			}
+		}
+
+		ControlAction.click(6, 335, 412, 128, 35);
+
+		while (true) {
+			delay(1000);
 		}
 
 		break;
