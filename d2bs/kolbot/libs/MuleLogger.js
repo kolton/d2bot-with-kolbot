@@ -22,6 +22,7 @@ var MuleLogger = {
 	// don't edit
 	getItemDesc: function (unit) {
 		var val, code,
+			gid = "",
 			header = "",
 			rval = "",
 			color = -1,
@@ -202,13 +203,18 @@ var MuleLogger = {
 			header = me.account + " / " + me.name;
 		}
 
-		rval = (name + "$" + desc + "$" + code + "$" + header + "$" + unit.gid + ";" + 0 + ";" + color);
+		// d2bot# optimization for runes, gems and set/unique items
+		if ([5, 7].indexOf(unit.quality) > -1 || [74, 96, 97, 98, 99, 100, 101, 102].indexOf(unit.itemType) > -1) {
+			gid = unit.gid;
+		}
+
+		rval = (name + "$" + desc + "$" + code + "$" + header + "$" + gid + ";" + "0" + ";" + color);
 
 		return rval;
 	},
 
 	logChar: function () {
-		var folder,
+		var i, folder,
 			items = me.getItems(),
 			realm = me.realm || "Single Player",
 			finalString = "";
@@ -225,7 +231,7 @@ var MuleLogger = {
 			folder.create(me.account);
 		}
 
-		for (var i = 0; i < items.length; i += 1) {
+		for (i = 0; i < items.length; i += 1) {
 			if (items[i].mode === 0) {
 				finalString += (this.getItemDesc(items[i]) + "\n");
 			}

@@ -30,6 +30,10 @@ include("automule.js");
 include("gambling.js");
 load("tools/heartbeat.js");
 
+if (!FileTools.exists("data/" + me.profile + ".json")) {
+	DataFile.create();
+}
+
 var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
 	gamePass = "",
 	gameName = "",
@@ -37,10 +41,6 @@ var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, first
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
 	isUp = "no";
-
-if (!FileTools.exists("data/" + me.profile + ".json")) {
-	DataFile.create();
-}
 
 function ReceiveCopyData(msgID, msg) {
 	switch (msgID) {
