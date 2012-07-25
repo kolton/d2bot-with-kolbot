@@ -39,7 +39,7 @@ function main() {
 	}
 
 	// mule logger stuff
-	if (me.gamename.toLowerCase() === MuleLogger.LogGame[0].toLowerCase()) {
+	if (me.gamename.toLowerCase().indexOf(MuleLogger.LogGame[0].toLowerCase()) > -1) {
 		MuleLogger.logChar();
 
 		while ((getTickCount() - me.gamestarttime) < MuleLogger.IngameTime * 1000) {

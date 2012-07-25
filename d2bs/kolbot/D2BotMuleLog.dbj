@@ -22,11 +22,16 @@ include("MuleLogger.js");
 include("gambling.js");
 load("tools/heartbeat.js");
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, currAcc, charList,
+if (!FileTools.exists("data/" + me.profile + ".json")) {
+	DataFile.create();
+}
+
+var difficulty, error, keyswap, rdblocker, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList,
 	gamePass = "",
 	gameName = "",
 	nextGame = "",
 	lastGameStatus = "ready",
+	gameCount = DataFile.getStats().runs + 1,
 	accounts = [],
 	chars = [];
 
@@ -108,6 +113,8 @@ function main() {
 					lastGameStatus = "ingame";
 					ingame = true;
 					gameStart = getTickCount();
+
+					DataFile.updateStats("runs", gameCount);
 				}
 			}
 
@@ -120,7 +127,8 @@ function main() {
 }
 
 function locationAction(location) {
-	var i, control, string, text, currChar;
+	var i, control, string, text, currChar,
+		obj = {};
 
 MainSwitch:
 	switch (location) {
@@ -138,6 +146,7 @@ MainSwitch:
 			print("updating runs");
 			D2Bot.updateRuns();
 
+			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
 
@@ -146,16 +155,16 @@ MainSwitch:
 			break;
 		}
 
-		if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
 			break;
 		}
 
 		if (!locationTimeout(5000, location)) { // in case join button gets bugged
-			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
 				break;
 			}
 
-			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
 				break;
 			}
 		}
@@ -175,23 +184,26 @@ MainSwitch:
 			ControlAction.click(6, 431, 341, 15, 16); // remove level restriction
 		}
 
+		if (gameCount >= 99) {
+			gameCount = 1;
+
+			DataFile.updateStats("runs", gameCount);
+		}
+
+		if (lastGameStatus === "pending") {
+			D2Bot.printToConsole("Failed to create game");
+
+			gameCount += 1;
+		}
+
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
-		createGame(MuleLogger.LogGame[0], MuleLogger.LogGame[1], 0);
+		createGame(MuleLogger.LogGame[0] + gameCount, MuleLogger.LogGame[1], 0);
+		locationTimeout(5000, location);
 
 		lastGameStatus = "pending";
-
-		locationTimeout(5000, location);
 
 		break;
 	case 5: // Join Game
-		D2Bot.updateStatus("Join Game");
-		timeoutDelay("Join Game Delay", StarterConfig.CreateGameDelay * 1e3);
-		joinGame(MuleLogger.LogGame[0], MuleLogger.LogGame[1]);
-
-		lastGameStatus = "pending";
-
-		locationTimeout(5000, location);
-
 		break;
 	case 6: // Ladder
 		break;
@@ -200,17 +212,49 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
+		// account list is empty - nothing more to do
 		if (!accounts.length) {
+			// if mule logging is successful, delete the json file
+			FileTools.remove("logs/MuleLog.json");
 			D2Bot.printToConsole("Done logging mules!");
 			D2Bot.stop();
 
 			break;
 		}
 
-		currAcc = accounts.shift();
-		currAcc = currAcc.split("/");
-		charList = chars.shift();
+		// check if some info is already stored, false for fresh start, true for 2nd+ character or crash/restart
+		if (FileTools.exists("logs/MuleLog.json")) {
+			obj = JSON.parse(FileTools.readText("logs/MuleLog.json"));
 
+			// find current account based on stored info
+			for (i = 0; i < accounts.length; i += 1) {
+				if (accounts[i][0] === obj.currAcc) {
+					// assign current account and its character list
+					currAcc = accounts[i];
+					charList = chars[i];
+
+					// remove current account from accounts array
+					accounts.splice(i, 1);
+
+					break;
+				}
+			}
+		}
+
+		// if there's no current account or if there's no account found in the json file, use the first account from the accounts array
+		if (!currAcc) {
+			currAcc = accounts.shift();
+			currAcc = currAcc.split("/");
+			charList = chars.shift();
+		}
+
+		// assign current account, this will be stored in a file
+		obj.currAcc = currAcc[0];
+
+		print("ÿc4Mule Loggerÿc2: Login account: " + currAcc[0]);
+
+		// store account info
+		FileTools.writeText("logs/MuleLog.json", JSON.stringify(obj));
 		ControlAction.loginAccount({account: currAcc[0], password: currAcc[1], realm: currAcc[2]});
 
 		break;
@@ -299,8 +343,29 @@ MainSwitch:
 			charList = ControlAction.getCharacters();
 		}
 
-		currChar = charList.shift();
+		if (FileTools.exists("logs/MuleLog.json")) {
+			obj = JSON.parse(FileTools.readText("logs/MuleLog.json"));
 
+			if (obj.currChar) {
+				for (i = 0; i < charList.length; i += 1) {
+					if (charList[i] === obj.currChar) {
+						currChar = charList[i];
+
+						charList.splice(i, 1);
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (!currChar) {
+			currChar = charList.shift();
+		}
+
+		obj.currChar = currChar;
+
+		FileTools.writeText("logs/MuleLog.json", JSON.stringify(obj));
 		ControlAction.loginCharacter({charName: currChar});
 
 		break;
