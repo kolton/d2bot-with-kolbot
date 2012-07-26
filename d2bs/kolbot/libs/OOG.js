@@ -191,9 +191,61 @@ var ControlAction = {
 	},
 
 	clickRealm: function (realm) {
-		this.click(6, 264, 391, 272, 25);
-		this.click(4, 257, 500, 292, 160, 403, 350 + realm * 25);
-		this.click(6, 281, 538, 96, 32);
+		if (realm < 0 || realm > 3) {
+			throw new Error("clickRealm: Invalid realm!");
+		}
+
+		var control, currentRealm;
+
+		me.blockMouse = true;
+
+MainLoop:
+		while (true) {
+			switch (getLocation()) {
+			case 8:
+				control = getControl(6, 264, 391, 272, 25);
+
+				if (control) {
+					switch (control.text.split(getLocaleString(11049).substring(0, getLocaleString(11049).length - 2))[1]) {
+					case "U.S. EAST":
+						currentRealm = 1;
+
+						break;
+					case "U.S. WEST":
+						currentRealm = 0;
+
+						break;
+					case "ASIA":
+						currentRealm = 2;
+
+						break;
+					case "EUROPE":
+						currentRealm = 3;
+
+						break;
+					}
+				}
+
+				if (currentRealm === realm) {
+					break MainLoop;
+				}
+
+				this.click(6, 264, 391, 272, 25);
+
+				break;
+			case 27:
+				this.click(4, 257, 500, 292, 160, 403, 350 + realm * 25);
+				this.click(6, 281, 538, 96, 32);
+
+				break;
+			}
+
+			delay(500);
+		}
+
+		me.blockMouse = false;
+
+		return true;
 	},
 
 	loginAccount: function (info) {
@@ -210,7 +262,7 @@ var ControlAction = {
 			switch (getLocation()) {
 			case 8: // main menu
 				if (info.realm) {
-					ControlAction.clickRealm(realms[info.realm]);					
+					ControlAction.clickRealm(realms[info.realm]);
 				}
 
 				this.click(6, 264, 366, 272, 35);
