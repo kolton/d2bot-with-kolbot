@@ -270,6 +270,12 @@ function LoadConfig() {
 	Config.TownCheck = false; // Go to town if out of potions
 	Config.LogExperience = false; // Print experience statistics in the manager.
 
+	// Fastmod config
+	Config.fcr = 0; // 0 - disable, 1 to 255 - set value of faster cast rate 
+	Config.fhr = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
+	Config.fbr = 0; // 0 - disable, 1 to 255 - set value of faster block recovery 
+	Config.ias = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
+	
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
