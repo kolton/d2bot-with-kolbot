@@ -112,6 +112,12 @@ var Config = {
 	TeleSwitch: false,
 	LogExperience: false,
 	TownCheck: false,
+	
+	// Fastmod
+	fcr: 0,
+	fhr: 0,
+	fbr: 0,
+	ias: 0,
 
 	// Anti-hostile
 	AntiHostile: false,

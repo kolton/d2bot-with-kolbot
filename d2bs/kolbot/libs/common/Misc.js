@@ -716,3 +716,31 @@ var Experience = {
 		}
 	}
 };
+
+var Packet = new function () {
+	var BYTE = 1, WORD = 2, DWORD = 4;
+	this.castSkill = function (hand, wX, wY) {
+		hand = (hand == 0) ? 0x0c : 0x05;
+		sendPacket(BYTE, hand, WORD, wX, WORD, wY);
+	};
+	this.unitCast = function (hand, who) {
+		hand = (hand == 0) ? 0x11 : 0x0a;
+		sendPacket(BYTE, hand, DWORD, who.type, DWORD, who.gid);
+	};
+	this.moveNPC = function (npc, dwX, dwY) {
+		sendPacket(BYTE, 0x59, DWORD, npc.type, DWORD, npc.gid, DWORD, dwX, DWORD, dwY);
+	};
+	this.teleWalk = function (wX, wY) {
+		sendPacket(BYTE, 0x5f, WORD, wX, WORD, wY);
+		sendPacket(BYTE, 0x4b, DWORD, me.type, DWORD, me.gid);
+		delay(me.ping*2 + 1);
+	};
+	this.flash = function (who) {
+		sendPacket(BYTE, 0x4b, DWORD, 0x00, DWORD, who.gid);
+	}
+	this.changeStat = function (stat, value) {
+		if (value > 0) {
+			getPacket(BYTE, 0x1d, BYTE, stat, BYTE, value);
+		}
+	};
+};

@@ -127,6 +127,12 @@ function main() {
 	}
 
 	DataFile.updateStats("experience");
+	
+	// Load Fastmod
+	Packet.changeStat(105, Config.fcr); 
+	Packet.changeStat(99, Config.fhr);
+	Packet.changeStat(102, Config.fbr);
+	Packet.changeStat(93, Config.ias);
 
 	// Load events and threads
 	addEventListener("gameevent", this.gameEvent);
