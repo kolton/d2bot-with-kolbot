@@ -496,12 +496,18 @@ var Misc = {
 					check = true;
 				}
 			}
+
+			if (Config.OpenChests && Town.needKeys())
+			{
+				check = true;
+			}
 		}
 
 		if (check) {
 			Town.goToTown();
 			Town.heal();
 			Town.buyPotions();
+			Town.buyKeys();
 			Town.reviveMerc();
 			me.cancel();
 			Town.move("portalspot");
