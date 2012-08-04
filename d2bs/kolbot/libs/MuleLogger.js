@@ -1,3 +1,9 @@
+/**
+*	@filename	MuleLogger.js
+*	@author		kolton
+*	@desc		Log items on configurable accounts/characters
+*/
+
 var MuleLogger = {
 	LogAccounts: {
 		/* Format: 
@@ -10,188 +16,41 @@ var MuleLogger = {
 			realm = useast, uswest, europe or asia
 		*/
 
-		"account/password/realm": ["character"]
+		"account/password/realm": ["all"]
 	},
 
 	LogGame: ["muleloggame", "password"], // ["gamename", "password"]
-
+	LogNames: true, // Put account/character name on the picture
 	IngameTime: 180,
 
 
 
 	// don't edit
 	getItemDesc: function (unit) {
-		var val, code,
+		var i, code, desc,
+			stringColor = "",
 			gid = "",
 			header = "",
-			rval = "",
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, ""),
-			desc = "";
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
 
-		if (unit.getFlag(0x4000000)) { // runeword
-			desc += ("\\xffc4" + unit.fname.split("\n").reverse().join("\\n\\xffc5").replace(/ÿc[0-9!"+<;.*]/, "") + "\\xffc0");
-		} else {
-			desc += (Pickit.itemColor(unit, false).replace("ÿ", "\\xff") + unit.fname.split("\n").reverse().join("\\n").replace(/ÿc[0-9!"+<;.*]/, "") + "\\xffc0");
+		desc = unit.description.split("\n");
+
+		// Lines are normally in reverse. Add color tags if needed and reverse order.
+		for (i = 0; i < desc.length; i += 1) {
+			if (desc[i].match(/^ÿ/)) {
+				stringColor = desc[i].substring(0, 3);
+			} else {
+				desc[i] = stringColor + desc[i];
+			}
+
+			// process line for d2bot
+			desc[i] = desc[i].replace("ÿ", "\\xff").replace("\xFF", "\\xff");
 		}
 
-		switch (unit.itemType) {
-		case 2: // shield
-		case 69: // voodoo shield
-		case 70: // paladin shield
-			val = unit.getStat(31);
-
-			if (val) {
-				desc += ("\\nDefense: " + val);
-			}
-
-			val = 20 + unit.getStat(20);
-
-			switch (me.classid) {
-			case 0:
-			case 4:
-			case 6:
-				val += 5;
-
-				break;
-			case 3:
-				val += 10;
-
-				break;
-			}
-
-			desc += ("\\nChance to Block: \\xffc3" + Math.min(val, 75) + "%\\xffc0");
-
-			if (unit.getStat(72)) {
-				desc += ("\\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
-			}
-
-			color = unit.getColor();
-
-			break;
-		case 3: // armor
-		case 37: // helm
-		case 71: // primal helm
-		case 72: // pelt
-		case 75: // circlet
-		case 15: // boots
-		case 16: // belt
-		case 19: // gloves
-			val = unit.getStat(31);
-
-			if (val) {
-				desc += ("\\nDefense: " + val);
-			}
-
-			if (unit.getStat(72)) {
-				desc += ("\\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
-			}
-
-			color = unit.getColor();
-
-			break;
-		// weapons
-		case 24:
-		case 25:
-		case 26:
-		case 28:
-		case 29:
-		case 30:
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		case 36:
-		case 67: // handtohand - claws with no staffmods
-		case 68:
-		case 86:
-		case 87:
-		case 88: // assassinclaw - claws with staffmods
-			if (unit.getStat(21)) {
-				desc += ("\\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
-			}
-
-			if (unit.getStat(23)) {
-				desc += ("\\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
-			}
-
-			if (unit.getStat(72)) {
-				desc += ("\\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
-			}
-
-			color = unit.getColor();
-
-			break;
-		// missile
-		case 27:
-		case 35:
-		case 85:
-			if (unit.getStat(23)) {
-				desc += ("\\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
-			}
-
-			color = unit.getColor();
-
-			break;
-		// throwing
-		case 42:
-		case 43:
-		case 44:
-			if (unit.getStat(21)) {
-				desc += ("\\nThrow Damage: " + unit.getStat(159) + " to " + unit.getStat(160));
-			}
-
-			if (unit.getStat(21)) {
-				desc += ("\\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
-			}
-
-			if (unit.getStat(70)) {
-				desc += ("\\nQuantity: " + unit.getStat(70));
-			}
-
-			color = unit.getColor();
-
-			break;
-		default:
-			break;
-		}
-
-		val = getBaseStat("items", unit.classid, 52);
-
-		if (val) {
-			desc += ("\\nRequired Strength: " + val);
-		}
-
-		val = getBaseStat("items", unit.classid, 53);
-
-		if (val) {
-			desc += ("\\nRequired Dexterity: " + val);
-		}
-
-		val = unit.getStat(92);
-
-		if (val > 1 && unit.getFlag(0x10)) {
-			desc += ("\\nRequired Level: " + val);
-		}
-
-		desc += ("\\xffc3" + unit.description.split("\n").reverse().join("\\n") + "\\xffc0");
-
-		if (unit.getFlag(0x400000)) {
-			desc += "\\n\\xffc3Ethereal (Cannot be Repaired)\\xffc0";
-		}
-
-		val = unit.getStat(194);
-
-		if (val) {
-			desc += ((unit.getFlag(0x400000) ? "\\xffc3, " : "\\n\\xffc3") + "Socketed (" + val + ")\\xffc0");
-		}
-
-		if (!unit.getFlag(0x10)) {
-			desc += "\\n\\xffc1Unidentified\\xffc0";
-		}
-
-		desc += ("\\nItem Level: " + unit.ilvl);
-
+		desc = desc.reverse().join("\\n");
+		color = unit.getColor();
+		desc += ("\\n\\xffc0Item Level: " + unit.ilvl);
 		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
 		code = code.replace(" ", "");
 
@@ -199,7 +58,7 @@ var MuleLogger = {
 			code += (unit.gfx + 1);
 		}
 
-		if (me.account) {
+		if (this.LogNames && me.account) {
 			header = me.account + " / " + me.name;
 		}
 
@@ -208,9 +67,7 @@ var MuleLogger = {
 			gid = unit.gid;
 		}
 
-		rval = (name + "$" + desc + "$" + code + "$" + header + "$" + gid + ";" + "0" + ";" + color);
-
-		return rval;
+		return (name + "$" + desc + "$" + code + "$" + header + "$" + gid + ";" + "0" + ";" + color);
 	},
 
 	logChar: function () {

@@ -9,7 +9,7 @@ var AutoMule = {
 	hardcore: false,
 
 	// Game name and password of the mule game
-	muleGameName: ["mule", "pw"], // ["gamename", "password"]
+	muleGameName: ["mulegame", "mulepw"], // ["gamename", "password"]
 
 	// List of profiles that will mule items. Casing matters!
 	enabledProfiles: [""],

@@ -145,9 +145,61 @@ function Baal() {
 		return true;
 	};
 
+	this.announce = function () {
+		var count, string, souls, dolls,
+			monster = getUnit(1);
+
+		if (monster) {
+			count = 0;
+
+			do {
+				if (Attack.checkMonster(monster) && monster.y < 5094) {
+					if (getDistance(me, monster) <= 40) {
+						count += 1;
+					}
+
+					if (!souls && monster.classid === 641) {
+						souls = true;
+					}
+
+					if (!dolls && monster.classid === 691) {
+						dolls = true;
+					}
+				}
+			} while (monster.getNext());
+		}
+
+		if (count > 0) {
+			string = Config.Baal.HotTPMsg + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
+		} else {
+			string = "Warm TP. No immediate monsters.";
+		}
+
+		if (souls) {
+			string += " Souls ";
+
+			if (dolls) {
+				string += "and Dolls ";
+			}
+
+			string += "in area.";
+		} else if (dolls) {
+			string += " Dolls in area.";
+		}
+
+		say(string);
+	};
+
 	Town.doChores();
-	Pather.useWaypoint(129);
-	Precast.doPrecast(true);
+
+	if (Config.Baal.RandomPrecast) {
+		Pather.useWaypoint("random");
+		Precast.doPrecast(true);
+		Pather.useWaypoint(129);
+	} else {
+		Pather.useWaypoint(129);
+		Precast.doPrecast(true);
+	}
 
 	if (!Pather.moveToExit([130, 131], true)) {
 		throw new Error("Failed to move to Throne of Destruction.");
@@ -157,7 +209,8 @@ function Baal() {
 
 	if (Config.PublicMode) {
 		Pather.makePortal();
-		say(Config.Baal.HotTPMsg);
+		//say(Config.Baal.HotTPMsg);
+		this.announce();
 	}
 
 	if (Config.Baal.DollQuit && getUnit(1, 691)) {

@@ -100,6 +100,28 @@ function ScriptMsgEvent(msg) {
 	}
 }
 
+function timer(tick) {
+	if (!tick) {
+		return "";
+	}
+
+	var min, sec;
+
+	min = Math.floor((getTickCount() - tick) / 60000).toString();
+
+	if (min <= 9) {
+		min = "0" + min;
+	}
+
+	sec = (Math.floor((getTickCount() - tick) / 1000) % 60).toString();
+
+	if (sec <= 9) {
+		sec = "0" + sec;
+	}
+
+	return " (" + min + ":" + sec + ")";
+}
+
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
@@ -123,7 +145,7 @@ function main() {
 					}
 
 					print("Updating Status");
-					D2Bot.updateStatus("Game: " + me.gamename);
+					//D2Bot.updateStatus("Game: " + me.gamename);
 
 					oldGame = me.gamename;
 					lastGameStatus = "ingame";
@@ -132,6 +154,8 @@ function main() {
 
 					DataFile.updateStats("runs", gameCount);
 				}
+
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
