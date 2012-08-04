@@ -747,7 +747,7 @@ MainLoop:
 	},
 
 	buyKeys: function () {
-		if (!this.needKeys()) {
+		if (!this.wantKeys()) {
 			return true;
 		}
 
@@ -775,18 +775,26 @@ MainLoop:
 		return true;
 	},
 
-	needKeys: function () {
+	checkKeys: function (min) {
 		if (!Config.OpenChests || me.classid === 6) {
 			return false;
 		}
 
 		var key = me.findItem("key", 0, 3);
 
-		if (key && key.getStat(70) > 6) {
+		if (key && key.getStat(70) > min) {
 			return false;
 		}
 
 		return true;
+	},
+
+	needKeys: function () {
+		return this.checkKeys(0);
+	},
+
+	wantKeys: function () {
+		return this.checkKeys(6);
 	},
 
 	repair: function () {
