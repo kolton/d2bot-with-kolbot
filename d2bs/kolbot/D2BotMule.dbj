@@ -220,7 +220,7 @@ load("tools/heartbeat.js");
 addEventListener("copydata", ReceiveCopyData);
 
 function main() {
-	var obj;
+	var obj, statusTimeout;
 
 	// ugly solution to uglier problem - pickItem area update
 	if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -241,7 +241,7 @@ function main() {
 				Storage.Init();
 			}
 
-			for (var statusTimeout = 0; statusTimeout < 60000 && status !== "begin"; statusTimeout += 500) {
+			for (statusTimeout = 0; statusTimeout < 60000 && status !== "begin"; statusTimeout += 500) {
 				delay(500);
 			}
 
