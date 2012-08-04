@@ -241,7 +241,7 @@ function main() {
 				Storage.Init();
 			}
 
-			for (var statusTimeout = 0; statusTimeout < 60000; statusTimeout += 500) {
+			for (var statusTimeout = 0; statusTimeout < 60000 && status !== "begin"; statusTimeout += 500) {
 				delay(500);
 			}
 
