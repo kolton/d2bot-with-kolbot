@@ -59,7 +59,7 @@ function pickItems() {
 		rval = "done",
 		list = [];
 
-	while (true) {
+	while (me.ingame) {
 		if (mulerStatus === "done") {
 			item = getUnit(4, -1, 3); // item, on ground
 
@@ -241,7 +241,7 @@ function main() {
 				Storage.Init();
 			}
 
-			while (status !== "begin") {
+			for (var statusTimeout = 0; statusTimeout < 60000; statusTimeout += 500) {
 				delay(500);
 			}
 
