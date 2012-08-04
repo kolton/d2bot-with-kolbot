@@ -261,8 +261,6 @@ var Town = {
 	},
 
 	fillTome: function (code) {
-		delay(500);
-
 		if (this.checkScrolls(code) >= 13) {
 			return true;
 		}
@@ -273,6 +271,8 @@ var Town = {
 		if (!npc) {
 			return false;
 		}
+
+		delay(500); // this was at the top
 
 		if (!me.findItem("tbk", 0, 3)) {
 			tome = npc.getItem("tbk");

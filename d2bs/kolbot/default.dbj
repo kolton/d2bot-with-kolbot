@@ -51,21 +51,12 @@ function main() {
 		return;
 	}
 
-	var i, sojPause,
+	var i, sojPause, quitFlag,
 		sojCounter = 0,
 		startTime = getTickCount();
 
 	this.gameEvent = function (mode, param1, param2, name1, name2) {
 		switch (mode) {
-		case 0:
-		case 1:
-		case 3:
-			if (Config.QuitList.indexOf(name1) > -1) {
-				print(name1 + (mode === 0 ? " timed out" : " left"));
-				quit();
-			}
-
-			break;
 		case 17: // 0x11 - "%Param1 Stones of Jordan Sold to Merchants"
 			if (!Config.SoJWaitTime) {
 				break;
@@ -93,6 +84,33 @@ function main() {
 		if (gid > 0 && mode === 0) {
 			gidList.push(gid);
 		}
+	};
+
+	this.scriptEvent = function (msg) {
+		switch (msg) {
+		case "quit":
+			// don't call multiple times
+			if (quitFlag) {
+				return;
+			}
+
+			quitFlag = true;
+
+			globalQuit();
+
+			break;
+		}
+	};
+
+	var globalQuit = function () {
+		print("ÿc8Run duration ÿc2" + ((getTickCount() - startTime) / 1000));
+
+		if (Config.LogExperience) {
+			delay(500);
+			Experience.log();
+		}
+
+		quit();
 	};
 
 	// If game name is a part of Gambling System, don't load scripts
@@ -127,15 +145,16 @@ function main() {
 	}
 
 	DataFile.updateStats("experience");
-	
+
 	// Load Fastmod
-	Packet.changeStat(105, Config.fcr); 
-	Packet.changeStat(99, Config.fhr);
-	Packet.changeStat(102, Config.fbr);
-	Packet.changeStat(93, Config.ias);
+	Packet.changeStat(105, Config.FCR); 
+	Packet.changeStat(99, Config.FHR);
+	Packet.changeStat(102, Config.FBR);
+	Packet.changeStat(93, Config.IAS);
 
 	// Load events and threads
 	addEventListener("gameevent", this.gameEvent);
+	addEventListener("scriptmsg", this.scriptEvent);
 	load("tools/ToolsThread.js");
 	load("tools/TownChicken.js");
 
@@ -176,13 +195,7 @@ function main() {
 		}
 	}
 
-	print("ÿc8Run duration ÿc2" + ((getTickCount() - startTime) / 1000));
 	DataFile.updateStats("gold");
-
-	if (Config.LogExperience) {
-		delay(500);
-		Experience.log();
-	}
 
 	if (sojPause) {
 		try {
@@ -205,5 +218,5 @@ function main() {
 		say(Config.LastMessage);
 	}
 
-	quit();
+	globalQuit();
 }

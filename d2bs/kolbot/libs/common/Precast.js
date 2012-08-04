@@ -22,12 +22,12 @@ var Precast = new function () {
 
 		delay(500);
 
-		for (i = 0; i < 10; i += 1) {
+		for (i = 0; i < 5; i += 1) {
 			weaponSwitch();
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 2000) {
+			while (getTickCount() - tick < 4000) {
 				if (me.weaponswitch === slot) {
 					delay(me.ping + 1);
 

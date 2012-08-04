@@ -52,16 +52,17 @@ function NTIPOpenFile(filepath)
 	return true;
 }
 
-function NTIPCheckItem(item, list, verbose) {
-	if (!list) {
+function NTIPCheckItem(item, entryList, verbose) {
+	var i, list, identified, num,
+		result = 0;
+
+	if (!entryList) {
 		list = _NTIP_CheckList;
+	} else {
+		list = entryList;
 	}
 
-	var i;
-	var _identified;
-	var _result = 0;
-
-	_identified = item.getFlag(0x10);
+	identified = item.getFlag(0x10);
 
 	for (i = 0 ; i < list.length ; i++) {
 		try {
@@ -70,44 +71,44 @@ function NTIPCheckItem(item, list, verbose) {
 					if (list[i][1].length > 0) {
 						if (eval(list[i][1])) {
 							if (list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) {
-								if (NTIP_CheckQuantityOwned(list[i][0],list[i][1], false) < list[i][2]["MaxQuantity"]) {
-									//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3));
-									//return 1;
-									_result = 1;
-									
+								num = NTIP_CheckQuantityOwned(list[i][0],list[i][1]);
+
+								if (num < list[i][2]["MaxQuantity"]) {
+									result = 1;
+
 									break;
 								} else {
-									//print("I already have enough of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)+" in my stash!");
-									//return 0;
+									if (item.mode === 0 && item.location === 3 && num === list[i][2]["MaxQuantity"]) { // attempt at inv fix for maxquantity
+										result = 1;
+									}
+
 									break;
 								}
 							} else {
-								//print("No maximum for this item");
-								//return 1;
-								_result = 1;
+								result = 1;
 
 								break;
 							}
-						} else if (!_identified && _result == 0) {
-							_result = -1;
+						} else if (!identified && result == 0) {
+							result = -1;
 						}
 					} else {
 						if (list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) {
-							if (NTIP_CheckQuantityOwned(list[i][0], null, false) < list[i][2]["MaxQuantity"]) {
-								//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3));
-								//return 1;
-								_result = 1;
+							num = NTIP_CheckQuantityOwned(list[i][0], null);
+
+							if (num < list[i][2]["MaxQuantity"]) {
+								result = 1;
 
 								break;
 							} else {
-								//print("I already have enough of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)+" in my stash!");
-								//return 0;
+								if (item.mode === 0 && item.location === 3 && num === list[i][2]["MaxQuantity"]) { // attempt at inv fix for maxquantity
+									result = 1;
+								}
+
 								break;
 							}
 						} else {
-							//print("No maximum for this item");
-							//return 1;
-							_result = 1;
+							result = 1;
 
 							break;
 						}
@@ -116,81 +117,94 @@ function NTIPCheckItem(item, list, verbose) {
 			} else if(list[i][1].length > 0) {
 				if (eval(list[i][1])) {
 					if (list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) {
-						if (NTIP_CheckQuantityOwned(null, list[i][1], false) < list[i][2]["MaxQuantity"]) {
-							//print("I need more of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3));
-							//return 1;
-							_result = 1;
+						num = NTIP_CheckQuantityOwned(null, list[i][1]);
+
+						if (num < list[i][2]["MaxQuantity"]) {
+							result = 1;
 
 							break;
 						} else {
-							//print("I already have enough of these "+NTC_ItemQualityToMGRColor[item.quality] + item.itemdesc.split("\n")[0].substring(3)+" in my stash!");
-							//return 0;
+							if (item.mode === 0 && item.location === 3 && num === list[i][2]["MaxQuantity"]) { // attempt at inv fix for maxquantity
+								result = 1;
+							}
+
 							break;
 						}
 					} else {
-						//return 1;
-						_result = 1;
+						result = 1;
 
 						break;
 					}
-				} else if(!_identified && _result == 0) {
-					_result = -1;
+				} else if (!identified && result == 0) {
+					result = -1;
 				}
 			}
 		} catch (pickError) {
 			showConsole();
 
-			if (arguments.length === 1) {
+			if (!entryList) {
 				print("ÿc1Pickit error! Line # ÿc2" + stringArray[i].count + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
 
 				_NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
 			} else {
 				print("ÿc1Pickit error in runeword config!");
 			}
-		}
-	}
-	
-	if (verbose) {
-		if (_result > 0) {
-			return {line: stringArray[i].file + " #" + stringArray[i].count, result: _result};
-		} else {
-			return {line: null, result: _result};
+
+			result = 0;
 		}
 	}
 
-	return _result;
+	if (verbose) {
+		if (result > 0) {
+			return {line: stringArray[i].file + " #" + stringArray[i].count, result: result};
+		} else {
+			return {line: null, result: result};
+		}
+	}
+
+	return result;
 }
 
 // Internal function
-function NTIP_CheckQuantityOwned(item_type, item_stats, check_inventory_too)
-{
-	var _nb = 0;
-	var _items = me.getItems();
-	if (!_items)
-	{
+function NTIP_CheckQuantityOwned(item_type, item_stats) {
+	var i, item,
+		num = 0,
+		items = me.getItems();
+
+	if (!items) {
 		print("I can't find my items!");
+
 		return 0;
 	}
-	for(var i = 0 ; i < _items.length ; i++)
-	{
-		if(_items[i].mode == 0 && _items[i].location == 7)
-		{
-			var item = _items[i];
-			if((item_type != null && item_type.length > 0 && eval(item_type)) || item_type == null)
-				if((item_stats != null && item_stats.length > 0 && eval(item_stats)) || item_stats == null)
-					_nb++;
+
+	for (i = 0; i < items.length; i += 1) {
+		if (items[i].mode === 0 && items[i].location === 7) {
+			item = items[i];
+
+			if ((item_type != null && item_type.length > 0 && eval(item_type)) || item_type === null) {
+				if ((item_stats != null && item_stats.length > 0 && eval(item_stats)) || item_stats === null) {
+					num += 1;
+				}
+			}
 		}
-		/*else if(check_inventory_too && _items[i].mode == 0 && _items[i].location == 3)
-		{
-			var item = _items[i];
-			if((item_type != null && item_type.length > 0 && eval(item_type)) || item_type == null)
-				if((item_stats != null && item_stats.length > 0 && eval(item_stats)) || item_stats == null)
-					if(Config.Inventory[_items[i].y][_items[i].x] > 0) // we check only space that is supposed to be free
-						_nb++;
-		}*/
+
+		// inv check
+		else if (items[i].mode === 0 && items[i].location === 3) {
+			item = items[i];
+
+			if ((item_type != null && item_type.length > 0 && eval(item_type)) || item_type === null) {
+				if ((item_stats != null && item_stats.length > 0 && eval(item_stats)) || item_stats === null) {
+					if (Config.Inventory[items[i].y][items[i].x] > 0) { // we check only space that is supposed to be free
+						num += 1;
+					}
+				}
+			}
+		}
 	}
-	//print("I have "+_nb+" of these.");
-	return _nb;
+
+	print("I have "+num+" of these.");
+
+	return num;
 }
 
 function NTIPParseLineInt(input)
@@ -443,30 +457,53 @@ Unit.prototype.__defineGetter__('itemclass',
 );
 
 /*
-	0 = Black
-	1 = White
-	2 = Orange
-	
-	3 = Light Yellow
-	4 = Light Red
-	5 = Light Gold
-	6 = Light Blue
-	7 = Light Purple
-	
-	8 = Crystal Blue
-	9 = Crystal Red
-	10 = Crystal Green
-	
-	11 = Dark Yellow
-	12 = Dark Red
-	13 = Dark Gold
-	14 = Dark Green
-	15 = Dark Blue
+	_NTIPAliasColor["black"] = 3;
+	_NTIPAliasColor["lightblue"] = 4;
+	_NTIPAliasColor["darkblue"] = 5;
+	_NTIPAliasColor["crystalblue"] = 6;
+	_NTIPAliasColor["lightred"] = 7;
+	_NTIPAliasColor["darkred"] = 8;
+	_NTIPAliasColor["crystalred"] = 9;
+	_NTIPAliasColor["darkgreen"] = 11;
+	_NTIPAliasColor["crystalgreen"] = 12;
+	_NTIPAliasColor["lightyellow"] = 13;
+	_NTIPAliasColor["lightgold"] = 14;
+	_NTIPAliasColor["darkyellow"] = 15;
+	_NTIPAliasColor["darkgold"] = 16;
+	_NTIPAliasColor["lightpurple"] = 17;
+	_NTIPAliasColor["orange"] = 19;
+	_NTIPAliasColor["white"] = 20;
 */
 
 Unit.prototype.getColor = function () {
+	// check type
+	if ([2, 3, 15, 16, 19, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 42, 43, 44, 67, 68, 71, 72, 85, 86, 87, 88].indexOf(this.itemType) === -1) {
+		return -1;
+	}
+
+	// check quality
+	if ([4, 6].indexOf(this.quality) === -1) {
+		return -1;
+	}
+
 	var i,
 		colors = {
+			"Screaming": 19,
+			"Howling": 19,
+			"Wailing": 19,
+			"Sapphire": 4,
+			"Snowy": 4,
+			"Shivering": 4,
+			"Boreal": 4,
+			"Hibernal": 4,
+			"Ruby": 7,
+			"Amber": 13,
+			"Static": 13,
+			"Glowing": 13,
+			"Buzzing": 13,
+			"Arcing": 13,
+			"Shocking": 13,
+			"Emerald": 12,
 			"Saintly": 16,
 			"Holy": 16,
 			"Godly": 16,
@@ -474,20 +511,8 @@ Unit.prototype.getColor = function () {
 			"Mnemonic": 6,
 			"Psychic": 14,
 			"Veteran's": 14,
-			"of the Mammoth": 9,
-			"of Frost Shield": 4,
-			"of Nova Shield": 6,
 			"Faithful": 20,
 			"Dragon's": 6,
-			"of Spikes": 19,
-			"of Razors": 19,
-			"of Swords": 19,
-			"of Stability": 14,
-			"of the Colosuss": 9,
-			"of the Squid": 9,
-			"of the Whale": 9,
-			"of Defiance": 8,
-			"of the Titan": 16,
 			"Vulpine": 6,
 			"Shimmering": 17,
 			"Rainbow": 17,
@@ -502,7 +527,7 @@ Unit.prototype.getColor = function () {
 			"Feral": 14,
 			"Hierophant's": 12,
 			"Resonant": 14,
-			"Raging	": 14,
+			"Raging": 14,
 			"Veteran's": 14,
 			"Berserker's": 12,
 			"Blighting": 14,
@@ -517,10 +542,6 @@ Unit.prototype.getColor = function () {
 			"Archer's": 14,
 			"Kenshi's": 14,
 			"Lancer's": 14,
-			//"of Alacrity": 14, // on gloves, conflicts with weapons
-			"of Wealth": 14,
-			"of Fortune": 14,
-			"of Luck": 14,
 			"Charged": 14,
 			"Blazing": 14,
 			"Freezing": 14,
@@ -528,9 +549,6 @@ Unit.prototype.getColor = function () {
 			"Witch-hunter's": 12,
 			"Arch-Angel's": 12,
 			"Valkyrie's": 12,
-			"of Perfection": 16,
-			"of Regrowth": 9,
-			"of Atlas": 16,
 			"Massive": 16,
 			"Savage": 16,
 			"Merciless": 16,
@@ -548,20 +566,11 @@ Unit.prototype.getColor = function () {
 			"King's": 16,
 			"Master's": 16,
 			"Elysian": 16,
-			"Snowy": 4,
-			"Shivering": 4,
-			"Boreal": 4,
-			"Hibernal": 4,
 			"Fiery": 8,
 			"Smoldering": 8,
 			"Smoking": 8,
 			"Flaming": 8,
 			"Condensing": 8,
-			"Static": 13,
-			"Glowing": 13,
-			"Buzzing": 13,
-			"Arcing": 13,
-			"Shocking": 13,
 			"Septic": 11,
 			"Foul": 11,
 			"Corrosive": 11,
@@ -586,18 +595,42 @@ Unit.prototype.getColor = function () {
 			"of the Lamprey": 9,
 			"of the Wraith": 9,
 			"of the Vampire": 9,
-			//"of the Giant": 16,
 			"of Icebolt": 4,
 			"of Nova": 6,
-			"Screaming": 19,
-			"Howling": 19,
-			"Wailing": 19,
-			"Sapphire": 4,
-			"Ruby": 7,
-			"Amber": 13,
-			"Emerald": 12,
+			"of the Mammoth": 9,
+			"of Frost Shield": 4,
+			"of Nova Shield": 6,
+			"of Wealth": 14,
+			"of Fortune": 14,
+			"of Luck": 14,
+			"of Perfection": 16,
+			"of Regrowth": 9,
+			"of Spikes": 19,
+			"of Razors": 19,
+			"of Swords": 19,
+			"of Stability": 14,
+			"of the Colosuss": 9,
+			"of the Squid": 9,
+			"of the Whale": 9,
+			"of Defiance": 8,
+			"of the Titan": 16,
+			"of Atlas": 16,
 			"of Wizardry": 16
 		};
+
+	switch (this.itemType) {
+	case 15: // boots
+		colors["of Precision"] = 16;
+
+		break;
+	case 16: // gloves
+		colors["of Alacrity"] = 14;
+		colors["of the Leech"] = 9;
+		colors["of the Bat"] = 9;
+		colors["of the Giant"] = 16;
+
+		break;
+	}
 
 	for (i = 0; i < this.suffixes.length; i += 1) {
 		if (colors.hasOwnProperty(this.suffixes[i])) {

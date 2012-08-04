@@ -436,7 +436,7 @@ MainLoop:
 					do {
 						text = control.getText();
 
-						if (text instanceof Array && typeof text[1] === "string" && text[1] === info.charName) {
+						if (text instanceof Array && typeof text[1] === "string" && text[1].toLowerCase() === info.charName.toLowerCase()) {
 							control.click();
 							this.click(6, 627, 572, 128, 35);
 

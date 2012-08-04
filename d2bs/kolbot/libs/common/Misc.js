@@ -323,181 +323,33 @@ var Misc = {
 		return false;
 	},
 
-	// Log kept item stats in the manager. It's buggy.
-	logItem: function (action, unit, keptLine) { // hackit to the max
-		var val, code,
+	// Log kept item stats in the manager.
+	logItem: function (action, unit, keptLine) {
+		var i, val, code, desc,
+			stringColor = "",
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, ""),
-			desc = "";
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
 
-		if (unit.getFlag(0x4000000)) { // runeword
-			desc += ("ÿc4" + unit.fname.split("\n").reverse().join("\nÿc5").replace(/ÿc[0-9!"+<;.*]/, "") + "ÿc0");
-		} else {
-			desc += (Pickit.itemColor(unit, false) + unit.fname.split("\n").reverse().join("\n").replace(/ÿc[0-9!"+<;.*]/, "") + "ÿc0");
+		desc = unit.description.split("\n");
+
+		// Lines are normally in reverse. Add color tags if needed and reverse order.
+		for (i = 0; i < desc.length; i += 1) {
+			if (desc[i].match(/^ÿ/)) {
+				stringColor = desc[i].substring(0, 3);
+			} else {
+				desc[i] = stringColor + desc[i];
+			}
 		}
 
-		switch (unit.itemType) {
-		case 2: // shield
-		case 69: // voodoo shield
-		case 70: // paladin shield
-			val = unit.getStat(31);
-
-			if (val) {
-				desc += ("\nDefense: " + val);
-			}
-
-			val = 20 + unit.getStat(20);
-
-			switch (me.classid) {
-			case 0:
-			case 4:
-			case 6:
-				val += 5;
-
-				break;
-			case 3:
-				val += 10;
-
-				break;
-			}
-
-			desc += ("\nChance to Block: ÿc3" + Math.min(val, 75) + "%ÿc0");
-
-			if (unit.getStat(72)) {
-				desc += ("\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
-			}
-
-			color = unit.getColor();
-
-			break;
-		case 3: // armor
-		case 37: // helm
-		case 71: // primal helm
-		case 72: // pelt
-		case 75: // circlet
-		case 15: // boots
-		case 16: // belt
-		case 19: // gloves
-			val = unit.getStat(31);
-
-			if (val) {
-				desc += ("\nDefense: " + val);
-			}
-
-			if (unit.getStat(72)) {
-				desc += ("\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
-			}
-
-			color = unit.getColor();
-
-			break;
-		// weapons
-		case 24:
-		case 25:
-		case 26:
-		case 28:
-		case 29:
-		case 30:
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		case 36:
-		case 67: // handtohand - claws with no staffmods
-		case 68:
-		case 86:
-		case 87:
-		case 88: // assassinclaw - claws with staffmods
-			if (unit.getStat(21)) {
-				desc += ("\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
-			}
-
-			if (unit.getStat(23)) {
-				desc += ("\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
-			}
-
-			if (unit.getStat(72)) {
-				desc += ("\nDurability: " + unit.getStat(72) + " of " + unit.getStat(73));
-			}
-
-			color = unit.getColor();
-
-			break;
-		// missile
-		case 27:
-		case 35:
-		case 85:
-			if (unit.getStat(23)) {
-				desc += ("\nTwo-Hand Damage: " + unit.getStat(23) + " to " + unit.getStat(24));
-			}
-
-			color = unit.getColor();
-
-			break;
-		// throwing
-		case 42:
-		case 43:
-		case 44:
-			if (unit.getStat(21)) {
-				desc += ("\nThrow Damage: " + unit.getStat(159) + " to " + unit.getStat(160));
-			}
-
-			if (unit.getStat(21)) {
-				desc += ("\nOne-Hand Damage: " + unit.getStat(21) + " to " + unit.getStat(22));
-			}
-
-			if (unit.getStat(70)) {
-				desc += ("\nQuantity: " + unit.getStat(70));
-			}
-
-			color = unit.getColor();
-
-			break;
-		default:
-			break;
-		}
-
-		val = getBaseStat("items", unit.classid, 52);
-
-		if (val) {
-			desc += ("\nRequired Strength: " + val);
-		}
-
-		val = getBaseStat("items", unit.classid, 53);
-
-		if (val) {
-			desc += ("\nRequired Dexterity: " + val);
-		}
-
-		val = unit.getStat(92);
-
-		if (val > 1 && unit.getFlag(0x10)) {
-			desc += ("\nRequired Level: " + val);
-		}
-
-		desc += ("ÿc3" + unit.description.split("\n").reverse().join("\n") + "ÿc0");
-
-		if (unit.getFlag(0x400000)) {
-			desc += "\nÿc3Ethereal (Cannot be Repaired)ÿc0";
-		}
-
-		val = unit.getStat(194);
-
-		if (val) {
-			desc += ((unit.getFlag(0x400000) ? "ÿc3, " : "\nÿc3") + "Socketed (" + val + ")ÿc0");
-		}
-
-		if (!unit.getFlag(0x10)) {
-			desc += "\nÿc1Unidentifiedÿc0";
-		}
-
-		desc += ("\nItem Level: " + unit.ilvl);
+		desc = desc.reverse().join("\n");
+		color = unit.getColor();
+		desc += ("\nÿc0Item Level: " + unit.ilvl);
 
 		if (action === "Kept") {
 			val = DataFile.getStats().lastArea;
 
 			if (val) {
-				desc += ("\nArea: " + val);
+				desc += ("\nÿc0Area: " + val);
 			}
 		}
 
@@ -509,7 +361,7 @@ var Misc = {
 		}
 
 		if (keptLine) {
-			desc += ("\nLine: " + keptLine);
+			desc += ("\nÿc0Line: " + keptLine);
 		}
 
 		D2Bot.printToItemLog(action + " " + name, desc, code, 0, color);
@@ -577,7 +429,7 @@ var Misc = {
 	},
 
 	// Go to town when low on hp/mp or when out of potions. can be upgraded to check for curses etc.
-	townCheck: function (tpchicken) {
+	townCheck: function () {
 		var potion, check,
 			needhp = true,
 			needmp = true;
@@ -623,10 +475,6 @@ var Misc = {
 				}
 			}
 		}
-
-		/*if (tpchicken && ((Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) || (Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
-			check = true;
-		}*/
 
 		if (check) {
 			Town.goToTown();
@@ -717,30 +565,29 @@ var Experience = {
 	}
 };
 
-var Packet = new function () {
-	var BYTE = 1, WORD = 2, DWORD = 4;
-	this.castSkill = function (hand, wX, wY) {
-		hand = (hand == 0) ? 0x0c : 0x05;
-		sendPacket(BYTE, hand, WORD, wX, WORD, wY);
-	};
-	this.unitCast = function (hand, who) {
-		hand = (hand == 0) ? 0x11 : 0x0a;
-		sendPacket(BYTE, hand, DWORD, who.type, DWORD, who.gid);
-	};
-	this.moveNPC = function (npc, dwX, dwY) {
-		sendPacket(BYTE, 0x59, DWORD, npc.type, DWORD, npc.gid, DWORD, dwX, DWORD, dwY);
-	};
-	this.teleWalk = function (wX, wY) {
-		sendPacket(BYTE, 0x5f, WORD, wX, WORD, wY);
-		sendPacket(BYTE, 0x4b, DWORD, me.type, DWORD, me.gid);
-		delay(me.ping*2 + 1);
-	};
-	this.flash = function (who) {
-		sendPacket(BYTE, 0x4b, DWORD, 0x00, DWORD, who.gid);
-	}
-	this.changeStat = function (stat, value) {
+var Packet = {
+	castSkill: function (hand, wX, wY) {
+		hand = (hand === 0) ? 0x0c : 0x05;
+		sendPacket(1, hand, 2, wX, 2, wY);
+	},
+	unitCast: function (hand, who) {
+		hand = (hand === 0) ? 0x11 : 0x0a;
+		sendPacket(1, hand, 4, who.type, 4, who.gid);
+	},
+	moveNPC: function (npc, dwX, dwY) {
+		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
+	},
+	teleWalk: function (wX, wY) {
+		sendPacket(1, 0x5f, 2, wX, 2, wY);
+		delay(me.ping + 5);
+		sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
+	},
+	flash: function (gid) {
+		sendPacket(1, 0x4b, 4, 0, 4, gid);
+	},
+	changeStat: function (stat, value) {
 		if (value > 0) {
-			getPacket(BYTE, 0x1d, BYTE, stat, BYTE, value);
+			getPacket(1, 0x1d, 1, stat, 1, value);
 		}
-	};
+	}
 };

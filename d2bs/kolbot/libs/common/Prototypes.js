@@ -70,7 +70,7 @@ Unit.prototype.openMenu = function () {
 			}
 
 			if (getUIFlag(0x08)) {
-				delay(900);
+				delay(500 + me.ping * 2);
 
 				return true;
 			}

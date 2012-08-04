@@ -11,10 +11,6 @@ var Pather = {
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 
 	moveTo: function (x, y, retry, clearPath, pop) {
-		if (typeof this.enigma === "undefined") {
-			this.enigma = this.checkEnigma();
-		}
-
 		if (getDistance(me, x, y) < 2) {
 			return true;
 		}
@@ -47,7 +43,7 @@ var Pather = {
 			node = {x: x, y: y},
 			fail = 0;
 
-		this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1) && (me.classid === 1 || this.enigma);
+		this.useTeleport = this.teleport && !me.inTown && ((me.getSkill(54, 1) && me.classid === 1) || me.getStat(97, 54));
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -142,29 +138,14 @@ var Pather = {
 		return getDistance(me, node.x, node.y) < 4;
 	},
 
-	// tele charged items can cause C/I when not using enigma, this check prevents that
-	checkEnigma: function () {
-		var item = me.getItem(-1, 1);
-
-		if (item) {
-			do {
-				if (item.getPrefix(20539)) {
-					return true;
-				}
-			} while (item.getNext());
-		}
-
-		return false;
-	},
-
 	teleportTo: function (x, y) {
 		var i, tick;
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			if (typeof castXY === "function") {
+			if (Config.PacketTeleport) {
 				Skill.setSkill(54, 0);
-				castXY(0, x, y);
+				Packet.castSkill(0, x, y);
 			} else {
 				Skill.cast(54, 0, x, y);
 			}
@@ -256,6 +237,10 @@ ModeLoop:
 	},
 
 	openDoors: function (x, y) {
+		if (me.inTown) {
+			return false;
+		}
+
 		// Regular doors
 		var i, tick,
 			door = getUnit(2, "door", 0);
@@ -495,8 +480,12 @@ ModeLoop:
 	// If there is no check, it will try to take the waypoint directly, without opening the waypoint screen
 	useWaypoint: function (targetArea, check) {
 		// Check if target area has a waypoint
-		if (this.wpAreas.indexOf(targetArea) < 0) {
+		if (this.wpAreas.indexOf(targetArea) < 0 && targetArea !== "random") {
 			throw new Error("useWaypoint: Invalid area.");
+		}
+
+		if (targetArea === "random") {
+			check = true;
 		}
 
 		// We're already there
@@ -532,6 +521,17 @@ ModeLoop:
 
 				while (getTickCount() - tick < 2000) {
 					if (getUIFlag(0x14)) { // Waypoint screen is open
+						if (targetArea === "random") {
+							while (true) {
+								targetArea = this.wpAreas[rand(0, this.wpAreas.length - 1)];
+
+								// get a valid wp, avoid towns
+								if ([1, 40, 75, 103, 109].indexOf(targetArea) === -1 && getWaypoint(this.wpAreas.indexOf(targetArea))) {
+									break;
+								}
+							}
+						}
+
 						if (!getWaypoint(this.wpAreas.indexOf(targetArea))) {
 							throw new Error("useWaypoint: You don't have the waypoint");
 						}

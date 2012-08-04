@@ -70,6 +70,7 @@ function LoadConfig() {
 		Config.Mephisto.KillCouncil = false;
 
 	// *** act 4 ***
+	Scripts.OuterSteppes = false;
 	Scripts.Izual = false;
 	Scripts.Hephasto = false;
 	Scripts.Vizier = false; // Intended for classic sorc, kills Vizier only.
@@ -104,6 +105,7 @@ function LoadConfig() {
 		Config.Baal.BaalMsg = "Baal";
 		Config.Baal.DollQuit = false; // End script if Dolls (Undead Soul Killers) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
+		Config.Baal.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
 
 	/* ### leeching section ###
 	* Unless stated otherwise, leader's character name isn't needed on order to run.
@@ -121,6 +123,8 @@ function LoadConfig() {
 		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
+		Config.BaalHelper.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
+		Config.BaalHelper.SkipTP = true; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 		Config.Follower.Leader = ""; // Leader's ingame name. This only applies to Follower script
 
@@ -271,10 +275,11 @@ function LoadConfig() {
 	Config.LogExperience = false; // Print experience statistics in the manager.
 
 	// Fastmod config
-	Config.fcr = 0; // 0 - disable, 1 to 255 - set value of faster cast rate 
-	Config.fhr = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
-	Config.fbr = 0; // 0 - disable, 1 to 255 - set value of faster block recovery 
-	Config.ias = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
+	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of faster cast rate 
+	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
+	Config.FBR = 0; // 0 - disable, 1 to 255 - set value of faster block recovery 
+	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
+	Config.PacketTeleport = false; // Use packets to teleport - no animation and max speed
 
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile

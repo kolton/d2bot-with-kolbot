@@ -1,7 +1,7 @@
 var StarterConfig = {
 	MinGameTime: 120, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
 	CreateGameDelay: 5, // Seconds to wait before creating a new game
-	ResetCount: 99, // Reset game count back to 1 every X games.
+	ResetCount: 999, // Reset game count back to 1 every X games.
 	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
 
 	JoinChannel: "", // Name of the channel to join
@@ -10,7 +10,7 @@ var StarterConfig = {
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
-	CrashDelay: 60, // Seconds to wait after a d2 window crash
+	CrashDelay: 0, // Seconds to wait after a d2 window crash
 	FTJDelay: 60, // Seconds to wait after failing to create a game
 	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
@@ -106,6 +106,28 @@ function ScriptMsgEvent(msg) {
 	}
 }
 
+function timer(tick) {
+	if (!tick) {
+		return "";
+	}
+
+	var min, sec;
+
+	min = Math.floor((getTickCount() - tick) / 60000).toString();
+
+	if (min <= 9) {
+		min = "0" + min;
+	}
+
+	sec = (Math.floor((getTickCount() - tick) / 1000) % 60).toString();
+
+	if (sec <= 9) {
+		sec = "0" + sec;
+	}
+
+	return " (" + min + ":" + sec + ")";
+}
+
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
@@ -123,20 +145,23 @@ function main() {
 				isUp = "yes";
 
 				if (!ingame) {
+					gameStart = getTickCount();
+
 					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
 						print("leaving game");
 						quit();
 					}
 
 					print("Updating Status");
-					D2Bot.updateStatus("Game: " + me.gamename);
+					//D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
-					gameStart = getTickCount();
 
 					DataFile.updateStats("runs", gameCount);
 				}
+
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
@@ -186,6 +211,12 @@ MainSwitch:
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
+
+			if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
+				gameCount = 1;
+
+				DataFile.updateStats("runs", gameCount);
+			}
 		}
 
 		// #### experimental gambling system start ####
@@ -245,6 +276,12 @@ MainSwitch:
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
+
+			if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
+				gameCount = 1;
+
+				DataFile.updateStats("runs", gameCount);
+			}
 		}
 
 		// #### experimental gambling system start ####
@@ -306,12 +343,6 @@ MainSwitch:
 			ControlAction.setText(1, 657, 342, 27, 20, StarterConfig.CharacterDifference.toString());
 		} else if (StarterConfig.CharacterDifference === false && control.disabled === 5) {
 			ControlAction.click(6, 431, 341, 15, 16);
-		}
-
-		if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
-			gameCount = 1;
-
-			DataFile.updateStats("runs", gameCount);
 		}
 
 		while (!gameName) {

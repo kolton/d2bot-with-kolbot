@@ -164,29 +164,65 @@ function BaalHelper() { // experi-mental
 		}
 	}
 
-	var i, tick, portal;
+	var i, tick, portal, party;
 
 	Town.goToTown(5);
 	Town.doChores();
 
-	if (!me.getState(32)) {
+	if (Config.BaalHelper.RandomPrecast) {
+		Pather.useWaypoint("random");
+		Precast.doPrecast(true);
+	} else {
 		Pather.useWaypoint(129);
 		Precast.doPrecast(true);
-		Pather.useWaypoint(109);
 	}
 
-	Town.move("portalspot");
-
-	for (i = 0; i < 180; i += 1) {
-		if (Pather.usePortal(131, null)) {
-			break;
+	if (Config.BaalHelper.SkipTP) {
+		if (me.area !== 129) {
+			Pather.useWaypoint(129);
 		}
 
-		delay(1000);
-	}
+		if (!Pather.moveToExit([130, 131], false)) {
+			throw new Error("Failed to move to WSK3.");
+		}
 
-	if (i === 180) {
-		throw new Error("No portals to Throne");
+WSKLoop:
+		for (i = 0; i < 180; i += 1) {
+			party = getParty();
+
+			if (party) {
+				do {
+					if (party.area === 131) {
+						break WSKLoop;
+					}
+				} while (party.getNext());
+			}
+
+			delay(1000);
+		}
+
+		if (i === 180) {
+			throw new Error("No players in Throne.");
+		}
+
+		if (!Pather.moveToExit(131, true) || !Pather.moveTo(15113, 5040)) {
+			throw new Error("Failed to move to Throne of Destruction.");
+		}
+	} else {
+		Pather.useWaypoint(109);
+		Town.move("portalspot");
+
+		for (i = 0; i < 180; i += 1) {
+			if (Pather.usePortal(131, null)) {
+				break;
+			}
+
+			delay(1000);
+		}
+
+		if (i === 180) {
+			throw new Error("No portals to Throne.");
+		}
 	}
 
 	if (Config.BaalHelper.DollQuit && getUnit(1, 691)) {

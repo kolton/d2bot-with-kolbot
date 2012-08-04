@@ -129,9 +129,9 @@ var ClassAttack = {
 					return 0;
 				}
 
-				if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
+				/*if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
 					return false;
-				}
+				}*/
 			}
 
 			if (Config.AttackSkill[index + 1] > -1) {
@@ -211,11 +211,7 @@ var ClassAttack = {
 		}
 
 		if (getDistance(me, x, y) > 0) {
-			if (typeof this.enigma === "undefined") {
-				this.enigma = Pather.checkEnigma();
-			}
-
-			if (Pather.teleport && !me.inTown && me.getSkill(54, 1) && (me.classid === 1 || this.enigma)) {
+			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
 				//Pather.teleportTo(x, y);
 				Skill.cast(54, 0, x, y);
 			} else {

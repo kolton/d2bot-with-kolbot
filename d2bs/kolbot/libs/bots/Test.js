@@ -12,11 +12,6 @@ function Test() {
 	}
 
 	addEventListener("keydown", KeyDown);
-	addEventListener("copydata", CopyDataEvent);
-
-	function CopyDataEvent(mode, msg) {
-		print(msg);
-	}
 
 	while (true) {
 		if (c) {
@@ -30,5 +25,6 @@ function Test() {
 }
 
 function test() {
-	Pickit.pickItems();
+	//print(MuleLogger.getItemDesc(getUnit(101)));
+	Pather.moveToExit(me.area + 1, true);
 }

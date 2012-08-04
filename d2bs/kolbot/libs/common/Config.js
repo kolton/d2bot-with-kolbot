@@ -112,12 +112,13 @@ var Config = {
 	TeleSwitch: false,
 	LogExperience: false,
 	TownCheck: false,
-	
+
 	// Fastmod
-	fcr: 0,
-	fhr: 0,
-	fbr: 0,
-	ias: 0,
+	FCR: 0,
+	FHR: 0,
+	FBR: 0,
+	IAS: 0,
+	PacketTeleport: false,
 
 	// Anti-hostile
 	AntiHostile: false,
@@ -227,13 +228,16 @@ var Config = {
 		SafeTPMsg: "TP safe!",
 		BaalMsg: "Baal",
 		DollQuit: false,
-		KillBaal: false
+		KillBaal: false,
+		RandomPrecast: false
 	},
 	BaalHelper: {
 		KillNihlathak: false,
 		FastChaos: false,
 		DollQuit: false,
-		KillBaal: false
+		KillBaal: false,
+		RandomPrecast: false,
+		SkipTP: false
 	},
 	Corpsefire: {
 		ClearDen: false

@@ -216,77 +216,95 @@ function main() {
 		}
 		);
 
+	addEventListener("gameevent",
+		function (mode, param1, param2, name1, name2) {
+			switch (mode) {
+			case 0:
+			case 1:
+			case 3:
+				if (Config.QuitList.indexOf(name1) > -1) {
+					print(name1 + (mode === 0 ? " timed out" : " left"));
+					scriptBroadcast("quit");
+				}
+
+				break;
+			}
+		}
+		);
+
 	while (me.ingame) {
 		if (!me.inTown) {
-			if (Config.UseHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseHP / 100)) {
-				this.drinkPotion(0);
-			}
-
-			if (Config.UseRejuvHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseRejuvHP / 100)) {
-				this.drinkPotion(2);
-			}
-
-			if (Config.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
-				D2Bot.updateChickens();
-				D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + this.getNearestMonster() + ";9");
-
-				//me.chickenhp = me.hpmax; // Just to trigger the core chicken
-				quit();
-
-				break;
-			}
-
-			if (Config.UseMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseMP / 100)) {
-				this.drinkPotion(1);
-			}
-
-			if (Config.UseRejuvMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseRejuvMP / 100)) {
-				this.drinkPotion(2);
-			}
-
-			if (Config.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
-				D2Bot.updateChickens();
-				D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";9");
-
-				//me.chickenmp = me.mpmax; // Just to trigger the core chicken
-				quit();
-
-				break;
-			}
-
-			if (Config.IronGolemChicken > 0 && me.classid === 2) {
-				if (!ironGolem || !copyUnit(ironGolem).x) {
-					ironGolem = this.getIronGolem();
+			try {
+				if (Config.UseHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseHP / 100)) {
+					this.drinkPotion(0);
 				}
 
-				if (ironGolem) {
-					if (ironGolem.hp <= Math.floor(128 * Config.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
-						D2Bot.updateChickens();
-						D2Bot.printToConsole("Irom Golem Chicken in " + getArea().name + ";9");
-						quit();
+				if (Config.UseRejuvHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseRejuvHP / 100)) {
+					this.drinkPotion(2);
+				}
 
-						break;
+				if (Config.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
+					D2Bot.updateChickens();
+					D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + getArea().name + this.getNearestMonster() + ";9");
+
+					me.chickenhp = me.hpmax; // Just to trigger the core chicken
+
+					break;
+				}
+
+				if (Config.UseMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseMP / 100)) {
+					this.drinkPotion(1);
+				}
+
+				if (Config.UseRejuvMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseRejuvMP / 100)) {
+					this.drinkPotion(2);
+				}
+
+				if (Config.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
+					D2Bot.updateChickens();
+					D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + getArea().name + ";9");
+
+					me.chickenmp = me.mpmax; // Just to trigger the core chicken
+
+					break;
+				}
+
+				if (Config.IronGolemChicken > 0 && me.classid === 2) {
+					if (!ironGolem || !copyUnit(ironGolem).x) {
+						ironGolem = this.getIronGolem();
+					}
+
+					if (ironGolem) {
+						if (ironGolem.hp <= Math.floor(128 * Config.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
+							D2Bot.updateChickens();
+							D2Bot.printToConsole("Irom Golem Chicken in " + getArea().name + ";9");
+							quit();
+
+							break;
+						}
 					}
 				}
-			}
 
-			if (Config.UseMerc) {
-				mercHP = getMercHP();
+				if (Config.UseMerc) {
+					mercHP = getMercHP();
 
-				if (mercHP > 0) {
-					if (mercHP < Config.MercChicken) {
-						D2Bot.printToConsole("Merc Golem Chicken in " + getArea().name + ";9");
-						quit();
+					if (mercHP > 0) {
+						if (mercHP < Config.MercChicken) {
+							D2Bot.printToConsole("Merc Golem Chicken in " + getArea().name + ";9");
+							quit();
 
-						break;
-					}
+							break;
+						}
 
-					if (mercHP < Config.UseMercRejuv) {
-						this.drinkPotion(4);
-					} else if (mercHP < Config.UseMercHP) {
-						this.drinkPotion(3);
+						if (mercHP < Config.UseMercRejuv) {
+							this.drinkPotion(4);
+						} else if (mercHP < Config.UseMercHP) {
+							this.drinkPotion(3);
+						}
 					}
 				}
+			} catch (e) {
+
 			}
 		}
 
