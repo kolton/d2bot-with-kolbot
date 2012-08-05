@@ -21,9 +21,9 @@ var MuleLogger = {
 
 	LogGame: ["muleloggame", "password"], // ["gamename", "password"]
 	LogNames: true, // Put account/character name on the picture
-	IngameTime: 180,
-
-
+	LogItemLevel: true, // Add item level to the picture
+	SaveScreenShot: true, // Save pictures in jpg format (saved in 'Images' folder)
+	IngameTime: 20, // Time to wait after leaving game
 
 	// don't edit
 	getItemDesc: function (unit) {
@@ -31,7 +31,6 @@ var MuleLogger = {
 			stringColor = "",
 			gid = "",
 			header = "",
-			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
 
 		desc = unit.description.split("\n");
@@ -49,8 +48,11 @@ var MuleLogger = {
 		}
 
 		desc = desc.reverse().join("\\n");
-		color = unit.getColor();
-		desc += ("\\n\\xffc0Item Level: " + unit.ilvl);
+
+		if (this.LogItemLevel) {
+			desc += ("\\n\\xffc0Item Level: " + unit.ilvl);
+		}
+
 		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
 		code = code.replace(" ", "");
 
@@ -67,14 +69,16 @@ var MuleLogger = {
 			gid = unit.gid;
 		}
 
-		return (name + "$" + desc + "$" + code + "$" + header + "$" + gid + ";" + "0" + ";" + color);
+		return (name + "$" + desc + "$" + code + "$" + header + "$" + gid);
 	},
 
 	logChar: function () {
 		var i, folder,
 			items = me.getItems(),
+			color = -1,
 			realm = me.realm || "Single Player",
-			finalString = "";
+			finalString = "",
+			screenShot = "";
 
 		if (!FileTools.exists("mules/" + realm)) {
 			folder = dopen("mules");
@@ -90,7 +94,14 @@ var MuleLogger = {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (items[i].mode === 0) {
-				finalString += (this.getItemDesc(items[i]) + "\n");
+				color = items[i].getColor();
+				finalString += (this.getItemDesc(items[i]) + ";" + "0" + ";" + color + "\n");
+
+				if (this.SaveScreenShot) {
+					screenShot = items[i].itemType + this.getItemDesc(items[i]) + ";" + color;
+					sendCopyData(null, "D2Bot #", 0, "saveItem;" + screenShot);
+					delay(500);
+				}
 			}
 		}
 
