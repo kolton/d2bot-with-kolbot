@@ -90,7 +90,7 @@ var DataFile = {
 		FileTools.writeText("data/" + me.profile + ".json", string);
 	},
 
-	getStats: function () {
+	getObj: function () {
 		var obj, string;
 
 		if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -98,7 +98,20 @@ var DataFile = {
 		}
 
 		string = FileTools.readText("data/" + me.profile + ".json");
-		obj = JSON.parse(string);
+		try {
+			obj = JSON.parse(string);
+		}
+		catch (e) {
+			// If we failed, file might be corrupted, so create a new one
+			this.create();
+			obj = JSON.parse(string);
+		}
+
+		return obj;
+	},
+
+	getStats: function () {
+		var obj = this.getObj();
 
 		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level};
 	},
@@ -106,8 +119,7 @@ var DataFile = {
 	updateStats: function (arg, value) {
 		var obj, string;
 
-		string = FileTools.readText("data/" + me.profile + ".json");
-		obj = JSON.parse(string);
+		obj = this.getObj();
 
 		switch (arg) {
 		case "runs":
@@ -141,8 +153,7 @@ var DataFile = {
 	updateDeaths: function () {
 		var obj, string;
 
-		string = FileTools.readText("data/" + me.profile + ".json");
-		obj = JSON.parse(string);
+		obj = this.getObj();
 		obj.deaths = obj.deaths + 1;
 		string = JSON.stringify(obj);
 
@@ -564,21 +575,36 @@ MainLoop:
 };
 
 var ShitList = {
+	create: function () {
+		obj = {
+			shitlist: []
+		};
+
+		string = JSON.stringify(obj);
+
+		FileTools.writeText("shitlist.json", string);
+	},
+
+	getObj: function () {
+		string = FileTools.readText("shitlist.json");
+		try {
+			obj = JSON.parse(string);
+		}
+		catch (e) {
+			this.create();
+		}
+
+		return obj;
+	},
+
 	read: function () {
 		var obj, string;
 
 		if (!FileTools.exists("shitlist.json")) {
-			obj = {
-				shitlist: []
-			};
-
-			string = JSON.stringify(obj);
-
-			FileTools.writeText("shitlist.json", string);
+			this.create();
 		}
 
-		string = FileTools.readText("shitlist.json");
-		obj = JSON.parse(string);
+		obj = this.getObj();
 
 		return obj.shitlist;
 	},
@@ -586,8 +612,7 @@ var ShitList = {
 	add: function (name) {
 		var obj, string;
 
-		string = FileTools.readText("shitlist.json");
-		obj = JSON.parse(string);
+		obj = this.getObj();
 
 		obj.shitlist.push(name);
 
