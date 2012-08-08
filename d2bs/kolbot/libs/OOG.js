@@ -334,6 +334,10 @@ MainLoop:
 				this.click(2, 0, 599, 800, 600);
 
 				break;
+			case 29: // Char create
+				this.click(6, 33, 572, 96, 588);
+
+				break;
 			case 31: // ToU
 				this.click(6, 525, 513, 128, 35);
 
