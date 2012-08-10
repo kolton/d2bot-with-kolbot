@@ -342,7 +342,7 @@ function main() {
 		} catch (e2) {
 			print("Caught an exception in the main loop.");
 			print(e);
-			D2Bot.printToConsole("Exception: " + e);
+			D2Bot.printToConsole("Exception: " + e2);
 		}
 	}
 }
