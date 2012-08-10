@@ -73,8 +73,8 @@ var Town = {
 		this.buyPotions();
 		this.identify();
 		this.shopItems();
-		this.repair();
 		this.buyKeys();
+		this.repair();
 		this.gamble();
 		this.reviveMerc();
 		Cubing.doCubing();
@@ -344,7 +344,7 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
-			if (item.location != 3) {
+			if (item.location !== 3) {
 				continue;
 			}
 
@@ -880,6 +880,8 @@ MainLoop:
 			break;
 		}
 
+		this.shopItems();
+
 		return true;
 	},
 
@@ -1250,27 +1252,27 @@ MainLoop:
 		items = Storage.Inventory.Compare(Config.Inventory);
 
 		// If low on gold
-		if (me.getStat(14) + me.getStat(15) < Config.LowGold)
-		{
+		if (me.getStat(14) + me.getStat(15) < Config.LowGold) {
 			this.initNPC("Shop");
 			loseItemAction = sellAction;
-		}
-		else
+		} else {
 			loseItemAction = dropAction;
+		}
 
 		for (i = 0; !!items && i < items.length; i += 1) {
 			if ([18, 41, 78].indexOf(items[i].itemType) === -1 &&
-					(items[i].code != "tsc" || !!me.findItem("tbk", 0, 3)) &&
-					(items[i].code != "isc" || !!me.findItem("ibk", 0, 3)) &&
+					(items[i].code !== "tsc" || !!me.findItem("tbk", 0, 3)) &&
+					(items[i].code !== "isc" || !!me.findItem("ibk", 0, 3)) &&
 					(Pickit.checkItem(items[i]).result === 0 ||
 					 Pickit.checkItem(items[i]).result === 4) &&
 					!Cubing.keepItem(items[i]) &&
 					!Runewords.keepItem(items[i])) {
 				try {
-					if (loseItemAction == sellAction)
+					if (loseItemAction === sellAction) {
 						items[i].sell();
-					else
+					} else {
 						items[i].drop();
+					}
 				} catch (e) {
 					print(e);
 				}
