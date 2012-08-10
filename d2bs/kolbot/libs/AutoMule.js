@@ -32,7 +32,7 @@ var AutoMule = {
 			switch (msg) {
 			case "report": // reply to status request
 				sendCopyData(null, AutoMule.muleProfile, 12, status);
-				
+
 				break;
 			case "quit": // quit command
 				status = "quit";

@@ -183,6 +183,7 @@ MainSwitch:
 	case 2: // Waiting In Line
 		D2Bot.updateStatus("Waiting...");
 		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
+		ControlAction.click(6, 433, 433, 96, 32);
 
 		break;
 	case 3: // Lobby Chat

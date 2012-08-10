@@ -250,6 +250,7 @@ MainSwitch:
 	case 2: // Waiting In Line
 		D2Bot.updateStatus("Waiting...");
 		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
+		ControlAction.click(6, 433, 433, 96, 32);
 
 		break;
 	case 3: // Lobby Chat
@@ -493,6 +494,7 @@ MainSwitch:
 		D2Bot.updateStatus("Disconnected");
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
+
 		break;
 	case 15: // New Character
 		break;
@@ -505,6 +507,7 @@ MainSwitch:
 	case 17: // Lobby - Lost Connection - just click okay, since we're toast anyway
 		delay(1000);
 		ControlAction.click(6, 351, 337, 96, 32);
+
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));

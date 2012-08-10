@@ -344,11 +344,13 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
-			if (item.location != 3)
+			if (item.location != 3) {
 				continue;
+			}
 
-			if (this.ignoredItemTypes.indexOf(item.itemType) !== -1)
+			if (this.ignoredItemTypes.indexOf(item.itemType) !== -1) {
 				continue;
+			}
 
 			switch (result.result) {
 			case 1:
@@ -1212,14 +1214,11 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, items,
+		var i, items, loseItemAction
+			dropAction = 0,
+			sellAction = 1,
 			clearList = [],
 			item = me.getItem(-1, 0);
-
-		var dropAction = 0;
-		var sellAction = 1;
-
-		var loseItemAction;
 
 		// Potions (after death usually)
 		if (item) {
@@ -1368,6 +1367,7 @@ MainLoop:
 			this.act[4].spot.waypoint = [5113, 5068];
 			this.act[4].spot.nihlathak = [5071, 5111];
 			this.act[4].initialized = true;
+
 			break;
 		}
 

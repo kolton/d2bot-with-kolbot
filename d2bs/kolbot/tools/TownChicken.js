@@ -25,6 +25,8 @@ include("common/Storage.js");
 include("common/Town.js");
 
 function main() {
+	var townCheck = false;
+
 	this.togglePause = function () {
 		var script = getScript("default.dbj");
 
@@ -39,26 +41,33 @@ function main() {
 		}
 	};
 
+	addEventListener("scriptmsg",
+		function (msg) {
+			if (msg === "townCheck") {
+				townCheck = true;
+			}
+		}
+		);
+
 	// Init config and attacks
 	Config.init();
 	Attack.init();
 	Storage.Init();
 
 	while (true) {
-		if (!me.inTown && ((Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) || (Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
+		if (!me.inTown && (townCheck ||
+			(Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) ||
+			(Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
 			this.togglePause();
-			
+
 			try {
-				me.overhead("Town chicken");
+				me.overhead("Going to town");
 				Town.goToTown();
-				Town.heal();
-				Town.buyPotions();
-				Town.reviveMerc();
-				me.cancel();
+				Town.doChores();
 				Town.move("portalspot");
 
 				if (!Pather.usePortal(null, me.name)) {
-					throw new Error("Misc.townCheck: Failed to use portal.");
+					throw new Error("TownChicken: Failed to use portal.");
 				}
 
 				if (Config.PublicMode) {
@@ -66,6 +75,8 @@ function main() {
 				}
 			} finally {
 				this.togglePause();
+
+				townCheck = false;
 			}
 		}
 

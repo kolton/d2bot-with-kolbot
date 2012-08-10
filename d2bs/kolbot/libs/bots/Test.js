@@ -3,7 +3,7 @@ function Test() {
 
 	var c;
 
-	include("automule.js");
+	//include("automule.js");
 
 	function KeyDown(key) {
 		if (key === 45) {
@@ -25,6 +25,5 @@ function Test() {
 }
 
 function test() {
-	//print(MuleLogger.getItemDesc(getUnit(101)));
-	Pather.moveToExit(me.area + 1, true);
+	Pather.moveToExit(108, true);
 }

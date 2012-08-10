@@ -102,18 +102,18 @@ var Attack = {
 
 				if (dodgeList.length) {
 					dodgeList.sort(Sort.units);
-					
+
 					if (typeof test === "undefined") {
 						test = {x: target.x, y: target.y};
 					}
 
 					if (getDistance(me, dodgeList[0]) < 13) {
-						this.dodge(test, 15, dodgeList);
+						this.dodge(test, ClassAttack.skillRange[1] || 15, dodgeList);
 					}
 				}
 			}
 
-			Misc.townCheck(true);
+			Misc.townCheck();
 
 			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
 				break;
@@ -126,7 +126,11 @@ var Attack = {
 			attackCount += 1;
 		}
 
-		return (target.mode === 0 || target.mode === 12);
+		if (target.mode !== 0 && target.mode !== 12) {
+			throw new Error("Failed to kill " + target.name);
+		}
+
+		return true;
 	},
 
 	getScarinessLevel: function (unit) {
@@ -429,12 +433,12 @@ var Attack = {
 	},
 
 	// Draw lines around a room on minimap
-	markRoom: function (room, color) {
+	/*markRoom: function (room, color) {
 		new Line(room.x * 5, room.y * 5, room.x * 5, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5, room.x * 5 + room.xsize, room.y * 5, color, true);
 		new Line(room.x * 5 + room.xsize, room.y * 5, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
 		new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
-	},
+	},*/
 
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
@@ -549,7 +553,7 @@ var Attack = {
 	validSpot: function (x, y) {
 		var result;
 
-		if (!me.area) { // Just in case
+		if (!me.area || !x || !y) { // Just in case
 			return false;
 		}
 
@@ -687,22 +691,24 @@ var Attack = {
 			return false;
 		}
 
-		if (unit.classid === 543 && me.area === 131) { // Baal in Throne
-			return false;
-		}
-
 		if (getBaseStat("monstats", unit.classid, "neverCount")) { // neverCount base stat - hydras, traps etc.
 			return false;
 		}
 
 		switch (unit.classid) {
+		case 179: // An evil force - cow (lol)
+			return false;
+		case 543: // Baal in Throne
+			if (me.area === 131) {
+				return false;
+			}
+
+			break;
 		case 110: // Vultures
 		case 111:
 		case 112:
 		case 113:
 		case 114:
-		case 179: // An evil force - cow (lol)
-			return false;
 		case 608:
 			if (unit.mode === 8) { // Flying
 				return false;

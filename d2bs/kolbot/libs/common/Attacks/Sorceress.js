@@ -78,20 +78,20 @@ var ClassAttack = {
 		var index, staticRange, timedIndex, untimedIndex;
 
 		// Static
-		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.checkResist(unit, "lightning") && Config.StaticList.indexOf(unit.name) > -1) {
+		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.indexOf(unit.name) > -1 && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
 			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 
-			if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, staticRange, 0x4)) {
-					return 1;
+			while (Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
+				if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
+					if (!Attack.getIntoPosition(unit, staticRange, 0x4)) {
+						return 1;
+					}
+				}
+
+				if (!Skill.cast(42, 0)) {
+					return 2;
 				}
 			}
-
-			if (!Skill.cast(42, 0)) {
-				return 2;
-			}
-
-			return 3;
 		}
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;

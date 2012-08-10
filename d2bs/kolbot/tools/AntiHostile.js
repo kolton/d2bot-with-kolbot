@@ -4,8 +4,6 @@
 *	@desc		handle hostile threats
 */
 
-// TODO: more classes for entrance guard, timeout/leave event for hostiles array
-
 js_strict(true);
 
 include("json2.js");
@@ -28,7 +26,7 @@ include("common/Town.js");
 
 function main() {
 	// Variables and functions
-	var player, findTrigger, attackCount, mugShot, prevPos,
+	var player, findTrigger, attackCount, prevPos, check,
 		charClass = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 		hostiles = [];
 
@@ -46,8 +44,9 @@ function main() {
 		case 0x06: // "%Name1 was Slain by %Name2" 
 			if (param2 === 0x00 && name2 === me.name) {
 				D2Bot.printToConsole(name1 + " has been neutralized.;4");
-
-				mugShot = true;
+				hideConsole();
+				delay(500);
+				takeScreenshot();
 			}
 
 			break;
@@ -176,25 +175,57 @@ function main() {
 			findTrigger = false;
 		}
 
-		if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131 && me.classid === 1) { // Spam entrance test
-			prevPos = {x: me.x, y: me.y};
+		if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131) { // Spam entrance test
+			switch (me.classid) {
+			case 1: // Sorceress
+				prevPos = {x: me.x, y: me.y};
+				this.pause();
+				Pather.moveTo(15103, 5247);
 
-			this.pause();
-			Pather.moveTo(15103, 5247);
-
-			while (!this.findPlayer() && hostiles.length > 0) {
-				if (!me.getState(121)) {
-					Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
-				} else {
-					if (Config.AttackSkill[2] > -1) {
-						Skill.cast(Config.AttackSkill[2], ClassAttack.skillHand[2], 15099, 5237);
+				while (!this.findPlayer() && hostiles.length > 0) {
+					if (!me.getState(121)) {
+						Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
 					} else {
-						while (me.getState(121)) {
-							delay(40);
+						if (Config.AttackSkill[2] > -1) {
+							Skill.cast(Config.AttackSkill[2], ClassAttack.skillHand[2], 15099, 5237);
+						} else {
+							while (me.getState(121)) {
+								delay(40);
+							}
 						}
 					}
 				}
+
+				break;
+			case 6: // Assassin
+				prevPos = {x: me.x, y: me.y};
+				this.pause();
+				Pather.moveTo(15103, 5247);
+
+				while (!this.findPlayer() && hostiles.length > 0) {
+					if (Config.UseTraps) {
+						check = ClassAttack.checkTraps({x: 15099, y: 5242, classid: 544});
+
+						if (check) {
+							ClassAttack.placeTraps({x: 15099, y: 5242, classid: 544}, 5);
+						}
+					}
+
+					Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
+
+					while (me.getState(121)) {
+						delay(40);
+					}
+				}
+
+				break;
 			}
+		}
+
+		if (!hostiles.length && prevPos) {
+			Pather.moveTo(prevPos.x, prevPos.y);
+			this.resume();
+			prevPos = false;
 		}
 
 		player = this.findPlayer();
@@ -245,14 +276,6 @@ function main() {
 			Pather.moveTo(prevPos.x, prevPos.y);
 			this.resume();
 			this.stopFlash();
-		}
-
-		if (mugShot) {
-			hideConsole();
-			delay(500);
-			takeScreenshot();
-
-			mugShot = false;
 		}
 
 		delay(200);
