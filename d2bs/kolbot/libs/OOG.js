@@ -98,10 +98,10 @@ var DataFile = {
 		}
 
 		string = FileTools.readText("data/" + me.profile + ".json");
-
 		try {
 			obj = JSON.parse(string);
-		} catch (e) {
+		}
+		catch (e) {
 			// If we failed, file might be corrupted, so create a new one
 			this.create();
 			obj = JSON.parse(string);
@@ -335,7 +335,7 @@ MainLoop:
 
 				break;
 			case 29: // Char create
-				this.click(6, 33, 572, 96, 588);
+				this.click(6, 33, 572, 128, 35);
 
 				break;
 			case 31: // ToU
@@ -580,10 +580,9 @@ MainLoop:
 
 var ShitList = {
 	create: function () {
-		var string,
-			obj = {
-				shitlist: []
-			};
+		obj = {
+			shitlist: []
+		};
 
 		string = JSON.stringify(obj);
 
@@ -591,12 +590,11 @@ var ShitList = {
 	},
 
 	getObj: function () {
-		var obj,
-			string = FileTools.readText("shitlist.json");
-
+		string = FileTools.readText("shitlist.json");
 		try {
 			obj = JSON.parse(string);
-		} catch (e) {
+		}
+		catch (e) {
 			this.create();
 		}
 
@@ -604,7 +602,7 @@ var ShitList = {
 	},
 
 	read: function () {
-		var obj;
+		var obj, string;
 
 		if (!FileTools.exists("shitlist.json")) {
 			this.create();
