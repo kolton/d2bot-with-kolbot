@@ -129,6 +129,37 @@ var Attack = {
 		return (target.mode === 0 || target.mode === 12);
 	},
 
+	getScarinessLevel: function (unit) {
+		var scariness = 0, ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
+
+		// Only handling monsters for now
+		if (unit.type !== 1) {
+			return undefined;
+		}
+
+		// Minion
+		if (unit.spectype & 0x08) {
+			scariness += 1;
+		}
+
+		// Champion
+		if (unit.spectype & 0x02) {
+			scariness += 2;
+		}
+
+		// Boss
+		if (unit.spectype & 0x04) {
+			scariness += 4;
+		}
+
+		// Summoner or the like
+		if (ids.indexOf(unit.classid) > -1) {
+			scariness += 8;
+		}
+
+		return scariness;
+	},
+
 	// Clear monsters in a section based on range and spectype or clear monsters around a boss monster
 	clear: function (range, spectype, bossId, sortfunc, pickit) { // probably going to change to passing an object
 		if (Config.MFLeader && !!bossId) {
@@ -212,7 +243,15 @@ var Attack = {
 
 			target = copyUnit(monsterList[0]);
 
-			if (typeof target.x !== "undefined" && Math.abs(orgx - target.x) <= range && Math.abs(orgy - target.y) <= range && (!spectype || (target.spectype & spectype)) && this.checkMonster(target) && (me.getSkill(54, 1) || !checkCollision(me, target, 0x1))) {
+			if (typeof target.x !== "undefined" &&
+					((Math.abs(orgx - target.x) <= range &&
+						Math.abs(orgy - target.y) <= range) ||
+						(this.getScarinessLevel(target) > 7 &&
+						Math.abs(me.x - target.x) <= range &&
+						Math.abs(me.y - target.y) <= range)) &&
+					(!spectype || (target.spectype & spectype)) &&
+					this.checkMonster(target) &&
+					(me.getSkill(54, 1) || !checkCollision(me, target, 0x1))) {
 				if (Config.Dodge) {
 					if (attackCount % 5 === 0) {
 						dodgeList = this.buildDodgeList();
@@ -465,6 +504,25 @@ var Attack = {
 	// Sort monsters based on distance, spectype and classId (summoners are attacked first)
 	sortMonsters: function (unitA, unitB) {
 		var ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
+
+		if (ids.indexOf(unitA.classid) > -1 &&
+				ids.indexOf(unitB.classid) > -1) {
+			// Kill "scary" uniques first (like Bishibosh)
+			if ((unitA.spectype & 0x04) !== 0 &&
+					(unitB.spectype & 0x04) !== 0) {
+				return 0;
+			}
+		   
+			if ((unitA.spectype & 0x04) !== 0) {
+				return -1;
+			}
+		   
+			if ((unitB.spectype & 0x04) !== 0) {
+				return 1;
+			}
+
+			return 0;
+		}
 
 		if (ids.indexOf(unitA.classid) > -1) {
 			return -1;
