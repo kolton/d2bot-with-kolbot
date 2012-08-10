@@ -1214,7 +1214,7 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, items, loseItemAction
+		var i, items, loseItemAction,
 			dropAction = 0,
 			sellAction = 1,
 			clearList = [],
