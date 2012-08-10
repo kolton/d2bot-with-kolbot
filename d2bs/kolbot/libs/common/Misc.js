@@ -475,33 +475,16 @@ var Misc = {
 				}
 			}
 
-			if (Config.OpenChests && Town.needKeys())
-			{
+			if (Config.OpenChests && Town.needKeys()) {
 				check = true;
 			}
 		}
 
 		if (check) {
-			Town.goToTown();
-			Town.heal();
-			Town.buyPotions();
-			Town.buyKeys();
-			Town.reviveMerc();
-			me.cancel();
-			Town.move("portalspot");
-
-			if (!Pather.usePortal(null, me.name)) {
-				throw new Error("Misc.townCheck: Failed to use portal.");
-			}
-
-			if (Config.PublicMode) {
-				Pather.makePortal();
-			}
-
-			return true;
+			scriptBroadcast("townCheck");
 		}
 
-		return false;
+		return true;
 	}
 };
 

@@ -224,7 +224,7 @@
 [name] == meshboots && [quality] == set # [plusdefense] == 125 && [coldresist] == 25 && [lightresist] == 25 // Natalya's Soul, perfect
 
 [name] == boots && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 20 // Hotspur
-[name] == lightplatedboots && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 60 // Goblin Toe
+//[name] == lightplatedboots && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 60 // Goblin Toe
 //[name] == greaves && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 80 // Tearhaunch
 
 //=================================================================================================================================================================================

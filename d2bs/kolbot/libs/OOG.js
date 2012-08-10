@@ -117,7 +117,7 @@ var DataFile = {
 	},
 
 	updateStats: function (arg, value) {
-		var obj, string;
+		var obj, string, area;
 
 		obj = this.getObj();
 
@@ -132,6 +132,12 @@ var DataFile = {
 
 			break;
 		case "lastArea":
+			area = getArea();
+
+			if (typeof area !== "object") {
+				return;
+			}
+
 			if (obj.lastArea === getArea().name) {
 				return;
 			}

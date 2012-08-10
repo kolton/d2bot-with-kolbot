@@ -9,10 +9,11 @@ var CollMap = new function () {
 	this.maps = [];
 
 	this.addRoom = function (x, y) {
+		// In case a room is passed directly
 		if (x instanceof Room) {
 			this.rooms.push(x);
 			this.maps.push(x.getCollision());
-			
+
 			return true;
 		}
 

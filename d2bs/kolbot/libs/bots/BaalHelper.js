@@ -310,6 +310,7 @@ MainLoop:
 		}
 
 		delay(1000);
+		Pather.moveTo(15092, 5011);
 
 		portal = getUnit(2, 563);
 

@@ -82,7 +82,7 @@ var ClassAttack = {
 
 		if (checkTraps) {
 			if (Math.round(getDistance(me, unit)) > 20 || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, 20, 0x4) || checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
+				if (!Attack.getIntoPosition(unit, 20, 0x4) || (checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1))) {
 					return 1;
 				}
 			}
@@ -199,7 +199,7 @@ var ClassAttack = {
 						return true;
 					}
 
-					if (unit.hasOwnProperty("classid") && [211, 242, 243, 544].indexOf(unit.classid) > -1) { // Duriel, Mephisto, Diablo, Baal
+					if ((unit.hasOwnProperty("classid") && [211, 242, 243, 544].indexOf(unit.classid) > -1) || (unit.hasOwnProperty("type") && unit.type === 0)) { // Duriel, Mephisto, Diablo, Baal, other players
 						if (traps >= Config.BossTraps.length) {
 							return true;
 						}

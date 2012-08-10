@@ -21,7 +21,7 @@ function Summoner() {
 		}
 	}
 
-	if (!Pather.moveToPreset(me.area, 2, 357)) {
+	if (!Pather.moveToPreset(me.area, 2, 357, -3, -3)) {
 		throw new Error("Failed to move to Summoner");
 	}
 

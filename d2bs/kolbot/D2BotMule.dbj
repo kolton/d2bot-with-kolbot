@@ -1,4 +1,15 @@
-var muler, mulerStatus, keyswap,
+var StarterConfig = {
+	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
+	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
+	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
+	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use.
+	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
+	PleaseWaitTimeout: 10, // Seconds to wait before cancelling the 'Please Wait...' screen
+	WaitInLineTimeout: 60 // Seconds to wait before cancelling the 'Waiting in Line...' screen
+};
+
+
+var muler, mulerStatus, keyswap, connectFail,
 	makeNext = false,
 	status = "loading";
 
@@ -59,8 +70,9 @@ function pickItems() {
 		rval = "fail",
 		list = [];
 
-	while (me.ingame && !me.gameReady)
+	while (me.ingame && !me.gameReady) {
 		delay(500);
+	}
 
 	while (me.gameReady) {
 		if (mulerStatus === "done") {
@@ -73,12 +85,10 @@ function pickItems() {
 			}
 
 			// If and only if there is nothing left are we "done"
-			if (list.length == 0)
-			{
+			if (list.length === 0) {
 				rval = "done";
 				break;
 			}
-
 			while (list.length > 0) {
 				item = list.shift();
 				canFit = Storage.Inventory.CanFit(item);
@@ -96,8 +106,9 @@ function pickItems() {
 				}
 			}
 
-			if (rval == "next")
+			if (rval === "next") {
 				break;
+			}
 		} else {
 			sendCopyData(null, muler, 0, "report");
 			//D2Bot.shoutGlobal("report", 0);
@@ -180,6 +191,15 @@ function nextChar() {
 		charNumbers = "abcdefghijklmnopqrstuvwxyz",
 		obj = MuleData.read();
 
+	if (getLocation() === 12) {
+		obj.charNum = ControlAction.getCharacters().length;
+	}
+
+	// dirty
+	if (obj.charNum > 25) {
+		obj.charNum = 0;
+	}
+
 	num = obj.accNum.toString();
 
 	for (i = 0; i < num.length; i += 1) {
@@ -214,6 +234,21 @@ function timeoutDelay(text, time) {
 	}
 }
 
+function updateCount() {
+	D2Bot.updateCount();
+	delay(1000);
+	ControlAction.click(6, 264, 366, 272, 35);
+
+	try {
+		login(me.profile);
+	} catch (e) {
+
+	}
+
+	delay(1000);
+	ControlAction.click(6, 33, 572, 128, 35);
+}
+
 include("json2.js");
 include("oog.js");
 include("automule.js");
@@ -243,11 +278,10 @@ function main() {
 		if (!FileTools.exists("AutoMule." + AutoMule.realm + ".json")) {
 			MuleData.create();
 		}
-	}
-	catch (e) {
+	} catch (e) {
 		print("Caught exception creating data files.");
 		print(e);
-		D2Bot.printToConsole("Exception: "+e);
+		D2Bot.printToConsole("Exception: " + e);
 	}
 
 	while (true) {
@@ -256,6 +290,7 @@ function main() {
 				if (status === "loading") {
 					status = "ready";
 
+					D2Bot.updateStatus("In mule game.");
 					D2Bot.printToConsole("In mule game.");
 					Storage.Init();
 				}
@@ -264,8 +299,7 @@ function main() {
 					delay(500);
 				}
 
-				if (!muler)
-				{
+				if (!muler) {
 					D2Bot.printToConsole("Failed to contact mulee.");
 					D2Bot.stop();
 				}
@@ -305,11 +339,10 @@ function main() {
 
 			locationAction(getLocation());
 			delay(1000);
-		}
-		catch (e) {
+		} catch (e2) {
 			print("Caught an exception in the main loop.");
 			print(e);
-			D2Bot.printToConsole("Exception: "+e);
+			D2Bot.printToConsole("Exception: " + e);
 		}
 	}
 }
@@ -319,6 +352,8 @@ function locationAction(location) {
 
 MainSwitch:
 	switch (location) {
+	case 0:
+		break;
 	case 1:
 	case 3:
 		if (makeNext) {
@@ -344,12 +379,22 @@ MainSwitch:
 		locationTimeout(5000, location);
 
 		break;
+	case 2: // Waiting In Line
+		D2Bot.updateStatus("Waiting...");
+		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
+		ControlAction.click(6, 433, 433, 96, 32);
+
+		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
 		delay(2000);
 		joinGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
 		locationTimeout(5000, location);
 
+		break;
+	case 6: // Ladder
+		break;
+	case 7: // Channel List
 		break;
 	case 8: // menu
 	case 9: // login
@@ -431,6 +476,49 @@ MainSwitch:
 		}
 
 		break;
+	case 11: // Unable To Connect
+		D2Bot.updateStatus("Unable To Connect");
+
+		if (connectFail) {
+			timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 6e4);
+
+			connectFail = false;
+		}
+
+		if (!ControlAction.click(6, 335, 450, 128, 35)) {
+			break;
+		}
+
+		connectFail = true;
+
+		break;
+	case 13: // Realm Down - Character Select screen
+		D2Bot.updateStatus("Realm Down");
+		delay(1000);
+
+		if (!ControlAction.click(6, 33, 572, 128, 35)) {
+			break;
+		}
+
+		updateCount();
+		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
+		D2Bot.CDKeyRD();
+
+		if (keyswap) {
+			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			D2Bot.restart();
+		}
+
+		break;
+	case 14: // Character Select / Main Menu - Disconnected
+		D2Bot.updateStatus("Disconnected");
+		delay(500);
+		ControlAction.click(6, 351, 337, 96, 32);
+
+		break;
 	case 18: // splash
 		ControlAction.click();
 
@@ -488,9 +576,68 @@ MainSwitch:
 		}
 
 		break;
+	case 16: // Character Select - Please Wait popup
+		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {
+			ControlAction.click(6, 351, 337, 96, 32);
+		}
+
+		break;
+	case 17: // Lobby - Lost Connection - just click okay, since we're toast anyway
+		delay(1000);
+		ControlAction.click(6, 351, 337, 96, 32);
+
+		break;
+	case 19: // Login - Cdkey In Use
+		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+		D2Bot.CDKeyInUse();
+
+		if (keyswap) {
+			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			ControlAction.click(6, 335, 450, 128, 35);
+			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+		}
+
+		break;
+	case 20: // Single Player - Select Difficulty
+		break;
+	case 21: // Main Menu - Connecting
+		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
+			ControlAction.click(6, 330, 416, 128, 35);
+		}
+
+		break;
+	case 22: // Login - Invalid Cdkey (classic or xpac)
+		if (keyswap) {
+			D2Bot.printToConsole("Invalid CD-Key");
+			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			D2Bot.restart(true);
+		} else {
+			ControlAction.click(6, 335, 450, 128, 35);
+			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
+		}
+
+		break;
+	case 23: // Character Select - Connecting
+		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+		}
+
+		break;
+	case 24: // Server Down - not much to do but wait..
+		break;
+	case 25: // Lobby - Please Wait
+		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {
+			ControlAction.click(6, 351, 337, 96, 32);
+		}
+
+		break;
 	case 26: // game already exists
 		ControlAction.click(6, 652, 469, 120, 20); // Join
 
+		break;
+	case 27: // Gateway Select
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		ControlAction.click(6, 533, 469, 120, 20);
@@ -500,5 +647,7 @@ MainSwitch:
 		ControlAction.click(6, 351, 337, 96, 32);
 
 		break;
+	case 38: // Game is full
+		break; // not sure how/if to handle
 	}
 }

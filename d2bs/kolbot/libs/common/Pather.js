@@ -8,9 +8,20 @@ var Pather = {
 	teleport: true,
 	walkDistance: 15,
 	teleDistance: 40,
+	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 
 	moveTo: function (x, y, retry, clearPath, pop) {
+		var i, path, mob,
+			node = {x: x, y: y},
+			fail = 0;
+
+		for (i = 0; i < this.cancelFlags.length; i += 1) {
+			if (getUIFlag(this.cancelFlags[i])) {
+				me.cancel();
+			}
+		}
+
 		if (getDistance(me, x, y) < 2) {
 			return true;
 		}
@@ -21,10 +32,6 @@ var Pather = {
 
 		if (typeof (x) !== "number" || typeof (y) !== "number") {
 			throw new Error("moveTo: Coords must be numbers");
-		}
-
-		if (getUIFlag(0x01) || getUIFlag(0x02) || getUIFlag(0x04) || getUIFlag(0x16) || getUIFlag(0x0C) || getUIFlag(0x0F)) {
-			me.cancel();
 		}
 
 		if (typeof retry === "undefined") {
@@ -39,10 +46,6 @@ var Pather = {
 			pop = false;
 		}
 
-		var path, mob,
-			node = {x: x, y: y},
-			fail = 0;
-
 		this.useTeleport = this.teleport && !me.inTown && ((me.getSkill(54, 1) && me.classid === 1) || me.getStat(97, 54));
 
 		// Teleport without calling getPath if the spot is close enough
@@ -53,6 +56,10 @@ var Pather = {
 		// Walk without calling getPath if the spot is close enough
 		if (!this.useTeleport && getDistance(me, x, y) <= 5) {
 			return this.walkTo(x, y);
+		}
+
+		if (!me.area) {
+			throw new Error("moveTo: area error");
 		}
 
 		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? this.teleDistance : this.walkDistance);
@@ -72,8 +79,10 @@ var Pather = {
 		}
 
 		while (path.length > 0) {
-			if (getUIFlag(0x01) || getUIFlag(0x02) || getUIFlag(0x04) || getUIFlag(0x16) || getUIFlag(0x0C) || getUIFlag(0x0F)) {
-				me.cancel();
+			for (i = 0; i < this.cancelFlags.length; i += 1) {
+				if (getUIFlag(this.cancelFlags[i])) {
+					me.cancel();
+				}
 			}
 
 			node = path.shift();
@@ -125,9 +134,7 @@ var Pather = {
 					}
 				}
 
-				if (Misc.townCheck(false)) {
-					this.useTeleport = this.teleport && !me.inTown && me.getSkill(54, 1);
-				}
+				Misc.townCheck();
 			}
 		}
 
@@ -339,7 +346,7 @@ ModeLoop:
 
 	// moveToExit can take a single area or an array of areas as the first argument
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, exits, myRoom, targetRoom,
+		var i, j, area, exits, myRoom, targetRoom, dest,
 			areas = [];
 
 		if (targetArea instanceof Array) {
@@ -349,7 +356,13 @@ ModeLoop:
 		}
 
 		for (i = 0; i < areas.length; i += 1) {
-			exits = getArea().exits;
+			area = getArea();
+
+			if (typeof area !== "object") {
+				throw new Error("moveToExit: error in getArea()");
+			}
+
+			exits = area.exits;
 
 			if (!exits || !exits.length) {
 				return false;
@@ -357,7 +370,16 @@ ModeLoop:
 
 			for (j = 0; j < exits.length; j += 1) {
 				if (exits[j].target === areas[i]) {
-					this.moveToUnit(exits[j], 0, 0, clearPath);
+					//this.moveToUnit(exits[j], 0, 0, clearPath);
+
+					// tile exit fix, helps with a certain crash too
+					dest = this.getNearestWalkable(exits[j].x, exits[j].y, 5, 1);
+
+					if (!dest) {
+						return false;
+					}
+
+					Pather.moveTo(dest[0], dest[1], 3, clearPath);
 
 					/* i < areas.length - 1 is for crossing multiple areas.
 						In that case we must use the exit before the last area.
@@ -372,24 +394,6 @@ ModeLoop:
 							this.moveTo(targetRoom[0], targetRoom[1]);
 
 							break;
-
-							/*if (targetRoom[0] > myRoom[0]) {
-								return this.moveTo(me.x + 10, me.y);
-							}
-
-							if (targetRoom[0] < myRoom[0]) {
-								return this.moveTo(me.x - 10, me.y);
-							}
-
-							if (targetRoom[1] > myRoom[1]) {
-								return this.moveTo(me.x, me.y + 10);
-							}
-
-							if (targetRoom[1] < myRoom[1]) {
-								return this.moveTo(me.x, me.y - 10);
-							}
-
-							return false;*/
 						case 2:
 							if (!this.useUnit(5, exits[j].tileid, areas[i])) {
 								return false;
@@ -402,6 +406,10 @@ ModeLoop:
 					break;
 				}
 			}
+		}
+
+		if (use) {
+			return typeof targetArea === "object" ? me.area === targetArea[targetArea.length - 1] : me.area === targetArea;
 		}
 
 		return true;
@@ -456,7 +464,10 @@ ModeLoop:
 		}
 
 		for (i = 0; i < 3; i += 1) {
-			this.moveToUnit(unit);
+			if (getDistance(me, unit) > 5) {
+				this.moveToUnit(unit);
+			}
+
 			unit.interact();
 
 			tick = getTickCount();
@@ -533,7 +544,14 @@ ModeLoop:
 						}
 
 						if (!getWaypoint(this.wpAreas.indexOf(targetArea))) {
-							throw new Error("useWaypoint: You don't have the waypoint");
+							me.cancel();
+							me.overhead("Trying to get the waypoint");
+
+							if (this.getWP(targetArea)) {
+								return true;
+							}
+
+							throw new Error("Pather.useWaypoint: Failed to go to waypoint");
 						}
 
 						break;
@@ -541,10 +559,6 @@ ModeLoop:
 
 					delay(10);
 				}
-			}
-
-			if (me.inTown) {
-				Town.move("waypoint");
 			}
 
 			if (getUIFlag(0x14) || !check) {
@@ -575,6 +589,10 @@ ModeLoop:
 
 			if (i > 2) { // Try to get unstuck
 				Town.move("stash");
+			}
+
+			if (me.inTown) {
+				Town.move("waypoint");
 			}
 		}
 
@@ -810,5 +828,203 @@ MainLoop:
 		default:
 			return false;
 		}
+	},
+
+	getWP: function (area) {
+		var i, j, wp, preset,
+			wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
+
+		this.journeyTo(area);
+
+		for (i = 0; i < wpIDs.length; i += 1) {
+			preset = getPresetUnit(area, 2, wpIDs[i]);
+
+			if (preset) {
+				this.moveToUnit(preset);
+
+				wp = getUnit(2, "waypoint");
+
+				if (wp) {
+					for (j = 0; j < 10; j += 1) {
+						wp.interact();
+
+						if (getUIFlag(0x14)) {
+							me.cancel();
+
+							return true;
+						}
+
+						delay(500);
+					}
+				}
+			}
+		}
+
+		return false;
+	},
+
+	// TODO: Hell levels
+	journeyTo: function (area) {
+		var i, special, unit, tick, target;
+
+		target = this.plotCourse(area);
+
+		print(target.course);
+
+		/*while (true) {
+			delay(500);
+		}*/
+
+		if (target.useWP) {
+			Town.goToTown();
+		}
+
+		// handle variable flayer jungle entrances
+		if (target.course.indexOf(78) > -1) {
+			Town.goToTown(3); // without initiated act, getArea().exits will crash
+
+			special = getArea(78);
+
+			if (special) {
+				special = special.exits;
+
+				for (i = 0; i < special.length; i += 1) {
+					if (special[i].target === 77) {
+						target.course.splice(target.course.indexOf(78), 0, 77); // add great marsh if needed
+
+						break;
+					}
+				}
+			}
+		}
+
+		while (target.course.length) {
+			if (!me.inTown) {
+				Precast.doPrecast(false);
+			}
+
+			if (me.inTown && this.wpAreas.indexOf(target.course[0]) > -1 && getWaypoint(this.wpAreas.indexOf(target.course[0]))) {
+				this.useWaypoint(target.course[0], true);
+			} else if (me.area === 109 && target.course[0] === 110) { // Harrogath -> Bloody Foothills
+				this.moveTo(5026, 5095);
+
+				unit = getUnit(2, 449); // Gate
+
+				if (unit) {
+					for (i = 0; i < 3; i += 1) {
+						unit.interact();
+
+						tick = getTickCount();
+
+						while (getTickCount() - tick < 3000) {
+							if (unit.mode === 2) {
+								delay(1000);
+
+								break;
+							}
+						}
+					}
+				}
+
+				this.moveToExit(target.course[0], true);
+			} else if (me.area === 4 && target.course[0] === 38) { // Stony Field -> Tristram
+				this.moveToPreset(me.area, 1, 737, 0, 0, false, true);
+
+				for (i = 0; i < 5; i += 1) {
+					if (this.usePortal(38)) {
+						break;
+					}
+
+					delay(1000);
+				}
+			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
+				this.moveToPreset(me.area, 2, 357);
+
+				for (i = 0; i < 5; i += 1) {
+					unit = getUnit(2, 357);
+
+					unit.interact();
+					delay(1000);
+					me.cancel();
+
+					if (this.usePortal(46)) {
+						break;
+					}
+				}
+			} else if (me.area === 54 && target.course[0] === 74) { // Palace -> Arcane
+				this.moveTo(10073, 8670);
+				this.usePortal(null);
+			} else if (me.area === 109 && target.course[0] === 121) { // Harrogath -> Nihlathak's Temple
+				Town.move("anya");
+				this.usePortal(121);
+			} else {
+				this.moveToExit(target.course[0], true);
+			}
+
+			target.course.shift();
+		}
+	},
+
+	plotCourse: function (dest, src) {
+		var node, prevArea,
+			useWP = false,
+			arr = [],
+			previousAreas = [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46, 46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102, 103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129, 130, 131, 109, 109, 109, 109],
+			visitedNodes = [],
+			toVisitNodes = [{from: dest, to: null}];
+
+		if (!src) {
+			src = me.area;
+		}
+
+		while (toVisitNodes.length > 0) {
+			node = toVisitNodes[0];
+
+			// If we've already visited it, just move on
+			if (visitedNodes[node.from] === undefined) {
+				visitedNodes[node.from] = node.to;
+
+				// If we have this wp we can start from there
+				if (Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))) {
+					if (node.from !== src) {
+						useWP = true;
+					}
+					src = node.from;
+				}
+
+				// We found it, time to go
+				if (node.from === src) {
+					break;
+				}
+
+				if ((prevArea = previousAreas[node.from]) !== 0 && visitedNodes.indexOf(prevArea) === -1) {
+					toVisitNodes.push({from: prevArea, to: node.from});
+				}
+
+				for (prevArea = 1; prevArea < previousAreas.length; prevArea += 1) {
+					// Only interested in those connected to node
+					if (previousAreas[prevArea] === node.from && visitedNodes.indexOf(prevArea) === -1) {
+						toVisitNodes.push({from: prevArea, to: node.from});
+					}
+				}
+			}
+			
+			toVisitNodes.shift();
+		}
+
+		arr.push(src);
+
+		node = src;
+
+		while (node !== dest && node !== undefined) {
+			arr.push(node = visitedNodes[node]);
+		}
+
+		// Something failed
+		if (node === undefined) {
+			return false;
+		}
+
+		return {course: arr, useWP: useWP};
 	}
 };

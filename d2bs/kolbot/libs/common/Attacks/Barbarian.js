@@ -242,7 +242,7 @@ MainLoop:
 					}
 
 					if (Config.FindItemSwitch) {
-						Precast.weaponSwitch(Config.FindItemSwitch - 1);
+						Precast.weaponSwitch(Config.FindItemSwitch);
 					}
 
 CorpseLoop:

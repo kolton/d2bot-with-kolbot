@@ -22,7 +22,7 @@ var MuleLogger = {
 	LogGame: ["muleloggame", "password"], // ["gamename", "password"]
 	LogNames: true, // Put account/character name on the picture
 	LogItemLevel: true, // Add item level to the picture
-	SaveScreenShot: true, // Save pictures in jpg format (saved in 'Images' folder)
+	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
 	IngameTime: 20, // Time to wait after leaving game
 
 	// don't edit
@@ -73,6 +73,10 @@ var MuleLogger = {
 	},
 
 	logChar: function () {
+		while (!me.gameReady) {
+			delay(500);
+		}
+
 		var i, folder,
 			items = me.getItems(),
 			color = -1,
@@ -90,6 +94,10 @@ var MuleLogger = {
 			folder = dopen("mules/" + realm);
 
 			folder.create(me.account);
+		}
+
+		if (!items.length) {
+			return;
 		}
 
 		for (i = 0; i < items.length; i += 1) {

@@ -109,11 +109,17 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
-		var i;
+		var i,
+			dodgeList = [];
 
 		if (Config.AttackSkill[index] === 112) {
 			if (unit.classid === 691) {
-				Attack.getIntoPosition(unit, 15, 0x4);
+				dodgeList = Attack.buildDodgeList();
+
+				if (dodgeList.length) {
+					dodgeList.sort(Sort.units);
+					Attack.dodge(unit, 15, dodgeList);
+				}
 
 				if (Config.AttackSkill[index + 1] > -1) {
 					Skill.setSkill(Config.AttackSkill[index + 1], 0);
@@ -126,7 +132,7 @@ var ClassAttack = {
 				if (!this.getHammerPosition(unit)) {
 					print("can't get to " + unit.name);
 
-					return 0;
+					return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
 				}
 
 				/*if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
