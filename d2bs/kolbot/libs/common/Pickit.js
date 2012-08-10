@@ -21,6 +21,13 @@ var Pickit = {
 		this.beltSize = Storage.BeltSize();
 	},
 
+	// Returns:
+	// 	-1 - Needs iding
+	// 	0 - Unwanted
+	// 	1 - NTIP wants
+	// 	2 - Cubing wants
+	// 	3 - Runeword wants
+	// 	4 - Pickup to sell (triggered when low on gold)
 	checkItem: function (unit) {
 		var result = NTIPCheckItem(unit, false, true);
 
@@ -30,6 +37,18 @@ var Pickit = {
 
 		if (Runewords.checkItem(unit)) {
 			return {result: 3, line: null};
+		}
+
+		// If total gold is less than 10k pick up anything worth 10 gold per
+		// square to sell in town.
+		if (me.getStat(14) + me.getStat(15) < Config.LowGold && result == 0)
+		{
+			// Gold doesn't take up room, just pick it up
+			if (unit.name == "Gold")
+				return {result: 4, line: null};
+
+			if (unit.getItemCost(1) / (unit.sizex * unit.sizey) >= 10)
+				return {result: 4, line: null};
 		}
 
 		return result;
