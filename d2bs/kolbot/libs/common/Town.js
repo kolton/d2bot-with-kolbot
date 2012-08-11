@@ -354,9 +354,11 @@ MainLoop:
 
 			switch (result.result) {
 			case 1:
-				if (item.getFlag(0x10)) {
+				// Not needed with new code. Wasn't needed with old either...
+
+				/*if (item.getFlag(0x10)) {
 					Misc.logItem("Kept", item, result.line);
-				}
+				}*/
 
 				break;
 			case 2:
@@ -365,6 +367,7 @@ MainLoop:
 			// magics are often not worth iding.
 			case 4:
 				item.sell();
+
 				break;
 			case -1:
 				if (tome) {
@@ -402,6 +405,7 @@ MainLoop:
 				switch (result.result) {
 				case 1:
 					Misc.logItem("Kept", item, result.line);
+
 					break;
 				case -1:
 				case 2:
