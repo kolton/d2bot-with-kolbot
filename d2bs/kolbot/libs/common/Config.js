@@ -8,16 +8,36 @@ var Scripts = {};
 
 var Config = {
 	init: function (notify) {
-		var prefix = "",
+		var configFilename = "", i,
 			classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
-		if (FileTools.exists("libs/config/" + me.realm + "." + classes[me.classid] + "." + me.charname + ".js")) {
-			prefix = me.realm + ".";
+		for (i = 0; i < 5; i += 1) {
+			switch (i) {
+			case 0:
+				configFilename = me.realm + "." + classes[me.classid] + "." +
+					me.profile + ".js";
+				break;
+			case 1:
+				configFilename = classes[me.classid] + "." + me.profile + ".js";
+				break;
+			case 2:
+				configFilename = me.realm + "." + classes[me.classid] + "." +
+					me.charname + ".js";
+				break;
+			case 3:
+				configFilename = classes[me.classid] + "." + me.charname +
+					".js";
+				break;
+			}
+
+			if (FileTools.exists("libs/config/" + configFilename)) {
+				break;
+			}
 		}
 
-		if (!FileTools.exists("libs/config/" + prefix + classes[me.classid] + "." + me.charname + ".js")) {
+		if (!FileTools.exists("libs/config/" + configFilename)) {
 			if (notify) {
-				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!");
+				print("ÿc1" + configFilename + ".js not found!");
 				print("ÿc1Loading default config.");
 			}
 
@@ -29,7 +49,7 @@ var Config = {
 		}
 
 		try {
-			include("config/" + prefix + classes[me.classid] + "." + me.charname + ".js");
+			include("config/" + configFilename);
 		} catch (e1) {
 			throw new Error("Failed to load character config.");
 		}
