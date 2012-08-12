@@ -92,6 +92,7 @@ var Config = {
 	LastMessage: "",
 	UseMerc: false,
 	MercWatch: false,
+	LowGold: 0,
 	StashGold: 0,
 	FieldID: false,
 	CainID: {

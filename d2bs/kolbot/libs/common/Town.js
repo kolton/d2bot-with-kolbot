@@ -321,7 +321,7 @@ var Town = {
 			return true;
 		}
 
-		list = this.getUnids();
+		list = Storage.Inventory.Compare(Config.Inventory);
 
 		if (!list) {
 			return false;
@@ -344,6 +344,12 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
+			if (item.location != 3)
+				continue;
+
+			if (this.ignoredItemTypes.indexOf(item.itemType) !== -1)
+				continue;
+
 			switch (result.result) {
 			case 1:
 				if (item.getFlag(0x10)) {
@@ -352,6 +358,11 @@ MainLoop:
 
 				break;
 			case 2:
+				break;
+			// Items for gold, will sell magics, etc. w/o id, but at low levels
+			// magics are often not worth iding.
+			case 4:
+				item.sell();
 				break;
 			case -1:
 				if (tome) {
@@ -1205,6 +1216,11 @@ MainLoop:
 			clearList = [],
 			item = me.getItem(-1, 0);
 
+		var dropAction = 0;
+		var sellAction = 1;
+
+		var loseItemAction;
+
 		// Potions (after death usually)
 		if (item) {
 			do {
@@ -1234,10 +1250,28 @@ MainLoop:
 		// Any leftover items from a failed ID (crashed game, disconnect etc.)
 		items = Storage.Inventory.Compare(Config.Inventory);
 
+		// If low on gold
+		if (me.getStat(14) + me.getStat(15) < Config.LowGold)
+		{
+			this.initNPC("Shop");
+			loseItemAction = sellAction;
+		}
+		else
+			loseItemAction = dropAction;
+
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if ([18, 41, 78].indexOf(items[i].itemType) === -1 && Pickit.checkItem(items[i]).result === 0 && !Cubing.keepItem(items[i]) && !Runewords.keepItem(items[i])) {
+			if ([18, 41, 78].indexOf(items[i].itemType) === -1 &&
+					(items[i].code != "tsc" || !!me.findItem("tbk", 0, 3)) &&
+					(items[i].code != "isc" || !!me.findItem("ibk", 0, 3)) &&
+					(Pickit.checkItem(items[i]).result === 0 ||
+					 Pickit.checkItem(items[i]).result === 4) &&
+					!Cubing.keepItem(items[i]) &&
+					!Runewords.keepItem(items[i])) {
 				try {
-					items[i].drop();
+					if (loseItemAction == sellAction)
+						items[i].sell();
+					else
+						items[i].drop();
 				} catch (e) {
 					print(e);
 				}
