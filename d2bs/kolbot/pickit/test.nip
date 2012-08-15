@@ -1,4 +1,4 @@
-//[quality] >= magic
+[quality] >= magic # [strength] > 100
 [quality] == rare && [color] == crystalblue
 [quality] == rare && [color] == white
 //[color] == Crystal Blue

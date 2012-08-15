@@ -3,10 +3,6 @@ var StarterConfig = {
 	CreateGameDelay: 5, // Seconds to wait before creating a new game
 	ResetCount: 999, // Reset game count back to 1 every X games.
 	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
-
-	JoinChannel: "", // Name of the channel to join
-	FirstJoinMessage: "", // Message to say when first joining a channel, usually ".login"
-	AnnounceGames: false, // Announce next game in channel
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
@@ -19,6 +15,14 @@ var StarterConfig = {
 	PleaseWaitTimeout: 10, // Seconds to wait before cancelling the 'Please Wait...' screen
 	WaitInLineTimeout: 60, // Seconds to wait before cancelling the 'Waiting in Line...' screen
 	GameDoesNotExistTimeout: 30 // Seconds to wait before cancelling the 'Game does not exist.' screen
+};
+
+var ChannelConfig = {
+	// Now you can join separate channels for separate profiles, use separate join messages etc
+	// Format: "Profile Name": {JoinChannel: "channel", FirstJoinMessage: "login message", AnnounceGames: true}
+	// Multiple entries are separated by a comma
+
+	"Example": {JoinChannel: "my channel", FirstJoinMessage: ".login", AnnounceGames: true}
 };
 
 
@@ -184,7 +188,7 @@ MainSwitch:
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
 
-		if (StarterConfig.JoinChannel !== "") {
+		if (ChannelConfig.hasOwnProperty(me.profile) && ChannelConfig[me.profile].JoinChannel !== "") {
 			ControlAction.click(6, 27, 480, 120, 20);
 
 			break;
@@ -302,16 +306,16 @@ MainSwitch:
 			chatActionsDone = true;
 
 			timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-			say("/j " + StarterConfig.JoinChannel);
+			say("/j " + ChannelConfig[me.profile].JoinChannel);
 			delay(1000);
 
-			if (StarterConfig.FirstJoinMessage !== "") {
-				say(StarterConfig.FirstJoinMessage);
+			if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
+				say(ChannelConfig[me.profile].FirstJoinMessage);
 				delay(500);
 			}
 		}
 
-		if (StarterConfig.AnnounceGames) {
+		if (ChannelConfig[me.profile].AnnounceGames) {
 			delay(1000);
 			say("Next game is " + gameName + gameCount + (gamePass === "" ? "" : "//" + gamePass));
 		}

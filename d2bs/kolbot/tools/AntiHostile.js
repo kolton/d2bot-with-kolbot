@@ -36,6 +36,7 @@ function main() {
 		case 0x00: // "%Name1(%Name2) dropped due to time out."
 		case 0x01: // "%Name1(%Name2) dropped due to errors."
 		case 0x03: // "%Name1(%Name2) left our world. Diablo's minions weaken."
+			// Remove the hostile player from the list
 			if (hostiles.indexOf(name1) > -1) {
 				hostiles.splice(hostiles.indexOf(name1), 1);
 			}
@@ -56,6 +57,12 @@ function main() {
 			}
 
 			break;
+		}
+	};
+
+	this.scriptEvent = function (msg) {
+		if (msg === "findHostiles") {
+			findTrigger = true;
 		}
 	};
 
@@ -95,6 +102,7 @@ function main() {
 		}
 	};
 
+	// Initiate flashing sequence
 	this.startFlash = function (gid) {
 		var script = getScript("tools/FlashThread.js");
 
@@ -103,6 +111,7 @@ function main() {
 		}
 	};
 
+	// Abort flashing sequence
 	this.stopFlash = function () {
 		var script = getScript("tools/FlashThread.js");
 
@@ -111,6 +120,7 @@ function main() {
 		}
 	};
 
+	// Find hostile player Units
 	this.findPlayer = function () {
 		var i, player;
 
@@ -139,10 +149,24 @@ function main() {
 		load("tools/FlashThread.js");
 	}
 
-	// Attack sequence adjustments
+	// Attack sequence adjustments - this only affects the AntiHostile thread
 	switch (me.classid) {
+	case 0: // Amazon - increase skill range
+		if ([24].indexOf(Config.AttackSkill[1]) > -1) {
+			ClassAttack.skillRange[1] = 40;
+			ClassAttack.skillRange[2] = 40;
+		}
+
+		break;
 	case 1: // Sorceress - increase skill range
-		if ([47, 49, 53, 56, 59].indexOf(Config.AttackSkill[1]) > -1) {
+		if ([47, 49, 51, 53, 56, 59].indexOf(Config.AttackSkill[1]) > -1) {
+			ClassAttack.skillRange[1] = 40;
+			ClassAttack.skillRange[2] = 40;
+		}
+
+		break;
+	case 2: // Necromancer - increase skill range
+		if ([84, 93].indexOf(Config.AttackSkill[1]) > -1) {
 			ClassAttack.skillRange[1] = 40;
 			ClassAttack.skillRange[2] = 40;
 		}
@@ -156,7 +180,27 @@ function main() {
 		break;
 	}
 
+	// A simple but fast player dodge function
+	this.moveAway = function (unit, range) {
+		var i, coordx, coordy,
+			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
+			angles = [0, 45, -45, 90, -90, 135, -135, 180];
+
+		for (i = 0; i < angles.length; i += 1) {
+			// Avoid the position where the player actually tries to move to
+			coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * range + unit.targetx);
+			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * range + unit.targety);
+
+			if (Attack.validSpot(coordx, coordy)) {
+				return Pather.moveTo(coordx, coordy);
+			}
+		}
+
+		return false;
+	};
+
 	addEventListener("gameevent", this.hostileEvent);
+	addEventListener("scriptmsg", this.scriptEvent);
 	print("ÿc2Anti-Hostile thread loaded.");
 	this.findHostiles();
 
@@ -175,7 +219,8 @@ function main() {
 			findTrigger = false;
 		}
 
-		if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131) { // Spam entrance test
+		// Mode 3 - Spam entrance (still experimental)
+		if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131) {
 			switch (me.classid) {
 			case 1: // Sorceress
 				prevPos = {x: me.x, y: me.y};
@@ -194,6 +239,22 @@ function main() {
 							}
 						}
 					}
+				}
+
+				break;
+			case 5: // Druid
+				// Don't bother if it's not a tornado druid
+				if (Config.AttackSkill[1] !== 245) {
+					break;
+				}
+
+				prevPos = {x: me.x, y: me.y};
+				this.pause();
+				Pather.moveTo(15103, 5247);
+
+				while (!this.findPlayer() && hostiles.length > 0) {
+					// Tornado path is a function of target x. Slight randomization will make sure it can't always miss
+					Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099 + rand(-2, 2), 5237);
 				}
 
 				break;
@@ -222,16 +283,19 @@ function main() {
 			}
 		}
 
+		// Player left, return to old position
 		if (!hostiles.length && prevPos) {
 			Pather.moveTo(prevPos.x, prevPos.y);
 			this.resume();
+
+			// Reset position
 			prevPos = false;
 		}
 
 		player = this.findPlayer();
 
 		if (player) {
-			// Quit if hostile player is nearby
+			// Mode 1 - Quit if hostile player is nearby
 			if (Config.HostileAction === 1) {
 				quit();
 
@@ -250,15 +314,17 @@ function main() {
 			attackCount = 0;
 
 			while (attackCount < 100) {
-				if (!copyUnit(player).x || player.inTown) { // Invalidated unit (out of getUnit range)
+				if (!copyUnit(player).x || player.inTown) { // Invalidated Unit (out of getUnit range) or player in town
 					break;
 				}
 
+				// Specific attack additions
 				switch (me.classid) {
 				case 1: // Sorceress
-					if (ClassAttack.skillRange[1] > 20 && getDistance(me, player) < 30) {
-						print(ClassAttack.skillRange[1]);
-						Attack.getIntoPosition(player, ClassAttack.skillRange[1], 0x4);
+				case 2: // Necromancer
+					// Move away if the player is too close or if he tries to move too close (telestomp)
+					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || getDistance(me, player.targetx, player.targety) < 15)) {
+						this.moveAway(player, ClassAttack.skillRange[1]);
 					}
 
 					break;

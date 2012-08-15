@@ -9,11 +9,11 @@
 
 function AutoBaal() {
 	// editable variables
-	var safeMsg = ["safe", "throne clear", "leechers can come", "tp is up", "1 clear"], // safe message - casing doesn't matter
+	var i, baalCheck, throneCheck, hotCheck, leader, suspect, solofail, portal, baal,
+		// internal variables
+		safeMsg = ["safe", "throne clear", "leechers can come", "tp is up", "1 clear"], // safe message - casing doesn't matter
 		baalMsg = ["baal", "submortal"], // baal message - casing doesn't matter
-		hotMsg = ["hot"], // used for shrine hunt
-	// internal variables
-		i, baalCheck, throneCheck, hotCheck, leader, suspect, solofail, portal, baal;
+		hotMsg = ["hot", "warm"]; // used for shrine hunt
 
 	addEventListener('chatmsg', // chat event, listen to what leader says
 		function (nick, msg) { // handler function
@@ -42,9 +42,9 @@ function AutoBaal() {
 				}
 			}
 		}
-	);
+		);
 
-	function AutoLeaderDetect(destination) { // autoleader by Ethic
+	function autoLeaderDetect(destination) { // autoleader by Ethic
 		do {
 			solofail = 0;
 			suspect = getParty(); // get party object (players in game)
@@ -59,7 +59,7 @@ function AutoBaal() {
 					print("ÿc4AutoBaal: ÿc0Autodetected " + leader);
 					return true;
 				}
-			} while (suspect.getNext()); 
+			} while (suspect.getNext());
 
 			if (solofail === 0) { // empty game, nothing left to do
 				return false;
@@ -75,10 +75,26 @@ function AutoBaal() {
 		throw new Error("Town.goToTown failed."); // critical error - can't reach harrogath
 	}
 
+	if (Config.AutoBaal.Leader) {
+		leader = Config.AutoBaal.Leader;
+
+		for (i = 0; i < 30; i += 1) {
+			if (Misc.inMyParty(leader)) {
+				break;
+			}
+
+			delay(1000);
+		}
+
+		if (i === 30) {
+			throw new Error("Autobaal: Leader not partied");
+		}
+	}
+
 	Town.doChores();
 	Town.move("portalspot");
 
-	if (AutoLeaderDetect(131)) { // find the first player in area 131 - throne of destruction
+	if (leader || autoLeaderDetect(131)) { // find the first player in area 131 - throne of destruction
 		while (Misc.inMyParty(leader)) { // do our stuff while partied
 			if (hotCheck && Config.AutoBaal.FindShrine) {
 				Pather.useWaypoint(4);
@@ -118,7 +134,7 @@ function AutoBaal() {
 
 			if (baalCheck && me.area === 131) { // wait for baal signal - leader's baal message
 				Pather.moveTo(15092, 5010); // move closer to chamber portal
-				Precast.doPrecast(true);
+				Precast.doPrecast(false);
 
 				while (getUnit(1, 543)) { // wait for baal to go through the portal
 					delay(500);
@@ -126,7 +142,7 @@ function AutoBaal() {
 
 				portal = getUnit(2, 563);
 
-				delay(5000); // wait for others to enter first - helps  with curses and tentacles from spawning around you
+				delay(2000); // wait for others to enter first - helps  with curses and tentacles from spawning around you
 				print("ÿc4AutoBaal: ÿc0Entering chamber.");
 
 				if (Pather.usePortal(null, null, portal)) { // enter chamber

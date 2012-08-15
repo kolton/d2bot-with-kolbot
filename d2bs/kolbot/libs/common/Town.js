@@ -89,6 +89,8 @@ var Town = {
 
 	// Start a task and return the NPC Unit
 	initNPC: function (task) {
+		//print(task);
+
 		var npc = getInteractedNPC();
 
 		if (npc && npc.name.toLowerCase() !== this.tasks[me.act - 1][task]) {
@@ -314,7 +316,7 @@ var Town = {
 	},
 
 	identify: function () {
-		var item, tome, scroll, npc, list, timer, tpTome, result,
+		var i, item, tome, scroll, npc, list, timer, tpTome, result,
 			tpTomePos = {};
 
 		if (this.cainID()) {
@@ -324,6 +326,18 @@ var Town = {
 		list = Storage.Inventory.Compare(Config.Inventory);
 
 		if (!list) {
+			return false;
+		}
+
+		// Avoid unnecessary NPC visits
+		for (i = 0; i < list.length; i += 1) {
+			// Only unid items or sellable junk (low level) should trigger a NPC visit
+			if ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1) {
+				break;
+			}
+		}
+
+		if (i === list.length) {
 			return false;
 		}
 
@@ -653,7 +667,7 @@ MainLoop:
 		var i, items, result,
 			npc = getInteractedNPC();
 
-		if (!npc) {
+		if (!npc || !getUIFlag(0x0C) || !npc.itemcount) {
 			return false;
 		}
 

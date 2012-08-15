@@ -25,5 +25,32 @@ function Test() {
 }
 
 function test() {
-	Pather.moveToExit(108, true);
+	Town.doChores();
+	//print(Pickit.checkItem(getUnit(101)).result);
+	//print(Cubing.keepItem(getUnit(101)));
+	
+	/*try {
+		print("go");
+		var tx, ty, player = getUnit(0, "aym");
+
+		if (player) {
+			tx = player.targetx;
+			ty = player.targety;
+
+			while (true) {
+				if (player.targetx !== tx || player.targety !== ty) {
+					tx = player.targetx;
+					ty = player.targety;
+
+					if (getDistance(me, tx, ty) < 10) {
+						me.overhead("danger");
+					}
+				}
+
+				delay(10);
+			}
+		}
+	} catch (e) {
+	
+	}*/
 }

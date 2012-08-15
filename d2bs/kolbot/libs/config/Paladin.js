@@ -226,6 +226,16 @@ function LoadConfig() {
 	Config.Cubing = false; // Set to true to enable cubing.
 
 	// All ingredients will be auto-picked, for classids check libs/NTItemAlias.dbl
+	//Config.Recipes.push([Recipe.Gem, 560]); // perfect amethyst
+	//Config.Recipes.push([Recipe.Gem, 565]); // perfect topaz
+	//Config.Recipes.push([Recipe.Gem, 570]); // perfect sapphire
+	//Config.Recipes.push([Recipe.Gem, 575]); // perfect emerald
+	//Config.Recipes.push([Recipe.Gem, 580]); // perfect ruby
+	//Config.Recipes.push([Recipe.Gem, 585]); // perfect diamond
+	//Config.Recipes.push([Recipe.Gem, 600]); // perfect skull
+
+	//Config.Recipes.push([Recipe.Token]); // token of absolution
+	
 	Config.Recipes.push([Recipe.Rune, 630]); // pul -> um
 	Config.Recipes.push([Recipe.Rune, 631]); // um -> mal
 	Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
@@ -235,7 +245,7 @@ function LoadConfig() {
 	Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
 	Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
 	Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
-	Config.Recipes.push([Recipe.HitPower.Glove, 452]); // Craft Hit Power Vambraces
+	Config.Recipes.push([Recipe.HitPower.Gloves, 452]); // Craft Hit Power Vambraces
 
 	Config.Recipes.push([Recipe.Reroll.Magic, 421]); // Reroll magic Diadem
 	Config.Recipes.push([Recipe.Reroll.Rare, 421]); // Reroll rare Diadem

@@ -233,6 +233,7 @@ var Config = {
 		KillGriswold: false
 	},
 	AutoBaal: {
+		Leader: "",
 		FindShrine: false
 	},
 	KurastChests: {

@@ -306,7 +306,7 @@ var Cubing = {
 
 				break;
 			case Recipe.Reroll.Magic: // Hacky solution ftw
-				this.recipes.push({Ingredients: [Config.Recipes[i][1], "pgem", "pgem", "pgem"], Level: 90, Index: Recipe.Reroll.Magic});
+				this.recipes.push({Ingredients: [Config.Recipes[i][1], "pgem", "pgem", "pgem"], Level: 91, Index: Recipe.Reroll.Magic});
 
 				break;
 			case Recipe.Reroll.Rare:
@@ -550,7 +550,7 @@ IngredientLoop:
 		var i;
 
 		for (i = 0; i < this.neededIngredients.length; i += 1) {
-			if (unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe)) {
+			if (this.keepItem(unit) || unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe)) {
 				return true;
 			}
 		}
@@ -566,7 +566,7 @@ IngredientLoop:
 		var i;
 
 		for (i = 0; i < this.validIngredients.length; i += 1) {
-			if (unit.location === 3 && unit.gid === this.validIngredients[i].gid) {
+			if (unit.mode === 0 && unit.gid === this.validIngredients[i].gid) {
 				return true;
 			}
 		}
@@ -669,6 +669,7 @@ IngredientLoop:
 				delay(700 + me.ping);
 				print("ÿc4Cubing: " + string);
 				D2Bot.printToConsole(string + ";5");
+				this.buildLists();
 
 				items = me.findItems(-1, -1, 6);
 
@@ -679,15 +680,15 @@ IngredientLoop:
 						switch (result.result) {
 						case 0:
 							items[j].drop();
+
 							break;
 						case 1:
 							Misc.logItem("Cubing kept", items[j], result.line);
+
 							break;
 						}
 					}
 				}
-
-				this.buildLists();
 
 				if (!this.emptyCube()) {
 					break;
