@@ -187,7 +187,7 @@ function BaalHelper() { // experi-mental
 		}
 
 WSKLoop:
-		for (i = 0; i < 180; i += 1) {
+		for (i = 0; i < 60; i += 1) {
 			party = getParty();
 
 			if (party) {
@@ -201,7 +201,7 @@ WSKLoop:
 			delay(1000);
 		}
 
-		if (i === 180) {
+		if (i === 60) {
 			throw new Error("No players in Throne.");
 		}
 
@@ -212,7 +212,7 @@ WSKLoop:
 		Pather.useWaypoint(109);
 		Town.move("portalspot");
 
-		for (i = 0; i < 180; i += 1) {
+		for (i = 0; i < 90; i += 1) {
 			if (Pather.usePortal(131, null)) {
 				break;
 			}
@@ -220,7 +220,7 @@ WSKLoop:
 			delay(1000);
 		}
 
-		if (i === 180) {
+		if (i === 90) {
 			throw new Error("No portals to Throne.");
 		}
 	}

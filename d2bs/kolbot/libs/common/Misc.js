@@ -485,6 +485,34 @@ var Misc = {
 		}
 
 		return true;
+	},
+
+	// Log someone's gear
+	spy: function (name) {
+		if (!isIncluded("ntitemparser.dbl")) {
+			include("ntitemparser.dbl");
+		}
+
+		if (!isIncluded("oog.js")) {
+			include("oog.js");
+		}
+
+		var i, items,
+			unit = getUnit(0, name);
+
+		if (!unit) {
+			print("player not found");
+
+			return false;
+		}
+
+		items = unit.getItems();
+
+		for (i = 0; i < items.length; i += 1) {
+			this.logItem(name, items[i]);
+		}
+
+		return true;
 	}
 };
 
@@ -542,7 +570,7 @@ var Experience = {
 			runsToLevel = this.runsToLevel(),
 			totalRunsToLevel = this.totalRunsToLevel();
 
-		string = "XP Gain: " + gain + ", Progress: " + me.getStat(12) + " (" + progress + "%), Est. runs until level-up: " + runsToLevel + "/" + totalRunsToLevel;
+		string = "Game: " + me.gamename + ", XP Gain: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next: " + runsToLevel + "/" + totalRunsToLevel;
 
 		if (gain) {
 			D2Bot.printToConsole(string + ";4");

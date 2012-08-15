@@ -70,7 +70,7 @@ function pickItems() {
 		rval = "fail",
 		list = [];
 
-	while (me.ingame && !me.gameReady) {
+	while (!me.ingame && !me.gameReady) {
 		delay(500);
 	}
 
@@ -80,15 +80,19 @@ function pickItems() {
 
 			if (item) {
 				do {
-					list.push(copyUnit(item));
+					if (Town.ignoredItemTypes.indexOf(item.itemType) === -1) { // don't pick up trash
+						list.push(copyUnit(item));
+					}
 				} while (item.getNext());
 			}
 
 			// If and only if there is nothing left are we "done"
 			if (list.length === 0) {
 				rval = "done";
+
 				break;
 			}
+
 			while (list.length > 0) {
 				item = list.shift();
 				canFit = Storage.Inventory.CanFit(item);
@@ -266,7 +270,7 @@ load("tools/heartbeat.js");
 addEventListener("copydata", ReceiveCopyData);
 
 function main() {
-	var obj, statusTimeout;
+	var i, items, obj, statusTimeout;
 
 	try {
 		// ugly solution to uglier problem - pickItem area update
@@ -286,13 +290,28 @@ function main() {
 
 	while (true) {
 		try {
-			if (me.gameReady) {
+			if (me.ingame && me.gameReady) {
 				if (status === "loading") {
 					status = "ready";
 
 					D2Bot.updateStatus("In mule game.");
 					D2Bot.printToConsole("In mule game.");
 					Storage.Init();
+					delay(1000); // this is needed! me.getItems() will always return false otherwise
+
+					items = me.getItems();
+
+					if (items) {
+						for (i = 0; i < items.length; i += 1) {
+							if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1) { // drop trash (id/tp scroll primarily)
+								try {
+									items[i].drop();
+								} catch (dropError) {
+									print("Failed to drop an item. Not like it matters.");
+								}
+							}
+						}
+					}
 				}
 
 				for (statusTimeout = 0; statusTimeout < 60000 && status !== "begin"; statusTimeout += 500) {
@@ -341,7 +360,7 @@ function main() {
 			delay(1000);
 		} catch (e2) {
 			print("Caught an exception in the main loop.");
-			print(e);
+			print(e2);
 			D2Bot.printToConsole("Exception: " + e2);
 		}
 	}

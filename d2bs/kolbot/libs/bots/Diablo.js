@@ -163,7 +163,7 @@ function Diablo() {
 		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
 		}
-		
+
 		if (!this.openSeal(393)) {
 			throw new Error("Failed to open Infector seals.");
 		}
@@ -237,12 +237,43 @@ function Diablo() {
 	};
 
 	this.followPath = function (path, sortfunc) {
-		var i;
+		var i,
+			cleared = [];
 
 		for (i = 0; i < path.length; i += 2) {
+			if (cleared.length) {
+				this.clearStrays(cleared);
+			}
+
 			Pather.moveTo(path[i], path[i + 1]);
 			Attack.clear(30, 0, false, sortfunc);
+
+			// Push cleared positions so they can be checked for strays
+			cleared.push([path[i], path[i + 1]]);
 		}
+	};
+
+	this.clearStrays = function (cleared) {
+		var i,
+			unit = getUnit(1);
+
+		if (unit) {
+			do {
+				if (Attack.checkMonster(unit)) {
+					for (i = 0; i < cleared.length; i += 1) {
+						if (getDistance(unit, cleared[i][0], cleared[i][1]) < 30 && Attack.validSpot(unit.x, unit.y)) {
+							//me.overhead("we got a stray");
+							Pather.moveToUnit(unit);
+							Attack.clear(30);
+
+							break;
+						}
+					}
+				}
+			} while (unit.getNext());
+		}
+
+		return true;
 	};
 
 	// path coordinates
