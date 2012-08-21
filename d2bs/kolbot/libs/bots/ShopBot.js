@@ -1,5 +1,5 @@
 function ShopBot() {
-	var npc, tickCount, town, wpArea, path,
+	var npc, tickCount, town, wpArea, path, result,
 		cycles = 0,
 		cyclesText = new Text("Cycles in last minute: " + cycles, 50, 260, 2, 1),
 		leadRetry = 10,
