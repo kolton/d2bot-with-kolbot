@@ -52,8 +52,9 @@ function ShopBot() {
 		for (i = 0; i < items.length; i += 1) {
 			if (Config.ShopBot.ScanIDs.indexOf(items[i].classid) > -1) {
 				//print("Scanning " + items[i].name);
-
-				if (Pickit.checkItem(items[i]) === 1) {
+				result = Pickit.checkItem(items[i]);
+ 
+				if (result.result === 1) {
 					try {
 						if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
 							Misc.logItem("Shopped", items[i]);
