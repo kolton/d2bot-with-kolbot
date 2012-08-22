@@ -218,7 +218,7 @@
 #### SKILL IDS ####
 ###################
 
-	General:
+*** General
 	0 - Attack
 	1 - Kick
 	2 - Throw
@@ -226,7 +226,7 @@
 	4 - Left Hand Throw
 	5 - Left Hand Swing
 	
-	Amazon:
+*** Amazon
 	6 - Magic Arrow
 	7 - Fire Arrow
 	8 - Inner Strike
@@ -258,7 +258,7 @@
 	34 - Lightning Strike
 	35 - Lightning Fury
 	
-	Sorceress:
+*** Sorceress
 	36 - Fire Bolt
 	37 - Warmth
 	38 - Charged Bolt
@@ -290,7 +290,7 @@
 	64 - Frozen Orb
 	65 - Cold Mastery
 	
-	Necromancer:
+*** Necromancer
 	66 - Amplify Damage
 	67 - Teeth
 	68 - Bone Armor
@@ -322,7 +322,7 @@
 	94 - Fire Golem
 	95 - Revive
 	
-	Paladin:
+*** Paladin
 	96 - Sacrifice
 	97 - Smite
 	98 - Might
@@ -354,7 +354,7 @@
 	124 - Redemption
 	125 - Salvation
 	
-	Barbarian:
+*** Barbarian
 	126 - Bash
 	127 - Sword Mastery
 	128 - Axe Mastery
@@ -386,7 +386,7 @@
 	154 - War Cry
 	155 - Battle Command
 	
-	Druid:
+*** Druid
 	221 - Raven
 	222 - Poison Creeper
 	223 - Werewolf
@@ -418,7 +418,7 @@
 	249 - Armageddon
 	250 - Hurricane
 	
-	Assassin:
+*** Assassin
 	251 - Fire Blast
 	252 - Claw Mastery
 	253 - Psychic Hammer
