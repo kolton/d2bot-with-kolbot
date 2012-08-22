@@ -7,6 +7,22 @@
 function Baal() {
 	var tick, portal;
 
+	this.castTraps = function () {	
+		switch (me.classid) {
+		case 6: // Assassin
+			if (Config.UseTraps) {
+				var attackPos = [15088,5023,15087,5032,15098,5022,15101,5034,15094,5029];
+				Pather.moveTo(15093, 5039);
+				for (i = 0; i < 5; i++) {
+					if(i == 0 || i == 2 || i == 3) // Added delays to prevent trap miscast
+						delay(75);	
+					if(Config.Traps[i] > 0)
+						Skill.cast(Config.Traps[i], 0, attackPos[i*2], attackPos[(i*2)+1]);
+				}
+			}
+		}
+	};
+	
 	this.preattack = function () {
 		var check;
 
@@ -46,14 +62,10 @@ function Baal() {
 
 			break;
 		case 6: // Assassin
-			if (Config.UseTraps) {
-				check = ClassAttack.checkTraps({x: 15093, y: 5029});
-
-				if (check) {
-					ClassAttack.placeTraps({x: 15093, y: 5029}, 5);
-
-					return true;
-				}
+			if (Config.AttackSkill[3] === 256) {
+				Skill.cast(Config.AttackSkill[3], 0, 15093, 5029);
+				
+				return true;
 			}
 
 			break;
@@ -228,6 +240,8 @@ function Baal() {
 
 	tick = getTickCount();
 	Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
+		
+	this.castTraps();
 
 MainLoop:
 	while (true) {
@@ -244,20 +258,26 @@ MainLoop:
 			Attack.clear(40);
 
 			tick = getTickCount();
-
+			
 			Precast.doPrecast(true);
-
+		
+			this.castTraps();
+			
 			break;
 		case 2:
 			Attack.clear(40);
 
 			tick = getTickCount();
+		
+			this.castTraps();
 
 			break;
 		case 4:
 			Attack.clear(40);
 
 			tick = getTickCount();
+		
+			this.castTraps();
 
 			break;
 		case 3:
@@ -265,6 +285,8 @@ MainLoop:
 			this.checkHydra();
 
 			tick = getTickCount();
+		
+			this.castTraps();
 
 			break;
 		case 5:
