@@ -17,7 +17,7 @@ function Baal() {
 					if(i == 0 || i == 2 || i == 3) // Added delays to prevent trap miscast
 						delay(75);	
 					if(Config.Traps[i] > 0)
-						Skill.cast(Config.Traps[i], 0, attackPos[i*2], attackPos[(i*2)+1]);
+						Skill.cast(Config.Traps[i], 1, attackPos[i*2], attackPos[(i*2)+1]);
 				}
 			}
 		}
