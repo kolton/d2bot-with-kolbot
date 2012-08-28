@@ -104,6 +104,7 @@ var DataFile = {
 		} catch (e) {
 			// If we failed, file might be corrupted, so create a new one
 			this.create();
+
 			obj = JSON.parse(string);
 		}
 
@@ -266,6 +267,8 @@ MainLoop:
 	},
 
 	loginAccount: function (info) {
+		var tick;
+
 		me.blockMouse = true;
 
 		var realms = {
@@ -274,6 +277,8 @@ MainLoop:
 			"asia": 2,
 			"europe": 3
 		};
+
+		tick = getTickCount();
 
 		while (getLocation() !== 12 && getLocation() !== 42) {
 			switch (getLocation()) {
@@ -291,18 +296,18 @@ MainLoop:
 				this.click(6, 264, 484, 272, 35); // log in
 
 				break;
-			case 10: // login error - let the starter handle it
-				ControlAction.click(6, 335, 412, 128, 35);
-
-				me.blockMouse = false;
-
-				return false;
 			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
 
 				break;
 			default:
-				break;
+				me.blockMouse = false;
+
+				return false;
+			}
+
+			if (getTickCount() - tick >= 20000) {
+				return false;
 			}
 
 			delay(500);

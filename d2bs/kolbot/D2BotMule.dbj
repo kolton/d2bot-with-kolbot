@@ -9,7 +9,7 @@ var StarterConfig = {
 };
 
 
-var muler, mulerStatus, keyswap, connectFail,
+var muler, mulerStatus, keyswap, connectFail, makeAcc, muleMode, muleFilename, muleInfoObj,
 	makeNext = false,
 	status = "loading";
 
@@ -24,19 +24,19 @@ var MuleData = {
 			accNum: 0,
 			character: "",
 			charNum: 0,
-			fullChars: []
+			fullChars: [],
+			torchChars: []
 		};
-
 		string = JSON.stringify(obj);
 
-		FileTools.writeText("AutoMule." + AutoMule.realm + ".json", string);
+		FileTools.writeText(muleFilename, string);
 	},
 
 	// read data from the mule datafile and return the data object
 	read: function () {
 		var obj, string;
 
-		string = FileTools.readText("AutoMule." + AutoMule.realm + ".json");
+		string = FileTools.readText(muleFilename);
 		obj = JSON.parse(string);
 
 		return obj;
@@ -44,9 +44,11 @@ var MuleData = {
 
 	// write a data object to the mule datafile
 	write: function (obj) {
-		var string = JSON.stringify(obj);
+		var string;
 
-		FileTools.writeText("AutoMule." + AutoMule.realm + ".json", string);
+		string = JSON.stringify(obj);
+
+		FileTools.writeText(muleFilename, string);
 	}
 };
 
@@ -66,12 +68,34 @@ function stashItems() {
 
 // pick items from ground
 function pickItems() {
-	var canFit, item,
+	var i, items, canFit, item,
 		rval = "fail",
 		list = [];
 
 	while (!me.ingame && !me.gameReady) {
 		delay(500);
+	}
+
+	for (i = 0; i < 10; i += 1) {
+		items = me.getItems();
+
+		if (items) {
+			break;
+		}
+
+		delay(1000);
+	}
+
+	if (items) {
+		for (i = 0; i < items.length; i += 1) {
+			if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1) { // drop trash (id/tp scroll primarily)
+				try {
+					items[i].drop();
+				} catch (dropError) {
+					print("Failed to drop an item. Not like it matters.");
+				}
+			}
+		}
 	}
 
 	while (me.gameReady) {
@@ -128,8 +152,19 @@ function pickItems() {
 function getMuler(msg) {
 	var i;
 
+	for (i = 0; i < TorchSystem.FarmerProfiles.length; i += 1) {
+		// Make a difference between normal mule and torch mule request coming from torch profile
+		if (msg.toLowerCase().indexOf("|torch") > -1 && msg.split("|torch")[0].toLowerCase() === TorchSystem.FarmerProfiles[i].toLowerCase()) {
+			muleMode = 1; // mule torch
+
+			return TorchSystem.FarmerProfiles[i];
+		}
+	}
+
 	for (i = 0; i < AutoMule.enabledProfiles.length; i += 1) {
 		if (msg.toLowerCase() === AutoMule.enabledProfiles[i].toLowerCase()) {
+			muleMode = 0; // normal mule
+
 			return AutoMule.enabledProfiles[i];
 		}
 	}
@@ -178,7 +213,7 @@ function nextAccount() {
 	var obj = MuleData.read();
 
 	obj.accNum = obj.accNum + 1;
-	obj.account = AutoMule.accountPrefix + obj.accNum;
+	obj.account = muleInfoObj.accountPrefix + obj.accNum;
 	obj.character = "";
 	obj.charNum = 0;
 	obj.fullChars = [];
@@ -212,7 +247,7 @@ function nextChar() {
 
 	charSuffix += charNumbers[obj.charNum];
 	obj.charNum = obj.charNum + 1;
-	obj.character = AutoMule.charPrefix + charSuffix;
+	obj.character = muleInfoObj.charPrefix + charSuffix;
 
 	MuleData.write(obj);
 
@@ -253,10 +288,43 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
+function checkTorch() {
+	while (!me.gameReady) {
+		delay(500);
+	}
+
+	var item = me.getItem("cm2");
+
+	if (item) {
+		do {
+			if (item.quality === 7) {
+				return true;
+			}
+		} while (item.getNext());
+	}
+
+	return false;
+}
+
+function foreverAlone() {
+	var party = getParty();
+
+	if (party) {
+		do {
+			if (party.name !== me.name) {
+				return false;
+			}
+		} while (party.getNext());
+	}
+
+	return true;
+}
+
 include("json2.js");
 include("oog.js");
 include("automule.js");
 include("mulelogger.js");
+include("torchsystem.js");
 include("NTItemParser.dbl");
 include("common/storage.js");
 include("common/pickit.js");
@@ -270,7 +338,20 @@ load("tools/heartbeat.js");
 addEventListener("copydata", ReceiveCopyData);
 
 function main() {
-	var i, items, obj, statusTimeout;
+	delay(rand(1, 2) * 1000);
+	D2Bot.requestGameInfo();
+
+	// Wait for muler before login = give room to determine muling mode (normal or torch)
+	while (!muler) {
+		delay(1000);
+	}
+
+	print("Muler found: " + muler);
+
+	muleInfoObj = muleMode === 0 ? AutoMule.Mule : AutoMule.TorchMule;
+	muleFilename = muleMode === 0 ? "logs/AutoMule." + muleInfoObj.realm + ".json" : "logs/TorchMule." + muleInfoObj.realm + ".json";
+
+	var obj, statusTimeout;
 
 	try {
 		// ugly solution to uglier problem - pickItem area update
@@ -279,7 +360,7 @@ function main() {
 		}
 
 		// create mule datafile if it doesn't exist
-		if (!FileTools.exists("AutoMule." + AutoMule.realm + ".json")) {
+		if (!FileTools.exists(muleFilename)) {
 			MuleData.create();
 		}
 	} catch (e) {
@@ -297,29 +378,14 @@ function main() {
 					D2Bot.updateStatus("In mule game.");
 					D2Bot.printToConsole("In mule game.");
 					Storage.Init();
-					delay(1000); // this is needed! me.getItems() will always return false otherwise
-
-					items = me.getItems();
-
-					if (items) {
-						for (i = 0; i < items.length; i += 1) {
-							if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1) { // drop trash (id/tp scroll primarily)
-								try {
-									items[i].drop();
-								} catch (dropError) {
-									print("Failed to drop an item. Not like it matters.");
-								}
-							}
-						}
-					}
 				}
 
 				for (statusTimeout = 0; statusTimeout < 60000 && status !== "begin"; statusTimeout += 500) {
 					delay(500);
 				}
 
-				if (!muler) {
-					D2Bot.printToConsole("Failed to contact mulee.");
+				if (status !== "begin") {
+					D2Bot.printToConsole("Nobody joined - stopping.");
 					D2Bot.stop();
 				}
 
@@ -332,6 +398,14 @@ function main() {
 					//D2Bot.shoutGlobal("quit", 0);
 					MuleLogger.logChar();
 					delay(500);
+
+					obj = MuleData.read();
+
+					if (checkTorch()) {
+						obj.torchChars.push(me.name);
+					}
+
+					MuleData.write(obj);
 					D2Bot.printToConsole("Done muling.");
 					D2Bot.stop();
 
@@ -340,8 +414,13 @@ function main() {
 				case "next":
 					MuleLogger.logChar();
 					delay(500);
+
 					makeNext = true;
 					obj = MuleData.read();
+
+					if (checkTorch()) {
+						obj.torchChars.push(me.name);
+					}
 
 					obj.fullChars.push(me.name);
 					MuleData.write(obj);
@@ -423,23 +502,29 @@ MainSwitch:
 
 		obj = MuleData.read();
 
-		if (!obj.account || obj.account.indexOf(AutoMule.accountPrefix) < 0) {
+		if (!obj.account || obj.account.indexOf(muleInfoObj.accountPrefix) < 0) {
 			nextAccount();
 
 			obj = MuleData.read();
 		}
 
 		info = {
-			realm: AutoMule.realm,
+			realm: muleInfoObj.realm,
 			account: obj.account,
-			password: AutoMule.accountPassword
+			password: muleInfoObj.accountPassword
 		};
 
-		if (!ControlAction.loginAccount(info)) {
+		if (makeAcc) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
 			D2Bot.printToConsole("Made account: " + info.account);
+
+			makeAcc = false;
+
+			break;
 		}
+
+		ControlAction.loginAccount(info);
 
 		break;
 	case 10: // Login Error
@@ -460,10 +545,6 @@ MainSwitch:
 				D2Bot.updateStatus("Invalid Password");
 				D2Bot.printToConsole("Invalid Password");
 				break;
-			case getLocaleString(5208):
-				D2Bot.updateStatus("Invalid Account");
-				D2Bot.printToConsole("Invalid Account");
-				break;
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey");
@@ -480,6 +561,13 @@ MainSwitch:
 				D2Bot.updateStatus("Disconnected");
 				D2Bot.printToConsole("Disconnected");
 				ControlAction.click(6, 335, 412, 128, 35);
+
+				break MainSwitch;
+			case getLocaleString(5208):
+				ControlAction.click(6, 335, 412, 128, 35);
+
+				makeAcc = true;
+
 				break MainSwitch;
 			default:
 				D2Bot.updateStatus("Login Error");
@@ -549,7 +637,7 @@ MainSwitch:
 		obj = MuleData.read();
 
 		if (makeNext) {
-			if (obj.fullChars.length === 8) {
+			if (obj.fullChars.length === 8 || (muleMode === 1 && obj.torchChars.length === 8)) {
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -559,7 +647,7 @@ MainSwitch:
 			makeNext = false;
 		}
 
-		if (!obj.character || obj.character.indexOf(AutoMule.charPrefix) < 0) {
+		if (!obj.character || obj.character.indexOf(muleInfoObj.charPrefix) < 0) {
 			nextChar();
 
 			obj = MuleData.read();
@@ -568,11 +656,17 @@ MainSwitch:
 		info = {
 			account: obj.account,
 			charName: obj.character,
-			ladder: AutoMule.ladder,
-			hardcore: AutoMule.hardcore,
-			expansion: AutoMule.expansion,
+			ladder: muleInfoObj.ladder,
+			hardcore: muleInfoObj.hardcore,
+			expansion: muleInfoObj.expansion,
 			charClass: "amazon"
 		};
+
+		if (muleMode === 1 && obj.torchChars.indexOf(info.charName) > -1) {
+			nextChar();
+
+			break;
+		}
 
 		if (ControlAction.findCharacter(info)) {
 			ControlAction.loginCharacter(info);
@@ -585,6 +679,7 @@ MainSwitch:
 			}
 
 			if (!ControlAction.makeCharacter(info)) {
+				// TODO: check if acc is full and cancel location 15 and 29 if true
 				nextChar();
 
 				break;

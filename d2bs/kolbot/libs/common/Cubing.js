@@ -92,7 +92,7 @@ var Cubing = {
 			return;
 		}
 
-		print("We have " + Config.Recipes.length + " cubing recipe(s).");
+		//print("We have " + Config.Recipes.length + " cubing recipe(s).");
 
 		this.buildRecipes();
 		this.buildLists();

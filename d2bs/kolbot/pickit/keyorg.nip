@@ -1,0 +1,5 @@
+[name] == diablo'shorn || [name] == mephisto'sbrain || [name] == baal'seye
+[name] == keyofhate # # [maxquantity] == 5
+[name] == keyofterror # # [maxquantity] == 5
+[name] == keyofdestruction # # [maxquantity] == 5
+[name] == largecharm && [quality] == unique

@@ -39,7 +39,7 @@ function ShopBot() {
 		var i, items,
 			npc = getInteractedNPC();
 
-		if (!npc) {
+		if (!npc || !getUIFlag(0x0C) || !npc.itemcount) {
 			return false;
 		}
 
@@ -52,9 +52,8 @@ function ShopBot() {
 		for (i = 0; i < items.length; i += 1) {
 			if (Config.ShopBot.ScanIDs.indexOf(items[i].classid) > -1) {
 				//print("Scanning " + items[i].name);
-				result = Pickit.checkItem(items[i]);
- 
-				if (result.result === 1) {
+
+				if (Pickit.checkItem(items[i]).result === 1) {
 					try {
 						if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
 							Misc.logItem("Shopped", items[i]);

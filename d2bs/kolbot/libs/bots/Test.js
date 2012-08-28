@@ -25,32 +25,38 @@ function Test() {
 }
 
 function test() {
-	Town.doChores();
-	//print(Pickit.checkItem(getUnit(101)).result);
-	//print(Cubing.keepItem(getUnit(101)));
-	
-	/*try {
-		print("go");
-		var tx, ty, player = getUnit(0, "aym");
+	Misc.logItem("TEST", getUnit(101) || me.getItem());
+}
 
-		if (player) {
-			tx = player.targetx;
-			ty = player.targety;
+function thawingadventure() {
+	var i, items,
+		item = me.getItem("bhm"),
+		count = me.itemcount,
+		u = getUnit(101);
 
-			while (true) {
-				if (player.targetx !== tx || player.targety !== ty) {
-					tx = player.targetx;
-					ty = player.targety;
+	if (!u) {
+		return;
+	}
 
-					if (getDistance(me, tx, ty) < 10) {
-						me.overhead("danger");
+	while (true) {
+		sendPacket(1, 0x32, 4, getInteractedNPC().gid, 4, u.gid, 4, 0, 4, 0);
+
+		if (me.itemcount >= count + 40) {
+			while (me.itemcount !== count) {
+				items = me.getItems();
+
+				for (i = 0; i < items.length; i += 1) {
+					if (items[i].mode === 0 && items[i].location === 3) {
+						sendPacket(1, 0x27, 4, item.gid, 4, items[i].gid);
+
+						delay(10);
 					}
 				}
 
 				delay(10);
 			}
 		}
-	} catch (e) {
-	
-	}*/
+
+		delay(10);
+	}
 }
