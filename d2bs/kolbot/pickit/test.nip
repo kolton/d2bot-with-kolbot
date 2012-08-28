@@ -1,7 +1,1 @@
-[quality] >= magic # [strength] > 100
-[quality] == rare && [color] == crystalblue
-[quality] == rare && [color] == white
-//[color] == Crystal Blue
-//[name] == greatertalons # [assassinskills] == 2
-[type] == 74 # # [maxquantity] == 10
-[name] == helrune
+[type] == armor # # {maxquantity] == 1

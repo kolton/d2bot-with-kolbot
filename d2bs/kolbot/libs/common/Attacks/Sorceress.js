@@ -61,6 +61,10 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
+		if (!me.getState(30) && me.getSkill(58, 1)) {
+			Skill.cast(58, 0);
+		}
+
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
@@ -81,7 +85,7 @@ var ClassAttack = {
 		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.indexOf(unit.name) > -1 && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
 			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 
-			while (Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
+			while (Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.checkMonster(unit)) {
 				if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
 					if (!Attack.getIntoPosition(unit, staticRange, 0x4)) {
 						return 1;

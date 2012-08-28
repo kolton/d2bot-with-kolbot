@@ -8,25 +8,31 @@ var Scripts = {};
 
 var Config = {
 	init: function (notify) {
-		var configFilename = "", i,
+		var i,
+			configFilename = "",
 			classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
 		for (i = 0; i < 5; i += 1) {
 			switch (i) {
 			case 0:
-				configFilename = me.realm + "." + classes[me.classid] + "." +
-					me.profile + ".js";
+				configFilename = me.realm + "." + classes[me.classid] + "." + me.profile + ".js";
+
 				break;
 			case 1:
 				configFilename = classes[me.classid] + "." + me.profile + ".js";
+
 				break;
 			case 2:
-				configFilename = me.realm + "." + classes[me.classid] + "." +
-					me.charname + ".js";
+				configFilename = me.realm + "." + classes[me.classid] + "." + me.charname + ".js";
+
 				break;
 			case 3:
-				configFilename = classes[me.classid] + "." + me.charname +
-					".js";
+				configFilename = classes[me.classid] + "." + me.charname + ".js";
+
+				break;
+			case 4:
+				configFilename = me.profile + ".js";
+
 				break;
 			}
 
@@ -298,5 +304,10 @@ var Config = {
 	},
 	Summoner: {
 		FireEye: false
+	},
+	OrgTorch: {
+		WaitForKeys: false,
+		WaitTimeout: false,
+		UseSalvation: false
 	}
 };

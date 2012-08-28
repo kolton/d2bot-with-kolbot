@@ -6,6 +6,7 @@ include("NTItemParser.dbl");
 include("OOG.js");
 include("AutoMule.js");
 include("Gambling.js");
+include("TorchSystem.js");
 include("MuleLogger.js");
 include("common/Attack.js");
 include("common/Cubing.js");
@@ -34,8 +35,8 @@ function main() {
 	}
 
 	// don't load default for mules
-	if (me.profile === AutoMule.muleProfile) {
-		return;
+	if (me.profile === AutoMule.Mule.muleProfile || me.profile === AutoMule.TorchMule.muleProfile) {
+		return true;
 	}
 
 	// mule logger stuff
@@ -48,37 +49,12 @@ function main() {
 
 		quit();
 
-		return;
+		return true;
 	}
 
-	var i, sojPause, quitFlag,
+	var i, sojPause,
 		sojCounter = 0,
 		startTime = getTickCount();
-
-	this.gameEvent = function (mode, param1, param2, name1, name2) {
-		switch (mode) {
-		case 17: // 0x11 - "%Param1 Stones of Jordan Sold to Merchants"
-			if (!Config.SoJWaitTime) {
-				break;
-			}
-
-			D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants;7");
-			sojPause = true;
-			sojCounter = 0;
-
-			break;
-		case 18: // 0x12 - "Diablo Walks the Earth"
-			if (!Config.StopOnDClone) {
-				break;
-			}
-
-			D2Bot.printToConsole("Diablo Walks the Earth;7");
-			removeEventListener("gameevent", this.gameEvent);
-			scriptBroadcast("dclone");
-
-			break;
-		}
-	};
 
 	this.itemEvent = function (gid, mode, code, global) {
 		if (gid > 0 && mode === 0) {
@@ -88,29 +64,12 @@ function main() {
 
 	this.scriptEvent = function (msg) {
 		switch (msg) {
-		case "quit":
-			// don't call multiple times
-			if (quitFlag) {
-				return;
-			}
-
-			quitFlag = true;
-
-			globalQuit();
+		case "soj":
+			sojPause = true;
+			sojCounter = 0;
 
 			break;
 		}
-	};
-
-	var globalQuit = function () {
-		print("ÿc8Run duration ÿc2" + ((getTickCount() - startTime) / 1000));
-
-		if (Config.LogExperience) {
-			delay(500);
-			Experience.log();
-		}
-
-		quit();
 	};
 
 	// If game name is a part of Gambling System, don't load scripts
@@ -133,8 +92,13 @@ function main() {
 	Cubing.init();
 	Runewords.init();
 
-	// override default action if in mule game
+	// AutoMule handler
 	AutoMule.inGameCheck();
+
+	// TorchSystem handler
+	TorchSystem.inGameCheck();
+
+	// TODO: Consolidate Gambling System
 
 	me.maxgametime = Config.MaxGameTime * 1000;
 
@@ -147,13 +111,12 @@ function main() {
 	DataFile.updateStats("experience");
 
 	// Load Fastmod
-	Packet.changeStat(105, Config.FCR); 
+	Packet.changeStat(105, Config.FCR);
 	Packet.changeStat(99, Config.FHR);
 	Packet.changeStat(102, Config.FBR);
 	Packet.changeStat(93, Config.IAS);
 
 	// Load events and threads
-	addEventListener("gameevent", this.gameEvent);
 	addEventListener("scriptmsg", this.scriptEvent);
 	load("tools/ToolsThread.js");
 	load("tools/TownChicken.js");
@@ -177,6 +140,11 @@ function main() {
 		Town.clearBelt();
 		Town.clearInventory();
 		Pickit.pickItems();
+	}
+
+	// Next game = drop keys
+	if (TorchSystem.keyCheck()) {
+		scriptBroadcast("torch");
 	}
 
 	// Go
@@ -218,5 +186,7 @@ function main() {
 		say(Config.LastMessage);
 	}
 
-	globalQuit();
+	scriptBroadcast("quit");
+
+	return true;
 }

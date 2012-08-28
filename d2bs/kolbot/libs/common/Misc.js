@@ -364,7 +364,7 @@ var Misc = {
 			desc += ("\nÿc0Line: " + keptLine);
 		}
 
-		D2Bot.printToItemLog(action + " " + name, desc, code, 0, color);
+		D2Bot.printToItemLog(action + " " + name, desc, code, unit.quality, color);
 	},
 
 	// Change into werewolf or werebear
@@ -489,12 +489,12 @@ var Misc = {
 
 	// Log someone's gear
 	spy: function (name) {
-		if (!isIncluded("ntitemparser.dbl")) {
-			include("ntitemparser.dbl");
-		}
-
 		if (!isIncluded("oog.js")) {
 			include("oog.js");
+		}
+
+		if (!isIncluded("common/prototypes.js")) {
+			include("common/prototypes.js");
 		}
 
 		var i, items,

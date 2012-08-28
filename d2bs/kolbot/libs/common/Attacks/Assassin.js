@@ -9,6 +9,7 @@ var ClassAttack = {
 	skillHand: [],
 	skillElement: [],
 	lastTrapPos: {},
+	trapRange: 20,
 
 	init: function () {
 		var i;
@@ -81,8 +82,8 @@ var ClassAttack = {
 		checkTraps = this.checkTraps(unit);
 
 		if (checkTraps) {
-			if (Math.round(getDistance(me, unit)) > 20 || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, 20, 0x4) || (checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1))) {
+			if (Math.round(getDistance(me, unit)) > this.trapRange || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, this.trapRange, 0x4) || (checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1))) {
 					return 1;
 				}
 			}

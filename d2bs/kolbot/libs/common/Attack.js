@@ -675,7 +675,7 @@ var Attack = {
 
 	// Check if a monster is attackable
 	checkMonster: function (unit) {
-		if (!unit) {
+		if (!unit || !copyUnit(unit).x) {
 			return false;
 		}
 
@@ -888,6 +888,7 @@ AuraLoop: // Skip monsters with auras
 		switch (skillId) {
 		case 74: // Corpse Explosion
 		case 147: // Frenzy
+		case 273: // Minge Blast
 		case 500: // Summoner
 			return "physical";
 		case 101: // Holy Bolt

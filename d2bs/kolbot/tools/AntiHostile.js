@@ -26,43 +26,30 @@ include("common/Town.js");
 
 function main() {
 	// Variables and functions
-	var player, findTrigger, attackCount, prevPos, check,
+	var player, findTrigger, attackCount, prevPos, check, missile,
 		charClass = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 		hostiles = [];
 
-	// Flips the 'find' trigger - allows the main loop to scan for hostiles
-	this.hostileEvent = function (mode, param1, param2, name1, name2) {
-		switch (mode) {
-		case 0x00: // "%Name1(%Name2) dropped due to time out."
-		case 0x01: // "%Name1(%Name2) dropped due to errors."
-		case 0x03: // "%Name1(%Name2) left our world. Diablo's minions weaken."
-			// Remove the hostile player from the list
-			if (hostiles.indexOf(name1) > -1) {
-				hostiles.splice(hostiles.indexOf(name1), 1);
-			}
-
-			break;
-		case 0x06: // "%Name1 was Slain by %Name2" 
-			if (param2 === 0x00 && name2 === me.name) {
-				D2Bot.printToConsole(name1 + " has been neutralized.;4");
-				hideConsole();
-				delay(500);
-				takeScreenshot();
-			}
-
-			break;
-		case 0x07:
-			if (param2 === 0x03) { // "%Player has declared hostility towards you."
-				findTrigger = true;
-			}
-
-			break;
-		}
-	};
-
+	// AntiHostile gets game event info from ToolsThread
 	this.scriptEvent = function (msg) {
-		if (msg === "findHostiles") {
+		switch (msg.split(" ")[0]) {
+		case "findHostiles": // Scan for hostile players
 			findTrigger = true;
+
+			break;
+		case "remove": // Remove a hostile player that left the game
+			if (hostiles.indexOf(msg.split(" ")[1]) > -1) {
+				hostiles.splice(hostiles.indexOf(msg.split(" ")[1]), 1);
+			}
+
+			break;
+		case "mugshot": // Take a screenshot and log the kill
+			D2Bot.printToConsole(msg.split(" ")[1] + " has been neutralized.;4");
+			hideConsole();
+			delay(500);
+			takeScreenshot();
+
+			break;
 		}
 	};
 
@@ -138,6 +125,27 @@ function main() {
 
 		return false;
 	};
+	
+	// Find a missile type
+	this.findMissile = function (owner, id, range) {
+		if (typeof range === "undefined") {
+			range = 999;
+		}
+		
+		var missile = getUnit(3, id);
+		
+		if (!missile) {
+			return false;
+		}
+		
+		do {
+			if (missile.owner === owner.gid && getDistance(owner, missile) < range) {
+				return missile;
+			}
+		} while (missile.getNext());
+
+		return false;
+	};
 
 	// Init config and attacks
 	Config.init();
@@ -175,6 +183,8 @@ function main() {
 	case 6: // Assassin - use Mind Blast with trapsins
 		if (me.getSkill(273, 1) && [251, 256].indexOf(Config.AttackSkill[1]) > -1) {
 			Config.AttackSkill[1] = 273; // Mind Blast
+			ClassAttack.skillRange[1] = 40;
+			ClassAttack.trapRange = 40;
 		}
 
 		break;
@@ -188,8 +198,8 @@ function main() {
 
 		for (i = 0; i < angles.length; i += 1) {
 			// Avoid the position where the player actually tries to move to
-			coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * range + unit.targetx);
-			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * range + unit.targety);
+			coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * range + unit.x); // unit.targetx
+			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * range + unit.y); // unit.targety
 
 			if (Attack.validSpot(coordx, coordy)) {
 				return Pather.moveTo(coordx, coordy);
@@ -199,7 +209,6 @@ function main() {
 		return false;
 	};
 
-	addEventListener("gameevent", this.hostileEvent);
 	addEventListener("scriptmsg", this.scriptEvent);
 	print("ÿc2Anti-Hostile thread loaded.");
 	this.findHostiles();
@@ -314,7 +323,7 @@ function main() {
 			attackCount = 0;
 
 			while (attackCount < 100) {
-				if (!copyUnit(player).x || player.inTown) { // Invalidated Unit (out of getUnit range) or player in town
+				if (!copyUnit(player).x || player.inTown || me.mode === 17) { // Invalidated Unit (out of getUnit range) or player in town
 					break;
 				}
 
@@ -322,9 +331,36 @@ function main() {
 				switch (me.classid) {
 				case 1: // Sorceress
 				case 2: // Necromancer
+					// Dodge missiles - experimental
+					missile = getUnit(3);
+
+					if (missile) {
+						do {
+							if (getPlayerFlag(me.gid, missile.owner, 8) && (getDistance(me, missile) < 15 || missile.targetx && getDistance(me, missile.targetx, missile.targety) < 15)) {
+								this.moveAway(missile, ClassAttack.skillRange[1]);
+
+								break;
+							}
+						} while (missile.getNext());
+					}
+
 					// Move away if the player is too close or if he tries to move too close (telestomp)
-					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || getDistance(me, player.targetx, player.targety) < 15)) {
+					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || player.targetx && getDistance(me, player.targetx, player.targety) < 15)) {
 						this.moveAway(player, ClassAttack.skillRange[1]);
+					}
+
+					break;
+				case 3: // Paladin
+					switch (player.classid) {
+					case 3:
+						// For vs other hdins - try to intercept path, but not when there's nearby hammers
+						if (player.targetx && getDistance(me, player) > 8 && !this.findMissile(player, 92, 10)) {
+							Pather.moveTo(player.targetx + 2, player.targety);
+						}
+
+						/*if (getDistance(me, player) < 5) {
+							Skill.cast(97, 1, player);
+						}*/
 					}
 
 					break;

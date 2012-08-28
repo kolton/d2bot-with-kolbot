@@ -59,6 +59,9 @@ var Town = {
 
 	// Do town chores
 	doChores: function () {
+		var i,
+			cancelFlags = [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f];
+
 		if (me.classid === 4 && Config.FindItem && Config.FindItemSwitch) { // weapon switch fix in case last game dropped with item find switch on
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
@@ -81,10 +84,18 @@ var Town = {
 		Runewords.makeRunewords();
 		this.stash(true);
 
-		while (getUIFlag(0x08) || getUIFlag(0x1A) || getUIFlag(0x19)) {
-			me.cancel();
-			delay(300);
+		for (i = 0; i < cancelFlags.length; i += 1) {
+			if (getUIFlag(cancelFlags[i])) {
+				delay(500);
+				me.cancel();
+
+				break;
+			}
 		}
+
+		me.cancel();
+
+		return true;
 	},
 
 	// Start a task and return the NPC Unit
@@ -1015,7 +1026,7 @@ MainLoop:
 			}
 		}
 
-		delay(300);
+		delay(1000);
 		Attack.checkInfinity();
 
 		return !!me.getMerc();
@@ -1054,6 +1065,8 @@ MainLoop:
 		if (!this.needStash()) {
 			return true;
 		}
+
+		me.cancel();
 
 		var i,
 			items = Storage.Inventory.Compare(Config.Inventory);
@@ -1096,9 +1109,7 @@ MainLoop:
 			stash = getUnit(2, 267);
 
 		if (stash) {
-			for (i = 0; i < 3; i += 1) {
-				//Pather.moveToUnit(stash, 0, 0, false, useTK);
-
+			for (i = 0; i < 5; i += 1) {
 				if (useTK) {
 					Skill.cast(43, 0, stash);
 				} else {
@@ -1110,10 +1121,17 @@ MainLoop:
 				while (getTickCount() - tick < 1000) {
 					if (getUIFlag(0x19)) {
 						delay(200);
+
 						return true;
 					}
 
 					delay(10);
+				}
+
+				if (i > 1) {
+					Packet.flash(me.gid);
+					this.move("waypoint");
+					this.move("stash");
 				}
 			}
 		}

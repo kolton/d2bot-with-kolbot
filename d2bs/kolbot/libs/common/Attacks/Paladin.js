@@ -18,14 +18,17 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
 				this.skillHand[i] = 2; // shift bypass
 				break;
 			case 96: // Sacrifice
 			case 97: // Smite
 			case 106: // Zeal
-			case 112: // Blessed Hammer
 			case 116: // Conversion
+				this.skillRange[i] = 2;
+				this.skillHand[i] = 2; // shift bypass
+				break;
+			case 112: // Blessed Hammer
 				this.skillRange[i] = 3;
 				break;
 			case 101: // Holy Bolt
@@ -50,7 +53,7 @@ var ClassAttack = {
 		}
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+			if (getDistance(me, unit) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
 					return 1;
 				}
@@ -135,9 +138,9 @@ var ClassAttack = {
 					return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
 				}
 
-				/*if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
+				if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
 					return false;
-				}*/
+				}
 			}
 
 			if (Config.AttackSkill[index + 1] > -1) {
@@ -147,7 +150,7 @@ var ClassAttack = {
 			for (i = 0; i < 3; i += 1) {
 				Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
 
-				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5) {
+				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5 || unit.type === 0) {
 					break;
 				}
 			}
@@ -158,15 +161,29 @@ var ClassAttack = {
 		if (Config.AttackSkill[index] === 101) {
 			CollMap.reset();
 
-			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || CollMap.checkColl(me, unit, 0x2004)) {
+			if (getDistance(me, unit) > this.skillRange[index] || CollMap.checkColl(me, unit, 0x2004)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x2004, true)) {
 					return 0;
 				}
 			}
 		} else if (getDistance(me, unit) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-			// walk short distances instead of tele for melee attacks
-			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
-				return 0;
+			// walk short distances instead of tele for melee attacks. teleport if failed to walk
+			switch (Config.AttackSkill[index]) {
+			case 0:
+			case 96:
+			case 106:
+			case 116:
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+					return 0;
+				}
+
+				break;
+			default:
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+					return 0;
+				}
+
+				break;
 			}
 		}
 
@@ -181,7 +198,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 4, y]];
+			positions = unit.type === 0 ? [[x + 2, y], [x + 2, y + 1]] : [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (getDistance(me, positions[i][0], positions[i][1]) < 1) {
@@ -196,7 +213,7 @@ var ClassAttack = {
 		var i,
 			x = unit.x,
 			y = unit.y,
-			positions = [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 4, y]];
+			positions = unit.type === 0 ? [[x + 2, y], [x + 2, y + 1]] : [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (Attack.validSpot(positions[i][0], positions[i][1])) {

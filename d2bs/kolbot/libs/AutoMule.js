@@ -1,12 +1,27 @@
 var AutoMule = {
-	muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
-	accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
-	accountPassword: "",  // Account password.
-	charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
-	realm: "", // Available options: "useast", "uswest", "europe", "asia"
-	expansion: true,
-	ladder: true,
-	hardcore: false,
+	// Normal mule info
+	Mule: {
+		muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
+		accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
+		accountPassword: "",  // Account password.
+		charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
+		realm: "", // Available options: "useast", "uswest", "europe", "asia"
+		expansion: true,
+		ladder: true,
+		hardcore: false
+	},
+
+	// Torch mule info - you can use the same profile as Normal mule, using the same accounts is possible but not recommended (8 premade chars can cause conflicts)
+	TorchMule: {
+		muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
+		accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
+		accountPassword: "",  // Account password.
+		charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
+		realm: "", // Available options: "useast", "uswest", "europe", "asia"
+		expansion: true,
+		ladder: true,
+		hardcore: false
+	},
 
 	// Game name and password of the mule game
 	muleGameName: ["mulegame", "mulepw"], // ["gamename", "password"]
@@ -26,12 +41,30 @@ var AutoMule = {
 
 		D2Bot.printToConsole("In mule game.");
 
-		var status = "muling";
+		var mode, muleInfoObj,
+			status = "muling";
+
+		function CheckModeEvent(msg) {
+			switch (msg) {
+			case "torch":
+				print("Torch muling mode");
+
+				mode = 1;
+
+				break;
+			case "normal":
+				print("Normal muling mode");
+
+				mode = 0;
+
+				break;
+			}
+		}
 
 		function DropStatusEvent(mode, msg) {
 			switch (msg) {
 			case "report": // reply to status request
-				sendCopyData(null, AutoMule.muleProfile, 12, status);
+				sendCopyData(null, muleInfoObj.muleProfile, 12, status);
 
 				break;
 			case "quit": // quit command
@@ -43,13 +76,31 @@ var AutoMule = {
 
 		print("ÿc4AutoMuleÿc0: In mule game.");
 		addEventListener("copydata", DropStatusEvent);
+		addEventListener("scriptmsg", CheckModeEvent);
+		scriptBroadcast("requestMuleMode");
+		delay(500);
+		muleInfoObj = mode === 0 ? this.Mule : this.TorchMule;
 
 		if (!Town.goToTown(1)) {
 			throw new Error("Failed to go to stash in act 1");
 		}
 
-		sendCopyData(null, this.muleProfile, 11, "begin");
-		this.dropStuff();
+		sendCopyData(null, muleInfoObj.muleProfile, 11, "begin");
+
+		switch (mode) {
+		case 0:
+			this.dropStuff();
+
+			break;
+		case 1:
+			this.dropTorch();
+
+			break;
+		default:
+			print("Something got bjorked");
+
+			break;
+		}
 
 		status = "done";
 		print("status done");
@@ -64,26 +115,31 @@ var AutoMule = {
 
 		removeEventListener("copydata", DropStatusEvent);
 		quit();
+		delay(10000);
 
 		return true;
 	},
 
 	// call mule profile, check if it's available for the mule session
-	outOfGameCheck: function () {
-		var status = "",
+	outOfGameCheck: function (mode) {
+		mode = mode || 0;
+
+		var status = "", muleInfoObj,
 			failCount = 0;
+
+		muleInfoObj = mode === 1 ? this.TorchMule : this.Mule;
 
 		function MuleCheckEvent(mode, msg) {
 			status = msg;
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting mule profile: " + this.muleProfile);
-		D2Bot.start(this.muleProfile);
+		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleInfoObj.muleProfile);
+		D2Bot.start(muleInfoObj.muleProfile);
 
 MainLoop:
 		while (true) {
-			sendCopyData(null, this.muleProfile, 10, me.profile);
+			sendCopyData(null, muleInfoObj.muleProfile, 10, me.profile + (mode === 1 ? "|torch" : ""));
 			delay(1000);
 
 			switch (status) {
@@ -99,7 +155,7 @@ MainLoop:
 			default:
 				failCount += 1;
 
-				if (failCount >= 45) {
+				if (failCount >= 60) {
 					D2Bot.printToConsole("No response from mule profile.");
 
 					break MainLoop;
@@ -121,7 +177,7 @@ MainLoop:
 		me.cancel();
 	},
 
-	// empty the stash while ignoring cubing/runeword ingredients TODO skip horadric cube
+	// empty the stash while ignoring cubing/runeword ingredients
 	emptyStash: function () {
 		if (!Town.openStash()) {
 			return false;
@@ -132,7 +188,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
+				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].itemType !== 39 &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
@@ -142,7 +198,7 @@ MainLoop:
 		return true;
 	},
 
-	// empty the inventory while ignoring cubing/runeword ingredients TODO skip horadric cube
+	// empty the inventory while ignoring cubing/runeword ingredients
 	emptyInventory: function () {
 		if (!Town.openStash()) {
 			return false;
@@ -153,7 +209,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
+				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].itemType !== 39 &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
@@ -198,6 +254,28 @@ MainLoop:
 
 		if (this.baseGids.indexOf(item.gid) > -1) {
 			return true;
+		}
+
+		return false;
+	},
+
+	dropTorch: function () {
+		if (!Town.openStash()) {
+			return false;
+		}
+
+		var item = me.getItem("cm2");
+
+		if (item) {
+			do {
+				if (item.quality === 7) {
+					item.drop();
+					delay(1000);
+					me.cancel();
+
+					return true;
+				}
+			} while (item.getNext());
 		}
 
 		return false;

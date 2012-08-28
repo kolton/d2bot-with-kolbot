@@ -51,8 +51,11 @@ function main() {
 
 	// Init config and attacks
 	Config.init();
+	Pickit.init();
 	Attack.init();
 	Storage.Init();
+	Cubing.init();
+	Runewords.init();
 
 	while (true) {
 		if (!me.inTown && (townCheck ||

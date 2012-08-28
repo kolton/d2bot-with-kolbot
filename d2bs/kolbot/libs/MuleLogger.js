@@ -96,7 +96,7 @@ var MuleLogger = {
 			folder.create(me.account);
 		}
 
-		if (!items.length) {
+		if (!items || !items.length) {
 			return;
 		}
 

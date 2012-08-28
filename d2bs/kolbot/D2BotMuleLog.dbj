@@ -1,6 +1,6 @@
 var StarterConfig = {
 	MinGameTime: 0, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
-	CreateGameDelay: 2, // Seconds to wait before creating a new game
+	CreateGameDelay: 5, // Seconds to wait before creating a new game
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
