@@ -328,13 +328,13 @@ var Misc = {
 		var i, val, code, desc,
 			stringColor = "",
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ï¿½c[0-9!"+<;.*]|^ /, "");
 
 		desc = unit.description.split("\n");
 
 		// Lines are normally in reverse. Add color tags if needed and reverse order.
 		for (i = 0; i < desc.length; i += 1) {
-			if (desc[i].match(/^ÿ/)) {
+			if (desc[i].match(/^ï¿½/)) {
 				stringColor = desc[i].substring(0, 3);
 			} else {
 				desc[i] = stringColor + desc[i];
@@ -343,13 +343,13 @@ var Misc = {
 
 		desc = desc.reverse().join("\n");
 		color = unit.getColor();
-		desc += ("\nÿc0Item Level: " + unit.ilvl);
+		desc += ("\nï¿½c0Item Level: " + unit.ilvl);
 
 		if (action === "Kept") {
 			val = DataFile.getStats().lastArea;
 
 			if (val) {
-				desc += ("\nÿc0Area: " + val);
+				desc += ("\nï¿½c0Area: " + val);
 			}
 		}
 
@@ -361,7 +361,7 @@ var Misc = {
 		}
 
 		if (keptLine) {
-			desc += ("\nÿc0Line: " + keptLine);
+			desc += ("\nï¿½c0Line: " + keptLine);
 		}
 
 		D2Bot.printToItemLog(action + " " + name, desc, code, unit.quality, color);
@@ -561,11 +561,17 @@ var Experience = {
 	totalRunsToLevel: function () {
 		return Math.round(this.nextExp[me.getStat(12)] / this.gain());
 	},
+	
+	// Adds commas to bigger numbers for exp gain
+	addCommas: function (amount) {
+		var parts = amount.toString().split(".");
+		return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
+	},
 
 	// Log to manager
 	log: function () {
 		var string,
-			gain = this.gain(),
+			gain = this.addCommas(this.gain()),
 			progress = this.progress(),
 			runsToLevel = this.runsToLevel(),
 			totalRunsToLevel = this.totalRunsToLevel();
