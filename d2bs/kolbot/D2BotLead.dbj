@@ -209,6 +209,10 @@ MainSwitch:
 			break;
 		}
 
+		// automule test lines
+		//ingame = true;
+		//muleTrigger = true;
+
 		if (ingame) {
 			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
 				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
@@ -216,7 +220,9 @@ MainSwitch:
 
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
+				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
+				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -293,7 +299,9 @@ MainSwitch:
 
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
+				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
+				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
