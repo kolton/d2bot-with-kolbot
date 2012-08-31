@@ -138,7 +138,7 @@ function pickItems() {
 				break;
 			}
 		} else {
-			sendCopyData(null, muler, 0, "report");
+			sendCopyData(null, muler.toString(), 10, "report");
 			//D2Bot.shoutGlobal("report", 0);
 		}
 
@@ -192,7 +192,7 @@ function ReceiveCopyData(mode, msg) {
 		if (!muler) {
 			muler = getMuler(msg);
 		} else {
-			sendCopyData(null, muler, 0, status);
+			sendCopyData(null, muler.toString(), 10, status);
 			//D2Bot.shoutGlobal(status, 0);
 		}
 
@@ -394,7 +394,7 @@ function main() {
 				switch (pickItems()) {
 				// done picking, tell the muler to leave game and kill mule profile
 				case "done":
-					sendCopyData(null, muler, 0, "quit");
+					sendCopyData(null, muler.toString(), 10, "quit");
 					//D2Bot.shoutGlobal("quit", 0);
 					MuleLogger.logChar();
 					delay(500);

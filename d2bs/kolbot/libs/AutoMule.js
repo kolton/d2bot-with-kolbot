@@ -130,7 +130,9 @@ var AutoMule = {
 		muleInfoObj = mode === 1 ? this.TorchMule : this.Mule;
 
 		function MuleCheckEvent(mode, msg) {
-			status = msg;
+			if (mode === 10) {
+				status = msg;
+			}
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
