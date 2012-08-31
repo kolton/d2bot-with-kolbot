@@ -139,7 +139,7 @@ var AutoMule = {
 
 MainLoop:
 		while (true) {
-			sendCopyData(null, muleInfoObj.muleProfile, 10, me.profile + (mode === 1 ? "|torch" : ""));
+			sendCopyData(null, muleInfoObj.muleProfile, 10, me.profile.toString() + (mode === 1 ? "|torch" : ""));
 			delay(1000);
 
 			switch (status) {
@@ -149,7 +149,7 @@ MainLoop:
 				break MainLoop;
 			case "ready":
 				joinGame(this.muleGameName[0], this.muleGameName[1]);
-				delay(2000);
+				delay(5000);
 
 				break MainLoop;
 			default:
@@ -166,6 +166,10 @@ MainLoop:
 		}
 
 		removeEventListener("copydata", MuleCheckEvent);
+
+		while (me.ingame) {
+			delay(1000);
+		}
 
 		return true;
 	},
