@@ -100,7 +100,7 @@ function DiabloHelper() {
 		var trapCheck,
 			tick = getTickCount();
 
-		while (getTickCount() - tick < 17500) {
+		while (getTickCount() - tick < 20000) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
 				case 1: // Sorceress
@@ -148,6 +148,8 @@ function DiabloHelper() {
 					break;
 				default:
 					delay(500);
+
+					break;
 				}
 			} else {
 				delay(500);

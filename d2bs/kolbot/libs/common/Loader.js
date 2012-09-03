@@ -55,8 +55,7 @@ ScriptLoop:
 							print("ÿc2Starting script: ÿc9" + i);
 							global[i]();
 						} catch (e) {
-							showConsole();
-							print("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + ") : ÿc1" + e.message);
+							Misc.errorReport("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + "): ÿc1" + e.message);
 						}
 					}
 				} else {

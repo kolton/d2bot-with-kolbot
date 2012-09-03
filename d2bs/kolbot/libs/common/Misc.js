@@ -353,11 +353,30 @@ var Misc = {
 			}
 		}
 
-		code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
-		code = code.replace(" ", "");
+		// experimental
+		/*switch (unit.quality) {
+		case 5:
+			// needs item by item handling :/
+			break;
+		case 7:
+			for (i = 0; i < 401; i += 1) {
+				if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+					code = getBaseStat(17, i, "invfile");
 
-		if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
-			code += (unit.gfx + 1);
+					break;
+				}
+			}
+
+			break;
+		}*/
+
+		if (!code) {
+			code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
+			code = code.replace(" ", "");
+
+			if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
+				code += (unit.gfx + 1);
+			}
 		}
 
 		if (keptLine) {
@@ -513,6 +532,53 @@ var Misc = {
 		}
 
 		return true;
+	},
+
+	// hopefully multi-thread and multi-profile friendly txt func
+	fileAction: function (path, mode, msg) {
+		var i, file,
+			contents = "";
+
+MainLoop:
+		for (i = 0; i < 30; i += 1) {
+			try {
+				file = File.open(path, mode);
+
+				switch (mode) {
+				case 0: // read
+					contents = file.readLine();
+
+					break MainLoop;
+				case 1: // write
+				case 2: // append
+					file.write(msg);
+
+					break MainLoop;
+				}
+			} catch (e) {
+
+			} finally {
+				file.close();
+			}
+
+			delay(100);
+		}
+
+		return mode === 0 ? contents : true;
+	},
+
+	// Report script errors to logs/ScriptErrorLog.txt
+	errorReport: function (msg) {
+		var h, m, s, date;
+
+		date = new Date();
+		h = date.getHours();
+		m = date.getMinutes();
+		s = date.getSeconds();
+
+		showConsole();
+		print(msg);
+		this.fileAction("logs/ScriptErrorLog.txt", 2, "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n");
 	}
 };
 
@@ -583,6 +649,64 @@ var Experience = {
 };
 
 var Packet = {
+	buyItem: function (item, shiftBuy) {
+		var i, tick, container,
+			itemCount = me.itemcount,
+			npc = getInteractedNPC();
+
+		if (!npc) {
+			throw new Error("buyItem: No NPC menu open.");
+		}
+
+		if (me.getStat(14) + me.getStat(15) < item.getItemCost(0)) { // Can we afford the item?
+			return false;
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			sendPacket(1, 0x32, 4, npc.gid, 4, item.gid, 4, shiftBuy ? 0x80000000 : 0, 4, 0);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (shiftBuy) {
+					switch (item.classid) {
+					case 529: // tp scroll
+						container = me.getItem(518);
+
+						if (container && container.getStat(70) === 20) {
+							return true;
+						}
+
+						break;
+					case 530: // id scroll
+						container = me.getItem(519);
+
+						if (container && container.getStat(70) === 20) {
+							return true;
+						}
+
+						break;
+					case 543: // key
+						container = me.getItem(543);
+
+						if (container && container.getStat(70) === 12) {
+							return true;
+						}
+
+						break;
+					}
+				}
+
+				if (itemCount !== me.itemcount) {
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
 	castSkill: function (hand, wX, wY) {
 		hand = (hand === 0) ? 0x0c : 0x05;
 		sendPacket(1, hand, 2, wX, 2, wY);
