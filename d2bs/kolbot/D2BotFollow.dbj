@@ -37,9 +37,10 @@ var JoinSettings = {
 include("json2.js");
 include("OOG.js");
 include("automule.js");
+include("torchsystem.js");
 load("tools/heartbeat.js");
 
-var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
+var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
 	gamePass = "",
 	gameName = "",
 	nextGame = "",
@@ -90,6 +91,20 @@ function ScriptMsgEvent(msg) {
 	switch (msg) {
 	case "mule":
 		muleTrigger = true;
+
+		break;
+	case "torch":
+		torchTrigger = true;
+
+		break;
+	case "muleTorch":
+		torchMuleTrigger = true;
+
+		break;
+	case "requestMuleMode":
+		scriptBroadcast(torchMuleTrigger ? "torch" : "normal");
+
+		torchMuleTrigger = false;
 
 		break;
 	}
@@ -197,14 +212,27 @@ MainSwitch:
 
 		if (ingame) {
 			// ### automule ###
-			if (muleTrigger) {
-				AutoMule.outOfGameCheck();
+			if (muleTrigger || torchMuleTrigger) {
+				removeEventListener('copydata', ReceiveCopyData);
+				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
+				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
+				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
 
 				break;
 			}
 			// ### automule end ###
+
+			// ### Torch System ###
+			if (torchTrigger) {
+				TorchSystem.outOfGameCheck();
+
+				torchTrigger = false;
+
+				break;
+			}
+			// ### Torch System end ###
 
 			print("updating runs");
 			D2Bot.updateRuns();
@@ -240,14 +268,27 @@ MainSwitch:
 
 		if (ingame) {
 			// ### automule ###
-			if (muleTrigger) {
-				AutoMule.outOfGameCheck();
+			if (muleTrigger || torchMuleTrigger) {
+				removeEventListener('copydata', ReceiveCopyData);
+				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
+				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
+				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
 
 				break;
 			}
 			// ### automule end ###
+
+			// ### Torch System ###
+			if (torchTrigger) {
+				TorchSystem.outOfGameCheck();
+
+				torchTrigger = false;
+
+				break;
+			}
+			// ### Torch System end ###
 
 			print("updating runs");
 			D2Bot.updateRuns();

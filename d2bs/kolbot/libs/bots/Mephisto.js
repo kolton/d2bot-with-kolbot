@@ -117,24 +117,36 @@ function Mephisto() {
 		Pather.moveTo(17600, 8125);
 
 		if (getUnit(1, getLocaleString(2858))) {
-			Attack.kill(getLocaleString(2858));
-			Attack.clear(15, 0, getLocaleString(2858));
+			try {
+				Attack.kill(getLocaleString(2858));
+				Attack.clear(15, 0, getLocaleString(2858));
+			} catch (e1) {
+
+			}
 		}
 
 		//right voidbringer
 		Pather.moveTo(17600, 8015);
 
 		if (getUnit(1, getLocaleString(2859))) {
-			Attack.kill(getLocaleString(2859));
-			Attack.clear(15, 0, getLocaleString(2859));
+			try {
+				Attack.kill(getLocaleString(2859));
+				Attack.clear(15, 0, getLocaleString(2859));
+			} catch (e2) {
+
+			}
 		}
 
 		//middle bremm
 		Pather.moveTo(17635, 8070);
 
 		if (getUnit(1, getLocaleString(2861))) {
-			Attack.kill(getLocaleString(2861));
-			Attack.clear(15, 0, getLocaleString(2861));
+			try {
+				Attack.kill(getLocaleString(2861));
+				Attack.clear(15, 0, getLocaleString(2861));
+			} catch (e3) {
+
+			}
 		}
 	};
 
@@ -149,7 +161,7 @@ function Mephisto() {
 	if (Config.Mephisto.KillCouncil) {
 		this.killCouncil();
 	}
-	
+
 	if (Config.OpenChests) {
 		Pather.moveTo(17572, 8011);
 		Attack.openChests(5);
