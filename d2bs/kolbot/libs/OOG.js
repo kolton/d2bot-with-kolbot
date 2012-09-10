@@ -88,6 +88,8 @@ var DataFile = {
 		string = JSON.stringify(obj);
 
 		FileTools.writeText("data/" + me.profile + ".json", string);
+
+		return obj;
 	},
 
 	getObj: function () {
@@ -103,9 +105,7 @@ var DataFile = {
 			obj = JSON.parse(string);
 		} catch (e) {
 			// If we failed, file might be corrupted, so create a new one
-			this.create();
-
-			obj = JSON.parse(string);
+			obj = this.create();
 		}
 
 		return obj;
@@ -297,6 +297,11 @@ MainLoop:
 				this.click(6, 264, 484, 272, 35); // log in
 
 				break;
+			case 11:
+				// Unable to connect, let the caller handle it.
+				me.blockMouse = false;
+				return false;
+			case 18: // splash
 			case 12: // char screen - break
 				break MainLoop;
 			case 18: // splash
@@ -614,6 +619,8 @@ var ShitList = {
 		string = JSON.stringify(obj);
 
 		FileTools.writeText("shitlist.json", string);
+
+		return obj;
 	},
 
 	getObj: function () {
@@ -623,7 +630,7 @@ var ShitList = {
 		try {
 			obj = JSON.parse(string);
 		} catch (e) {
-			this.create();
+			obj = this.create();
 		}
 
 		return obj;

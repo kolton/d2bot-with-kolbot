@@ -858,6 +858,12 @@ MainLoop:
 		return true;
 	};
 
+	this.clearArea = function (area) {
+		Pather.journeyTo(area);
+		Attack.clearLevel(0);
+		say("Done clearing area: " + area);
+	};
+
 	var command,
 		current = 0,
 		thisThread = getScript("tools/rushthread.js"),
@@ -899,7 +905,10 @@ MainLoop:
 
 				break;
 			default:
-				if (sequence.indexOf(command) > -1) {
+				if (command.split(" ")[0] !== undefined &&
+						command.split(" ")[0] === "clear") {
+					this.clearArea(Number(command.split(" ")[1]));
+				} else if (sequence.indexOf(command) > -1) {
 					current = sequence.indexOf(command);
 
 					Town.goToTown();

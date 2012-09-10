@@ -325,7 +325,7 @@ var Misc = {
 
 	// Log kept item stats in the manager.
 	logItem: function (action, unit, keptLine) {
-		var i, val, code, desc,
+		var i, lastArea, code, desc,
 			stringColor = "",
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
@@ -346,10 +346,10 @@ var Misc = {
 		desc += ("\nÿc0Item Level: " + unit.ilvl);
 
 		if (action === "Kept") {
-			val = DataFile.getStats().lastArea;
+			lastArea = DataFile.getStats().lastArea;
 
-			if (val) {
-				desc += ("\nÿc0Area: " + val);
+			if (lastArea) {
+				desc += ("\nÿc0Area: " + lastArea);
 			}
 		}
 
@@ -452,6 +452,11 @@ var Misc = {
 		var potion, check,
 			needhp = true,
 			needmp = true;
+
+		// Can't tp from uber trist
+		if (me.area === 136) {
+			return true;
+		}
 
 		if (Config.TownCheck && !me.inTown) {
 			if (Config.BeltColumn.indexOf("hp") > -1) {

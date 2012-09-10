@@ -184,6 +184,11 @@ function Mephisto() {
 	}
 
 	Pickit.pickItems();
+
+	if (Config.OpenChests) {
+		Pather.moveTo(17515, 8061);
+		Attack.openChests(5);
+	}
 	/*Pather.moveTo(17590, 8068);
 	delay(1500);
 	Pather.usePortal(null);*/

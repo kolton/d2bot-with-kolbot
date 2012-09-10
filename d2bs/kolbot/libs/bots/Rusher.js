@@ -16,7 +16,7 @@ function Rusher() {
 	load("tools/rushthread.js");
 	delay(500);
 
-	var rushThread, command, master,
+	var rushThread, command, master, commandSplit0,
 		commands = [];
 
 	rushThread = getScript("tools/rushthread.js");
@@ -94,9 +94,17 @@ function Rusher() {
 
 				break;
 			default:
-				if (command.split(" ")[0] !== undefined && command.split(" ")[0] === "do") {
+				commandSplit0 = command.split(" ")[0];
+				if (commandSplit0 === undefined) {
+					break;
+				}
+
+				if (commandSplit0 === "do") {
 					this.reloadThread();
 					rushThread.send(command.split(" ")[1]);
+				} else if (commandSplit0 === "clear") {
+					this.reloadThread();
+					rushThread.send(command);
 				}
 
 				break;
