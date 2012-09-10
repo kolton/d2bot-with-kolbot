@@ -408,6 +408,7 @@ MainSwitch:
 		}
 
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
+		print("Creating Game: " + gameName + gameCount);
 		createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
 		locationTimeout(5000, location);
 
@@ -612,6 +613,8 @@ MainSwitch:
 
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.printToConsole("Game doesn't exist");

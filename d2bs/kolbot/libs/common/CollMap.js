@@ -40,11 +40,11 @@ var CollMap = new function () {
 		j = x - this.rooms[index].x * 5;
 		i = y - this.rooms[index].y * 5;
 
-		if (typeof (this.maps[index][i]) === "undefined" || typeof (this.maps[index][i][j]) === "undefined") {
+		try {
+			return this.maps[index][i][j];
+		} catch (e) {
 			return 5;
 		}
-
-		return this.maps[index][i][j];
 	};
 
 	this.getRoomIndex = function (x, y) {
@@ -78,7 +78,6 @@ var CollMap = new function () {
 
 	// Check collision between unitA and unitB. true = collision present, false = collision not present
 	// If checking for blocking collisions (0x1, 0x4), true means blocked, false means not blocked
-
 	this.checkColl = function (unitA, unitB, coll) {
 		var i, k, l, cx, cy, angle, distance;
 

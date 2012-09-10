@@ -101,7 +101,7 @@ function AutoBaal() {
 				Precast.doPrecast(true);
 
 				for (i = 4; i > 1; i -= 1) {
-					if (Misc.getShrinesInArea(i, 15)) {
+					if (Misc.getShrinesInArea(i, 15, true)) {
 						break;
 					}
 				}
@@ -111,7 +111,7 @@ function AutoBaal() {
 					Pather.useWaypoint(5);
 
 					for (i = 5; i < 8; i += 1) {
-						if (Misc.getShrinesInArea(i, 15)) {
+						if (Misc.getShrinesInArea(i, 15, true)) {
 							break;
 						}
 					}

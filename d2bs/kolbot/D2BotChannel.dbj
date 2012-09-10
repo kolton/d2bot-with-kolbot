@@ -490,11 +490,11 @@ MainLoop:
 	case 26: // Lobby - Game Name Exists
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.printToConsole("Game doesn't exist");
-
-		lastGameStatus = "ready";
 
 		if (!locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location)) {
 			ControlAction.click(6, 652, 469, 120, 20);
@@ -505,10 +505,11 @@ MainLoop:
 	case 38: // Game is full
 		D2Bot.printToConsole("Game is full");
 
-		lastGameStatus = "ready";
+		retry = 2;
 
-		delay(500);
 		ControlAction.click(6, 652, 469, 120, 20);
+		ControlAction.click(6, 433, 433, 96, 32);
+
 		break;
 	case 42: // Empty character screen
 		delay(1000);

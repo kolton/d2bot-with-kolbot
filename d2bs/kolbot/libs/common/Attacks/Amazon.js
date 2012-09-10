@@ -30,7 +30,7 @@ var ClassAttack = {
 				this.skillRange[i] = 3;
 				break;
 			case 24: // Charged Strike
-				this.skillRange[i] = 15;
+				this.skillRange[i] = 20;
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;

@@ -67,6 +67,10 @@ function main() {
 			(Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
 			this.togglePause();
 
+			while (!me.gameReady) {
+				delay(200);
+			}
+
 			try {
 				me.overhead("Going to town");
 				Town.goToTown();
@@ -80,6 +84,9 @@ function main() {
 				if (Config.PublicMode) {
 					Pather.makePortal();
 				}
+			} catch (e) {
+				Misc.errorReport("TownChicken fail");
+				quit();
 			} finally {
 				this.togglePause();
 

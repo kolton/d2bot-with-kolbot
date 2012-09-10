@@ -526,7 +526,7 @@ ModeLoop:
 
 		wp = getUnit(2, "waypoint");
 
-		if (!wp) {
+		if (!wp && me.inTown) {
 			Town.move("stash");
 			Town.move("waypoint");
 
@@ -537,7 +537,11 @@ ModeLoop:
 			}
 		}
 
-		for (i = 0; i < 5; i += 1) {
+		if (!me.inTown) {
+			this.moveToUnit(wp);
+		}
+
+		for (i = 0; i < 12; i += 1) {
 			if (check) {
 				this.moveToUnit(wp);
 				wp.interact(); // TODO: Telekinesis option
@@ -586,7 +590,12 @@ ModeLoop:
 					}
 
 					if (me.area === targetArea) {
-						delay(500);
+						delay(200);
+
+						// crash workaround, testing
+						if (me.area === 109) {
+							me.move(me.x, me.y - 5);
+						}
 
 						return true;
 					}
@@ -595,18 +604,22 @@ ModeLoop:
 				}
 			}
 
-			this.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4); // In case of client/server desync
-
 			if (i > 1) { // Activate check if we fail direct interact twice
+				Packet.flash(me.gid);
+
 				check = true;
 			}
 
-			if (i > 2) { // Try to get unstuck
-				Town.move("stash");
-			}
-
 			if (me.inTown) {
+				me.move(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4); // In case of client/server desync
+
+				if (i > 2) {
+					Town.move("stash");
+				}
+
 				Town.move("waypoint");
+			} else {
+				this.moveToUnit(wp);
 			}
 		}
 
@@ -642,7 +655,7 @@ ModeLoop:
 			} while (!oldGid && oldPortal.getNext());
 		}
 
-		for (i = 0; i < 200; i += 1) {
+		for (i = 0; i < 400; i += 1) {
 			if (me.mode === 17) {
 				break;
 			}

@@ -48,6 +48,7 @@ function main() {
 		}
 
 		quit();
+		delay(10000);
 
 		return true;
 	}
@@ -80,6 +81,7 @@ function main() {
 				DataFile.updateStats("gold");
 				delay(5000);
 				quit();
+				delay(10000);
 			}
 		}
 	}
@@ -99,7 +101,6 @@ function main() {
 	TorchSystem.inGameCheck();
 
 	// TODO: Consolidate Gambling System
-
 	me.maxgametime = Config.MaxGameTime * 1000;
 
 	if (me.getStat(13) < DataFile.getStats().experience) { // check for experience decrease -> log death
@@ -133,7 +134,7 @@ function main() {
 		print("ÿc2Fast pickit active.");
 		addEventListener("itemaction", this.itemEvent);
 	}
-
+	
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
 	if (!Scripts.UserAddon && !Scripts.Test) {
 		Town.getCorpse();

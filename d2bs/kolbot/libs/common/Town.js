@@ -59,6 +59,10 @@ var Town = {
 
 	// Do town chores
 	doChores: function () {
+		if (!me.inTown) {
+			this.goToTown();
+		}
+
 		var i,
 			cancelFlags = [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f];
 
@@ -150,8 +154,6 @@ var Town = {
 			return false;
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -234,8 +236,6 @@ var Town = {
 			col = this.checkColumns(); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -317,8 +317,6 @@ var Town = {
 			return false;
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -349,7 +347,7 @@ var Town = {
 		// Avoid unnecessary NPC visits
 		for (i = 0; i < list.length; i += 1) {
 			// Only unid items or sellable junk (low level) should trigger a NPC visit
-			if ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1) {
+			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && [-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1) {
 				break;
 			}
 		}
@@ -474,8 +472,6 @@ MainLoop:
 				}
 			}
 		}
-
-		delay(750);
 
 		return true;
 	},
@@ -715,8 +711,6 @@ MainLoop:
 			}
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -786,8 +780,6 @@ MainLoop:
 			me.cancel();
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -841,8 +833,6 @@ MainLoop:
 
 			return false;
 		}
-
-		delay(750);
 
 		return true;
 	},
@@ -924,7 +914,6 @@ MainLoop:
 		}
 
 		//this.shopItems();
-		delay(750);
 
 		return true;
 	},
@@ -1103,13 +1092,24 @@ MainLoop:
 			}
 		}
 
-		delay(750);
-
 		return true;
 	},
 
 	needStash: function () {
-		return Storage.Inventory.Compare(Config.Inventory).length > 0 || (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5);
+		if (Config.StashGold && me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5) {
+			return true;
+		}
+
+		var i,
+			items = Storage.Inventory.Compare(Config.Inventory);
+
+		for (i = 0; i < items.length; i += 1) {
+			if (Storage.Stash.CanFit(items[i])) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 
 	openStash: function () {

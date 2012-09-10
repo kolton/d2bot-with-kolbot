@@ -28,8 +28,12 @@ var Attack = {
 	checkInfinity: function () {
 		var i, merc, items;
 
-		for (i = 0; !merc && i < 3; i += 1) {
+		for (i = 0; i < 3; i += 1) {
 			merc = me.getMerc();
+
+			if (merc) {
+				break;
+			}
 
 			delay(50);
 		}

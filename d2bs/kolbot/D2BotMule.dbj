@@ -27,6 +27,7 @@ var MuleData = {
 			fullChars: [],
 			torchChars: []
 		};
+
 		string = JSON.stringify(obj);
 
 		FileTools.writeText(muleFilename, string);
@@ -217,6 +218,7 @@ function nextAccount() {
 	obj.character = "";
 	obj.charNum = 0;
 	obj.fullChars = [];
+	obj.torchChars = [];
 
 	MuleData.write(obj);
 
@@ -230,9 +232,9 @@ function nextChar() {
 		charNumbers = "abcdefghijklmnopqrstuvwxyz",
 		obj = MuleData.read();
 
-	if (getLocation() === 12) {
+	/*if (getLocation() === 12) {
 		obj.charNum = ControlAction.getCharacters().length;
-	}
+	}*/
 
 	// dirty
 	if (obj.charNum > 25) {
@@ -752,6 +754,8 @@ MainSwitch:
 
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		ControlAction.click(6, 533, 469, 120, 20);
