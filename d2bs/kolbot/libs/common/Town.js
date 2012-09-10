@@ -1369,7 +1369,7 @@ MainLoop:
 		case 3:
 			this.act[2].spot = {};
 			this.act[2].spot.meshif = [5118, 5168];
-			this.act[2].spot[NPC.Hratli] = [5223, 5048];
+			this.act[2].spot[NPC.Hratli] = [5223, 5048, 5127, 5172];
 			this.act[2].spot[NPC.Ormus] = [5129, 5093];
 			this.act[2].spot[NPC.Asheara] = [5043, 5093];
 			this.act[2].spot[NPC.Alkor] = [5083, 5016];
@@ -1413,6 +1413,8 @@ MainLoop:
 	},
 
 	move: function (spot) {
+		var i;
+
 		if (!me.inTown) { // To prevent long trips if tp to town failed
 			throw new Error("Town.move: You're not in town!");
 		}
@@ -1455,6 +1457,17 @@ MainLoop:
 			}
 
 			Pather.moveTo(townSpot[0], townSpot[1], 3);
+
+			// If unit has more than one location and it's not here, search
+			if (townSpot.length > 2 && !getUnit(1, spot)) {
+				for (i = 0; i < townSpot.length / 2; i += 1) {
+					Pather.moveTo(townSpot[i * 2], townSpot[i * 2 + 1], 3);
+
+					if (!!getUnit(1, spot)) {
+						break;
+					}
+				}
+			}
 		}
 
 		return true;
