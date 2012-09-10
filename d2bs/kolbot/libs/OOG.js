@@ -280,7 +280,8 @@ MainLoop:
 
 		tick = getTickCount();
 
-		while (getLocation() !== 12 && getLocation() !== 42) {
+MainLoop:
+		while (true) {
 			switch (getLocation()) {
 			case 8: // main menu
 				if (info.realm) {
@@ -301,11 +302,24 @@ MainLoop:
 				me.blockMouse = false;
 				return false;
 			case 18: // splash
+			case 12: // char screen - break
+				break MainLoop;
+			case 18: // splash
 				this.click(2, 0, 599, 800, 600);
 
 				break;
-			case 21:
+			case 21: // connecting
+			case 23: // char screen connecting
 				break;
+			case 42: // empty char screen
+				// make sure we're not on connecting screen
+				delay(2000);
+
+				if (getLocation() === 23) {
+					break;
+				}
+
+				break MainLoop; // break if we're sure we're on empty char screen
 			default:
 				me.blockMouse = false;
 

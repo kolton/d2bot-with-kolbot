@@ -386,15 +386,20 @@ ModeLoop:
 					*/
 					if (use || i < areas.length - 1) {
 						switch (exits[j].type) {
-						case 1:
+						case 1: // walk through
 							myRoom = getRoom(me.x, me.y);
 							myRoom = [myRoom.x * 5 + myRoom.xsize / 2, myRoom.y * 5 + myRoom.ysize / 2];
 							targetRoom = this.getNearestRoom(areas[i]);
 
-							this.moveTo(targetRoom[0], targetRoom[1]);
+							if (targetRoom) {
+								this.moveTo(targetRoom[0], targetRoom[1]);
+							} else {
+								// might need adjustments
+								return false;
+							}
 
 							break;
-						case 2:
+						case 2: // stairs
 							if (!this.useUnit(5, exits[j].tileid, areas[i])) {
 								return false;
 							}
@@ -416,9 +421,18 @@ ModeLoop:
 	},
 
 	getNearestRoom: function (area) {
-		var x, y, dist,
-			room = getRoom(area),
-			minDist = 1000;
+		var i, x, y, dist, room,
+			minDist = 10000;
+
+		for (i = 0; i < 5; i += 1) {
+			room = getRoom(area);
+
+			if (room) {
+				break;
+			}
+
+			delay(200);
+		}
 
 		if (!room) {
 			return false;
@@ -1012,10 +1026,11 @@ MainLoop:
 				visitedNodes[node.from] = node.to;
 
 				// If we have this wp we can start from there
-				if (Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))) {
+				if (Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from)) && node.from !== 46) {
 					if (node.from !== src) {
 						useWP = true;
 					}
+
 					src = node.from;
 				}
 
@@ -1035,7 +1050,7 @@ MainLoop:
 					}
 				}
 			}
-			
+
 			toVisitNodes.shift();
 		}
 
