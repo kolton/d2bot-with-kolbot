@@ -39,7 +39,7 @@ include("OOG.js");
 include("automule.js");
 load("tools/heartbeat.js");
 
-var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone,
+var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchMuleTrigger,
 	gamePass = "",
 	gameName = "",
 	nextGame = "",
@@ -92,6 +92,10 @@ function ScriptMsgEvent(msg) {
 		muleTrigger = true;
 
 		break;
+	case "requestMuleMode":
+		scriptBroadcast(torchMuleTrigger ? "torch" : "normal");
+
+		torchMuleTrigger = false;
 	}
 }
 
