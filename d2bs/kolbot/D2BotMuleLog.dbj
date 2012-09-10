@@ -456,8 +456,10 @@ MainSwitch:
 
 		break;
 	case 42: // Empty character screen
-		delay(1000);
-		ControlAction.click(6, 33, 572, 128, 35);
+		// Game glitches and doesn't show connecting for 2-3 seconds.
+		if (!locationTimeout(3000, location)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+		}
 
 		break;
 	default:

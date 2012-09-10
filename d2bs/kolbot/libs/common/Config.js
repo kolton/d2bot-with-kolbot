@@ -277,6 +277,7 @@ var Config = {
 		StarTP: "Star TP up"
 	},
 	DiabloHelper: {
+		Wait: 120,
 		Entrance: false
 	},
 	BattleOrders: {
@@ -309,5 +310,8 @@ var Config = {
 		WaitForKeys: false,
 		WaitTimeout: false,
 		UseSalvation: false
+	},
+	Synch: {
+		WaitFor: []
 	}
 };
