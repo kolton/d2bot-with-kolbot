@@ -277,6 +277,7 @@ var Config = {
 		StarTP: "Star TP up"
 	},
 	DiabloHelper: {
+		Wait: 120,
 		Entrance: false
 	},
 	BattleOrders: {
