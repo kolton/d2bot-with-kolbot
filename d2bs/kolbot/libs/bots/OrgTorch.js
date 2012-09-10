@@ -274,6 +274,10 @@ function OrgTorch() {
 		print("Making organs.");
 
 		for (i = 0; i < 3; i += 1) {
+			if (this.checkUneven()) {
+				break;
+			}
+
 			portal = this.openPortal(0);
 
 			if (portal) {
@@ -281,10 +285,6 @@ function OrgTorch() {
 			}
 
 			this.pandemoniumRun();
-
-			if (this.checkUneven()) {
-				break;
-			}
 		}
 	}
 

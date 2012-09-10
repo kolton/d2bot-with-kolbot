@@ -15,7 +15,11 @@ function Pindleskin() {
 
 	Precast.doPrecast(true);
 	Pather.moveTo(10058, 13234);
-	Attack.clear(15, 0, getLocaleString(22497)); // Pindleskin
+	try {
+		Attack.clear(15, 0, getLocaleString(22497)); // Pindleskin
+	} catch (e) {
+		print(e);
+	}
 
 	if (Config.Pindleskin.KillNihlathak) {
 		if (!Pather.moveToExit([122, 123, 124], true)) {
