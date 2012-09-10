@@ -133,8 +133,8 @@ Unit.prototype.buy = function (shiftBuy) {
 		return false;
 	}
 
-	var i, tick,
-		gold = me.getStat(14) + me.getStat(15);
+	var i, tick, container,
+		itemCount = me.itemcount;
 
 	for (i = 0; i < 3; i += 1) {
 		this.shop(shiftBuy ? 6 : 2);
@@ -142,7 +142,44 @@ Unit.prototype.buy = function (shiftBuy) {
 		tick = getTickCount();
 
 		while (getTickCount() - tick < 2000) {
-			if (me.getStat(14) + me.getStat(15) !== gold) {
+			if (shiftBuy) {
+				switch (this.classid) {
+				case 529: // tp scroll
+					container = me.getItem(518); // tp tome
+
+					if (container && container.getStat(70) === 20) {
+						delay(500);
+
+						return true;
+					}
+
+					break;
+				case 530: // id scroll
+					container = me.getItem(519); // id tome
+
+					if (container && container.getStat(70) === 20) {
+						delay(500);
+
+						return true;
+					}
+
+					break;
+				case 543: // key
+					container = me.getItem(543); // key stack
+
+					if (container && container.getStat(70) === 12) {
+						delay(500);
+
+						return true;
+					}
+
+					break;
+				}
+
+				delay(90);
+			}
+
+			if (itemCount !== me.itemcount) {
 				delay(500);
 
 				return true;
@@ -351,20 +388,22 @@ Unit.prototype.getSuffix = function (id) {
 };
 
 Unit.prototype.__defineGetter__('itemclass',
-	function() {
+	function () {
 		if (getBaseStat(0, this.classid, 'code') === undefined) {
 			return 0;
 		}
 
 		if (getBaseStat(0, this.classid, 'code') === getBaseStat(0, this.classid, 'ultracode')) {
 			return 2;
-		} else if (getBaseStat(0, this.classid, 'code') === getBaseStat(0, this.classid, 'ubercode')) {
-			return 1;
-		} else {
-			return 0;
 		}
+
+		if (getBaseStat(0, this.classid, 'code') === getBaseStat(0, this.classid, 'ubercode')) {
+			return 1;
+		}
+
+		return 0;
 	}
-);
+	);
 
 /*
 	_NTIPAliasColor["black"] = 3;
@@ -493,7 +532,7 @@ Unit.prototype.getColor = function () {
 			"Lord's": 16,
 			"Fool's": 20,
 			"King's": 16,
-			"Master's": 16,
+			//"Master's": 16,
 			"Elysian": 16,
 			"Fiery": 8,
 			"Smoldering": 8,
@@ -559,16 +598,16 @@ Unit.prototype.getColor = function () {
 			colors["of the Giant"] = 16;
 
 			break;
-		}	
+		}
 	} else if (this.quality === 5) {
 		for (i = 0; i < 127; i += 1) {
-			if (this.fname.indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
+			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
 				return getBaseStat(16, i, 12) > 20 ? -1 : getBaseStat(16, i, 12);
 			}
 		}
 	} else if (this.quality === 7) {
 		for (i = 0; i < 401; i += 1) {
-			if (this.fname.indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 				return getBaseStat(17, i, 13) > 20 ? -1 : getBaseStat(17, i, 13);
 			}
 		}
@@ -587,4 +626,4 @@ Unit.prototype.getColor = function () {
 	}
 
 	return -1;
-}
+};

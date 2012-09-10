@@ -131,6 +131,7 @@ function LoadConfig() {
 	Config.QuitList = []; // List of character names to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 
 	// *** special scripts ***
+	Scripts.WPGetter = false; // Get missing waypoints
 	Scripts.OrgTorch = false;
 		Config.OrgTorch.WaitForKeys = true; // Enable Torch System to get keys from other profiles. See libs/TorchSystem.js for more info
 		Config.OrgTorch.WaitTimeout = 15; // Time in minutes to wait for keys before moving on

@@ -150,6 +150,8 @@ var Town = {
 			return false;
 		}
 
+		delay(750);
+
 		return true;
 	},
 
@@ -232,6 +234,8 @@ var Town = {
 			col = this.checkColumns(); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
 		}
 
+		delay(750);
+
 		return true;
 	},
 
@@ -312,6 +316,8 @@ var Town = {
 
 			return false;
 		}
+
+		delay(750);
 
 		return true;
 	},
@@ -468,6 +474,8 @@ MainLoop:
 				}
 			}
 		}
+
+		delay(750);
 
 		return true;
 	},
@@ -707,6 +715,8 @@ MainLoop:
 			}
 		}
 
+		delay(750);
+
 		return true;
 	},
 
@@ -776,6 +786,8 @@ MainLoop:
 			me.cancel();
 		}
 
+		delay(750);
+
 		return true;
 	},
 
@@ -829,6 +841,8 @@ MainLoop:
 
 			return false;
 		}
+
+		delay(750);
 
 		return true;
 	},
@@ -909,7 +923,8 @@ MainLoop:
 			break;
 		}
 
-		this.shopItems();
+		//this.shopItems();
+		delay(750);
 
 		return true;
 	},
@@ -1026,7 +1041,7 @@ MainLoop:
 			}
 		}
 
-		delay(1000);
+		delay(750);
 		Attack.checkInfinity();
 
 		return !!me.getMerc();
@@ -1087,6 +1102,8 @@ MainLoop:
 				me.cancel();
 			}
 		}
+
+		delay(750);
 
 		return true;
 	},
