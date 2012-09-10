@@ -317,6 +317,7 @@ function NTIPParseLineInt(input)
 				switch (property) {
 				case 'color':
 					if (typeof _NTIPAliasColor[_keyword] === "undefined") {
+						print("Unknown color: " + _keyword);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasColor[_keyword];
@@ -325,6 +326,7 @@ function NTIPParseLineInt(input)
 					break;
 				case 'type':
 					if (typeof _NTIPAliasType[_keyword] === "undefined") {
+						print("Unknown type: " + _keyword);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasType[_keyword];
@@ -333,6 +335,7 @@ function NTIPParseLineInt(input)
 					break;
 				case 'name':
 					if (typeof _NTIPAliasClassID[_keyword] === "undefined") {
+						print("Unknown name: " + _keyword);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasClassID[_keyword];
@@ -341,6 +344,7 @@ function NTIPParseLineInt(input)
 					break;
 				case 'class':
 					if (typeof _NTIPAliasClass[_keyword] === "undefined") {
+						print("Unknown class: " + _keyword);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasClass[_keyword];
@@ -349,6 +353,7 @@ function NTIPParseLineInt(input)
 					break;
 				case 'quality':
 					if (typeof _NTIPAliasQuality[_keyword] === "undefined") {
+						print("Unknown quality: " + _keyword);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasQuality[_keyword];
@@ -357,6 +362,7 @@ function NTIPParseLineInt(input)
 					break;
 				case 'flag':
 					if (typeof _NTIPAliasFlag[_keyword] === "undefined") {
+						print("Unknown flag: " + _keyword);
 						_result[0] += "false)";
 					} else {
 						_result[0] += _NTIPAliasFlag[_keyword] + ")";
@@ -390,6 +396,7 @@ function NTIPParseLineInt(input)
 
 			if (isNaN(_keyword)) {
 				if (typeof _NTIPAliasStat[_keyword] === "undefined") {
+					print("Unknown stat: " + _keyword);
 					_result[1] += "false";
 				} else {
 					_result[1] += "item.getStat(" + _NTIPAliasStat[_keyword] + ")";

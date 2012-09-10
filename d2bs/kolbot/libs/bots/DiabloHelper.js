@@ -249,7 +249,7 @@ function DiabloHelper() {
 	Pather.useWaypoint(103);
 	Town.move("portalspot");
 
-	for (i = 0; i < 120; i += 1) {
+	for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
 		if (Pather.usePortal(108, null)) {
 			break;
 		}

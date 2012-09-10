@@ -979,8 +979,10 @@ MainLoop:
 		}
 	},
 
+	plotCourse_openedWpMenu: false,
+
 	plotCourse: function (dest, src) {
-		var node, prevArea,
+		var node, prevArea, tick, i, wp,
 			useWP = false,
 			arr = [],
 			previousAreas = [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46, 46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102, 103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129, 130, 131, 109, 109, 109, 109],
@@ -989,6 +991,31 @@ MainLoop:
 
 		if (!src) {
 			src = me.area;
+		}
+
+		if (!this.plotCourse_openedWpMenu && me.inTown) {
+			// WP back to this area, and do the check (to get the list of wps)
+			if (me.inTown) {
+				Town.move("waypoint");
+			}
+
+			wp = getUnit(2, "waypoint");
+
+			for (i = 0; i < 5; i += 1) {
+				wp.interact();
+
+				tick = getTickCount();
+				// Wait for wp menu to open
+				while (getTickCount() - tick < 2000 && !getUIFlag(0x14)) {
+					delay(10);
+				}
+
+				if (getUIFlag(0x14)) {
+					this.plotCourse_openedWpMenu = true;
+					me.cancel();
+					break;
+				}
+			}
 		}
 
 		while (toVisitNodes.length > 0) {

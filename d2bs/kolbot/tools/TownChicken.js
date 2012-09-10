@@ -44,7 +44,11 @@ function main() {
 	addEventListener("scriptmsg",
 		function (msg) {
 			if (msg === "townCheck") {
-				townCheck = true;
+				if (me.area === 136) {
+					print("Can't tp from uber trist.");
+				} else {
+					townCheck = true;
+				}
 			}
 		}
 		);
