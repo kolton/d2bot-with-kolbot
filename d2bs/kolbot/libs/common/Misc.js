@@ -286,7 +286,7 @@ var Misc = {
 	},
 
 	// Check all shrines in area and get the first one of specified type
-	getShrinesInArea: function (area, type) {
+	getShrinesInArea: function (area, type, use) {
 		var i, coords, shrine,
 			shrineLocs = [],
 			shrineIds = [2, 81, 83],
@@ -305,14 +305,18 @@ var Misc = {
 
 			coords = shrineLocs.shift();
 
-			Pather.moveTo(coords[0], coords[1], 2, false, true);
+			Pather.moveTo(coords[0], coords[1], 2);
 
 			shrine = getUnit(2, "shrine");
 
 			if (shrine) {
 				do {
 					if (shrine.objtype === type) {
-						this.getShrine(shrine);
+						if (use) {
+							return this.getShrine(shrine);
+						}
+
+						//Pather.moveTo(coords[0], coords[1], 2);
 
 						return true;
 					}
@@ -633,6 +637,24 @@ var Experience = {
 		return Math.round(this.nextExp[me.getStat(12)] / this.gain());
 	},
 
+	getTime: function () {
+		var min, sec;
+
+		min = Math.floor((getTickCount() - me.gamestarttime) / 60000).toString();
+
+		if (min <= 9) {
+			min = "0" + min;
+		}
+
+		sec = (Math.floor((getTickCount() - me.gamestarttime) / 1000) % 60).toString();
+
+		if (sec <= 9) {
+			sec = "0" + sec;
+		}
+
+		return " (" + min + ":" + sec + ")";
+	},
+
 	// Log to manager
 	log: function () {
 		var string,
@@ -641,7 +663,7 @@ var Experience = {
 			runsToLevel = this.runsToLevel(),
 			totalRunsToLevel = this.totalRunsToLevel();
 
-		string = "Game: " + me.gamename + ", XP Gain: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next: " + runsToLevel + "/" + totalRunsToLevel;
+		string = "Game: " + me.gamename + this.getTime() + ", XP: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next lvl ETA: " + runsToLevel;
 
 		if (gain) {
 			D2Bot.printToConsole(string + ";4");

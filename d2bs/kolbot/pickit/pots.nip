@@ -4,4 +4,4 @@
 [name] == supermanapotion
 [name] == rejuvenationpotion
 [name] == fullrejuvenationpotion
-[name] == gold # [gold] >= 2000
+[name] == gold # [gold] >= 500

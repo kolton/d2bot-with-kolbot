@@ -20,6 +20,7 @@ var ClassAttack = {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 96: // Sacrifice
 			case 97: // Smite
@@ -27,21 +28,27 @@ var ClassAttack = {
 			case 116: // Conversion
 				this.skillRange[i] = 2;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 112: // Blessed Hammer
 				this.skillRange[i] = 3;
+
 				break;
 			case 101: // Holy Bolt
 				this.skillRange[i] = 5;
+
 				break;
 			case 107: // Charge
 				this.skillRange[i] = 10;
+
 				break;
 			case 121: // Fist of the Heavens
 				this.skillRange[i] = 20;
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 25;
+
 				break;
 			}
 		}
@@ -159,6 +166,12 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[index] === 101) {
+			if (getDistance(me, unit) > this.skillRange[index] + 3 || CollMap.checkColl(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+					return 0;
+				}
+			}
+
 			CollMap.reset();
 
 			if (getDistance(me, unit) > this.skillRange[index] || CollMap.checkColl(me, unit, 0x2004)) {

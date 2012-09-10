@@ -549,6 +549,8 @@ JoinLoop:
 	case 26: // Lobby - Game Name Exists
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.printToConsole("Game doesn't exist");

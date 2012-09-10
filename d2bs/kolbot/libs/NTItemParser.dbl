@@ -25,29 +25,31 @@ var stringArray = [];
 
 function NTIPOpenFile(filepath)
 {
-	var _nipfile;
-	var _line;
+	var i, nipfile;
+	var line;
 	var string;
+	var lines;
 	var count = 0;
 
-	_nipfile = File.open(filepath, 0);
+	nipfile = File.open(filepath, 0);
 
-	if(!_nipfile)
+	if (!nipfile) {
 		return false;
-
-	while(!_nipfile.eof)
-	{
-		string = _nipfile.readLine();
-		_line = NTIPParseLineInt(string);
-		count += 1;
-
-		if (_line) {
-			_NTIP_CheckList.push(_line);
-			stringArray.push({string: string, count: count, file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length)});
-		}
 	}
 
-	_nipfile.close();
+	lines = nipfile.readAllLines();
+
+	nipfile.close();
+
+	for (i = 0; i < lines.length; i += 1) {
+		line = NTIPParseLineInt(lines[i]);
+		count += 1;
+
+		if (line) {
+			_NTIP_CheckList.push(line);
+			stringArray.push({string: lines[i], count: count, file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length)});
+		}
+	}
 
 	return true;
 }
@@ -207,33 +209,29 @@ function NTIP_CheckQuantityOwned(item_type, item_stats) {
 	return num;
 }
 
-function NTIPParseLineInt(input)
-{
-	var i, property;
-	var _start, _end;
-	var _section, _keyword;
-	var _result;
+function NTIPParseLineInt(input) {
+	var i, property, _start, _end, _section, _keyword, _result;
 
 	_end = input.indexOf("//");
 
-	if(_end != -1)
+	if (_end !== -1) {
 		input = input.substring(0, _end);
+	}
 
 	input = input.replace(/ |;|\t/g, "").toLowerCase();
 
-	if(input.length < 5)
+	if (input.length < 5) {
 		return null;
+	}
 
 	_result = input.split("#");
 
-	if(_result[0] && _result[0].length > 4)
-	{
+	if (_result[0] && _result[0].length > 4) {
 		_section = _result[0].split("[");
 
 		_result[0] = _section[0];
 
-		for(i = 1 ; i < _section.length ; i++)
-		{
+		for (i = 1 ; i < _section.length ; i += 1) {
 			_end = _section[i].indexOf("]") + 1;
 			property = _section[i].substring(0, _end - 1);
 

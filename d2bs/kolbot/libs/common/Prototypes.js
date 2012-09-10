@@ -97,9 +97,8 @@ Unit.prototype.startTrade = function (mode) {
 
 	for (i = 0; i < 3; i += 1) {
 		if (this.openMenu()) {
-			delay(10);
 			this.useMenu(menuId);
-			delay(10);
+			delay(1000);
 
 			tick = getTickCount();
 

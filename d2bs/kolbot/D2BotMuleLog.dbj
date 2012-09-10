@@ -26,7 +26,7 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList,
+var difficulty, error, keyswap, rdblocker, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList, nextAcc,
 	gamePass = "",
 	gameName = "",
 	nextGame = "",
@@ -213,6 +213,13 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
+		if (nextAcc) {
+			accounts.shift();
+			chars.shift();
+
+			nextAcc = false;
+		}
+
 		if (!accounts.length) {
 			FileTools.remove("logs/MuleLog.json");
 			D2Bot.printToConsole("Done logging mules!");
@@ -236,9 +243,9 @@ MainSwitch:
 			}
 		}
 
-		currAcc = accounts.shift();
+		currAcc = accounts[0];
 		currAcc = currAcc.split("/");
-		charList = chars.shift();
+		charList = chars[0];
 		obj.currAcc = currAcc[0];
 
 		print("ÿc4Mule Loggerÿc2: Login account: " + currAcc[0]);
@@ -348,6 +355,11 @@ MainSwitch:
 		currChar = charList.shift();
 		obj.currChar = currChar;
 
+		// last char in acc = trigger next acc
+		if (!charList.length) {
+			nextAcc = true;
+		}
+
 		print("ÿc4Mule Loggerÿc2: Login character: " + currChar);
 		FileTools.writeText("logs/MuleLog.json", JSON.stringify(obj));
 		ControlAction.loginCharacter({charName: currChar});
@@ -441,6 +453,8 @@ MainSwitch:
 
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		ControlAction.click(6, 533, 469, 120, 20);

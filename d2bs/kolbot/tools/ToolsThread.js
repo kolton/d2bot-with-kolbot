@@ -35,7 +35,7 @@ function main() {
 	this.cacheConfig = function (obj) {
 		var newObj = {};
 
-		newObj.QuitList = obj.QuitList;
+		newObj.QuitList = obj.QuitList.slice();
 		newObj.AntiHostile = obj.AntiHostile;
 		newObj.SoJWaitTime = obj.SoJWaitTime;
 		newObj.StopOnDClone = obj.StopOnDClone;
@@ -351,9 +351,7 @@ function main() {
 
 					D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + area.name + this.getNearestMonster() + ";9");
 					D2Bot.updateChickens();
-
-					me.chickenhp = me.hpmax + 500; // Just to trigger the core chicken
-					//quit();
+					quit();
 
 					break;
 				}
@@ -375,9 +373,7 @@ function main() {
 
 					D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + area.name + ";9");
 					D2Bot.updateChickens();
-
-					me.chickenmp = me.mpmax + 500; // Just to trigger the core chicken
-					//quit();
+					quit();
 
 					break;
 				}
