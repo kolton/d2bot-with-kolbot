@@ -310,5 +310,8 @@ var Config = {
 		WaitForKeys: false,
 		WaitTimeout: false,
 		UseSalvation: false
+	},
+	Synch: {
+		WaitFor: []
 	}
 };
