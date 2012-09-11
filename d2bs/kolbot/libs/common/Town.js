@@ -81,6 +81,16 @@ var Town = {
 		this.identify();
 		this.shopItems();
 		this.buyKeys();
+		
+		/*me.cancel();
+				
+		for (i = 0; i < 10; i += 1) {
+			var pickupgold = getUnit(4, 523, 3);
+			if (pickupgold) {
+				Pickit.pickItem(pickupgold);
+			}
+		}*/
+		
 		this.repair();
 		this.gamble();
 		this.reviveMerc();

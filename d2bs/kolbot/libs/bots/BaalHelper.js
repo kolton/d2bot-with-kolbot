@@ -112,6 +112,10 @@ function BaalHelper() { // experi-mental
 				Attack.clearList(monList);
 			}
 		}
+		
+	if (Config.PublicMode == 1 || Config.PublicMode == 2) {
+		Pather.makePortal();
+	}
 
 		for (i = 0; i < pos.length; i += 2) {
 			Pather.moveTo(pos[i], pos[i + 1]);
@@ -187,7 +191,7 @@ function BaalHelper() { // experi-mental
 		}
 
 WSKLoop:
-		for (i = 0; i < 60; i += 1) {
+		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
 			party = getParty();
 
 			if (party) {
@@ -201,9 +205,11 @@ WSKLoop:
 			delay(1000);
 		}
 
-		if (i === 60) {
+		if (i === Config.BaalHelper.Wait) {
 			throw new Error("No players in Throne.");
 		}
+		
+		Pather.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
 
 		if (!Pather.moveToExit(131, true) || !Pather.moveTo(15113, 5040)) {
 			throw new Error("Failed to move to Throne of Destruction.");
@@ -212,7 +218,7 @@ WSKLoop:
 		Pather.useWaypoint(109);
 		Town.move("portalspot");
 
-		for (i = 0; i < 90; i += 1) {
+		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
 			if (Pather.usePortal(131, null)) {
 				break;
 			}
@@ -220,7 +226,7 @@ WSKLoop:
 			delay(1000);
 		}
 
-		if (i === 90) {
+		if (i === Config.BaalHelper.Wait) {
 			throw new Error("No portals to Throne.");
 		}
 	}

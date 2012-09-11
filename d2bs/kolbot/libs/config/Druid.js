@@ -68,6 +68,7 @@ function LoadConfig() {
 	Scripts.Mephisto = false;
 		Config.Mephisto.MoatTrick = false;
 		Config.Mephisto.KillCouncil = false;
+		Config.Mephisto.TakeRedPortal = true;
 
 	// *** act 4 ***
 	Scripts.OuterSteppes = false;

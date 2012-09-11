@@ -21,6 +21,11 @@ function Wakka() {
 
 				if (suspect.area === destination) { // first player in our party found in destination area...
 					leader = suspect.name; // ... is our leader
+					
+					if (suspect.area === 131) {
+						return false;
+					}
+					
 					print("ÿc4Wakka: ÿc0Autodetected " + leader);
 					return true;
 				}
