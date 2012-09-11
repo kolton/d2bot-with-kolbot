@@ -743,6 +743,8 @@ MainLoop:
 		while (items.length > 0) {
 			list.push(items.shift().gid);
 		}
+		
+		me.cancel();
 
 		while (me.getStat(14) + me.getStat(15) >= Config.GambleGoldStop) {
 			if (!getInteractedNPC()) {
