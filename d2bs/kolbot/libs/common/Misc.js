@@ -636,23 +636,33 @@ var Experience = {
 	totalRunsToLevel: function () {
 		return Math.round(this.nextExp[me.getStat(12)] / this.gain());
 	},
+	
+	// Total time till next level
+	timeToLevel: function () {
+		var tTLrawSeconds = (Math.floor((getTickCount() - me.gamestarttime) / 1000)).toString(),
+			tTLrawtimeToLevel = this.runsToLevel() * tTLrawSeconds,
+			tTLDays = Math.floor(tTLrawtimeToLevel / 86400),
+			tTLHours = Math.floor((tTLrawtimeToLevel % 86400) / 3600),
+			tTLMinutes = Math.floor(((tTLrawtimeToLevel % 86400) % 3600) / 60),
+			tTLSeconds = ((tTLrawtimeToLevel % 86400) % 3600) % 60;
+		
+		//return tDays + "d " + tTLHours + "h " + tTLMinutes + "m " + tTLSeconds + "s";
+		//return tTLDays + "d " + tTLHours + "h " + tTLMinutes + "m";
+		return tTLDays + " days " + tTLHours + " hours " + tTLMinutes + " minutes";
+	},
 
-	getTime: function () {
-		var min, sec;
-
-		min = Math.floor((getTickCount() - me.gamestarttime) / 60000).toString();
-
-		if (min <= 9) {
-			min = "0" + min;
+	// Get Game Time
+	getGameTime: function () {
+		var rawMinutes = Math.floor((getTickCount() - me.gamestarttime) / 60000).toString(),
+			rawSeconds = (Math.floor((getTickCount() - me.gamestarttime) / 1000) % 60).toString();
+		if (rawMinutes <= 9) {
+			rawMinutes = "0" + rawMinutes;
 		}
-
-		sec = (Math.floor((getTickCount() - me.gamestarttime) / 1000) % 60).toString();
-
-		if (sec <= 9) {
-			sec = "0" + sec;
+		if (rawSeconds <= 9) {
+			rawSeconds = "0" + rawSeconds;
 		}
-
-		return " (" + min + ":" + sec + ")";
+		return rawMinutes + "m " + rawSeconds + "s";
+		//return " (" + rawMinutes + ":" + rawSeconds + ")";
 	},
 
 	// Log to manager
@@ -661,17 +671,26 @@ var Experience = {
 			gain = this.gain(),
 			progress = this.progress(),
 			runsToLevel = this.runsToLevel(),
-			totalRunsToLevel = this.totalRunsToLevel();
+			totalRunsToLevel = this.totalRunsToLevel(),
+			getGameTime = this.getGameTime(),
+			timeToLevel = this.timeToLevel();
+			
+		//string = "Game: " + me.gamename + getGameTime + ", XP: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next lvl ETA: " + runsToLevel;
+		if (me.gamepassword == "") {
+			string = "[Game: " + me.gamename + "] [Game Time: " + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP Gained: " + gain + "] [Games to Level eta: " + runsToLevel + "] [Time to Level eta: " + timeToLevel + "]";
+		}
+		else
+		{
+			string = "[Game: " + me.gamename + "//" + me.gamepassword + "] [Game Time: " + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP Gained: " + gain + "] [Games to Level eta: " + runsToLevel + "] [Time to Level eta: " + timeToLevel + "]";
+		}
 
-		string = "Game: " + me.gamename + this.getTime() + ", XP: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next lvl ETA: " + runsToLevel;
-
-		if (gain) {
+		//if (gain) {
 			D2Bot.printToConsole(string + ";4");
 
 			if (me.getStat(12) > DataFile.getStats().level) {
 				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";5");
 			}
-		}
+		//}
 	}
 };
 
