@@ -315,7 +315,8 @@ var Config = {
 	OrgTorch: {
 		WaitForKeys: false,
 		WaitTimeout: false,
-		UseSalvation: false
+		UseSalvation: false,
+		GetFade: false
 	},
 	Synch: {
 		WaitFor: []
