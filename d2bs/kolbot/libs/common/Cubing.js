@@ -656,7 +656,7 @@ IngredientLoop:
 				i = -1;
 
 				while (items.length) {
-					string += ("" + items[0].name + " + ")
+					string += ("" + items[0].name + (items.length > 1 ? " + " : ""));
 					Storage.Cube.MoveTo(items[0]);
 					items.shift();
 				}
