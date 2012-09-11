@@ -684,13 +684,13 @@ var Experience = {
 			string = "[Game: " + me.gamename + "//" + me.gamepassword + "] [Game Time: " + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP Gained: " + gain + "] [Games to Level eta: " + runsToLevel + "] [Time to Level eta: " + timeToLevel + "]";
 		}
 
-		//if (gain) {
+		if (gain) {
 			D2Bot.printToConsole(string + ";4");
 
 			if (me.getStat(12) > DataFile.getStats().level) {
 				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";5");
 			}
-		//}
+		}
 	}
 };
 
