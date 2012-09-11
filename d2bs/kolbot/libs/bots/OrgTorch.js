@@ -70,6 +70,25 @@ function OrgTorch() {
 	this.checkUneven = function () {
 		return (me.getItem("mbr") && me.getItem("bey") && me.getItem("dhn"));
 	};
+	
+	this.getFade = function () {
+		if (Config.OrgTorch.GetFade && me.classid === 3) {
+			if (!me.getState(159)) {
+				print("Getting Fade");
+				Pather.useWaypoint(107);
+				Precast.doPrecast(true);
+				Pather.moveTo(7811, 5872);
+				if (me.classid === 3 && me.getSkill(125, 1)) {
+					Skill.setSkill(125, 0);
+				}		
+				while (!me.getState(159)) {
+					delay(100);
+				}
+				print("Fade Achieved.");
+			}
+		}
+		return true;
+	};
 
 	this.openPortal = function (mode) { // 0 = orgs, 1 = torch
 		var portal,
@@ -272,6 +291,9 @@ function OrgTorch() {
 	}
 
 	if (tkeys >= 3 && hkeys >= 3 && dkeys >= 3) {
+	
+		this.getFade();
+	
 		print("Making organs.");
 
 		for (i = 0; i < 3; i += 1) {
@@ -294,6 +316,9 @@ function OrgTorch() {
 	horns = me.findItems("dhn", 0).length;
 
 	if (brains && eyes && horns) {
+	
+		this.getFade();
+	
 		print("Making torch");
 
 		portal = this.openPortal(1);
