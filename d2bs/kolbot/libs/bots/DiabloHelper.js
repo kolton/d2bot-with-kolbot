@@ -257,7 +257,7 @@ function DiabloHelper() {
 		delay(1000);
 	}
 
-	if (i === 120) {
+	if (i === Config.DiabloHelper.Wait) {
 		throw new Error("No portals to Chaos");
 	}
 
