@@ -210,6 +210,10 @@ WSKLoop:
 		}
 		
 		Pather.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
+		
+		if (!Pather.moveToExit([130, 131], false)) {
+			throw new Error("Failed to move to WSK3.");
+		}
 
 		if (!Pather.moveToExit(131, true) || !Pather.moveTo(15113, 5040)) {
 			throw new Error("Failed to move to Throne of Destruction.");
