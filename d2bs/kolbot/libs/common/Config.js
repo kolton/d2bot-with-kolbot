@@ -35,7 +35,7 @@ var Config = {
 
 				break;
 			case 5:
-				configFilename = "Config." + me.profile + "." + me.charname + ".js";
+				configFilename = "Config." + me.profile + "." + me.charname + ".js"; // Added to make it easier to have hundreds of configs.
 
 				break;
 			}
@@ -320,5 +320,20 @@ var Config = {
 	},
 	Synch: {
 		WaitFor: []
+	},
+	TristramLeech: {
+		Leader: "",
+		Wait: 120
+	},
+	TravincalLeech: {
+		Leader: "",
+		Helper: false,
+		Wait: 120
+	},
+	Tristram: {
+		PortalLeech: false
+	},
+	Travincal: {
+		PortalLeech: false
 	}
 };

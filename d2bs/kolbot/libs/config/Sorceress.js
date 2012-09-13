@@ -36,6 +36,7 @@ function LoadConfig() {
 		Config.Rakanishu.KillGriswold = true;
 	Scripts.Coldcrow = false;
 	Scripts.Tristram = false;
+		Config.Tristram.PortalLeech = false; // Set to true to open a portal for leechers.
 	Scripts.Pit = false;
 		Config.Pit.ClearPit1 = true;
 	Scripts.Treehead = false;
@@ -65,6 +66,7 @@ function LoadConfig() {
 	Scripts.Icehawk = false;
 	Scripts.Endugu = false;
 	Scripts.Travincal = false;
+		Config.Travincal.PortalLeech = false; // Set to true to open a portal for leechers.
 	Scripts.Mephisto = false;
 		Config.Mephisto.MoatTrick = false;
 		Config.Mephisto.KillCouncil = false;
@@ -113,6 +115,11 @@ function LoadConfig() {
 	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)
 	*/
 
+	Scripts.TristramLeech = false; // Enters Tristram, attempts to stay close to the leader and will try and help kill.
+		Config.TristramLeech.Leader = ""; // Leader's ingame name.
+	Scripts.TravincalLeech = false; // Enters portal at back of Travincal.
+		Config.TravincalLeech.Leader = ""; // Leader's ingame name.
+		Config.TravincalLeech.Helper = true // If set to true the character will teleport to the stairs and help attack.
 	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
 	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
 	Scripts.DiabloHelper = false; // Chaos helper, kills monsters and doesn't open seals on its own.
