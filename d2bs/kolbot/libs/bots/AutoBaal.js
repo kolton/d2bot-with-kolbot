@@ -125,7 +125,7 @@ function AutoBaal() {
 
 			if (throneCheck && me.area === 109) { // wait for throne signal - leader's safe message
 				print("ÿc4AutoBaal: ÿc0Trying to take TP to throne.");
-				Pather.usePortal(null, leader); // take TP to throne
+				Pather.usePortal(131, null); // take TP to throne
 				Pather.moveTo(15113, 5050); // move to a safe spot
 				Precast.doPrecast(true);
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
