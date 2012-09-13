@@ -30,7 +30,7 @@ function TristramLeech() {
 	leader = Config.TristramLeech.Leader
 
 	// Check leader isn't in other zones, whilst waiting for portal.
-	for (i = 0; i < 400; i += 1) {
+	for (i = 0; i < Config.TristramLeech.Wait; i += 1) {
 	
 		var whereisleader = getParty(leader);
 		
@@ -53,7 +53,7 @@ function TristramLeech() {
 		delay(1000);
 	}
 
-	if (i === 400) {
+	if (i === Config.TristramLeech.Wait) {
 		throw new Error("No portal found to Tristram.");
 	}
 	

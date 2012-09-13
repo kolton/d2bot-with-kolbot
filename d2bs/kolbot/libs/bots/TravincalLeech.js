@@ -29,7 +29,7 @@ function TravincalLeech() {
 
 	leader = Config.TravincalLeech.Leader
 
-	for (i = 0; i < 400; i += 1) {
+	for (i = 0; i < Config.TravincalLeech.Wait; i += 1) {
 	
 		whereisleader = getParty(leader);
 		if (whereisleader) {
@@ -47,7 +47,7 @@ function TravincalLeech() {
 			delay(1000);
 	}
 
-	if (i === 200) {
+	if (i === Config.TravincalLeech.Wait) {
 		throw new Error("No portal found to Travincal.");
 	}
 
