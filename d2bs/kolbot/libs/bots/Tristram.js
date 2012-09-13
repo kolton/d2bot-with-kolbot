@@ -29,7 +29,7 @@ function Tristram() {
 		delay(1000);
 	}
 	
-	/*if (Config.Tristram.PortalLeech) {
+	if (Config.Tristram.PortalLeech) {
 
 		Pather.makePortal();
 		delay(1000);
@@ -39,9 +39,7 @@ function Tristram() {
 
 		Attack.clearLevel(Config.ClearType);
 
-	}*/
-
-	Attack.clearLevel(Config.ClearType);
+	}
 
 	return true;
 }
