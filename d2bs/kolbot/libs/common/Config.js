@@ -12,7 +12,7 @@ var Config = {
 			configFilename = "",
 			classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
-		for (i = 0; i < 5; i += 1) {
+		for (i = 0; i < 6; i += 1) {
 			switch (i) {
 			case 0:
 				configFilename = me.realm + "." + classes[me.classid] + "." + me.profile + ".js";
@@ -32,6 +32,10 @@ var Config = {
 				break;
 			case 4:
 				configFilename = me.profile + ".js";
+
+				break;
+			case 5:
+				configFilename = "Config." + me.profile + "." + me.charname + ".js"; // Added to make it easier to have hundreds of configs.
 
 				break;
 			}
@@ -260,6 +264,7 @@ var Config = {
 		RandomPrecast: false
 	},
 	BaalHelper: {
+		Wait: 120,
 		KillNihlathak: false,
 		FastChaos: false,
 		DollQuit: false,
@@ -297,7 +302,8 @@ var Config = {
 	},
 	Mephisto: {
 		MoatTrick: false,
-		KillCouncil: false
+		KillCouncil: false,
+		TakeRedPortal: false
 	},
 	ShopBot: {
 		ScanIDs: [],
@@ -309,9 +315,25 @@ var Config = {
 	OrgTorch: {
 		WaitForKeys: false,
 		WaitTimeout: false,
-		UseSalvation: false
+		UseSalvation: false,
+		GetFade: false
 	},
 	Synch: {
 		WaitFor: []
+	},
+	TristramLeech: {
+		Leader: "",
+		Wait: 120
+	},
+	TravincalLeech: {
+		Leader: "",
+		Helper: false,
+		Wait: 120
+	},
+	Tristram: {
+		PortalLeech: false
+	},
+	Travincal: {
+		PortalLeech: false
 	}
 };

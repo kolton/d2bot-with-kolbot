@@ -36,6 +36,7 @@ function LoadConfig() {
 		Config.Rakanishu.KillGriswold = true;
 	Scripts.Coldcrow = false;
 	Scripts.Tristram = false;
+		Config.Tristram.PortalLeech = false; // Set to true to open a portal for leechers.
 	Scripts.Pit = false;
 		Config.Pit.ClearPit1 = true;
 	Scripts.Treehead = false;
@@ -65,9 +66,11 @@ function LoadConfig() {
 	Scripts.Icehawk = false;
 	Scripts.Endugu = false;
 	Scripts.Travincal = false;
+		Config.Travincal.PortalLeech = false; // Set to true to open a portal for leechers.
 	Scripts.Mephisto = false;
 		Config.Mephisto.MoatTrick = false;
 		Config.Mephisto.KillCouncil = false;
+		Config.Mephisto.TakeRedPortal = true;
 
 	// *** act 4 ***
 	Scripts.OuterSteppes = false;
@@ -112,6 +115,11 @@ function LoadConfig() {
 	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)
 	*/
 
+	Scripts.TristramLeech = false; // Enters Tristram, attempts to stay close to the leader and will try and help kill.
+		Config.TristramLeech.Leader = ""; // Leader's ingame name.
+	Scripts.TravincalLeech = false; // Enters portal at back of Travincal.
+		Config.TravincalLeech.Leader = ""; // Leader's ingame name.
+		Config.TravincalLeech.Helper = true // If set to true the character will teleport to the stairs and help attack.
 	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
 	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
 	Scripts.DiabloHelper = false; // Chaos helper, kills monsters and doesn't open seals on its own.
@@ -136,6 +144,7 @@ function LoadConfig() {
 		Config.OrgTorch.WaitForKeys = true; // Enable Torch System to get keys from other profiles. See libs/TorchSystem.js for more info
 		Config.OrgTorch.WaitTimeout = 15; // Time in minutes to wait for keys before moving on
 		Config.OrgTorch.UseSalvation = true; // Use Salvation aura on Mephisto (if possible)
+		Config.OrgTorch.GetFade = false; // Get fade by standing in a fire. You MUST have Last Wish or Treachery on your character being worn.
 	Scripts.Rusher = false; // Rush bot alpha version (no questing yet, only rushing), for a list of commands, see Rusher.js
 	Scripts.CrushTele = false; // classic rush teleporter. go to area of interest and press "-" numpad key
 	Scripts.Questing = false; // solves missing quests (skill/stat+shenk)
