@@ -112,10 +112,6 @@ function BaalHelper() { // experi-mental
 				Attack.clearList(monList);
 			}
 		}
-		
-	if (Config.PublicMode == 1 || Config.PublicMode == 2) {
-		Pather.makePortal();
-	}
 
 		for (i = 0; i < pos.length; i += 2) {
 			Pather.moveTo(pos[i], pos[i + 1]);
@@ -168,7 +164,7 @@ function BaalHelper() { // experi-mental
 		}
 	}
 
-	var i, tick, portal, party;
+	var i, tick, portal, party, entrance;
 
 	Town.goToTown(5);
 	Town.doChores();
@@ -208,9 +204,21 @@ WSKLoop:
 		if (i === Config.BaalHelper.Wait) {
 			throw new Error("No players in Throne.");
 		}
-		
-		Pather.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
-		
+
+		for (i = 0; i < 3; i += 1) {
+			entrance = getUnit(5, 82);
+
+			if (entrance) {
+				break;
+			}
+
+			delay(200);
+		}
+
+		if (entrance) {
+			Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
+		}
+
 		if (!Pather.moveToExit([130, 131], false)) {
 			throw new Error("Failed to move to WSK3.");
 		}
