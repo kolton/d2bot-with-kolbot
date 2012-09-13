@@ -81,6 +81,16 @@ var Town = {
 		this.identify();
 		this.shopItems();
 		this.buyKeys();
+		
+		/*me.cancel();
+				
+		for (i = 0; i < 10; i += 1) {
+			var pickupgold = getUnit(4, 523, 3);
+			if (pickupgold) {
+				Pickit.pickItem(pickupgold);
+			}
+		}*/
+		
 		this.repair();
 		this.gamble();
 		this.reviveMerc();
@@ -733,6 +743,8 @@ MainLoop:
 		while (items.length > 0) {
 			list.push(items.shift().gid);
 		}
+		
+		me.cancel();
 
 		while (me.getStat(14) + me.getStat(15) >= Config.GambleGoldStop) {
 			if (!getInteractedNPC()) {

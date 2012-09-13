@@ -189,9 +189,13 @@ function Mephisto() {
 		Pather.moveTo(17515, 8061);
 		Attack.openChests(5);
 	}
-	/*Pather.moveTo(17590, 8068);
-	delay(1500);
-	Pather.usePortal(null);*/
+	
+	if (Config.Mephisto.TakeRedPortal) {
+		Pather.moveTo(17590, 8068);
+		delay(1500);
+		Pather.moveTo(17601, 8070);
+		Pather.usePortal(null);
+	}
 
 	return true;
 }
