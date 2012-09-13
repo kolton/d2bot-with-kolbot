@@ -28,8 +28,18 @@ function Tristram() {
 
 		delay(1000);
 	}
+	
+	if (Config.Tristram.PortalLeech) {
 
-	Attack.clearLevel(Config.ClearType);
+		Pather.makePortal();
+		delay(1000);
+		Attack.clearLevel(0);
+
+	} else {
+
+		Attack.clearLevel(Config.ClearType);
+
+	}
 
 	return true;
 }
