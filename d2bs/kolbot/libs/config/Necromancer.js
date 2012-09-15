@@ -303,7 +303,7 @@ function LoadConfig() {
 	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
 	Config.FBR = 0; // 0 - disable, 1 to 255 - set value of faster block recovery 
 	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
-	Config.PacketTeleport = false; // Use packets to teleport - no animation and max speed
+	Config.PacketCasting = 2; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
 	
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile

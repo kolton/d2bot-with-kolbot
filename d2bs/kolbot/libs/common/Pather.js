@@ -150,7 +150,7 @@ var Pather = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			if (Config.PacketTeleport) {
+			if (Config.PacketCasting) {
 				Skill.setSkill(54, 0);
 				Packet.castSkill(0, x, y);
 			} else {
