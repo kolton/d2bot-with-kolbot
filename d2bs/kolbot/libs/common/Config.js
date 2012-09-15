@@ -47,7 +47,7 @@ var Config = {
 
 		if (!FileTools.exists("libs/config/" + configFilename)) {
 			if (notify) {
-				print("ÿc1" + configFilename + ".js not found!");
+				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
 				print("ÿc1Loading default config.");
 			}
 
@@ -149,7 +149,7 @@ var Config = {
 	FHR: 0,
 	FBR: 0,
 	IAS: 0,
-	PacketTeleport: false,
+	PacketCasting: 0,
 
 	// Anti-hostile
 	AntiHostile: false,

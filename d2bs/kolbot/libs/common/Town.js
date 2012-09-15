@@ -537,9 +537,8 @@ MainLoop:
 			}
 
 			if (cain && cain.openMenu()) {
-				delay(10);
 				cain.useMenu(0x0FB4);
-				delay(500);
+				delay(1000);
 				me.cancel();
 			}
 
@@ -1025,11 +1024,10 @@ MainLoop:
 			return false;
 		}
 
-		delay(300);
-
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			npc.useMenu(0x1507);
+			delay(1000);
 
 			tick = getTickCount();
 
@@ -1038,7 +1036,7 @@ MainLoop:
 					break MainLoop;
 				}
 
-				delay(10);
+				delay(100);
 			}
 		}
 
@@ -1423,7 +1421,7 @@ MainLoop:
 			break;
 		case 5:
 			this.act[4].spot = {};
-			this.act[4].spot.portalspot = [5097, 5024];
+			this.act[4].spot.portalspot = [5092, 5024];
 			this.act[4].spot.stash = [5129, 5061];
 			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
 			this.act[4].spot[NPC.Malah] = [5078, 5029];
@@ -1444,8 +1442,8 @@ MainLoop:
 	move: function (spot) {
 		var i;
 
-		if (!me.inTown) { // To prevent long trips if tp to town failed
-			throw new Error("Town.move: You're not in town!");
+		if (!me.inTown && !this.goToTown()) { // To prevent long trips if tp to town failed
+			throw new Error("Town.move: Failed to go to town!");
 		}
 
 		// TODO: Add character config variable for telekinesis

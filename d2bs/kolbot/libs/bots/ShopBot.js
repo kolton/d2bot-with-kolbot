@@ -14,7 +14,7 @@ function ShopBot() {
 			moveNPC(npc, path[i], path[i + 1]);
 
 			for (j = 0; j < leadTimeout; j += 1) {
-				if (getDistance(npc.x, npc.y, path[i], path[i + 1]) < 4) {
+				if (getDistance(npc.x, npc.y, path[i], path[i + 1]) < 2) {
 					break;
 				}
 
@@ -35,12 +35,65 @@ function ShopBot() {
 		return true;
 	};
 
+	this.openMenu = function (npc) {
+		if (npc.type !== 1) {
+			throw new Error("Unit.openMenu: Must be used on NPCs.");
+		}
+
+		if (getUIFlag(0x08)) {
+			return true;
+		}
+
+		var i, j;
+
+		for (i = 0; i < 3; i += 1) {
+			if (getDistance(me, npc) > 3) {
+				Pather.moveToUnit(npc);
+			}
+
+			//npc.interact();
+			sendPacket(1, 0x13, 4, 1, 4, npc.gid);
+
+			for (j = 0; j < 40; j += 1) {
+				if (j % 8 === 0) {
+					me.cancel();
+					delay(300);
+					//npc.interact();
+					sendPacket(1, 0x13, 4, 1, 4, npc.gid);
+				}
+
+				if (getUIFlag(0x08)) {
+					return true;
+				}
+
+				delay(25);
+			}
+		}
+
+		return false;
+	},
+
 	this.shopItems = function () {
 		var i, items,
 			npc = getInteractedNPC();
 
-		if (!npc || !getUIFlag(0x0C) || !npc.itemcount) {
+		if (!npc) {
 			return false;
+		}
+
+		for (i = 0; i < 10; i += 1) {
+			delay(150);
+
+			if (i % 2 === 0) {
+				//sendPacket(1, 0x2f, 4, 1, 4, npc.gid);
+				sendPacket(1, 0x38, 4, 1, 4, npc.gid, 4, 0);
+			}
+
+			if (npc.itemcount > 0) {
+				//delay(200);
+
+				break;
+			}
 		}
 
 		items = npc.getItems();
@@ -49,6 +102,8 @@ function ShopBot() {
 			return false;
 		}
 
+		me.overhead(items.length + " items");
+
 		for (i = 0; i < items.length; i += 1) {
 			if (Config.ShopBot.ScanIDs.indexOf(items[i].classid) > -1) {
 				//print("Scanning " + items[i].name);
@@ -56,8 +111,12 @@ function ShopBot() {
 				if (Pickit.checkItem(items[i]).result === 1) {
 					try {
 						if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
-							Misc.logItem("Shopped", items[i]);
-							items[i].buy();
+							delay(1000);
+
+							if (npc.startTrade()) {
+								Misc.logItem("Shopped", items[i]);
+								items[i].buy();
+							}
 						}
 					} catch (e) {
 						print(e);
@@ -95,7 +154,7 @@ function ShopBot() {
 				unit.interact(area);
 			}
 
-			delay(100);
+			delay(75);
 
 			if (me.area === area) {
 				return true;
@@ -108,10 +167,22 @@ function ShopBot() {
 	Town.doChores();
 
 	switch (Config.ShopBot.ShopNPC.toLowerCase()) {
+	case "ormus":
+		wpArea = 101;
+		town = 75;
+		path = [5147, 5089, 5156, 5075, 5157, 5063, 5160, 5050];
+
+		if (!Town.goToTown(3) || !Town.move(NPC.Ormus)) {
+			throw new Error("Failed to get to NPC");
+		}
+
+		npc = getUnit(1, NPC.Ormus);
+
+		break;
 	case "anya":
 		wpArea = 129;
 		town = 109;
-		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5070];
+		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5068];
 
 		if (!Town.goToTown(5) || !Town.move(NPC.Anya)) {
 			throw new Error("Failed to get to NPC");
@@ -144,8 +215,10 @@ function ShopBot() {
 		}
 
 		if (me.area === town) {
-			npc.startTrade();
-			this.shopItems();
+			if (this.openMenu(npc)) {
+				this.shopItems();
+			}
+
 			me.cancel();
 		}
 

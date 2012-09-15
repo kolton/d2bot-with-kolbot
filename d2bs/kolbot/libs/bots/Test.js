@@ -37,7 +37,7 @@ function Test() {
 }
 
 function test() {
-	sendPacket(1, 0x32, 4, getInteractedNPC().gid, 4, getUnit(101).gid, 4, 0, 4, 0);
+	new Text("Nipple pinchy", 50, 260, 2, 1);
 }
 
 var _NTIP_CheckList = [],
