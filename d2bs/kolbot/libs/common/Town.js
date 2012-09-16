@@ -1527,6 +1527,13 @@ MainLoop:
 	},
 
 	visitTown: function () {
+		if (me.inTown) {
+			this.doChores();
+			this.move("stash");
+
+			return true;
+		}
+
 		var preArea = me.area;
 
 		try { // not an essential function -> handle thrown errors
