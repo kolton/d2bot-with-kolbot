@@ -34,6 +34,7 @@ function LoadConfig() {
 		Config.Mausoleum.ClearCrypt = false;
 	Scripts.Rakanishu = false;
 		Config.Rakanishu.KillGriswold = true;
+	Scripts.UndergroundPassage = false;
 	Scripts.Coldcrow = false;
 	Scripts.Tristram = false;
 		Config.Tristram.PortalLeech = false; // Set to true to open a portal for leechers.
