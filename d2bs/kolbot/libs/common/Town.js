@@ -169,11 +169,15 @@ var Town = {
 
 	// Check if healing is needed, based on character config
 	needHealing: function () {
-		if (me.hp * 100 / me.hpmax > Config.HealHP && me.mp * 100 / me.mpmax > Config.HealMP) {
-			return false;
+		if (me.hp * 100 / me.hpmax < Config.HealHP || me.mp * 100 / me.mpmax < Config.HealMP) {
+			return true;
+		}
+		
+		if ((Config.HealPoison && me.getState(2)) || (Config.HealCurse && (me.getState(9) || me.getState(61)))) {
+			return true;
 		}
 
-		return true;
+		return false;
 	},
 
 	// Buy potions from a NPC
