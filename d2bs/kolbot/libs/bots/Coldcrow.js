@@ -13,7 +13,7 @@ function Coldcrow() {
 		throw new Error("Failed to move to Cave");
 	}
 	
-	if (!Pather.moveToPreset(me.area, 1, 736, 5, 5, false)) {
+	if (!Pather.moveToPreset(me.area, 1, 736, 0, 0, false)) {
 		throw new Error("Failed to move to Coldcrow");
 	}
 	

@@ -23,7 +23,7 @@ function OrgTorch() {
 				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
 					//D2Bot.printToConsole("torch found");
 					scriptBroadcast("muleTorch");
-
+					delay(10000);
 					quit();
 					delay(10000);
 				}
@@ -166,6 +166,7 @@ function OrgTorch() {
 			}
 
 			Attack.kill(708);
+			Attack.clear(5);
 			Pickit.pickItems();
 			Town.goToTown();
 

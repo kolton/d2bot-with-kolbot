@@ -378,7 +378,7 @@ function main() {
 					status = "ready";
 
 					D2Bot.updateStatus("In mule game.");
-					D2Bot.printToConsole("In mule game.");
+					D2Bot.printToConsole("In mule game. Character: " + me.charname + ";7");
 					Storage.Init();
 				}
 
@@ -387,7 +387,7 @@ function main() {
 				}
 
 				if (status !== "begin") {
-					D2Bot.printToConsole("Nobody joined - stopping.");
+					D2Bot.printToConsole("Nobody joined - stopping." + ";7");
 					D2Bot.stop();
 				}
 
@@ -408,7 +408,7 @@ function main() {
 					}
 
 					MuleData.write(obj);
-					D2Bot.printToConsole("Done muling.");
+					D2Bot.printToConsole("Done muling." + ";7");
 					D2Bot.stop();
 
 					break;
@@ -427,7 +427,7 @@ function main() {
 					obj.fullChars.push(me.name);
 					MuleData.write(obj);
 					nextChar();
-					D2Bot.printToConsole("Mule full, getting next character.");
+					D2Bot.printToConsole("Mule full, getting next character." + ";7");
 					quit();
 
 					break;
@@ -519,7 +519,7 @@ MainSwitch:
 		if (makeAcc) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
-			D2Bot.printToConsole("Made account: " + info.account);
+			D2Bot.printToConsole("Made account: " + info.account + ";7");
 
 			makeAcc = false;
 
@@ -688,7 +688,7 @@ MainSwitch:
 			}
 
 			//FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
-			D2Bot.printToConsole("Made character: " + info.charName);
+			D2Bot.printToConsole("Made character: " + info.charName + ";7");
 		}
 
 		break;

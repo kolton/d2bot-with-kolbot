@@ -226,9 +226,36 @@ function DiabloHelper() {
 		var i;
 
 		for (i = 0; i < path.length; i += 2) {
-			Pather.moveTo(path[i], path[i + 1]);
+			Pather.moveTo(path[i] + rand(-5, 5), path[i + 1] + rand(-5, 5));
 			Attack.clear(30, 0, false, sortfunc);
 		}
+	};
+	
+	this.skipTP = function () {
+		var i, partycheck;
+		for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
+		
+			partycheck = getParty();
+			if (partycheck) {
+				do {
+					if (partycheck.area === 131) {
+						return false;						
+					}
+					if (partycheck.area === 107 || partycheck.area === 108) {
+						return true;
+					}
+				} while (partycheck.getNext());
+			}
+		
+			delay(1000);
+			
+		}
+
+		if (i === Config.DiabloHelper.Wait) {
+			throw new Error("No players River of Flame");
+		}
+		
+		return false;
 	};
 
 	// path coordinates
@@ -240,37 +267,64 @@ function DiabloHelper() {
 	this.starToInfA = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5295, 7919, 5290];
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
 
-	var i, partybaal;
-
+	var i, partycheck;
 
 	// start
 	Town.doChores();
-	Pather.useWaypoint(107);
-	Precast.doPrecast(true);
-	Pather.useWaypoint(103);
-	Town.move("portalspot");
-
-	for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
 	
-		partybaal = getParty();
-		if (partybaal) {
-			do {
-				if (partybaal.area === 131) {
-					return false;
-				}
-			} while (partybaal.getNext());
-		}
-	
-		if (Pather.usePortal(108, null)) {
-			break;
-		}
-
-		delay(1000);
+	if (Config.DiabloHelper.RandomPrecast) {
+		Pather.useWaypoint("random");
+		Precast.doPrecast(true);
+		Pather.useWaypoint(103);
+	} else {
+		Pather.useWaypoint(107);
+		Precast.doPrecast(true);
+		Pather.useWaypoint(103);
 	}
 
-	if (i === Config.DiabloHelper.Wait) {
+	if (Config.DiabloHelper.SkipTP) {
+		
+		if (!this.skipTP()) {
+			return false
+		}
+		
+		if (!Pather.usePortal(108, null)) {
+			Pather.useWaypoint(107);
+		
+			if (!Pather.moveTo(7790, 5544)) {
+				throw new Error("Failed to move to Chaos Sanctuary");
+			}
 
-		throw new Error("No portals to Chaos");
+			Attack.clear(35, 0, false);
+		}
+		
+	} else {
+	
+		Town.move("portalspot");
+	
+		for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
+		
+			partycheck = getParty();
+			if (partycheck) {
+				do {
+					if (partycheck.area === 131) {
+						return false;
+					}
+				} while (partycheck.getNext());
+			}
+		
+			if (Pather.usePortal(108, null)) {
+				break;
+			}
+
+			delay(1000);
+		}
+
+		if (i === Config.DiabloHelper.Wait) {
+
+			throw new Error("No portals to Chaos");
+		}
+	
 	}
 
 	this.initLayout();
@@ -289,7 +343,7 @@ function DiabloHelper() {
 	this.seisSeal();
 	Precast.doPrecast(true);
 	this.infectorSeal();
-	Pather.moveTo(7788, 5292);
+	Pather.moveTo(7793 + rand(-2, 2), 5292 + rand(-2, 2)); // Randomize helps picket in public games.
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();
