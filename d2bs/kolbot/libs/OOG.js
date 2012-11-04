@@ -87,7 +87,8 @@ var DataFile = {
 
 		string = JSON.stringify(obj);
 
-		FileTools.writeText("data/" + me.profile + ".json", string);
+		//FileTools.writeText("data/" + me.profile + ".json", string);
+		Misc.fileAction("data/" + me.profile + ".json", 1, string);
 
 		return obj;
 	},
@@ -99,7 +100,8 @@ var DataFile = {
 			DataFile.create();
 		}
 
-		string = FileTools.readText("data/" + me.profile + ".json");
+		//string = FileTools.readText("data/" + me.profile + ".json");
+		string = Misc.fileAction("data/" + me.profile + ".json", 0);
 
 		try {
 			obj = JSON.parse(string);
@@ -108,7 +110,13 @@ var DataFile = {
 			obj = this.create();
 		}
 
-		return obj;
+		if (obj) {
+			return obj;
+		}
+
+		print("Error reading DataFile. Using null values.");
+
+		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0};
 	},
 
 	getStats: function () {
@@ -154,7 +162,8 @@ var DataFile = {
 
 		string = JSON.stringify(obj);
 
-		FileTools.writeText("data/" + me.profile + ".json", string);
+		//FileTools.writeText("data/" + me.profile + ".json", string);
+		Misc.fileAction("data/" + me.profile + ".json", 1, string);
 	},
 
 	updateDeaths: function () {
@@ -164,7 +173,8 @@ var DataFile = {
 		obj.deaths = obj.deaths + 1;
 		string = JSON.stringify(obj);
 
-		FileTools.writeText("data/" + me.profile + ".json", string);
+		//FileTools.writeText("data/" + me.profile + ".json", string);
+		Misc.fileAction("data/" + me.profile + ".json", 1, string);
 	}
 };
 
@@ -267,11 +277,9 @@ MainLoop:
 	},
 
 	loginAccount: function (info) {
-		var tick;
-
 		me.blockMouse = true;
 
-		var realms = {
+		var tick, realms = {
 			"uswest": 0,
 			"useast": 1,
 			"asia": 2,
@@ -301,7 +309,6 @@ MainLoop:
 				// Unable to connect, let the caller handle it.
 				me.blockMouse = false;
 				return false;
-			case 18: // splash
 			case 12: // char screen - break
 				break MainLoop;
 			case 18: // splash
@@ -618,14 +625,16 @@ var ShitList = {
 
 		string = JSON.stringify(obj);
 
-		FileTools.writeText("shitlist.json", string);
+		//FileTools.writeText("shitlist.json", string);
+		Misc.fileAction("shitlist.json", 1, string);
 
 		return obj;
 	},
 
 	getObj: function () {
 		var obj,
-			string = FileTools.readText("shitlist.json");
+			//string = FileTools.readText("shitlist.json");
+			string = Misc.fileAction("shitlist.json", 0);
 
 		try {
 			obj = JSON.parse(string);
@@ -633,7 +642,13 @@ var ShitList = {
 			obj = this.create();
 		}
 
-		return obj;
+		if (obj) {
+			return obj;
+		}
+
+		print("Failed to read ShitList. Using null values");
+
+		return {shitlist: []};
 	},
 
 	read: function () {
@@ -657,6 +672,7 @@ var ShitList = {
 
 		string = JSON.stringify(obj);
 
-		FileTools.writeText("shitlist.json", string);
+		//FileTools.writeText("shitlist.json", string);
+		Misc.fileAction("shitlist.json", 1, string);
 	}
 };

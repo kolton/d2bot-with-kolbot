@@ -22,7 +22,7 @@ var ChannelConfig = {
 	// Format: "Profile Name": {JoinChannel: "channel", FirstJoinMessage: "login message", AnnounceGames: true}
 	// Multiple entries are separated by a comma
 
-	"Example": {JoinChannel: "my channel", FirstJoinMessage: ".login", AnnounceGames: true}
+	//"Example": {JoinChannel: "my channel", FirstJoinMessage: ".login", AnnounceGames: true}
 };
 
 
@@ -33,6 +33,7 @@ include("OOG.js");
 include("automule.js");
 include("gambling.js");
 include("torchsystem.js");
+include("common/misc.js");
 load("tools/heartbeat.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -145,6 +146,18 @@ function timer(tick) {
 	}
 
 	return " (" + min + ":" + sec + ")";
+}
+
+function randomString(len) {
+	var i,
+		rval = "",
+		letters = "abcdefghijklmnopqrstuvwxyz";
+
+    for (i = 0; i < len; i += 1) {
+		rval += letters[Math.floor(Math.random() * 26)];
+	}
+
+	return rval;
 }
 
 function main() {

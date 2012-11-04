@@ -11,7 +11,18 @@ Unit.prototype.__defineGetter__("idle",
 			throw new Error("Unit.idle: Must be used with player units.");
 		}
 
-		return (me.mode === 1 || me.mode === 5);
+		return (this.mode === 1 || this.mode === 5);
+	}
+	);
+	
+// Death check
+Unit.prototype.__defineGetter__("dead",
+	function () {
+		if (this.type > 0) {
+			throw new Error("Unit.dead: Must be used with player units.");
+		}
+
+		return (this.mode === 0 || this.mode === 17);
 	}
 	);
 
@@ -82,7 +93,7 @@ Unit.prototype.openMenu = function () {
 	return false;
 };
 
-// mode = "Gamble", "Repair" or "Trade"
+// mode = "Gamble", "Repair" or "Shop"
 Unit.prototype.startTrade = function (mode) {
 	if (this.type !== 1) {
 		throw new Error("Unit.startTrade: Must be used on NPCs.");
@@ -92,12 +103,11 @@ Unit.prototype.startTrade = function (mode) {
 		return true;
 	}
 
-	var i, tick,
-		menuId = mode === "Gamble" ? 0x0D46 : mode === "Repair" ? 0x0D06 : 0x0D44;
+	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
 		if (this.openMenu()) {
-			this.useMenu(menuId);
+			Misc.useMenu(mode);
 			delay(1000);
 
 			tick = getTickCount();

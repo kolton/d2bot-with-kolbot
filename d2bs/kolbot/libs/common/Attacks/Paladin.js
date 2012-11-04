@@ -209,8 +209,8 @@ var ClassAttack = {
 
 	checkHammerPosition: function (unit) {
 		var i,
-			x = unit.x,
-			y = unit.y,
+			x = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targetx : unit.x,
+			y = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targety : unit.y,
 			positions = unit.type === 0 ? [[x + 2, y], [x + 2, y + 1]] : [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
 
 		for (i = 0; i < positions.length; i += 1) {
@@ -224,8 +224,8 @@ var ClassAttack = {
 
 	getHammerPosition: function (unit) {
 		var i,
-			x = unit.x,
-			y = unit.y,
+			x = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targetx : unit.x,
+			y = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targety : unit.y,
 			positions = unit.type === 0 ? [[x + 2, y], [x + 2, y + 1]] : [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
 
 		for (i = 0; i < positions.length; i += 1) {

@@ -327,11 +327,11 @@ var Misc = {
 			if (shrine) {
 				do {
 					if (shrine.objtype === type) {
+						Pather.moveTo(shrine.x - 2, shrine.y - 2);
+
 						if (use) {
 							return this.getShrine(shrine);
 						}
-
-						//Pather.moveTo(coords[0], coords[1], 2);
 
 						return true;
 					}
@@ -582,7 +582,9 @@ MainLoop:
 			} catch (e) {
 
 			} finally {
-				file.close();
+				if (file) {
+					file.close();
+				}
 			}
 
 			delay(100);
@@ -603,6 +605,49 @@ MainLoop:
 		showConsole();
 		print(msg);
 		this.fileAction("logs/ScriptErrorLog.txt", 2, "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n");
+	},
+
+	// Use a NPC menu
+	useMenu: function (id) {
+		var i,
+			lines = getDialogLines();
+
+		if (!lines) {
+			return false;
+		}
+
+		for (i = 0; i < lines.length; i += 1) {
+			if (lines[i].selectable) {
+				switch (id) {
+				case "Gamble":
+					if (lines[i].text.toLowerCase() === "gamble") {
+						lines[i].handler();
+
+						return true;
+					}
+
+					break;
+				case "Repair":
+					if (lines[i].text.toLowerCase() === "trade/repair") {
+						lines[i].handler();
+
+						return true;
+					}
+
+					break;
+				case "Shop":
+					if (lines[i].text.toLowerCase() === "trade") {
+						lines[i].handler();
+
+						return true;
+					}
+
+					break;
+				}
+			}
+		}
+
+		return false;
 	}
 };
 

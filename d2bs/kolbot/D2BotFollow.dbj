@@ -10,7 +10,7 @@ var StarterConfig = {
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
 	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
-	PleaseWaitTimeout: 10, // Seconds to wait before cancelling the 'Please Wait...' screen
+	PleaseWaitTimeout: 30, // Seconds to wait before cancelling the 'Please Wait...' screen
 	WaitInLineTimeout: 60, // Seconds to wait before cancelling the 'Waiting in Line...' screen
 	GameDoesNotExistTimeout: 30 // Seconds to wait before cancelling the 'Game does not exist.' screen
 };
@@ -38,6 +38,7 @@ include("json2.js");
 include("OOG.js");
 include("automule.js");
 include("torchsystem.js");
+include("common/misc.js");
 load("tools/heartbeat.js");
 
 var i, j, difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
