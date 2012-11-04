@@ -71,6 +71,10 @@ var Pickit = {
 			delay(40);
 		}
 
+		if (me.dead) {
+			return false;
+		}
+
 		item = getUnit(4);
 		this.pickList = [];
 
@@ -167,6 +171,10 @@ var Pickit = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
+			if (me.dead) {
+				return false;
+			}
+
 			while (!me.idle) {
 				delay(40);
 			}

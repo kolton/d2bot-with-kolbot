@@ -12,6 +12,10 @@ var Pather = {
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 
 	moveTo: function (x, y, retry, clearPath, pop) {
+		if (me.dead) { // Abort if dead
+			return false;
+		}
+
 		var i, path, mob,
 			node = {x: x, y: y},
 			fail = 0;
@@ -46,7 +50,7 @@ var Pather = {
 			pop = false;
 		}
 
-		this.useTeleport = this.teleport && !me.inTown && ((me.getSkill(54, 1) && me.classid === 1) || me.getStat(97, 54));
+		this.useTeleport = this.teleport && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -79,6 +83,10 @@ var Pather = {
 		}
 
 		while (path.length > 0) {
+			if (me.dead) { // Abort if dead
+				return false;
+			}
+
 			for (i = 0; i < this.cancelFlags.length; i += 1) {
 				if (getUIFlag(this.cancelFlags[i])) {
 					me.cancel();
@@ -181,7 +189,7 @@ MainLoop:
 		}
 
 		// Charge!
-		if (me.classid === 3 && me.mode !== 17 && !me.inTown && me.mp >= 9 && getDistance(me, x, y) > 8 && Skill.setSkill(107, 1)) {
+		if (me.classid === 3 && me.dead && !me.inTown && me.mp >= 9 && getDistance(me, x, y) > 8 && Skill.setSkill(107, 1)) {
 			if (Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
@@ -190,12 +198,12 @@ MainLoop:
 			delay(20);
 			clickMap(2, 1, x, y);
 
-			while (me.mode !== 1 && me.mode !== 5 && me.mode !== 17) {
+			while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
 				delay(40);
 			}
 		}
 
-		while (getDistance(me, x, y) > 3 && me.mode !== 17) {
+		while (getDistance(me, x, y) > 3 && !me.dead) {
 			if (me.classid === 3 && Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
@@ -211,7 +219,7 @@ MainLoop:
 
 ModeLoop:
 			while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
-				if (me.mode === 17) {
+				if (me.dead) {
 					return false;
 				}
 
@@ -231,7 +239,7 @@ ModeLoop:
 			}
 
 			// Wait until we're done walking - idle or dead
-			while (me.mode !== 1 && me.mode !== 5 && me.mode !== 17) {
+			while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
 				delay(40);
 			}
 
@@ -240,7 +248,7 @@ ModeLoop:
 			}
 		}
 
-		return true;
+		return !me.dead && getDistance(me, x, y) < 4;
 	},
 
 	openDoors: function (x, y) {
@@ -488,7 +496,7 @@ ModeLoop:
 
 			while (getTickCount() - tick < 3000) {
 				if ((targetArea === null && me.area !== preArea) || me.area === targetArea) {
-					delay(400);
+					//delay(200);
 
 					return true;
 				}
@@ -537,7 +545,7 @@ ModeLoop:
 			}
 		}
 
-		if (!me.inTown) {
+		if (!me.inTown && getDistance(me, wp) > 5) {
 			this.moveToUnit(wp);
 		}
 
@@ -585,17 +593,8 @@ ModeLoop:
 				tick = getTickCount();
 
 				while (getTickCount() - tick < 2000) {
-					while (!me.gameReady) {
-						delay(100);
-					}
-
 					if (me.area === targetArea) {
-						delay(200);
-
-						// crash workaround, testing
-						if (me.area === 109) {
-							me.move(me.x, me.y - 5);
-						}
+						//delay(200);
 
 						return true;
 					}
@@ -656,7 +655,7 @@ ModeLoop:
 		}
 
 		for (i = 0; i < 400; i += 1) {
-			if (me.mode === 17) {
+			if (me.dead) {
 				break;
 			}
 
@@ -734,7 +733,7 @@ ModeLoop:
 
 			while (getTickCount() - tick < 1000) {
 				if (me.area !== preArea) {
-					delay(300);
+					//delay(200);
 
 					return true;
 				}

@@ -520,11 +520,11 @@ var Attack = {
 					(unitB.spectype & 0x04) !== 0) {
 				return 0;
 			}
-		   
+
 			if ((unitA.spectype & 0x04) !== 0) {
 				return -1;
 			}
-		   
+
 			if ((unitB.spectype & 0x04) !== 0) {
 				return 1;
 			}
@@ -619,7 +619,6 @@ var Attack = {
 	// Move away from a nearby monster into a more safe position
 	dodge: function (unit, distance, list) {
 		var i, j, coordx, coordy, count,
-			t = getTickCount(),
 			maxcount = 99,
 			coords = [],
 			goodCoords = [],
@@ -627,7 +626,6 @@ var Attack = {
 			angles = [0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180];
 
 		// step 1 - build possible dodge positions based on angles
-
 		for (i = 0; i < angles.length; i = i + 1) {
 			coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
@@ -669,7 +667,6 @@ var Attack = {
 				return true;
 			}
 
-			//print("ÿc2dodge calc time: ÿc9" + (getTickCount() - t));
 			me.overhead("Dodge!");
 			Pather.moveTo(goodCoords[0], goodCoords[1], 1);
 		}
@@ -808,11 +805,13 @@ EnchantLoop: // Skip enchanted monsters
 
 			for (j = 0; j < tempArray.length; j += 1) {
 				if (!unit.getEnchant(tempArray[j])) {
-					continue EnchantLoop;
+					break;
 				}
 			}
 
-			return false;
+			if (j === tempArray.length) {
+				return false;
+			}
 		}
 
 ImmuneLoop: // Skip immune monsters
@@ -821,11 +820,13 @@ ImmuneLoop: // Skip immune monsters
 
 			for (j = 0; j < tempArray.length; j += 1) {
 				if (this.checkResist(unit, tempArray[j])) { // Infinity calculations are built-in
-					continue ImmuneLoop;
+					break;
 				}
 			}
 
-			return false;
+			if (j === tempArray.length) {
+				return false;
+			}
 		}
 
 AuraLoop: // Skip monsters with auras

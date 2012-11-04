@@ -37,7 +37,9 @@ function Test() {
 }
 
 function test() {
-	new Text("Nipple pinchy", 50, 260, 2, 1);
+	print("test");
+	
+	Town.initNPC("Shop");
 }
 
 var _NTIP_CheckList = [],

@@ -95,6 +95,7 @@ function Rusher() {
 				break;
 			default:
 				commandSplit0 = command.split(" ")[0];
+
 				if (commandSplit0 === undefined) {
 					break;
 				}

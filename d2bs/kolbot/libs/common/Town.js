@@ -81,16 +81,6 @@ var Town = {
 		this.identify();
 		this.shopItems();
 		this.buyKeys();
-		
-		/*me.cancel();
-				
-		for (i = 0; i < 10; i += 1) {
-			var pickupgold = getUnit(4, 523, 3);
-			if (pickupgold) {
-				Pickit.pickItem(pickupgold);
-			}
-		}*/
-		
 		this.repair();
 		this.gamble();
 		this.reviveMerc();
@@ -169,11 +159,12 @@ var Town = {
 
 	// Check if healing is needed, based on character config
 	needHealing: function () {
-		if (me.hp * 100 / me.hpmax < Config.HealHP || me.mp * 100 / me.mpmax < Config.HealMP) {
+		if (me.hp * 100 / me.hpmax <= Config.HealHP || me.mp * 100 / me.mpmax <= Config.HealMP) {
 			return true;
 		}
-		
-		if ((Config.HealPoison && me.getState(2)) || (Config.HealCurse && (me.getState(9) || me.getState(61)))) {
+
+		// Status effects
+		if (Config.HealStatus && (me.getState(2) || me.getState(9) || me.getState(61))) {
 			return true;
 		}
 
@@ -338,7 +329,7 @@ var Town = {
 		var tome = me.findItem(id, 0, 3);
 
 		if (!tome) {
-			return false;
+			return 20; // nothing to fill
 		}
 
 		return tome.getStat(70);
@@ -387,88 +378,82 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
-			if (item.location !== 3) {
-				continue;
-			}
-
-			if (this.ignoredItemTypes.indexOf(item.itemType) !== -1) {
-				continue;
-			}
-
-			switch (result.result) {
-			case 1:
-				// Not needed with new code. Wasn't needed with old either...
-
-				/*if (item.getFlag(0x10)) {
-					Misc.logItem("Kept", item, result.line);
-				}*/
-
-				break;
-			case 2:
-				break;
-			// Items for gold, will sell magics, etc. w/o id, but at low levels
-			// magics are often not worth iding.
-			case 4:
-				item.sell();
-
-				break;
-			case -1:
-				if (tome) {
-					this.identifyItem(item, tome);
-				} else {
-					scroll = npc.getItem("isc");
-
-					if (scroll) {
-						if (!Storage.Inventory.CanFit(scroll)) {
-							tpTome = me.findItem("tbk", 0, 3);
-
-							if (tpTome) {
-								tpTomePos = {x: tpTome.x, y: tpTome.y};
-
-								tpTome.sell();
-								delay(500);
-							}
-						}
-
-						delay(500);
-						scroll.buy();
-					}
-
-					scroll = me.findItem("isc", 0, 3);
-
-					if (!scroll) {
-						break MainLoop;
-					}
-
-					this.identifyItem(item, scroll);
-				}
-
-				result = Pickit.checkItem(item);
-
+			if (item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
 				switch (result.result) {
 				case 1:
-					Misc.logItem("Kept", item, result.line);
+					// Not needed with new code. Wasn't needed with old either...
+
+					/*if (item.getFlag(0x10)) {
+						Misc.logItem("Kept", item, result.line);
+					}*/
+
+					break;
+				case 2:
+					break;
+				// Items for gold, will sell magics, etc. w/o id, but at low levels
+				// magics are often not worth iding.
+				case 4:
+					item.sell();
 
 					break;
 				case -1:
-				case 2:
-				case 3: // just in case
-					break;
-				default:
-					item.sell();
+					if (tome) {
+						this.identifyItem(item, tome);
+					} else {
+						scroll = npc.getItem("isc");
 
-					timer = getTickCount() - this.sellTimer; // shop speedup test
+						if (scroll) {
+							if (!Storage.Inventory.CanFit(scroll)) {
+								tpTome = me.findItem("tbk", 0, 3);
 
-					//print("sell timer: " + timer);
+								if (tpTome) {
+									tpTomePos = {x: tpTome.x, y: tpTome.y};
 
-					if (timer > 0 && timer < 500) {
-						delay(timer);
+									tpTome.sell();
+									delay(500);
+								}
+							}
+
+							delay(500);
+							scroll.buy();
+						}
+
+						scroll = me.findItem("isc", 0, 3);
+
+						if (!scroll) {
+							break MainLoop;
+						}
+
+						this.identifyItem(item, scroll);
+					}
+
+					result = Pickit.checkItem(item);
+
+					switch (result.result) {
+					case 1:
+						Misc.logItem("Kept", item, result.line);
+
+						break;
+					case -1:
+					case 2:
+					case 3: // just in case
+						break;
+					default:
+						item.sell();
+
+						timer = getTickCount() - this.sellTimer; // shop speedup test
+
+						//print("sell timer: " + timer);
+
+						if (timer > 0 && timer < 500) {
+							delay(timer);
+						}
+
+						break;
 					}
 
 					break;
 				}
-
-				break;
 			}
 		}
 
@@ -746,7 +731,7 @@ MainLoop:
 		while (items.length > 0) {
 			list.push(items.shift().gid);
 		}
-		
+
 		me.cancel();
 
 		while (me.getStat(14) + me.getStat(15) >= Config.GambleGoldStop) {
@@ -1444,8 +1429,6 @@ MainLoop:
 	},
 
 	move: function (spot) {
-		var i;
-
 		if (!me.inTown && !this.goToTown()) { // To prevent long trips if tp to town failed
 			throw new Error("Town.move: Failed to go to town!");
 		}
@@ -1455,7 +1438,7 @@ MainLoop:
 			delay(40);
 		}
 
-		var townSpot, temp,
+		var i, townSpot, temp,
 			useTK = me.classid === 1 && me.getSkill(43, 1) && ["stash", "portalspot", "waypoint"].indexOf(spot) > -1;
 
 		if (!this.act[me.act - 1].initialized) {

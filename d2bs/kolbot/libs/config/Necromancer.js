@@ -120,7 +120,7 @@ function LoadConfig() {
 		Config.TristramLeech.Leader = ""; // Leader's ingame name.
 	Scripts.TravincalLeech = false; // Enters portal at back of Travincal.
 		Config.TravincalLeech.Leader = ""; // Leader's ingame name.
-		Config.TravincalLeech.Helper = true // If set to true the character will teleport to the stairs and help attack.
+		Config.TravincalLeech.Helper = true; // If set to true the character will teleport to the stairs and help attack.
 	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
 	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
 	Scripts.DiabloHelper = false; // Chaos helper, kills monsters and doesn't open seals on its own.
@@ -165,8 +165,7 @@ function LoadConfig() {
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
 	Config.HealMP = 0; // Go to a healer if under designated percent of mana.
-	Config.HealPoison = false; // Go to a healer if poisoned
-	Config.HealCurse = false; // Go to a healer if cursed
+	Config.HealStatus = false // Go to a healer if poisoned or cursed
 	Config.UseMerc = true; // Use merc. This is ignored and always false in d2classic.
 	Config.MercWatch = false; // Instant merc revive during battle.
 

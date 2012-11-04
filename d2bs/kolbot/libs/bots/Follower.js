@@ -74,7 +74,7 @@ function Follower() {
 
 		if (player) {
 			do {
-				if (player.mode !== 0 && player.mode !== 17) {
+				if (!player.dead) {
 					return player;
 				}
 			} while (player.getNext());
@@ -87,11 +87,17 @@ function Follower() {
 	this.checkLeaderAct = function (unit) {
 		if (unit.area <= 39) {
 			return 1;
-		} else if (unit.area >= 40 && unit.area <= 74) {
+		}
+
+		if (unit.area >= 40 && unit.area <= 74) {
 			return 2;
-		} else if (unit.area >= 75 && unit.area <= 102) {
+		}
+
+		if (unit.area >= 75 && unit.area <= 102) {
 			return 3;
-		} else if (unit.area >= 103 && unit.area <= 108) {
+		}
+
+		if (unit.area >= 103 && unit.area <= 108) {
 			return 4;
 		}
 
@@ -360,7 +366,7 @@ function Follower() {
 	};
 
 	this.pickPotions = function (range) {
-		if (me.mode === 17) {
+		if (me.dead) {
 			return false;
 		}
 
@@ -387,21 +393,13 @@ function Follower() {
 		while (pickList.length > 0) {
 			item = pickList.shift();
 
-			if (!item || !copyUnit(item).x) {
-				continue;
+			if (item && copyUnit(item).x) {
+				status = Pickit.checkItem(item).result;
+
+				if (status && Pickit.canPick(item)) {
+					Pickit.pickItem(item, status);
+				}
 			}
-
-			status = Pickit.checkItem(item).result;
-
-			if (!status) {
-				continue;
-			}
-
-			if (!Pickit.canPick(item)) {
-				continue;
-			}
-
-			Pickit.pickItem(item, status);
 		}
 
 		return true;
@@ -568,7 +566,11 @@ function Follower() {
 					break;
 				}
 
-				action = msg;
+				if (action) {
+					say("Busy with " + action);
+				} else {
+					action = msg;
+				}
 
 				break;
 			}
@@ -615,7 +617,7 @@ function Follower() {
 				me.revive();
 				delay(1000);
 			}
-			
+
 			Town.move("portalspot");
 			say("I'm alive!");
 		}

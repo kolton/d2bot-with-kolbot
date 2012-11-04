@@ -95,6 +95,7 @@ var Config = {
 	IronGolemChicken: 0,
 	HealHP: 0,
 	HealMP: 0,
+	HealStatus: false,
 	TownHP: 0,
 	TownMP: 0,
 
