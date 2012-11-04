@@ -289,8 +289,15 @@ function Diablo() {
 
 	// start
 	Town.doChores();
-	Pather.useWaypoint(107);
-	Precast.doPrecast(true);
+	
+	if (Config.Diablo.RandomPrecast) {
+		Pather.useWaypoint("random");
+		Precast.doPrecast(true);
+		Pather.useWaypoint(107);
+	} else {
+		Pather.useWaypoint(107);
+		Precast.doPrecast(true);
+	}
 
 	if (!Pather.moveTo(7790, 5544)) {
 		throw new Error("Failed to move to Chaos Sanctuary");
@@ -301,24 +308,31 @@ function Diablo() {
 	if (Config.Diablo.Entrance) {
 		Attack.clear(35, 0, false, this.entranceSort);
 		Pather.moveTo(7790, 5544);
-		Pather.makePortal();
-		say(Config.Diablo.EntranceTP);
-		Precast.doPrecast(true);
+		
+		if (Config.PublicMode) {
+			Pather.makePortal();
+			say(Config.Diablo.EntranceTP);
+			Precast.doPrecast(true);
+		}
+		
 		this.followPath(this.entranceToStar, this.entranceSort);
 	} else {
 		Pather.moveTo(7774, 5305);
 		Attack.clear(15, 0, false, this.starSort);
 	}
 
-	Pather.moveTo(7774, 5305);
-	Pather.makePortal();
-	say(Config.Diablo.StarTP);
+	if (Config.PublicMode) {
+		Pather.moveTo(7774, 5305);
+		Pather.makePortal();
+		say(Config.Diablo.StarTP);
+	}
+	
 	Attack.clear(30, 0, false, this.starSort);
 	this.vizierSeal();
 	this.seisSeal();
 	Precast.doPrecast(true);
 	this.infectorSeal();
-	Pather.moveTo(7788, 5292);
+	Pather.moveTo(7793 + rand(-2, 2), 5292 + rand(-2, 2)); // Randomize helps picket in public games.
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();

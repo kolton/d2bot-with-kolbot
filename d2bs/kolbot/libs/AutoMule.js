@@ -39,7 +39,7 @@ var AutoMule = {
 			return false;
 		}
 
-		D2Bot.printToConsole("In mule game.");
+		D2Bot.printToConsole("In mule game." + ";7");
 
 		var mode, muleInfoObj,
 			status = "muling";
@@ -136,7 +136,7 @@ var AutoMule = {
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleInfoObj.muleProfile);
+		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleInfoObj.muleProfile + ";7");
 		D2Bot.start(muleInfoObj.muleProfile);
 
 MainLoop:
@@ -146,7 +146,7 @@ MainLoop:
 
 			switch (status) {
 			case "begin":
-				D2Bot.printToConsole("Mule profile is busy");
+				D2Bot.printToConsole("Mule profile is busy" + ";7");
 
 				break MainLoop;
 			case "ready":
@@ -158,7 +158,7 @@ MainLoop:
 				failCount += 1;
 
 				if (failCount >= 60) {
-					D2Bot.printToConsole("No response from mule profile.");
+					D2Bot.printToConsole("No response from mule profile." + ";7");
 
 					break MainLoop;
 				}

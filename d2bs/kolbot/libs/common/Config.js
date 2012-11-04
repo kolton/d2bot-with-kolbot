@@ -270,12 +270,15 @@ var Config = {
 		DollQuit: false,
 		KillBaal: false,
 		RandomPrecast: false,
-		SkipTP: false
+		SkipTP: false,
+		WaitForSafeTP: false,
+		Leader: ""
 	},
 	Corpsefire: {
 		ClearDen: false
 	},
 	Diablo: {
+		RandomPrecast: false,
 		Entrance: false,
 		SealWarning: "Leave the seals alone!",
 		EntranceTP: "Entrance TP up",
@@ -283,7 +286,9 @@ var Config = {
 	},
 	DiabloHelper: {
 		Wait: 120,
-		Entrance: false
+		Entrance: false,
+		SkipTP: false,
+		RandomPrecast: false
 	},
 	BattleOrders: {
 		Mode: 0,

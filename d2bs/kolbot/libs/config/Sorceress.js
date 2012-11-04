@@ -80,6 +80,7 @@ function LoadConfig() {
 	Scripts.Vizier = false; // Intended for classic sorc, kills Vizier only.
 	Scripts.FastDiablo = false;
 	Scripts.Diablo = false;
+		Config.Diablo.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
 		Config.Diablo.Entrance = true; // Start from entrance
 		Config.Diablo.SealWarning = "Leave the seals alone!";
 		Config.Diablo.EntranceTP = "Entrance TP up";
@@ -120,11 +121,13 @@ function LoadConfig() {
 		Config.TristramLeech.Leader = ""; // Leader's ingame name.
 	Scripts.TravincalLeech = false; // Enters portal at back of Travincal.
 		Config.TravincalLeech.Leader = ""; // Leader's ingame name.
-		Config.TravincalLeech.Helper = true // If set to true the character will teleport to the stairs and help attack.
+		Config.TravincalLeech.Helper = true; // If set to true the character will teleport to the stairs and help attack.
 	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
 	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
 	Scripts.DiabloHelper = false; // Chaos helper, kills monsters and doesn't open seals on its own.
 		Config.DiabloHelper.Entrance = true; // Start from entrance
+		Config.DiabloHelper.SkipTP = true; // Don't wait for a TP. If a TP exists it will use it. Great Anti-PK measure.
+		Config.DiabloHelper.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
 	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
 		Config.AutoBaal.FindShrine = false; // Find shrine when hot tp message is sent. You can change messages in AutoBaal.js
 	Scripts.BaalHelper = false;
@@ -134,6 +137,8 @@ function LoadConfig() {
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
 		Config.BaalHelper.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
 		Config.BaalHelper.SkipTP = true; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
+		Config.BaalHelper.WaitForSafeTP = true; // Only works when SkipTP is false.
+		Config.BaalHelper.Leader = ""; // Leaders name. Only needs to be configured for use of WaitForSafeTP
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 		Config.Follower.Leader = ""; // Leader's ingame name. This only applies to Follower script
 

@@ -82,14 +82,15 @@ var Town = {
 		this.shopItems();
 		this.buyKeys();
 		
-		/*me.cancel();
-				
-		for (i = 0; i < 10; i += 1) {
-			var pickupgold = getUnit(4, 523, 3);
-			if (pickupgold) {
-				Pickit.pickItem(pickupgold);
+		if (Config.Gamble) {
+			me.cancel();					
+			for (i = 0; i < 10; i += 1) {
+				var pickupgold = getUnit(4, 523, 3);
+				if (pickupgold) {
+					Pickit.pickItem(pickupgold);
+				}
 			}
-		}*/
+		}
 		
 		this.repair();
 		this.gamble();

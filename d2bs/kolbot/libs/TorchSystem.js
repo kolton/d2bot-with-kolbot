@@ -100,7 +100,7 @@ var TorchSystem = {
 		removeEventListener('copydata', CheckEvent);
 
 		if (game) {
-			D2Bot.printToConsole("Joining key drop game.");
+			D2Bot.printToConsole("Joining key drop game." + ";7");
 			delay(2000);
 			joinGame(game[0], game[1]);
 			delay(4000);

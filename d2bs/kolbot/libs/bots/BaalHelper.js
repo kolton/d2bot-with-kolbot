@@ -5,6 +5,27 @@
 */
 
 function BaalHelper() { // experi-mental
+
+	// editable variables
+	var safeMsg = ["safe", "throne clear", "leechers can come", "tp is up", "1 clear", "safe tp"]; // safe message - casing doesn't matter
+
+	var i, safeCheck;
+	var leader = Config.BaalHelper.Leader;
+	
+	addEventListener('chatmsg', // chat event, listen to what leader says
+		function (nick, msg) { // handler function
+			var i;
+			if (nick === leader) { // filter leader messages
+				for (i = 0; i < safeMsg.length; i += 1) { // loop through all predefined messages to find a match
+					if (msg.toLowerCase().indexOf(safeMsg[i].toLowerCase()) > -1) { // leader says a safe tp message
+						safeCheck = true; // safe to enter throne
+						break;
+					}
+				}
+			}
+		}
+	);
+
 	this.preattack = function () {
 		var check;
 
@@ -172,18 +193,37 @@ function BaalHelper() { // experi-mental
 	if (Config.BaalHelper.RandomPrecast) {
 		Pather.useWaypoint("random");
 		Precast.doPrecast(true);
+		Pather.useWaypoint(109);
 	} else {
 		Pather.useWaypoint(129);
 		Precast.doPrecast(true);
+		Pather.useWaypoint(109);
 	}
 
 	if (Config.BaalHelper.SkipTP) {
+	
+		if (!Pather.usePortal(131, null)) {
+		
 		if (me.area !== 129) {
 			Pather.useWaypoint(129);
 		}
 
 		if (!Pather.moveToExit([130, 131], false)) {
 			throw new Error("Failed to move to WSK3.");
+		}
+		
+		for (i = 0; i < 3; i += 1) {
+			entrance = getUnit(5, 82);
+
+			if (entrance) {
+				break;
+			}
+
+			delay(200);
+		}
+
+		if (entrance) {
+			Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
 		}
 
 WSKLoop:
@@ -205,20 +245,6 @@ WSKLoop:
 			throw new Error("No players in Throne.");
 		}
 
-		for (i = 0; i < 3; i += 1) {
-			entrance = getUnit(5, 82);
-
-			if (entrance) {
-				break;
-			}
-
-			delay(200);
-		}
-
-		if (entrance) {
-			Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
-		}
-
 		if (!Pather.moveToExit([130, 131], false)) {
 			throw new Error("Failed to move to WSK3.");
 		}
@@ -226,13 +252,20 @@ WSKLoop:
 		if (!Pather.moveToExit(131, true) || !Pather.moveTo(15113, 5040)) {
 			throw new Error("Failed to move to Throne of Destruction.");
 		}
+		
+		}
 	} else {
-		Pather.useWaypoint(109);
 		Town.move("portalspot");
 
 		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
-			if (Pather.usePortal(131, null)) {
-				break;
+			if (Config.BaalHelper.WaitForSafeTP) {
+				if (safeCheck && me.area === 109) { // wait for throne signal - leader's safe message
+					Pather.usePortal(131, null); // take TP to throne
+				}
+			} else {
+				if (Pather.usePortal(131, null)) {
+					break;
+				}
 			}
 
 			delay(1000);
