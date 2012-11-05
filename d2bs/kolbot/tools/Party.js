@@ -10,6 +10,7 @@ function main() {
 	include("common/Config.js");
 	include("common/Cubing.js");
 	include("common/Runewords.js");
+	include("common/Misc.js");
 	Config.init();
 
 	var myPartyId, player, otherParty, shitList,
