@@ -29,7 +29,7 @@ var Pickit = {
 	// 3 - Runeword wants
 	// 4 - Pickup to sell (triggered when low on gold)
 	checkItem: function (unit) {
-		var result = NTIPCheckItem(unit, false, true);
+		var rval = NTIPCheckItem(unit, false, true);
 
 		if (Cubing.checkItem(unit)) {
 			return {result: 2, line: null};
@@ -41,9 +41,9 @@ var Pickit = {
 
 		// If total gold is less than 10k pick up anything worth 10 gold per
 		// square to sell in town.
-		if (me.getStat(14) + me.getStat(15) < Config.LowGold && result === 0) {
+		if (me.getStat(14) + me.getStat(15) < Config.LowGold && rval.result === 0) {
 			// Gold doesn't take up room, just pick it up
-			if (unit.name === "Gold") {
+			if (unit.classid === 523) {
 				return {result: 4, line: null};
 			}
 
@@ -52,7 +52,7 @@ var Pickit = {
 			}
 		}
 
-		return result;
+		return rval;
 	},
 
 	pickItems: function () {
@@ -63,7 +63,7 @@ var Pickit = {
 			this.gid = unit.gid;
 		}
 
-		var status, gid, item, canFit, keptLine;
+		var status, gid, item, canFit;
 
 		Town.clearBelt();
 

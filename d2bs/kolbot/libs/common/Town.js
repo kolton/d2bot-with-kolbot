@@ -339,9 +339,7 @@ var Town = {
 		var i, item, tome, scroll, npc, list, timer, tpTome, result,
 			tpTomePos = {};
 
-		if (this.cainID()) {
-			return true;
-		}
+		this.cainID();
 
 		list = Storage.Inventory.Compare(Config.Inventory);
 
@@ -526,7 +524,8 @@ MainLoop:
 			}
 
 			if (cain && cain.openMenu()) {
-				cain.useMenu(0x0FB4);
+				//cain.useMenu(0x0FB4);
+				Misc.useMenu("Identify");
 				delay(1000);
 				me.cancel();
 			}
@@ -1015,7 +1014,8 @@ MainLoop:
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			npc.useMenu(0x1507);
+			//npc.useMenu(0x1507);
+			Misc.useMenu("Resurrect");
 			delay(1000);
 
 			tick = getTickCount();
@@ -1076,7 +1076,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && (Pickit.checkItem(items[i]).result > 0 || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
+				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4 || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
 					Storage.Stash.MoveTo(items[i]);
 				}
 			}
