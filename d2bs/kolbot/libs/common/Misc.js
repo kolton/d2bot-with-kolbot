@@ -607,7 +607,7 @@ MainLoop:
 		this.fileAction("logs/ScriptErrorLog.txt", 2, "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n");
 	},
 
-	// Use a NPC menu
+	// Use a NPC menu. Experimental function, subject to change
 	useMenu: function (id) {
 		var i,
 			lines = getDialogLines();
@@ -619,6 +619,22 @@ MainLoop:
 		for (i = 0; i < lines.length; i += 1) {
 			if (lines[i].selectable) {
 				switch (id) {
+				case "Identify":
+					if (lines[i].text.toLowerCase() === "identify items") {
+						lines[i].handler();
+
+						return true;
+					}
+
+					break;
+				case "Resurrect":
+					if (lines[i].text.toLowerCase().indexOf("resurrect") > -1) {
+						lines[i].handler();
+
+						return true;
+					}
+
+					break;
 				case "Gamble":
 					if (lines[i].text.toLowerCase() === "gamble") {
 						lines[i].handler();
