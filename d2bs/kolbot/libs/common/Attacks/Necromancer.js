@@ -14,6 +14,10 @@ var ClassAttack = {
 	init: function () {
 		var i;
 
+		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
+			Config.AttackSkill.push(Config.LowManaSkill[i]);
+		}
+
 		for (i = 0; i < Config.AttackSkill.length; i += 1) {
 			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
 			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
@@ -22,23 +26,29 @@ var ClassAttack = {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 73: // Poison Dagger
 				this.skillRange[i] = 3;
+
 				break;
 			case 92: // Poison Nova
 				this.skillRange[i] = 8;
+
 				break;
 			case 67: // Teeth
 			case 84: // Bone Spear
 			case 93: // Bone Spirit
 				this.skillRange[i] = 15;
+
 				break;
 			case 500: // Summoner
 				this.skillRange[i] = 3;
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
+
 				break;
 			}
 		}
@@ -47,40 +57,52 @@ var ClassAttack = {
 			switch (Config.Curse[i]) {
 			case 0: //nothing
 				this.curseState[i] = 0;
+
 				break;
 			case 66: //amplify damage
 				this.curseState[i] = 9;
+
 				break;
 			case 71: //dim vision
 				this.curseState[i] = 23;
+
 				break;
 			case 72: //weaken
 				this.curseState[i] = 19;
+
 				break;
 			case 76: //iron maiden
 				this.curseState[i] = 55;
+
 				break;
 			case 77: //terror
 				this.curseState[i] = 56;
+
 				break;
 			case 81: //confuse
 				this.curseState[i] = 59;
+
 				break;
 			case 82: //life tap
 				this.curseState[i] = 58;
+
 				break;
 			case 86: //attract
 				this.curseState[i] = 57;
+
 				break;
 			case 87: //decrepify
 				this.curseState[i] = 60;
+
 				break;
 			case 91: //lower resist
 				this.curseState[i] = 61;
+
 				break;
 			default:
 				Config.Curse[i] = 0;
 				print("Invalid curse id");
+
 				break;
 			}
 		}
@@ -196,17 +218,24 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
-		var i;
+		var i,
+			timed = index,
+			untimed = index + 1;
 
-		if (Config.AttackSkill[index] === 92) {
-			if (!this.novaTick || getTickCount() - this.novaTick > Config.PoisonNovaDelay) {
-				if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-					if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+		// Low mana timed skill
+		if (Config.AttackSkill[timed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[timed]) > me.mp) {
+			timed = Config.AttackSkill.length - 2;
+		}
+
+		if (Config.AttackSkill[timed] === 92) {
+			if (!this.novaTick || getTickCount() - this.novaTick > Config.PoisonNovaDelay * 1000) {
+				if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
+					if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
 						return 0;
 					}
 				}
 
-				if (Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit)) {
+				if (Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit)) {
 					this.novaTick = getTickCount();
 
 					return true;
@@ -214,30 +243,35 @@ var ClassAttack = {
 
 				return false;
 			}
-		} else if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+		} else if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed])) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
 					return 0;
 				}
 			}
 
-			if (Config.AttackSkill[index] === 500) {
+			if (Config.AttackSkill[timed] === 500) {
 				delay(300);
 
 				return true;
 			}
 
-			return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
 		}
 
-		if (Config.AttackSkill[index + 1] > -1) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[index + 1] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4)) {
+		// Low mana untimed skill
+		if (Config.AttackSkill[untimed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[untimed]) > me.mp) {
+			untimed = Config.AttackSkill.length - 1;
+		}
+
+		if (Config.AttackSkill[untimed] > -1) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4)) {
 					return 0;
 				}
 			}
 
-			return Skill.cast(Config.AttackSkill[index + 1], this.skillHand[index + 1], unit);
+			return Skill.cast(Config.AttackSkill[untimed], this.skillHand[untimed], unit);
 		}
 
 		for (i = 0; i < 25; i += 1) {
@@ -248,7 +282,7 @@ var ClassAttack = {
 			}
 		}
 
-		while (this.novaTick && getTickCount() - this.novaTick < Config.PoisonNovaDelay) {
+		while (this.novaTick && getTickCount() - this.novaTick < Config.PoisonNovaDelay * 1000) {
 			delay(40);
 		}
 

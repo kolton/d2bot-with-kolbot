@@ -12,6 +12,10 @@ var ClassAttack = {
 	init: function () {
 		var i;
 
+		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
+			Config.AttackSkill.push(Config.LowManaSkill[i]);
+		}
+
 		for (i = 0; i < Config.AttackSkill.length; i += 1) {
 			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
 			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
@@ -20,9 +24,11 @@ var ClassAttack = {
 			case 0: // Normal Attack
 				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 38: // Charged Bolt
 				this.skillRange[i] = 6;
+
 				break;
 			case 42: // Static Field
 				if (me.gametype) {
@@ -34,23 +40,29 @@ var ClassAttack = {
 				break;
 			case 44: // Frost Nova
 				this.skillRange[i] = 5;
+
 				break;
 			case 48: // Nova
 				this.skillRange[i] = 7;
+
 				break;
 			case 49: // Lightning
 			case 53: // Chain Lightning
 				this.skillRange[i] = 15;
+
 				break;
 			case 64: // Frozen Orb
 				this.skillRange[i] = 15;
+
 				break;
 			// oskills
 			case 106: // Zeal
 				this.skillRange[i] = 3;
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 25;
+
 				break;
 			}
 		}
@@ -151,6 +163,11 @@ var ClassAttack = {
 	doCast: function (unit, timed, untimed) {
 		var i;
 
+		// Low mana timed skill
+		if (timed && Config.AttackSkill[timed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[timed]) > me.mp) {
+			timed = Config.AttackSkill.length - 2;
+		}
+
 		if (timed && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed]))) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
@@ -159,6 +176,11 @@ var ClassAttack = {
 			}
 
 			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
+		}
+
+		// Low mana untimed skill
+		if (untimed && Config.AttackSkill[untimed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[untimed]) > me.mp) {
+			untimed = Config.AttackSkill.length - 1;
 		}
 
 		if (untimed && Config.AttackSkill[untimed] > -1) {

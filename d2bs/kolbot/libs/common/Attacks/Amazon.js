@@ -9,9 +9,14 @@ var ClassAttack = {
 	skillHand: [],
 	skillElement: [],
 	bowCheck: false,
+	lightFuryTick: 0,
 
 	init: function () {
 		var i;
+
+		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
+			Config.AttackSkill.push(Config.LowManaSkill[i]);
+		}
 
 		for (i = 0; i < Config.AttackSkill.length; i += 1) {
 			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
@@ -105,12 +110,16 @@ var ClassAttack = {
 		if (Town.needRepair()) { // Repair check, mainly to restock arrows
 			Town.visitTown();
 		}
+
+		this.lightFuryTick = 0;
 	},
 
 	doCast: function (unit, index) {
-		var i;
+		var i,
+			timed = index,
+			untimed = index + 1;
 
-		// arrow/bolt check
+		// Arrow/bolt check
 		if (this.bowCheck) {
 			switch (this.bowCheck) {
 			case "bow":
@@ -128,26 +137,52 @@ var ClassAttack = {
 			}
 		}
 
-		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[index])) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-				// walk short distances instead of tele for melee attacks
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
-					return 0;
-				}
-			}
-
-			return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+		// Low mana timed skill
+		if (Config.AttackSkill[timed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[timed]) > me.mp) {
+			timed = Config.AttackSkill.length - 2;
 		}
 
-		if (Config.AttackSkill[index + 1] > -1) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[index + 1] || checkCollision(me, unit, 0x4)) {
-				// walk short distances instead of tele for melee attacks
-				if (!Attack.getIntoPosition(unit, this.skillRange[index + 1], 0x4, this.skillRange[index + 1] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+		if (Config.AttackSkill[timed] === 35) {
+			if (!this.lightFuryTick || getTickCount() - this.lightFuryTick > Config.LightningFuryDelay * 1000) {
+				if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
+					if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
+						return 0;
+					}
+				}
+
+				if (Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit)) {
+					this.lightFuryTick = getTickCount();
+
+					return true;
+				}
+
+				return false;
+			}
+		} else if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed])) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
+				// Walk short distances instead of tele for melee attacks
+				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4, this.skillRange[timed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
 					return 0;
 				}
 			}
 
-			return Skill.cast(Config.AttackSkill[index + 1], this.skillHand[index + 1], unit);
+			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
+		}
+
+		// Low mana untimed skill
+		if (Config.AttackSkill[untimed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[untimed]) > me.mp) {
+			untimed = Config.AttackSkill.length - 1;
+		}
+
+		if (Config.AttackSkill[untimed] > -1) {
+			if (Math.round(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
+				// Walk short distances instead of tele for melee attacks
+				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4, this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+					return 0;
+				}
+			}
+
+			return Skill.cast(Config.AttackSkill[untimed], this.skillHand[untimed], unit);
 		}
 
 		for (i = 0; i < 25; i += 1) {
@@ -156,6 +191,10 @@ var ClassAttack = {
 			if (!me.getState(121)) {
 				break;
 			}
+		}
+
+		while (this.lightFuryTick && getTickCount() - this.lightFuryTick < Config.LightningFuryDelay * 1000) {
+			delay(40);
 		}
 
 		return false;

@@ -132,7 +132,7 @@ function Rushee() {
 				return false;
 			}
 
-			npc.useMenu(0x0D36);
+			Misc.useMenu(0x0D36);
 
 			break;
 		case 3:
@@ -157,7 +157,7 @@ function Rushee() {
 				return false;
 			}
 
-			npc.useMenu(0x0D38);
+			Misc.useMenu(0x0D38);
 
 			break;
 		case 4:

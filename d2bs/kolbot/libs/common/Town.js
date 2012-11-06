@@ -70,6 +70,10 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
 
+		if (Config.MFSwitchPercent) {
+			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+		}
+
 		this.heal();
 		this.fillTome("tbk");
 
@@ -525,7 +529,7 @@ MainLoop:
 
 			if (cain && cain.openMenu()) {
 				//cain.useMenu(0x0FB4);
-				Misc.useMenu("Identify");
+				Misc.useMenu(0x0FB4);
 				delay(1000);
 				me.cancel();
 			}
@@ -1015,7 +1019,7 @@ MainLoop:
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			//npc.useMenu(0x1507);
-			Misc.useMenu("Resurrect");
+			Misc.useMenu(0x1507);
 			delay(1000);
 
 			tick = getTickCount();

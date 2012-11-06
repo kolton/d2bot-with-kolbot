@@ -103,11 +103,12 @@ Unit.prototype.startTrade = function (mode) {
 		return true;
 	}
 
-	var i, tick;
+	var i, tick,
+		menuId = mode === "Gamble" ? 0x0D46 : mode === "Repair" ? 0x0D06 : 0x0D44;
 
 	for (i = 0; i < 3; i += 1) {
 		if (this.openMenu()) {
-			Misc.useMenu(mode);
+			Misc.useMenu(menuId);
 			delay(1000);
 
 			tick = getTickCount();
