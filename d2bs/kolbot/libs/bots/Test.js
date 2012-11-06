@@ -38,8 +38,8 @@ function Test() {
 
 function test() {
 	print("test");
-	
-	Town.initNPC("Shop");
+
+	Attack.clear(50);
 }
 
 var _NTIP_CheckList = [],

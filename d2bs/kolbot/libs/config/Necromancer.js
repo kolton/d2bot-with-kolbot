@@ -300,6 +300,10 @@ function LoadConfig() {
 	Config.TownCheck = false; // Go to town if out of potions
 	Config.LogExperience = false; // Print experience statistics in the manager.
 
+	// MF Switch
+	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.
+	Config.MFSwitch = 0; // MF weapon slot: 0 = slot I, 1 = slot II
+
 	// Fastmod config
 	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of faster cast rate 
 	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
@@ -337,6 +341,10 @@ function LoadConfig() {
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
 
+	// Low mana skills - these will be used if main skills can't be cast.
+	Config.LowManaSkill[0] = -1; // Timed low mana skill.
+	Config.LowManaSkill[1] = -1; // Untimed low mana skill.
+
 	Config.Dodge = false; // Move away from monsters that get too close. Don't use with short-ranged attacks like Poison Dagger.
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
@@ -351,7 +359,7 @@ function LoadConfig() {
 	Config.Skeletons = 0; // Number of skeletons to raise. Set to "max" to auto detect, set to 0 to disable.
 	Config.SkeletonMages = 0; // Number of skeleton mages to raise. Set to "max" to auto detect, set to 0 to disable.
 	Config.Revives = 0; // Number of revives to raise. Set to "max" to auto detect, set to 0 to disable.
-	Config.PoisonNovaDelay = 2000; // Delay between two Poison Novas
+	Config.PoisonNovaDelay = 2; // Delay between two Poison Novas in seconds.
 	Config.ActiveSummon = false; // Raise dead between each attack. If false, it will raise after clearing a spot.
 	Config.ReviveUnstackable = true; // Revive monsters that can move freely after you teleport.
 	Config.IronGolemChicken = 30; // Exit game if Iron Golem's life is less or equal to designated percent.

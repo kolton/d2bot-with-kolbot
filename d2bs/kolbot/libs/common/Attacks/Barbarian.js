@@ -12,6 +12,10 @@ var ClassAttack = {
 	init: function () {
 		var i;
 
+		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
+			Config.AttackSkill.push(Config.LowManaSkill[i]);
+		}
+
 		for (i = 0; i < Config.AttackSkill.length; i += 1) {
 			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
 			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
@@ -51,6 +55,7 @@ var ClassAttack = {
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
+
 				break;
 			}
 		}
@@ -121,6 +126,11 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
+		// Low mana skill
+		if (Config.AttackSkill[index] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[index]) > me.mp) {
+			index = Config.AttackSkill.length - 1;
+		}
+
 		if (Config.AttackSkill[index] === 151) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x1)) {

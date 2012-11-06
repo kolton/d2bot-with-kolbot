@@ -15,6 +15,11 @@ var Skill = {
 			return false;
 		}
 
+		// No mana to cast
+		if (this.getManaCost(skillId) > me.mp) {
+			return false;
+		}
+
 		if (typeof skillId === "undefined") {
 			throw new Error("Skill.cast: Must supply a skill ID");
 		}
@@ -55,14 +60,17 @@ var Skill = {
 			case 0:
 				clickType = 3;
 				shift = 0;
+
 				break;
 			case 1:
 				clickType = 0;
 				shift = 1;
+
 				break;
 			case 2: // For melee skills that don't need shift
 				clickType = 0;
 				shift = 0;
+
 				break;
 			}
 
@@ -74,7 +82,7 @@ MainLoop:
 					clickMap(clickType, shift, x, y);
 				}
 
-				delay(30);
+				delay(20);
 
 				if (typeof x === "object") {
 					clickMap(clickType + 2, shift, x);
@@ -82,12 +90,12 @@ MainLoop:
 					clickMap(clickType + 2, shift, x, y);
 				}
 
-				for (i = 0; i < 4; i += 1) {
+				for (i = 0; i < 8; i += 1) {
 					if (me.attacking) {
 						break MainLoop;
 					}
 
-					delay(40);
+					delay(20);
 				}
 			}
 
@@ -139,6 +147,16 @@ MainLoop:
 	// Skills that cn be cast in town
 	townSkill: function (skillId) {
 		return [32, 40, 43, 50, 52, 58, 60, 68, 75, 85, 94, 117, 221, 222, 226, 227, 235, 236, 237, 246, 247, 258, 267, 268, 277, 278, 279].indexOf(skillId) > -1;
+	},
+
+	// Get mana cost of the skill (mBot)
+	getManaCost: function (skillId) {
+		var skillLvl = me.getSkill(skillId, 1),
+			effectiveShift = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
+			lvlmana = getBaseStat(3, skillId, "lvlmana") === 65535 ? -1 : getBaseStat(3, skillId, "lvlmana"), // Correction for skills that need less mana with levels (kolton)
+			ret = Math.max((getBaseStat(3, skillId, "mana") + lvlmana * (skillLvl - 1)) * (effectiveShift[getBaseStat(3, skillId, "manashift")] / 256), getBaseStat(3, skillId, "minmana"));
+
+		return ret;
 	}
 };
 
@@ -608,7 +626,10 @@ MainLoop:
 	},
 
 	// Use a NPC menu. Experimental function, subject to change
+	// id = string number (with exception of Ressurect merc). http://www.blizzhackers.cc/viewtopic.php?f=209&t=378493
 	useMenu: function (id) {
+		print("useMenu " + getLocaleString(id)); // debug
+
 		var i,
 			lines = getDialogLines();
 
@@ -619,46 +640,20 @@ MainLoop:
 		for (i = 0; i < lines.length; i += 1) {
 			if (lines[i].selectable) {
 				switch (id) {
-				case "Identify":
-					if (lines[i].text.toLowerCase() === "identify items") {
+				case 0x1507: // Ressurect Merc
+					if (lines[i].text.indexOf(getLocaleString(22695)) > -1) {
 						lines[i].handler();
 
 						return true;
 					}
 
 					break;
-				case "Resurrect":
-					if (lines[i].text.toLowerCase().indexOf("resurrect") > -1) {
+				default:
+					if (lines[i].text === getLocaleString(id)) {
 						lines[i].handler();
 
 						return true;
 					}
-
-					break;
-				case "Gamble":
-					if (lines[i].text.toLowerCase() === "gamble") {
-						lines[i].handler();
-
-						return true;
-					}
-
-					break;
-				case "Repair":
-					if (lines[i].text.toLowerCase() === "trade/repair") {
-						lines[i].handler();
-
-						return true;
-					}
-
-					break;
-				case "Shop":
-					if (lines[i].text.toLowerCase() === "trade") {
-						lines[i].handler();
-
-						return true;
-					}
-
-					break;
 				}
 			}
 		}

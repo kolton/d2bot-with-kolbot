@@ -142,6 +142,8 @@ var Config = {
 	GambleGoldStop: 0,
 	MiniShopBot: false,
 	TeleSwitch: false,
+	MFSwitch: 0,
+	MFSwitchPercent: 0,
 	LogExperience: false,
 	TownCheck: false,
 
@@ -163,11 +165,13 @@ var Config = {
 	// Attack specific
 	Dodge: false,
 	AttackSkill: [],
+	LowManaSkill: [],
 	TeleStomp: false,
 	ClearType: false,
 	BossPriority: false,
 
 	// Amazon specific
+	LightningFuryDelay: 0,
 	SummonValkyrie: false,
 
 	// Sorceress specific

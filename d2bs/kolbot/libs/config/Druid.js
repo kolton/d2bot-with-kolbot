@@ -300,6 +300,10 @@ function LoadConfig() {
 	Config.TownCheck = false; // Go to town if out of potions
 	Config.LogExperience = false; // Print experience statistics in the manager.
 
+	// MF Switch
+	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.
+	Config.MFSwitch = 0; // MF weapon slot: 0 = slot I, 1 = slot II
+
 	// Fastmod config
 	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of faster cast rate 
 	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
@@ -336,6 +340,10 @@ function LoadConfig() {
 	Config.AttackSkill[4] = -1; // Primary untimed skill to others. Keep at -1 if Config.AttackSkill[3] is untimed skill.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
+
+	// Low mana skills - these will be used if main skills can't be cast.
+	Config.LowManaSkill[0] = -1; // Timed low mana skill.
+	Config.LowManaSkill[1] = -1; // Untimed low mana skill.
 
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all

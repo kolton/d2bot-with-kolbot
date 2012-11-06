@@ -118,16 +118,26 @@ var Attack = {
 			}
 
 			Misc.townCheck();
+			
+			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
+				Precast.weaponSwitch(Math.abs(Config.MFSwitch));
+			}
 
 			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
 				break;
 			}
 
 			if (!copyUnit(target).x) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
-				return true;
+				break;
 			}
 
 			attackCount += 1;
+		}
+
+		Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+
+		if (!copyUnit(target).x) {
+			return true;
 		}
 
 		if (target.mode !== 0 && target.mode !== 12) {

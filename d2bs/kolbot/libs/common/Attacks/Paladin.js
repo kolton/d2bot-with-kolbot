@@ -12,6 +12,10 @@ var ClassAttack = {
 	init: function () {
 		var i;
 
+		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
+			Config.AttackSkill.push(Config.LowManaSkill[i]);
+		}
+
 		for (i = 0; i < Config.AttackSkill.length; i += 1) {
 			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
 			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
@@ -120,9 +124,21 @@ var ClassAttack = {
 
 	doCast: function (unit, index) {
 		var i,
+			atkSkill = index,
+			aura = index + 1,
 			dodgeList = [];
 
-		if (Config.AttackSkill[index] === 112) {
+		// Low mana skill
+		if (Config.AttackSkill[atkSkill] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[atkSkill]) > me.mp) {
+			atkSkill = Config.AttackSkill.length - 2;
+		}
+
+		// Low mana aura
+		if (Config.AttackSkill[aura] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[aura]) > me.mp) {
+			aura = Config.AttackSkill.length - 1;
+		}
+
+		if (Config.AttackSkill[atkSkill] === 112) {
 			if (unit.classid === 691) {
 				dodgeList = Attack.buildDodgeList();
 
@@ -131,11 +147,11 @@ var ClassAttack = {
 					Attack.dodge(unit, 15, dodgeList);
 				}
 
-				if (Config.AttackSkill[index + 1] > -1) {
-					Skill.setSkill(Config.AttackSkill[index + 1], 0);
+				if (Config.AttackSkill[aura] > -1) {
+					Skill.setSkill(Config.AttackSkill[aura], 0);
 				}
 
-				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+				return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
 			}
 
 			if (!this.checkHammerPosition(unit)) {
@@ -150,12 +166,12 @@ var ClassAttack = {
 				}
 			}
 
-			if (Config.AttackSkill[index + 1] > -1) {
-				Skill.setSkill(Config.AttackSkill[index + 1], 0);
+			if (Config.AttackSkill[aura] > -1) {
+				Skill.setSkill(Config.AttackSkill[aura], 0);
 			}
 
 			for (i = 0; i < 3; i += 1) {
-				Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+				Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
 
 				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5 || unit.type === 0) {
 					break;
@@ -165,34 +181,34 @@ var ClassAttack = {
 			return true;
 		}
 
-		if (Config.AttackSkill[index] === 101) {
-			if (getDistance(me, unit) > this.skillRange[index] + 3 || CollMap.checkColl(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+		if (Config.AttackSkill[atkSkill] === 101) {
+			if (getDistance(me, unit) > this.skillRange[atkSkill] + 3 || CollMap.checkColl(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4)) {
 					return 0;
 				}
 			}
 
 			CollMap.reset();
 
-			if (getDistance(me, unit) > this.skillRange[index] || CollMap.checkColl(me, unit, 0x2004)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x2004, true)) {
+			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x2004, true)) {
 					return 0;
 				}
 			}
-		} else if (getDistance(me, unit) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
+		} else if (getDistance(me, unit) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
 			// walk short distances instead of tele for melee attacks. teleport if failed to walk
-			switch (Config.AttackSkill[index]) {
+			switch (Config.AttackSkill[atkSkill]) {
 			case 0:
 			case 96:
 			case 106:
 			case 116:
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
 					return 0;
 				}
 
 				break;
 			default:
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4)) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4)) {
 					return 0;
 				}
 
@@ -200,11 +216,11 @@ var ClassAttack = {
 			}
 		}
 
-		if (Config.AttackSkill[index + 1] > -1) {
-			Skill.setSkill(Config.AttackSkill[index + 1], 0);
+		if (Config.AttackSkill[aura] > -1) {
+			Skill.setSkill(Config.AttackSkill[aura], 0);
 		}
 
-		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+		return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
 	},
 
 	checkHammerPosition: function (unit) {

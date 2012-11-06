@@ -260,7 +260,7 @@ function Follower() {
 
 			if (npc) {
 				npc.openMenu();
-				npc.useMenu(0x0D36);
+				Misc.useMenu(0x0D36);
 			}
 
 			break;
@@ -284,7 +284,7 @@ function Follower() {
 
 			if (npc) {
 				npc.openMenu();
-				npc.useMenu(0x0D38);
+				Misc.useMenu(0x0D38);
 			}
 
 			break;
