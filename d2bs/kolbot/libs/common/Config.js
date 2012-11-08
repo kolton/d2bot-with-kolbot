@@ -292,6 +292,7 @@ var Config = {
 	},
 	BattleOrders: {
 		Mode: 0,
+		Getters: [],
 		Wait: false
 	},
 	Enchant: {

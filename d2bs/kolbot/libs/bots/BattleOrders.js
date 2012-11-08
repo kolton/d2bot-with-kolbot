@@ -5,6 +5,31 @@
 */
 
 function BattleOrders() {
+	this.giveBO = function (list) {
+		var i, unit,
+			failTimer = 60,
+			tick = getTickCount();
+
+		for (i = 0; i < list.length; i += 1) {
+			unit = getUnit(0, list[i]);
+
+			if (unit) {
+				while (!unit.getState(32)) {
+					if (getTickCount() - tick >= failTimer * 1000) {
+						showConsole();
+						print("ÿc1BO timeout fail.");
+						quit();
+					}
+
+					Precast.doPrecast(true);
+					delay(1000);
+				}
+			}
+		}
+
+		return true;
+	};
+
 	Town.doChores();
 
 	try {
@@ -17,47 +42,39 @@ function BattleOrders() {
 
 	Pather.moveTo(me.x + 6, me.y + 6);
 
-	var bo, leader,
-		count = 0;
-
-	function ChatEvent(nick, msg) {
-		var playerPartyid = getParty(nick).partyid;
-
-		if (msg === "BO" && playerPartyid !== 65535 && playerPartyid === getParty().partyid) {
-			removeEventListener("chatmsg", ChatEvent);
-
-			bo = true;
-			leader = nick;
-		}
-	}
-
-	if (Config.BattleOrders.Mode === 0) {
-		addEventListener("chatmsg", ChatEvent);
-	}
+	var i,
+		tick = getTickCount(),
+		failTimer = 60;
 
 MainLoop:
 	while (true) {
 		switch (Config.BattleOrders.Mode) {
-		case 0:
-			if (bo) {
-				Precast.doPrecast(true);
+		case 0: // Give BO
+			for (i = 0; i < Config.BattleOrders.Getters.length; i += 1) {
+				while (!Misc.inMyParty(Config.BattleOrders.Getters[i]) || !getUnit(0, Config.BattleOrders.Getters[i])) {
+					if (getTickCount() - tick >= failTimer * 1000) {
+						showConsole();
+						print("ÿc1BO timeout fail.");
+						quit();
+					}
 
+					delay(500);
+				}
+			}
+
+			if (this.giveBO(Config.BattleOrders.Getters)) {
 				break MainLoop;
 			}
 
 			break;
-		case 1:
+		case 1: // Get BO
 			if (me.getState(32)) {
 				break MainLoop;
 			}
 
-			if (count % 10 === 0) { // say "BO" every 5 seconds
-				say("BO");
-			}
-
-			if (count > 60) { // 30 seconds with no bo
+			if (getTickCount() - tick >= failTimer * 1000) {
 				showConsole();
-				print("ÿc1Failed to get BO");
+				print("ÿc1BO timeout fail.");
 				quit();
 			}
 
@@ -65,15 +82,15 @@ MainLoop:
 		}
 
 		delay(500);
-
-		count += 1;
 	}
 
 	Pather.useWaypoint(1);
 
 	if (Config.BattleOrders.Mode === 0 && Config.BattleOrders.Wait) {
-		while (Misc.inMyParty(leader)) {
-			delay(1000);
+		for (i = 0; i < Config.BattleOrders.Getters.length; i += 1) {
+			while (Misc.inMyParty(Config.BattleOrders.Getters[i])) {
+				delay(500);
+			}
 		}
 	}
 

@@ -48,6 +48,7 @@
 
 function Follower() {
 	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit,
+		commanders = [Config.Follower.Leader],
 		attack = true,
 		openContainers = true,
 		classes = ["amazon", "sorceress", "necromancer", "paladin", "barbarian", "druid", "assassin"],
@@ -141,7 +142,7 @@ function Follower() {
 
 		// Arcane<->Cellar portal
 		if ((me.area === 74 && area === 54) || (me.area === 54 && area === 74)) {
-			Pather.usePortal(area);
+			Pather.usePortal(null);
 
 			return 4;
 		}
@@ -566,13 +567,25 @@ function Follower() {
 					break;
 				}
 
-				if (action) {
-					say("Busy with " + action);
-				} else {
-					action = msg;
-				}
+				action = msg;
 
 				break;
+			}
+		}
+
+		if (msg && msg.indexOf("leader ") > -1 && commanders.indexOf(nick) > -1) {
+			piece = msg.split(" ")[1];
+
+			if (typeof piece === "string") {
+				if (commanders.indexOf(piece) === -1) {
+					commanders.push(piece);
+				}
+
+				say("Switching leader to " + piece);
+
+				Config.Follower.Leader = piece;
+				leader = this.getLeader(Config.Follower.Leader);
+				leaderUnit = this.getLeaderUnit(Config.Follower.Leader);
 			}
 		}
 	};
@@ -635,9 +648,28 @@ function Follower() {
 				}
 			}
 
-			if (getDistance(me, leaderUnit) <= 50) {
+			/*if (getDistance(me, leaderUnit) <= 50) {
 				if (getDistance(me, leaderUnit) > 4) {
 					Pather.moveToUnit(leaderUnit);
+				}
+			}*/
+
+			// Nad42 long distance following
+			if (leader.area === me.area) {
+				try {
+					if (copyUnit(leaderUnit).x) {
+						if (getDistance(me, leaderUnit) > 4) {
+							Pather.moveToUnit(leaderUnit);
+						}
+					} else {
+						//print("trying roster");
+						Pather.moveToUnit(leader);
+					}
+				} catch (err) {
+					//print("error with copyUnit, trying roster");
+					if (leader.area === me.area) {
+						Pather.moveToUnit(leader);
+					}
 				}
 			}
 
@@ -773,9 +805,13 @@ WPLoop:
 				say("Going outside.");
 				Town.goToTown(this.checkLeaderAct(leader));
 				Town.move("portalspot");
-				Pather.usePortal(null, leader.name);
 
-				while (!this.getLeaderUnit(Config.Follower.Leader)) {
+				if (!Pather.usePortal(null, leader.name)) {
+					break;
+				}
+
+				//while (!this.getLeaderUnit(Config.Follower.Leader)) {
+				while (leader.area !== me.area) { // EXPERIMENTAL
 					Attack.clear(10);
 					delay(200);
 				}
