@@ -40,11 +40,11 @@ var CollMap = new function () {
 		j = x - this.rooms[index].x * 5;
 		i = y - this.rooms[index].y * 5;
 
-		try {
+		if (this.maps[index] && this.maps[index][i] && this.maps[index][i][j]) {
 			return this.maps[index][i][j];
-		} catch (e) {
-			return 5;
 		}
+
+		return 5;
 	};
 
 	this.getRoomIndex = function (x, y) {

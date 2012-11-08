@@ -117,7 +117,7 @@ var UnitInfo = new function () {
 				if (items[i].getFlag(0x4000000)) {
 					string = items[i].fname.split("\n")[1] + "ÿc0 " + items[i].fname.split("\n")[0];
 				} else {
-					string = quality[items[i].quality] + (items[i].quality > 4 && items[i].getFlag(0x10) ? items[i].fname.split("\n")[1].replace("ÿc4", "") : items[i].name);
+					string = quality[items[i].quality] + (items[i].quality > 4 && items[i].getFlag(0x10) ? items[i].fname.split("\n").reverse()[0].replace("ÿc4", "") : items[i].name);
 				}
 
 				this.hooks.push(new Text(string, this.x, this.y + (i + 2) * 15, 0, 13, 2));

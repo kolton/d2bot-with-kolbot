@@ -471,14 +471,14 @@ ModeLoop:
 		var i, tick, unit,
 			preArea = me.area;
 
-		for (i = 0; i < 3; i += 1) {
+		for (i = 0; i < 5; i += 1) {
 			unit = getUnit(type, id);
 
 			if (unit) {
 				break;
 			}
 
-			delay(100);
+			delay(200);
 		}
 
 		if (!unit) {
