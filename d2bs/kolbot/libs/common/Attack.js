@@ -118,7 +118,7 @@ var Attack = {
 			}
 
 			Misc.townCheck();
-			
+
 			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
 				Precast.weaponSwitch(Math.abs(Config.MFSwitch));
 			}
@@ -134,7 +134,9 @@ var Attack = {
 			attackCount += 1;
 		}
 
-		Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+		if (Config.MFSwitchPercent) {
+			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+		}
 
 		if (!copyUnit(target).x) {
 			return true;
