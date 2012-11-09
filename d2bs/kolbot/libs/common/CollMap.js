@@ -39,8 +39,8 @@ var CollMap = new function () {
 
 		j = x - this.rooms[index].x * 5;
 		i = y - this.rooms[index].y * 5;
-
-		if (this.maps[index] && this.maps[index][i] && this.maps[index][i][j]) {
+		
+		if (typeof this.maps[index] !== "undefined" && typeof this.maps[index][i] !== "undefined" && typeof this.maps[index][i][j] !== "undefined") {
 			return this.maps[index][i][j];
 		}
 
