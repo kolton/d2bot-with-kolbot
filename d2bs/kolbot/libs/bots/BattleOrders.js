@@ -14,7 +14,7 @@ function BattleOrders() {
 			unit = getUnit(0, list[i]);
 
 			if (unit) {
-				while (!unit.getState(32)) {
+				while (!unit.getState(32) && copyUnit(unit).x) {
 					if (getTickCount() - tick >= failTimer * 1000) {
 						showConsole();
 						print("ÿc1BO timeout fail.");
@@ -69,6 +69,8 @@ MainLoop:
 			break;
 		case 1: // Get BO
 			if (me.getState(32)) {
+				delay(1000);
+
 				break MainLoop;
 			}
 
