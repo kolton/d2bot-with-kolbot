@@ -20,6 +20,7 @@ include("json2.js");
 include("OOG.js");
 include("MuleLogger.js");
 include("gambling.js");
+include("common/misc.js");
 load("tools/heartbeat.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
