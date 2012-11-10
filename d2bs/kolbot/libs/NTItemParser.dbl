@@ -50,6 +50,8 @@ function NTIPOpenFile(filepath)
 			stringArray.push({string: lines[i], count: count, file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length)});
 		}
 	}
+	
+	//print(filepath + ": " + lines.length);
 
 	return true;
 }

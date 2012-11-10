@@ -97,6 +97,7 @@ var AutoMule = {
 
 			break;
 		default:
+			//D2Bot.printToConsole("Something got bjorked");
 			print("Something got bjorked");
 
 			break;
@@ -104,9 +105,12 @@ var AutoMule = {
 
 		status = "done";
 		print("status done");
+		//D2Bot.printToConsole("status done");
 
 		while (true) {
 			if (status === "quit") {
+				//D2Bot.printToConsole("status quit");
+
 				break;
 			}
 
@@ -150,10 +154,11 @@ MainLoop:
 
 				break MainLoop;
 			case "ready":
+				delay(2000);
 				joinGame(this.muleGameName[0], this.muleGameName[1]);
 				delay(5000);
 
-				break MainLoop;
+				return true;
 			default:
 				failCount += 1;
 
@@ -173,7 +178,7 @@ MainLoop:
 			delay(1000);
 		}
 
-		return true;
+		return false;
 	},
 
 	dropStuff: function () {
@@ -194,7 +199,8 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].itemType !== 39 &&
+				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
+						(TorchSystem.FarmerProfiles.indexOf(me.profile) === -1 && TorchSystem.KeyFinderProfiles.indexOf(me.profile) === -1 || [647, 648, 649].indexOf(items[i].classid) === -1) &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
@@ -215,7 +221,8 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].itemType !== 39 &&
+				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
+						(TorchSystem.FarmerProfiles.indexOf(me.profile) === -1 && TorchSystem.KeyFinderProfiles.indexOf(me.profile) === -1 || [647, 648, 649].indexOf(items[i].classid) === -1) &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
