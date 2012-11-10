@@ -380,7 +380,8 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
-			if (item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
+			//if (item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
+			if (item.location === 3) { // ignore list check shouldn't be needed
 				switch (result.result) {
 				case 1:
 					// Not needed with new code. Wasn't needed with old either...
@@ -718,6 +719,10 @@ MainLoop:
 	gamble: function () {
 		if (!this.needGamble() || !Config.GambleItems.length) {
 			return true;
+		}
+
+		if (getUIFlag(0x0C)) {
+			me.cancel(); // cancel trade screen so it doesn't buy certain sold items back from Jamella
 		}
 
 		var i, items, npc, newItem, result,
@@ -1080,7 +1085,7 @@ MainLoop:
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4 || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
+				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && ((Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
 					Storage.Stash.MoveTo(items[i]);
 				}
 			}

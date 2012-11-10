@@ -27,7 +27,7 @@ var TorchSystem = {
 		var i, items;
 
 		for (i = 0; i < this.FarmGames.length; i += 1) {
-			if (me.gamename.toLowerCase().match(this.FarmGames[i].toLowerCase())) {
+			if (this.FarmGames[i].length > 0 && me.gamename.toLowerCase().match(this.FarmGames[i].toLowerCase())) {
 				print("ÿc4Torch Systemÿc0: In Farm game.");
 				Town.goToTown(1);
 				Town.openStash();
@@ -103,9 +103,11 @@ var TorchSystem = {
 			D2Bot.printToConsole("Joining key drop game.");
 			delay(2000);
 			joinGame(game[0], game[1]);
-			delay(4000);
+			delay(5000);
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 };

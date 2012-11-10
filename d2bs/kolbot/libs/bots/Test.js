@@ -39,10 +39,10 @@ function Test() {
 function test() {
 	print("test");
 
-	Attack.clear(50);
+	AutoMule.dropStuff();
 }
 
-var _NTIP_CheckList = [],
+/*var _NTIP_CheckList = [],
 	stringArray = [];
 
 function minify(filepath)
@@ -72,4 +72,4 @@ function minify(filepath)
 	FileTools.writeText(filepath + ".mini", result);
 
 	return true;
-}
+}*/
