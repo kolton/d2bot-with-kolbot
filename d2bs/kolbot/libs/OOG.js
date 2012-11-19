@@ -63,7 +63,7 @@ var D2Bot = {
 		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
 	},
 	updateCount: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateCount;" + getIP());
+		sendCopyData(null, "D2Bot #", 0, "updateCount;" + "nnqq");
 	},
 	shoutGlobal: function (msg, mode) {
 		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");

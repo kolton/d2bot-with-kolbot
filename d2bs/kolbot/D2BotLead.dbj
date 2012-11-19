@@ -1,6 +1,6 @@
 var StarterConfig = {
 	MinGameTime: 120, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
-	CreateGameDelay: 5, // Seconds to wait before creating a new game
+	CreateGameDelay: 10, // Seconds to wait before creating a new game
 	ResetCount: 999, // Reset game count back to 1 every X games.
 	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
@@ -416,13 +416,20 @@ MainSwitch:
 		if (lastGameStatus === "pending") {
 			D2Bot.printToConsole("Failed to create game");
 			timeoutDelay("FTJ delay", StarterConfig.FTJDelay * 1e3);
+			D2Bot.updateRuns();
 
 			gameCount += 1;
 		}
 
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
 		print("Creating Game: " + gameName + gameCount);
+
+		me.blockMouse = true;
+
 		createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
+
+		me.blockMouse = false;
+
 		locationTimeout(5000, location);
 
 		lastGameStatus = "pending";
@@ -544,11 +551,12 @@ MainSwitch:
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 		D2Bot.CDKeyRD();
 
-		if (keyswap) {
+		if (keyswap && !rdblocker) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
+			D2Bot.printToConsole("Realm Down - Restart");
 			D2Bot.restart();
 		}
 
@@ -594,13 +602,44 @@ MainSwitch:
 
 		break;
 	case 22: // Login - Invalid Cdkey (classic or xpac)
-		if (keyswap) {
-			D2Bot.printToConsole("Invalid CD-Key");
-			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
-		} else {
-			ControlAction.click(6, 335, 450, 128, 35);
-			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
+		text = ControlAction.getText(4, 162, 270, 477, 50);
+		string = "";
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+		}
+
+		switch (string) {
+		case getLocaleString(10914):
+			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+			D2Bot.CDKeyInUse();
+
+			if (keyswap) {
+				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			} else {
+				ControlAction.click(6, 335, 450, 128, 35);
+				timeoutDelay("LoD key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+			}
+
+			break;
+		default:
+			if (keyswap) {
+				D2Bot.printToConsole("Invalid CD-Key");
+				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			} else {
+				ControlAction.click(6, 335, 450, 128, 35);
+				timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
+			}
+
+			break;
 		}
 
 		break;

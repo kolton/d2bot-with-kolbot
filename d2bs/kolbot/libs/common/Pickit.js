@@ -41,7 +41,7 @@ var Pickit = {
 
 		// If total gold is less than 10k pick up anything worth 10 gold per
 		// square to sell in town.
-		if (me.getStat(14) + me.getStat(15) < Config.LowGold && rval.result === 0) {
+		if (me.getStat(14) + me.getStat(15) < Config.LowGold && rval.result === 0 && Town.ignoredItemTypes.indexOf(unit.itemType) === -1) {
 			// Gold doesn't take up room, just pick it up
 			if (unit.classid === 523) {
 				return {result: 4, line: null};
@@ -211,7 +211,8 @@ MainLoop:
 						break MainLoop;
 					}
 
-					if (unit.getParent() && unit.getParent().name === me.name) {
+					//if (unit.getParent() && unit.getParent().name === me.name) {
+					if (me.getItem(-1, -1, gid)) {
 						picked = true;
 					}
 
@@ -292,7 +293,7 @@ MainLoop:
 	},
 
 	canPick: function (unit) {
-		var tome, charm, i, potion, needPots;
+		var tome, charm, i, potion, needPots, buffers, pottype;
 
 		switch (unit.itemType) {
 		case 4: // Gold
@@ -352,22 +353,42 @@ MainLoop:
 				} while (potion.getNext());
 			}
 
-			if (needPots < 1) {
-				// For juvs in inventory
-				if (Config.RejuvBuffer && unit.itemType === 78) {
-					if (!Storage.Inventory.CanFit(unit)) {
-						return false;
-					}
+			if (needPots < 1 && this.checkBelt()) {
+				buffers = ["HPBuffer", "MPBuffer", "RejuvBuffer"];
 
-					needPots = Config.RejuvBuffer;
-					potion = me.getItem(-1, 0);
+				for (i = 0; i < buffers.length; i += 1) {
+					if (Config[buffers[i]]) {
+						switch (buffers[i]) {
+						case "HPBuffer":
+							pottype = 76;
 
-					if (potion) {
-						do {
-							if (potion.itemType === 78 && potion.location === 3) {
-								needPots -= 1;
+							break;
+						case "MPBuffer":
+							pottype = 77;
+
+							break;
+						case "RejuvBuffer":
+							pottype = 78;
+
+							break;
+						}
+
+						if (unit.itemType === pottype) {
+							if (!Storage.Inventory.CanFit(unit)) {
+								return false;
 							}
-						} while (potion.getNext());
+
+							needPots = Config[buffers[i]];
+							potion = me.getItem(-1, 0);
+
+							if (potion) {
+								do {
+									if (potion.itemType === pottype && potion.location === 3) {
+										needPots -= 1;
+									}
+								} while (potion.getNext());
+							}
+						}
 					}
 				}
 			}
@@ -384,6 +405,21 @@ MainLoop:
 		}
 
 		return true;
+	},
+	
+	checkBelt: function () {
+		var check = 0,
+			item = me.getItem(-1, 2);
+
+		if (item) {
+			do {
+				if (item.x < 4) {
+					check += 1;
+				}
+			} while (item.getNext());
+		}
+
+		return check === 4;
 	},
 
 	fastPick: function () {

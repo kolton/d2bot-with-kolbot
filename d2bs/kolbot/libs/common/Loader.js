@@ -8,6 +8,7 @@ var global = this;
 
 var Loader = {
 	scriptList: [],
+	printToOOG: false,
 
 	init: function () {
 		this.getScripts();
@@ -40,7 +41,7 @@ ScriptLoop:
 				include("bots/" + i + ".js");
 
 				if (typeof (global[i]) === "function") {
-					if (i !== "Test") {
+					if (i !== "Test" && i !== "Follower") {
 						try {
 							townCheck = Town.goToTown();
 						} catch (e1) {
@@ -55,6 +56,10 @@ ScriptLoop:
 							print("ÿc2Starting script: ÿc9" + i);
 							global[i]();
 						} catch (e) {
+							if (this.printToOOG) {
+								D2Bot.printToConsole(e.message + ";9");
+							}
+
 							Misc.errorReport("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + "): ÿc1" + e.message);
 						}
 					}

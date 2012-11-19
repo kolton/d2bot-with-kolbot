@@ -1,6 +1,6 @@
 function Rushee() {
 	var quester, leader, target,
-		leaderName = "kolX-g",
+		leaderName = "kolxi-d",
 		action = "";
 
 	this.findLeader = function (name) {

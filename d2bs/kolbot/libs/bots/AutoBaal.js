@@ -1,5 +1,5 @@
 /**
-*	@filename	Andariel.js
+*	@filename	AutoBaal.js
 *	@author		kolton
 *	@desc		Universal Baal leecher by Kolton with Autoleader by Ethic
 *				Pure leech script for throne and Baal
@@ -145,7 +145,7 @@ function AutoBaal() {
 				print("ÿc4AutoBaal: ÿc0Entering chamber.");
 
 				if (Pather.usePortal(null, null, portal)) { // enter chamber
-					Pather.moveTo(15177, 5952); // go to a safe position
+					Pather.moveTo(15166, 5903); // go to a safe position
 				}
 
 				Town.getCorpse(); // check for corpse - happens if you die and reenter

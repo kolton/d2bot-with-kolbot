@@ -140,7 +140,7 @@ MainLoop:
 				delay(500);
 
 				split = command.split("kill ")[1];
-				
+
 				if (!Pather.usePortal(player.area, player.name)) {
 					me.overhead("Failed to use TP");
 

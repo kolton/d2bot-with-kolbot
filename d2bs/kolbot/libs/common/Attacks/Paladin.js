@@ -224,10 +224,24 @@ var ClassAttack = {
 	},
 
 	checkHammerPosition: function (unit) {
-		var i,
-			x = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targetx : unit.x,
-			y = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targety : unit.y,
-			positions = unit.type === 0 ? [[x + 2, y], [x + 2, y + 1]] : [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
+		var i, x, y, positions,
+			baseId = getBaseStat("monstats", unit.classid, "baseid"),
+			size = getBaseStat("monstats2", baseId, "sizex") || 3;
+
+		switch (unit.type) {
+		case 0: // Player
+			x = unit.x;
+			y = unit.y;
+			positions = [[x + 2, y], [x + 2, y + 1]];
+
+			break;
+		case 1: // Monster
+			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targetx : unit.x;
+			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targety : unit.y;
+			positions = [[x + size - 1, y + size - 1], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
+
+			break;
+		}
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (getDistance(me, positions[i][0], positions[i][1]) < 1) {
@@ -239,10 +253,24 @@ var ClassAttack = {
 	},
 
 	getHammerPosition: function (unit) {
-		var i,
-			x = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targetx : unit.x,
-			y = (unit.mode === 2 || unit.mode === 15) && unit.type === 1 && getDistance(me, unit) > 5 ? unit.targety : unit.y,
-			positions = unit.type === 0 ? [[x + 2, y], [x + 2, y + 1]] : [[x + 2, y + 2], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
+		var i, x, y, positions,
+			baseId = getBaseStat("monstats", unit.classid, "baseid"),
+			size = getBaseStat("monstats2", baseId, "sizex") || 3;
+
+		switch (unit.type) {
+		case 0: // Player
+			x = unit.x;
+			y = unit.y;
+			positions = [[x + 2, y], [x + 2, y + 1]];
+
+			break;
+		case 1: // Monster
+			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targetx : unit.x;
+			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targety : unit.y;
+			positions = [[x + size - 1, y + size - 1], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
+
+			break;
+		}
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (Attack.validSpot(positions[i][0], positions[i][1])) {
@@ -267,6 +295,10 @@ var ClassAttack = {
 				//Pather.teleportTo(x, y);
 				Skill.cast(54, 0, x, y);
 			} else {
+				if (Config.Vigor) {
+					Skill.setSkill(115, 0);
+				}
+
 				me.move(x, y);
 			}
 		}
