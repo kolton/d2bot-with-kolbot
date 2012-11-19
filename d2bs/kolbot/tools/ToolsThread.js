@@ -70,7 +70,7 @@ function main() {
 		return true;
 	};
 
-	this.getPotion = function (pottype) {
+	this.getPotion = function (pottype, type) {
 		var i,
 			items = me.getItems();
 
@@ -79,8 +79,8 @@ function main() {
 		}
 
 		for (i = 0; i < items.length; i += 1) {
-			if (pottype === 78 && items[i].mode === 0 && items[i].location === 3 && items[i].itemType === 78) {
-				print("ÿc2Drinking rejuventation potion from inventory.");
+			if (type < 3 && items[i].mode === 0 && items[i].location === 3 && items[i].itemType === pottype) {
+				print("ÿc2Drinking potion from inventory.");
 
 				return copyUnit(items[i]);
 			}
@@ -107,6 +107,16 @@ function main() {
 		}
 
 		script = getScript("tools/antihostile.js");
+
+		if (script) {
+			if (script.running) {
+				script.pause();
+			} else {
+				script.resume();
+			}
+		}
+
+		script = getScript("tools/rushthread.js");
 
 		if (script) {
 			if (script.running) {
@@ -164,7 +174,7 @@ function main() {
 			break;
 		}
 
-		potion = this.getPotion(pottype);
+		potion = this.getPotion(pottype, type);
 
 		if (potion) {
 			if (me.mode === 0 || me.mode === 17) {
@@ -174,7 +184,11 @@ function main() {
 			if (type < 3) {
 				potion.interact();
 			} else {
-				clickItem(2, potion);
+				try {
+					clickItem(2, potion);
+				} catch (e) {
+					this.drinkPotion(type); // Recursive check - we better drink the damn potion
+				}
 			}
 
 			timerLastDrink[type] = getTickCount();
@@ -203,13 +217,15 @@ function main() {
 			} while (monster.getNext());
 		}
 
-		monster = getUnit(1, -1, -1, gid);
-
-		if (monster) {
-			return ". Nearest monster: " + monster.name;
+		if (gid) {
+			monster = getUnit(1, -1, -1, gid);
 		}
 
-		return ".";
+		if (monster) {
+			return " to " + monster.name;
+		}
+
+		return "";
 	};
 
 	this.getIronGolem = function () {
@@ -349,7 +365,7 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + area.name + this.getNearestMonster() + ";9");
+					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + area.name + ". Ping: " + me.ping + ";9");
 					D2Bot.updateChickens();
 					quit();
 
@@ -371,7 +387,7 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + area.name + ";9");
+					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + area.name + ";9");
 					D2Bot.updateChickens();
 					quit();
 
@@ -418,10 +434,12 @@ function main() {
 							break;
 						}
 
+						if (mercHP < configCache.UseMercHP) {
+							this.drinkPotion(3);
+						}
+
 						if (mercHP < configCache.UseMercRejuv) {
 							this.drinkPotion(4);
-						} else if (mercHP < configCache.UseMercHP) {
-							this.drinkPotion(3);
 						}
 					}
 				}

@@ -72,16 +72,18 @@ Unit.prototype.openMenu = function () {
 		}
 
 		this.interact();
+		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 
 		for (j = 0; j < 40; j += 1) {
 			if (j % 10 === 0) {
 				me.cancel();
 				delay(400);
 				this.interact();
+				//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 			}
 
 			if (getUIFlag(0x08)) {
-				delay(500 + me.ping * 2);
+				delay(700 + me.ping);
 
 				return true;
 			}

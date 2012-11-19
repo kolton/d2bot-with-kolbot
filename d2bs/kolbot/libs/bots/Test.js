@@ -39,7 +39,7 @@ function Test() {
 function test() {
 	print("test");
 
-	AutoMule.dropStuff();
+	Town.doChores();
 }
 
 /*var _NTIP_CheckList = [],

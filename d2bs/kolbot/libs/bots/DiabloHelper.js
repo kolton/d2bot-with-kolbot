@@ -31,7 +31,7 @@ function DiabloHelper() {
 
 	this.initLayout = function () {
 		this.vizLayout = this.getLayout(396, 5275); // 1 = "Y", 2 = "L"
-		this.seisLayout = this.getLayout(394, 7773); // 1= "2", 2 = "5"
+		this.seisLayout = this.getLayout(394, 7773); // 1 = "2", 2 = "5"
 		this.infLayout = this.getLayout(392, 7893); // 1 = "I", 2 = "J"
 	};
 
@@ -50,7 +50,7 @@ function DiabloHelper() {
 			}
 		}
 
-		for (i = 0; i < (name === getLocaleString(2853) ? 12 : 10); i += 1) {
+		for (i = 0; i < 16; i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
@@ -65,7 +65,12 @@ function DiabloHelper() {
 
 	this.vizierSeal = function () {
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.starSort);
-		this.vizLayout === 1 ? Pather.moveTo(7691, 5292) : Pather.moveTo(7695, 5316);
+
+		if (this.vizLayout === 1) {
+			Pather.moveTo(7691, 5292);
+		} else {
+			Pather.moveTo(7695, 5316);
+		}
 
 		if (!this.getBoss(getLocaleString(2851))) {
 			throw new Error("Failed to kill Vizier");
@@ -76,7 +81,12 @@ function DiabloHelper() {
 
 	this.seisSeal = function () {
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.starSort);
-		this.seisLayout === 1 ? Pather.moveTo(7790, 5200) : Pather.moveTo(7798, 5186);
+
+		if (this.seisLayout === 1) {
+			Pather.moveTo(7771, 5196);
+		} else {
+			Pather.moveTo(7798, 5186);
+		}
 
 		if (!this.getBoss(getLocaleString(2852))) {
 			throw new Error("Failed to kill de Seis");
@@ -87,7 +97,12 @@ function DiabloHelper() {
 
 	this.infectorSeal = function () {
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
-		this.infLayout === 1 ? Pather.moveTo(7908, 5269) : Pather.moveTo(7932, 5305);
+
+		if (this.infLayout === 1) {
+			delay(1);
+		} else {
+			Pather.moveTo(7928, 5295); // temp
+		}
 
 		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
@@ -100,7 +115,7 @@ function DiabloHelper() {
 		var trapCheck,
 			tick = getTickCount();
 
-		while (getTickCount() - tick < 20000) {
+		while (getTickCount() - tick < 30000) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
 				case 1: // Sorceress
@@ -251,8 +266,8 @@ function DiabloHelper() {
 	Town.move("portalspot");
 
 	for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
-	
 		partybaal = getParty();
+
 		if (partybaal) {
 			do {
 				if (partybaal.area === 131) {
@@ -260,7 +275,7 @@ function DiabloHelper() {
 				}
 			} while (partybaal.getNext());
 		}
-	
+
 		if (Pather.usePortal(108, null)) {
 			break;
 		}

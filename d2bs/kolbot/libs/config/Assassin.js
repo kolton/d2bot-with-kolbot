@@ -102,6 +102,7 @@ function LoadConfig() {
 	Scripts.Frozenstein = false;
 		Config.Frozenstein.ClearFrozenRiver = true;
 	Scripts.Bonesaw = false;
+		Config.Bonesaw.ClearDrifterCavern = false;
 	Scripts.Snapchip = false;
 		Config.Snapchip.ClearIcyCellar = true;
 	Scripts.Baal = false;
@@ -125,10 +126,12 @@ function LoadConfig() {
 	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
 	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
 	Scripts.DiabloHelper = false; // Chaos helper, kills monsters and doesn't open seals on its own.
+		Config.DiabloHelper.Wait = 120; // Seconds to wait for a runner to be in Chaos
 		Config.DiabloHelper.Entrance = true; // Start from entrance
 	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
 		Config.AutoBaal.FindShrine = false; // Find shrine when hot tp message is sent. You can change messages in AutoBaal.js
 	Scripts.BaalHelper = false;
+		Config.BaalHelper.Wait = 120; // Seconds to wait for a runner to be in Throne
 		Config.BaalHelper.KillNihlathak = false; // Kill Nihlathak before going to Throne
 		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
@@ -177,6 +180,8 @@ function LoadConfig() {
 	Config.UseRejuvMP = 0; // Drink a rejuvenation potion if mana is under designated percent.
 	Config.UseMercHP = 75; // Give a healing potion to your merc if his/her life is under designated percent.
 	Config.UseMercRejuv = 0; // Give a rejuvenation potion to your merc if his/her life is under designated percent.
+	Config.HPBuffer = 0; // Number of healing potions to keep in inventory.
+	Config.MPBuffer = 0; // Number of mana potions to keep in inventory.
 	Config.RejuvBuffer = 0; // Number of rejuvenation potions to keep in inventory.
 
 	// Chicken settings

@@ -47,7 +47,7 @@
 */
 
 function Follower() {
-	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit,
+	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit, player,
 		commanders = [Config.Follower.Leader],
 		attack = true,
 		openContainers = true,
@@ -485,6 +485,10 @@ function Follower() {
 				}
 
 				break;
+			case "flash":
+				Packet.flash(me.gid);
+
+				break;
 			case "aoff":
 			case me.name + " aoff":
 				attack = false;
@@ -573,7 +577,7 @@ function Follower() {
 			}
 		}
 
-		if (msg && msg.indexOf("leader ") > -1 && commanders.indexOf(nick) > -1) {
+		if (msg && msg.split(" ")[0] === "leader" && commanders.indexOf(nick) > -1) {
 			piece = msg.split(" ")[1];
 
 			if (typeof piece === "string") {
@@ -648,28 +652,23 @@ function Follower() {
 				}
 			}
 
-			/*if (getDistance(me, leaderUnit) <= 50) {
-				if (getDistance(me, leaderUnit) > 4) {
-					Pather.moveToUnit(leaderUnit);
-				}
-			}*/
+			if (!leaderUnit) {
+				player = getUnit(0);
 
-			// Nad42 long distance following
-			if (leader.area === me.area) {
-				try {
-					if (copyUnit(leaderUnit).x) {
-						if (getDistance(me, leaderUnit) > 4) {
-							Pather.moveToUnit(leaderUnit);
+				if (player) {
+					do {
+						if (player.name !== me.name) {
+							Pather.moveToUnit(player);
+
+							break;
 						}
-					} else {
-						//print("trying roster");
-						Pather.moveToUnit(leader);
-					}
-				} catch (err) {
-					//print("error with copyUnit, trying roster");
-					if (leader.area === me.area) {
-						Pather.moveToUnit(leader);
-					}
+					} while (player.getNext());
+				}
+			}
+
+			if (leaderUnit && getDistance(me.x, me.y, leaderUnit.x, leaderUnit.y) <= 60) {
+				if (getDistance(me.x, me.y, leaderUnit.x, leaderUnit.y) > 4) {
+					Pather.moveToUnit(leaderUnit);
 				}
 			}
 
@@ -786,14 +785,14 @@ WPLoop:
 
 			break;
 		case "p":
-			say("Picking items.");
+			say("!Picking items.");
 			Pickit.pickItems();
 
 			if (openContainers) {
 				this.openContainers(20);
 			}
 
-			say("Done picking.");
+			say("!Done picking.");
 
 			break;
 		case "1":
@@ -810,8 +809,7 @@ WPLoop:
 					break;
 				}
 
-				//while (!this.getLeaderUnit(Config.Follower.Leader)) {
-				while (leader.area !== me.area) { // EXPERIMENTAL
+				while (!this.getLeaderUnit(Config.Follower.Leader) && !me.dead) {
 					Attack.clear(10);
 					delay(200);
 				}
@@ -832,6 +830,18 @@ WPLoop:
 				Town.doChores();
 				Town.move("portalspot");
 				say("Ready");
+			}
+
+			break;
+		case "h":
+			if (me.classid === 4) {
+				Skill.cast(130);
+			}
+
+			break;
+		case "bo":
+			if (me.classid === 4) {
+				Precast.doPrecast(true);
 			}
 
 			break;

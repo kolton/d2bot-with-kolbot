@@ -7,6 +7,7 @@
 var Attack = {
 	classes: ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 	infinity: false,
+	dodgePos: [],
 
 	// Initialize attacks
 	init: function () {
@@ -134,6 +135,8 @@ var Attack = {
 			attackCount += 1;
 		}
 
+		this.dodgePos = [];
+
 		if (Config.MFSwitchPercent) {
 			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
 		}
@@ -254,7 +257,9 @@ var Attack = {
 		}
 
 		while (monsterList.length > 0) {
-			if (me.mode === 17) {
+			delay(5);
+
+			if (me.dead) {
 				return false;
 			}
 
@@ -264,14 +269,12 @@ var Attack = {
 			target = copyUnit(monsterList[0]);
 
 			if (typeof target.x !== "undefined" &&
-					((Math.abs(orgx - target.x) <= range &&
-						Math.abs(orgy - target.y) <= range) ||
-						(this.getScarinessLevel(target) > 7 &&
-						Math.abs(me.x - target.x) <= range &&
-						Math.abs(me.y - target.y) <= range)) &&
+					((Math.abs(orgx - target.x) <= range && Math.abs(orgy - target.y) <= range) ||
+					(this.getScarinessLevel(target) > 7 && Math.abs(me.x - target.x) <= range && Math.abs(me.y - target.y) <= range)) &&
 					(!spectype || (target.spectype & spectype)) &&
 					this.checkMonster(target) &&
-					(me.getSkill(54, 1) || !checkCollision(me, target, 0x1))) {
+					(me.getSkill(54, 1) || !checkCollision(me, target, 0x1))
+					) {
 				if (Config.Dodge) {
 					if (attackCount % 5 === 0) {
 						dodgeList = this.buildDodgeList();
@@ -335,6 +338,7 @@ var Attack = {
 
 		ClassAttack.afterAttack(pickit);
 		this.openChests(range);
+		this.dodgePos = [];
 
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
@@ -440,6 +444,7 @@ var Attack = {
 
 		ClassAttack.afterAttack(true);
 		this.openChests(30);
+		this.dodgePos = [];
 
 		if (attackCount > 0) {
 			Pickit.pickItems();
@@ -637,20 +642,28 @@ var Attack = {
 			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
 			angles = [0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180];
 
-		// step 1 - build possible dodge positions based on angles
-		for (i = 0; i < angles.length; i = i + 1) {
-			coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
-			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
+		if (!this.dodgePos.length || getDistance(me.x, me.y, this.dodgePos[0][0], this.dodgePos[0][1]) > 50) {
+			print("Build dodgePos");
 
-			if (this.validSpot(coordx, coordy)) {
-				coords.push([coordx, coordy]);
+			// step 1 - build possible dodge positions based on angles
+			for (i = 0; i < angles.length; i = i + 1) {
+				coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
+				coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
+
+				if (this.validSpot(coordx, coordy)) {
+					coords.push([coordx, coordy]);
+				}
 			}
-		}
 
-		if (coords.length === 0) { // no valid positions - don't move
-			me.overhead("Can't dodge :(");
+			if (coords.length === 0) { // no valid positions - don't move
+				me.overhead("Can't dodge :(");
 
-			return true;
+				return true;
+			}
+
+			this.dodgePos = coords.slice();
+		} else {
+			coords = this.dodgePos.slice();
 		}
 
 		coords.sort(Sort.points);

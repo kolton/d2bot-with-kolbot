@@ -120,6 +120,8 @@ var Config = {
 	PublicMode: false,
 	ShitList: false,
 	QuitList: [],
+	HPBuffer: 0,
+	MPBuffer: 0,
 	RejuvBuffer: 0,
 	PickRange: 40,
 	FastPick: false,
@@ -341,5 +343,11 @@ var Config = {
 	},
 	Travincal: {
 		PortalLeech: false
+	},
+	SkillStat: {
+		Skills: []
+	},
+	Bonesaw: {
+		ClearDrifterCavern: false
 	}
 };

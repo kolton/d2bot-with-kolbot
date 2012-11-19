@@ -102,6 +102,7 @@ var Town = {
 		}
 
 		me.cancel();
+		print("town chores done");
 
 		return true;
 	},
@@ -119,9 +120,13 @@ var Town = {
 		}
 
 		if (!npc) {
-			this.move(this.tasks[me.act - 1][task]);
-
 			npc = getUnit(1, this.tasks[me.act - 1][task]);
+
+			if (!npc) {
+				this.move(this.tasks[me.act - 1][task]);
+
+				npc = getUnit(1, this.tasks[me.act - 1][task]);
+			}
 		}
 
 		if (!npc || (!getUIFlag(0x08) && !npc.openMenu())) {
@@ -333,7 +338,12 @@ var Town = {
 		var tome = me.findItem(id, 0, 3);
 
 		if (!tome) {
-			return 20; // nothing to fill
+			switch (id) {
+			case "ibk":
+				return 20; // Ignore missing ID tome
+			case "tbk":
+				return 0; // Force TP tome check
+			}
 		}
 
 		return tome.getStat(70);
@@ -380,19 +390,8 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
-			//if (item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
-			if (item.location === 3) { // ignore list check shouldn't be needed
+			if (item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
 				switch (result.result) {
-				case 1:
-					// Not needed with new code. Wasn't needed with old either...
-
-					/*if (item.getFlag(0x10)) {
-						Misc.logItem("Kept", item, result.line);
-					}*/
-
-					break;
-				case 2:
-					break;
 				// Items for gold, will sell magics, etc. w/o id, but at low levels
 				// magics are often not worth iding.
 				case 4:
@@ -460,20 +459,7 @@ MainLoop:
 			}
 		}
 
-		if (!me.findItem("tbk", 0, 3)) {
-			this.fillTome("tbk");
-
-			tpTome = me.findItem("tbk", 0, 3);
-
-			if (tpTome) {
-				if (tpTome.x !== tpTomePos.x || tpTome.y !== tpTomePos.y) {
-					if (tpTome.toCursor()) {
-						clickItem(0, tpTomePos.x, tpTomePos.y, 3);
-						delay(300);
-					}
-				}
-			}
-		}
+		this.fillTome("tbk"); // Check for TP tome in case it got sold for ID scrolls
 
 		return true;
 	},
@@ -710,6 +696,8 @@ MainLoop:
 						print(e);
 					}
 				}
+
+				delay(2);
 			}
 		}
 
@@ -1281,35 +1269,35 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, items, loseItemAction,
+		var i, loseItemAction,
 			dropAction = 0,
 			sellAction = 1,
-			clearList = [],
-			item = me.getItem(-1, 0);
+			items = me.getItems();
 
-		// Potions (after death usually)
-		if (item) {
-			do {
-				if (item.location === 3) {
-					switch (item.itemType) {
-					case 76: // Healing
-					case 77: // Mana
-						clearList.push(copyUnit(item));
-						break;
-					case 78: // Rejuv
-						if (Config.RejuvBuffer) { // TODO: Improve
-							break;
+		if (items) {
+			for (i = 0; i < items.length; i += 1) {
+				if (items[i].mode === 0 && items[i].location === 3) {
+					switch (items[i].itemType) {
+					case 76:
+						if (!Config.HPBuffer) {
+							items[i].interact();
 						}
 
-						clearList.push(copyUnit(item));
+						break;
+					case 77:
+						if (!Config.MPBuffer) {
+							items[i].interact();
+						}
+
+						break;
+					case 78:
+						if (!Config.RejuvBuffer) {
+							items[i].interact();
+						}
+
 						break;
 					}
 				}
-			} while (item.getNext());
-
-			while (clearList.length > 0) {
-				clearList.shift().interact();
-				delay(200);
 			}
 		}
 
@@ -1319,6 +1307,7 @@ MainLoop:
 		// If low on gold
 		if (me.getStat(14) + me.getStat(15) < Config.LowGold) {
 			this.initNPC("Shop");
+
 			loseItemAction = sellAction;
 		} else {
 			loseItemAction = dropAction;
@@ -1442,29 +1431,26 @@ MainLoop:
 	},
 
 	move: function (spot) {
+		print("Townmove: " + spot);
+
 		if (!me.inTown && !this.goToTown()) { // To prevent long trips if tp to town failed
 			throw new Error("Town.move: Failed to go to town!");
 		}
 
-		// TODO: Add character config variable for telekinesis
-		while (!me.idle) {
+		/*while (!me.idle) {
 			delay(40);
-		}
+		}*/
 
 		var i, townSpot, temp,
-			useTK = me.classid === 1 && me.getSkill(43, 1) && ["stash", "portalspot", "waypoint"].indexOf(spot) > -1;
+			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
 
 		if (!this.act[me.act - 1].initialized) {
 			this.initialize();
 		}
 
 		if (typeof (this.act[me.act - 1].spot[spot]) === "object") {
-			//print("Moving to " + spot + " from " + me.x + " " + me.y);
-
 			townSpot = this.act[me.act - 1].spot[spot];
 		} else {
-			//print("ÿc1Invalid town spot: " + spot);
-
 			return false;
 		}
 
@@ -1483,12 +1469,12 @@ MainLoop:
 				Pather.moveTo(temp[0], temp[1], 3);
 			}
 
-			Pather.moveTo(townSpot[0], townSpot[1], 3);
+			Pather.moveTo(townSpot[0], townSpot[1]);
 
 			// If unit has more than one location and it's not here, search
 			if (townSpot.length > 2 && !getUnit(1, spot)) {
 				for (i = 0; i < townSpot.length / 2; i += 1) {
-					Pather.moveTo(townSpot[i * 2], townSpot[i * 2 + 1], 3);
+					Pather.moveTo(townSpot[i * 2], townSpot[i * 2 + 1]);
 
 					if (!!getUnit(1, spot)) {
 						break;

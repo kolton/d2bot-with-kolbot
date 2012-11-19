@@ -496,7 +496,7 @@ ModeLoop:
 
 			while (getTickCount() - tick < 3000) {
 				if ((targetArea === null && me.area !== preArea) || me.area === targetArea) {
-					//delay(200);
+					delay(200);
 
 					return true;
 				}
@@ -594,7 +594,7 @@ ModeLoop:
 
 				while (getTickCount() - tick < 2000) {
 					if (me.area === targetArea) {
-						//delay(200);
+						delay(200);
 
 						return true;
 					}
@@ -733,7 +733,7 @@ ModeLoop:
 
 			while (getTickCount() - tick < 1000) {
 				if (me.area !== preArea) {
-					//delay(200);
+					delay(200);
 
 					return true;
 				}
@@ -742,6 +742,8 @@ ModeLoop:
 			}
 
 			if (i > 1) {
+				Packet.flash(me.gid);
+
 				useTK = false;
 			}
 

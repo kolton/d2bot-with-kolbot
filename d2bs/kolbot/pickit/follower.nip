@@ -6,3 +6,5 @@
 [type] == rejuvpotion
 
 [quality] >= magic # [strength] > 100
+
+[type] == 39

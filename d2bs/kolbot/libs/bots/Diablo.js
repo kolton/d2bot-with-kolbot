@@ -91,7 +91,7 @@ function Diablo() {
 		var i, boss,
 			glow = getUnit(2, 131);
 
-		for (i = 0; i < (name === getLocaleString(2853) ? 14 : 12); i += 1) {
+		for (i = 0; i < 16; i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
@@ -175,7 +175,7 @@ function Diablo() {
 		var trapCheck,
 			tick = getTickCount();
 
-		while (getTickCount() - tick < 20000) {
+		while (getTickCount() - tick < 30000) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
 				case 1: // Sorceress

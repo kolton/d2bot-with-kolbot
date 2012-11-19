@@ -15,5 +15,9 @@ function Bonesaw() {
 
 	Attack.clear(15, 0, getLocaleString(22502)); // Bonesaw Breaker
 
+	if (Config.Bonesaw.ClearDrifterCavern && Pather.moveToExit(116, true)) {
+		Attack.clearLevel(Config.ClearType);
+	}
+
 	return true;
 }

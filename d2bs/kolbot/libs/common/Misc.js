@@ -17,6 +17,10 @@ var Skill = {
 
 		// No mana to cast
 		if (this.getManaCost(skillId) > me.mp) {
+			if (Config.AttackSkill.indexOf(skillId) > -1) {
+				delay(200);
+			}
+
 			return false;
 		}
 
@@ -628,10 +632,22 @@ MainLoop:
 	// Use a NPC menu. Experimental function, subject to change
 	// id = string number (with exception of Ressurect merc). http://www.blizzhackers.cc/viewtopic.php?f=209&t=378493
 	useMenu: function (id) {
-		print("useMenu " + getLocaleString(id)); // debug
+		print("useMenu " + getLocaleString(id));
 
-		var i,
-			lines = getDialogLines();
+		var i, npc, lines;
+
+		// Trade crashes a lot with dialog lines
+		if (id === 0x0D44) {
+			npc = getInteractedNPC();
+
+			if (npc) {
+				npc.useMenu(id);
+
+				return true;
+			}
+		}
+
+		lines = getDialogLines();
 
 		if (!lines) {
 			return false;
@@ -642,15 +658,15 @@ MainLoop:
 				switch (id) {
 				case 0x1507: // Ressurect Merc
 					if (lines[i].text.indexOf(getLocaleString(22695)) > -1) {
-						lines[i].handler();
+						getDialogLines()[i].handler();
 
 						return true;
 					}
 
 					break;
 				default:
-					if (lines[i].text === getLocaleString(id)) {
-						lines[i].handler();
+					if (lines[i].text.indexOf(getLocaleString(id)) > -1) {
+						getDialogLines()[i].handler();
 
 						return true;
 					}
@@ -834,8 +850,9 @@ var Packet = {
 	},
 	teleWalk: function (wX, wY) {
 		sendPacket(1, 0x5f, 2, wX, 2, wY);
-		delay(me.ping + 5);
+		delay(200);
 		sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
+		delay(200);
 	},
 	flash: function (gid) {
 		sendPacket(1, 0x4b, 4, 0, 4, gid);
