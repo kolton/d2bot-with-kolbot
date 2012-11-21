@@ -226,7 +226,12 @@ var ClassAttack = {
 	checkHammerPosition: function (unit) {
 		var i, x, y, positions,
 			baseId = getBaseStat("monstats", unit.classid, "baseid"),
-			size = getBaseStat("monstats2", baseId, "sizex") || 3;
+			size = getBaseStat("monstats2", baseId, "sizex");
+
+		// in case base stat returns something outrageous
+		if (typeof size !== "number" || size < 1 || size > 3) {
+			size = 3;
+		}
 
 		switch (unit.type) {
 		case 0: // Player
@@ -255,7 +260,12 @@ var ClassAttack = {
 	getHammerPosition: function (unit) {
 		var i, x, y, positions,
 			baseId = getBaseStat("monstats", unit.classid, "baseid"),
-			size = getBaseStat("monstats2", baseId, "sizex") || 3;
+			size = getBaseStat("monstats2", baseId, "sizex");
+
+		// in case base stat returns something outrageous
+		if (typeof size !== "number" || size < 1 || size > 3) {
+			size = 3;
+		}
 
 		switch (unit.type) {
 		case 0: // Player
