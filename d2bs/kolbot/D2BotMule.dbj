@@ -365,6 +365,12 @@ function main() {
 		if (!FileTools.exists(muleFilename)) {
 			MuleData.create();
 		}
+
+		obj = MuleData.read();
+
+		if (obj.account && obj.account.indexOf(muleInfoObj.accountPrefix) < 0) {
+			MuleData.create();
+		}
 	} catch (e) {
 		print("Caught exception creating data files.");
 		print(e);
@@ -794,6 +800,7 @@ MainSwitch:
 		break;
 	case 30: // charname already exists
 		ControlAction.click(6, 351, 337, 96, 32);
+		ControlAction.click(6, 33, 572, 128, 35);
 
 		break;
 	case 38: // Game is full

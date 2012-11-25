@@ -9,6 +9,7 @@ var global = this;
 var Loader = {
 	scriptList: [],
 	printToOOG: false,
+	screenshotErrors: false,
 
 	init: function () {
 		this.getScripts();
@@ -57,10 +58,15 @@ ScriptLoop:
 							global[i]();
 						} catch (e) {
 							if (this.printToOOG) {
-								D2Bot.printToConsole(e.message + ";9");
+								D2Bot.printToConsole(e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line " + e.lineNumber + ": " + e.message + ";9");
 							}
 
 							Misc.errorReport("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + "): ÿc1" + e.message);
+
+							if (this.screenshotErrors) {
+								takeScreenshot();
+								delay(500);
+							}
 						}
 					}
 				} else {

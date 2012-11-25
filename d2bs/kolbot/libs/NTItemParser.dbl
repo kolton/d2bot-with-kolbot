@@ -29,7 +29,7 @@ function NTIPOpenFile(filepath)
 	var line;
 	var string;
 	var lines;
-	var count = 0;
+	var info;
 
 	nipfile = File.open(filepath, 0);
 
@@ -42,12 +42,17 @@ function NTIPOpenFile(filepath)
 	nipfile.close();
 
 	for (i = 0; i < lines.length; i += 1) {
-		line = NTIPParseLineInt(lines[i]);
-		count += 1;
+		info = {
+			line: i + 1,
+			file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
+			string: lines[i]
+		};
+
+		line = NTIPParseLineInt(lines[i], info);
 
 		if (line) {
 			_NTIP_CheckList.push(line);
-			stringArray.push({string: lines[i], count: count, file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length)});
+			stringArray.push(info);
 		}
 	}
 	
@@ -147,7 +152,7 @@ function NTIPCheckItem(item, entryList, verbose) {
 			showConsole();
 
 			if (!entryList) {
-				print("ÿc1Pickit error! Line # ÿc2" + stringArray[i].count + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
+				print("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
 
 				_NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
 			} else {
@@ -160,7 +165,7 @@ function NTIPCheckItem(item, entryList, verbose) {
 
 	if (verbose) {
 		if (result > 0) {
-			return {line: stringArray[i].file + " #" + stringArray[i].count, result: result};
+			return {line: stringArray[i].file + " #" + stringArray[i].line, result: result};
 		} else {
 			return {line: null, result: result};
 		}
@@ -211,7 +216,7 @@ function NTIP_CheckQuantityOwned(item_type, item_stats) {
 	return num;
 }
 
-function NTIPParseLineInt(input) {
+function NTIPParseLineInt(input, info) {
 	var i, property, _start, _end, _section, _keyword, _result;
 
 	_end = input.indexOf("//");
@@ -292,7 +297,7 @@ function NTIPParseLineInt(input) {
 
 				break;
 			default:
-				print("Unknown Keyword : " + input);
+				print("Unknown Keyword : " + input + " File: " + info.file + " Line: " + info.line);
 
 				break;
 			}
@@ -317,7 +322,7 @@ function NTIPParseLineInt(input) {
 				switch (property) {
 				case 'color':
 					if (typeof _NTIPAliasColor[_keyword] === "undefined") {
-						print("Unknown color: " + _keyword);
+						print("Unknown color: " + _keyword + " File: " + info.file + " Line: " + info.line);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasColor[_keyword];
@@ -326,7 +331,7 @@ function NTIPParseLineInt(input) {
 					break;
 				case 'type':
 					if (typeof _NTIPAliasType[_keyword] === "undefined") {
-						print("Unknown type: " + _keyword);
+						print("Unknown type: " + _keyword + " File: " + info.file + " Line: " + info.line);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasType[_keyword];
@@ -335,7 +340,7 @@ function NTIPParseLineInt(input) {
 					break;
 				case 'name':
 					if (typeof _NTIPAliasClassID[_keyword] === "undefined") {
-						print("Unknown name: " + _keyword);
+						print("Unknown name: " + _keyword + " File: " + info.file + " Line: " + info.line);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasClassID[_keyword];
@@ -344,7 +349,7 @@ function NTIPParseLineInt(input) {
 					break;
 				case 'class':
 					if (typeof _NTIPAliasClass[_keyword] === "undefined") {
-						print("Unknown class: " + _keyword);
+						print("Unknown class: " + _keyword + " File: " + info.file + " Line: " + info.line);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasClass[_keyword];
@@ -353,7 +358,7 @@ function NTIPParseLineInt(input) {
 					break;
 				case 'quality':
 					if (typeof _NTIPAliasQuality[_keyword] === "undefined") {
-						print("Unknown quality: " + _keyword);
+						print("Unknown quality: " + _keyword + " File: " + info.file + " Line: " + info.line);
 						_result[0] += "false";
 					} else {
 						_result[0] += _NTIPAliasQuality[_keyword];
@@ -362,7 +367,7 @@ function NTIPParseLineInt(input) {
 					break;
 				case 'flag':
 					if (typeof _NTIPAliasFlag[_keyword] === "undefined") {
-						print("Unknown flag: " + _keyword);
+						print("Unknown flag: " + _keyword + " File: " + info.file + " Line: " + info.line);
 						_result[0] += "false)";
 					} else {
 						_result[0] += _NTIPAliasFlag[_keyword] + ")";
@@ -396,7 +401,7 @@ function NTIPParseLineInt(input) {
 
 			if (isNaN(_keyword)) {
 				if (typeof _NTIPAliasStat[_keyword] === "undefined") {
-					print("Unknown stat: " + _keyword);
+					print("Unknown stat: " + _keyword + " File: " + info.file + " Line: " + info.line);
 					_result[1] += "false";
 				} else {
 					_result[1] += "item.getStat(" + _NTIPAliasStat[_keyword] + ")";

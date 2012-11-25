@@ -154,16 +154,14 @@ var ClassAttack = {
 				return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
 			}
 
-			if (!this.checkHammerPosition(unit)) {
-				if (!this.getHammerPosition(unit)) {
-					print("can't get to " + unit.name);
+			if (!this.getHammerPosition(unit)) {
+				print("can't get to " + unit.name);
 
-					return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
-				}
+				return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
+			}
 
-				if (getDistance(me, unit) > 6) { // increase pvp aggressiveness
-					return false;
-				}
+			if (getDistance(me, unit) > 5) { // increase pvp aggressiveness
+				return false;
 			}
 
 			if (Config.AttackSkill[aura] > -1) {
@@ -223,40 +221,6 @@ var ClassAttack = {
 		return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
 	},
 
-	checkHammerPosition: function (unit) {
-		var i, x, y, positions,
-			baseId = getBaseStat("monstats", unit.classid, "baseid"),
-			size = getBaseStat("monstats2", baseId, "sizex");
-
-		// in case base stat returns something outrageous
-		if (typeof size !== "number" || size < 1 || size > 3) {
-			size = 3;
-		}
-
-		switch (unit.type) {
-		case 0: // Player
-			x = unit.x;
-			y = unit.y;
-			positions = [[x + 2, y], [x + 2, y + 1]];
-
-			break;
-		case 1: // Monster
-			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targetx : unit.x;
-			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targety : unit.y;
-			positions = [[x + size - 1, y + size - 1], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
-
-			break;
-		}
-
-		for (i = 0; i < positions.length; i += 1) {
-			if (getDistance(me, positions[i][0], positions[i][1]) < 1) {
-				return true;
-			}
-		}
-
-		return false;
-	},
-
 	getHammerPosition: function (unit) {
 		var i, x, y, positions,
 			baseId = getBaseStat("monstats", unit.classid, "baseid"),
@@ -275,11 +239,17 @@ var ClassAttack = {
 
 			break;
 		case 1: // Monster
-			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targetx : unit.x;
-			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) > 5 ? unit.targety : unit.y;
+			x = unit.x;
+			y = unit.y;
 			positions = [[x + size - 1, y + size - 1], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
 
 			break;
+		}
+
+		for (i = 0; i < positions.length; i += 1) {
+			if (getDistance(me, positions[i][0], positions[i][1]) < 1) {
+				return true;
+			}
 		}
 
 		for (i = 0; i < positions.length; i += 1) {

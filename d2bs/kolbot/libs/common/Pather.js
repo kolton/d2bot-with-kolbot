@@ -6,7 +6,7 @@
 
 var Pather = {
 	teleport: true,
-	walkDistance: 15,
+	walkDistance: 12,
 	teleDistance: 40,
 	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
@@ -167,7 +167,7 @@ MainLoop:
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 500) {
+			while (getTickCount() - tick < Math.max(500, me.ping + 200)) {
 				if (getDistance(me, x, y) < 5) {
 					return true;
 				}
@@ -490,6 +490,7 @@ ModeLoop:
 				this.moveToUnit(unit);
 			}
 
+			delay(200);
 			unit.interact();
 
 			tick = getTickCount();
@@ -630,7 +631,7 @@ ModeLoop:
 			return true;
 		}
 
-		var i, portal, oldPortal, oldGid,
+		var i, portal, oldPortal, oldGid, tick,
 			tpTome = me.findItem("tbk", 0, 3);
 
 		if (!tpTome) {
@@ -654,26 +655,38 @@ ModeLoop:
 			} while (!oldGid && oldPortal.getNext());
 		}
 
-		for (i = 0; i < 400; i += 1) {
+		for (i = 0; i < 5; i += 1) {
 			if (me.dead) {
 				break;
 			}
 
-			if (i % 50 === 0) {
-				tpTome.interact();
+			Packet.flash(me.gid);
+			tpTome.interact();
+
+			tick = getTickCount();
+
+MainLoop:
+			while (getTickCount() - tick < 2000) {
+				portal = getUnit(2, "portal");
+
+				if (portal) {
+					do {
+						if (portal.getParent() === me.name && portal.gid !== oldGid) {
+							if (use) {
+								if (this.usePortal(null, null, portal)) {
+									return true;
+								}
+
+								break MainLoop; // don't spam usePortal
+							} else {
+								return true;
+							}
+						}
+					} while (portal.getNext());
+				}
+
+				delay(20);
 			}
-
-			portal = getUnit(2, "portal");
-
-			if (portal) {
-				do {
-					if (portal.getParent() === me.name && portal.gid !== oldGid) {
-						return use ? this.usePortal(null, null, portal) : true;
-					}
-				} while (portal.getNext());
-			}
-
-			delay(20);
 		}
 
 		return false;
@@ -707,12 +720,12 @@ ModeLoop:
 
 				Skill.cast(43, 0, portal);
 			} else {
-				if (getDistance(me, portal) > 3) {
+				if (getDistance(me, portal) > 2) {
 					this.moveToUnit(portal);
 				}
 
-				//portal.interact();
-				sendPacket(1, 0x13, 4, 2, 4, portal.gid);
+				portal.interact();
+				//sendPacket(1, 0x13, 4, 2, 4, portal.gid);
 			}
 
 			if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary, maybe some other portals
@@ -830,7 +843,8 @@ MainLoop:
 			for (dy = -1; dy <= 1; dy += 1) {
 				value = CollMap.getColl(x + dx, y + dy);
 
-				if (value !== 0 && value !== 16) {
+				//if (value !== 0 && value !== 16) {
+				if (value & 0x1) {
 					return false;
 				}
 			}

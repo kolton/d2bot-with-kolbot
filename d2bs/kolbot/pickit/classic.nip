@@ -10,7 +10,7 @@
 [type] == amulet && [quality] == rare # [amazonskills]+[sorceressskills]+[necromancerskills]+[paladinskills]+[barbarianskills] == 2 && ([fireresist]+[lightresist]+[coldresist]+[poisonresist] >= 64 || [fcr] == 10 && [maxhp]+[maxmana] >= 50)
 
 [type] == amulet && [quality] == rare # [paladinskills] >= 1 && [fireresist]+[lightresist]+[coldresist]+[poisonresist] >= 64
-[type] == amulet && [quality] <= rare # [barbarianskills] == 2 || [sorceressskills] == 2
+//[type] == amulet && [quality] <= rare # [barbarianskills] == 2 || [sorceressskills] == 2
 
 //------ rings ------
 
@@ -101,8 +101,8 @@
 //------ rings ------
 
 //[name] == ring && [quality] == unique # [itemmagicbonus] == 30 // nagel
-//[name] == ring && [quality] == unique # [maxmana] == 20 // soj
-[name] == ring && [quality] == unique # [hpregen] == 8 && [manaleech] >= 7 // manald
+[name] == ring && [quality] == unique # [maxmana] == 20 // soj
+//[name] == ring && [quality] == unique # [hpregen] == 8 && [manaleech] >= 7 // manald
 
 //------ belts ------
 

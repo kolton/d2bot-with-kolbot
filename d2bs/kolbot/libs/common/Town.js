@@ -102,7 +102,6 @@ var Town = {
 		}
 
 		me.cancel();
-		print("town chores done");
 
 		return true;
 	},
@@ -1281,18 +1280,21 @@ MainLoop:
 					case 76:
 						if (!Config.HPBuffer) {
 							items[i].interact();
+							delay(200);
 						}
 
 						break;
 					case 77:
 						if (!Config.MPBuffer) {
 							items[i].interact();
+							delay(200);
 						}
 
 						break;
 					case 78:
 						if (!Config.RejuvBuffer) {
 							items[i].interact();
+							delay(200);
 						}
 
 						break;
@@ -1431,8 +1433,6 @@ MainLoop:
 	},
 
 	move: function (spot) {
-		print("Townmove: " + spot);
-
 		if (!me.inTown && !this.goToTown()) { // To prevent long trips if tp to town failed
 			throw new Error("Town.move: Failed to go to town!");
 		}
@@ -1469,6 +1469,7 @@ MainLoop:
 				Pather.moveTo(temp[0], temp[1], 3);
 			}
 
+			print("Townmove: " + spot + " " + townSpot);
 			Pather.moveTo(townSpot[0], townSpot[1]);
 
 			// If unit has more than one location and it's not here, search

@@ -421,18 +421,38 @@ MainSwitch:
 			gameCount += 1;
 		}
 
-		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
-		print("Creating Game: " + gameName + gameCount);
-
 		me.blockMouse = true;
 
-		createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
+		ControlAction.setText(1, 432, 162, 158, 20, gameName + gameCount);
+		ControlAction.setText(1, 432, 217, 158, 20, gamePass);
+
+		switch (difficulty) {
+		case "Normal":
+			ControlAction.click(6, 430, 381, 16, 16);
+
+			break;
+		case "Nightmare":
+			ControlAction.click(6, 555, 381, 16, 16);
+
+			break;
+		case "Hell":
+			ControlAction.click(6, 698, 381, 16, 16);
+
+			break;
+		}
+
+		if (lastGameStatus !== "pending") {
+			timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
+		}
+
+		print("Creating Game: " + gameName + gameCount);
+		ControlAction.click(6, 594, 433, 172, 32);
+		//createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
 
 		me.blockMouse = false;
+		lastGameStatus = "pending";
 
 		locationTimeout(5000, location);
-
-		lastGameStatus = "pending";
 
 		break;
 	case 5: // Join Game

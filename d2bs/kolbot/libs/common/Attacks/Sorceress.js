@@ -175,6 +175,10 @@ var ClassAttack = {
 				}
 			}
 
+			if (Config.AttackSkill[timed] === 59) {
+				return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit.x + rand(-2, 2), unit.y + rand(-2, 2));
+			}
+
 			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
 		}
 
