@@ -195,6 +195,10 @@ var ControlAction = {
 	},
 
 	setText: function (type, x, y, xsize, ysize, text) {
+		if (!text) {
+			return false;
+		}
+
 		var control = getControl(type, x, y, xsize, ysize);
 
 		if (!control) {
@@ -597,8 +601,9 @@ MainLoop:
 				}
 
 				break;
-			case 30: // char name exists
+			case 30: // char name exists (text box 4, 268, 320, 264, 120)
 				ControlAction.click(6, 351, 337, 96, 32);
+				ControlAction.click(6, 33, 572, 128, 35);
 
 				me.blockMouse = false;
 

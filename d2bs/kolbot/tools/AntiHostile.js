@@ -125,19 +125,19 @@ function main() {
 
 		return false;
 	};
-	
+
 	// Find a missile type
 	this.findMissile = function (owner, id, range) {
 		if (typeof range === "undefined") {
 			range = 999;
 		}
-		
+
 		var missile = getUnit(3, id);
-		
+
 		if (!missile) {
 			return false;
 		}
-		
+
 		do {
 			if (missile.owner === owner.gid && getDistance(owner, missile) < range) {
 				return missile;
@@ -336,7 +336,7 @@ function main() {
 
 					if (missile) {
 						do {
-							if (getPlayerFlag(me.gid, missile.owner, 8) && (getDistance(me, missile) < 15 || missile.targetx && getDistance(me, missile.targetx, missile.targety) < 15)) {
+							if (getPlayerFlag(me.gid, missile.owner, 8) && (getDistance(me, missile) < 15 || (missile.targetx && getDistance(me, missile.targetx, missile.targety) < 15))) {
 								this.moveAway(missile, ClassAttack.skillRange[1]);
 
 								break;
@@ -345,7 +345,7 @@ function main() {
 					}
 
 					// Move away if the player is too close or if he tries to move too close (telestomp)
-					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || player.targetx && getDistance(me, player.targetx, player.targety) < 15)) {
+					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || (player.targetx && getDistance(me, player.targetx, player.targety) < 15))) {
 						this.moveAway(player, ClassAttack.skillRange[1]);
 					}
 
@@ -361,6 +361,8 @@ function main() {
 						/*if (getDistance(me, player) < 5) {
 							Skill.cast(97, 1, player);
 						}*/
+
+						break;
 					}
 
 					break;

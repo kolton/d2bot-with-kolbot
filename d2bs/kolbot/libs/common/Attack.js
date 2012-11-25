@@ -507,9 +507,7 @@ var Attack = {
 			rooms.sort(RoomSort);
 			room = rooms.shift();
 
-			//print("myroom: " + myRoom[0] + ", " + myRoom[1] + " nextroom: " + room[0] + ", " + room[1]);
-
-			result = Pather.getNearestWalkable(room[0], room[1], 15, 2);
+			result = Pather.getNearestWalkable(room[0], room[1], 15, 3);
 
 			if (result) {
 				//this.markRoom(getRoom(room[0], room[1]), 0x84);
@@ -1028,7 +1026,8 @@ AuraLoop: // Skip monsters with auras
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				if (this.validSpot(cx, cy)) {
+				//if (this.validSpot(cx, cy)) {
+				if (Pather.checkSpot(cx, cy)) {
 					coords.push([cx, cy]);
 				}
 			}
@@ -1043,7 +1042,7 @@ AuraLoop: // Skip monsters with auras
 						CollMap.reset();
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1], 1));
+						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1], 3));
 					}
 				}
 			}

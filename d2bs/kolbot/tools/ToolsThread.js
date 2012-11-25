@@ -278,6 +278,10 @@ function main() {
 				+ " ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
 
 			break;
+		case 110: // decimal point
+			say("/fps");
+
+			break;
 		}
 	};
 
