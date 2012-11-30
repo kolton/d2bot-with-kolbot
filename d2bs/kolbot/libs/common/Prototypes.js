@@ -71,6 +71,10 @@ Unit.prototype.openMenu = function () {
 			Pather.moveToUnit(this);
 		}
 
+		if (i > 0) {
+			Packet.flash(me.gid);
+		}
+
 		this.interact();
 		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 

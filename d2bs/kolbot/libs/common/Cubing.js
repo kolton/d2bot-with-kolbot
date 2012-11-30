@@ -512,16 +512,21 @@ IngredientLoop:
 	},
 
 	checkRecipe: function (recipe) {
+		//print(recipe.toSource());
+
 		var i, j, item,
 			usedGids = [],
 			matchList = [];
 
 		for (i = 0; i < recipe.Ingredients.length; i += 1) {
 			for (j = 0; j < this.validIngredients.length; j += 1) {
-				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 && (this.validIngredients[j].classid === recipe.Ingredients[i] || (recipe.Ingredients[i] === "pgem" && [566, 586, 601].indexOf(this.validIngredients[j].classid) > -1))) {
+				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 && 
+						(this.validIngredients[j].classid === recipe.Ingredients[i] || (recipe.Ingredients[i] === "pgem" &&
+						[566, 586, 601].indexOf(this.validIngredients[j].classid) > -1))
+						) {
 					item = me.getItem(this.validIngredients[j].classid, -1, this.validIngredients[j].gid);
 
-					if (item) {
+					if (item && this.validItem(item, recipe)) { // 26.11.2012. check if the item actually belongs to the given recipe
 						// don't repeat the same item. TODO: determine if this is still needed since it's older code
 						usedGids.push(this.validIngredients[j].gid);
 						// push the item into the match list
@@ -550,7 +555,7 @@ IngredientLoop:
 		var i;
 
 		for (i = 0; i < this.neededIngredients.length; i += 1) {
-			if (this.keepItem(unit) || unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe)) {
+			if (this.keepItem(unit) || (unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe))) {
 				return true;
 			}
 		}
@@ -656,7 +661,7 @@ IngredientLoop:
 				i = -1;
 
 				while (items.length) {
-					string += ("" + items[0].name + (items.length > 1 ? " + " : ""));
+					string += (items[0].name + (items.length > 1 ? " + " : ""));
 					Storage.Cube.MoveTo(items[0]);
 					items.shift();
 				}

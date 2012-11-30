@@ -159,6 +159,7 @@ var Config = {
 	// Anti-hostile
 	AntiHostile: false,
 	HostileAction: 0,
+	TownOnHostile: false,
 
 	// DClone
 	StopOnDClone: false,
@@ -251,7 +252,9 @@ var Config = {
 	},
 	AutoBaal: {
 		Leader: "",
-		FindShrine: false
+		FindShrine: false,
+		LeechSpot: [15115, 5050],
+		LongRangeSupport: false
 	},
 	KurastChests: {
 		LowerKurast: false,
@@ -324,7 +327,8 @@ var Config = {
 		WaitForKeys: false,
 		WaitTimeout: false,
 		UseSalvation: false,
-		GetFade: false
+		GetFade: false,
+		MakeTorch: true
 	},
 	Synch: {
 		WaitFor: []
@@ -349,5 +353,22 @@ var Config = {
 	},
 	Bonesaw: {
 		ClearDrifterCavern: false
+	},
+	ChestHunterAct1: {
+		Hole: false,
+		Cave: false,
+		Pit: false,
+		MausoCrypt: false
+	},
+	ChestHunterAct2: {
+		StonyTomb: false,
+		AncientTunnels: false,
+		ArcaneSanctuary: false,
+		TalTombs: false
+	},
+	ChestHunterAct5: {
+		GlacialDrifter: false,
+		FrozenCellar: false,
+		HellChests:  false
 	}
 };

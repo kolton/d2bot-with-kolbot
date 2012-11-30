@@ -129,7 +129,10 @@ function LoadConfig() {
 		Config.DiabloHelper.Wait = 120; // Seconds to wait for a runner to be in Chaos
 		Config.DiabloHelper.Entrance = true; // Start from entrance
 	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
-		Config.AutoBaal.FindShrine = false; // Find shrine when hot tp message is sent. You can change messages in AutoBaal.js
+		Config.AutoBaal.Leader = ""; // Leader's charname. Set to "" for automatic detection.
+		Config.AutoBaal.FindShrine = false; // false = disabled, 1 = search after hot tp message, 2 = search as soon as leader is found
+		Config.AutoBaal.LeechSpot = [15115, 5050]; // X, Y coords of Throne Room leech spot
+		Config.AutoBaal.LongRangeSupport = false; // Cast long distance skills from a safe spot
 	Scripts.BaalHelper = false;
 		Config.BaalHelper.Wait = 120; // Seconds to wait for a runner to be in Throne
 		Config.BaalHelper.KillNihlathak = false; // Kill Nihlathak before going to Throne
@@ -146,6 +149,7 @@ function LoadConfig() {
 	// *** special scripts ***
 	Scripts.WPGetter = false; // Get missing waypoints
 	Scripts.OrgTorch = false;
+		Config.OrgTorch.MakeTorch = true; // Convert organ sets to torches
 		Config.OrgTorch.WaitForKeys = true; // Enable Torch System to get keys from other profiles. See libs/TorchSystem.js for more info
 		Config.OrgTorch.WaitTimeout = 15; // Time in minutes to wait for keys before moving on
 		Config.OrgTorch.UseSalvation = true; // Use Salvation aura on Mephisto (if possible)
@@ -165,6 +169,25 @@ function LoadConfig() {
 		Config.ShopBot.ShopNPC = "Anya"; // Only Anya for now
 		// Scan only selected classids for maximum speed. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [187, 188, 194, 195, 326, 327, 338, 373, 397, 443, 449];
+
+	// *** Guest scripts ***
+	
+	// Chest Hunter by Talltree
+	Scripts.ChestHunterAct1 = true;
+		Config.ChestHunterAct1.Hole = true; //Golden Chest in the Hole	
+		Config.ChestHunterAct1.Cave = true; //Golden Chest in the Cave	
+		Config.ChestHunterAct1.Pit = true; // Golden Chest in the Pit
+		Config.ChestHunterAct1.MausoCrypt = true; //all Chests in Mausoleum and Crypta
+	Scripts.ChestHunterAct2 = true;	
+		Config.ChestHunterAct2.StonyTomb = true; //Golden Chest in the Stony Tomb
+		Config.ChestHunterAct2.AncientTunnels = true; //Golden Chest in the Ancient Tunnels
+		Config.ChestHunterAct2.ArcaneSanctuary = true; //all Chests in the Arcane Sanctuary
+		Config.ChestHunterAct2.TalTombs = true; //all Chests in the 7 Tal Tombs
+	Scripts.ChestHunterAct3 = true;	// Spider Cave and Spider Cavern, Rest of the Chests are convered with "KurastChests"
+	Scripts.ChestHunterAct5 = true;
+		Config.ChestHunterAct5.GlacialDrifter = true; //Glacial Trail and Drifter Cavern Golden Chest
+		Config.ChestHunterAct5.FrozenCellar = true; //Golden Chest in the Frozen Cellar
+		Config.ChestHunterAct5.HellChests = true; //Golden Chest in Abbadon, Pit of Acheron, Infernal Pit
 
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
@@ -320,6 +343,7 @@ function LoadConfig() {
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
+	Config.TownOnHostile = false; // Go to town instead of quitting when HostileAction is 0 or 1
 
 	// DClone config
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth

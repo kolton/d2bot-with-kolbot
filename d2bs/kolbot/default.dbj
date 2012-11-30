@@ -35,7 +35,7 @@ function main() {
 	}
 
 	// don't load default for mules
-	if (me.profile === AutoMule.Mule.muleProfile || me.profile === AutoMule.TorchMule.muleProfile) {
+	if (AutoMule.getMuleObject(0) || AutoMule.getMuleObject(1)) {
 		return true;
 	}
 

@@ -122,7 +122,7 @@ var Pickit = {
 						} else {
 							print("ÿc7Not enough room for " + item.name);
 
-							if (AutoMule.enabledProfiles.indexOf(me.profile) > -1) {
+							if (!!AutoMule.getMule()) {
 								scriptBroadcast("mule");
 								quit();
 							}
@@ -180,6 +180,11 @@ MainLoop:
 			}
 
 			if ((unit.mode !== 3 && unit.mode !== 5) || !copyUnit(unit).x) { // added invalidated unit check
+				// backup check for picked
+				if (gid && me.getItem(-1, -1, gid)) {
+					picked = true;
+				}
+
 				break MainLoop;
 			}
 
@@ -191,7 +196,7 @@ MainLoop:
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 750) {
+			while (getTickCount() - tick < 1000) {
 				unit = copyUnit(unit);
 
 				if (classid === 523) {
@@ -219,7 +224,7 @@ MainLoop:
 					break MainLoop;
 				}
 
-				delay(10);
+				delay(20);
 			}
 
 			//print("pick retry");
@@ -233,6 +238,7 @@ MainLoop:
 			case 1:
 				if (this.ignoreLog.indexOf(type) === -1) {
 					Misc.logItem("Kept", unit, keptLine);
+					delay(200);
 				}
 
 				break;

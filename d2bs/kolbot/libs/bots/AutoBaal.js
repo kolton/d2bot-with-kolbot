@@ -21,8 +21,9 @@ function AutoBaal() {
 
 			if (nick === leader) { // filter leader messages
 				for (i = 0; i < hotMsg.length; i += 1) { // loop through all predefined messages to find a match
-					if (msg.toLowerCase().indexOf(hotMsg[i].toLowerCase()) > -1) { // leader says a hot tp message
+					if (msg.toLowerCase().indexOf(hotMsg[i].toLowerCase()) > -1 && Config.AutoBaal.FindShrine === 1) { // leader says a hot tp message
 						hotCheck = true; // safe to enter baal chamber
+
 						break;
 					}
 				}
@@ -30,6 +31,7 @@ function AutoBaal() {
 				for (i = 0; i < safeMsg.length; i += 1) { // loop through all predefined messages to find a match
 					if (msg.toLowerCase().indexOf(safeMsg[i].toLowerCase()) > -1) { // leader says a safe tp message
 						throneCheck = true; // safe to enter throne
+
 						break;
 					}
 				}
@@ -37,12 +39,66 @@ function AutoBaal() {
 				for (i = 0; i < baalMsg.length; i += 1) { // loop through all predefined messages to find a match
 					if (msg.toLowerCase().indexOf(baalMsg[i].toLowerCase()) > -1) { // leader says a baal message
 						baalCheck = true; // safe to enter baal chamber
+
 						break;
 					}
 				}
 			}
 		}
 		);
+
+	// test
+	this.longRangeSupport = function () {
+		if ([24, 49, 51, 56, 59, 84, 93, 140, 244].indexOf(Config.AttackSkill[1]) === -1 &&
+				[24, 49, 51, 56, 59, 84, 93, 140, 244].indexOf(Config.AttackSkill[3]) === -1) {
+			return false;
+		}
+
+		var monster, monList, index;
+
+		monster = getUnit(1);
+		monList = [];
+
+		if (monster) {
+			do {
+				if (Attack.checkMonster(monster) && getDistance(me, monster) < 50 && !checkCollision(me, monster, 0x4)) {
+					monList.push(copyUnit(monster));
+				}
+			} while (monster.getNext());
+		}
+
+		while (monList.length) {
+			monList.sort(Sort.units);
+
+			monster = copyUnit(monList[0]);
+
+			if (monster && Attack.checkMonster(monster)) {
+				index = monster.spectype & 0x7 ? 1 : 3;
+
+				if (Attack.checkResist(monster, Attack.getSkillElement(Config.AttackSkill[index]))) {
+					if (Config.AttackSkill[index] > -1) {
+						if (!me.getState(121)) {
+							Skill.cast(Config.AttackSkill[index], ClassAttack.skillHand[index], monster);
+						} else if (Config.AttackSkill[index + 1] > -1) {
+							Skill.cast(Config.AttackSkill[index + 1], ClassAttack.skillHand[index + 1], monster);
+						} else {
+							while (me.getState(121)) {
+								delay(40);
+							}
+						}
+					}
+				} else {
+					monList.shift();
+				}
+			} else {
+				monList.shift();
+			}
+
+			delay(5);
+		}
+
+		return true;
+	};
 
 	function autoLeaderDetect(destination) { // autoleader by Ethic
 		do {
@@ -91,12 +147,16 @@ function AutoBaal() {
 		}
 	}
 
+	if (Config.AutoBaal.FindShrine === 2) {
+		hotCheck = true;
+	}
+
 	Town.doChores();
 	Town.move("portalspot");
 
 	if (leader || autoLeaderDetect(131)) { // find the first player in area 131 - throne of destruction
 		while (Misc.inMyParty(leader)) { // do our stuff while partied
-			if (hotCheck && Config.AutoBaal.FindShrine) {
+			if (hotCheck) {
 				Pather.useWaypoint(4);
 				Precast.doPrecast(true);
 
@@ -126,9 +186,13 @@ function AutoBaal() {
 			if (throneCheck && me.area === 109) { // wait for throne signal - leader's safe message
 				print("ÿc4AutoBaal: ÿc0Trying to take TP to throne.");
 				Pather.usePortal(131, null); // take TP to throne
-				Pather.moveTo(15113, 5050); // move to a safe spot
+				Pather.moveTo(Config.AutoBaal.LeechSpot[0], Config.AutoBaal.LeechSpot[1]); // move to a safe spot
 				Precast.doPrecast(true);
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
+			}
+
+			if (!baalCheck && me.area === 131 && Config.AutoBaal.LongRangeSupport) {
+				this.longRangeSupport();
 			}
 
 			if (baalCheck && me.area === 131) { // wait for baal signal - leader's baal message
@@ -153,8 +217,12 @@ function AutoBaal() {
 
 			baal = getUnit(1, 544);
 
-			if (baal && (baal.mode === 0 || baal.mode === 12)) {
-				break;
+			if (baal) {
+				if (baal.mode === 0 || baal.mode === 12) {
+					break;
+				}
+
+				this.longRangeSupport();
 			}
 
 			if (me.mode === 17) { // death check

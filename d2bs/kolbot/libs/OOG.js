@@ -56,8 +56,12 @@ var D2Bot = {
 	requestGame: function (who) {
 		sendCopyData(null, who, 3, me.profile);
 	},
-	stop: function () {
-		sendCopyData(null, "D2Bot #", 0, "stop"); //this stops current window
+	stop: function (profile) {
+		if (profile) {
+			sendCopyData(null, "D2Bot #", 0, "stop;" + profile);
+		} else {
+			sendCopyData(null, "D2Bot #", 0, "stop");
+		}
 	},
 	start: function (profile) {
 		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
@@ -183,7 +187,7 @@ var ControlAction = {
 		var control = getControl(type, x, y, xsize, ysize);
 
 		if (!control) {
-			print("control not found " + type + " " + x + " " + y);
+			print("control not found " + type + " " + x + " " + y + " location " + getLocation());
 			return false;
 		}
 
@@ -310,8 +314,10 @@ MainLoop:
 
 				break;
 			case 11:
+			case 13: // realm down
 				// Unable to connect, let the caller handle it.
 				me.blockMouse = false;
+
 				return false;
 			case 12: // char screen - break
 				break MainLoop;
@@ -319,6 +325,7 @@ MainLoop:
 				this.click(2, 0, 599, 800, 600);
 
 				break;
+			case 16: // please wait
 			case 21: // connecting
 			case 23: // char screen connecting
 				break;
@@ -332,6 +339,8 @@ MainLoop:
 
 				break MainLoop; // break if we're sure we're on empty char screen
 			default:
+				print(getLocation());
+
 				me.blockMouse = false;
 
 				return false;
@@ -416,7 +425,17 @@ MainLoop:
 	},
 
 	findCharacter: function (info) {
-		var control, text;
+		var control, text, tick;
+
+		tick = getTickCount();
+
+		while (getLocation() !== 12) {
+			if (getTickCount() - tick >= 5000) {
+				break;
+			}
+
+			delay(1000);
+		}
 
 		if (getLocation() === 12) {
 			control = getControl(4, 37, 178, 200, 92);
@@ -505,6 +524,7 @@ MainLoop:
 				break;
 			case 42: // empty character select
 				this.click(6, 33, 572, 128, 35);
+
 				break;
 			default:
 				break;

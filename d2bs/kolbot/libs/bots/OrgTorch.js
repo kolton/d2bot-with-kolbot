@@ -314,6 +314,10 @@ function OrgTorch() {
 		}
 	}
 
+	if (!Config.OrgTorch.MakeTorch) {
+		return true;
+	}
+
 	brains = me.findItems("mbr", 0).length;
 	eyes = me.findItems("bey", 0).length;
 	horns = me.findItems("dhn", 0).length;
