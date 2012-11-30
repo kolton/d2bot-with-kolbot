@@ -668,6 +668,10 @@ MainSwitch:
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
+		if (rdblocker) {
+			D2Bot.restart();
+		}
+
 		break;
 	case 24: // Server Down - not much to do but wait..
 		break;

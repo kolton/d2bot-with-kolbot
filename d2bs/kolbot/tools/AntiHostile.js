@@ -218,7 +218,19 @@ function main() {
 		// Scan for hostiles or quit
 		if (findTrigger) {
 			if (Config.HostileAction === 0) {
-				quit();
+				if (Config.TownOnHostile) {
+					this.pause();
+					Town.goToTown();
+
+					while (hostiles.length > 0) {
+						delay(500);
+					}
+					
+					Pather.usePortal(null, me.name);
+					this.resume();
+				} else {
+					quit();
+				}
 
 				return;
 			}
@@ -306,7 +318,19 @@ function main() {
 		if (player) {
 			// Mode 1 - Quit if hostile player is nearby
 			if (Config.HostileAction === 1) {
-				quit();
+				if (Config.TownOnHostile) {
+					this.pause();
+					Town.goToTown();
+
+					while (hostiles.length > 0) {
+						delay(500);
+					}
+
+					Pather.usePortal(null, me.name);
+					this.resume();
+				} else {
+					quit();
+				}
 
 				return;
 			}
@@ -347,22 +371,6 @@ function main() {
 					// Move away if the player is too close or if he tries to move too close (telestomp)
 					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || (player.targetx && getDistance(me, player.targetx, player.targety) < 15))) {
 						this.moveAway(player, ClassAttack.skillRange[1]);
-					}
-
-					break;
-				case 3: // Paladin
-					switch (player.classid) {
-					case 3:
-						// For vs other hdins - try to intercept path, but not when there's nearby hammers
-						if (player.targetx && getDistance(me, player) > 8 && !this.findMissile(player, 92, 10)) {
-							Pather.moveTo(player.targetx + 2, player.targety);
-						}
-
-						/*if (getDistance(me, player) < 5) {
-							Skill.cast(97, 1, player);
-						}*/
-
-						break;
 					}
 
 					break;

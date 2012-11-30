@@ -248,7 +248,6 @@
 //ladder reset
 
 [type] == ring && [quality] == rare # [fcr] == 10 && [maxmana] >= 40
-[type] == ring && [quality] == rare # [fcr] == 10 && [strength] >= 10
 
 //[type] == armor && [quality] >= magic # [strength] > 100
 //[type] == helm && [quality] >= magic # [strength] > 100

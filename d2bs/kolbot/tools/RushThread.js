@@ -73,7 +73,7 @@ function main() {
 		Pather.useWaypoint(35);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([36, 37], true) || !Pather.moveTo(22587, 9577)) {
+		if (!Pather.moveToExit([36, 37], true) || !Pather.moveTo(22582, 9612)) {
 			throw new Error("andy failed");
 		}
 

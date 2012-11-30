@@ -12,6 +12,7 @@ function main() {
 
 	include("OOG.js");
 	include("json2.js");
+	include("automule.js");
 	include("common/Attack.js");
 	include("common/Config.js");
 	include("common/Cubing.js");
@@ -276,6 +277,15 @@ function main() {
 			showConsole();
 			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39)
 				+ " ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
+
+			break;
+		case 101: // numpad 5
+			if (!!AutoMule.getMule()) {
+				print("ÿc2Mule triggered");
+				this.quitPrep();
+				scriptBroadcast("mule");
+				quit();
+			}
 
 			break;
 		case 110: // decimal point

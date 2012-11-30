@@ -269,7 +269,7 @@ var Misc = {
 
 		var chest,
 			presetUnits = getPresetUnits(area),
-			chestIds = [5, 6, 87, 92, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
+			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
 						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
 
 		if (!presetUnits) {
@@ -364,27 +364,43 @@ var Misc = {
 		return false;
 	},
 
-	// Log kept item stats in the manager.
-	logItem: function (action, unit, keptLine) {
-		var i, lastArea, code, desc,
-			stringColor = "",
-			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
+	getItemDesc: function (unit) {
+		var i, desc,
+			stringColor = "";
 
 		desc = unit.description.split("\n");
 
 		// Lines are normally in reverse. Add color tags if needed and reverse order.
 		for (i = 0; i < desc.length; i += 1) {
-			if (desc[i].match(/^ÿ/)) {
-				stringColor = desc[i].substring(0, 3);
+			if (desc[i].indexOf(getLocaleString(3331)) > -1) { // Remove sell value
+				desc.splice(i, 1);
 			} else {
-				desc[i] = stringColor + desc[i];
+				if (desc[i].match(/^ÿ/)) {
+					stringColor = desc[i].substring(0, 3);
+				} else {
+					desc[i] = stringColor + desc[i];
+				}
 			}
 		}
 
+		if (desc[desc.length - 1]) {
+			desc[desc.length - 1] += (" (" + unit.ilvl + ")");
+		}
+
 		desc = desc.reverse().join("\n");
+
+		return desc;
+	},
+
+	// Log kept item stats in the manager.
+	logItem: function (action, unit, keptLine) {
+		var i, lastArea, code, desc, sock,
+			color = -1,
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
+
+		desc = this.getItemDesc(unit);
 		color = unit.getColor();
-		desc += ("\nÿc0Item Level: " + unit.ilvl);
+		//desc += ("\nÿc0Item Level: " + unit.ilvl);
 
 		if (action === "Kept") {
 			lastArea = DataFile.getStats().lastArea;
@@ -537,11 +553,24 @@ var Misc = {
 			}
 		}
 
+		sock = unit.getItems();
+
+		if (sock) {
+			for (i = 0; i < sock.length; i += 1) {
+				if (sock[i].itemType === 58) {
+					desc += "\n\n";
+					desc += this.getItemDesc(sock[i]);
+				}
+			}
+		}
+
 		if (keptLine) {
 			desc += ("\nÿc0Line: " + keptLine);
 		}
 
 		D2Bot.printToItemLog(action + " " + name, desc, code, unit.quality, color);
+
+		return true;
 	},
 
 	// Change into werewolf or werebear

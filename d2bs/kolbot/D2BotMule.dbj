@@ -9,7 +9,7 @@ var StarterConfig = {
 };
 
 
-var muler, mulerStatus, keyswap, connectFail, makeAcc, muleMode, muleFilename, muleInfoObj,
+var master, masterStatus, keyswap, connectFail, makeAcc, muleMode, muleFilename, muleObj,
 	makeNext = false,
 	status = "loading";
 
@@ -100,7 +100,7 @@ function pickItems() {
 	}
 
 	while (me.gameReady) {
-		if (mulerStatus === "done") {
+		if (masterStatus === "done") {
 			item = getUnit(4, -1, 3); // item, on ground
 
 			if (item) {
@@ -139,7 +139,7 @@ function pickItems() {
 				break;
 			}
 		} else {
-			sendCopyData(null, muler.toString(), 10, "report");
+			sendCopyData(null, master, 10, "report");
 			//D2Bot.shoutGlobal("report", 0);
 		}
 
@@ -149,32 +149,10 @@ function pickItems() {
 	return rval;
 }
 
-// on some systems, copydata is sent in all lowercase...
-function getMuler(msg) {
-	var i;
-
-	for (i = 0; i < TorchSystem.FarmerProfiles.length; i += 1) {
-		// Make a difference between normal mule and torch mule request coming from torch profile
-		if (msg.toLowerCase().indexOf("|torch") > -1 && msg.split("|torch")[0].toLowerCase() === TorchSystem.FarmerProfiles[i].toLowerCase()) {
-			muleMode = 1; // mule torch
-
-			return TorchSystem.FarmerProfiles[i];
-		}
-	}
-
-	for (i = 0; i < AutoMule.enabledProfiles.length; i += 1) {
-		if (msg.toLowerCase() === AutoMule.enabledProfiles[i].toLowerCase()) {
-			muleMode = 0; // normal mule
-
-			return AutoMule.enabledProfiles[i];
-		}
-	}
-
-	return "";
-}
-
-// muler/mule communication function
+// master/mule communication function
 function ReceiveCopyData(mode, msg) {
+	var masterInfo;
+
 	// mode check instead of msg check because of crashes
 	switch (mode) {
 	case 1: // join
@@ -190,10 +168,15 @@ function ReceiveCopyData(mode, msg) {
 
 	// automule specific
 	case 10: // mule request
-		if (!muler) {
-			muler = getMuler(msg);
+		if (!master) {
+			masterInfo = AutoMule.getMaster(msg);
+
+			if (masterInfo) {
+				master = masterInfo[0];
+				muleMode = masterInfo[1];
+			}
 		} else {
-			sendCopyData(null, muler.toString(), 10, status);
+			sendCopyData(null, master, 10, status);
 			//D2Bot.shoutGlobal(status, 0);
 		}
 
@@ -202,8 +185,8 @@ function ReceiveCopyData(mode, msg) {
 		status = "begin";
 
 		break;
-	case 12: // get muler's status
-		mulerStatus = msg;
+	case 12: // get master's status
+		masterStatus = msg;
 
 		break;
 	}
@@ -214,7 +197,7 @@ function nextAccount() {
 	var obj = MuleData.read();
 
 	obj.accNum = obj.accNum + 1;
-	obj.account = muleInfoObj.accountPrefix + obj.accNum;
+	obj.account = muleObj.accountPrefix + obj.accNum;
 	obj.character = "";
 	obj.charNum = 0;
 	obj.fullChars = [];
@@ -249,7 +232,7 @@ function nextChar() {
 
 	charSuffix += charNumbers[obj.charNum];
 	obj.charNum = obj.charNum + 1;
-	obj.character = muleInfoObj.charPrefix + charSuffix;
+	obj.character = muleObj.charPrefix + charSuffix;
 
 	MuleData.write(obj);
 
@@ -280,12 +263,16 @@ function updateCount() {
 	delay(1000);
 	ControlAction.click(6, 264, 366, 272, 35);
 
-	try {
-		login(me.profile);
-	} catch (e) {
+	var info,
+		obj = MuleData.read();
 
-	}
+	info = {
+		realm: muleObj.realm,
+		account: obj.account,
+		password: muleObj.accountPassword
+	};
 
+	ControlAction.loginAccount(info);
 	delay(1000);
 	ControlAction.click(6, 33, 572, 128, 35);
 }
@@ -343,15 +330,15 @@ function main() {
 	delay(rand(1, 2) * 1000);
 	D2Bot.requestGameInfo();
 
-	// Wait for muler before login = give room to determine muling mode (normal or torch)
-	while (!muler) {
+	// Wait for master before login = give room to determine muling mode (normal or torch)
+	while (!master) {
 		delay(1000);
 	}
 
-	print("Muler found: " + muler);
+	print("Master found: " + master);
 
-	muleInfoObj = muleMode === 0 ? AutoMule.Mule : AutoMule.TorchMule;
-	muleFilename = muleMode === 0 ? "logs/AutoMule." + muleInfoObj.realm + ".json" : "logs/TorchMule." + muleInfoObj.realm + ".json";
+	muleObj = AutoMule.getMuleObject(muleMode);
+	muleFilename = AutoMule.getMuleFilename(muleMode);
 
 	var obj, statusTimeout;
 
@@ -368,7 +355,7 @@ function main() {
 
 		obj = MuleData.read();
 
-		if (obj.account && obj.account.indexOf(muleInfoObj.accountPrefix) < 0) {
+		if (obj.account && obj.account.indexOf(muleObj.accountPrefix) < 0) {
 			MuleData.create();
 		}
 	} catch (e) {
@@ -384,7 +371,7 @@ function main() {
 					status = "ready";
 
 					D2Bot.updateStatus("In mule game.");
-					D2Bot.printToConsole("In mule game.");
+					D2Bot.printToConsole("In mule game;5");
 					Storage.Init();
 				}
 
@@ -393,19 +380,16 @@ function main() {
 				}
 
 				if (status !== "begin") {
-					D2Bot.printToConsole("Nobody joined - stopping.");
+					D2Bot.printToConsole("Nobody joined - stopping;9");
 					D2Bot.stop();
 				}
 
 				me.overhead("begin");
 
 				switch (pickItems()) {
-				// done picking, tell the muler to leave game and kill mule profile
+				// done picking, tell the master to leave game and kill mule profile
 				case "done":
-					sendCopyData(null, muler.toString(), 10, "quit");
-					//D2Bot.shoutGlobal("quit", 0);
 					MuleLogger.logChar();
-					delay(500);
 
 					obj = MuleData.read();
 
@@ -414,7 +398,9 @@ function main() {
 					}
 
 					MuleData.write(obj);
-					D2Bot.printToConsole("Done muling.");
+					D2Bot.printToConsole("Done muling;5");
+					sendCopyData(null, master, 10, "quit");
+					delay(500);
 					D2Bot.stop();
 
 					break;
@@ -433,7 +419,7 @@ function main() {
 					obj.fullChars.push(me.name);
 					MuleData.write(obj);
 					nextChar();
-					D2Bot.printToConsole("Mule full, getting next character.");
+					D2Bot.printToConsole("Mule full, getting next character;5");
 					quit();
 
 					break;
@@ -481,7 +467,7 @@ MainSwitch:
 		}
 
 		delay(2000);
-		createGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
+		createGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
 		locationTimeout(5000, location);
 
 		break;
@@ -494,7 +480,7 @@ MainSwitch:
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
 		delay(2000);
-		joinGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
+		joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
 		locationTimeout(5000, location);
 
 		break;
@@ -510,22 +496,22 @@ MainSwitch:
 
 		obj = MuleData.read();
 
-		if (!obj.account || obj.account.indexOf(muleInfoObj.accountPrefix) < 0) {
+		if (!obj.account || obj.account.indexOf(muleObj.accountPrefix) < 0) {
 			nextAccount();
 
 			obj = MuleData.read();
 		}
 
 		info = {
-			realm: muleInfoObj.realm,
+			realm: muleObj.realm,
 			account: obj.account,
-			password: muleInfoObj.accountPassword
+			password: muleObj.accountPassword
 		};
 
 		if (makeAcc) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
-			D2Bot.printToConsole("Made account: " + info.account);
+			D2Bot.printToConsole("Made account: " + info.account + ";5");
 
 			makeAcc = false;
 
@@ -642,6 +628,28 @@ MainSwitch:
 	case 15: // new character (selected)
 	case 29: // new character (list)
 	case 42: // empty char screen
+		// Can't create character, button greyed out = high likelyhood of realm down
+		if (getLocation() === 42 && getControl(6, 33, 528, 168, 60).disabled === 4) {
+			D2Bot.updateStatus("Realm Down");
+			delay(1000);
+
+			if (!ControlAction.click(6, 33, 572, 128, 35)) {
+				break;
+			}
+
+			updateCount();
+			timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
+			D2Bot.CDKeyRD();
+
+			if (keyswap) {
+				D2Bot.printToConsole("Realm Down - Changing CD-Key");
+				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				D2Bot.restart(true);
+			} else {
+				D2Bot.restart();
+			}
+		}
+
 		obj = MuleData.read();
 
 		if (makeNext) {
@@ -655,7 +663,7 @@ MainSwitch:
 			makeNext = false;
 		}
 
-		if (!obj.character || obj.character.indexOf(muleInfoObj.charPrefix) < 0) {
+		if (!obj.character || obj.character.indexOf(muleObj.charPrefix) < 0) {
 			nextChar();
 
 			obj = MuleData.read();
@@ -664,9 +672,9 @@ MainSwitch:
 		info = {
 			account: obj.account,
 			charName: obj.character,
-			ladder: muleInfoObj.ladder,
-			hardcore: muleInfoObj.hardcore,
-			expansion: muleInfoObj.expansion,
+			ladder: muleObj.ladder,
+			hardcore: muleObj.hardcore,
+			expansion: muleObj.expansion,
 			charClass: "amazon"
 		};
 
@@ -693,8 +701,7 @@ MainSwitch:
 				break;
 			}
 
-			//FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
-			D2Bot.printToConsole("Made character: " + info.charName);
+			D2Bot.printToConsole("Made character: " + info.charName + ";5");
 		}
 
 		break;

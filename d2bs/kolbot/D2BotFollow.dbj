@@ -212,6 +212,10 @@ MainSwitch:
 			break;
 		}
 
+		// automule test lines
+		//ingame = true;
+		//muleTrigger = true;
+
 		if (ingame) {
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
@@ -582,6 +586,10 @@ JoinLoop:
 	case 23: // Character Select - Connecting
 		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
 			ControlAction.click(6, 33, 572, 128, 35);
+		}
+
+		if (rdblocker) {
+			D2Bot.restart();
 		}
 
 		break;

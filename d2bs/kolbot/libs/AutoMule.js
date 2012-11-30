@@ -1,59 +1,235 @@
 var AutoMule = {
-	// Normal mule info
-	Mule: {
-		muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
-		accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
-		accountPassword: "",  // Account password.
-		charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
-		realm: "", // Available options: "useast", "uswest", "europe", "asia"
-		expansion: true,
-		ladder: true,
-		hardcore: false
+	Mules: {
+		"Mule1":  {
+			muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
+			accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
+			accountPassword: "",  // Account password.
+			charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
+			realm: "", // Available options: "useast", "uswest", "europe", "asia"
+			expansion: true,
+			ladder: true,
+			hardcore: false,
+
+			// Game name and password of the mule game. Never use the same game name as for mule logger.
+			muleGameName: ["mulegame", "pw"], // ["gamename", "password"]
+
+			// List of profiles that will mule items.
+			enabledProfiles: [""],
+
+			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
+			stopProfile: ""
+		}
 	},
 
-	// Torch mule info - you can use the same profile as Normal mule, using the same accounts is possible but not recommended (8 premade chars can cause conflicts)
-	TorchMule: {
-		muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
-		accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
-		accountPassword: "",  // Account password.
-		charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
-		realm: "", // Available options: "useast", "uswest", "europe", "asia"
-		expansion: true,
-		ladder: true,
-		hardcore: false
+	TorchMules: {
+		"Mule1":  {
+			muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
+			accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
+			accountPassword: "",  // Account password.
+			charPrefix: "",  // Character prefix. Suffix added automatically when making characters.
+			realm: "", // Available options: "useast", "uswest", "europe", "asia"
+			expansion: true,
+			ladder: true,
+			hardcore: false,
+
+			// Game name and password of the mule game. Never use the same game name as for mule logger.
+			muleGameName: ["mulegame", "pw"], // ["gamename", "password"]
+
+			// List of profiles that will mule items.
+			enabledProfiles: [""],
+
+			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
+			stopProfile: ""
+		}
 	},
 
-	// Game name and password of the mule game
-	muleGameName: ["mulegame", "mulepw"], // ["gamename", "password"]
+	// Get the Mule of the current profile
+	getMule: function (mode) {
+		var mule, i, j, k;
 
-	// List of profiles that will mule items. Casing matters!
-	enabledProfiles: [""],
+		mode = mode || 0;
+		mule = mode === 1 ? this.TorchMules : this.Mules;
 
+		for (i in mule) {
+			if (mule.hasOwnProperty(i)) {
+				for (j in mule[i]) {
+					if (mule[i].hasOwnProperty(j) && j === "enabledProfiles") {
+						for (k = 0; k < mule[i][j].length; k += 1) {
+							if (mule[i][j][k].toLowerCase() === me.profile.toLowerCase()) {
+								// Return the Mule it belongs to
+								return mule[i];
+							}
+						}
+					}
+				}
+			}
+		}
 
+		return false;
+	},
 
-	// internal functions, don't edit
+	// Get the item dropper for current Mule. Returns [profilename, mulemode]
+	getMaster: function (profile) {
+		var i, j, k,
+			mule = this.Mules;
 
-	// check game name, override default.dbj actions
+		for (i = 0; i < TorchSystem.FarmerProfiles.length; i += 1) {
+			// Make a difference between normal mule and torch mule request coming from torch profile
+			if (profile.toLowerCase().indexOf("|torch") > -1 && profile.split("|torch")[0].toLowerCase() === TorchSystem.FarmerProfiles[i].toLowerCase()) {
+				return [TorchSystem.FarmerProfiles[i], 1];
+			}
+		}
+
+		for (i in mule) {
+			if (mule.hasOwnProperty(i)) {
+				for (j in mule[i]) {
+					if (mule[i].hasOwnProperty(j) && j === "enabledProfiles") {
+						for (k = 0; k < mule[i][j].length; k += 1) {
+							if (mule[i][j][k].toLowerCase() === profile.toLowerCase()) {
+								return [mule[i][j][k], 0];
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	},
+
+	// Get the object for the given Mule profile
+	getMuleObject: function (mode) {
+		var i, j, mule;
+
+		mode = mode || 0;
+		mule = mode === 1 ? this.TorchMules : this.Mules;
+
+		for (i in mule) {
+			if (mule.hasOwnProperty(i)) {
+				for (j in mule[i]) {
+					if (mule[i].hasOwnProperty(j) && j === "muleProfile" && mule[i][j].toLowerCase() === me.profile.toLowerCase()) {
+						return mule[i];
+					}
+				}
+			}
+		}
+
+		return false;
+	},
+
+	getMuleFilename: function (mode) {
+		var i, j, mule, name;
+
+		mode = mode || 0;
+		mule = mode === 1 ? this.TorchMules : this.Mules;
+
+MainLoop:
+		for (i in mule) {
+			if (mule.hasOwnProperty(i)) {
+				for (j in mule[i]) {
+					if (mule[i].hasOwnProperty(j) && j === "muleProfile" && mule[i][j].toLowerCase() === me.profile.toLowerCase()) {
+						name = i;
+
+						break MainLoop;
+					}
+				}
+			}
+		}
+
+		return mode === 0 ? "logs/AutoMule." + name + ".json" : "logs/TorchMule." + name + ".json";
+	},
+
+	outOfGameCheck: function (mode) {
+		mode = mode || 0;
+
+		var muleObj,
+			status = "",
+			failCount = 0;
+
+		muleObj = this.getMule(mode);
+
+		function MuleCheckEvent(mode, msg) {
+			if (mode === 10) {
+				status = msg;
+			}
+		}
+
+		addEventListener("copydata", MuleCheckEvent);
+		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile + ";5");
+
+		if (muleObj.stopProfile) {
+			D2Bot.stop(muleObj.stopProfile);
+		}
+
+		delay(1000);
+		D2Bot.start(muleObj.muleProfile);
+
+MainLoop:
+		while (true) {
+			sendCopyData(null, muleObj.muleProfile, 10, me.profile + (mode === 1 ? "|torch" : ""));
+			delay(1000);
+
+			switch (status) {
+			case "begin":
+				D2Bot.printToConsole("Mule profile is busy;9");
+
+				break MainLoop;
+			case "ready":
+				delay(2000);
+				joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
+				delay(5000);
+
+				return true;
+			default:
+				failCount += 1;
+
+				if (failCount >= 60) {
+					D2Bot.printToConsole("No response from mule profile;9");
+
+					break MainLoop;
+				}
+
+				break;
+			}
+		}
+
+		removeEventListener("copydata", MuleCheckEvent);
+
+		while (me.ingame) {
+			delay(1000);
+		}
+
+		D2Bot.stop(muleObj.muleProfile);
+		delay(1000);
+
+		if (muleObj.stopProfile) {
+			D2Bot.start(muleObj.stopProfile);
+		}
+
+		return false;
+	},
+
 	inGameCheck: function () {
-		if (me.gamename.toLowerCase() !== this.muleGameName[0].toLowerCase()) {
+		// Check if we're in mule or torch mule game
+		if ((!this.getMule(0) || me.gamename.toLowerCase() !== this.getMule(0).muleGameName[0].toLowerCase()) &&
+				(!this.getMule(1) || me.gamename.toLowerCase() !== this.getMule(1).muleGameName[0].toLowerCase())) {
 			return false;
 		}
 
-		D2Bot.printToConsole("In mule game.");
-
-		var mode, muleInfoObj,
+		var mode, muleObj, tick,
+			timeout = 150 * 1000, // Ingame mule timeout
 			status = "muling";
 
 		function CheckModeEvent(msg) {
 			switch (msg) {
 			case "torch":
-				print("Torch muling mode");
+				D2Bot.printToConsole("In torch mule game;5");
 
 				mode = 1;
 
 				break;
 			case "normal":
-				print("Normal muling mode");
+				D2Bot.printToConsole("In mule game;5");
 
 				mode = 0;
 
@@ -64,7 +240,7 @@ var AutoMule = {
 		function DropStatusEvent(mode, msg) {
 			switch (msg) {
 			case "report": // reply to status request
-				sendCopyData(null, muleInfoObj.muleProfile, 12, status);
+				sendCopyData(null, muleObj.muleProfile, 12, status);
 
 				break;
 			case "quit": // quit command
@@ -74,18 +250,25 @@ var AutoMule = {
 			}
 		}
 
-		print("ÿc4AutoMuleÿc0: In mule game.");
 		addEventListener("copydata", DropStatusEvent);
 		addEventListener("scriptmsg", CheckModeEvent);
 		scriptBroadcast("requestMuleMode");
 		delay(500);
-		muleInfoObj = mode === 0 ? this.Mule : this.TorchMule;
+		muleObj = this.getMule(mode);
+
+		if (me.gamename.toLowerCase() !== muleObj.muleGameName[0].toLowerCase()) {
+			return false;
+		}
+
+		print("ÿc4AutoMuleÿc0: In mule game.");
+
+		me.maxgametime = 0;
 
 		if (!Town.goToTown(1)) {
 			throw new Error("Failed to go to stash in act 1");
 		}
 
-		sendCopyData(null, muleInfoObj.muleProfile, 11, "begin");
+		sendCopyData(null, muleObj.muleProfile, 11, "begin");
 
 		switch (mode) {
 		case 0:
@@ -104,12 +287,16 @@ var AutoMule = {
 		}
 
 		status = "done";
-		print("status done");
-		//D2Bot.printToConsole("status done");
+		tick = getTickCount();
 
 		while (true) {
 			if (status === "quit") {
-				//D2Bot.printToConsole("status quit");
+				break;
+			}
+
+			if (getTickCount() - tick > timeout) {
+				D2Bot.printToConsole("Mule didn't rejoin. Picking up items;9");
+				Pickit.pickItems();
 
 				break;
 			}
@@ -118,67 +305,17 @@ var AutoMule = {
 		}
 
 		removeEventListener("copydata", DropStatusEvent);
+		D2Bot.stop(muleObj.muleProfile);
+		delay(1000);
+
+		if (muleObj.stopProfile) {
+			D2Bot.start(muleObj.stopProfile);
+		}
+
 		quit();
 		delay(10000);
 
 		return true;
-	},
-
-	// call mule profile, check if it's available for the mule session
-	outOfGameCheck: function (mode) {
-		mode = mode || 0;
-
-		var status = "", muleInfoObj,
-			failCount = 0;
-
-		muleInfoObj = mode === 1 ? this.TorchMule : this.Mule;
-
-		function MuleCheckEvent(mode, msg) {
-			if (mode === 10) {
-				status = msg;
-			}
-		}
-
-		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleInfoObj.muleProfile);
-		D2Bot.start(muleInfoObj.muleProfile);
-
-MainLoop:
-		while (true) {
-			sendCopyData(null, muleInfoObj.muleProfile, 10, me.profile.toString() + (mode === 1 ? "|torch" : ""));
-			delay(1000);
-
-			switch (status) {
-			case "begin":
-				D2Bot.printToConsole("Mule profile is busy");
-
-				break MainLoop;
-			case "ready":
-				delay(2000);
-				joinGame(this.muleGameName[0], this.muleGameName[1]);
-				delay(5000);
-
-				return true;
-			default:
-				failCount += 1;
-
-				if (failCount >= 60) {
-					D2Bot.printToConsole("No response from mule profile.");
-
-					break MainLoop;
-				}
-
-				break;
-			}
-		}
-
-		removeEventListener("copydata", MuleCheckEvent);
-
-		while (me.ingame) {
-			delay(1000);
-		}
-
-		return false;
 	},
 
 	dropStuff: function () {

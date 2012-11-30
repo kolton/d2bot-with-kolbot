@@ -34,7 +34,7 @@ var Pather = {
 			throw new Error("moveTo: Function must be called with at least 2 arguments.");
 		}
 
-		if (typeof (x) !== "number" || typeof (y) !== "number") {
+		if (typeof x !== "number" || typeof y !== "number") {
 			throw new Error("moveTo: Coords must be numbers");
 		}
 
@@ -651,8 +651,10 @@ ModeLoop:
 			do {
 				if (oldPortal.getParent() === me.name) {
 					oldGid = oldPortal.gid;
+
+					break;
 				}
-			} while (!oldGid && oldPortal.getNext());
+			} while (oldPortal.getNext());
 		}
 
 		for (i = 0; i < 5; i += 1) {
@@ -673,13 +675,13 @@ MainLoop:
 					do {
 						if (portal.getParent() === me.name && portal.gid !== oldGid) {
 							if (use) {
-								if (this.usePortal(null, null, portal)) {
+								if (this.usePortal(null, null, copyUnit(portal))) {
 									return true;
 								}
 
 								break MainLoop; // don't spam usePortal
 							} else {
-								return true;
+								return portal;
 							}
 						}
 					} while (portal.getNext());
@@ -701,66 +703,72 @@ MainLoop:
 			preArea = me.area;
 
 		if (unit) {
-			portal = unit;
-		} else {
-			portal = this.getPortal(targetArea, owner);
-		}
+			portal = copyUnit(unit);
 
-		if (!portal) {
-			return false;
+			if (!portal) {
+				return false;
+			}
 		}
 
 		useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
 
 		for (i = 0; i < 5; i += 1) {
-			if (useTK) {
-				if (getDistance(me, portal) > 13) {
-					Attack.getIntoPosition(portal, 13, 0x4);
-				}
-
-				Skill.cast(43, 0, portal);
-			} else {
-				if (getDistance(me, portal) > 2) {
-					this.moveToUnit(portal);
-				}
-
-				portal.interact();
-				//sendPacket(1, 0x13, 4, 2, 4, portal.gid);
+			if (!unit) {
+				portal = this.getPortal(targetArea, owner);
 			}
 
-			if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary, maybe some other portals
-				portal.interact();
+			if (portal) {
+				if (useTK) {
+					if (getDistance(me, portal) > 13) {
+						Attack.getIntoPosition(portal, 13, 0x4);
+					}
+
+					Skill.cast(43, 0, portal);
+				} else {
+					if (getDistance(me, portal) > 2) {
+						this.moveToUnit(portal);
+					}
+
+					portal.interact();
+					//sendPacket(1, 0x13, 4, 2, 4, portal.gid);
+				}
+
+				if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary, maybe some other portals
+					portal.interact();
+
+					tick = getTickCount();
+
+					while (getTickCount() - tick < 2000) {
+						if (portal.mode === 2) {
+							break;
+						}
+
+						delay(10);
+					}
+				}
 
 				tick = getTickCount();
 
-				while (getTickCount() - tick < 2000) {
-					if (portal.mode === 2) {
-						break;
+				while (getTickCount() - tick < 1000) {
+					if (me.area !== preArea) {
+						delay(200);
+
+						return true;
 					}
 
 					delay(10);
 				}
-			}
 
-			tick = getTickCount();
+				if (i > 1) {
+					Packet.flash(me.gid);
 
-			while (getTickCount() - tick < 1000) {
-				if (me.area !== preArea) {
-					delay(200);
-
-					return true;
+					useTK = false;
 				}
 
-				delay(10);
+				//this.moveTo(me.x + rand(-1, 1) * 3, me.y + rand(-1, 1) * 3); // In case of client/server desync
 			}
 
-			if (i > 1) {
-				Packet.flash(me.gid);
-
-				useTK = false;
-			}
-
-			//this.moveTo(me.x + rand(-1, 1) * 3, me.y + rand(-1, 1) * 3); // In case of client/server desync
+			delay(100);
 		}
 
 		return false;

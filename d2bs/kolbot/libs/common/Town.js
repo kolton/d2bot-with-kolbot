@@ -1414,7 +1414,7 @@ MainLoop:
 			break;
 		case 5:
 			this.act[4].spot = {};
-			this.act[4].spot.portalspot = [5092, 5024];
+			this.act[4].spot.portalspot = [5099, 5025];
 			this.act[4].spot.stash = [5129, 5061];
 			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
 			this.act[4].spot[NPC.Malah] = [5078, 5029];
@@ -1441,7 +1441,7 @@ MainLoop:
 			delay(40);
 		}*/
 
-		var i, townSpot, temp,
+		var i, townSpot,
 			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
 
 		if (!this.act[me.act - 1].initialized) {
@@ -1454,21 +1454,11 @@ MainLoop:
 			return false;
 		}
 
-		//temp = Pather.getNearestWalkable(townSpot[0], townSpot[1], 6, 1);
-
 		if (useTK) {
 			if (getDistance(me, townSpot[0], townSpot[1]) > 14) {
-				if (temp) {
-					Attack.getIntoPosition({x: temp[0], y: temp[1]}, 14, 0x4);
-				}
-
 				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
 			}
 		} else {
-			if (temp) {
-				Pather.moveTo(temp[0], temp[1], 3);
-			}
-
 			print("Townmove: " + spot + " " + townSpot);
 			Pather.moveTo(townSpot[0], townSpot[1]);
 
@@ -1491,8 +1481,12 @@ MainLoop:
 		var towns = [1, 40, 75, 103, 109];
 
 		if (!me.inTown) {
-			if (!Pather.makePortal(true)) {
+			if (!Pather.makePortal()) {
 				throw new Error("Town.goToTown: Failed to make TP");
+			}
+
+			if (!Pather.usePortal(null, me.name)) {
+				throw new Error("Town.goToTown: Failed to take TP");
 			}
 		}
 
