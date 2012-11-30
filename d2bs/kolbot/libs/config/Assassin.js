@@ -173,18 +173,18 @@ function LoadConfig() {
 	// *** Guest scripts ***
 	
 	// Chest Hunter by Talltree
-	Scripts.ChestHunterAct1 = true;
+	Scripts.ChestHunterAct1 = false;
 		Config.ChestHunterAct1.Hole = true; //Golden Chest in the Hole	
 		Config.ChestHunterAct1.Cave = true; //Golden Chest in the Cave	
 		Config.ChestHunterAct1.Pit = true; // Golden Chest in the Pit
 		Config.ChestHunterAct1.MausoCrypt = true; //all Chests in Mausoleum and Crypta
-	Scripts.ChestHunterAct2 = true;	
+	Scripts.ChestHunterAct2 = false;	
 		Config.ChestHunterAct2.StonyTomb = true; //Golden Chest in the Stony Tomb
 		Config.ChestHunterAct2.AncientTunnels = true; //Golden Chest in the Ancient Tunnels
 		Config.ChestHunterAct2.ArcaneSanctuary = true; //all Chests in the Arcane Sanctuary
 		Config.ChestHunterAct2.TalTombs = true; //all Chests in the 7 Tal Tombs
-	Scripts.ChestHunterAct3 = true;	// Spider Cave and Spider Cavern, Rest of the Chests are convered with "KurastChests"
-	Scripts.ChestHunterAct5 = true;
+	Scripts.ChestHunterAct3 = false;	// Spider Cave and Spider Cavern, Rest of the Chests are convered with "KurastChests"
+	Scripts.ChestHunterAct5 = false;
 		Config.ChestHunterAct5.GlacialDrifter = true; //Glacial Trail and Drifter Cavern Golden Chest
 		Config.ChestHunterAct5.FrozenCellar = true; //Golden Chest in the Frozen Cellar
 		Config.ChestHunterAct5.HellChests = true; //Golden Chest in Abbadon, Pit of Acheron, Infernal Pit
