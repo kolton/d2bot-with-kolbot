@@ -710,14 +710,14 @@ MainLoop:
 			}
 		}
 
-		useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
-
 		for (i = 0; i < 5; i += 1) {
 			if (!unit) {
 				portal = this.getPortal(targetArea, owner);
 			}
 
 			if (portal) {
+				useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
+
 				if (useTK) {
 					if (getDistance(me, portal) > 13) {
 						Attack.getIntoPosition(portal, 13, 0x4);
