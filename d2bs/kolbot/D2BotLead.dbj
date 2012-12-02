@@ -19,10 +19,11 @@ var StarterConfig = {
 
 var ChannelConfig = {
 	// Now you can join separate channels for separate profiles, use separate join messages etc
-	// Format: "Profile Name": {JoinChannel: ["channel"], FirstJoinMessage: "login message", AnnounceGames: true}
+	// Format 1 - single channel: "Profile Name": {JoinChannel: "channel", FirstJoinMessage: "login message", AnnounceGames: true}
+	// Format 2 - multiple channels: "Profile Name": {JoinChannel: ["channel 1", "channel 2"], FirstJoinMessage: ["channel 1 login", "channel 2 login"], AnnounceGames: true}
 	// Multiple entries are separated by a comma
 
-	//"Example": {JoinChannel: ["my channel"], FirstJoinMessage: ".login", AnnounceGames: true}
+	//"Example": {JoinChannel: "my channel", FirstJoinMessage: ".login", AnnounceGames: true}
 };
 
 
@@ -225,6 +226,7 @@ MainSwitch:
 		// automule test lines
 		//ingame = true;
 		//muleTrigger = true;
+		//torchMuleTrigger = true;
 
 		if (ingame) {
 			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
@@ -363,15 +365,43 @@ MainSwitch:
 		if (!chatActionsDone) {
 			chatActionsDone = true;
 
-			for (i = 0; i < ChannelConfig[me.profile].JoinChannel.length; i += 1) {
+			// Single channel
+			if (typeof ChannelConfig[me.profile].JoinChannel === "string") {
 				timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-				say("/j " + ChannelConfig[me.profile].JoinChannel[i]);
-				delay(1000);
+				say("/j " + ChannelConfig[me.profile].JoinChannel);
+				delay(2000);
 
 				if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
 					say(ChannelConfig[me.profile].FirstJoinMessage);
 					delay(500);
 				}
+			}
+
+			// Multiple channels
+			if (typeof ChannelConfig[me.profile].JoinChannel === "object") {
+				for (i = 0; i < ChannelConfig[me.profile].JoinChannel.length; i += 1) {
+					timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+					say("/j " + ChannelConfig[me.profile].JoinChannel[i]);
+					delay(2000);
+
+					if (ChannelConfig[me.profile].FirstJoinMessage[i] !== "") {
+						say(ChannelConfig[me.profile].FirstJoinMessage[i]);
+						delay(500);
+					}
+				}
+			}
+		}
+
+		if (!chatActionsDone) {
+			chatActionsDone = true;
+
+			timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+			say("/j " + ChannelConfig[me.profile].JoinChannel);
+			delay(1000);
+
+			if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
+				say(ChannelConfig[me.profile].FirstJoinMessage);
+				delay(500);
 			}
 		}
 
