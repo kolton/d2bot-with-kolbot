@@ -106,10 +106,11 @@ function LoadConfig() {
 	Scripts.Snapchip = false;
 		Config.Snapchip.ClearIcyCellar = true;
 	Scripts.Baal = false;
-		Config.Baal.HotTPMsg = "Hot TP!";
-		Config.Baal.SafeTPMsg = "TP safe!";
-		Config.Baal.BaalMsg = "Baal";
-		Config.Baal.DollQuit = false; // End script if Dolls (Undead Soul Killers) are found.
+		Config.Baal.HotTPMessage = "Hot TP!";
+		Config.Baal.SafeTPMessage = "Safe TP!";
+		Config.Baal.BaalMessage = "Baal!";
+		Config.Baal.SoulQuit = false; // End script if Souls (Undead Soul Killers) are found.
+		Config.Baal.DollQuit = false; // End script if Dolls (Undead Stigyan Dolls) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
 		Config.Baal.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
 
@@ -129,7 +130,10 @@ function LoadConfig() {
 		Config.DiabloHelper.Wait = 120; // Seconds to wait for a runner to be in Chaos
 		Config.DiabloHelper.Entrance = true; // Start from entrance
 	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
-		Config.AutoBaal.FindShrine = false; // Find shrine when hot tp message is sent. You can change messages in AutoBaal.js
+		Config.AutoBaal.Leader = ""; // Leader's charname. Set to "" for automatic detection.
+		Config.AutoBaal.FindShrine = false; // false = disabled, 1 = search after hot tp message, 2 = search as soon as leader is found
+		Config.AutoBaal.LeechSpot = [15115, 5050]; // X, Y coords of Throne Room leech spot
+		Config.AutoBaal.LongRangeSupport = false; // Cast long distance skills from a safe spot
 	Scripts.BaalHelper = false;
 		Config.BaalHelper.Wait = 120; // Seconds to wait for a runner to be in Throne
 		Config.BaalHelper.KillNihlathak = false; // Kill Nihlathak before going to Throne
@@ -138,6 +142,24 @@ function LoadConfig() {
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
 		Config.BaalHelper.RandomPrecast = true; // Use random WP to precast. Anti PK measure.
 		Config.BaalHelper.SkipTP = true; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
+	Scripts.BaalAssistant = false; // Used to leech or help in baal runs.
+		Config.BaalAssistant.Leader = ""; // Leave blank to automatically find a leader. (Not Reccomended)
+		Config.BaalAssistant.Wait = 120; // Seconds to wait for a runner to be in the throne / portal wait / safe TP wait / hot TP wait...
+		Config.BaalAssistant.KillNihlathak = false; // Kill Nihlathak before going to Throne
+		Config.BaalAssistant.FastChaos = false; // Kill Diablo before going to Throne
+		Config.BaalAssistant.Helper = true; // Set to true to help attack, set false to to leech.
+		Config.BaalAssistant.GetShrine = false; // Set to true to get a experience shrine at the start of the run.
+		Config.BaalAssistant.GetShrineWaitForHotTP = false; // Set to true to get a experience shrine after leader shouts the hot tp message as defined in Config.BaalAssistant.HotTPMessage
+		Config.BaalAssistant.RandomPrecast = true; // Use a random waypoint to precast. Anti-PK measure.
+		Config.BaalAssistant.SkipTP = false; // Set to true to enable the helper to skip the TP and teleport down to the throne room.
+		Config.BaalAssistant.WaitForSafeTP = false; // Set to true to wait for a safe TP message (defined in SafeTPMessage)
+		Config.BaalAssistant.DollQuit = false; // Quit on dolls. (Hardcore players?)
+		Config.BaalAssistant.SoulQuit = false; // Quit on Souls. (Hardcore players?)
+		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely. 
+		Config.BaalAssistant.HotTPMessage = ["Hot", "Hot TP", "2"]; // Configure safe TP messages.
+		Config.BaalAssistant.SafeTPMessage = ["Safe", "Safe TP!", "Clear", "1"]; // Configure safe TP messages.
+		Config.BaalAssistant.BaalMessage = ["Baal", "Baal!", "3"]; // Configure baal messages, this is a precautionary measure.
+		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game", "NG"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 		Config.Follower.Leader = ""; // Leader's ingame name. This only applies to Follower script
 
