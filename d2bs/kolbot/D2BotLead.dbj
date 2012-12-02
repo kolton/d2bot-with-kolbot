@@ -19,10 +19,10 @@ var StarterConfig = {
 
 var ChannelConfig = {
 	// Now you can join separate channels for separate profiles, use separate join messages etc
-	// Format: "Profile Name": {JoinChannel: "channel", FirstJoinMessage: "login message", AnnounceGames: true}
+	// Format: "Profile Name": {JoinChannel: ["channel"], FirstJoinMessage: "login message", AnnounceGames: true}
 	// Multiple entries are separated by a comma
 
-	//"Example": {JoinChannel: "my channel", FirstJoinMessage: ".login", AnnounceGames: true}
+	//"Example": {JoinChannel: ["my channel"], FirstJoinMessage: ".login", AnnounceGames: true}
 };
 
 
@@ -363,13 +363,15 @@ MainSwitch:
 		if (!chatActionsDone) {
 			chatActionsDone = true;
 
-			timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-			say("/j " + ChannelConfig[me.profile].JoinChannel);
-			delay(1000);
+			for (i = 0; i < ChannelConfig[me.profile].JoinChannel.length; i += 1) {
+				timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+				say("/j " + ChannelConfig[me.profile].JoinChannel[i]);
+				delay(1000);
 
-			if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
-				say(ChannelConfig[me.profile].FirstJoinMessage);
-				delay(500);
+				if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
+					say(ChannelConfig[me.profile].FirstJoinMessage);
+					delay(500);
+				}
 			}
 		}
 
