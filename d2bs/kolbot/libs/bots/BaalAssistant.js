@@ -511,8 +511,7 @@ function BaalAssistant() {
 				if (ngCheck) {
 					return true;
 				}
-				if (!getUnit(1, 543)) {
-					baalCheck = true;
+				if (baalCheck) {
 					throneStatus = true;
 					break;
 				}
@@ -612,8 +611,7 @@ function BaalAssistant() {
 				if (ngCheck) {
 					return true;
 				}
-				if (!getUnit(1, 543)) {
-					baalCheck = true;
+				if (baalCheck) {
 					throneStatus = true;
 					break;
 				}
