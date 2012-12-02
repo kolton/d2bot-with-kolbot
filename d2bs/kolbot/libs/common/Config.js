@@ -35,7 +35,7 @@ var Config = {
 
 				break;
 			case 5:
-				configFilename = "Config." + me.profile + "." + me.charname + ".js"; // Added to make it easier to have hundreds of configs.
+				configFilename =  me.profile + "." + classes[me.classid] + "." + me.charname + ".js";
 
 				break;
 			}
@@ -266,12 +266,32 @@ var Config = {
 		KillGhosts: false
 	},
 	Baal: {
-		HotTPMsg: "Hot TP!",
-		SafeTPMsg: "TP safe!",
-		BaalMsg: "Baal",
 		DollQuit: false,
+		SoulQuit: false,
 		KillBaal: false,
-		RandomPrecast: false
+		RandomPrecast: false,
+		HotTPMessage: "Hot TP!",
+		SafeTPMessage: "Safe TP!",
+		BaalMessage: "Baal!"
+	},
+	BaalAssistant: {
+		Leader: "",
+		KillNihlathak: false,
+		FastChaos: false,
+		Wait: 120,
+		Helper: false,
+		GetShrine: false,
+		GetShrineWaitForHotTP: false,
+		DollQuit: false,
+		SoulQuit: false,
+		RandomPrecast: false,
+		SkipTP: false,
+		WaitForSafeTP: false,
+		KillBaal: false,
+		HotTPMessage: [],
+		SafeTPMessage: [],
+		BaalMessage: [],
+		NextGameMessage: []
 	},
 	BaalHelper: {
 		Wait: 120,
