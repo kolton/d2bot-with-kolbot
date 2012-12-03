@@ -6,23 +6,23 @@
  
 function BaalAssistant() {
 	
-	var Leader = Config.BaalAssistant.Leader,
+	var Leader = Config.BaalAssistant.Leader, // Not entriely needed in the configs.
 		KillNihlathak = Config.BaalAssistant.KillNihlathak,
 		FastChaos = Config.BaalAssistant.FastChaos,
-		Wait = Config.BaalAssistant.Wait,
+		Wait = Config.BaalAssistant.Wait, // Not entriely needed in the configs.
 		Helper = Config.BaalAssistant.Helper,
 		GetShrine = Config.BaalAssistant.GetShrine,
 		GetShrineWaitForHotTP = Config.BaalAssistant.GetShrineWaitForHotTP,
-		RandomPrecast = Config.BaalAssistant.RandomPrecast,
+		RandomPrecast = Config.BaalAssistant.RandomPrecast, // Not entriely needed in the configs.
 		SkipTP = Config.BaalAssistant.SkipTP,
 		WaitForSafeTP = Config.BaalAssistant.WaitForSafeTP,
 		DollQuit = Config.BaalAssistant.DollQuit,
 		SoulQuit = Config.BaalAssistant.SoulQuit,
-		KillBaal = Config.BaalAssistant.KillBaal,
-		hotTPMessage = Config.BaalAssistant.HotTPMessage,
-		safeTPMessage = Config.BaalAssistant.SafeTPMessage,
-		baalMessage = Config.BaalAssistant.BaalMessage,
-		nextGameMessage = Config.BaalAssistant.NextGameMessage,
+		KillBaal = Config.BaalAssistant.KillBaal, 
+		hotTPMessage = Config.BaalAssistant.HotTPMessage, // Not entriely needed in the configs.
+		safeTPMessage = Config.BaalAssistant.SafeTPMessage, // Not entriely needed in the configs.
+		baalMessage = Config.BaalAssistant.BaalMessage, // Doesn't need to be in configs.
+		nextGameMessage = Config.BaalAssistant.NextGameMessage, // Doesn't need to be in configs.
 		hotCheck = false,
 		safeCheck = false,
 		baalCheck = false,
@@ -511,10 +511,6 @@ function BaalAssistant() {
 				if (ngCheck) {
 					return true;
 				}
-				if (baalCheck) {
-					throneStatus = true;
-					break;
-				}
 				delay(100);
 			}
 
@@ -610,10 +606,6 @@ function BaalAssistant() {
 			for (i = 0; i < 5; i += 1) {
 				if (ngCheck) {
 					return true;
-				}
-				if (baalCheck) {
-					throneStatus = true;
-					break;
 				}
 				delay(100);
 			}
