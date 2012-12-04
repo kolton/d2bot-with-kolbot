@@ -5,20 +5,37 @@
 */
 
 function MFHelper() {
-	var player, playerAct, split,
+	var i, player, playerAct, split,
 		oldCommand = "",
 		command = "";
 
-	function ChatEvent(who, msg) {
-		command = msg;
+	function ChatEvent(name, msg) {
+		if (!player) {
+			var i,
+				match = ["kill", "clearlevel", "clear", "quit", "cows"];
+
+			if (msg) {
+				for (i = 0; i < match.length; i += 1) {
+					if (msg.match(match[i])) {
+						player = this.findPlayer(name);
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (player && name === player.name) {
+			command = msg;
+		}
 	}
-	
-	this.findPlayer = function () {
+
+	this.findPlayer = function (name) {
 		var party = getParty();
 
 		if (party) {
 			do {
-				if (party.name !== me.name && !party.inTown) {
+				if (party.name !== me.name && party.name === name) {
 					return party;
 				}
 			} while (party.getNext());
@@ -28,16 +45,23 @@ function MFHelper() {
 	};
 
 	this.getPlayerAct = function (player) {
-		switch (true) {
-		case player.area > 0 && player.area <= 39:
+		if (player.area > 0 && player.area <= 39) {
 			return 1;
-		case player.area >= 40 && player.area <= 74:
+		}
+
+		if (player.area >= 40 && player.area <= 74) {
 			return 2;
-		case player.area >= 75 && player.area <= 102:
+		}
+
+		if (player.area >= 75 && player.area <= 102) {
 			return 3;
-		case player.area >= 103 && player.area <= 108:
+		}
+
+		if (player.area >= 103 && player.area <= 108) {
 			return 4;
-		case player.area >= 109:
+		}
+
+		if (player.area >= 109) {
 			return 5;
 		}
 
@@ -56,8 +80,8 @@ function MFHelper() {
 			badRooms2 = badRooms[i].getNearby();
 
 			for (j = 0; j < badRooms2.length; j += 1) {
-				if (indexes.indexOf(badRooms2[j].x + "" + badRooms2[j].y) === -1) {
-					indexes.push(badRooms2[j].x + "" + badRooms2[j].y);
+				if (indexes.indexOf(badRooms2[j].x.toString() + badRooms2[j].y.toString()) === -1) {
+					indexes.push(badRooms2[j].x.toString() + badRooms2[j].y.toString());
 				}
 			}
 		}
@@ -65,7 +89,7 @@ function MFHelper() {
 		room = getRoom();
 
 		do {
-			if (indexes.indexOf(room.x + "" + room.y) === -1) {
+			if (indexes.indexOf(room.x.toString() + room.y.toString()) === -1) {
 				finalRooms.push([room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2]);
 			}
 		} while (room.getNext());
@@ -116,128 +140,136 @@ function MFHelper() {
 	Town.doChores();
 	Town.move("portalspot");
 
-MainLoop:
-	while (true) {
-		if (!player) {
-			player = this.findPlayer();
+	if (Config.Leader) {
+		for (i = 0; i < 30; i += 1) {
+			if (Misc.inMyParty(Config.Leader)) {
+				break;
+			}
+
+			delay(1000);
 		}
 
+		if (i === 30) {
+			throw new Error("Autobaal: Leader not partied");
+		}
+
+		player = this.findPlayer(Config.Leader);
+	}
+
+MainLoop:
+	while (true) {
 		if (player) {
 			playerAct = this.getPlayerAct(player);
-		
+
 			if (playerAct && playerAct !== me.act) {
 				Town.goToTown(this.getPlayerAct(player));
 				Town.move("portalspot");
 			}
-		}
 
-		if (command !== oldCommand) {
-			oldCommand = command;
+			// Finish if leader is in chaos or throne
+			if ([108, 131].indexOf(player.area) > -1) {
+				break;
+			}
 
-			switch (true) {
-			case command.indexOf("kill") > -1:
-				print("Received command: kill");
-				delay(500);
+			if (command !== oldCommand) {
+				oldCommand = command;
 
-				split = command.split("kill ")[1];
+				if (command.indexOf("kill") > -1) {
+					print("Received command: kill");
+					delay(500);
 
-				if (!Pather.usePortal(player.area, player.name)) {
-					me.overhead("Failed to use TP");
+					split = command.split("kill ")[1];
 
-					break;
-				}
+					if (!Pather.usePortal(player.area, player.name)) {
+						me.overhead("Failed to use TP");
 
-				Precast.doPrecast(false);
-
-				try {
-					if (!!parseInt(split, 10)) {
-						split = parseInt(split, 10);
+						break;
 					}
 
-					Attack.kill(split);
-					Pickit.pickItems();
-				} catch (killerror) {
-					print(killerror);
-				}
+					Precast.doPrecast(false);
 
-				delay(1000);
+					try {
+						if (!!parseInt(split, 10)) {
+							split = parseInt(split, 10);
+						}
 
-				if (!me.inTown && !Pather.usePortal(null, player.name)) {
-					Town.goToTown();
-				}
-
-				break;
-			case command.indexOf("clearlevel") > -1:
-				print("Received command: clearlevel");
-				delay(500);
-
-				if (!Pather.usePortal(player.area, player.name)) {
-					me.overhead("Failed to use TP");
-
-					break;
-				}
-
-				Precast.doPrecast(false);
-				Attack.clearLevel(Config.ClearType);
-				Precast.doPrecast(true);
-
-				if (!Pather.usePortal(null, player.name)) {
-					Town.goToTown();
-				}
-
-				break;
-			case command.indexOf("clear") > -1:
-				print("Received command: clear");
-				delay(500);
-
-				split = command.split("clear ")[1]
-
-				if (!Pather.usePortal(player.area, player.name)) {
-					me.overhead("Failed to use TP");
-
-					break;
-				}
-
-				Precast.doPrecast(false);
-
-				try {
-					if (!!parseInt(split, 10)) {
-						split = parseInt(split, 10);
+						Attack.kill(split);
+						Pickit.pickItems();
+					} catch (killerror) {
+						print(killerror);
 					}
 
-					Attack.clear(15, 0, split);
-				} catch (killerror) {
-					print(killerror);
+					delay(1000);
+
+					if (!me.inTown && !Pather.usePortal(null, player.name)) {
+						Town.goToTown();
+					}
+				} else if (command.indexOf("clearlevel") > -1) {
+					print("Received command: clearlevel");
+					delay(500);
+
+					if (!Pather.usePortal(player.area, player.name)) {
+						me.overhead("Failed to use TP");
+
+						break;
+					}
+
+					Precast.doPrecast(false);
+					Attack.clearLevel(Config.ClearType);
+					Precast.doPrecast(true);
+
+					if (!Pather.usePortal(null, player.name)) {
+						Town.goToTown();
+					}
+				} else if (command.indexOf("clear") > -1) {
+					print("Received command: clear");
+					delay(500);
+
+					split = command.split("clear ")[1];
+
+					if (!Pather.usePortal(player.area, player.name)) {
+						me.overhead("Failed to use TP");
+
+						break;
+					}
+
+					Precast.doPrecast(false);
+
+					try {
+						if (!!parseInt(split, 10)) {
+							split = parseInt(split, 10);
+						}
+
+						Attack.clear(15, 0, split);
+					} catch (killerror2) {
+						print(killerror2);
+					}
+
+					delay(1000);
+
+					if (!me.inTown && !Pather.usePortal(null, player.name)) {
+						Town.goToTown();
+					}
+				} else if (command.indexOf("quit") > -1) {
+					break MainLoop;
+				} else if (command.indexOf("cows") > -1) {
+					print("Received command: clear cows");
+					delay(500);
+
+					if (!Pather.usePortal(39)) {
+						me.overhead("Failed to use the portal");
+
+						break;
+					}
+
+					Precast.doPrecast(false);
+					this.clearCowLevel();
+					delay(1000);
+
+					if (!Pather.usePortal(null, player.name)) {
+						Town.goToTown();
+					}
 				}
-
-				delay(1000);
-
-				if (!me.inTown && !Pather.usePortal(null, player.name)) {
-					Town.goToTown();
-				}
-
-				break;
-			case command.indexOf("quit") > -1:
-				break MainLoop;
-			case command.indexOf("cows") > -1:
-				print("Received command: clear cows");
-				delay(500);
-
-				if (!Pather.usePortal(39)) {
-					me.overhead("Failed to use the portal");
-
-					break;
-				}
-
-				Precast.doPrecast(false);
-				this.clearCowLevel();
-				delay(1000);
-
-				if (!Pather.usePortal(null, player.name)) {
-					Town.goToTown();
-				}
-
-				break;
 			}
 		}
 

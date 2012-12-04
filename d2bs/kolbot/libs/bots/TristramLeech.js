@@ -27,7 +27,7 @@ function TristramLeech() {
 	Pather.useWaypoint(1); // Back To Rouge
 	Town.move("portalspot"); // Portal Spot
 
-	leader = Config.TristramLeech.Leader
+	leader = Config.Leader;
 
 	// Check leader isn't in other zones, whilst waiting for portal.
 	for (i = 0; i < Config.TristramLeech.Wait; i += 1) {

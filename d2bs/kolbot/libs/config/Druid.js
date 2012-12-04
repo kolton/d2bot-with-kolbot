@@ -119,10 +119,11 @@ function LoadConfig() {
 	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)
 	*/
 
+	Config.Leader = ""; // Leader's ingame character name. Leave blank to try auto-detection (works in AutoBaal, Wakka, MFHelper)
+	Config.QuitList = [""]; // List of character names to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
+
 	Scripts.TristramLeech = false; // Enters Tristram, attempts to stay close to the leader and will try and help kill.
-		Config.TristramLeech.Leader = ""; // Leader's ingame name.
 	Scripts.TravincalLeech = false; // Enters portal at back of Travincal.
-		Config.TravincalLeech.Leader = ""; // Leader's ingame name.
 		Config.TravincalLeech.Helper = true; // If set to true the character will teleport to the stairs and help attack.
 	Scripts.MFHelper = false; // Run the same MF run as the MFLeader. Leader must have Config.MFLeader = true
 	Scripts.Wakka = false; // Walking chaos leecher with auto leader assignment, stays at safe distance from the leeader
@@ -130,7 +131,6 @@ function LoadConfig() {
 		Config.DiabloHelper.Wait = 120; // Seconds to wait for a runner to be in Chaos
 		Config.DiabloHelper.Entrance = true; // Start from entrance
 	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
-		Config.AutoBaal.Leader = ""; // Leader's charname. Set to "" for automatic detection.
 		Config.AutoBaal.FindShrine = false; // false = disabled, 1 = search after hot tp message, 2 = search as soon as leader is found
 		Config.AutoBaal.LeechSpot = [15115, 5050]; // X, Y coords of Throne Room leech spot
 		Config.AutoBaal.LongRangeSupport = false; // Cast long distance skills from a safe spot
@@ -161,9 +161,6 @@ function LoadConfig() {
 		Config.BaalAssistant.BaalMessage = ["Baal", "Baal!", "3"]; // Configure baal messages, this is a precautionary measure.
 		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game", "NG"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
-		Config.Follower.Leader = ""; // Leader's ingame name. This only applies to Follower script
-
-	Config.QuitList = []; // List of character names to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
 
 	// *** special scripts ***
 	Scripts.WPGetter = false; // Get missing waypoints
@@ -363,6 +360,7 @@ function LoadConfig() {
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
 	Config.TownOnHostile = false; // Go to town instead of quitting when HostileAction is 0 or 1
+	Config.ViperCheck = false; // Quit if revived Tomb Vipers are sighted
 
 	// DClone config
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth

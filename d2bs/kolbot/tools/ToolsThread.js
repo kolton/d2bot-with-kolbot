@@ -5,7 +5,7 @@
 */
 
 function main() {
-	var i, mercHP, ironGolem, area,
+	var i, mercHP, ironGolem, area, tick,
 		configCache = {},
 		quitFlag = false,
 		timerLastDrink = [];
@@ -95,37 +95,30 @@ function main() {
 	};
 
 	this.togglePause = function () {
-		var script = getScript("default.dbj");
+		var i,	script,
+			scripts = ["default.dbj", "tools/townchicken.js", "tools/antihostile.js", "tools/party.js", "tools/flashthread.js", "tools/rushthread.js"];
 
-		if (script) {
-			if (script.running) {
-				print("ÿc1Pausing.");
-				script.pause();
-			} else {
-				print("ÿc2Resuming.");
-				script.resume();
+		for (i = 0; i < scripts.length; i += 1) {
+			script = getScript(scripts[i]);
+
+			if (script) {
+				if (script.running) {
+					if (script.name === "default.dbj") {
+						print("ÿc1Pausing.");
+					}
+
+					script.pause();
+				} else {
+					if (script.name === "default.dbj") {
+						print("ÿc2Resuming.");
+					}
+
+					script.resume();
+				}
 			}
 		}
 
-		script = getScript("tools/antihostile.js");
-
-		if (script) {
-			if (script.running) {
-				script.pause();
-			} else {
-				script.resume();
-			}
-		}
-
-		script = getScript("tools/rushthread.js");
-
-		if (script) {
-			if (script.running) {
-				script.pause();
-			} else {
-				script.resume();
-			}
-		}
+		return true;
 	};
 
 	this.drinkPotion = function (type) {
@@ -229,6 +222,20 @@ function main() {
 		return "";
 	};
 
+	this.checkVipers = function () {
+		var monster = getUnit(1, 597);
+
+		if (monster) {
+			do {
+				if (monster.getState(96) && monster.getParent().name !== me.name) {
+					return true;
+				}
+			} while (monster.getNext());
+		}
+
+		return false;
+	};
+
 	this.getIronGolem = function () {
 		var golem = getUnit(1, "iron golem");
 
@@ -325,7 +332,7 @@ function main() {
 			break;
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
 			if (configCache.SoJWaitTime) {
-				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants;7");
+				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3] + ";7");
 				scriptBroadcast("soj");
 			}
 
@@ -356,11 +363,13 @@ function main() {
 
 	// Cache variables to prevent a bug where d2bs loses the reference to Config object
 	configCache = this.cacheConfig(Config);
+	tick = getTickCount();
 
 	addEventListener("scriptmsg", this.scriptEvent);
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
 
+	// Start
 	while (me.ingame) {
 		if (!me.inTown) {
 			try {
@@ -456,6 +465,14 @@ function main() {
 							this.drinkPotion(4);
 						}
 					}
+				}
+
+				if (Config.ViperCheck && getTickCount() - tick >= 250) {
+					if (this.checkVipers()) {
+						quitFlag = true;
+					}
+
+					tick = getTickCount();
 				}
 			} catch (e) {
 				D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");

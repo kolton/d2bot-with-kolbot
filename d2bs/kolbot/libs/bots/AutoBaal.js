@@ -131,8 +131,8 @@ function AutoBaal() {
 		throw new Error("Town.goToTown failed."); // critical error - can't reach harrogath
 	}
 
-	if (Config.AutoBaal.Leader) {
-		leader = Config.AutoBaal.Leader;
+	if (Config.Leader) {
+		leader = Config.Leader;
 
 		for (i = 0; i < 30; i += 1) {
 			if (Misc.inMyParty(leader)) {

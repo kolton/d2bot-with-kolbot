@@ -5,14 +5,7 @@
  */
 
 function Baal() {
-	var portal, tick,
-		RandomPrecast = Config.Baal.RandomPrecast,
-		DollQuit = Config.Baal.DollQuit,
-		SoulQuit = Config.Baal.SoulQuit,
-		KillBaal = Config.Baal.KillBaal,
-		hotTPMessage = Config.Baal.HotTPMessage,
-		safeTPMessage = Config.Baal.SafeTPMessage,
-		baalMessage = Config.Baal.BaalMessage;
+	var portal, tick;
 
 	this.preattack = function () {
 		var check;
@@ -230,7 +223,7 @@ function Baal() {
 
 	Town.doChores();
 
-	if (RandomPrecast) {
+	if (Config.Baal.RandomPrecast) {
 		Pather.useWaypoint("random");
 		Precast.doPrecast(true);
 	} else {
@@ -248,9 +241,14 @@ function Baal() {
 
 	Pather.moveTo(15095, 5029);
 
-	if ((SoulQuit && getUnit(1, 691)) || (DollQuit && getUnit(1, 690))) {
-		say("Too many undead soul killers and undead stygian dolls, next game!");
-		print("Undead soul killers or Undead stygian dolls found, ending script.");
+	if (Config.Baal.DollQuit && getUnit(1, 691)) {
+		say("Dolls found! NG.");
+
+		return true;
+	}
+
+	if (Config.Baal.SoulQuit && getUnit(1, 641)) {
+		say("Souls found! NG.");
 
 		return true;
 	}
@@ -259,7 +257,7 @@ function Baal() {
 		this.announce();
 		Pather.moveTo(15118, 5002);
 		Pather.makePortal();
-		say(hotTPMessage);
+		say(Config.Baal.HotTPMessage);
 		Attack.clear(15);
 	}
 
@@ -268,7 +266,7 @@ function Baal() {
 	if (Config.PublicMode) {
 		Pather.moveTo(15118, 5045);
 		Pather.makePortal();
-		say(safeTPMessage);
+		say(Config.Baal.SafeTPMessage);
 		Precast.doPrecast(true);
 	}
 
@@ -337,9 +335,9 @@ MainLoop:
 		delay(10);
 	}
 
-	if (KillBaal) {
+	if (Config.Baal.KillBaal) {
 		if (Config.PublicMode) {
-			say(baalMessage);
+			say(Config.Baal.BaalMessage);
 		}
 
 		Pather.moveTo(15090, 5008);

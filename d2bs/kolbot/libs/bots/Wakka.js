@@ -7,7 +7,14 @@
 var stopLvl = 99;
 
 function Wakka() {
-	function AutoLeaderDetect(destination) { // autoleader by Ethic
+	var i, safeTP, portal, vizClear, seisClear, infClear, tick, diablo,
+		minDist = 40,
+		maxDist = 80,
+		leaderUnit = null,
+		leaderPartyUnit = null,
+		leader = "";
+
+	function autoLeaderDetect(destination) { // autoleader by Ethic
 		var solofail, suspect;
 
 		do {
@@ -27,6 +34,7 @@ function Wakka() {
 					}
 
 					print("ÿc4Wakka: ÿc0Autodetected " + leader);
+
 					return true;
 				}
 			} while (suspect.getNext());
@@ -132,7 +140,7 @@ function Wakka() {
 			me.revive();
 		}
 
-		var i, corpse,
+		var corpse,
 			rval = false;
 
 		corpse = getUnit(0, me.name, 17);
@@ -153,8 +161,7 @@ function Wakka() {
 	};
 
 	this.followPath = function (dest) {
-		var node,
-			path = getPath(me.area, me.x, me.y, dest[0], dest[1], 0, 15);
+		var path = getPath(me.area, me.x, me.y, dest[0], dest[1], 0, 15);
 
 		if (!path) {
 			throw new Error("Failed go get path");
@@ -220,18 +227,27 @@ function Wakka() {
 	};
 
 	// start
-	var i, safeTP, portal, viz, seis, inf, vizClear, seisClear, infClear, path, tick, diablo,
-		minDist = 40,
-		maxDist = 80,
-		leaderUnit = null,
-		leaderPartyUnit = null,
-		leader = "";
-
 	Town.goToTown(4);
 	Town.doChores();
 	Town.move("portalspot");
 
-	if (AutoLeaderDetect(108)) {
+	if (Config.Leader) {
+		leader = Config.Leader;
+
+		for (i = 0; i < 30; i += 1) {
+			if (Misc.inMyParty(leader)) {
+				break;
+			}
+
+			delay(1000);
+		}
+
+		if (i === 30) {
+			throw new Error("Wakka: Leader not partied");
+		}
+	}
+
+	if (leader || autoLeaderDetect(108)) {
 		while (Misc.inMyParty(leader)) {
 			if (me.getStat(12) >= stopLvl) {
 				D2Bot.stop();
