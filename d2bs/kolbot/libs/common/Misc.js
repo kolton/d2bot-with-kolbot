@@ -782,8 +782,9 @@ MainLoop:
 
 		var i, npc, lines;
 
-		// Trade crashes a lot with dialog lines
-		if (id === 0x0D44) {
+		switch (id) {
+		case 0x1507: // Resurrect
+		case 0x0D44: // Trade
 			npc = getInteractedNPC();
 
 			if (npc) {
@@ -791,6 +792,8 @@ MainLoop:
 
 				return true;
 			}
+
+			break;
 		}
 
 		lines = getDialogLines();
@@ -800,23 +803,10 @@ MainLoop:
 		}
 
 		for (i = 0; i < lines.length; i += 1) {
-			if (lines[i].selectable) {
-				switch (id) {
-				case 0x1507: // Ressurect Merc
-					if (lines[i].text.indexOf(getLocaleString(22695)) > -1) {
-						getDialogLines()[i].handler();
+			if (lines[i].selectable && lines[i].text.indexOf(getLocaleString(id)) > -1) {
+				getDialogLines()[i].handler();
 
-						return true;
-					}
-
-					break;
-				default:
-					if (lines[i].text.indexOf(getLocaleString(id)) > -1) {
-						getDialogLines()[i].handler();
-
-						return true;
-					}
-				}
+				return true;
 			}
 		}
 

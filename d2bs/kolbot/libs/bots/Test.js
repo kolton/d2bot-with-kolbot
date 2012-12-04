@@ -39,13 +39,7 @@ function Test() {
 function test() {
 	print("test");
 
-	var testthatshit = function (x, y) {
-		print(x + ", " + y);
-		
-		return true;
-	};
-
-	print(getPath(me.area, me.x, me.y, me.x + 5, me.y + 5, 3, 15, testthatshit, testthatshit));
+	Town.move("portalspot");
 }
 
 /*var _NTIP_CheckList = [],

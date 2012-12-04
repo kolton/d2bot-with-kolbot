@@ -119,6 +119,7 @@ var Config = {
 	],
 	PublicMode: false,
 	ShitList: false,
+	Leader: "",
 	QuitList: [],
 	HPBuffer: 0,
 	MPBuffer: 0,
@@ -160,6 +161,7 @@ var Config = {
 	AntiHostile: false,
 	HostileAction: 0,
 	TownOnHostile: false,
+	ViperCheck: false,
 
 	// DClone
 	StopOnDClone: false,

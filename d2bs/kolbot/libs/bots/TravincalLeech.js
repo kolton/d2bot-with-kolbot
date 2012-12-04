@@ -27,7 +27,7 @@ function TravincalLeech() {
 	Pather.useWaypoint(75);
 	Town.move("portalspot"); 
 
-	leader = Config.TravincalLeech.Leader
+	leader = Config.Leader;
 
 	for (i = 0; i < Config.TravincalLeech.Wait; i += 1) {
 	

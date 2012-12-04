@@ -1414,7 +1414,7 @@ MainLoop:
 			break;
 		case 5:
 			this.act[4].spot = {};
-			this.act[4].spot.portalspot = [5099, 5025];
+			this.act[4].spot.portalspot = [5098, 5019];
 			this.act[4].spot.stash = [5129, 5061];
 			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
 			this.act[4].spot[NPC.Malah] = [5078, 5029];
@@ -1441,7 +1441,7 @@ MainLoop:
 			delay(40);
 		}*/
 
-		var i, townSpot,
+		var i, townSpot, path,
 			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
 
 		if (!this.act[me.act - 1].initialized) {
@@ -1454,12 +1454,26 @@ MainLoop:
 			return false;
 		}
 
+		// Act 5 hack
+		if (me.act === 5 && spot === "portalspot" && getDistance(me, 5113, 5068) <= 8) {
+			//me.overhead("a5 path override");
+
+			path = [5113, 5068, 5108, 5051, 5106, 5046, 5104, 5041, 5102, 5027, 5098, 5018];
+
+			for (i = 0; i < path.length; i += 2) {
+				Pather.walkTo(path[i], path[i + 1]);
+			}
+
+			return true;
+		}
+
 		if (useTK) {
 			if (getDistance(me, townSpot[0], townSpot[1]) > 14) {
 				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
 			}
 		} else {
-			print("Townmove: " + spot + " " + townSpot);
+			print("Townmove: " + spot + " from " + me.x + ", " + me.y);
+			delay(100);
 			Pather.moveTo(townSpot[0], townSpot[1]);
 
 			// If unit has more than one location and it's not here, search

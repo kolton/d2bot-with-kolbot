@@ -48,7 +48,7 @@
 
 function Follower() {
 	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit, player,
-		commanders = [Config.Follower.Leader],
+		commanders = [Config.Leader],
 		attack = true,
 		openContainers = true,
 		classes = ["amazon", "sorceress", "necromancer", "paladin", "barbarian", "druid", "assassin"],
@@ -443,7 +443,7 @@ function Follower() {
 	};
 
 	this.chatEvent = function (nick, msg) {
-		if (msg && nick === Config.Follower.Leader) {
+		if (msg && nick === Config.Leader) {
 			switch (msg) {
 			case "tele":
 			case me.name + " tele":
@@ -587,9 +587,9 @@ function Follower() {
 
 				say("Switching leader to " + piece);
 
-				Config.Follower.Leader = piece;
-				leader = this.getLeader(Config.Follower.Leader);
-				leaderUnit = this.getLeaderUnit(Config.Follower.Leader);
+				Config.Leader = piece;
+				leader = this.getLeader(Config.Leader);
+				leaderUnit = this.getLeaderUnit(Config.Leader);
 			}
 		}
 	};
@@ -603,7 +603,7 @@ function Follower() {
 	charClass = classes[me.classid];
 
 	for (i = 0; i < 20; i += 1) {
-		leader = this.getLeader(Config.Follower.Leader);
+		leader = this.getLeader(Config.Leader);
 
 		if (leader) {
 			break;
@@ -620,7 +620,7 @@ function Follower() {
 		say("Leader found.");
 	}
 
-	while (!Misc.inMyParty(Config.Follower.Leader)) {
+	while (!Misc.inMyParty(Config.Leader)) {
 		delay(500);
 	}
 
@@ -628,7 +628,7 @@ function Follower() {
 	Town.move("portalspot");
 
 	// Main Loop
-	while (Misc.inMyParty(Config.Follower.Leader)) {
+	while (Misc.inMyParty(Config.Leader)) {
 		if (me.mode === 17) {
 			while (!me.inTown) {
 				me.revive();
@@ -645,7 +645,7 @@ function Follower() {
 
 		if (!me.inTown) {
 			if (!leaderUnit || !copyUnit(leaderUnit).x) {
-				leaderUnit = this.getLeaderUnit(Config.Follower.Leader);
+				leaderUnit = this.getLeaderUnit(Config.Leader);
 
 				if (leaderUnit) {
 					say("Leader unit found.");
@@ -715,7 +715,7 @@ function Follower() {
 					delay(100);
 				}
 
-				leaderUnit = this.getLeaderUnit(Config.Follower.Leader);
+				leaderUnit = this.getLeaderUnit(Config.Leader);
 			}
 		}
 
@@ -809,7 +809,7 @@ WPLoop:
 					break;
 				}
 
-				while (!this.getLeaderUnit(Config.Follower.Leader) && !me.dead) {
+				while (!this.getLeaderUnit(Config.Leader) && !me.dead) {
 					Attack.clear(10);
 					delay(200);
 				}
