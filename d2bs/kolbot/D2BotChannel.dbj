@@ -55,6 +55,7 @@ include("common/misc.js");
 load("tools/heartbeat.js");
 
 var gameName, gamePass, oldGame, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
+	loginFail = 0,
 	isUp = "no",
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
@@ -217,6 +218,9 @@ MainSwitch:
 		break;
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
+
+		loginFail = 0;
+
 		ControlAction.click(6, 27, 480, 120, 20);
 
 		break;
@@ -366,6 +370,14 @@ MainLoop:
 	case 9: // Login
 	case 12: // Character Select
 	case 18: // D2 Splash
+		if (firstLogin) { // multiple realm botting fix in case of R/D or disconnect
+			ControlAction.click(6, 33, 572, 128, 35);
+		}
+
+		if (!firstLogin) {
+			firstLogin = true;
+		}
+
 		D2Bot.updateStatus("Logging In");
 
 		try {
@@ -392,10 +404,21 @@ MainLoop:
 			case getLocaleString(5207):
 				D2Bot.updateStatus("Invalid Password");
 				D2Bot.printToConsole("Invalid Password");
+
 				break;
 			case getLocaleString(5208):
+				loginFail += 1;
+
+				if (loginFail < 2) {
+					timeoutDelay("Login retry", 3000);
+					ControlAction.click(6, 335, 412, 128, 35);
+
+					break MainSwitch;
+				}
+
 				D2Bot.updateStatus("Invalid Account");
 				D2Bot.printToConsole("Invalid Account");
+
 				break;
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
@@ -414,10 +437,12 @@ MainLoop:
 				D2Bot.updateStatus("Disconnected");
 				D2Bot.printToConsole("Disconnected");
 				ControlAction.click(6, 335, 412, 128, 35);
+
 				break MainSwitch;
 			default:
 				D2Bot.updateStatus("Login Error");
 				D2Bot.printToConsole("Login Error - " + string);
+
 				break;
 			}
 		}
