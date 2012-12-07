@@ -96,20 +96,21 @@ var Pickit = {
 
 				if (item && (item.mode === 3 || item.mode === 5)) {
 					status = this.checkItem(item);
-
+	
 					if (status.result && this.canPick(item)) {
 						// Check room, don't check gold, scrolls and potions
 						canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
-
+						var color = this.itemColor(item);
+						
 						if (!canFit && Config.FieldID && Town.fieldID()) {
 							canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
 						}
 
 						if (!canFit && this.canMakeRoom()) {
-							print("ÿc7Trying to make room for " + item.name);
+							print("ÿc7Trying to make room for " + color + item.name);
 
 							if (!Town.visitTown()) {
-								print("ÿc7Not enough room for " + item.name);
+								print("ÿc7Not enough room for " + color + item.name);
 
 								return false;
 							}
@@ -120,7 +121,7 @@ var Pickit = {
 						if (canFit) {
 							this.pickItem(item, status.result, status.line);
 						} else {
-							print("ÿc7Not enough room for " + item.name);
+							print("ÿc7Not enough room for " + color + item.name);
 
 							if (!!AutoMule.getMule()) {
 								scriptBroadcast("mule");
