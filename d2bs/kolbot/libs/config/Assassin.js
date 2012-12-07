@@ -97,6 +97,7 @@ function LoadConfig() {
 		Config.Eldritch.KillShenk = true;
 		Config.Eldritch.KillDacFarren = true;
 	Scripts.Eyeback = false;
+	Scripts.SharpTooth = false;
 	Scripts.ThreshSocket = false;
 	Scripts.Abaddon = false;
 	Scripts.Frozenstein = false;
