@@ -82,12 +82,12 @@ function main() {
 		say("1");
 
 		while (!this.playerIn()) {
-			Pather.moveTo(22587, 9577);
+			Pather.moveTo(22582, 9612);
 			delay(250);
 		}
 
 		Attack.kill(156);
-		Pather.moveTo(22587, 9577);
+		Pather.moveTo(22582, 9612);
 		Pather.usePortal(null, me.name);
 		say("a2");
 		Pather.useWaypoint(40);
@@ -331,6 +331,8 @@ function main() {
 
 		var coords = [me.x, me.y];
 
+		Pather.moveTo(coords[0] - 24, coords[1]);
+		Pather.moveTo(coords[0] - 24, coords[1] - 135);
 		Pather.moveTo(coords[0] + 81, coords[1] - 135);
 		Pather.makePortal();
 		Attack.clear(25);
@@ -581,7 +583,7 @@ function main() {
 			throw new Error("Failed to go to Ancients way.");
 		}
 
-		Pather.moveTo(10057, 12645);
+		Pather.moveTo(10057, 12675);
 		Pather.makePortal();
 		say("1");
 
