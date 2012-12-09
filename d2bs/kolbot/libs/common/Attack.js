@@ -409,6 +409,7 @@ var Attack = {
 				switch (result) {
 				case 1:
 					monsterList.shift();
+
 					break;
 				case 2:
 				case 3:
@@ -565,7 +566,7 @@ var Attack = {
 			}
 		}
 
-		return 1;
+		return 0;
 	},
 
 	// Check if a set of coords is valid/accessable

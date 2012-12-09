@@ -43,7 +43,7 @@ var ClassAttack = {
 				break;
 			case 146: // Battle Cry
 			case 154: // War Cry
-				this.skillRange[i] = 5;
+				this.skillRange[i] = 4;
 
 				break;
 			case 151: // Whirlwind
@@ -160,7 +160,7 @@ var ClassAttack = {
 		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
 	},
 
-	whirlwind: function (unit, index) {
+	/*whirlwind: function (unit, index) {
 		var i, j, coords, angle,
 			//angles = [180, 45, -45, 90, -90]; // Angle offsets
 			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
@@ -185,6 +185,24 @@ MainLoop:
 		}
 
 		CollMap.reset();
+
+		return false;
+	},*/
+
+	whirlwind: function (unit, index) {
+		var i, coords, angle,
+			//angles = [180, 45, -45, 90, -90]; // Angle offsets
+			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
+
+		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
+
+		for (i = 0; i < angles.length; i += 1) { // get a better spot
+			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 5 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 5 + unit.y)];
+
+			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1)) {
+				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
+			}
+		}
 
 		return false;
 	},

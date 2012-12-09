@@ -257,7 +257,6 @@ function DiabloHelper() {
 
 	var i, partybaal;
 
-
 	// start
 	Town.doChores();
 	Pather.useWaypoint(107);
@@ -268,23 +267,22 @@ function DiabloHelper() {
 	for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
 		partybaal = getParty();
 
-		if (partybaal) {
+		if (partybaal && partybaal.area) {
 			do {
 				if (partybaal.area === 131) {
 					return false;
 				}
 			} while (partybaal.getNext());
-		}
 
-		if (Pather.usePortal(108, null)) {
-			break;
+			if (Pather.usePortal(108, null)) {
+				break;
+			}
 		}
 
 		delay(1000);
 	}
 
 	if (i === Config.DiabloHelper.Wait) {
-
 		throw new Error("No portals to Chaos");
 	}
 

@@ -6,6 +6,7 @@
 
 function main() {
 	var i, mercHP, ironGolem, area, tick,
+		pingTimer = [],
 		configCache = {},
 		quitFlag = false,
 		timerLastDrink = [];
@@ -52,8 +53,39 @@ function main() {
 		newObj.UseMercRejuv = obj.UseMercRejuv;
 		newObj.UseMercHP = obj.UseMercHP;
 		newObj.LogExperience = obj.LogExperience;
+		newObj.PingQuit = obj.PingQuit.slice();
 
 		return newObj;
+	};
+
+	this.checkPing = function (print) {
+		var i;
+
+		for (i = 0; i < configCache.PingQuit.length; i += 1) {
+			if (configCache.PingQuit[i].Ping > 0) {
+				if (me.ping >= configCache.PingQuit[i].Ping) {
+					me.overhead("High Ping");
+
+					if (pingTimer[i] === undefined || pingTimer[i] === 0) {
+						pingTimer[i] = getTickCount();
+					}
+
+					if (getTickCount() - pingTimer[i] >= configCache.PingQuit[i].Duration * 1000) {
+						if (print) {
+							D2Bot.printToConsole("High ping (" + me.ping + "/" + configCache.PingQuit[i].Ping + ") - leaving game.;9");
+						}
+
+						scriptBroadcast("pingquit");
+
+						return true;
+					}
+				} else {
+					pingTimer[i] = 0;
+				}
+			}
+		}
+
+		return false;
 	};
 
 	this.quitPrep = function () {
@@ -371,8 +403,8 @@ function main() {
 
 	// Start
 	while (me.ingame) {
-		if (!me.inTown) {
-			try {
+		try {
+			if (!me.inTown) {
 				if (configCache.UseHP > 0 && me.hp < Math.floor(me.hpmax * configCache.UseHP / 100)) {
 					this.drinkPotion(0);
 				}
@@ -474,12 +506,16 @@ function main() {
 
 					tick = getTickCount();
 				}
-			} catch (e) {
-				D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");
-				quit();
 
-				return;
+				if (this.checkPing(true)) {
+					quitFlag = true;
+				}
 			}
+		} catch (e) {
+			D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");
+			quit();
+
+			return;
 		}
 
 		if (quitFlag) {
@@ -489,6 +525,7 @@ function main() {
 				Experience.log();
 			}
 
+			this.checkPing(false); // In case of quitlist triggering first
 			this.quitPrep();
 			quit();
 

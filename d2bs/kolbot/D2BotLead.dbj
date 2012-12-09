@@ -1,12 +1,13 @@
 var StarterConfig = {
 	MinGameTime: 120, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
+	PingQuitDelay: 30, // Time in seconds to wait in lobby after quitting due to high ping
 	CreateGameDelay: 10, // Seconds to wait before creating a new game
 	ResetCount: 999, // Reset game count back to 1 every X games.
 	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
-	CrashDelay: 0, // Seconds to wait after a d2 window crash
+	CrashDelay: 10, // Seconds to wait after a d2 window crash
 	FTJDelay: 60, // Seconds to wait after failing to create a game
 	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
@@ -41,7 +42,7 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
+var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger, pingQuit,
 	loginFail = 0,
 	gamePass = "",
 	gameName = "",
@@ -123,6 +124,10 @@ function ScriptMsgEvent(msg) {
 		scriptBroadcast(torchMuleTrigger ? "torch" : "normal");
 
 		torchMuleTrigger = false;
+
+		break;
+	case "pingquit":
+		pingQuit = true;
 
 		break;
 	}
@@ -219,6 +224,12 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby");
 
 		loginFail = 0;
+
+		if (StarterConfig.PingQuitDelay && pingQuit) {
+			timeoutDelay("Ping Delay", StarterConfig.PingQuitDelay * 1e3);
+
+			pingQuit = false;
+		}
 
 		if (ChannelConfig.hasOwnProperty(me.profile) && ChannelConfig[me.profile].JoinChannel !== "") {
 			ControlAction.click(6, 27, 480, 120, 20);
@@ -499,7 +510,7 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
-		if (firstLogin) { // multiple realm botting fix in case of R/D or disconnect
+		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
@@ -512,7 +523,7 @@ MainSwitch:
 		try {
 			login(me.profile);
 		} catch (e) {
-			print(e);
+			print(e + " " + getLocation());
 		}
 
 		break;
@@ -712,6 +723,7 @@ MainSwitch:
 
 		break;
 	case 23: // Character Select - Connecting
+	case 42: // Empty character screen
 		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
@@ -760,13 +772,10 @@ MainSwitch:
 	case 38: // Game is full
 		// doesn't happen when making
 		break;
-	case 42: // Empty character screen
-		ControlAction.click(6, 33, 572, 128, 35);
-
-		break;
 	default:
 		if (location !== undefined) {
 			D2Bot.printToConsole("Unhandled location " + location);
+			//takeScreenshot();
 			delay(500);
 			D2Bot.restart();
 		}

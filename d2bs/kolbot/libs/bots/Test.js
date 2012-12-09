@@ -36,10 +36,58 @@ function Test() {
 	}
 }
 
+var a = -1, b = 1;
+
 function test() {
 	print("test");
 
-	Town.move("portalspot");
+	/*this.damage = 500;
+	this.time = 0;
+
+	while (true) {
+		checkLifeyo();
+		delay(10);
+	}*/
+
+	function qq() {
+		a += 1;
+
+		if (a === 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	somefunc(qq);
+}
+
+function somefunc(func) {
+	print(func.call());
+}
+
+function checkLifeyo() {
+	if (!this.hp) {
+		this.hp = me.hp;
+	}
+
+	if (this.hp > me.hp && me.hp < me.hpmax) {
+		me.overhead("taking damage");
+
+		if (!this.timer) {
+			this.timer = getTickCount();
+		}
+
+		if (getTickCount() - this.timer >= this.time) {
+			if (this.hp - this.damage > me.hp) {
+				D2Bot.printToConsole("DoT chicken");
+				//quit();
+			}
+
+			this.hp = 0;
+			this.timer = 0;
+		}
+	}
 }
 
 /*var _NTIP_CheckList = [],

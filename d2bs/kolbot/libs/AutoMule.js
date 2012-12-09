@@ -210,6 +210,11 @@ MainLoop:
 	},
 
 	inGameCheck: function () {
+		// Single player
+		if (!me.gamename) {
+			return false;
+		}
+
 		// Check if we're in mule or torch mule game
 		if ((!this.getMule(0) || me.gamename.toLowerCase() !== this.getMule(0).muleGameName[0].toLowerCase()) &&
 				(!this.getMule(1) || me.gamename.toLowerCase() !== this.getMule(1).muleGameName[0].toLowerCase())) {
