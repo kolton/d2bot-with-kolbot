@@ -189,13 +189,13 @@ MainLoop:
 		}
 
 		// Charge!
-		if (me.classid === 3 && me.dead && !me.inTown && me.mp >= 9 && getDistance(me, x, y) > 8 && Skill.setSkill(107, 1)) {
+		if (me.classid === 3 && !me.dead && !me.inTown && me.mp >= 9 && getDistance(me, x, y) > 8 && Skill.setSkill(107, 1)) {
 			if (Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
 
 			clickMap(0, 1, x, y);
-			delay(20);
+			delay(40);
 			clickMap(2, 1, x, y);
 
 			while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
@@ -208,11 +208,11 @@ MainLoop:
 				Skill.setSkill(115, 0);
 			}
 
-			if (this.openDoors(x, y) && getDistance(me, x, y) < 4) {
+			if (this.openDoors(x, y) && getDistance(me.x, me.y, x, y) < 4) {
 				return true;
 			}
 
-			me.move(x, y);
+			this.clickMove(x, y);
 
 			attemptCount += 1;
 			nTimer = getTickCount();
@@ -230,7 +230,7 @@ ModeLoop:
 						return false;
 					}
 
-					me.move(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1));
+					this.clickMove(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1));
 
 					break ModeLoop;
 				}
@@ -249,6 +249,12 @@ ModeLoop:
 		}
 
 		return !me.dead && getDistance(me, x, y) < 4;
+	},
+
+	clickMove: function (x, y) {
+		clickMap(0, 0, x, y);
+		delay(40);
+		clickMap(2, 0, x, y);
 	},
 
 	openDoors: function (x, y) {
@@ -615,7 +621,7 @@ ModeLoop:
 			}
 
 			if (me.inTown) {
-				me.move(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4); // In case of client/server desync
+				this.clickMove(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4); // In case of client/server desync
 
 				if (i > 2) {
 					Town.move("stash");

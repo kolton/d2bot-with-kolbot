@@ -294,10 +294,27 @@ MainSwitch:
 			fListTick = getTickCount();
 		}
 
-		if (lastGameStatus === "pending") {
+		switch (lastGameStatus) {
+		case "pending": // Most likely FTJ (can't detect it directly)
 			retry += 1;
 
-			//print("game joining failed " + retry);
+			D2Bot.updateRuns();
+
+			if (retry < 3) {
+				ControlAction.click(6, 652, 469, 120, 20);
+
+				break MainSwitch;
+			}
+
+			break;
+		case "DNE": // Game didn't exist
+			retry += 1;
+
+			break;
+		case "FULL": // Game is full
+			retry = 3;
+
+			break;
 		}
 
 		if (retry >= 3) {
@@ -346,7 +363,7 @@ MainLoop:
 		D2Bot.updateStatus("Join Game");
 
 		if (gameName !== "") {
-			if (retry === 0) { // Only delay on first join - the rest is handled by GameDoesNotExistTimeout. Any other case is instant fail (ie. full game).
+			if (retry === 0 || lastGameStatus === "pending") { // Only delay on first join - the rest is handled by GameDoesNotExistTimeout. Any other case is instant fail (ie. full game).
 				if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
 					timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
 				} else if (StarterConfig.JoinDelay) {
@@ -370,7 +387,7 @@ MainLoop:
 	case 9: // Login
 	case 12: // Character Select
 	case 18: // D2 Splash
-		if (firstLogin) { // multiple realm botting fix in case of R/D or disconnect
+		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
@@ -570,8 +587,14 @@ MainLoop:
 
 		break;
 	case 23: // Character Select - Connecting
+	case 42: // Empty character screen
 		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
+			//print("QQQ");
 			ControlAction.click(6, 33, 572, 128, 35);
+		}
+
+		if (rdblocker) {
+			D2Bot.restart();
 		}
 
 		break;
@@ -595,19 +618,15 @@ MainLoop:
 		ControlAction.click(6, 433, 433, 96, 32);
 		timeoutDelay("Game doesn't exist", StarterConfig.GameDoesNotExistTimeout * 1e3);
 
+		lastGameStatus = "DNE";
+
 		break;
 	case 38: // Game is full
 		//D2Bot.printToConsole("Game is full");
-
-		retry = 2; // force fail - becaomes 3 at next cycle and aborts join
-
 		ControlAction.click(6, 652, 469, 120, 20);
 		ControlAction.click(6, 433, 433, 96, 32);
 
-		break;
-	case 42: // Empty character screen
-		delay(1000);
-		ControlAction.click(6, 33, 572, 128, 35);
+		lastGameStatus = "FULL";
 
 		break;
 	default:

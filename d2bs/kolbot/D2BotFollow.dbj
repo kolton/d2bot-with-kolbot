@@ -3,7 +3,7 @@ var StarterConfig = {
 	FirstJoinMessage: "", // Message to say when first joining a channel, usually ".login"
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
-	RejoinDelay: 10, // Time in seconds to wait before next join attempt
+	JoinRetryDelay: 15, // Time in seconds to wait before next join attempt
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
 	CrashDelay: 0, // Seconds to wait after a d2 window crash
@@ -32,6 +32,22 @@ var JoinSettings = {
 	"Leader": ["Leecher"]
 };
 
+// Advanced config - you don't have to edit this unless you need some of the features provided
+var AdvancedConfig = {
+	/* Features: Override join delay for each profile
+
+	* Format *:
+		"Profile Name": {JoinDelay: number_of_seconds}
+
+	* Example * (don't edit this - it's just an example):
+		"MyProfile1": {JoinDelay: 3},
+		"MyProfile2": {JoinDelay: 6}
+	*/
+
+	// Put your lines under this one. Multiple entries are separated by commas. No comma after the last one.
+
+};
+
 
 
 // No touchy!
@@ -56,10 +72,16 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-function timeoutDelay(text, time) {
+function timeoutDelay(text, time, stopfunc) {
 	var endTime = getTickCount() + time;
 
 	while (getTickCount() < endTime) {
+		if (typeof stopfunc === "function" && stopfunc.call()) {
+			D2Bot.printToConsole("Game is finished. Stopping join delay.");
+
+			break;
+		}
+
 		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
 		delay(500);
 	}
@@ -373,16 +395,35 @@ JoinLoop:
 			ControlAction.setText(1, 606, 148, 155, 20, gamePass);
 			ControlAction.setText(1, 432, 148, 155, 20, nextGame);
 
+			if (lastGameStatus === "pending") {
+				timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000,
+					function () {
+						D2Bot.requestGame(leader);
+						delay(500);
+
+						return isUp === "no" || nextGame !== gameName;
+					}
+					);
+				D2Bot.updateRuns();
+				D2Bot.requestGame(leader);
+				delay(200);
+
+				if (isUp !== "yes") {
+					lastGameStatus = "ready";
+
+					break;
+				}
+			}
+
 			if (isUp !== "yes") {
 				break;
 			}
 
-			if (lastGameStatus === "pending") {
-				timeoutDelay("Join Delay", StarterConfig.RejoinDelay * 1000);
-			}
-
 			print("joining game " + nextGame);
-			delay(rand(1, 1000));
+
+			if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
+				timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
+			}
 
 			me.blockMouse = true;
 
@@ -405,7 +446,7 @@ JoinLoop:
 	case 9: // Login
 	case 12: // Character Select
 	case 18: // D2 Splash
-		if (firstLogin) { // multiple realm botting fix in case of R/D or disconnect
+		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
@@ -418,7 +459,7 @@ JoinLoop:
 		try {
 			login(me.profile);
 		} catch (e) {
-			print(e);
+			print(e + " " + getLocation());
 		}
 
 		break;
@@ -608,6 +649,7 @@ JoinLoop:
 
 		break;
 	case 23: // Character Select - Connecting
+	case 42: // Empty character screen
 		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
@@ -655,14 +697,10 @@ JoinLoop:
 		lastGameStatus = "ready";
 
 		break;
-	case 42: // Empty character screen
-		delay(1000);
-		ControlAction.click(6, 33, 572, 128, 35);
-
-		break;
 	default:
 		if (location !== undefined) {
 			D2Bot.printToConsole("Unhandled location " + location);
+			//takeScreenshot();
 			delay(500);
 			D2Bot.restart();
 		}

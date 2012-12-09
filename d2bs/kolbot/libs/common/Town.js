@@ -28,18 +28,20 @@ var NPC = {
 	Malah: getLocaleString(22478).toLowerCase(),
 	Anya: getLocaleString(22477).toLowerCase(),
 	Larzuk: getLocaleString(22476).toLowerCase(),
-	"Qual-Kehk": getLocaleString(22480).toLowerCase()
+	"Qual-Kehk": getLocaleString(22480).toLowerCase(),
+
+	Cain: getLocaleString(2890).toLowerCase()
 };
 
 var Town = {
 	sellTimer: getTickCount(), // shop speedup test
 
 	tasks: [
-		{Heal: NPC.Akara, Shop: NPC.Akara, Gamble: NPC.Gheed, Repair: NPC.Charsi, Merc: NPC.Kashya, Key: NPC.Akara},
-		{Heal: NPC.Fara, Shop: NPC.Drognan, Gamble: NPC.Elzix, Repair: NPC.Fara, Merc: NPC.Greiz, Key: NPC.Lysander},
-		{Heal: NPC.Ormus, Shop: NPC.Ormus, Gamble: NPC.Alkor, Repair: NPC.Hratli, Merc: NPC.Asheara, Key: NPC.Hratli},
-		{Heal: NPC.Jamella, Shop: NPC.Jamella, Gamble: NPC.Jamella, Repair: NPC.Halbu, Merc: NPC.Tyrael, Key: NPC.Jamella},
-		{Heal: NPC.Malah, Shop: NPC.Malah, Gamble: NPC.Anya, Repair: NPC.Larzuk, Merc: NPC["Qual-Kehk"], Key: NPC.Malah}
+		{Heal: NPC.Akara, Shop: NPC.Akara, Gamble: NPC.Gheed, Repair: NPC.Charsi, Merc: NPC.Kashya, Key: NPC.Akara, CainID: NPC.Cain},
+		{Heal: NPC.Fara, Shop: NPC.Drognan, Gamble: NPC.Elzix, Repair: NPC.Fara, Merc: NPC.Greiz, Key: NPC.Lysander, CainID: NPC.Cain},
+		{Heal: NPC.Ormus, Shop: NPC.Ormus, Gamble: NPC.Alkor, Repair: NPC.Hratli, Merc: NPC.Asheara, Key: NPC.Hratli, CainID: NPC.Cain},
+		{Heal: NPC.Jamella, Shop: NPC.Jamella, Gamble: NPC.Jamella, Repair: NPC.Halbu, Merc: NPC.Tyrael, Key: NPC.Jamella, CainID: NPC.Cain},
+		{Heal: NPC.Malah, Shop: NPC.Malah, Gamble: NPC.Anya, Repair: NPC.Larzuk, Merc: NPC["Qual-Kehk"], Key: NPC.Malah, CainID: NPC.Cain}
 	],
 
 	ignoredItemTypes: [ // Items that won't be stashed
@@ -147,6 +149,11 @@ var Town = {
 			}
 
 			break;
+		case "CainID":
+			//cain.useMenu(0x0FB4);
+			Misc.useMenu(0x0FB4);
+			delay(1000);
+			me.cancel();
 		}
 
 		return npc;
@@ -505,19 +512,10 @@ MainLoop:
 				}
 			}
 
-			this.move("cain");
-
-			cain = getUnit(1, getLocaleString(2890));
+			cain = this.initNPC("CainID");
 
 			if (!cain) {
 				return false;
-			}
-
-			if (cain && cain.openMenu()) {
-				//cain.useMenu(0x0FB4);
-				Misc.useMenu(0x0FB4);
-				delay(1000);
-				me.cancel();
 			}
 
 			for (i = 0; i < unids.length; i += 1) {
@@ -1157,7 +1155,7 @@ MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			corpse = getUnit(0, me.name, 17);
 
-			if (corpse && getDistance(me, corpse) <= 20) {
+			if (corpse && getDistance(me.x, me.y, corpse.x, corpse.y) <= 20) {
 				while (copyUnit(corpse).x) {
 					if (me.dead) {
 						return false;
@@ -1454,9 +1452,9 @@ MainLoop:
 			return false;
 		}
 
-		// Act 5 hack
-		if (me.act === 5 && spot === "portalspot" && getDistance(me, 5113, 5068) <= 8) {
-			//me.overhead("a5 path override");
+		// Act 5 wp->portalspot override - ActMap.cpp crash
+		if (me.act === 5 && spot === "portalspot" && getDistance(me.x, me.y, 5113, 5068) <= 8) {
+			//print("a5 path override");
 
 			path = [5113, 5068, 5108, 5051, 5106, 5046, 5104, 5041, 5102, 5027, 5098, 5018];
 
@@ -1468,7 +1466,7 @@ MainLoop:
 		}
 
 		if (useTK) {
-			if (getDistance(me, townSpot[0], townSpot[1]) > 14) {
+			if (getDistance(me.x, me.y, townSpot[0], townSpot[1]) > 14) {
 				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
 			}
 		} else {

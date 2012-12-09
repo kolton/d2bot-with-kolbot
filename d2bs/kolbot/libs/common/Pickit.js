@@ -63,7 +63,7 @@ var Pickit = {
 			this.gid = unit.gid;
 		}
 
-		var status, gid, item, canFit;
+		var status, gid, item, canFit, color;
 
 		Town.clearBelt();
 
@@ -96,12 +96,12 @@ var Pickit = {
 
 				if (item && (item.mode === 3 || item.mode === 5)) {
 					status = this.checkItem(item);
-	
+
 					if (status.result && this.canPick(item)) {
 						// Check room, don't check gold, scrolls and potions
 						canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
-						var color = this.itemColor(item);
-						
+						color = this.itemColor(item);
+
 						if (!canFit && Config.FieldID && Town.fieldID()) {
 							canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
 						}
@@ -160,18 +160,36 @@ var Pickit = {
 	},
 
 	pickItem: function (unit, status, keptLine) {
-		var i, picked, tick,
-			classid = unit.classid,
-			gid = unit.gid,
-			name = unit.name,
-			type = unit.itemType,
-			color = this.itemColor(unit),
-			gold = unit.getStat(14),
-			// TODO: Add config option for Telekinesis
-			useTk = me.classid === 1 && me.getSkill(43, 1) && (type === 4 || type === 22 || (type > 75 && type < 82)) && getDistance(me, unit) > 5 && getDistance(me, unit) < 20 && !checkCollision(me, unit, 0x4);
+		function ItemStats(unit) {
+			this.type = unit.itemType;
+			this.classid = unit.classid;
+			this.name = unit.name;
+			this.color = Pickit.itemColor(unit);
+			this.gold = unit.getStat(14);
+			this.useTk = me.classid === 1 && me.getSkill(43, 1) && (this.type === 4 || this.type === 22 || (this.type > 75 && this.type < 82)) &&
+						getDistance(me, unit) > 5 && getDistance(me, unit) < 20 && !checkCollision(me, unit, 0x4);
+			this.picked = false;
+		}
+
+		var i, item, tick, gid, stats;
+
+		if (unit.gid) {
+			gid = unit.gid;
+			item = getUnit(4, -1, -1, gid);
+		}
+
+		if (!item) {
+			return false;
+		}
+
+		stats = new ItemStats(item);
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
+			if (!getUnit(4, -1, -1, gid)) {
+				break MainLoop;
+			}
+
 			if (me.dead) {
 				return false;
 			}
@@ -180,46 +198,36 @@ MainLoop:
 				delay(40);
 			}
 
-			if ((unit.mode !== 3 && unit.mode !== 5) || !copyUnit(unit).x) { // added invalidated unit check
-				// backup check for picked
-				if (gid && me.getItem(-1, -1, gid)) {
-					picked = true;
-				}
-
+			if (item.mode !== 3 && item.mode !== 5) {
 				break MainLoop;
 			}
 
-			if (useTk) {
-				Skill.cast(43, 0, unit);
-			} else if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit)) {
-				unit.interact();
+			if (stats.useTk) {
+				Skill.cast(43, 0, item);
+			} else if (getDistance(me, item) < 4 || Pather.moveToUnit(item)) {
+				item.interact();
 			}
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 1000) {
-				unit = copyUnit(unit);
+				item = copyUnit(item);
 
-				if (classid === 523) {
-					if (!unit.getStat(14) || unit.getStat(14) < gold) {
-						print("ÿc7Picked up " + color + gold + " " + name);
+				if (stats.classid === 523) {
+					if (!item.getStat(14) || item.getStat(14) < stats.gold) {
+						print("ÿc7Picked up " + stats.color + (item.getStat(14) ? (item.getStat(14) - stats.gold) : stats.gold) + " " + stats.name);
 
 						break MainLoop;
 					}
 				}
 
-				if (unit.mode !== 3 && unit.mode !== 5) {
-					switch (classid) {
+				if (item.mode !== 3 && item.mode !== 5) {
+					switch (stats.classid) {
 					case 529: // Scroll of Town Portal
 					case 530: // Scroll of Identify
-						print("ÿc7Picked up " + color + name + " ÿc7(" + Town.checkScrolls(classid === 529 ? "tbk" : "ibk") + "/20)");
+						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkScrolls(stats.classid === 529 ? "tbk" : "ibk") + "/20)");
 
 						break MainLoop;
-					}
-
-					//if (unit.getParent() && unit.getParent().name === me.name) {
-					if (me.getItem(-1, -1, gid)) {
-						picked = true;
 					}
 
 					break MainLoop;
@@ -231,24 +239,25 @@ MainLoop:
 			//print("pick retry");
 		}
 
-		if (picked) {
-			print("ÿc7Picked up " + color + name);
+		stats.picked = !!me.getItem(-1, -1, gid);
+
+		if (stats.picked) {
+			print("ÿc7Picked up " + stats.color + stats.name);
 			DataFile.updateStats("lastArea");
 
 			switch (status) {
 			case 1:
-				if (this.ignoreLog.indexOf(type) === -1) {
-					Misc.logItem("Kept", unit, keptLine);
-					delay(200);
+				if (this.ignoreLog.indexOf(stats.type) === -1) {
+					Misc.logItem("Kept", item, keptLine);
 				}
 
 				break;
 			case 2:
-				Cubing.update(classid);
+				Cubing.update(stats.classid);
 
 				break;
 			case 3:
-				Runewords.update(classid, gid);
+				Runewords.update(stats.classid, gid);
 
 				break;
 			}
@@ -413,7 +422,7 @@ MainLoop:
 
 		return true;
 	},
-	
+
 	checkBelt: function () {
 		var check = 0,
 			item = me.getItem(-1, 2);

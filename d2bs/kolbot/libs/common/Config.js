@@ -149,6 +149,7 @@ var Config = {
 	MFSwitchPercent: 0,
 	LogExperience: false,
 	TownCheck: false,
+	PingQuit: [{Ping: 0, Duration: 0}],
 
 	// Fastmod
 	FCR: 0,

@@ -20,12 +20,11 @@ function OrgTorch() {
 			return false;
 		}
 
-		var i,
-			items = Storage.Inventory.Compare(Config.Inventory);
+		var item = me.getItem("cm2");
 
-		if (items) {
-			for (i = 0; i < items.length; i += 1) {
-				if (items[i].quality === 7 && Pickit.checkItem(items[i]).result === 1) {
+		if (item) {
+			do {
+				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
 					if (TorchSystem.FarmerProfiles.indexOf(me.profile) > -1) {
 						//D2Bot.printToConsole("torch found");
 						scriptBroadcast("muleTorch");
@@ -36,7 +35,7 @@ function OrgTorch() {
 						return true;
 					}
 				}
-			}
+			} while (item.getNext());
 		}
 
 		return false;
