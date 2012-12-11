@@ -1,0 +1,197 @@
+var tilelist=new Array();
+
+function buildTileList() {
+   for (i=0; i<200; i++) {
+      tilelist[i]=new Array();
+   }
+   //Act 1 (Complete)
+   tilelist[2][8]=2; // Den
+   tilelist[8][2]=4; // Den Out
+   tilelist[3][9]=3; // Cave
+   tilelist[9][13]=5; //Cave-Cave level 2
+   tilelist[13][9]=4; //Cave Level 2 - Cave
+   tilelist[9][3]=4; // Cave out
+   tilelist[4][10]=1; // Undergounrd      - Darien variation 1
+   tilelist[4][1000]=3; // Undergounrd    - Darien variation 1
+   tilelist[4][1001]=0; // Undergounrd    - Darien variation 1
+   tilelist[10][4]=4; // Underground-stoney
+   tilelist[10][14]=5; // underground-underground2
+   tilelist[14][10]=4; // underground2-underground
+   tilelist[10][5]=4; // Underground-dark wood
+   tilelist[5][10]=1; // Dark Wood-Underground
+   tilelist[6][11]=3; // Black Marsh - Hole
+   tilelist[11][6]=4; // Hole - Black Marsh
+   tilelist[11][15]=5; // Hole - Hole Level 2
+   tilelist[15][11]=4; // Hole Level 2 - Hole
+   tilelist[6][20]=10; // Black Marsh - Forgotten Tower
+   tilelist[20][6]=11; // Forgotten Tower - Black Marsh
+   tilelist[20][21]=12; // Forgotten Tower - Tower Level 1
+   tilelist[21][20]=8; // Tower Level 1 - Forgotten Tower
+   tilelist[21][22]=9; // Tower Level 1 - Tower Level 2
+   tilelist[22][21]=8; // Tower Level 2- Tower Level 1
+   tilelist[22][23]=9; // Tower Level 2 - Tower Level 3
+   tilelist[23][22]=8; // Tower Level 3 - Tower Level 2
+   tilelist[23][24]=9; // Tower Level 3 - Tower Level 4
+   tilelist[24][23]=8; // Tower Level 4 - Tower Level 3
+   tilelist[24][25]=9; // Tower Level 4 - Tower Level 5
+   tilelist[25][24]=8; // Tower Level 5 - Tower Level 4
+   tilelist[7][12]=2; // Tamoe - Pit
+   tilelist[7][120]=3; // Tamoe - Pit    - Darien variation 1  
+   tilelist[12][7]=4; // Pit - Tamoe
+   tilelist[12][16]=5; // Pit - Pit level 2
+   tilelist[16][12]=4; // Pit Level 2 - Pit
+   tilelist[28][29]=14; // Barracks - Jail Level 1
+   tilelist[29][28]=13; // Jail Level 1 - Barracks
+   tilelist[29][30]=14; // Jail Level 1 - Jail Level 2
+   tilelist[30][29]=13; // Jail Level 2 - Jail Level 1
+   tilelist[30][31]=14; // Jail Level 2 - Jail Level 3
+   tilelist[31][30]=13; // Jail Level 3 - Jail Level 2
+   tilelist[31][32]=13; // Jail Level 3 - Inner Cloister
+   tilelist[32][31]=14; // Inner Cloister - Jail Level 3
+   tilelist[33][34]=15; // Cathedral - Cat Level 1
+   tilelist[34][33]=16; // Cat Level 1 - Cathedral
+   tilelist[34][35]=18; // Cat Level 1 - Cat Level 2
+   tilelist[35][34]=17; // Cat Level 2 - Cat Level 1
+   tilelist[35][36]=18; // Cat Level 2 - Cat Level 3
+   tilelist[36][35]=17; // Cat Level 3 - Cat Level 2
+   tilelist[36][37]=18; // Cat Level 3 - Cat Level 4
+   tilelist[37][36]=17; // Cat Level 4 - Cat Level 3
+   
+   // Act2
+   tilelist[40][47]=19; // Lut - Sewers Level 1 (trap door)
+   //tilelist[40][47]=20; // Lut - Sewers Level 1 (seaside)
+   //tilelist[47][40]=21; // Sewers Level 1 - Lut (seaside)
+   tilelist[47][40]=22; // Sewers Level 1- Lut (trap door)
+   tilelist[47][48]=23; // Sewers Level 1 - Sewers Level 2
+   tilelist[48][47]=22; // Sewers Level 2 - Sewers Level 1
+   tilelist[48][49]=23; // Sewers Level 2 - Sewers Level 3
+   tilelist[49][48]=22; // Sewers Level 3 - Sewers Level 2
+   tilelist[41][55]=34; // Rocky Waste - Stoney Tomb 1
+   tilelist[55][41]=45; // Stoney Tomb 1 - Rocky Waste
+   tilelist[55][59]=46; // Stoney Tomb 1 - Stoney Tomb 2
+   tilelist[59][55]=45; // Stoney Tomb 2 - Stoney Tomb 1
+   tilelist[42][56]=33; // Dry Hills - Halls 1
+   tilelist[42][560]=34; // Dry Hills - Halls 1 - Darien variation 1
+   tilelist[42][561]=35; // Dry Hills - Halls 1 - Darien variation 2
+   tilelist[42][562]=36; // Dry Hills - Halls 1 - Darien variation 3
+   tilelist[56][42]=45; // Halls 1 - Dry Hills
+   tilelist[56][57]=46; // Halls 1 - Halls 2
+   tilelist[57][56]=45; // Halls 2 - Halls 1
+   tilelist[57][60]=46; // Halls 2 - Halls 3
+   tilelist[60][57]=45; // Halls 3 - Halls 2
+   tilelist[43][62]=47; // Far Oasis - Maggot 1
+   tilelist[62][43]=48; // Maggot 1 - Far Oasis
+   tilelist[62][63]=49; // Maggot 1 - Maggot 2
+   tilelist[63][62]=48; // Maggot 2 - Maggot 1
+   tilelist[63][64]=49; // Maggot 2 - Maggot 3
+   tilelist[64][63]=48; // Maggot 3 - Maggot 2
+   tilelist[44][65]=50; // Lost City - Ancient Tunnels
+   tilelist[65][44]=22; // Ancient Tunnels - Lost City
+   tilelist[45][58]=37; // Valley of Snakes - Claw Viper 1
+   tilelist[58][45]=45; // Claw Viper 1 - Valley of Snakes
+   tilelist[58][61]=46; // Claw Viper 1 - Claw Viper 2       ///Darien Fix
+   tilelist[61][58]=45; // Claw Viper 2 - Claw Viper 1       ///Darien Fix
+   tilelist[40][50]=24; // Lut - Harem
+   tilelist[50][40]=25; // Harem - Lut
+   tilelist[50][51]=29; // Harem - Harem 2 (down/left)
+   tilelist[51][50]=27; // Harem 2 - Harem  (down/left)
+   tilelist[51][52]=29; // Harem 2 - Palace Level 1 (down/left)
+   tilelist[52][53]=32; // Palace 1 - Palace 2 (down/left)
+   tilelist[53][52]=31; // Palace 2 - Palace 1 (down/left)
+   tilelist[53][54]=32; // Palace 2 - Palace 3 (down/left)
+   tilelist[54][53]=31; // Palace 3 - Palace 2 (down/left)
+   tilelist[46][66]=38; // Canyon - Tomb 1
+   tilelist[46][67]=39; // Canyon - Tomb 2
+   tilelist[46][68]=40; // Canyon - Tomb 3
+   tilelist[46][69]=41; // Canyon - Tomb 4
+   tilelist[46][70]=42; // Canyon - Tomb 5
+   tilelist[46][71]=43; // Canyon - Tomb 6
+   tilelist[46][72]=44; // Canyon - Tomb 7
+   tilelist[66][46]=45; // Tomb 1 - Canyon
+   tilelist[67][46]=45; // Tomb 2 - Canyon
+   tilelist[68][46]=45; // Tomb 3 - Canyon
+   tilelist[69][46]=45; // Tomb 4 - Canyon
+   tilelist[70][46]=45; // Tomb 5 - Canyon
+   tilelist[71][46]=45; // Tomb 6 - Canyon
+   tilelist[72][46]=45; // Tomb 7 - Canyon
+   
+   //Act3
+   tilelist[101][102]=67; // Durance 3
+   tilelist[101][1021]=68; // Durance 3 - Darien variation 1 
+
+   //Act4 (Complete)
+   tilelist[106][107]=69; // City of the Damned - River of Flame
+   tilelist[107][106]=70; // River - City
+   
+   //Act5 (NOT Complete)
+   tilelist[112][113]=71; // Arreat Plateau - Crystaline Passage
+   tilelist[113][112]=73; // Crystaline - Arreat Plateau
+   tilelist[113][115]=74; // Crystaline - Glacial Trail
+   tilelist[113][114]=75; // Crystaline - Frozen River
+   tilelist[114][113]=73; // Frozen River - Crystaline
+   tilelist[115][113]=73; // Glacial Trail - Crystaline
+   tilelist[115][116]=75; // Glacial - Drifter Cavern
+   tilelist[116][115]=73; // Drifter - Glacial
+   tilelist[115][117]=74; // Glacial - Tundra
+   tilelist[117][115]=72; // Tundra - Glacial
+   tilelist[117][118]=71; // Tundra - Ancient's Way
+   tilelist[118][117]=73; // Ancient's Way - Tundra
+   tilelist[118][119]=75; // Ancient's Way - Icey Cellar
+   tilelist[119][118]=73; // Icey Cellar - Ancient's Way
+   tilelist[118][120]=74; // Ancient's Way - Arreat Summit
+   tilelist[120][118]=79; // Arreat Summit - Ancient's Way
+   tilelist[120][128]=80; // Arreat Summit - Worldstone Level 1
+   tilelist[128][120]=81; // Worldstone Level 1 - Arreat Summit
+   tilelist[121][122]=76; // Nhilithaks Temple - Halls 1
+   tilelist[122][121]=78; // Halls 1 - Nhilithaks Temple
+   tilelist[122][133]=77; // Halls 1 - Halls 2
+   tilelist[123][122]=78; // Halls 2 - Halls 1
+   tilelist[123][124]=77; // Halls 2 - Halls 3
+   tilelist[124][123]=78; // Halls 3 - Halls 2
+   tilelist[129][130]=82; // WorldStone Keep Level 2 - WorldStone Keep Level 3  Added by Darien
+   tilelist[130][129]=81; // WorldStone Keep Level 3 - WorldStone Keep Level 2  Added by Darien
+   tilelist[130][131]=82; // WorldStone Keep Level 3 - Throne of Destruction    Added by Darien
+   tilelist[131][130]=81; // Throne of Destruction - WorldStone Keep Level 3    Added by Darien
+}
+
+/*
+function main() {
+   buildTileList();
+   if (me.area==2) {
+      clickme=getTile(8);  // 8 is the area I want to be in
+      tileInteract(clickme);
+   }
+}
+*/
+
+function getTile(n) {
+   var oldarea=me.area;
+   var tile=getUnit(5);
+   if(tile) do {
+      
+    	if(tile.classid==tilelist[me.area][n]) { 
+		print(tile.name); 
+		print("Tile " + tile.classid + " at "+tile.x+ ", "+tile.y);
+		return tile;
+	}
+   } while (tile.getNext());
+      return false;
+}
+
+function tileInteract(o) {
+   	//mlwalkto(o.x, o.y);
+   	var oldarea=me.area;
+	delay(100);
+	o.move();
+	delay(100);
+	me.move(o.x, o.y);
+	delay(100);
+	o.interact();
+   	var intercount=0;
+   	while (me.area==oldarea && intercount < 20) {
+      		o.interact();
+      		delay(100);
+      		intercount++;
+	}  
+	if(me.area == oldarea) print("Failed to interact with tile"); 	
+}

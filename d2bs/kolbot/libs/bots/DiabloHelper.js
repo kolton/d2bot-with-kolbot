@@ -255,7 +255,7 @@ function DiabloHelper() {
 	this.starToInfA = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5295, 7919, 5290];
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
 
-	var i, partybaal;
+	var i, partybaal, areaCheck;
 
 	// start
 	Town.doChores();
@@ -267,16 +267,20 @@ function DiabloHelper() {
 	for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
 		partybaal = getParty();
 
-		if (partybaal && partybaal.area) {
+		if (partybaal) {
 			do {
+				if (!areaCheck && partybaal.name !== me.name && partybaal.area) {
+					areaCheck = true;
+				}
+
 				if (partybaal.area === 131) {
 					return false;
 				}
 			} while (partybaal.getNext());
+		}
 
-			if (Pather.usePortal(108, null)) {
-				break;
-			}
+		if (areaCheck && Pather.usePortal(108, null)) {
+			break;
 		}
 
 		delay(1000);

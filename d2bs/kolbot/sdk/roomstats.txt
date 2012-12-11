@@ -1,0 +1,27 @@
+roomstats.txt
+room.getStat(int);
+
+I don't know what all of this is, nor even very little.
+
+
+From dlrgroom1:
+0	xStart
+1	yStart
+2	xSize1
+3	ySize1
+4	xPos
+5	yPos
+6	xSize2
+7	ySize2
+8
+
+From dlrgcoll:
+9	nPosGameX
+10	nPosGameY
+11	nSizeGameX
+12	nSizeGameY
+13	nPosRoomX
+14	nPosRoomY
+15	nSizeRoomX 
+16	nSizeRoomY
+

@@ -1,0 +1,13 @@
+#define BODYLOC_NONE                                                0
+#define BODYLOC_HEAD                                                1
+#define BODYLOC_NECK                                                2
+#define BODYLOC_TORSO                                               3
+#define BODYLOC_RIGHT_ARM                                           4
+#define BODYLOC_LEFT_ARM                                            5
+#define BODYLOC_RIGHT_RING                                          6
+#define BODYLOC_LEFT_RING                                           7
+#define BODYLOC_BELT                                                8
+#define BODYLOC_FEET                                                9
+#define BODYLOC_GLOVES                                              10
+#define BODYLOC_RIGHT_ARM_SECONDARY                                 11
+#define BODYLOC_LEFT_ARM_SECONDARY                                  12

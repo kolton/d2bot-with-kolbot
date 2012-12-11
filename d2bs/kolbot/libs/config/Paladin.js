@@ -186,6 +186,12 @@ function LoadConfig() {
 		Config.ShopBot.ShopNPC = "Anya"; // Only Anya for now
 		// Scan only selected classids for maximum speed. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [187, 188, 194, 195, 326, 327, 338, 373, 397, 443, 449];
+	Scripts.ChestMania = false; // Open chests in configured areas
+		Config.ChestMania.Act1 = [13, 14, 15, 16, 18, 19]; // List of act 1 areas to open chests in
+		Config.ChestMania.Act2 = [55, 59, 65, 66, 67, 68, 69, 70, 71, 72]; // List of act 2 areas to open chests in
+		Config.ChestMania.Act3 = [79, 80, 81, 92, 93, 84, 85, 90]; // List of act 3 areas to open chests in
+		Config.ChestMania.Act4 = []; // List of act 4 areas to open chests in
+		Config.ChestMania.Act5 = [115, 116, 119, 125, 126, 127]; // List of act 5 areas to open chests in
 
 	// *** Guest scripts ***
 	
@@ -346,6 +352,10 @@ function LoadConfig() {
 	Config.TownCheck = false; // Go to town if out of potions
 	Config.LogExperience = false; // Print experience statistics in the manager.
 	Config.PingQuit = [{Ping: 0, Duration: 0}]; // Quit if ping is over the given value for over the given time period in seconds.
+
+	// Shrine Scanner - scan for shrines while moving.
+	// Put the shrine types in order of priority (from highest to lowest). For a list of types, see sdk/shrines.txt
+	Config.ScanShrines = [];
 
 	// MF Switch
 	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.

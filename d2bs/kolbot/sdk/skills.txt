@@ -1,0 +1,357 @@
+0	Attack
+1	Kick
+2	Throw
+3	Unsummon
+4	Left Hand Throw
+5	Left Hand Swing
+6	Magic Arrow
+7	Fire Arrow
+8	Inner Sight
+9	Critical Strike
+10	Jab
+11	Cold Arrow
+12	Multiple Shot
+13	Dodge
+14	Power Strike
+15	Poison Javelin
+16	Exploding Arrow
+17	Slow Missiles
+18	Avoid
+19	Impale
+20	Lightning Bolt
+21	Ice Arrow
+22	Guided Arrow
+23	Penetrate
+24	Charged Strike
+25	Plague Javelin
+26	Strafe
+27	Immolation Arrow
+28	Dopplezon
+29	Evade
+30	Fend
+31	Freezing Arrow
+32	Valkyrie
+33	Pierce
+34	Lightning Strike
+35	Lightning Fury
+36	Fire Bolt
+37	Warmth
+38	Charged Bolt
+39	Ice Bolt
+40	Frozen Armor
+41	Inferno
+42	Static Field
+43	Telekinesis
+44	Frost Nova
+45	Ice Blast
+46	Blaze
+47	Fire Ball
+48	Nova
+49	Lightning
+50	Shiver Armor
+51	Fire Wall
+52	Enchant
+53	Chain Lightning
+54	Teleport
+55	Glacial Spike
+56	Meteor
+57	Thunder Storm
+58	Energy Shield
+59	Blizzard
+60	Chilling Armor
+61	Fire Mastery
+62	Hydra
+63	Lightning Mastery
+64	Frozen Orb
+65	Cold Mastery
+66	Amplify Damage
+67	Teeth
+68	Bone Armor
+69	Skeleton Mastery
+70	Raise Skeleton
+71	Dim Vision
+72	Weaken
+73	Poison Dagger
+74	Corpse Explosion
+75	Clay Golem
+76	Iron Maiden
+77	Terror
+78	Bone Wall
+79	Golem Mastery
+80	Raise Skeletal Mage
+81	Confuse
+82	Life Tap
+83	Poison Explosion
+84	Bone Spear
+85	BloodGolem
+86	Attract
+87	Decrepify
+88	Bone Prison
+89	Summon Resist
+90	IronGolem
+91	Lower Resist
+92	Poison Nova
+93	Bone Spirit
+94	FireGolem
+95	Revive
+96	Sacrifice
+97	Smite
+98	Might
+99	Prayer
+100	Resist Fire
+101	Holy Bolt
+102	Holy Fire
+103	Thorns
+104	Defiance
+105	Resist Cold
+106	Zeal
+107	Charge
+108	Blessed Aim
+109	Cleansing
+110	Resist Lightning
+111	Vengeance
+112	Blessed Hammer
+113	Concentration
+114	Holy Freeze
+115	Vigor
+116	Conversion
+117	Holy Shield
+118	Holy Shock
+119	Sanctuary
+120	Meditation
+121	Fist of the Heavens
+122	Fanaticism
+123	Conviction
+124	Redemption
+125	Salvation
+126	Bash
+127	Sword Mastery
+128	Axe Mastery
+129	Mace Mastery
+130	Howl
+131	Find Potion
+132	Leap
+133	Double Swing
+134	Pole Arm Mastery
+135	Throwing Mastery
+136	Spear Mastery
+137	Taunt
+138	Shout
+139	Stun
+140	Double Throw
+141	Increased Stamina
+142	Find Item
+143	Leap Attack
+144	Concentrate
+145	Iron Skin
+146	Battle Cry
+147	Frenzy
+148	Increased Speed
+149	Battle Orders
+150	Grim Ward
+151	Whirlwind
+152	Berserk
+153	Natural Resistance
+154	War Cry
+155	Battle Command
+156	Fire Hit
+157	UnHolyBolt
+158	SkeletonRaise
+159	MaggotEgg
+160	ShamanFire
+161	MagottUp
+162	MagottDown
+163	MagottLay
+164	AndrialSpray
+165	Jump
+166	Swarm Move
+167	Nest
+168	Quick Strike
+169	VampireFireball
+170	VampireFirewall
+171	VampireMeteor
+172	GargoyleTrap
+173	SpiderLay
+174	VampireHeal
+175	VampireRaise
+176	Submerge
+177	FetishAura
+178	FetishInferno
+179	ZakarumHeal
+180	Emerge
+181	Resurrect
+182	Bestow
+183	MissileSkill1
+184	MonTeleport
+185	PrimeLightning
+186	PrimeBolt
+187	PrimeBlaze
+188	PrimeFirewall
+189	PrimeSpike
+190	PrimeIceNova
+191	PrimePoisonball
+192	PrimePoisonNova
+193	DiabLight
+194	DiabCold
+195	DiabFire
+196	FingerMageSpider
+197	DiabWall
+198	DiabRun
+199	DiabPrison
+200	PoisonBallTrap
+201	AndyPoisonBolt
+202	HireableMissile
+203	DesertTurret
+204	ArcaneTower
+205	MonBlizzard
+206	Mosquito
+207	CursedBallTrapRight
+208	CursedBallTrapLeft
+209	MonFrozenArmor
+210	MonBoneArmor
+211	MonBoneSpirit
+212	MonCurseCast
+213	HellMeteor
+214	RegurgitatorEat
+215	MonFrenzy
+216	QueenDeath
+217	Scroll of Identify
+218	Book of Identify
+219	Scroll of Townportal
+220	Book of Townportal
+221	Raven
+222	Plague Poppy
+223	Wearwolf
+224	Shape Shifting
+225	Firestorm
+226	Oak Sage
+227	Summon Spirit Wolf
+228	Wearbear
+229	Molten Boulder
+230	Arctic Blast
+231	Cycle of Life
+232	Feral Rage
+233	Maul
+234	Eruption
+235	Cyclone Armor
+236	Heart of Wolverine
+237	Summon Fenris
+238	Rabies
+239	Fire Claws
+240	Twister
+241	Vines
+242	Hunger
+243	Shock Wave
+244	Volcano
+245	Tornado
+246	Spirit of Barbs
+247	Summon Grizzly
+248	Fury
+249	Armageddon
+250	Hurricane
+251	Fire Trauma
+252	Claw Mastery
+253	Psychic Hammer
+254	Tiger Strike
+255	Dragon Talon
+256	Shock Field
+257	Blade Sentinel
+258	Quickness
+259	Fists of Fire
+260	Dragon Claw
+261	Charged Bolt Sentry
+262	Wake of Fire Sentry
+263	Weapon Block
+264	Cloak of Shadows
+265	Cobra Strike
+266	Blade Fury
+267	Fade
+268	Shadow Warrior
+269	Claws of Thunder
+270	Dragon Tail
+271	Lightning Sentry
+272	Inferno Sentry
+273	Mind Blast
+274	Blades of Ice
+275	Dragon Flight
+276	Death Sentry
+277	Blade Shield
+278	Venom
+279	Shadow Master
+280	Royal Strike
+281	Wake Of Destruction Sentry
+282	Imp Inferno
+283	Imp Fireball
+284	Baal Taunt
+285	Baal Corpse Explode
+286	Baal Monster Spawn
+287	Catapult Charged Ball
+288	Catapult Spike Ball
+289	Suck Blood
+290	Cry Help
+291	Healing Vortex
+292	Teleport 2
+293	Self-resurrect
+294	Vine Attack
+295	Overseer Whip
+296	Barbs Aura
+297	Wolverine Aura
+298	Oak Sage Aura
+299	Imp Fire Missile
+300	Impregnate
+301	Siege Beast Stomp
+302	MinionSpawner
+303	CatapultBlizzard
+304	CatapultPlague
+305	CatapultMeteor
+306	BoltSentry
+307	CorpseCycler
+308	DeathMaul
+309	Defense Curse
+310	Blood Mana
+311	mon inferno sentry
+312	mon death sentry
+313	sentry lightning
+314	fenris rage
+315	Baal Tentacle
+316	Baal Nova
+317	Baal Inferno
+318	Baal Cold Missiles
+319	MegademonInferno
+320	EvilHutSpawner
+321	CountessFirewall
+322	ImpBolt
+323	Horror Arctic Blast
+324	death sentry ltng
+325	VineCycler
+326	BearSmite
+327	Resurrect2
+328	BloodLordFrenzy
+329	Baal Teleport
+330	Imp Teleport
+331	Baal Clone Teleport
+332	ZakarumLightning
+333	VampireMissile
+334	MephistoMissile
+335	DoomKnightMissile
+336	RogueMissile
+337	HydraMissile
+338	NecromageMissile
+339	MonBow
+340	MonFireArrow
+341	MonColdArrow
+342	MonExplodingArrow
+343	MonFreezingArrow
+344	MonPowerStrike
+345	SuccubusBolt
+346	MephFrostNova
+347	MonIceSpear
+348	ShamanIce
+349	Diablogeddon
+350	Delerium Change
+351	NihlathakCorpseExplosion
+352	SerpentCharge
+353	Trap Nova
+354	UnHolyBoltEx
+355	ShamanFireEx
+356	Imp Fire Missile Ex
