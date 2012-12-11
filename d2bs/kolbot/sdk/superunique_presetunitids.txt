@@ -1,0 +1,93 @@
+Super Unique PresetUnit Ids:
+
+*this list is correct to the best of my knowledge
+
+Id	Name
+250	The Summoner
+704	Bishibosh
+705	Bonebreak
+706	Coldcrow
+707	Rakanishu
+708	Treehead WoodFist
+709	Griswold
+710	The Countess
+711	Pitspawn Fouldog
+712	Flamespike the Crawler
+713	Boneash
+714	Radament
+715	Bloodwitch the Wild
+716	Fangskin
+717	Beetleburst
+718	Leatherarm
+719	Coldworm the Burrower
+720	Fire Eye
+721	Dark Elder
+723	Ancient Kaa the Soulless
+724	The Smith
+725	Web Mage the Burning
+726	Witch Doctor Endugu
+727	Stormtree
+728	Sarina the Battlemaid
+729	Icehawk Riftwing
+730	Ismail Vilehand
+731	Geleb Flamefinger
+732	Bremm Sparkfist
+733	Toorc Icefist
+734	Wyand Voidfinger
+735	Maffer Dragonhand
+736	Winged Death
+737	The Tormentor
+738	Taintbreeder
+739	Riftwraith the Cannibal
+740	Infector of Souls
+741	Lord De Seis
+742	Grand Vizier of Chaos
+743	The Cow King
+744	Corpsefire
+745	Hephasto (The Feature Creep)
+746	Siege Boss
+747	Ancient Barbarian 1
+748	Ancient Barbarian 2
+749	Ancient Barbarian 3
+750	Axe Dweller
+751	Bonesaw Breaker
+752	Dac Farren
+753	Eldritch (Megaflow Rectifier)
+754	Eyeback Unleashed
+755	Threash Socket
+756	Pindleskin
+757	Snapchip Shatter
+758	Anodized Elite
+759	Vinvear Molech
+760	Sharp Tooth Sayer
+761	Magma Torquer
+762	Blaze Ripper
+763	Frozenstein
+764	Nihlathak Boss
+765	Baal Subject 1
+766	Baal Subject 2
+767	Baal Subject 3
+768	Baal Subject 4
+769	Baal Subject 5
+
+
+
+--- not in super unique list, but still have a weird Ids: (thanks to mousepad for helping fill this in!)
+
+772 random boss pack?
+773 random champ pack?
+774 Flavie
+775 Blood Raven
+778 maggot queen (broken?)
+780,781 tenticles  
+787 flayers
+788 flayer+shaman
+792 ratmen
+793 ratmen+shaman
+794 demonimp pack
+796 enslaved pack
+795,797,798 ??
+799 dead enslaved
+800 dead demonimp
+801 dead barb
+802 dead prowlingdead  

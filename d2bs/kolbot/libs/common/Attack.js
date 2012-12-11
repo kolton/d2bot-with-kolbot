@@ -966,9 +966,13 @@ AuraLoop: // Skip monsters with auras
 	},
 
 	// Check if a monster is immune to specified attack type
-	checkResist: function (unit, type) {
+	checkResist: function (unit, type, maxres) {
 		if (unit.type === 0) { // player
 			return true;
+		}
+
+		if (typeof maxres !== "number") {
+			maxres = 100;
 		}
 
 		if (this.infinity && ["fire", "lightning", "cold"].indexOf(type) > -1) {
@@ -976,10 +980,10 @@ AuraLoop: // Skip monsters with auras
 				return this.getResist(unit, type) < 117;
 			}
 
-			return this.getResist(unit, type) < 100;
+			return this.getResist(unit, type) < maxres;
 		}
 
-		return this.getResist(unit, type) < 100;
+		return this.getResist(unit, type) < maxres;
 	},
 
 	// Detect use of bows/crossbows

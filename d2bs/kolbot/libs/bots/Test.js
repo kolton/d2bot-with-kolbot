@@ -40,26 +40,8 @@ var a = -1, b = 1;
 
 function test() {
 	print("test");
-
-	/*this.damage = 500;
-	this.time = 0;
-
-	while (true) {
-		checkLifeyo();
-		delay(10);
-	}*/
-
-	function qq() {
-		a += 1;
-
-		if (a === 1) {
-			return true;
-		}
-
-		return false;
-	}
-
-	somefunc(qq);
+	
+	print(Pather.plotCourse(80).course + " " + Pather.plotCourse(80).useWP);
 }
 
 function somefunc(func) {

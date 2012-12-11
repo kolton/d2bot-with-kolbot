@@ -133,6 +133,7 @@ var Config = {
 	SkipEnchant: [],
 	SkipImmune: [],
 	SkipAura: [],
+	ScanShrines: [],
 
 	Cubing: false,
 	Recipes: [],
@@ -376,6 +377,13 @@ var Config = {
 	},
 	Bonesaw: {
 		ClearDrifterCavern: false
+	},
+	ChestMania: {
+		Act1: [],
+		Act2: [],
+		Act3: [],
+		Act4: [],
+		Act5: []
 	},
 	ChestHunterAct1: {
 		Hole: false,

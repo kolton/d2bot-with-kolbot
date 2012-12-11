@@ -1,0 +1,23 @@
+0 null
+1 refilling
+2 health
+3 mana
+4 health exchange
+5 mana exchange
+6 armor
+7 combat
+8 resist fire
+9 resist cold
+10 resist lightning
+11 resist poison
+12 skill
+13 mana recharge
+14 stamina
+15 experience
+16 enirhs
+17 portal
+18 gem
+19 fire
+20 monster
+21 exploding
+22 poison

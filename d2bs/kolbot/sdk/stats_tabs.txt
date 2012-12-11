@@ -1,0 +1,26 @@
+item.getStat( 188, tab ); // lookup table
+
+0	Bow and Crossbow Skills
+1	Passive and Magic Skills
+2	Javelin and Spear Skills
+8	Fire Skills
+9	Lightning Skills
+10	Cold Skills
+16	Curses Skills
+17	Poison and Bone Skills
+18	Necromancer Summoning Skills
+24	Paladin Combat Skills
+25	Offensive Auras Skills
+26	Defensive Auras Skills
+32	Barbarian Combat Skills
+33	Masteries Skills
+34	Warcries Skills
+40	Druid Summoning Skills
+41	Shape Shifting Skills
+42	Elemental Skills
+48	Traps Skills
+49	Shadow Disciplines Skills
+50	Martial Arts Skills
+
+
+-- thanks to TheDesertWind for this list

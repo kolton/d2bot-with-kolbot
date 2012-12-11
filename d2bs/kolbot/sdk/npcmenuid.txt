@@ -1,0 +1,18 @@
+NPC Menu List:
+
+0x0D35 Talk
+0x0D44 Trade
+0x0D06 Trade/Repair
+0x0FB1 Imbue
+0x0D46 Gamble
+0x0D45 Hire
+0x0D36 Go East
+0x0D37 Go West
+0x0FB4 Identify Items
+0x0D38 Sail East
+0x0D39 Sail West
+0x1507 Ressurect Merc
+0x58DC Add Sockets
+0x58DD Personalize
+0x58D2 Travel to Harrogath
+

@@ -1,0 +1,60 @@
+// /////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////
+// Mode Flag To Mode List by TDW
+// /////////////////////////////////////////////////////////////////////////
+Player Mode Flags:
+0x00000001 =   0 = Player death = Player death
+0x00000002 =   1 = Player standing outside town = Player standing outside town
+0x00000004 =   2 = Player walking = Player walking
+0x00000008 =   3 = Player running = Player running
+0x00000010 =   4 = Player getting hit = Player getting hit
+0x00000020 =   5 = Player standing in town = Player standing in town
+0x00000040 =   6 = Player walking in town = Player walking in town
+0x00000080 =   7 = Player attacking 1 = Player attacking 1
+0x00000100 =   8 = Player attacking 2 = Player attacking 2
+0x00000200 =   9 = Player blocking = Player blocking
+0x00000400 =  10 = Player casting spell skill = Player casting spell skill
+0x00000800 =  11 = Player throwing an item = Player throwing an item
+0x00001000 =  12 = Player kicking = Player kicking
+0x00002000 =  13 = Player using skill 1 = Player using skill 1
+0x00004000 =  14 = Player using skill 2 = Player using skill 2
+0x00008000 =  15 = Player using skill 3 = Player using skill 3
+0x00010000 =  16 = Player using skill 4 = Player using skill 4
+0x00020000 =  17 = Player dead = Player dead
+0x00040000 =  18 = Player sequence = Player sequence
+0x00080000 =  19 = Player being knocked back = Player being knocked back
+NPC Mode Flags:
+0x00000001 =   0 = NPC death = NPC death
+0x00000002 =   1 = NPC standing still = NPC standing still
+0x00000004 =   2 = NPC walking = NPC walking
+0x00000008 =   3 = NPC getting hit = NPC getting hit
+0x00000010 =   4 = NPC attacking 1 = NPC attacking 1
+0x00000020 =   5 = NPC attacking 2 = NPC attacking 2
+0x00000040 =   6 = NPC blocking = NPC blocking
+0x00000080 =   7 = NPC casting spell skill = NPC casting spell skill
+0x00000100 =   8 = NPC using skill 1 = NPC using skill 1
+0x00000200 =   9 = NPC using skill 2 = NPC using skill 2
+0x00000400 =  10 = NPC using skill 3 = NPC using skill 3
+0x00000800 =  11 = NPC using skill 4 = NPC using skill 4
+0x00001000 =  12 = NPC dead = NPC dead
+0x00002000 =  13 = NPC being knocked back = NPC being knocked back
+0x00004000 =  14 = NPC sequence = NPC sequence
+0x00008000 =  15 = NPC running = NPC running
+Object Mode Flags:
+0x00000001 =   0 = Object idle = Object idle
+0x00000002 =   1 = Object operating = Object operating
+0x00000004 =   2 = Object opened = Object opened
+0x00000008 =   3 = Object special 1 = Object special 1
+0x00000010 =   4 = Object special 2 = Object special 2
+0x00000020 =   5 = Object special 3 = Object special 3
+0x00000040 =   6 = Object special 4 = Object special 4
+0x00000080 =   7 = Object special 5 = Object special 5
+Item Mode Flags:
+0x00000001 =   0 = Item inven stash cube store = Item inven stash cube store
+0x00000002 =   1 = Item equipped self or merc = Item equipped self or merc
+0x00000004 =   2 = Item in belt = Item in belt
+0x00000008 =   3 = Item on ground = Item on ground
+0x00000010 =   4 = Item on cursor = Item on cursor
+0x00000020 =   5 = Item being dropped = Item being dropped
+0x00000040 =   6 = Item socketed in item = Item socketed in item
+// /////////////////////////////////////////////////////////////////////////

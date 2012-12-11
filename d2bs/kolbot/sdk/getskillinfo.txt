@@ -1,0 +1,106 @@
+Usage:
+returnvar = getSkillInfo([SkillID or SkillName], index);
+
+0	Id
+1	Name
+2	ClassID
+3	Monster
+4	Enhanceable
+5	CostMult
+6	CostAdd
+7	ClassReq
+8	AttackRank
+9	ItemClass1	String
+10	ItemClass2	String
+11	ItemClass3	String
+12	ItemClass4	String
+13	ItemClass5	String
+14	ItemClass6	String
+15	Anim		String
+16	MonAnim		String
+17	AnimID
+18	MonAnimID
+19	SeqNum
+20	Durability
+21	Shiver
+22	unused
+23	UseAttackRate
+24	LineOfSight
+25	ItemEffect
+26	TargetableOnly
+27	SearchEnemyXY
+28	SearchMonsterNear
+29	SelectDead
+30	SearchOpenXY
+31	TargetPet
+32	TargetAlly
+33	Range		String
+34	RangeID
+35	AttackNoMana
+36	ReqLevel
+37	ReqStr
+38	ReqDex
+39	ReqInt
+40	ReqVit
+41	ReqSkillId1
+42	ReqSkillId2
+43	ReqSkillId3
+44	CasterState
+45	unknown, always -1
+46	IsAura
+47	pReqSkill1	ptr
+48	pReqSkill2	ptr
+49	pReqSkill3	ptr
+50	State1
+51	State2
+52	State3
+53	Delay
+54	SkillPage
+55	SkillRow
+56	SkillColumn
+57	IconCell
+58	LeftSkill
+59	ManaShift
+60	Mana
+61	LvlMana
+62	Interrupt
+63	InTown
+64	Periodic
+65	Finishing
+66	Passive
+67	Param1
+68	Param2
+69	Param3
+70	Param4
+71	Param5
+72	Param6
+73	InGame
+74	Open
+75	Beta
+76	unknown
+77	unknown
+78	unused
+79	ToHit
+80	LevToHit
+81	HitShift
+82	SrcDam
+83	unused
+84	unused
+85	MinDam
+86	MaxDam
+87	LevDam1
+88	LevDam2
+89	LevDam3
+90	EType
+91	EMin
+92	EMax
+93	ELev1
+94	ELev2
+95	ELev3
+96	ELen
+97	ELevLen1
+98	ELevLen2
+99	ELevLen3
+100	Proper Skill Name (Locale based)
+101	Item Description (Locale based)
+

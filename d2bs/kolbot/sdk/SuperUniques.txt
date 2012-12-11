@@ -1,0 +1,68 @@
+Name	hcIdx
+Bishibosh	0
+Bonebreak	1
+Coldcrow	2
+Rakanishu	3
+Treehead WoodFist	4
+Griswold	5
+The Countess	6
+Pitspawn Fouldog	7
+Flamespike the Crawler	8
+Boneash	9
+Radament	10
+Bloodwitch the Wild	11
+Fangskin	12
+Beetleburst	13
+Leatherarm	14
+Coldworm the Burrower	15
+Fire Eye	16
+Dark Elder	17
+The Summoner	18
+Ancient Kaa the Soulless	19
+The Smith	20
+Web Mage the Burning	21
+Witch Doctor Endugu	22
+Stormtree	23
+Sarina the Battlemaid	24
+Icehawk Riftwing	25
+Ismail Vilehand	26
+Geleb Flamefinger	27
+Bremm Sparkfist	28
+Toorc Icefist	29
+Wyand Voidfinger	30
+Maffer Dragonhand	31
+Winged Death	32
+The Tormentor	33
+Taintbreeder	34
+Riftwraith the Cannibal	35
+Infector of Souls	36
+Lord De Seis	37
+Grand Vizier of Chaos	38
+The Cow King	39
+Corpsefire	40
+The Feature Creep	41
+
+Siege Boss	42
+Ancient Barbarian 1	43
+Ancient Barbarian 2	44
+Ancient Barbarian 3	45
+Axe Dweller	46
+Bonesaw Breaker	47
+Dac Farren	48
+Megaflow Rectifier	49
+Eyeback Unleashed	50
+Threash Socket	51
+Pindleskin	52
+Snapchip Shatter	53
+Anodized Elite	54
+Vinvear Molech	55
+Sharp Tooth Sayer	56
+Magma Torquer	57
+Blaze Ripper	58
+Frozenstein	59
+Nihlathak	60
+Baal Subject 1	61
+Baal Subject 2	62
+Baal Subject 3	63
+Baal Subject 4	64
+Baal Subject 5	65

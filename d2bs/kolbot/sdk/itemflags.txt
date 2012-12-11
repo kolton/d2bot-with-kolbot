@@ -1,0 +1,21 @@
+Item Flags, pass the 0x hex code to the getFlag(), eg; flag = getFlag(0x400000);
+
+0x4000000	isRuneword	set if it is a runeword (note that 'ith' qualifies ;)
+0x1000000	isNamed		has a custom name "Player's item"
+0x800000	?		was set for all items tested (tested in inv, stash, store)
+0x400000	isEthereal	0 if not ethereal
+0x200000	isRuneOrPot	rune or potion, also set for mephisto's soulstone
+0x20000		isStartItem	an item that a new character starts with (like javelin and buckler, and the minor healings at the start)
+0x10000		isEar		a player ear
+0x4000		isNotInSocket	0 if in socket, 0 if in belt, 0 if equipped or equipped by merc, 0 for gems/charms/..
+0x2000		isInStore	in trade or gamble screen
+0x800		isSocketed	the item has sockets (they can be full or empty)
+0x400		isRejuv		only seen set for full rejuvs for now
+0x100		isBroken	just a bet, but i'm pretty sure it's correct
+0x80		isSwitchOut	a weapon switch command was performed, and this item is no longer being used
+0x40		isSwitchIn	a weapon switch command was performed, and this item is now being used
+0x10		isIdentified	0 if unid
+0x8		isInSocket	8 if in socket, valid for rune and jewels, not gems
+0x1		isEquipped	player or merc is wearing the item (don't trust too much, especially when bit 9 is set)
+
+**thanks to bluemind for testing and creating this wonderful list!

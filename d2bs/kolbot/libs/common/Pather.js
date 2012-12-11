@@ -122,12 +122,14 @@ var Pather = {
 					break;
 				}
 
+				if (Config.OpenChests) {
+					Misc.openChests(15);
+				}
+
+				Misc.scanShrines();
+
 				if (clearPath) {
 					Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
-
-					if (getDistance(me, node.x, node.y) > 4) {
-						this.moveTo(node.x, node.y);
-					}
 				}
 
 				if (Config.Countess.KillGhosts) { // TODO: expand&improve
@@ -136,10 +138,10 @@ var Pather = {
 					if (mob) {
 						Attack.clearList(mob);
 					}
+				}
 
-					if (getDistance(me, node.x, node.y) > 4) {
-						this.moveTo(node.x, node.y);
-					}
+				if (getDistance(me, node.x, node.y) > 5) {
+					this.moveTo(node.x, node.y);
 				}
 
 				Misc.townCheck();
@@ -927,17 +929,12 @@ MainLoop:
 		return false;
 	},
 
-	// TODO: Hell levels
 	journeyTo: function (area) {
 		var i, special, unit, tick, target;
 
-		target = this.plotCourse(area);
+		target = this.plotCourse(area, me.area);
 
 		print(target.course);
-
-		/*while (true) {
-			delay(500);
-		}*/
 
 		if (target.useWP) {
 			Town.goToTown();
@@ -1021,6 +1018,15 @@ MainLoop:
 			} else if (me.area === 109 && target.course[0] === 121) { // Harrogath -> Nihlathak's Temple
 				Town.move("anya");
 				this.usePortal(121);
+			} else if (me.area === 111 && target.course[0] === 125) { // Abaddon
+				this.moveToPreset(111, 2, 60);
+				this.usePortal(125);
+			} else if (me.area === 112 && target.course[0] === 126) { // Pits of Archeon
+				this.moveToPreset(112, 2, 60);
+				this.usePortal(126);
+			} else if (me.area === 117 && target.course[0] === 127) { // Infernal Pit
+				this.moveToPreset(117, 2, 60);
+				this.usePortal(127);
 			} else {
 				this.moveToExit(target.course[0], true);
 			}
@@ -1075,8 +1081,18 @@ MainLoop:
 			if (visitedNodes[node.from] === undefined) {
 				visitedNodes[node.from] = node.to;
 
+				if (!this.areasConnected(node.from, node.to)) {
+					useWP = true;
+
+					continue;
+				}
+
 				// If we have this wp we can start from there
-				if (Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from)) && node.from !== 46) {
+				if ((me.inTown || // check wp in town
+						((src !== previousAreas[dest] && dest !== previousAreas[src]) && // check wp if areas aren't linked
+							previousAreas[src] !== previousAreas[dest])) &&   // check wp if areas aren't linked with a common area
+								Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))
+									) {
 					if (node.from !== src) {
 						useWP = true;
 					}
@@ -1118,5 +1134,13 @@ MainLoop:
 		}
 
 		return {course: arr, useWP: useWP};
+	},
+
+	areasConnected: function (src, dest) {
+		if (src === 46 && dest === 74) {
+			return false;
+		}
+
+		return true;
 	}
 };

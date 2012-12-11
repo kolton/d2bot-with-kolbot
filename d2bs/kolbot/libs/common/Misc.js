@@ -263,37 +263,199 @@ var Misc = {
 
 	// Open all chests that have preset units in an area
 	openChestsInArea: function (area) {
+		var room, presetUnits,
+			rooms = [],
+			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
+						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
+
 		if (!area) {
 			area = me.area;
 		}
 
-		var chest,
-			presetUnits = getPresetUnits(area),
-			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
-						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
+		room = getRoom(area);
 
-		if (!presetUnits) {
+		if (room) {
+			do {
+				presetUnits = room.getPresetUnits(2);
+
+				while (presetUnits.length) {
+					presetUnits.sort(Sort.presetUnits);
+
+					if (chestIds.indexOf(presetUnits[0].id) > -1) {
+						rooms.push({x: presetUnits[0].roomx * 5 + presetUnits[0].x, y: presetUnits[0].roomy * 5 + presetUnits[0].y});
+
+						break;
+					}
+
+					presetUnits.shift();
+				}
+			} while (room.getNext());
+		}
+
+		while (rooms.length) {
+			rooms.sort(Sort.units);
+			this.openChestsInRoom(rooms[0].x, rooms[0].y);
+			rooms.shift();
+		}
+
+		return true;
+	},
+
+	openChestsInRoom: function (x, y) {
+		var unit, room,
+			unitList = [],
+			containers = ["chest", "armorstand", "weaponrack"];
+
+		Pather.moveTo(x, y);
+
+		room = getRoom(x, y);
+		unit = getUnit(2);
+
+		if (unit) {
+			do {
+				if (containers.indexOf(unit.name.toLowerCase()) > -1 && room.unitInRoom(unit) && unit.mode === 0) {
+					unitList.push(copyUnit(unit));
+				}
+			} while (unit.getNext());
+		}
+
+		while (unitList.length > 0) {
+			unitList.sort(Sort.units);
+
+			unit = unitList.shift();
+
+			if (unit) {
+				this.openChest(unit);
+				Pickit.pickItems();
+			}
+		}
+
+		return true;
+	},
+
+	openChests: function (range) {
+		var unit,
+			unitList = [],
+			containers = ["chest", "armorstand", "weaponrack"];
+
+		if (!range) {
+			range = 15;
+		}
+
+		unit = getUnit(2);
+
+		if (unit) {
+			do {
+				if (unit.name && containers.indexOf(unit.name.toLowerCase()) > -1 && getDistance(me.x, me.y, unit.x, unit.y) <= range && unit.mode === 0) {
+					unitList.push(copyUnit(unit));
+				}
+			} while (unit.getNext());
+		}
+
+		while (unitList.length > 0) {
+			unitList.sort(Sort.units);
+
+			unit = unitList.shift();
+
+			if (unit) {
+				this.openChest(unit);
+				Pickit.pickItems();
+			}
+		}
+
+		return true;
+	},
+
+	shrineStates: false,
+
+	scanShrines: function (range) {
+		if (!Config.ScanShrines.length) {
 			return false;
 		}
 
-		while (presetUnits.length > 0) {
-			presetUnits.sort(Sort.presetUnits);
+		if (!range) {
+			range = 25;
+		}
 
-			if (chestIds.indexOf(presetUnits[0].id) > -1) {
-				Pather.moveToUnit(presetUnits[0], 2, 0);
+		var i, j, shrine,
+			index  = -1,
+			shrineList = [];
 
-				chest = getUnit(2);
+		// Initiate shrine states
+		if (!this.shrineStates) {
+			this.shrineStates = [];
 
-				if (chest) {
-					do {
-						if (chestIds.indexOf(chest.classid) > -1 && getDistance(me, chest) < 5 && this.openChest(chest)) {
-							Pickit.pickItems();
-						}
-					} while (chest.getNext());
+			for (i = 0; i < Config.ScanShrines.length; i += 1) {
+				switch (Config.ScanShrines[i]) {
+				case 0: // None
+				case 1: // Refilling
+				case 2: // Health
+				case 3: // Mana
+				case 4: // Health Exchange (doesn't exist)
+				case 5: // Mana Exchange (doesn't exist)
+				case 16: // Enirhs (doesn't exist)
+				case 17: // Portal
+				case 18: // Gem
+				case 19: // Fire
+				case 20: // Monster
+				case 21: // Exploding
+				case 22: // Poison
+					this.shrineStates[i] = 0; // no state
+
+					break;
+				case 6: // Armor
+				case 7: // Combat
+				case 8: // Resist Fire
+				case 9: // Resist Cold
+				case 10: // Resist Lightning
+				case 11: // Resist Poison
+				case 12: // Skill
+				case 13: // Mana recharge
+				case 14: // Stamina
+				case 15: // Experience
+					// Both states and shrines are arranged in same order with armor shrine starting at 128
+					this.shrineStates[i] = Config.ScanShrines[i] + 122;
+
+					break;
+				}
+			}
+		}
+
+		shrine = getUnit(2, "shrine");
+
+		if (shrine) {
+			// Build a list of nearby shrines
+			do {
+				if (shrine.mode === 0 && getDistance(me.x, me.y, shrine.x, shrine.y) <= range) {
+					shrineList.push(copyUnit(shrine));
+				}
+			} while (shrine.getNext());
+
+			// Check if we have a shrine state, store its index if yes
+			for (i = 0; i < this.shrineStates.length; i += 1) {
+				if (me.getState(this.shrineStates[i])) {
+					index = i;
+
+					break;
 				}
 			}
 
-			presetUnits.shift();
+			for (i = 0; i < Config.ScanShrines.length; i += 1) {
+				for (j = 0; j < shrineList.length; j += 1) {
+					// Get the shrine if we have no active state or to refresh current state or if the shrine has no state
+					// Don't override shrine state with a lesser priority shrine
+					if (index === -1 || i <= index || this.shrineStates[i] === 0) {
+						if (shrineList[j].objtype === Config.ScanShrines[i]) {
+							this.getShrine(shrineList[j]);
+
+							// Gem shrine - pick gem
+							if (Config.ScanShrines[i] === 18) {
+								Pickit.pickItems();
+							}
+						}
+					}
+				}
+			}
 		}
 
 		return true;
@@ -817,7 +979,7 @@ MainLoop:
 var Sort = {
 	// Sort units by comparing distance between the player
 	units: function (a, b) {
-		return getDistance(me, a) - getDistance(me, b);
+		return getDistance(me.x, me.y, a.x, a.y) - getDistance(me.x, me.y, b.x, b.y);
 	},
 
 	// Sort preset units by comparing distance between the player (using preset x/y calculations)

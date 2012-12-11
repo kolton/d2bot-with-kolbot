@@ -1,0 +1,10 @@
+miscscreenmodes.txt:
+
+1	npc trade open
+2	buy cursor
+3	sell cursor
+4	repair cursor
+5	sell/buy confirm
+10	trade confirm
+11	trade screen
+12	Stash Open

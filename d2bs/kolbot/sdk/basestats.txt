@@ -1,0 +1,90 @@
+0	AlternateGfx (this is actually a 3-4 letter word)
+1	WeaponClass (this is actually a 3-4 letter word)
+2	TwoHandedWeaponClass (this is actually a 3-4 letter word)
+3
+4	MinAC
+5	MaxAC
+6	BaseGambleCost
+7	BaseAttackSpeed
+8	DurabilityWarning       (ItemRarity in weapons?)
+9	BaseCost
+10
+11
+12
+13
+14	(always FFFFFFFF, probably just a terminator between the DWORDs and single BYTEs)
+15	Version (64 for xpac, 0 for norm)
+16
+17
+18
+19
+20
+21	ItemRarity
+22	BaseItemLevel
+23	MinDmg (also applies to shields dmg)
+24	MaxDmg (also applies to shields dmg)
+25
+26
+27	MinTwoHandDmg
+28	MaxTwoHandDmg
+29	AttackRange
+30	StrBonus
+31	DexBonus
+32	StrReq
+33	DexReq
+34
+35	SizeX
+36	SizeY
+37	BaseBlock
+38	BaseDurability
+39
+40
+41	Component
+42
+43
+44
+45
+46
+47
+48	TwoHanded
+49
+50	Type
+51	(255 in weapons?)
+52
+53	SoundId
+54
+55	Quest
+56
+57	TransTable
+58
+59	LightRadius
+60
+61
+62
+63
+64
+65	DurationWarningWep
+66
+67
+68	MaxSockets
+69
+70
+71
+72
+73
+74
+75	BaseLevelReq
+76	MagicLvl
+77	Transform
+78	InvTrans
+79
+
+..
+
+167	Last few of these are probably the NPC sell values (all seem to be 255, which is what it is in the mpq)
+
+
+Initial compilation done by njaguar
+
+Feel free to update this as you discover (definitively) new values. Please post updates (just the new fields, or changes)
+to the forums.
