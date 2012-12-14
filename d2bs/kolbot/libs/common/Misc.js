@@ -266,7 +266,47 @@ var Misc = {
 	},
 
 	// Open all chests that have preset units in an area
+	// Open all chests that have preset units in an area
 	openChestsInArea: function (area) {
+		if (!area) {
+			area = me.area;
+		}
+
+		var chest,
+			presetUnits = getPresetUnits(area),
+			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
+						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
+
+		if (!presetUnits) {
+			return false;
+		}
+
+		while (presetUnits.length > 0) {
+			presetUnits.sort(Sort.presetUnits);
+
+			if (chestIds.indexOf(presetUnits[0].id) > -1) {
+				Pather.moveToUnit(presetUnits[0], 2, 0);
+
+				chest = getUnit(2, -1, 0);
+
+				if (chest) {
+					do {
+						if (chestIds.indexOf(chest.classid) > -1 && getDistance(me, chest) < 5 && this.openChest(chest)) {
+							Pickit.pickItems();
+
+							break;
+						}
+					} while (chest.getNext());
+				}
+			}
+
+			presetUnits.shift();
+		}
+
+		return true;
+	},
+
+	/*openChestsInArea: function (area) {
 		var room, presetUnits,
 			rooms = [],
 			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
@@ -303,7 +343,7 @@ var Misc = {
 		}
 
 		return true;
-	},
+	},*/
 
 	openChestsInRoom: function (x, y) {
 		var unit, room,

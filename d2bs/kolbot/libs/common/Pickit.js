@@ -65,7 +65,7 @@ var Pickit = {
 			this.x = unit.x;
 			this.y = unit.y;
 			this.sizex = unit.sizex; // cache for CanFit
-			this.sizey = unit.sizex;
+			this.sizey = unit.sizey;
 			this.gid = unit.gid;
 		}
 
