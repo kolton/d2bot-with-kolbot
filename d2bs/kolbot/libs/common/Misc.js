@@ -198,6 +198,10 @@ var Misc = {
 
 	// Check if a player is in your party
 	inMyParty: function (name) {
+		if (me.name === name) {
+			return true;
+		}
+
 		var player, myPartyId;
 
 		try {
@@ -466,7 +470,7 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 2, 0)) {
+			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 3, 0)) {
 				unit.interact();
 			}
 
@@ -798,7 +802,7 @@ var Misc = {
 
 	// Go to town when low on hp/mp or when out of potions. can be upgraded to check for curses etc.
 	townCheck: function () {
-		var potion, check,
+		var i, potion, check,
 			needhp = true,
 			needmp = true;
 
@@ -808,43 +812,45 @@ var Misc = {
 		}
 
 		if (Config.TownCheck && !me.inTown) {
-			if (Config.BeltColumn.indexOf("hp") > -1) {
-				potion = me.getItem(-1, 2); // belt item
+			for (i = 0; i < 4; i += 1) {
+				if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
+					potion = me.getItem(-1, 2); // belt item
 
-				if (potion) {
-					do {
-						if (potion.code.indexOf("hp") > -1) {
-							needhp = false;
+					if (potion) {
+						do {
+							if (potion.code.indexOf("hp") > -1) {
+								needhp = false;
 
-							break;
-						}
-					} while (potion.getNext());
+								break;
+							}
+						} while (potion.getNext());
+					}
+
+					if (needhp) {
+						print("We need healing potions");
+
+						check = true;
+					}
 				}
 
-				if (needhp) {
-					print("We need healing potions");
+				if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
+					potion = me.getItem(-1, 2); // belt item
 
-					check = true;
-				}
-			}
+					if (potion) {
+						do {
+							if (potion.code.indexOf("mp") > -1) {
+								needmp = false;
 
-			if (Config.BeltColumn.indexOf("mp") > -1) {
-				potion = me.getItem(-1, 2); // belt item
+								break;
+							}
+						} while (potion.getNext());
+					}
 
-				if (potion) {
-					do {
-						if (potion.code.indexOf("mp") > -1) {
-							needmp = false;
+					if (needmp) {
+						print("We need mana potions");
 
-							break;
-						}
-					} while (potion.getNext());
-				}
-
-				if (needmp) {
-					print("We need mana potions");
-
-					check = true;
+						check = true;
+					}
 				}
 			}
 

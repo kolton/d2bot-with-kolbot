@@ -92,6 +92,10 @@ var Precast = new function () {
 				}
 			}
 
+			if (me.getSkill(52, 0) && (!me.getState(16) || force)) {
+				this.enchant();
+			}
+
 			break;
 		case 2: // Necromancer
 			if (!me.getState(14) || force) {
@@ -350,5 +354,35 @@ MainLoop:
 		}
 
 		return !!rv;
+	};
+
+	this.enchant = function () {
+		var unit,
+			chanted = [];
+
+		// Player
+		unit = getUnit(0);
+
+		if (unit) {
+			do {
+				if (!unit.dead && Misc.inMyParty(unit.name) && getDistance(me, unit) <= 40) {
+					Skill.cast(52, 0, unit);
+					chanted.push(unit.name);
+				}
+			} while (unit.getNext());
+		}
+
+		// Minion
+		unit = getUnit(1);
+
+		if (unit) {
+			do {
+				if (unit.getParent() && chanted.indexOf(unit.getParent().name) > -1 && getDistance(me, unit) <= 40) {
+					Skill.cast(52, 0, unit);
+				}
+			} while (unit.getNext());
+		}
+
+		return true;
 	};
 };

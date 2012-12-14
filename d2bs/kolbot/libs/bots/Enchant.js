@@ -19,7 +19,7 @@ function Enchant() {
 
 		var unit = getUnit(0, nick);
 
-		if (!unit) {
+		if (!unit || getDistance(me, unit) > 40 ) {
 			say("Get closer.");
 
 			return false;
@@ -27,7 +27,7 @@ function Enchant() {
 
 		if (unit) {
 			do {
-				if (unit.mode !== 0 && unit.mode !== 17) { // player is alive
+				if (!unit.dead) { // player is alive
 					Skill.setSkill(52, 0);
 					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
 					delay(500);
@@ -50,8 +50,58 @@ function Enchant() {
 		return true;
 	};
 
+	this.autoChant = function () {
+		var unit,
+			chanted = [];
+
+		// Player
+		unit = getUnit(0);
+
+		if (unit) {
+			do {
+				if (unit.name !== me.name && !unit.dead && shitList.indexOf(unit.name) === -1 && Misc.inMyParty(unit.name) && !unit.getState(16) && getDistance(me, unit) <= 40) {
+					Skill.setSkill(52, 0);
+					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
+					delay(500);
+					chanted.push(unit.name);
+				}
+			} while (unit.getNext());
+		}
+
+		// Minion
+		unit = getUnit(1);
+
+		if (unit) {
+			do {
+				if (unit.getParent() && chanted.indexOf(unit.getParent().name) > -1 && !unit.getState(16) && getDistance(me, unit) <= 40) {
+					Skill.setSkill(52, 0);
+					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
+					delay(500);
+				}
+			} while (unit.getNext());
+		}
+
+		return true;
+	};
+
 	this.getLeg = function () {
 		var i, portal, wirt, leg, gid;
+
+		if (!Config.Enchant.GetLeg) {
+			leg = getUnit(4, 88);
+
+			if (leg) {
+				gid = leg.gid;
+
+				Pickit.pickItem(leg);
+
+				return me.getItem(-1, -1, gid);
+			}
+
+			say("Bring the leg to me.");
+
+			return false;
+		}
 
 		if (me.getItem(88)) {
 			return me.getItem(88);
@@ -405,7 +455,11 @@ MainLoop:
 				}
 
 				say("Commands:");
-				say("Chant: " + Config.Enchant.Triggers[0] + "| Open cow level: " + Config.Enchant.Triggers[1] + "| Give waypoints: " + Config.Enchant.Triggers[2]);
+				say("Chant: " + (Config.Enchant.Triggers[0] || "disabled") + "| Open cow level: " + (Config.Enchant.Triggers[1] || "disabled") + "| Give waypoints: " + (Config.Enchant.Triggers[2] || "disabled"));
+
+				if (Config.Enchant.AutoChant) {
+					say("Auto enchant is ON");
+				}
 
 				break;
 			case Config.Enchant.Triggers[0].toLowerCase(): // chant
@@ -436,7 +490,7 @@ MainLoop:
 				}
 
 				if (!this.openPortal(command[1])) {
-					say("Failed to open cow portal");
+					say("Failed to open cow portal.");
 				}
 
 				me.cancel();
@@ -465,6 +519,10 @@ MainLoop:
 
 		command = "";
 
+		if (Config.Enchant.AutoChant) {
+			this.autoChant();
+		}
+
 		if (getTickCount() - me.gamestarttime >= Config.Enchant.GameLength * 6e4) {
 			say("Use kolbot or die!");
 			delay(1000);
@@ -472,7 +530,7 @@ MainLoop:
 			break;
 		}
 
-		delay(100);
+		delay(200);
 	}
 
 	return true;

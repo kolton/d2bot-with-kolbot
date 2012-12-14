@@ -59,11 +59,6 @@ function LoadConfig() {
 
 	// *** act 3 ***
 	Scripts.Stormtree = false;
-	Scripts.KurastChests = false;
-		Config.KurastChests.LowerKurast = true;
-		Config.KurastChests.Bazaar = false;
-		Config.KurastChests.Sewers1 = false;
-		Config.KurastChests.Sewers2 = false;
 	Scripts.KurastTemples = false;
 	Scripts.Icehawk = false;
 	Scripts.Endugu = false;
@@ -106,6 +101,7 @@ function LoadConfig() {
 		Config.Bonesaw.ClearDrifterCavern = false;
 	Scripts.Snapchip = false;
 		Config.Snapchip.ClearIcyCellar = true;
+	Scripts.Worldstone = false;
 	Scripts.Baal = false;
 		Config.Baal.HotTPMessage = "Hot TP!";
 		Config.Baal.SafeTPMessage = "Safe TP!";
@@ -178,6 +174,8 @@ function LoadConfig() {
 	Scripts.GhostBusters = false; // Kill ghosts in most areas that contain them
 	Scripts.Enchant = false;
 		Config.Enchant.Triggers = ["chant", "cows", "wps"]; // Chat commands for enchant, cow level and waypoint giving
+		Config.Enchant.GetLeg = false; // Get Wirt's Leg from Tristram. If set to false, it will check for the leg in town.
+		Config.Enchant.AutoChant = false; // Automatically enchant nearby players and their minions
 		Config.Enchant.GameLength = 20; // Game length in minutes
 	Scripts.IPHunter = false;
 		Config.IPHunter.IPList = []; // List of IPs to look for. example: [165, 201, 64]
@@ -195,22 +193,6 @@ function LoadConfig() {
 
 	// *** Guest scripts ***
 	
-	// Chest Hunter by Talltree
-	Scripts.ChestHunterAct1 = false;
-		Config.ChestHunterAct1.Hole = true; //Golden Chest in the Hole	
-		Config.ChestHunterAct1.Cave = true; //Golden Chest in the Cave	
-		Config.ChestHunterAct1.Pit = true; // Golden Chest in the Pit
-		Config.ChestHunterAct1.MausoCrypt = true; //all Chests in Mausoleum and Crypta
-	Scripts.ChestHunterAct2 = false;	
-		Config.ChestHunterAct2.StonyTomb = true; //Golden Chest in the Stony Tomb
-		Config.ChestHunterAct2.AncientTunnels = true; //Golden Chest in the Ancient Tunnels
-		Config.ChestHunterAct2.ArcaneSanctuary = true; //all Chests in the Arcane Sanctuary
-		Config.ChestHunterAct2.TalTombs = true; //all Chests in the 7 Tal Tombs
-	Scripts.ChestHunterAct3 = false;	// Spider Cave and Spider Cavern, Rest of the Chests are convered with "KurastChests"
-	Scripts.ChestHunterAct5 = false;
-		Config.ChestHunterAct5.GlacialDrifter = true; //Glacial Trail and Drifter Cavern Golden Chest
-		Config.ChestHunterAct5.FrozenCellar = true; //Golden Chest in the Frozen Cellar
-		Config.ChestHunterAct5.HellChests = true; //Golden Chest in Abbadon, Pit of Acheron, Infernal Pit
 
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.

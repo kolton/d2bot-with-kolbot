@@ -24,7 +24,7 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -38,7 +38,7 @@ var ClassAttack = {
 			case 255: // Dragon Talon
 			case 260: // Dragon Claw
 			case 270: // Dragon Tail
-				this.skillRange[i] = 3;
+				this.skillRange[i] = 2;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;

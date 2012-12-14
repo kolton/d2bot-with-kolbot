@@ -326,6 +326,8 @@ var Config = {
 	},
 	Enchant: {
 		Triggers: ["chant", "cows", "wps"],
+		GetLeg: false,
+		AutoChant: false,
 		GameLength: 20
 	},
 	IPHunter: {
@@ -384,22 +386,5 @@ var Config = {
 		Act3: [],
 		Act4: [],
 		Act5: []
-	},
-	ChestHunterAct1: {
-		Hole: false,
-		Cave: false,
-		Pit: false,
-		MausoCrypt: false
-	},
-	ChestHunterAct2: {
-		StonyTomb: false,
-		AncientTunnels: false,
-		ArcaneSanctuary: false,
-		TalTombs: false
-	},
-	ChestHunterAct5: {
-		GlacialDrifter: false,
-		FrozenCellar: false,
-		HellChests:  false
 	}
 };

@@ -5,7 +5,7 @@
 */
 
 function IPHunter() {
-	var ip = me.gameserverip.split(".")[3];
+	var ip = Number(me.gameserverip.split(".")[3]);
 
 	if (Config.IPHunter.IPList.indexOf(ip) > -1) {
 		print("IP found!");

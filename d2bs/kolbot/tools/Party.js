@@ -60,6 +60,10 @@ function main() {
 
 					break;
 				case 2:
+					/*if (myPartyId !== 65535) {
+						return;
+					}*/
+
 					if (player.partyid !== 65535 && player.partyid !== myPartyId) {
 						otherParty = player.partyid;
 					}
