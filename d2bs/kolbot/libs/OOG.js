@@ -86,7 +86,10 @@ var DataFile = {
 			deaths: 0,
 			lastArea: "",
 			gold: 0,
-			level: 0
+			level: 0,
+			name: "",
+			gameName: "",
+			ingameTick: 0
 		};
 
 		string = JSON.stringify(obj);
@@ -120,61 +123,77 @@ var DataFile = {
 
 		print("Error reading DataFile. Using null values.");
 
-		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0};
+		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0};
 	},
 
 	getStats: function () {
 		var obj = this.getObj();
 
-		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level};
+		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick};
 	},
 
 	updateStats: function (arg, value) {
-		var obj, string, area;
+		var i, obj, string, area,
+			statArr = [];
 
-		obj = this.getObj();
-
-		switch (arg) {
-		case "runs":
-			obj.runs = value;
-
-			break;
-		case "experience":
-			obj.experience = me.getStat(13);
-			obj.level = me.getStat(12);
-
-			break;
-		case "lastArea":
-			area = getArea();
-
-			if (typeof area !== "object") {
-				return;
-			}
-
-			if (obj.lastArea === getArea().name) {
-				return;
-			}
-
-			obj.lastArea = getArea().name;
-
-			break;
-		case "gold":
-			obj.gold = me.getStat(14) + me.getStat(15);
-
-			break;
+		if (typeof arg === "object") {
+			statArr = arg.slice();
 		}
 
-		string = JSON.stringify(obj);
-
-		//FileTools.writeText("data/" + me.profile + ".json", string);
-		Misc.fileAction("data/" + me.profile + ".json", 1, string);
-	},
-
-	updateDeaths: function () {
-		var obj, string;
+		if (typeof arg === "string") {
+			statArr.push(arg);
+		}
 
 		obj = this.getObj();
-		obj.deaths = obj.deaths + 1;
+
+		for (i = 0; i < statArr.length; i += 1) {
+			switch (statArr[i]) {
+			case "runs":
+				obj.runs = value;
+
+				break;
+			case "experience":
+				obj.experience = me.getStat(13);
+				obj.level = me.getStat(12);
+
+				break;
+			case "lastArea":
+				area = getArea();
+
+				if (typeof area !== "object") {
+					return;
+				}
+
+				if (obj.lastArea === getArea().name) {
+					return;
+				}
+
+				obj.lastArea = getArea().name;
+
+				break;
+			case "gold":
+				obj.gold = me.getStat(14) + me.getStat(15);
+
+				break;
+			case "name":
+				obj.name = me.name;
+
+				break;
+			case "gameName":
+				obj.gameName = value;
+
+				break;
+			case "ingameTick":
+				obj.ingameTick = getTickCount();
+
+				break;
+			case "deaths":
+				obj.deaths = (obj.deaths || 0) + 1;
+
+				break;
+			}
+		}
+
 		string = JSON.stringify(obj);
 
 		//FileTools.writeText("data/" + me.profile + ".json", string);

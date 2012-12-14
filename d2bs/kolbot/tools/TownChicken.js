@@ -28,17 +28,30 @@ function main() {
 	var townCheck = false;
 
 	this.togglePause = function () {
-		var script = getScript("default.dbj");
+		var i,	script,
+			scripts = ["default.dbj", "tools/antihostile.js", "tools/rushthread.js"];
 
-		if (script) {
-			if (script.running) {
-				print("ÿc1Pausing.");
-				script.pause();
-			} else {
-				print("ÿc2Resuming.");
-				script.resume();
+		for (i = 0; i < scripts.length; i += 1) {
+			script = getScript(scripts[i]);
+
+			if (script) {
+				if (script.running) {
+					if (script.name === "default.dbj") {
+						print("ÿc1Pausing.");
+					}
+
+					script.pause();
+				} else {
+					if (script.name === "default.dbj") {
+						print("ÿc2Resuming.");
+					}
+
+					script.resume();
+				}
 			}
 		}
+
+		return true;
 	};
 
 	addEventListener("scriptmsg",

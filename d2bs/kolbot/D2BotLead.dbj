@@ -198,6 +198,7 @@ function main() {
 					ingame = true;
 
 					DataFile.updateStats("runs", gameCount);
+					DataFile.updateStats("ingameTick");
 				}
 
 				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
@@ -242,11 +243,17 @@ MainSwitch:
 		//muleTrigger = true;
 		//torchMuleTrigger = true;
 
-		if (ingame) {
+		if (ingame || error === "@error") {
+			if (!gameStart) {
+				gameStart = DataFile.getStats().ingameTick;
+			}
+
 			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
 				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
 			}
+		}
 
+		if (ingame) {
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
 				removeEventListener('copydata', ReceiveCopyData);
@@ -320,6 +327,16 @@ MainSwitch:
 		break;
 	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby Chat");
+
+		if (ingame || error === "@error") {
+			if (!gameStart) {
+				gameStart = DataFile.getStats().ingameTick;
+			}
+
+			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
+				timeoutDelay("Min game time wait", StarterConfig.MinGameTime * 1e3 + gameStart - getTickCount());
+			}
+		}
 
 		if (ingame) {
 			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {

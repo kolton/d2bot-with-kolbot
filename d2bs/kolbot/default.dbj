@@ -53,7 +53,7 @@ function main() {
 		return true;
 	}
 
-	var i, sojPause, exp,
+	var i, sojPause, stats,
 		sojCounter = 0,
 		startTime = getTickCount();
 
@@ -102,15 +102,15 @@ function main() {
 
 	// TODO: Consolidate Gambling System
 	me.maxgametime = Config.MaxGameTime * 1000;
-	exp = DataFile.getStats().experience
+	stats = DataFile.getStats();
 
-	if (me.getStat(13) < exp) { // check for experience decrease -> log death
+	if (stats.name === me.name && me.getStat(13) < stats.experience) { // check for experience decrease -> log death
 		D2Bot.printToConsole("You died in last game;9");
-		D2Bot.printToConsole("Experience decreased by " + (exp - me.getStat(13)) + ";9");
-		DataFile.updateDeaths();
+		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)) + ";9");
+		DataFile.updateStats("deaths");
 	}
 
-	DataFile.updateStats("experience");
+	DataFile.updateStats(["experience", "name"]);
 
 	// Load Fastmod
 	Packet.changeStat(105, Config.FCR);
@@ -121,7 +121,10 @@ function main() {
 	// Load events and threads
 	addEventListener("scriptmsg", this.scriptEvent);
 	load("tools/ToolsThread.js");
-	load("tools/TownChicken.js");
+
+	if (Config.TownCheck || Config.TownHP || Config.TownMP) {
+		load("tools/TownChicken.js");
+	}
 
 	if (Config.PublicMode) {
 		load("tools/Party.js");
@@ -135,7 +138,7 @@ function main() {
 		print("ÿc2Fast pickit active.");
 		addEventListener("itemaction", this.itemEvent);
 	}
-	
+
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
 	if (!Scripts.UserAddon && !Scripts.Test) {
 		Town.getCorpse();

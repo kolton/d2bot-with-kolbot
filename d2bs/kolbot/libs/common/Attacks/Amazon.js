@@ -24,21 +24,25 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 10: // Jab
 			case 14: // Power Strike
 			case 19: // Impale
 			case 30: // Fend
 			case 34: // Lightning Strike
-				this.skillRange[i] = 3;
+				this.skillRange[i] = 2;
+
 				break;
 			case 24: // Charged Strike
 				this.skillRange[i] = 20;
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
+
 				break;
 			}
 		}

@@ -140,9 +140,10 @@ function ReceiveCopyData(msgID, msg) {
 	case 2: // game info
 		print("Recieved Game Info");
 
-		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
-		keyswap = parseInt(keyswap, 10);
-		rdblocker = parseInt(rdblocker, 10);
+		difficulty = msg.split('/')[2];
+		error = msg.split('/')[3];
+		keyswap = Number(msg.split('/')[4]);
+		rdblocker = Number(msg.split('/')[5]);
 
 		break;
 	case 1: // join
@@ -395,13 +396,17 @@ JoinLoop:
 			ControlAction.setText(1, 606, 148, 155, 20, gamePass);
 			ControlAction.setText(1, 432, 148, 155, 20, nextGame);
 
-			if (lastGameStatus === "pending") {
+			if (lastGameStatus === "pending" || (error === "@error" && DataFile.getStats().gameName === nextGame)) {
+				if (error === "@error") {
+					error = "";
+				}
+
 				timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000,
 					function () {
 						D2Bot.requestGame(leader);
 						delay(500);
 
-						return isUp === "no" || nextGame !== gameName;
+						return isUp === "no" || (gameName && nextGame !== gameName);
 					}
 					);
 				D2Bot.updateRuns();
@@ -434,6 +439,7 @@ JoinLoop:
 			gameName = nextGame;
 			lastGameStatus = "pending";
 
+			DataFile.updateStats("gameName", nextGame);
 			locationTimeout(5000, location);
 		}
 

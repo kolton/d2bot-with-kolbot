@@ -240,6 +240,7 @@ function main() {
 			delay(250);
 		}
 
+		Pather.moveToPreset(me.area, 2, 357);
 		Attack.clear(15, 0, 250);
 
 		while (this.playerIn()) {
@@ -907,8 +908,7 @@ MainLoop:
 
 				break;
 			default:
-				if (command.split(" ")[0] !== undefined &&
-						command.split(" ")[0] === "clear") {
+				if (command.split(" ")[0] !== undefined && command.split(" ")[0] === "clear") {
 					this.clearArea(Number(command.split(" ")[1]));
 				} else if (sequence.indexOf(command) > -1) {
 					current = sequence.indexOf(command);

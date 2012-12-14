@@ -40,12 +40,14 @@ var a = -1, b = 1;
 
 function test() {
 	print("test");
-	
-	print(Pather.plotCourse(80).course + " " + Pather.plotCourse(80).useWP);
+
+	print(somefunc([1, 2, 3, 4, 5]));
 }
 
-function somefunc(func) {
-	print(func.call());
+function somefunc(arg) {
+	var x = arg.slice();
+	
+	return x;
 }
 
 function checkLifeyo() {

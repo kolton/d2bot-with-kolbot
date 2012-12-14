@@ -22,21 +22,25 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
 				this.skillHand[i] = 2; // shift bypass
+
 				break;
 			case 225: // Firestorm
 			case 229: // Molten Boulder
 			case 230: // Arctic Blast
 				this.skillRange[i] = 10;
+
 				break;
 			case 234: // Fissure
 			case 244: // Volcano
 				this.skillRange[i] = 15;
+
 				break;
 			case 240: // Twister
 			case 245: // Tornado
 				this.skillRange[i] = 5;
+
 				break;
 			case 232: // Feral Rage
 			case 233: // Maul
@@ -44,13 +48,16 @@ var ClassAttack = {
 			case 239: // Fire Claws
 			case 242: // Hunger
 			case 248: // Fury
-				this.skillRange[i] = 3;
+				this.skillRange[i] = 2;
+
 				break;
 			case 243: // Shock Wave
 				this.skillRange[i] = 8;
+
 				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
+
 				break;
 			}
 		}

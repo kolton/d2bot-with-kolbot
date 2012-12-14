@@ -10,6 +10,7 @@ var Pather = {
 	teleDistance: 40,
 	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
+	recursion: true,
 
 	moveTo: function (x, y, retry, clearPath, pop) {
 		if (me.dead) { // Abort if dead
@@ -122,26 +123,32 @@ var Pather = {
 					break;
 				}
 
-				if (Config.OpenChests) {
-					Misc.openChests(15);
-				}
+				if (this.recursion) {
+					this.recursion = false;
 
-				Misc.scanShrines();
-
-				if (clearPath) {
-					Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
-				}
-
-				if (Config.Countess.KillGhosts) { // TODO: expand&improve
-					mob = Attack.getMob("ghost", 0, 30);
-
-					if (mob) {
-						Attack.clearList(mob);
+					if (Config.OpenChests) {
+						Misc.openChests(15);
 					}
-				}
 
-				if (getDistance(me, node.x, node.y) > 5) {
-					this.moveTo(node.x, node.y);
+					Misc.scanShrines();
+
+					if (clearPath) {
+						Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
+					}
+
+					if (Config.Countess.KillGhosts) { // TODO: expand&improve
+						mob = Attack.getMob("ghost", 0, 30);
+
+						if (mob) {
+							Attack.clearList(mob);
+						}
+					}
+
+					if (getDistance(me, node.x, node.y) > 5) {
+						this.moveTo(node.x, node.y);
+					}
+
+					this.recursion = true;
 				}
 
 				Misc.townCheck();
@@ -170,7 +177,7 @@ MainLoop:
 			tick = getTickCount();
 
 			while (getTickCount() - tick < Math.max(500, me.ping + 200)) {
-				if (getDistance(me, x, y) < 5) {
+				if (getDistance(me.x, me.y, x, y) < 5) {
 					return true;
 				}
 
@@ -191,7 +198,7 @@ MainLoop:
 		}
 
 		// Charge!
-		if (me.classid === 3 && !me.dead && !me.inTown && me.mp >= 9 && getDistance(me, x, y) > 8 && Skill.setSkill(107, 1)) {
+		if (me.classid === 3 && !me.dead && !me.inTown && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
 			if (Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
@@ -205,7 +212,7 @@ MainLoop:
 			}
 		}
 
-		while (getDistance(me, x, y) > 3 && !me.dead) {
+		while (getDistance(me.x, me.y, x, y) > 3 && !me.dead) {
 			if (me.classid === 3 && Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
@@ -248,9 +255,11 @@ ModeLoop:
 			if (attemptCount >= 3) {
 				return false;
 			}
+
+			delay(5);
 		}
 
-		return !me.dead && getDistance(me, x, y) < 4;
+		return !me.dead && getDistance(me.x, me.y, x, y) < 4;
 	},
 
 	clickMove: function (x, y) {

@@ -57,9 +57,15 @@ var Pickit = {
 
 	pickItems: function () {
 		function ItemStats(unit) {
+			this.itemType = unit.itemType;
+			this.quality = unit.quality;
 			this.classid = unit.classid;
+			this.code = unit.code;
+			this.name = unit.name;
 			this.x = unit.x;
 			this.y = unit.y;
+			this.sizex = unit.sizex; // cache for CanFit
+			this.sizey = unit.sizex;
 			this.gid = unit.gid;
 		}
 
@@ -89,7 +95,7 @@ var Pickit = {
 		this.pickList.sort(this.sortItems);
 
 		while (this.pickList.length > 0) {
-			gid = this.pickList.shift().gid;
+			gid = this.pickList[0].gid;
 
 			if (gid) {
 				item = getUnit(4, -1, -1, gid);
@@ -97,31 +103,31 @@ var Pickit = {
 				if (item && (item.mode === 3 || item.mode === 5)) {
 					status = this.checkItem(item);
 
-					if (status.result && this.canPick(item)) {
+					if (status.result && this.canPick(this.pickList[0])) {
 						// Check room, don't check gold, scrolls and potions
-						canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
-						color = this.itemColor(item);
+						canFit = Storage.Inventory.CanFit(this.pickList[0]) || [4, 22, 76, 77, 78].indexOf(this.pickList[0].itemType) > -1;
+						color = this.itemColor(this.pickList[0]);
 
 						if (!canFit && Config.FieldID && Town.fieldID()) {
-							canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
+							canFit = Storage.Inventory.CanFit(this.pickList[0]) || [4, 22, 76, 77, 78].indexOf(this.pickList[0].itemType) > -1;
 						}
 
 						if (!canFit && this.canMakeRoom()) {
-							print("ÿc7Trying to make room for " + color + item.name);
+							print("ÿc7Trying to make room for " + color + this.pickList[0].name);
 
 							if (!Town.visitTown()) {
-								print("ÿc7Not enough room for " + color + item.name);
+								print("ÿc7Not enough room for " + color + this.pickList[0].name);
 
 								return false;
 							}
 
-							canFit = Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1;
+							canFit = Storage.Inventory.CanFit(this.pickList[0]) || [4, 22, 76, 77, 78].indexOf(this.pickList[0].itemType) > -1;
 						}
 
 						if (canFit) {
 							this.pickItem(item, status.result, status.line);
 						} else {
-							print("ÿc7Not enough room for " + color + item.name);
+							print("ÿc7Not enough room for " + color + this.pickList[0].name);
 
 							if (!!AutoMule.getMule()) {
 								scriptBroadcast("mule");
@@ -131,6 +137,8 @@ var Pickit = {
 					}
 				}
 			}
+
+			this.pickList.shift();
 		}
 
 		return true;
