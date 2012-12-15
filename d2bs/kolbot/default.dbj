@@ -29,6 +29,15 @@ function main() {
 		load("tools/heartbeat.js");
 	}
 
+	if (getScript("d2botmap.dbj")) {
+		load("tools/mapthread.js");
+		load("tools/ToolsThread.js");
+
+		while (true) {
+			delay(1000);
+		}
+	}
+
 	// wait until game is ready
 	while (!me.gameReady || typeof copyUnit(me).classid === "undefined") {
 		delay(50);

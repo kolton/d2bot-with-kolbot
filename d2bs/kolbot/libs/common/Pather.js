@@ -975,6 +975,7 @@ MainLoop:
 
 			if (me.inTown && this.wpAreas.indexOf(target.course[0]) > -1 && getWaypoint(this.wpAreas.indexOf(target.course[0]))) {
 				this.useWaypoint(target.course[0], true);
+				Precast.doPrecast(false);
 			} else if (me.area === 109 && target.course[0] === 110) { // Harrogath -> Bloody Foothills
 				this.moveTo(5026, 5095);
 
