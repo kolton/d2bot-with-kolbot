@@ -289,7 +289,7 @@ function main() {
 
 		do {
 			if (room instanceof Room && room.area === area) {
-				room.reveal(true);
+				room.reveal();
 			}
 		} while (room.getNext());
 	};
@@ -404,7 +404,7 @@ function main() {
 	// Start
 	while (me.ingame) {
 		try {
-			if (!me.inTown) {
+			if (!me.inTown && me.gameReady) {
 				if (configCache.UseHP > 0 && me.hp < Math.floor(me.hpmax * configCache.UseHP / 100)) {
 					this.drinkPotion(0);
 				}

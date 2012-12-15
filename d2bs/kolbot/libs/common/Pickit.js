@@ -313,7 +313,7 @@ MainLoop:
 	sortItems: function (unitA, unitB) {
 		// TODO: Add some kind of advanced sorting
 
-		return getDistance(me, unitA.x, unitA.y) - getDistance(me, unitB.x, unitB.y);
+		return getDistance(me, unitA) - getDistance(me, unitB);
 	},
 
 	canPick: function (unit) {
@@ -457,7 +457,7 @@ MainLoop:
 				status = this.checkItem(item);
 
 				if (status.result && this.canPick(item) && (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1)) {
-					this.pickItem(item, status, status.line);
+					this.pickItem(item, status.result, status.line);
 				}
 			}
 		}

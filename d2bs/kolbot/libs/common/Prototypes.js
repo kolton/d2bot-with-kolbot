@@ -55,9 +55,13 @@ Unit.prototype.__defineGetter__("attacking",
 	);
 
 // Open NPC menu
-Unit.prototype.openMenu = function () {
+Unit.prototype.openMenu = function (addDelay) {
 	if (this.type !== 1) {
 		throw new Error("Unit.openMenu: Must be used on NPCs.");
+	}
+
+	if (typeof addDelay === "undefined") {
+		addDelay = 0;
 	}
 
 	if (getUIFlag(0x08)) {
@@ -87,7 +91,7 @@ Unit.prototype.openMenu = function () {
 			}
 
 			if (getUIFlag(0x08)) {
-				delay(700 + me.ping);
+				delay(Math.max(700 + me.ping, 500 + me.ping * 2 + addDelay * 500));
 
 				return true;
 			}
@@ -113,7 +117,7 @@ Unit.prototype.startTrade = function (mode) {
 		menuId = mode === "Gamble" ? 0x0D46 : mode === "Repair" ? 0x0D06 : 0x0D44;
 
 	for (i = 0; i < 3; i += 1) {
-		if (this.openMenu()) {
+		if (this.openMenu(i)) { // Incremental delay on retries
 			Misc.useMenu(menuId);
 			delay(1000);
 

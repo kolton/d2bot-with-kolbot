@@ -1,0 +1,7 @@
+function main() {
+	load("tools/heartbeat.js");
+
+	while (true) {
+		delay(1000);
+	}
+}
