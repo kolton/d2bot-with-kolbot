@@ -49,12 +49,44 @@ function AutoBaal() {
 
 	// test
 	this.longRangeSupport = function () {
+		var monster, monList, index;
+
+		switch (me.classid) {
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			ClassAttack.raiseArmy(50);
+
+			if (Config.Curse[1] > 0) {
+				monster = getUnit(1);
+
+				if (monster) {
+					do {
+						if (Attack.checkMonster(monster) && getDistance(me, monster) < 50 && !checkCollision(me, monster, 0x4) &&
+								ClassAttack.isCursable(monster) && !(monster.spectype & 0x7) && !monster.getState(ClassAttack.curseState[1])) {
+							Skill.cast(Config.Curse[1], 0, monster);
+						}
+					} while (monster.getNext());
+				}
+			}
+
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
+		}
+
 		if ([24, 49, 51, 56, 59, 84, 93, 140, 244].indexOf(Config.AttackSkill[1]) === -1 &&
 				[24, 49, 51, 56, 59, 84, 93, 140, 244].indexOf(Config.AttackSkill[3]) === -1) {
 			return false;
 		}
-
-		var monster, monList, index;
 
 		monster = getUnit(1);
 		monList = [];

@@ -310,8 +310,12 @@ var ClassAttack = {
 		return true;
 	},
 
-	raiseArmy: function () {
+	raiseArmy: function (range) {
 		var i, tick, count, corpse, corpseList, skill, maxSkeletons, maxMages, maxRevives;
+
+		if (!range) {
+			range = 25;
+		}
 
 		if (Config.Skeletons === "max") {
 			skill = me.getSkill(70, 1);
@@ -340,7 +344,7 @@ var ClassAttack = {
 
 			if (corpse) {
 				do {
-					if (getDistance(me, corpse) <= 25 && this.checkCorpse(corpse)) { // within casting distance
+					if (getDistance(me, corpse) <= range && this.checkCorpse(corpse)) { // within casting distance
 						corpseList.push(copyUnit(corpse));
 					}
 				} while (corpse.getNext());

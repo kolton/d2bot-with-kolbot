@@ -121,12 +121,6 @@ function main() {
 
 	DataFile.updateStats(["experience", "name"]);
 
-	// Load Fastmod
-	Packet.changeStat(105, Config.FCR);
-	Packet.changeStat(99, Config.FHR);
-	Packet.changeStat(102, Config.FBR);
-	Packet.changeStat(93, Config.IAS);
-
 	// Load events and threads
 	addEventListener("scriptmsg", this.scriptEvent);
 	load("tools/ToolsThread.js");

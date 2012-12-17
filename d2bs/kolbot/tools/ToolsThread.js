@@ -331,7 +331,27 @@ function main() {
 			say("/fps");
 
 			break;
+		case 100: // numpad 4 - get nearest preset unit id
+			print(this.getNearestPreset());
+
+			break;
 		}
+	};
+
+	this.getNearestPreset = function () {
+		var i, unit, dist, id;
+
+		unit = getPresetUnits(me.area);
+		dist = 99;
+
+		for (i = 0; i < unit.length; i += 1) {
+			if (getDistance(me, unit[i].roomx * 5 + unit[i].x, unit[i].roomy * 5 + unit[i].y) < dist) {
+				dist = getDistance(me, unit[i].roomx * 5 + unit[i].x, unit[i].roomy * 5 + unit[i].y);
+				id = unit[i].type + " " + unit[i].id;
+			}
+		}
+
+		return id || "";
 	};
 
 	this.gameEvent = function (mode, param1, param2, name1, name2) {
@@ -400,6 +420,12 @@ function main() {
 	addEventListener("scriptmsg", this.scriptEvent);
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
+
+	// Load Fastmod
+	Packet.changeStat(105, Config.FCR);
+	Packet.changeStat(99, Config.FHR);
+	Packet.changeStat(102, Config.FBR);
+	Packet.changeStat(93, Config.IAS);
 
 	// Start
 	while (me.ingame) {
