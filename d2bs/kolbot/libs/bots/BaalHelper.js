@@ -169,7 +169,7 @@ function BaalHelper() { // experi-mental
 	Town.goToTown(5);
 	Town.doChores();
 
-	if (Config.BaalHelper.RandomPrecast) {
+	if (Config.RandomPrecast) {
 		Pather.useWaypoint("random");
 		Precast.doPrecast(true);
 	} else {
