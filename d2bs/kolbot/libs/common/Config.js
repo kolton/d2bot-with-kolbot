@@ -161,6 +161,7 @@ var Config = {
 
 	// Anti-hostile
 	AntiHostile: false,
+	RandomPrecast: false,
 	HostileAction: 0,
 	TownOnHostile: false,
 	ViperCheck: false,
@@ -273,13 +274,11 @@ var Config = {
 		DollQuit: false,
 		SoulQuit: false,
 		KillBaal: false,
-		RandomPrecast: false,
 		HotTPMessage: "Hot TP!",
 		SafeTPMessage: "Safe TP!",
 		BaalMessage: "Baal!"
 	},
 	BaalAssistant: {
-		Leader: "",
 		KillNihlathak: false,
 		FastChaos: false,
 		Wait: 120,
@@ -288,7 +287,6 @@ var Config = {
 		GetShrineWaitForHotTP: false,
 		DollQuit: false,
 		SoulQuit: false,
-		RandomPrecast: false,
 		SkipTP: false,
 		WaitForSafeTP: false,
 		KillBaal: false,
@@ -303,7 +301,6 @@ var Config = {
 		FastChaos: false,
 		DollQuit: false,
 		KillBaal: false,
-		RandomPrecast: false,
 		SkipTP: false
 	},
 	Corpsefire: {
