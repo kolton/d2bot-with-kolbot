@@ -6,14 +6,14 @@
  
 function BaalAssistant() {
 	
-	var Leader = Config.BaalAssistant.Leader, // Not entriely needed in the configs.
+	var Leader = Config.Leader, // Not entriely needed in the configs.
 		KillNihlathak = Config.BaalAssistant.KillNihlathak,
 		FastChaos = Config.BaalAssistant.FastChaos,
 		Wait = Config.BaalAssistant.Wait, // Not entriely needed in the configs.
 		Helper = Config.BaalAssistant.Helper,
 		GetShrine = Config.BaalAssistant.GetShrine,
 		GetShrineWaitForHotTP = Config.BaalAssistant.GetShrineWaitForHotTP,
-		RandomPrecast = Config.BaalAssistant.RandomPrecast, // Not entriely needed in the configs.
+		RandomPrecast = Config.RandomPrecast, // Not entriely needed in the configs.
 		SkipTP = Config.BaalAssistant.SkipTP,
 		WaitForSafeTP = Config.BaalAssistant.WaitForSafeTP,
 		DollQuit = Config.BaalAssistant.DollQuit,
@@ -274,8 +274,7 @@ function BaalAssistant() {
 	};
 
 	// Start
-	if (Config.BaalAssistant.Leader) {
-		Leader = Config.BaalAssistant.Leader;
+	if (Leader) {
 		for (i = 0; i < 30; i += 1) {
 			if (Misc.inMyParty(Leader)) {
 				break;
@@ -408,7 +407,7 @@ function BaalAssistant() {
 
 						Pather.moveTo(15095, 5029);
 
-						if ((SoulQuit && getUnit(1, 691)) || (DollQuit && getUnit(1, 690))) {
+						if ((SoulQuit && getUnit(1, 641)) || (DollQuit && getUnit(1, 691))) {
 							print("Undead soul killers or Undead stygian dolls found, ending script.");
 							return true;
 						}
@@ -420,7 +419,6 @@ function BaalAssistant() {
 						} else {
 							Pather.moveTo(15117, 5045);
 						}
-						Precast.doPrecast(true);
 
 						secondAttempt = true;
 						safeCheck = true;
@@ -437,7 +435,6 @@ function BaalAssistant() {
 							} else {
 								Pather.moveTo(15117, 5045);
 							}
-							Precast.doPrecast(true);
 						}
 					}
 				} else {
@@ -484,7 +481,6 @@ function BaalAssistant() {
 						} else {
 							Pather.moveTo(15117, 5045);
 						}
-						Precast.doPrecast(true);
 
 						secondAttempt = true;
 						safeCheck = true;
@@ -501,7 +497,6 @@ function BaalAssistant() {
 							} else {
 								Pather.moveTo(15117, 5045);
 							}
-							Precast.doPrecast(true);
 						}
 					}
 				}
@@ -613,10 +608,9 @@ function BaalAssistant() {
 			if ((throneStatus || baalCheck) && KillBaal && me.area === 131) {
 				if (Helper) {
 					Pather.moveTo(15090, 5008);
-					delay(4000);
+					delay(2000);
 					Precast.doPrecast(true);
 				} else {
-					delay(2000);
 					Pather.moveTo(15090, 5010);
 					Precast.doPrecast(true);
 				}
