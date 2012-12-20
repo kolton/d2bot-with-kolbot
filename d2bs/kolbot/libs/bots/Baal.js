@@ -223,7 +223,7 @@ function Baal() {
 
 	Town.doChores();
 
-	if (Config.Baal.RandomPrecast) {
+	if (Config.RandomPrecast) {
 		Pather.useWaypoint("random");
 		Precast.doPrecast(true);
 	} else {
@@ -341,7 +341,7 @@ MainLoop:
 		}
 
 		Pather.moveTo(15090, 5008);
-		delay(7000);
+		delay(5000);
 		Precast.doPrecast(true);
 
 		while (getUnit(1, 543)) {
