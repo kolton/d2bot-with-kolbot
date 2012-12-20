@@ -1,15 +1,15 @@
 var Hooks = {
 	monsters: {
-		monsterHooks: [],
+		hooks: [],
 
 		check: function () {
 			var i, unit;
 
-			for (i = 0; i < this.monsterHooks.length; i += 1) {
-				if (!copyUnit(this.monsterHooks[i].unit).x) {
-					this.monsterHooks[i].hook[0].remove();
-					this.monsterHooks[i].hook[1].remove();
-					this.monsterHooks.splice(i, 1);
+			for (i = 0; i < this.hooks.length; i += 1) {
+				if (!copyUnit(this.hooks[i].unit).x) {
+					this.hooks[i].hook[0].remove();
+					this.hooks[i].hook[1].remove();
+					this.hooks.splice(i, 1);
 
 					i -= 1;
 				}
@@ -42,7 +42,7 @@ var Hooks = {
 		},
 
 		add: function (unit) {
-			this.monsterHooks.push({
+			this.hooks.push({
 				unit: copyUnit(unit),
 				hook: this.newHook(unit)
 			});
@@ -70,9 +70,9 @@ var Hooks = {
 		getHook: function (unit) {
 			var i;
 
-			for (i = 0; i < this.monsterHooks.length; i += 1) {
-				if (this.monsterHooks[i].unit.gid === unit.gid) {
-					return this.monsterHooks[i].hook;
+			for (i = 0; i < this.hooks.length; i += 1) {
+				if (this.hooks[i].unit.gid === unit.gid) {
+					return this.hooks[i].hook;
 				}
 			}
 
@@ -82,11 +82,11 @@ var Hooks = {
 		remove: function (unit) {
 			var i;
 
-			for (i = 0; i < this.monsterHooks.length; i += 1) {
-				if (this.monsterHooks[i].unit.gid === unit.gid) {
-					this.monsterHooks[i].hook[0].remove();
-					this.monsterHooks[i].hook[1].remove();
-					this.monsterHooks.splice(i, 1);
+			for (i = 0; i < this.hooks.length; i += 1) {
+				if (this.hooks[i].unit.gid === unit.gid) {
+					this.hooks[i].hook[0].remove();
+					this.hooks[i].hook[1].remove();
+					this.hooks.splice(i, 1);
 
 					return true;
 				}
@@ -97,7 +97,7 @@ var Hooks = {
 	},
 
 	text: {
-		textHooks: [],
+		hooks: [],
 
 		check: function () {
 			if (!this.getHook("ping")) {
@@ -120,21 +120,21 @@ var Hooks = {
 		add: function (name) {
 			switch (name) {
 			case "ping":
-				this.textHooks.push({
+				this.hooks.push({
 					name: "ping",
 					hook: new Text("Ping: " + me.ping, 785, 56 + 16 * (Number(!!me.diff) + Number(!!me.gamepassword) + Number(!!me.gametype) + Number(!!me.gamename)), 4, 1, 1)
 				});
 
 				break;
 			case "time":
-				this.textHooks.push({
+				this.hooks.push({
 					name: "time",
 					hook: new Text(this.timer(), 785, 72 + 16 * (Number(!!me.diff) + Number(!!me.gamepassword) + Number(!!me.gametype) + Number(!!me.gamename)), 4, 1, 1)
 				});
 
 				break;
 			case "ip":
-				this.textHooks.push({
+				this.hooks.push({
 					name: "ip",
 					hook: new Text("IP: " + (me.gameserverip.length > 0 ? me.gameserverip.split(".")[3] : "0"), 785, 88 + 16 * (Number(!!me.diff) + Number(!!me.gamepassword) + Number(!!me.gametype) + Number(!!me.gamename)), 4, 1, 1)
 				});
@@ -146,9 +146,9 @@ var Hooks = {
 		getHook: function (name) {
 			var i;
 
-			for (i = 0; i < this.textHooks.length; i += 1) {
-				if (this.textHooks[i].name === name) {
-					return this.textHooks[i];
+			for (i = 0; i < this.hooks.length; i += 1) {
+				if (this.hooks[i].name === name) {
+					return this.hooks[i];
 				}
 			}
 
@@ -178,14 +178,14 @@ var Hooks = {
 				return;
 			}
 
-			while (this.textHooks.length) {
-				this.textHooks.shift().hook.remove();
+			while (this.hooks.length) {
+				this.hooks.shift().hook.remove();
 			}
 		}
 	},
 
 	vector: {
-		vectorHooks: [],
+		hooks: [],
 		currArea: 0,
 
 		check: function () {
@@ -220,21 +220,21 @@ var Hooks = {
 		},
 
 		add: function (x, y, color) {
-			this.vectorHooks.push(new Line(me.x, me.y, x, y, color, true));
+			this.hooks.push(new Line(me.x, me.y, x, y, color, true));
 		},
 
 		update: function () {
 			var i;
 
-			for (i = 0; i < this.vectorHooks.length; i += 1) {
-				this.vectorHooks[i].x = me.x;
-				this.vectorHooks[i].y = me.y;
+			for (i = 0; i < this.hooks.length; i += 1) {
+				this.hooks[i].x = me.x;
+				this.hooks[i].y = me.y;
 			}
 		},
 
 		flush: function () {
-			while (this.vectorHooks.length) {
-				this.vectorHooks.shift().remove();
+			while (this.hooks.length) {
+				this.hooks.shift().remove();
 			}
 
 			this.currArea = 0;
@@ -259,27 +259,37 @@ var Hooks = {
 		},
 
 		getPOI: function () {
-			var unit;
+			var unit, name;
 
 			switch (me.area) {
 			case 4: // Stony Field
 				unit = getPresetUnit(me.area, 1, 737);
+				name = "Cairn Stones";
 
 				break;
 			case 5: // Dark Wood
 				unit = getPresetUnit(me.area, 2, 30);
+				name = "Tree";
 
 				break;
 			case 49: // Sewers 3
 				unit = getPresetUnit(me.area, 2, 355);
+				name = "Radament";
 
 				break;
 			case 60: // Halls of the Dead 3
 				unit = getPresetUnit(me.area, 2, 354);
+				name = "Cube";
 
 				break;
 			case 74: // Arcane Sanctuary
 				unit = getPresetUnit(me.area, 2, 357);
+				name = "Summoner";
+
+				break;
+			case 64: // Maggot Lair 3
+				unit = getPresetUnit(me.area, 1, 749);
+				name = "Fat Worm";
 
 				break;
 			case 66: // Tal Rasha's Tombs
@@ -290,10 +300,12 @@ var Hooks = {
 			case 71:
 			case 72:
 				unit = getPresetUnit(me.area, 2, 152);
+				name = "Orifice";
 
 				break;
 			case 78: // Flayer Jungle
 				unit = getPresetUnit(me.area, 2, 252);
+				name = "Gidbinn";
 
 				break;
 			case 102: // Durance of Hate 3
@@ -301,28 +313,34 @@ var Hooks = {
 					x: 17588,
 					y: 8069
 				};
+				name = "Mephisto";
 
 				break;
 			case 105: // Plains of Despair
 				unit = getPresetUnit(me.area, 1, 256);
+				name = "Izual";
 
 				break;
 			case 107: // River of Flame
 				unit = getPresetUnit(me.area, 2, 376);
+				name = "Hephasto";
 
 				break;
 			case 108: // Chaos Sanctuary
 				unit = getPresetUnit(me.area, 2, 255);
+				name = "Star";
 
 				break;
 			case 111: // Frigid Highlands
 			case 112: // Arreat Plateau
 			case 117: // Frozen Tundra
 				unit = getPresetUnit(me.area, 2, 60);
+				name = "Hell Entrance";
 
 				break;
 			case 124: // Halls of Vaught
 				unit = getPresetUnit(me.area, 2, 462);
+				name = "Nihlathak";
 
 				break;
 			}
@@ -331,13 +349,15 @@ var Hooks = {
 				if (unit instanceof PresetUnit) {
 					return {
 						x: unit.roomx * 5 + unit.x,
-						y: unit.roomy * 5 + unit.y
+						y: unit.roomy * 5 + unit.y,
+						name: name
 					};
 				}
 
 				return {
 					x: unit.x,
-					y: unit.y
+					y: unit.y,
+					name: name
 				};
 			}
 
@@ -345,52 +365,162 @@ var Hooks = {
 		}
 	},
 
+	tele: {
+		hooks: [],
+		action: null,
+		currArea: 0,
+		prevAreas: [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+					36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46,
+					46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102,
+					103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129,
+					130, 131, 109, 109, 109, 109],
+
+		event: function (keycode) {
+			Hooks.tele.action = keycode;
+		},
+
+		check: function () {
+			if (this.action) {
+				var hook;
+
+				switch (this.action) {
+				case 96: // Numpad 0
+					hook = this.getHook("Next Area");
+
+					break;
+				case 97: // Numpad 1
+					hook = this.getHook("Previous Area");
+
+					break;
+				case 98: // Numpad 2
+					hook = this.getHook("Waypoint");
+
+					break;
+				case 99: // Numpad 3
+					hook = this.getHook("POI");
+
+					break;
+				}
+
+				if (hook) {
+					scriptBroadcast(typeof hook.destination === "number" ? hook.destination.toString() : hook.destination.x + "," + hook.destination.y);
+				}
+
+				this.action = null;
+			}
+
+			if (me.area !== this.currArea) {
+				this.flush();
+				this.add(me.area);
+				addEventListener("keyup", this.event);
+
+				this.currArea = me.area;
+			}
+		},
+
+		add: function (area) {
+			var i, exits, wp, poi;
+
+			poi = Hooks.vector.getPOI();
+
+			if (poi) {
+				this.hooks.push({
+					name: "POI",
+					destination: {x: poi.x, y: poi.y},
+					hook: new Text("Num 3: " + poi.name, 150, 525 - (this.hooks.length * 10))
+				});
+			}
+
+			wp = Hooks.vector.getWP();
+
+			if (wp) {
+				this.hooks.push({
+					name: "Waypoint",
+					destination: {x: wp.x, y: wp.y},
+					hook: new Text("Num 2: WP", 150, 525 - (this.hooks.length * 10))
+				});
+			}
+
+			exits = getArea(area).exits;
+
+			if (exits) {
+				for (i = 0; i < exits.length; i += 1) {
+					if (exits[i].target === this.prevAreas[me.area]) {
+						this.hooks.push({
+							name: "Previous Area",
+							destination: this.prevAreas[me.area],
+							hook: new Text("Num 1: " + getArea(this.prevAreas[me.area]).name, 150, 525 - (this.hooks.length * 10))
+						});
+					}
+
+					if (exits[i].target === this.prevAreas.indexOf(me.area)) {
+						this.hooks.push({
+							name: "Next Area",
+							destination: this.prevAreas.indexOf(me.area),
+							hook: new Text("Num 0: " + getArea(this.prevAreas.indexOf(me.area)).name, 150, 525 - (this.hooks.length * 10))
+						});
+					}
+				}
+			}
+		},
+
+		getHook: function (name) {
+			var i;
+
+			for (i = 0; i < this.hooks.length; i += 1) {
+				if (this.hooks[i].name === name) {
+					return this.hooks[i];
+				}
+			}
+
+			return false;
+		},
+
+		flush: function () {
+			while (this.hooks.length) {
+				this.hooks.shift().hook.remove();
+			}
+
+			removeEventListener("keyup", this.event);
+
+			this.currArea = 0;
+		}
+	},
+
 	update: function () {
+		while (!me.gameReady) {
+			delay(100);
+		}
+
 		this.monsters.check();
 		this.text.check();
 		this.vector.check();
+		this.tele.check();
 	},
 
 	flush: function () {
-		while (this.monsters.monsterHooks.length) {
-			this.monsters.monsterHooks[0].hook[0].remove();
-			this.monsters.monsterHooks[0].hook[1].remove();
-			this.monsters.monsterHooks.shift();
+		while (this.monsters.hooks.length) {
+			this.monsters.hooks[0].hook[0].remove();
+			this.monsters.hooks[0].hook[1].remove();
+			this.monsters.hooks.shift();
 		}
 
 		this.text.flush();
 		this.vector.flush();
+		this.tele.flush();
 
 		return true;
 	}
 };
 
 function main() {
-	print("ÿc9Map Thread Loaded");
 	include("common/attack.js");
-
-	var revealedAreas = [];
-
-	this.revealArea = function (area) {
-		var room = getRoom(area);
-
-		delay(200);
-
-		do {
-			if (room instanceof Room && room.area === area) {
-				room.reveal();
-			}
-		} while (room.getNext());
-	};
+	load("tools/maphelper.js");
+	print("ÿc9Map Thread Loaded");
 
 	while (true) {
 		while (!me.area || !me.gameReady) {
 			delay(100);
-		}
-
-		if (revealedAreas.indexOf(me.area) === -1) {
-			this.revealArea(me.area);
-			revealedAreas.push(me.area);
 		}
 
 		if (getUIFlag(0x0A)) {

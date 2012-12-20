@@ -312,7 +312,7 @@ function main() {
 			this.revealArea(me.area);
 
 			break;
-		case 96: // Numpad 0
+		case 107: // Numpad +
 			showConsole();
 			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39)
 				+ " ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
