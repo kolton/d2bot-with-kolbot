@@ -5,29 +5,89 @@
 */
 
 var TorchSystem = {
+	FarmerProfiles: {
 // ############################ S E T U P ##########################################
 
-	// Put uber killer profile names here. Example - FarmerProfiles: ["Uber Killer 1", "Uber Killer 2"],
-	FarmerProfiles: [""],
+		/* Each uber killer profile can have their own army of key finders
+			Multiple entries are separated with a comma
+			Example config:
 
-	// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
-	KeyFinderProfiles: [""],
+			// Farmer profile name
+			"Farmer 1": {
+				// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
+				KeyFinderProfiles: ["mf 1", "mf 2"],
 
-	// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGames: ["Ubers-", "Torchrun"],
-	FarmGames: [""],
+				// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
+				FarmGame: "torch1-"
+			},
+
+			// Farmer profile name
+			"Farmer 2": {
+				// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
+				KeyFinderProfiles: ["mf 3", "mf 4"],
+
+				// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
+				FarmGame: "torch2-"
+			}
+		*/
+
+		// Edit here!
+		"Farmer 1": {
+			// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
+			KeyFinderProfiles: [""],
+
+			// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
+			FarmGame: ""
+		}
 
 // #################################################################################
+	},
 
 	// Don't touch
+	getFarmers: function () {
+		var i, j,
+			list = [];
+
+		for (i in this.FarmerProfiles) {
+			if (this.FarmerProfiles.hasOwnProperty(i)) {
+				for (j = 0; j < this.FarmerProfiles[i].KeyFinderProfiles.length; j += 1) {
+					if (this.FarmerProfiles[i].KeyFinderProfiles[j].toLowerCase() === me.profile.toLowerCase()) {
+						this.FarmerProfiles[i].profile = i;
+
+						list.push(this.FarmerProfiles[i]);
+					}
+				}
+			}
+		}
+
+		if (list.length) {
+			return list;
+		}
+
+		return false;
+	},
+
+	isFarmer: function () {
+		if (this.FarmerProfiles.hasOwnProperty(me.profile)) {
+			this.FarmerProfiles[me.profile].profile = me.profile;
+
+			return this.FarmerProfiles[me.profile];
+		}
+
+		return false;
+	},
+
 	inGameCheck: function () {
-		if (this.KeyFinderProfiles.indexOf(me.profile) === -1) {
+		var i, items, farmers;
+
+		farmers = this.getFarmers();
+
+		if (!farmers) {
 			return false;
 		}
 
-		var i, items;
-
-		for (i = 0; i < this.FarmGames.length; i += 1) {
-			if (this.FarmGames[i].length > 0 && me.gamename.toLowerCase().match(this.FarmGames[i].toLowerCase())) {
+		for (i = 0; i < farmers.length; i += 1) {
+			if (farmers[i].FarmGame.length > 0 && me.gamename.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
 				print("ÿc4Torch Systemÿc0: In Farm game.");
 				Town.goToTown(1);
 				Town.openStash();
@@ -54,13 +114,11 @@ var TorchSystem = {
 	},
 
 	keyCheck: function () {
-		if (this.KeyFinderProfiles.indexOf(me.profile) === -1) {
+		if (!this.getFarmers()) {
 			return false;
 		}
 
 		if (me.getItem("pk1") && me.getItem("pk2") && me.getItem("pk3")) {
-			//D2Bot.printToConsole("We have enough keys.");
-
 			return true;
 		}
 
@@ -68,29 +126,32 @@ var TorchSystem = {
 	},
 
 	outOfGameCheck: function () {
-		//D2Bot.printToConsole("Trying to get in touch with Torch Farmers.");
-
-		var i, game;
+		var i, game, farmers;
 
 		function CheckEvent(mode, msg) {
-			var i;
+			var i,
+				farmers = TorchSystem.getFarmers();
 
-			for (i = 0; i < TorchSystem.FarmGames.length; i += 1) {
-				if (msg.toLowerCase().match(TorchSystem.FarmGames[i].toLowerCase())) {
+			for (i = 0; i < farmers.length; i += 1) {
+				if (msg.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
 					game = msg.split('/');
-
-					break;
 				}
 			}
 
 			return true;
 		}
 
+		farmers = this.getFarmers();
+
+		if (!farmers) {
+			return false;
+		}
+
 		addEventListener('copydata', CheckEvent);
 
-		for (i = 0; i < this.FarmerProfiles.length; i += 1) {
-			sendCopyData(null, this.FarmerProfiles[i], 0, me.profile);
-			delay(300);
+		for (i = 0; i < farmers.length; i += 1) {
+			sendCopyData(null, farmers[i].profile, 0, me.profile);
+			delay(500);
 
 			if (game) {
 				break;
@@ -102,7 +163,13 @@ var TorchSystem = {
 		if (game) {
 			D2Bot.printToConsole("Joining key drop game." + ";7");
 			delay(2000);
+
+			me.blockMouse = true;
+
 			joinGame(game[0], game[1]);
+
+			me.blockMouse = false;
+
 			delay(5000);
 
 			return true;
