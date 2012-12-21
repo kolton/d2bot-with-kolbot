@@ -25,7 +25,7 @@ function OrgTorch() {
 		if (item) {
 			do {
 				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
-					if (TorchSystem.FarmerProfiles.indexOf(me.profile) > -1) {
+					if (!!AutoMule.getMule(1)) {
 						//D2Bot.printToConsole("torch found");
 						scriptBroadcast("muleTorch");
 
@@ -247,15 +247,17 @@ function OrgTorch() {
 	};
 
 	// Start
-	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer;
+	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer;
 
 	this.checkTorch(); // does town chores too
 
 	if (Config.OrgTorch.WaitForKeys) {
 		timer = getTickCount();
-
+		farmer = TorchSystem.isFarmer();
 		this.torchSystemEvent = function (mode, msg) {
-			if (mode === 0 && TorchSystem.KeyFinderProfiles.indexOf(msg) > -1) {
+			var farmer = TorchSystem.isFarmer();
+
+			if (farmer && mode === 0 && farmer.KeyFinderProfiles.indexOf(msg) > -1) {
 				print("Got game request from: " + msg);
 				sendCopyData(null, msg, 0, me.gamename + "/" + me.gamepassword);
 			}
@@ -266,6 +268,10 @@ function OrgTorch() {
 		Town.move("stash");
 
 		while (true) {
+			if (!farmer) {
+				break;
+			}
+
 			if (Town.needStash()) {
 				Town.stash();
 			}
