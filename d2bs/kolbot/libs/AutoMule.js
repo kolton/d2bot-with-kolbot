@@ -71,12 +71,15 @@ var AutoMule = {
 	// Get the item dropper for current Mule. Returns [profilename, mulemode]
 	getMaster: function (profile) {
 		var i, j, k,
-			mule = this.Mules;
+			mule = this.Mules,
+			farmers = TorchSystem.getFarmers();
 
-		for (i = 0; i < TorchSystem.FarmerProfiles.length; i += 1) {
-			// Make a difference between normal mule and torch mule request coming from torch profile
-			if (profile.toLowerCase().indexOf("|torch") > -1 && profile.split("|torch")[0].toLowerCase() === TorchSystem.FarmerProfiles[i].toLowerCase()) {
-				return [TorchSystem.FarmerProfiles[i], 1];
+		if (farmers) {
+			for (i = 0; i < farmers.length; i += 1) {
+				// Make a difference between normal mule and torch mule request coming from torch profile
+				if (profile.toLowerCase().indexOf("|torch") > -1 && profile.split("|torch")[0].toLowerCase() === farmers[i].profile.toLowerCase()) {
+					return [farmers[i].profile, 1];
+				}
 			}
 		}
 
@@ -343,7 +346,7 @@ MainLoop:
 			for (i = 0; i < items.length; i += 1) {
 				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
 						[76, 77, 78].indexOf(items[i].itemType) === -1 && // don't drop potions
-						((TorchSystem.FarmerProfiles.indexOf(me.profile) === -1 && TorchSystem.KeyFinderProfiles.indexOf(me.profile) === -1) || [647, 648, 649].indexOf(items[i].classid) === -1) &&
+						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(items[i].classid) === -1) &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
@@ -366,7 +369,7 @@ MainLoop:
 			for (i = 0; i < items.length; i += 1) {
 				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
 						[76, 77, 78].indexOf(items[i].itemType) === -1 && // don't drop potions
-						((TorchSystem.FarmerProfiles.indexOf(me.profile) === -1 && TorchSystem.KeyFinderProfiles.indexOf(me.profile) === -1) || [647, 648, 649].indexOf(items[i].classid) === -1) &&
+						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(items[i].classid) === -1) &&
 						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
 					items[i].drop();
 				}
