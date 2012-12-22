@@ -61,6 +61,12 @@ function NTIPOpenFile(filepath)
 	return true;
 }
 
+function NTIPClear()
+{
+   _NTIP_CheckList = [];
+   stringArray = [];
+}
+
 function NTIPCheckItem(item, entryList, verbose) {
 	var i, list, identified, num,
 		result = 0;

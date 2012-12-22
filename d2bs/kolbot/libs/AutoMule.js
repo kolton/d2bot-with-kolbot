@@ -70,26 +70,17 @@ var AutoMule = {
 
 	// Get the item dropper for current Mule. Returns [profilename, mulemode]
 	getMaster: function (profile) {
-		var i, j, k,
-			mule = this.Mules,
-			farmers = TorchSystem.getFarmers();
+		var i, j, k, muleObj;
 
-		if (farmers) {
-			for (i = 0; i < farmers.length; i += 1) {
-				// Make a difference between normal mule and torch mule request coming from torch profile
-				if (profile.toLowerCase().indexOf("|torch") > -1 && profile.split("|torch")[0].toLowerCase() === farmers[i].profile.toLowerCase()) {
-					return [farmers[i].profile, 1];
-				}
-			}
-		}
+		muleObj = profile.toLowerCase().indexOf("|torch") > -1 ? this.TorchMules : this.Mules;
 
-		for (i in mule) {
-			if (mule.hasOwnProperty(i)) {
-				for (j in mule[i]) {
-					if (mule[i].hasOwnProperty(j) && j === "enabledProfiles") {
-						for (k = 0; k < mule[i][j].length; k += 1) {
-							if (mule[i][j][k].toLowerCase() === profile.toLowerCase()) {
-								return [mule[i][j][k], 0];
+		for (i in muleObj) {
+			if (muleObj.hasOwnProperty(i)) {
+				for (j in muleObj[i]) {
+					if (muleObj[i].hasOwnProperty(j) && j === "enabledProfiles") {
+						for (k = 0; k < muleObj[i][j].length; k += 1) {
+							if (muleObj[i][j][k].toLowerCase() === profile.split("|torch")[0].toLowerCase()) {
+								return [muleObj[i][j][k], profile.toLowerCase().indexOf("|torch") > -1 ? 1 : 0];
 							}
 						}
 					}
