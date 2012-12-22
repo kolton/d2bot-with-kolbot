@@ -12,8 +12,7 @@ var TorchSystem = {
 			Multiple entries are separated with a comma
 			Example config:
 
-			// Farmer profile name
-			"Farmer 1": {
+			"Farmer 1": { // Farmer profile name
 				// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
 				KeyFinderProfiles: ["mf 1", "mf 2"],
 
@@ -21,8 +20,7 @@ var TorchSystem = {
 				FarmGame: "torch1-"
 			},
 
-			// Farmer profile name
-			"Farmer 2": {
+			"Farmer 2": { // Farmer profile name
 				// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
 				KeyFinderProfiles: ["mf 3", "mf 4"],
 
@@ -32,7 +30,8 @@ var TorchSystem = {
 		*/
 
 		// Edit here!
-		"Farmer 1": {
+
+		"Farmer 1": { // Farmer profile name
 			// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
 			KeyFinderProfiles: [""],
 
