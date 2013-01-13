@@ -256,7 +256,7 @@ function LoadConfig() {
 	Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
 	// General config
-	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
+	Config.PublicMode = 0; // 1 = invite, 2 = accept, 3 = invite & accept, 0 = disable
 	Config.LastMessage = ""; // Message to say at the end of the run.
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will stay in game if the run is completed before.
