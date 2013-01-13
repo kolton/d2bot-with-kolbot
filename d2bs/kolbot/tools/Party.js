@@ -15,7 +15,7 @@ function main() {
 	var myPartyId, player, otherParty, shitList,
 		partyTick = getTickCount();
 
-	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode > 1 ? "Accept" : "Invite"));
+	print("ï¿½c2Party thread loaded. Mode: " + (Config.PublicMode > 1 ? "Accept" : "Invite"));
 
 	if (Config.ShitList) {
 		shitList = ShitList.read();
@@ -63,6 +63,20 @@ function main() {
 					}
 
 					if (player.partyflag === 2 && (!otherParty || player.partyid === otherParty) && (getTickCount() - partyTick >= 2000)) {
+						clickParty(player, 2);
+						delay(100);
+					}
+
+					break;
+				case 3:
+					if (player.partyid !== 65535 && player.partyid !== myPartyId) {
+						otherParty = player.partyid;
+					}
+
+					if (player.partyflag === 2 && (!otherParty || player.partyid === otherParty) && (getTickCount() - partyTick >= 2000)) {
+						clickParty(player, 2);
+						delay(100);
+					} else if (player.partyflag !== 4 && player.partyid === 65535) {
 						clickParty(player, 2);
 						delay(100);
 					}
