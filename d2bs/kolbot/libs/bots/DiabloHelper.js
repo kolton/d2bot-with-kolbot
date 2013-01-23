@@ -5,13 +5,36 @@
 */
 
 function DiabloHelper() {
-	// sort functions
-	this.entranceSort = function (a, b) {
-		return getDistance(a.x, a.y, 7790, 5544) - getDistance(b.x, b.y, 7790, 5544);
-	};
+	// Sort function
+	this.sort = function (a, b) {
+		// Entrance to Star / De Seis
+		if (me.y > 5325 || me.y < 5260) {
+			if (a.y > b.y) {
+				return -1;
+			}
 
-	this.starSort = function (a, b) {
-		return getDistance(a.x, a.y, 7774, 5305) - getDistance(b.x, b.y, 7774, 5305);
+			return 1;
+		}
+
+		// Vizier
+		if (me.x < 7765) {
+			if (a.x > b.x) {
+				return -1;
+			}
+
+			return 1;
+		}
+
+		// Infector
+		if (me.x > 7825) {
+			if (!checkCollision(me, a, 0x1) && a.x < b.x) {
+				return -1;
+			}
+
+			return 1;
+		}
+
+		return getDistance(me, a) - getDistance(me, b);
 	};
 
 	// general functions
@@ -54,7 +77,7 @@ function DiabloHelper() {
 			boss = getUnit(1, name);
 
 			if (boss) {
-				return Attack.clear(40, 0, name);
+				return Attack.clear(40, 0, name, this.sort);
 			}
 
 			delay(250);
@@ -64,7 +87,7 @@ function DiabloHelper() {
 	};
 
 	this.vizierSeal = function () {
-		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.starSort);
+		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.sort);
 
 		if (this.vizLayout === 1) {
 			Pather.moveTo(7691, 5292);
@@ -80,7 +103,7 @@ function DiabloHelper() {
 	};
 
 	this.seisSeal = function () {
-		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.starSort);
+		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.sort);
 
 		if (this.seisLayout === 1) {
 			Pather.moveTo(7771, 5196);
@@ -96,7 +119,7 @@ function DiabloHelper() {
 	};
 
 	this.infectorSeal = function () {
-		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
+		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.sort);
 
 		if (this.infLayout === 1) {
 			delay(1);
@@ -237,12 +260,12 @@ function DiabloHelper() {
 		return false;
 	};
 
-	this.followPath = function (path, sortfunc) {
+	this.followPath = function (path) {
 		var i;
 
 		for (i = 0; i < path.length; i += 2) {
 			Pather.moveTo(path[i], path[i + 1]);
-			Attack.clear(30, 0, false, sortfunc);
+			Attack.clear(30, 0, false, this.sort);
 		}
 	};
 
@@ -293,15 +316,15 @@ function DiabloHelper() {
 	this.initLayout();
 
 	if (Config.DiabloHelper.Entrance) {
-		Attack.clear(35, 0, false, this.entranceSort);
-		this.followPath(this.entranceToStar, this.entranceSort);
+		Attack.clear(35, 0, false, this.sort);
+		this.followPath(this.entranceToStar);
 	} else {
 		Pather.moveTo(7774, 5305);
-		Attack.clear(35, 0, false, this.starSort);
+		Attack.clear(35, 0, false, this.sort);
 	}
 
 	Pather.moveTo(7774, 5305);
-	Attack.clear(35, 0, false, this.starSort);
+	Attack.clear(35, 0, false, this.sort);
 	this.vizierSeal();
 	this.seisSeal();
 	Precast.doPrecast(true);

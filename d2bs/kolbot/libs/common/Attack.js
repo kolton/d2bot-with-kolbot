@@ -271,8 +271,7 @@ var Attack = {
 			if (typeof target.x !== "undefined" &&
 					((Math.abs(orgx - target.x) <= range && Math.abs(orgy - target.y) <= range) ||
 					(this.getScarinessLevel(target) > 7 && Math.abs(me.x - target.x) <= range && Math.abs(me.y - target.y) <= range)) &&
-					(!spectype || (target.spectype & spectype)) &&
-					this.checkMonster(target) &&
+					(!spectype || (target.spectype & spectype)) && this.checkMonster(target) &&
 					(me.getSkill(54, 1) || !checkCollision(me, target, 0x1))
 					) {
 				if (Config.Dodge) {
@@ -368,20 +367,38 @@ var Attack = {
 	},
 
 	// Clear an already formed array of monstas
-	clearList: function (list, sortfunc) {
-		var i, target, result,
+	clearList: function (mainArg, sortFunc) {
+		var i, target, result, monsterList,
 			dodgeList = [],
 			gidAttack = [],
-			attackCount = 0,
-			monsterList = list.slice(0);
+			attackCount = 0;
 
-		if (!sortfunc) {
-			sortfunc = this.sortMonsters;
+		switch (typeof mainArg) {
+		case "function":
+			monsterList = mainArg.call();
+
+			break;
+		case "object":
+			monsterList = mainArg.slice(0);
+
+			break;
+		default:
+			throw new Error("clearList: Invalid argument");
+		}
+
+		if (!sortFunc) {
+			sortFunc = this.sortMonsters;
 		}
 
 		while (monsterList.length > 0) {
+			delay(5);
+
+			if (me.dead) {
+				return false;
+			}
+
 			monsterList.sort(Sort.units);
-			monsterList.sort(sortfunc);
+			monsterList.sort(sortFunc);
 
 			target = copyUnit(monsterList[0]);
 

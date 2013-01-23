@@ -76,7 +76,7 @@ function OrgTorch() {
 	};
 
 	this.checkUneven = function () {
-		return (me.getItem("mbr") && me.getItem("bey") && me.getItem("dhn"));
+		return Config.MakeTorch && me.getItem("mbr") && me.getItem("bey") && me.getItem("dhn");
 	};
 
 	this.getFade = function () {

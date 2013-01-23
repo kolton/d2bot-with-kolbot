@@ -1,24 +1,61 @@
 // Blank starter used for testin
-
-const D2BOT_JOIN = 1;
-const D2BOT_GAMEINFO = 2;
-const D2BOT_REQUESTGAME = 3;
-
-var isUp = "no";
-
 function main() {
 	include("json2.js");
 	include("OOG.js");
 	include("common/misc.js");
+
+	var handle, c,
+		isUp = "no";
+
+	this.copyDataEvent = function (mode, msg) {
+		switch (msg) {
+		case "Handle":
+			handle = mode;
+
+			break;
+		}
+
+		switch (mode) {
+		case 3: // request game
+			D2Bot.joinMe(msg, me.gamename || "", "", me.gamepassword || "", isUp);
+
+			break;
+		}
+	};
+
+	this.keyDownEvent = function (key) {
+		if (key === 45) {
+			c = true;
+		}
+	};
+
+	this.test = function () {
+
+	};
+
+	addEventListener("keydown", this.keyDownEvent);
+	addEventListener('copydata', this.copyDataEvent);
+
+	while (!handle) {
+		delay(100);
+	}
+
+	DataFile.updateStats("handle", handle);
+	delay(500);
+	D2Bot.init();
 	load("tools/heartbeat.js");
-	
-	addEventListener('copydata', RecieveCopyData);
 
 	if (!FileTools.exists("data/" + me.profile + ".json")) {
 		DataFile.create();
 	}
-	
+
 	while (true) {
+		if (c) {
+			this.test();
+
+			c = false;
+		}
+
 		if (me.ingame) {
 			if (isUp === "no") {
 				isUp = "yes";
@@ -26,22 +63,7 @@ function main() {
 		} else {
 			isUp = "no";
 		}
-		
-		delay(1000);
-	}
-}
 
-function RecieveCopyData(msgID, msg){
-	switch(msgID) {
-	case D2BOT_GAMEINFO:
-		print("Recieved Game Info"); 
-		[gameName, gamePass, difficulty] = msg.split('/');
-		break;
-	case D2BOT_JOIN:
-		[nextGame, gamePass, isUp] = msg.split('/');
-		break;
-	case D2BOT_REQUESTGAME:
-		D2Bot.joinMe(msg, me.gamename, "", me.gamepassword, isUp); 
-		break;
+		delay(200);
 	}
 }

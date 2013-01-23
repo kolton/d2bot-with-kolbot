@@ -114,14 +114,16 @@ ScriptLoop:
 					if (townCheck) {
 						try {
 							print("ÿc2Starting script: ÿc9" + i);
+
 							if (reconfiguration) {
 								print("ÿc2Copying Config properties from " + i + " object.");
 								this.copy(Scripts[i], Config);
 							}
+
 							global[i]();
 						} catch (e) {
 							if (this.printToOOG) {
-								D2Bot.printToConsole(e.message + " in " + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line " + e.lineNumber + ". Ping:" + me.ping + ";9");
+								D2Bot.printToConsole(e.message + " in " + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line " + e.lineNumber + ". Ping:" + me.ping, 9);
 							}
 
 							Misc.errorReport("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + "): ÿc1" + e.message);

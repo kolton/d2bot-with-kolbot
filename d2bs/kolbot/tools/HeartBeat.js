@@ -5,8 +5,13 @@
 */
 
 function main() {
+	include("oog.js");
+	include("json2.js");
+	include("common/misc.js");
+	D2Bot.init();
+
 	while (true) {
-		sendCopyData(null, "D2Bot #", 0, "heartBeat");
+		D2Bot.heartBeat();
 
 		delay(1000);
 	}

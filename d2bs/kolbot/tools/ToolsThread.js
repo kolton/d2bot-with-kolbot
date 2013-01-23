@@ -23,6 +23,7 @@ function main() {
 	include("common/Town.js");
 	include("common/Misc.js");
 	print("ÿc3Start ToolsThread script");
+	D2Bot.init();
 	Config.init();
 
 	for (i = 0; i < 5; i += 1) {
@@ -72,7 +73,7 @@ function main() {
 
 					if (getTickCount() - pingTimer[i] >= configCache.PingQuit[i].Duration * 1000) {
 						if (print) {
-							D2Bot.printToConsole("High ping (" + me.ping + "/" + configCache.PingQuit[i].Ping + ") - leaving game.;9");
+							D2Bot.printToConsole("High ping (" + me.ping + "/" + configCache.PingQuit[i].Ping + ") - leaving game.", 9);
 						}
 
 						scriptBroadcast("pingquit");
@@ -86,21 +87,6 @@ function main() {
 		}
 
 		return false;
-	};
-
-	this.quitPrep = function () {
-		var i,	script,
-			scripts = ["default.dbj", "tools/townchicken.js", "tools/antihostile.js", "tools/party.js", "tools/flashthread.js", "tools/rushthread.js"];
-
-		for (i = 0; i < scripts.length; i += 1) {
-			script = getScript(scripts[i]);
-
-			if (script && script.running) {
-				script.stop();
-			}
-		}
-
-		return true;
 	};
 
 	this.getPotion = function (pottype, type) {
@@ -321,7 +307,6 @@ function main() {
 		case 101: // numpad 5
 			if (!!AutoMule.getMule()) {
 				print("ÿc2Mule triggered");
-				this.quitPrep();
 				scriptBroadcast("mule");
 				quit();
 			}
@@ -384,14 +369,14 @@ function main() {
 			break;
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
 			if (configCache.SoJWaitTime) {
-				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3] + ";7");
+				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3], 7);
 				scriptBroadcast("soj");
 			}
 
 			break;
 		case 0x12: // "Diablo Walks the Earth"
 			if (configCache.StopOnDClone) {
-				D2Bot.printToConsole("Diablo Walks the Earth;7");
+				D2Bot.printToConsole("Diablo Walks the Earth", 7);
 				this.togglePause();
 				Town.goToTown();
 				showConsole();
@@ -404,20 +389,10 @@ function main() {
 		}
 	};
 
-	this.scriptEvent = function (msg) {
-		switch (msg) {
-		case "quit":
-			quitFlag = true;
-
-			break;
-		}
-	};
-
 	// Cache variables to prevent a bug where d2bs loses the reference to Config object
 	configCache = this.cacheConfig(Config);
 	tick = getTickCount();
 
-	addEventListener("scriptmsg", this.scriptEvent);
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
 
@@ -446,7 +421,7 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + area.name + ". Ping: " + me.ping + ";9");
+					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + area.name + ". Ping: " + me.ping, 9);
 					D2Bot.updateChickens();
 					quit();
 
@@ -468,7 +443,7 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + area.name + ";9");
+					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + area.name, 9);
 					D2Bot.updateChickens();
 					quit();
 
@@ -488,7 +463,7 @@ function main() {
 								area = {name: "unknown"};
 							}
 
-							D2Bot.printToConsole("Irom Golem Chicken in " + area.name + ";9");
+							D2Bot.printToConsole("Irom Golem Chicken in " + area.name, 9);
 							D2Bot.updateChickens();
 							quit();
 
@@ -508,7 +483,7 @@ function main() {
 								area = {name: "unknown"};
 							}
 
-							D2Bot.printToConsole("Merc Chicken in " + area.name + ";9");
+							D2Bot.printToConsole("Merc Chicken in " + area.name, 9);
 							D2Bot.updateChickens();
 							quit();
 
@@ -538,7 +513,7 @@ function main() {
 				}
 			}
 		} catch (e) {
-			D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");
+			D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name, 9);
 			quit();
 
 			return;
@@ -552,7 +527,6 @@ function main() {
 			}
 
 			this.checkPing(false); // In case of quitlist triggering first
-			this.quitPrep();
 			quit();
 
 			break;

@@ -36,37 +36,42 @@ include("automule.js");
 include("gambling.js");
 include("torchsystem.js");
 include("common/misc.js");
-load("tools/heartbeat.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger, pingQuit,
-	loginFail = 0,
-	gamePass = "",
-	gameName = "",
-	nextGame = "",
-	lastGameStatus = "ready",
+var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone,
+	firstLogin, connectFail, torchTrigger, torchMuleTrigger, pingQuit,
 	gameCount = DataFile.getStats().runs + 1,
+	lastGameStatus = "ready",
+	loginFail = 0,
 	isUp = "no";
 
-function ReceiveCopyData(msgID, msg) {
-	switch (msgID) {
-	case 2: // game info
+function ReceiveCopyData(mode, msg) {
+	//print(mode + " " + msg);
+	var obj;
+
+	switch (msg) {
+	case "Handle":
+		handle = mode;
+
+		break;
+	}
+
+	switch (mode) {
+	case 2: // Game info
 		print("Recieved Game Info");
 
-		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
-		keyswap = parseInt(keyswap, 10);
-		rdblocker = parseInt(rdblocker, 10);
+		gameInfo = JSON.parse(msg);
 
 		break;
-	case 1: // join
-		[nextGame, gamePass, isUp] = msg.split('/');
+	case 3: // Game request
+		if (gameInfo) {
+			obj = JSON.parse(msg);
 
-		break;
-	case 3: // request game
-		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
+			D2Bot.joinMe(obj.profile, gameInfo.gameName, gameCount, gameInfo.gamePass, isUp);
+		}
 
 		break;
 	}
@@ -170,10 +175,26 @@ function randomString(len) {
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
-	delay(rand(1, 2) * 1000);
-	D2Bot.requestGameInfo();
 
-	if (error === "@error") {
+	var t = getTickCount();
+
+	while (!handle) {
+		delay(100);
+	}
+
+	DataFile.updateStats("handle", handle);
+	delay(500);
+	D2Bot.init();
+	load("tools/heartbeat.js");
+
+	while (!gameInfo) {
+		D2Bot.requestGameInfo();
+		delay(500);
+	}
+	
+	print(getTickCount() - t);
+
+	if (gameInfo.error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
@@ -185,11 +206,6 @@ function main() {
 
 				if (!ingame) {
 					gameStart = getTickCount();
-
-					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
-						print("leaving game");
-						quit();
-					}
 
 					print("Updating Status");
 					//D2Bot.updateStatus("Game: " + me.gamename);
@@ -243,7 +259,7 @@ MainSwitch:
 		//muleTrigger = true;
 		//torchMuleTrigger = true;
 
-		if (ingame || error === "@error") {
+		if (ingame || gameInfo.error === "@error") {
 			if (!gameStart) {
 				gameStart = DataFile.getStats().ingameTick;
 			}
@@ -328,7 +344,7 @@ MainSwitch:
 	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby Chat");
 
-		if (ingame || error === "@error") {
+		if (ingame || gameInfo.error === "@error") {
 			if (!gameStart) {
 				gameStart = DataFile.getStats().ingameTick;
 			}
@@ -438,7 +454,7 @@ MainSwitch:
 
 		if (ChannelConfig[me.profile].AnnounceGames) {
 			delay(1000);
-			say("Next game is " + gameName + gameCount + (gamePass === "" ? "" : "//" + gamePass));
+			say("Next game is " + gameInfo.gameName + gameCount + (gameInfo.gamePass === "" ? "" : "//" + gameInfo.gamePass));
 		}
 
 		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
@@ -471,7 +487,7 @@ MainSwitch:
 			ControlAction.click(6, 431, 341, 15, 16);
 		}
 
-		while (!gameName) {
+		while (!gameInfo.gameName) {
 			D2Bot.requestGameInfo();
 			delay(500);
 		}
@@ -486,10 +502,10 @@ MainSwitch:
 
 		me.blockMouse = true;
 
-		ControlAction.setText(1, 432, 162, 158, 20, gameName + gameCount);
-		ControlAction.setText(1, 432, 217, 158, 20, gamePass);
+		ControlAction.setText(1, 432, 162, 158, 20, gameInfo.gameName + gameCount);
+		ControlAction.setText(1, 432, 217, 158, 20, gameInfo.gamePass);
 
-		switch (difficulty) {
+		switch (gameInfo.difficulty) {
 		case "Normal":
 			ControlAction.click(6, 430, 381, 16, 16);
 
@@ -508,7 +524,7 @@ MainSwitch:
 			timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
 		}
 
-		print("Creating Game: " + gameName + gameCount);
+		print("Creating Game: " + gameInfo.gameName + gameCount);
 		ControlAction.click(6, 594, 433, 172, 32);
 		//createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
 
@@ -582,7 +598,7 @@ MainSwitch:
 				D2Bot.printToConsole("Disabled CDKey");
 				D2Bot.CDKeyDisabled();
 
-				if (keyswap) {
+				if (gameInfo.switchKeys) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
@@ -647,7 +663,7 @@ MainSwitch:
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 		D2Bot.CDKeyRD();
 
-		if (keyswap && !rdblocker) {
+		if (gameInfo.switchKeys && !gameInfo.rdBlocker) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
@@ -680,7 +696,7 @@ MainSwitch:
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 		D2Bot.CDKeyInUse();
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
@@ -716,7 +732,7 @@ MainSwitch:
 			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 			D2Bot.CDKeyInUse();
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
@@ -726,7 +742,7 @@ MainSwitch:
 
 			break;
 		default:
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Invalid CD-Key");
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
@@ -745,7 +761,7 @@ MainSwitch:
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
-		if (rdblocker) {
+		if (gameInfo.rdBlocker) {
 			D2Bot.restart();
 		}
 
@@ -772,10 +788,10 @@ MainSwitch:
 	case 28: // Lobby - Game Does Not Exist
 		D2Bot.printToConsole("Game doesn't exist");
 
-		if (rdblocker) {
+		if (gameInfo.rdBlocker) {
 			D2Bot.printToConsole("CDKey is probably flagged.");
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			}

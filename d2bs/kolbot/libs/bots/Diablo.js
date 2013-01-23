@@ -5,13 +5,36 @@
 */
 
 function Diablo() {
-	// sort functions
-	this.entranceSort = function (a, b) {
-		return getDistance(a.x, a.y, 7790, 5544) - getDistance(b.x, b.y, 7790, 5544);
-	};
+	// Sort function
+	this.sort = function (a, b) {
+		// Entrance to Star / De Seis
+		if (me.y > 5325 || me.y < 5260) {
+			if (a.y > b.y) {
+				return -1;
+			}
 
-	this.starSort = function (a, b) {
-		return getDistance(a.x, a.y, 7774, 5305) - getDistance(b.x, b.y, 7774, 5305);
+			return 1;
+		}
+
+		// Vizier
+		if (me.x < 7765) {
+			if (a.x > b.x) {
+				return -1;
+			}
+
+			return 1;
+		}
+
+		// Infector
+		if (me.x > 7825) {
+			if (!checkCollision(me, a, 0x1) && a.x < b.x) {
+				return -1;
+			}
+
+			return 1;
+		}
+
+		return getDistance(me, a) - getDistance(me, b);
 	};
 
 	// general functions
@@ -43,9 +66,11 @@ function Diablo() {
 		case 394:
 		case 392:
 			warn = true;
+
 			break;
 		default:
 			warn = false;
+
 			break;
 		}
 
@@ -95,7 +120,7 @@ function Diablo() {
 			boss = getUnit(1, name);
 
 			if (boss) {
-				return Attack.clear(40, 0, name);
+				return Attack.clear(40, 0, name, this.sort);
 			}
 
 			delay(250);
@@ -106,7 +131,7 @@ function Diablo() {
 
 	this.vizierSeal = function () {
 		print("Viz layout " + this.vizLayout);
-		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.starSort);
+		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB);
 
 		if (!this.openSeal(395) || !this.openSeal(396)) {
 			throw new Error("Failed to open Vizier seals.");
@@ -127,7 +152,7 @@ function Diablo() {
 
 	this.seisSeal = function () {
 		print("Seis layout " + this.seisLayout);
-		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.starSort);
+		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB);
 
 		if (!this.openSeal(394)) {
 			throw new Error("Failed to open de Seis seal.");
@@ -148,7 +173,7 @@ function Diablo() {
 
 	this.infectorSeal = function () {
 		print("Inf layout " + this.infLayout);
-		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.starSort);
+		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB);
 
 		if (!this.openSeal(392)) {
 			throw new Error("Failed to open Infector seals.");
@@ -238,7 +263,7 @@ function Diablo() {
 		throw new Error("Diablo not found");
 	};
 
-	this.followPath = function (path, sortfunc) {
+	this.followPath = function (path) {
 		var i,
 			cleared = [];
 
@@ -248,10 +273,16 @@ function Diablo() {
 			}
 
 			Pather.moveTo(path[i], path[i + 1]);
-			Attack.clear(30, 0, false, sortfunc);
+			Attack.clear(30, 0, false, this.sort);
 
 			// Push cleared positions so they can be checked for strays
 			cleared.push([path[i], path[i + 1]]);
+
+			// After 5 nodes go back 3 nodes to check for monsters
+			if (i === 10 && path.length > 16) {
+				path = path.slice(6);
+				i = 0;
+			}
 		}
 	};
 
@@ -266,7 +297,7 @@ function Diablo() {
 						if (getDistance(unit, cleared[i][0], cleared[i][1]) < 30 && Attack.validSpot(unit.x, unit.y)) {
 							//me.overhead("we got a stray");
 							Pather.moveToUnit(unit);
-							Attack.clear(30);
+							Attack.clear(20, 0, false, this.sort);
 
 							break;
 						}
@@ -279,7 +310,7 @@ function Diablo() {
 	};
 
 	// path coordinates
-	this.entranceToStar = [7794, 5517, 7791, 5491, 7768, 5459, 7775, 5424, 7817, 5458, 7777, 5408, 7769, 5379, 7777, 5357, 7809, 5359, 7805, 5330, 7780, 5317, 7774, 5305];
+	this.entranceToStar = [7794, 5517, 7791, 5491, 7768, 5459, 7775, 5424, 7817, 5458, 7777, 5408, 7769, 5379, 7777, 5357, 7809, 5359, 7805, 5330, 7780, 5317, 7791, 5293];
 	this.starToVizA = [7759, 5295, 7734, 5295, 7716, 5295, 7718, 5276, 7697, 5292, 7678, 5293, 7665, 5276, 7662, 5314];
 	this.starToVizB = [7759, 5295, 7734, 5295, 7716, 5295, 7701, 5315, 7666, 5313, 7653, 5284];
 	this.starToSeisA = [7781, 5259, 7805, 5258, 7802, 5237, 7776, 5228, 7775, 5205, 7804, 5193, 7814, 5169, 7788, 5153];
@@ -299,21 +330,31 @@ function Diablo() {
 	this.initLayout();
 
 	if (Config.Diablo.Entrance) {
-		Attack.clear(35, 0, false, this.entranceSort);
+		Attack.clear(30, 0, false, this.sort);
 		Pather.moveTo(7790, 5544);
-		Pather.makePortal();
-		say(Config.Diablo.EntranceTP);
+
+		if (Config.PublicMode) {
+			Pather.makePortal();
+			say(Config.Diablo.EntranceTP);
+		}
+
+		Pather.moveTo(7790, 5544);
 		Precast.doPrecast(true);
-		this.followPath(this.entranceToStar, this.entranceSort);
+		Attack.clear(30, 0, false, this.sort);
+		this.followPath(this.entranceToStar);
 	} else {
 		Pather.moveTo(7774, 5305);
-		Attack.clear(15, 0, false, this.starSort);
+		Attack.clear(15, 0, false, this.sort);
 	}
 
-	Pather.moveTo(7774, 5305);
-	Pather.makePortal();
-	say(Config.Diablo.StarTP);
-	Attack.clear(30, 0, false, this.starSort);
+	Pather.moveTo(7791, 5293);
+
+	if (Config.PublicMode) {
+		Pather.makePortal();
+		say(Config.Diablo.StarTP);
+	}
+
+	Attack.clear(30, 0, false, this.sort);
 	this.vizierSeal();
 	this.seisSeal();
 	Precast.doPrecast(true);

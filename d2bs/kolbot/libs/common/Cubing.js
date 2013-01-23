@@ -520,7 +520,7 @@ IngredientLoop:
 
 		for (i = 0; i < recipe.Ingredients.length; i += 1) {
 			for (j = 0; j < this.validIngredients.length; j += 1) {
-				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 && 
+				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 &&
 						(this.validIngredients[j].classid === recipe.Ingredients[i] || (recipe.Ingredients[i] === "pgem" &&
 						[566, 586, 601].indexOf(this.validIngredients[j].classid) > -1))
 						) {
@@ -673,7 +673,7 @@ IngredientLoop:
 				transmute();
 				delay(700 + me.ping);
 				print("ÿc4Cubing: " + string);
-				D2Bot.printToConsole(string + ";5");
+				D2Bot.printToConsole(string, 5);
 				this.buildLists();
 
 				items = me.findItems(-1, -1, 6);
