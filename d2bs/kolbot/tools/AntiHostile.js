@@ -44,7 +44,7 @@ function main() {
 
 			break;
 		case "mugshot": // Take a screenshot and log the kill
-			D2Bot.printToConsole(msg.split(" ")[1] + " has been neutralized.;4");
+			D2Bot.printToConsole(msg.split(" ")[1] + " has been neutralized.", 4);
 			hideConsole();
 			delay(500);
 			takeScreenshot();
@@ -60,7 +60,7 @@ function main() {
 		if (party) {
 			do {
 				if (party.name !== me.name && getPlayerFlag(me.gid, party.gid, 8) && hostiles.indexOf(party.name) === -1) {
-					D2Bot.printToConsole(party.name + " (Level " + party.level + " " + charClass[party.classid] + ")" + " has declared hostility.;8");
+					D2Bot.printToConsole(party.name + " (Level " + party.level + " " + charClass[party.classid] + ")" + " has declared hostility.", 8);
 					hostiles.push(party.name);
 				}
 			} while (party.getNext());
@@ -148,6 +148,7 @@ function main() {
 	};
 
 	// Init config and attacks
+	D2Bot.init();
 	Config.init();
 	Attack.init();
 	Storage.Init();
@@ -217,7 +218,9 @@ function main() {
 	while (true) {
 		// Scan for hostiles or quit
 		if (findTrigger) {
-			if (Config.HostileAction === 0) {
+			this.findHostiles();
+
+			if (Config.HostileAction === 0 || (Config.HostileAction === 1 && me.inTown)) {
 				if (Config.TownOnHostile) {
 					this.pause();
 					Town.goToTown();
@@ -225,7 +228,7 @@ function main() {
 					while (hostiles.length > 0) {
 						delay(500);
 					}
-					
+
 					Pather.usePortal(null, me.name);
 					this.resume();
 				} else {
@@ -234,8 +237,6 @@ function main() {
 
 				return;
 			}
-
-			this.findHostiles();
 
 			findTrigger = false;
 		}

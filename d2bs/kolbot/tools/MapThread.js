@@ -518,10 +518,24 @@ function main() {
 	load("tools/maphelper.js");
 	print("ÿc9Map Thread Loaded");
 
+	this.revealArea = function (area) {
+		if (!this.revealedAreas) {
+			this.revealedAreas = [];
+		}
+
+		if (this.revealedAreas.indexOf(area) === -1) {
+			delay(500);
+			revealLevel(true);
+			this.revealedAreas.push(area);
+		}
+	};
+
 	while (true) {
 		while (!me.area || !me.gameReady) {
 			delay(100);
 		}
+
+		this.revealArea(me.area);
 
 		if (getUIFlag(0x0A)) {
 			Hooks.update();

@@ -5,77 +5,220 @@
 */
 
 var D2Bot = {
-	printToConsole: function (msg, color) {
-		if (arguments.length < 2) {
-			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg);
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg + ";" + color);
-		}
-	},
-	printToItemLog: function (msg, tooltip, code, color1, color2, header, gid) {
-		header = header || "";
-		gid = gid || "";
+	handle: 0,
 
-		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg + "$" + tooltip + "$" + code + "$" + header + "$" + gid + ";" + color1 + ";" + color2 + ";" + header);
+	init: function () {
+		var handle = DataFile.getStats().handle;
+
+		if (handle) {
+			this.handle = handle;
+		}
+
+		return this.handle;
 	},
-	saveItem: function (filename, tooltip, code, color1, color2) {
-		sendCopyData(null, "D2Bot #", 0, "saveItem;" + filename + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);
+
+	printToConsole: function (msg, color, tooltip) {
+		var printObj = {
+				msg: msg,
+				color: color || 0,
+				tooltip: tooltip || ""
+			},
+			obj = {
+				profile: me.profile,
+				func: "printToConsole",
+				args: [JSON.stringify(printObj)]
+			};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
+	printToItemLog: function (msg, desc, code, color1, color2, header) {
+		header = header || "";
+
+		var itemObj = {
+				textColor: color1,
+				itemColor: color2,
+				image: code,
+				title: msg,
+				header: header,
+				description: desc,
+				sockets: [] // not yet implemented
+			},
+			obj = {
+				profile: me.profile,
+				func: "printToItemLog",
+				args: [JSON.stringify(itemObj)]
+			};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	// arg is a JSON string here, this might change in the future, but only mule logger uses this at the moment
+	saveItem: function (arg) {
+		var obj = {
+			profile: me.profile,
+			func: "saveItem",
+			args: [arg]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	updateStatus: function (msg) {
-		sendCopyData(null, "D2Bot #", 0, "updateStatus;" + msg);
+		var obj = {
+			profile: me.profile,
+			func: "updateStatus",
+			args: [msg]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	updateRuns: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateRuns");
+		var obj = {
+			profile: me.profile,
+			func: "updateRuns",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	updateChickens: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateChickens");
+		var obj = {
+			profile: me.profile,
+			func: "updateChickens",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	requestGameInfo: function () {
-		sendCopyData(null, "D2Bot #", 0, "requestGameInfo");
-		delay(500);
+		var obj = {
+			profile: me.profile,
+			func: "requestGameInfo",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
-	restart: function (reset) {
-		if (arguments.length > 0) {
-			sendCopyData(null, "D2Bot #", 0, "restartProfile;" + reset.toString());
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "restartProfile");
-		}
+
+	restart: function (keySwap) {
+		var obj = {
+			profile: me.profile,
+			func: "restartProfile",
+			args: arguments.length > 0 ? [me.profile, keySwap] : [me.profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	CDKeyInUse: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyInUse");
+		var obj = {
+			profile: me.profile,
+			func: "CDKeyInUse",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	CDKeyDisabled: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyDisabled");
+		var obj = {
+			profile: me.profile,
+			func: "CDKeyDisabled",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	CDKeyRD: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyRD");
+		var obj = {
+			profile: me.profile,
+			func: "CDKeyRD",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
-	joinMe: function (window, gameName, gameCount, gamePass, isUp) {
-		sendCopyData(null, window, 1, gameName + gameCount + "/" + gamePass + "/" + isUp);
-	},
-	requestGame: function (who) {
-		sendCopyData(null, who, 3, me.profile);
-	},
+
 	stop: function (profile) {
-		if (profile) {
-			sendCopyData(null, "D2Bot #", 0, "stop;" + profile);
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "stop");
+		if (!profile) {
+			profile = me.profile;
 		}
+
+		var obj = {
+			profile: me.profile,
+			func: "stop",
+			args: [profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	start: function (profile) {
-		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
+		var obj = {
+			profile: me.profile,
+			func: "start",
+			args: [profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	updateCount: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateCount;" + "nnqq");
+		var obj = {
+			profile: me.profile,
+			func: "updateCount",
+			args: ["1"]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	shoutGlobal: function (msg, mode) {
-		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");
+		var obj = {
+			profile: me.profile,
+			func: "shoutGlobal",
+			args: [msg, mode]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	heartBeat: function () {
-		sendCopyData(null, "D2Bot #", 0, "heartBeat");
+		var obj = {
+			profile: me.profile,
+			func: "heartBeat",
+			args: []
+		};
+
+		//print("ÿc1Heart beat " + this.handle);
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	// Profile to profile communication
+	joinMe: function (profile, gameName, gameCount, gamePass, isUp) {
+		var obj = {
+			gameName: gameName + gameCount,
+			gamePass: gamePass,
+			inGame: isUp === "yes"
+		};
+
+		sendCopyData(null, profile, 1, JSON.stringify(obj));
+	},
+
+	requestGame: function (profile) {
+		var obj = {
+			profile: me.profile
+		};
+
+		sendCopyData(null, profile, 3, JSON.stringify(obj));
 	}
 };
+
 var DataFile = {
 	create: function () {
 		var obj, string;
@@ -89,7 +232,8 @@ var DataFile = {
 			level: 0,
 			name: "",
 			gameName: "",
-			ingameTick: 0
+			ingameTick: 0,
+			handle: 0
 		};
 
 		string = JSON.stringify(obj);
@@ -123,13 +267,13 @@ var DataFile = {
 
 		print("Error reading DataFile. Using null values.");
 
-		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0};
+		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0, handle: 0};
 	},
 
 	getStats: function () {
 		var obj = this.getObj();
 
-		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick};
+		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick, handle: obj.handle};
 	},
 
 	updateStats: function (arg, value) {
@@ -189,6 +333,10 @@ var DataFile = {
 				break;
 			case "deaths":
 				obj.deaths = (obj.deaths || 0) + 1;
+
+				break;
+			case "handle":
+				obj.handle = value;
 
 				break;
 			}

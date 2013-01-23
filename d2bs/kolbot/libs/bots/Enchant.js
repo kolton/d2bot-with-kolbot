@@ -19,7 +19,7 @@ function Enchant() {
 
 		var unit = getUnit(0, nick);
 
-		if (!unit || getDistance(me, unit) > 40 ) {
+		if (!unit || getDistance(me, unit) > 40) {
 			say("Get closer.");
 
 			return false;
@@ -85,26 +85,32 @@ function Enchant() {
 	};
 
 	this.getLeg = function () {
-		var i, portal, wirt, leg, gid;
+		var i, portal, wirt, leg, gid, wrongLeg;
+
+		if (me.getItem(88)) {
+			return me.getItem(88);
+		}
 
 		if (!Config.Enchant.GetLeg) {
 			leg = getUnit(4, 88);
 
 			if (leg) {
-				gid = leg.gid;
+				do {
+					if (leg.name.indexOf("ÿc1") > -1) {
+						wrongLeg = true;
+					} else { // For idiots trying to give leg from another difficulty
+						gid = leg.gid;
 
-				Pickit.pickItem(leg);
+						Pickit.pickItem(leg);
 
-				return me.getItem(-1, -1, gid);
+						return me.getItem(-1, -1, gid);
+					}
+				} while (leg.getNext());
 			}
 
-			say("Bring the leg to me.");
+			say("Bring the leg " + (wrongLeg ? "from this difficulty" : "") + " to me.");
 
 			return false;
-		}
-
-		if (me.getItem(88)) {
-			return me.getItem(88);
 		}
 
 		Pather.useWaypoint(4);
@@ -196,22 +202,36 @@ function Enchant() {
 		}
 
 		if (Pather.getPortal(39)) {
+			say("Cow portal already open.");
+
 			return true;
 		}
 
-		if (me.getQuest(4, 10) || !me.getQuest(4, 0)) { // king dead or cain not saved
+		if (me.getQuest(4, 10)) { // king dead or cain not saved
+			say("Can't open the portal because I killed Cow King.");
+
+			return false;
+		}
+
+		if (Config.Enchant.GetLeg && !me.getQuest(4, 0)) {
+			say("Can't get leg because I don't have Cain quest.");
+
 			return false;
 		}
 
 		switch (me.gametype) {
 		case 0: // classic
 			if (!me.getQuest(26, 0)) { // diablo not completed
+				say("I don't have Diablo quest.");
+
 				return false;
 			}
 
 			break;
 		case 1: // expansion
 			if (!me.getQuest(40, 0)) { // baal not completed
+				say("I don't have Baal quest.");
+
 				return false;
 			}
 
@@ -246,6 +266,8 @@ function Enchant() {
 
 			delay(200);
 		}
+
+		say("Failed to open cow portal.");
 
 		return false;
 	};
@@ -455,7 +477,9 @@ MainLoop:
 				}
 
 				say("Commands:");
-				say("Chant: " + (Config.Enchant.Triggers[0] || "disabled") + "| Open cow level: " + (Config.Enchant.Triggers[1] || "disabled") + "| Give waypoints: " + (Config.Enchant.Triggers[2] || "disabled"));
+				say((Config.Enchant.Triggers[0] ? "Enhant: " + Config.Enchant.Triggers[0] : "") +
+						(Config.Enchant.Triggers[1] ? " | Open cow level: " + Config.Enchant.Triggers[1] : "") +
+							(Config.Enchant.Triggers[2] ? " | Give waypoints: " + Config.Enchant.Triggers[2] : ""));
 
 				if (Config.Enchant.AutoChant) {
 					say("Auto enchant is ON");
@@ -483,16 +507,7 @@ MainLoop:
 					break;
 				}
 
-				if (hostile) {
-					say("Command disabled because of hostiles.");
-
-					break;
-				}
-
-				if (!this.openPortal(command[1])) {
-					say("Failed to open cow portal.");
-				}
-
+				this.openPortal(command[1]);
 				me.cancel();
 
 				break;

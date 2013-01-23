@@ -5,7 +5,7 @@ var StarterConfig = {
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
 	CrashDelay: 60, // Seconds to wait after a d2 window crash
-	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
+	RealmDownDelay: 2, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
 	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
@@ -21,16 +21,12 @@ include("OOG.js");
 include("MuleLogger.js");
 include("gambling.js");
 include("common/misc.js");
-load("tools/heartbeat.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList, nextAcc,
-	gamePass = "",
-	gameName = "",
-	nextGame = "",
+var handle, gameInfo, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList, nextAcc,
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
 	accounts = [],
@@ -47,14 +43,19 @@ function parseInfo() {
 	}
 }
 
-function ReceiveCopyData(msgID, msg) {
-	switch (msgID) {
+function ReceiveCopyData(mode, msg) {
+	switch (msg) {
+	case "Handle":
+		handle = mode;
+
+		break;
+	}
+
+	switch (mode) {
 	case 2: // game info
 		print("Recieved Game Info");
 
-		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
-		keyswap = parseInt(keyswap, 10);
-		rdblocker = parseInt(rdblocker, 10);
+		gameInfo = JSON.parse(msg);
 
 		break;
 	}
@@ -96,10 +97,23 @@ function updateCount() {
 
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
-	D2Bot.requestGameInfo();
+
+	while (!handle) {
+		delay(100);
+	}
+
+	DataFile.updateStats("handle", handle);
+	D2Bot.init();
+	load("tools/heartbeat.js");
+
+	while (!gameInfo) {
+		D2Bot.requestGameInfo();
+		delay(500);
+	}
+
 	parseInfo();
 
-	if (error === "@error") {
+	if (gameInfo.error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
@@ -283,7 +297,7 @@ MainSwitch:
 				D2Bot.printToConsole("Disabled CDKey");
 				D2Bot.CDKeyDisabled();
 
-				if (keyswap) {
+				if (gameInfo.switchKeys) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
@@ -377,7 +391,7 @@ MainSwitch:
 		updateCount();
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
@@ -407,7 +421,7 @@ MainSwitch:
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 		D2Bot.CDKeyInUse();
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
@@ -443,7 +457,7 @@ MainSwitch:
 			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 			D2Bot.CDKeyInUse();
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
@@ -453,7 +467,7 @@ MainSwitch:
 
 			break;
 		default:
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Invalid CD-Key");
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);

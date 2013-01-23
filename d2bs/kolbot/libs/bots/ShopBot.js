@@ -1,7 +1,8 @@
 function ShopBot() {
 	var npc, tickCount, town, wpArea, path,
 		cycles = 0,
-		cyclesText = new Text("Cycles in last minute: " + cycles, 50, 260, 2, 1),
+		cyclesText2 = new Text(cycles.toString(), 240, 260, 2, 1), // Crash fix (2+ hooks don't crash)
+		cyclesText = new Text("Cycles in last minute: ", 50, 260, 2, 1),
 		leadRetry = 10,
 		leadTimeout = 20; // NPC move timeout in seconds
 
@@ -71,7 +72,7 @@ function ShopBot() {
 		}
 
 		return false;
-	},
+	};
 
 	this.shopItems = function () {
 		var i, items,
@@ -209,7 +210,7 @@ function ShopBot() {
 
 	while (true) {
 		if (getTickCount() - tickCount >= 60 * 1000) {
-			cyclesText.text = "Cycles in last minute: " + cycles;
+			cyclesText2.text = cycles.toString();
 			tickCount = getTickCount();
 			cycles = 0;
 		}

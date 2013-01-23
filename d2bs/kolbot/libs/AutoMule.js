@@ -11,9 +11,9 @@ var AutoMule = {
 			hardcore: false,
 
 			// Game name and password of the mule game. Never use the same game name as for mule logger.
-			muleGameName: ["mulegame", "pw"], // ["gamename", "password"]
+			muleGameName: ["", ""], // ["gamename", "password"]
 
-			// List of profiles that will mule items.
+			// List of profiles that will mule items. Example: enabledProfiles: ["profile 1", "profile 2"],
 			enabledProfiles: [""],
 
 			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
@@ -33,9 +33,9 @@ var AutoMule = {
 			hardcore: false,
 
 			// Game name and password of the mule game. Never use the same game name as for mule logger.
-			muleGameName: ["mulegame", "pw"], // ["gamename", "password"]
+			muleGameName: ["", ""], // ["gamename", "password"]
 
-			// List of profiles that will mule items.
+			// List of profiles that will mule items. Example: enabledProfiles: ["profile 1", "profile 2"],
 			enabledProfiles: [""],
 
 			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
@@ -149,7 +149,7 @@ MainLoop:
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile + ";7");
+		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile, 7);
 
 		if (muleObj.stopProfile) {
 			D2Bot.stop(muleObj.stopProfile);
@@ -165,7 +165,7 @@ MainLoop:
 
 			switch (status) {
 			case "begin":
-				D2Bot.printToConsole("Mule profile is busy." + ";9");
+				D2Bot.printToConsole("Mule profile is busy.", 9);
 
 				break MainLoop;
 			case "ready":
@@ -178,7 +178,7 @@ MainLoop:
 				failCount += 1;
 
 				if (failCount >= 60) {
-					D2Bot.printToConsole("No response from mule profile." + ";9");
+					D2Bot.printToConsole("No response from mule profile.", 9);
 
 					break MainLoop;
 				}
@@ -222,13 +222,13 @@ MainLoop:
 		function CheckModeEvent(msg) {
 			switch (msg) {
 			case "torch":
-				D2Bot.printToConsole("In torch mule game." + ";7");
+				D2Bot.printToConsole("In torch mule game.", 7);
 
 				mode = 1;
 
 				break;
 			case "normal":
-				D2Bot.printToConsole("In mule game." + ";7");
+				D2Bot.printToConsole("In mule game.", 7);
 
 				mode = 0;
 
@@ -294,7 +294,7 @@ MainLoop:
 			}
 
 			if (getTickCount() - tick > timeout) {
-				D2Bot.printToConsole("Mule didn't rejoin. Picking up items." + ";9");
+				D2Bot.printToConsole("Mule didn't rejoin. Picking up items.", 9);
 				Pickit.pickItems();
 
 				break;

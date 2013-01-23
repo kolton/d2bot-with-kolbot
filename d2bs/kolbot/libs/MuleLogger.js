@@ -14,12 +14,14 @@ var MuleLogger = {
 			To log a full account, put "accountname/password/realm": ["all"]
 
 			realm = useast, uswest, europe or asia
+
+			Individual entries are separated with a comma.
 		*/
 
 		"account/password/realm": ["all"]
 	},
 
-	LogGame: ["muleloggame", "password"], // ["gamename", "password"]
+	LogGame: ["", ""], // ["gamename", "password"]
 	LogNames: true, // Put account/character name on the picture
 	LogItemLevel: true, // Add item level to the picture
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
@@ -60,7 +62,6 @@ var MuleLogger = {
 	logItem: function (unit) {
 		var i, code, desc, sock,
 			header = "",
-			gid = "",
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
 
@@ -221,16 +222,20 @@ var MuleLogger = {
 			}
 		}
 
-		if (this.LogNames && me.account) {
-			header = me.account + " / " + me.name;
+		if (this.LogNames) {
+			header = (me.account || "Single Player") + " / " + me.name;
 		}
 
-		// d2bot# optimization for runes, gems and set/unique items
-		if ([5, 7].indexOf(unit.quality) > -1 || [74, 96, 97, 98, 99, 100, 101, 102].indexOf(unit.itemType) > -1) {
-			gid = unit.gid;
-		}
+		//return (name + "$" + desc + "$" + code + "$" + header + "$" + gid);
 
-		return (name + "$" + desc + "$" + code + "$" + header + "$" + gid);
+		return {
+			itemColor: color,
+			image: code,
+			title: name,
+			description: desc,
+			header: header,
+			sockets: [] // not yet implemented
+		};
 	},
 
 	logChar: function () {
@@ -238,12 +243,10 @@ var MuleLogger = {
 			delay(500);
 		}
 
-		var i, folder,
+		var i, folder, string,
 			items = me.getItems(),
-			color = -1,
 			realm = me.realm || "Single Player",
-			finalString = "",
-			screenShot = "";
+			finalString = "";
 
 		if (!FileTools.exists("mules/" + realm)) {
 			folder = dopen("mules");
@@ -263,17 +266,17 @@ var MuleLogger = {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (items[i].mode === 0) {
-				color = items[i].getColor();
-				finalString += (this.logItem(items[i]) + ";" + "0" + ";" + color + "\n");
+				string = JSON.stringify(this.logItem(items[i]));
+				finalString += (string + "\n");
 
 				if (this.SaveScreenShot) {
-					screenShot = items[i].itemType + this.logItem(items[i]) + ";" + color;
-					sendCopyData(null, "D2Bot #", 0, "saveItem;" + screenShot);
+					D2Bot.saveItem(string);
 					delay(500);
 				}
 			}
 		}
 
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + ".txt", finalString);
+		print("Item logging done.");
 	}
 };

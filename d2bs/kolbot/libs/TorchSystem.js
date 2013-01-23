@@ -160,7 +160,7 @@ var TorchSystem = {
 		removeEventListener('copydata', CheckEvent);
 
 		if (game) {
-			D2Bot.printToConsole("Joining key drop game." + ";7");
+			D2Bot.printToConsole("Joining key drop game.", 7);
 			delay(2000);
 
 			me.blockMouse = true;

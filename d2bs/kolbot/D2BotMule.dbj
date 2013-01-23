@@ -9,7 +9,8 @@ var StarterConfig = {
 };
 
 
-var master, masterStatus, keyswap, connectFail, makeAcc, muleMode, muleFilename, muleObj,
+var master, masterStatus, gameInfo, connectFail, makeAcc,
+	muleMode, muleFilename, muleObj, handle,
 	makeNext = false,
 	status = "loading";
 
@@ -153,6 +154,13 @@ function pickItems() {
 function ReceiveCopyData(mode, msg) {
 	var masterInfo;
 
+	switch (msg) {
+	case "Handle":
+		handle = mode;
+
+		break;
+	}
+
 	// mode check instead of msg check because of crashes
 	switch (mode) {
 	case 1: // join
@@ -160,7 +168,7 @@ function ReceiveCopyData(mode, msg) {
 	case 2: // game info
 		print("Recieved Game Info");
 
-		keyswap = parseInt(msg.split('/')[4], 10);
+		gameInfo = JSON.parse(msg);
 
 		break;
 	case 3: // request game
@@ -322,13 +330,22 @@ include("common/pather.js");
 include("common/misc.js");
 include("common/config.js");
 include("common/prototypes.js");
-load("tools/heartbeat.js");
 
 addEventListener("copydata", ReceiveCopyData);
 
 function main() {
-	delay(rand(1, 2) * 1000);
-	D2Bot.requestGameInfo();
+	while (!handle) {
+		delay(100);
+	}
+
+	DataFile.updateStats("handle", handle);
+	D2Bot.init();
+	load("tools/heartbeat.js");
+
+	while (!gameInfo) {
+		D2Bot.requestGameInfo();
+		delay(500);
+	}
 
 	// Wait for master before login = give room to determine muling mode (normal or torch)
 	while (!master) {
@@ -371,7 +388,7 @@ function main() {
 					status = "ready";
 
 					D2Bot.updateStatus("In mule game.");
-					D2Bot.printToConsole("In mule game." + ";7");
+					D2Bot.printToConsole("In mule game.", 7);
 					Storage.Init();
 				}
 
@@ -380,7 +397,7 @@ function main() {
 				}
 
 				if (status !== "begin") {
-					D2Bot.printToConsole("Nobody joined - stopping." + ";9");
+					D2Bot.printToConsole("Nobody joined - stopping.", 9);
 					D2Bot.stop();
 				}
 
@@ -398,7 +415,7 @@ function main() {
 					}
 
 					MuleData.write(obj);
-					D2Bot.printToConsole("Done muling." + ";7");
+					D2Bot.printToConsole("Done muling.", 7);
 					sendCopyData(null, master, 10, "quit");
 					delay(500);
 					D2Bot.stop();
@@ -419,7 +436,7 @@ function main() {
 					obj.fullChars.push(me.name);
 					MuleData.write(obj);
 					nextChar();
-					D2Bot.printToConsole("Mule full, getting next character." + ";7");
+					D2Bot.printToConsole("Mule full, getting next character.", 7);
 					quit();
 
 					break;
@@ -511,7 +528,7 @@ MainSwitch:
 		if (makeAcc) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
-			D2Bot.printToConsole("Made account: " + info.account + ";7");
+			D2Bot.printToConsole("Made account: " + info.account, 7);
 
 			makeAcc = false;
 
@@ -544,7 +561,7 @@ MainSwitch:
 				D2Bot.printToConsole("Disabled CDKey");
 				D2Bot.CDKeyDisabled();
 
-				if (keyswap) {
+				if (gameInfo.switchKeys) {
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
@@ -605,7 +622,7 @@ MainSwitch:
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 		D2Bot.CDKeyRD();
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
@@ -641,7 +658,7 @@ MainSwitch:
 			timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 			D2Bot.CDKeyRD();
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Realm Down - Changing CD-Key");
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
@@ -701,7 +718,7 @@ MainSwitch:
 				break;
 			}
 
-			D2Bot.printToConsole("Made character: " + info.charName + ";7");
+			D2Bot.printToConsole("Made character: " + info.charName, 7);
 		}
 
 		break;
@@ -720,7 +737,7 @@ MainSwitch:
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 		D2Bot.CDKeyInUse();
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
@@ -756,7 +773,7 @@ MainSwitch:
 			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 			D2Bot.CDKeyInUse();
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
@@ -766,7 +783,7 @@ MainSwitch:
 
 			break;
 		default:
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Invalid CD-Key");
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);

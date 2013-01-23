@@ -96,6 +96,7 @@ function main() {
 	}
 
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
+	D2Bot.init();
 	Config.init(true);
 	Pickit.init();
 	Attack.init();
@@ -113,9 +114,9 @@ function main() {
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
 
-	if (stats.name === me.name && me.getStat(13) < stats.experience) { // check for experience decrease -> log death
-		D2Bot.printToConsole("You died in last game;9");
-		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)) + ";9");
+	if (stats.name === me.name && me.getStat(13) < stats.experience && !Scripts.CSFiller) { // check for experience decrease -> log death
+		D2Bot.printToConsole("You died in last game", 9);
+		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)), 9);
 		DataFile.updateStats("deaths");
 	}
 
@@ -194,7 +195,7 @@ function main() {
 		say(Config.LastMessage);
 	}
 
-	scriptBroadcast("quit");
+	quit();
 
 	return true;
 }
