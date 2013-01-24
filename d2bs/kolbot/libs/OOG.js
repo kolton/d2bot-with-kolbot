@@ -17,11 +17,12 @@ var D2Bot = {
 		return this.handle;
 	},
 
-	printToConsole: function (msg, color, tooltip) {
+	printToConsole: function (msg, color, tooltip, trigger) {
 		var printObj = {
 				msg: msg,
 				color: color || 0,
-				tooltip: tooltip || ""
+				tooltip: tooltip || "",
+				trigger: trigger || ""
 			},
 			obj = {
 				profile: me.profile,
@@ -33,14 +34,12 @@ var D2Bot = {
 	},
 
 	printToItemLog: function (msg, desc, code, color1, color2, header) {
-		header = header || "";
-
 		var itemObj = {
 				textColor: color1,
 				itemColor: color2,
 				image: code,
 				title: msg,
-				header: header,
+				header: header || "",
 				description: desc,
 				sockets: [] // not yet implemented
 			},
@@ -350,6 +349,19 @@ var DataFile = {
 };
 
 var ControlAction = {
+	timeoutDelay: function (text, time, stopfunc) {
+		var endTime = getTickCount() + time;
+
+		while (getTickCount() < endTime) {
+			if (typeof stopfunc === "function" && stopfunc.call()) {
+				break;
+			}
+
+			D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+			delay(500);
+		}
+	},
+
 	click: function (type, x, y, xsize, ysize, targetx, targety) {
 		var control = getControl(type, x, y, xsize, ysize);
 
@@ -391,6 +403,37 @@ var ControlAction = {
 		}
 
 		return control.getText();
+	},
+
+	createGame: function (name, pass, diff, delay) {
+		me.blockMouse = true;
+
+		ControlAction.setText(1, 432, 162, 158, 20, name);
+		ControlAction.setText(1, 432, 217, 158, 20, pass);
+
+		switch (diff) {
+		case "Normal":
+			ControlAction.click(6, 430, 381, 16, 16);
+
+			break;
+		case "Nightmare":
+			ControlAction.click(6, 555, 381, 16, 16);
+
+			break;
+		default:
+			ControlAction.click(6, 698, 381, 16, 16);
+
+			break;
+		}
+
+		if (delay) {
+			this.timeoutDelay("Make Game Delay", delay);
+		}
+
+		print("Creating Game: " + name);
+		ControlAction.click(6, 594, 433, 172, 32);
+
+		me.blockMouse = false;
 	},
 
 	clickRealm: function (realm) {

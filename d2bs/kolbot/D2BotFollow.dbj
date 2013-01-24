@@ -67,21 +67,6 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-function timeoutDelay(text, time, stopfunc) {
-	var endTime = getTickCount() + time;
-
-	while (getTickCount() < endTime) {
-		if (typeof stopfunc === "function" && stopfunc.call()) {
-			D2Bot.printToConsole("Game is finished. Stopping join delay.");
-
-			break;
-		}
-
-		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
-		delay(500);
-	}
-}
-
 function locationTimeout(time, location) {
 	var endtime = getTickCount() + time;
 
@@ -203,7 +188,7 @@ function main() {
 	}
 
 	if (gameInfo.error === "@error") {
-		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
+		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
 
@@ -345,7 +330,7 @@ MainSwitch:
 		if (!chatActionsDone) {
 			chatActionsDone = true;
 
-			timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+			ControlAction.timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
 			say("/j " + StarterConfig.JoinChannel);
 			delay(1000);
 
@@ -413,12 +398,18 @@ JoinLoop:
 					gameInfo.error = "";
 				}
 
-				timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000,
+				ControlAction.timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000,
 					function () {
 						D2Bot.requestGame(leader);
 						delay(500);
 
-						return !joinInfo.inGame || (joinInfo.lastGame && joinInfo.gameName !== joinInfo.lastGame);
+						if (!joinInfo.inGame || (joinInfo.lastGame && joinInfo.gameName !== joinInfo.lastGame)) {
+							D2Bot.printToConsole("Game is finished. Stopping join delay.");
+
+							return true;
+						}
+
+						return false;
 					}
 					);
 				D2Bot.updateRuns();
@@ -439,7 +430,7 @@ JoinLoop:
 			print("joining game " + joinInfo.gameName);
 
 			if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
-				timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
+				ControlAction.timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
 			}
 
 			me.blockMouse = true;
@@ -503,7 +494,7 @@ JoinLoop:
 				loginFail += 1;
 
 				if (loginFail < 2) {
-					timeoutDelay("Login retry", 3000);
+					ControlAction.timeoutDelay("Login retry", 3000);
 					ControlAction.click(6, 335, 412, 128, 35);
 
 					break MainSwitch;
@@ -519,7 +510,7 @@ JoinLoop:
 				D2Bot.CDKeyDisabled();
 
 				if (gameInfo.switchKeys) {
-					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
@@ -551,7 +542,7 @@ JoinLoop:
 		D2Bot.updateStatus("Unable To Connect");
 
 		if (connectFail) {
-			timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 6e4);
+			ControlAction.timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 6e4);
 
 			connectFail = false;
 		}
@@ -572,12 +563,12 @@ JoinLoop:
 		}
 
 		updateCount();
-		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
+		ControlAction.timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 		D2Bot.CDKeyRD();
 
 		if (gameInfo.switchKeys && !gameInfo.rdBlocker) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
-			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
 			D2Bot.printToConsole("Realm Down - Restart");
@@ -607,10 +598,10 @@ JoinLoop:
 		D2Bot.CDKeyInUse();
 
 		if (gameInfo.switchKeys) {
-			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
-			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+			ControlAction.timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
 			ControlAction.click(6, 335, 450, 128, 35);
 		}
 
@@ -643,22 +634,22 @@ JoinLoop:
 			D2Bot.CDKeyInUse();
 
 			if (gameInfo.switchKeys) {
-				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
 				ControlAction.click(6, 335, 450, 128, 35);
-				timeoutDelay("LoD key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+				ControlAction.timeoutDelay("LoD key in use", StarterConfig.CDKeyInUseDelay * 6e4);
 			}
 
 			break;
 		default:
 			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Invalid CD-Key");
-				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
 				ControlAction.click(6, 335, 450, 128, 35);
-				timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
+				ControlAction.timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
 			}
 
 			break;
@@ -697,7 +688,7 @@ JoinLoop:
 			D2Bot.printToConsole("CDKey is probably flagged.");
 
 			if (gameInfo.switchKeys) {
-				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			}
 		} else {
