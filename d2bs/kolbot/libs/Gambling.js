@@ -40,6 +40,22 @@ var Gambling = {
 		Internals, don't edit unless you know how to
 	*/
 
+	inGameCheck: function () {
+		var i;
+
+		if (this.goldFinders.indexOf(me.profile) > -1) {
+			for (i = 0; i < this.gambleGames.length; i += 1) {
+				if (this.gambleGames[i] && me.gamename.match(this.gambleGames[i], "i")) {
+					this.dropGold();
+					DataFile.updateStats("gold");
+					delay(5000);
+					quit();
+					delay(10000);
+				}
+			}
+		}
+	},
+
 	dropGold: function () {
 		Town.goToTown(1);
 		Town.move("stash");
@@ -63,6 +79,8 @@ var Gambling = {
 			return false;
 		}
 
+		var i, game;
+
 		function CheckEvent(mode, msg) {
 			var i;
 
@@ -78,8 +96,6 @@ var Gambling = {
 
 			return true;
 		}
-
-		var i, game;
 
 		addEventListener('copydata', CheckEvent);
 		game = null;

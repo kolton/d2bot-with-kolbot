@@ -58,6 +58,23 @@ var MuleLogger = {
 		return desc;
 	},
 
+	inGameCheck: function () {
+		if (this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
+			this.logChar();
+
+			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
+				delay(1000);
+			}
+
+			quit();
+			delay(10000);
+
+			return true;
+		}
+
+		return false;
+	},
+
 	// Log kept item stats in the manager.
 	logItem: function (unit) {
 		var i, code, desc, sock,

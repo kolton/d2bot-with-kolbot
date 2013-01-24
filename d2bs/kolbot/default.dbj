@@ -48,19 +48,8 @@ function main() {
 		return true;
 	}
 
-	// mule logger stuff
-	if (me.gamename.toLowerCase().indexOf(MuleLogger.LogGame[0].toLowerCase()) > -1) {
-		MuleLogger.logChar();
-
-		while ((getTickCount() - me.gamestarttime) < MuleLogger.IngameTime * 1000) {
-			delay(1000);
-		}
-
-		quit();
-		delay(10000);
-
-		return true;
-	}
+	// MuleLogger handler
+	MuleLogger.inGameCheck();
 
 	var i, sojPause, stats,
 		sojCounter = 0,
@@ -82,19 +71,6 @@ function main() {
 		}
 	};
 
-	// If game name is a part of Gambling System, don't load scripts
-	if (Gambling.goldFinders.indexOf(me.profile) > -1) {
-		for (i = 0; i < Gambling.gambleGames.length; i += 1) {
-			if (me.gamename.match(Gambling.gambleGames[i])) {
-				Gambling.dropGold();
-				DataFile.updateStats("gold");
-				delay(5000);
-				quit();
-				delay(10000);
-			}
-		}
-	}
-
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
 	D2Bot.init();
 	Config.init(true);
@@ -110,7 +86,9 @@ function main() {
 	// TorchSystem handler
 	TorchSystem.inGameCheck();
 
-	// TODO: Consolidate Gambling System
+	// Gambling System handler
+	Gambling.inGameCheck();
+
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
 
@@ -192,7 +170,18 @@ function main() {
 	}
 
 	if (Config.LastMessage) {
-		say(Config.LastMessage);
+		switch (typeof Config.LastMessage) {
+		case "string":
+			say(Config.LastMessage);
+
+			break;
+		case "object":
+			for (i = 0; i < Config.LastMessage.length; i += 1) {
+				say(Config.LastMessage[i]);
+			}
+
+			break;
+		}
 	}
 
 	quit();
