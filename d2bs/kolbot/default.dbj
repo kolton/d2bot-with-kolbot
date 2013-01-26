@@ -74,7 +74,7 @@ function main() {
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
 	D2Bot.init();
 	Config.init(true);
-	Pickit.init();
+	Pickit.init(true);
 	Attack.init();
 	Storage.Init();
 	Cubing.init();
@@ -172,12 +172,12 @@ function main() {
 	if (Config.LastMessage) {
 		switch (typeof Config.LastMessage) {
 		case "string":
-			say(Config.LastMessage);
+			say(Config.LastMessage.replace("$nextgame", DataFile.getStats().nextGame, "i"));
 
 			break;
 		case "object":
 			for (i = 0; i < Config.LastMessage.length; i += 1) {
-				say(Config.LastMessage[i]);
+				say(Config.LastMessage[i].replace("$nextgame", DataFile.getStats().nextGame, "i"));
 			}
 
 			break;

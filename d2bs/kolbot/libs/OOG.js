@@ -232,7 +232,8 @@ var DataFile = {
 			name: "",
 			gameName: "",
 			ingameTick: 0,
-			handle: 0
+			handle: 0,
+			nextGame: ""
 		};
 
 		string = JSON.stringify(obj);
@@ -266,13 +267,13 @@ var DataFile = {
 
 		print("Error reading DataFile. Using null values.");
 
-		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0, handle: 0};
+		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0, handle: 0, nextGame: ""};
 	},
 
 	getStats: function () {
 		var obj = this.getObj();
 
-		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick, handle: obj.handle};
+		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick, handle: obj.handle, nextGame: obj.nextGame};
 	},
 
 	updateStats: function (arg, value) {
@@ -336,6 +337,10 @@ var DataFile = {
 				break;
 			case "handle":
 				obj.handle = value;
+
+				break;
+			case "nextGame":
+				obj.nextGame = value;
 
 				break;
 			}

@@ -592,44 +592,44 @@ IngredientLoop:
 		if (recipe.Index >= Recipe.HitPower.Helm && recipe.Index <= Recipe.Safety.Weapon) {
 			// Junk jewels (NOT matching a pickit entry)
 			if (unit.itemType === 58) {
-				if (recipe.Enabled && NTIPCheckItem(unit) === 0) {
+				if (recipe.Enabled && NTIP.CheckItem(unit) === 0) {
 					return true;
 				}
 			// Main item, NOT matching a pickit entry
-			} else if (unit.quality === 4 && Math.floor((me.charlvl + unit.ilvl) / 2) >= recipe.Level && NTIPCheckItem(unit) === 0) {
+			} else if (unit.quality === 4 && Math.floor((me.charlvl + unit.ilvl) / 2) >= recipe.Level && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
 		}
 
 		if (recipe.Index >= Recipe.Unique.Weapon.ToExceptional && recipe.Index <= Recipe.Unique.Armor.ToElite) {
 			// Unique item matching pickit entry
-			if (unit.quality === 7 && NTIPCheckItem(unit) === 1) {
+			if (unit.quality === 7 && NTIP.CheckItem(unit) === 1) {
 				return true;
 			}
 		}
 
 		if (recipe.Index >= Recipe.Rare.Weapon.ToExceptional && recipe.Index <= Recipe.Rare.Armor.ToElite) {
 			// Rare item matching pickit entry
-			if (unit.quality === 6 && NTIPCheckItem(unit) === 1) {
+			if (unit.quality === 6 && NTIP.CheckItem(unit) === 1) {
 				return true;
 			}
 		}
 
 		if (recipe.Index >= Recipe.Socket.Shield && recipe.Index <= Recipe.Socket.Helm) {
 			// Normal item matching pickit entry, no sorcets
-			if (unit.quality === 2 && unit.getStat(194) === 0 && NTIPCheckItem(unit) === 1) {
+			if (unit.quality === 2 && unit.getStat(194) === 0 && NTIP.CheckItem(unit) === 1) {
 				return true;
 			}
 		}
 
 		if (recipe.Index === Recipe.Reroll.Magic) {
-			if (unit.quality === 4 && unit.ilvl >= recipe.Level && NTIPCheckItem(unit) === 0) {
+			if (unit.quality === 4 && unit.ilvl >= recipe.Level && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
 		}
 
 		if (recipe.Index === Recipe.Reroll.Rare) {
-			if (unit.quality === 6 && NTIPCheckItem(unit) === 0) {
+			if (unit.quality === 6 && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
 		}

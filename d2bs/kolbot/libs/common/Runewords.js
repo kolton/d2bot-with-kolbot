@@ -106,7 +106,7 @@ var Runewords = {
 
 		// initiate pickit entries
 		for (i = 0; i < Config.KeepRunewords.length; i += 1) {
-			this.pickitEntries.push(NTIPParseLineInt(Config.KeepRunewords[i]));
+			this.pickitEntries.push(NTIP.ParseLineInt(Config.KeepRunewords[i]));
 		}
 
 		this.buildLists();
@@ -248,7 +248,7 @@ RuneLoop:
 						better check than getFlag(0x4000000) because randomly socketed items return false for it
 					*/
 
-					if (reroll && item.getItem() && !NTIPCheckItem(item, this.pickitEntries)) {
+					if (reroll && item.getItem() && !NTIP.CheckItem(item, this.pickitEntries)) {
 						return copyUnit(item);
 					}
 
@@ -347,7 +347,7 @@ RuneLoop:
 			print("ÿc4Runewords: ÿc0Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""));
 			D2Bot.printToConsole("Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""), 5);
 
-			if (NTIPCheckItem(items[0], this.pickitEntries)) {
+			if (NTIP.CheckItem(items[0], this.pickitEntries)) {
 				Misc.logItem("Runeword kept", items[0]);
 			}
 		}

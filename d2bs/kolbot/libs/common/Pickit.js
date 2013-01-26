@@ -9,13 +9,13 @@ var Pickit = {
 	beltSize: 1,
 	ignoreLog: [4, 5, 6, 22, 41, 76, 77, 78, 79, 80, 81], // Ignored item types for item logging
 
-	init: function () {
+	init: function (notify) {
 		var i, filename;
 
 		for (i = 0; i < Config.PickitFiles.length; i += 1) {
 			filename = "pickit/" + Config.PickitFiles[i];
 
-			NTIPOpenFile(filename);
+			NTIP.OpenFile(filename, notify);
 		}
 
 		this.beltSize = Storage.BeltSize();
@@ -29,7 +29,7 @@ var Pickit = {
 	// 3 - Runeword wants
 	// 4 - Pickup to sell (triggered when low on gold)
 	checkItem: function (unit) {
-		var rval = NTIPCheckItem(unit, false, true);
+		var rval = NTIP.CheckItem(unit, false, true);
 
 		if (Cubing.checkItem(unit)) {
 			return {result: 2, line: null};
@@ -317,7 +317,7 @@ MainLoop:
 	},
 
 	canPick: function (unit) {
-		var tome, charm, i, potion, needPots, buffers, pottype;
+		var tome, charm, i, potion, needPots, buffers, pottype, key;
 
 		switch (unit.itemType) {
 		case 4: // Gold
@@ -337,6 +337,18 @@ MainLoop:
 				} while (tome.getNext());
 			} else {
 				return false; // Don't pick scrolls if there's no tome
+			}
+
+			break;
+		case 41: // Key (new 26.1.2013)
+			key = me.getItem(543, 0);
+
+			if (key) {
+				do {
+					if (key.location === 3 && key.getStat(70) + unit.getStat(70) > 12) {
+						return false;
+					}
+				} while (key.getNext());
 			}
 
 			break;

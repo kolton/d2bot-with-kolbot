@@ -310,7 +310,8 @@ var Config = {
 		Entrance: false,
 		SealWarning: "Leave the seals alone!",
 		EntranceTP: "Entrance TP up",
-		StarTP: "Star TP up"
+		StarTP: "Star TP up",
+		DiabloMsg: "Diablo"
 	},
 	DiabloHelper: {
 		Wait: 120,

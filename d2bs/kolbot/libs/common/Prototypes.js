@@ -425,6 +425,85 @@ Unit.prototype.__defineGetter__('itemclass',
 	}
 	);
 
+Unit.prototype.getStatEx = function (id, subid) {
+	var i, temp, regex;
+
+	switch (id) {
+	case 31: // plusdefense
+		if (subid === 0) {
+			temp = this.description.split("\n");
+			regex = new RegExp("\\+\\d+ " + getLocaleString(3481));
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(regex, "i")) {
+					return Number(temp[i].match(/\d+/)[0]);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 83: // itemaddclassskills
+		if (typeof subid === "undefined") {
+			for (i = 0; i < 7; i += 1) {
+				if (this.getStat(83, i)) {
+					return this.getStat(83, i);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 188: // itemaddskilltab
+		if (typeof subid === "undefined") {
+			temp = [0, 1, 2, 8, 9, 10, 16, 17, 18, 24, 25, 26, 32, 33, 34, 40, 41, 42, 48, 49, 50];
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (this.getStat(188, temp[i])) {
+					return this.getStat(188, temp[i]);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	}
+
+	if (this.getFlag(0x04000000)) { // Runeword
+		switch (id) {
+		case 16: // enhanceddefense
+			temp = this.description.split("\n");
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(getLocaleString(3520), "i")) {
+					return Number(temp[i].match(/\d+/)[0]);
+				}
+			}
+
+			return 0;
+		case 18: // enhanceddamage
+			temp = this.description.split("\n");
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(getLocaleString(10038), "i")) {
+					return Number(temp[i].match(/\d+/)[0]);
+				}
+			}
+
+			return 0;
+		}
+	}
+
+	if (typeof subid === "undefined") {
+		return this.getStat(id);
+	}
+
+	return this.getStat(id, subid);
+};
+
 /*
 	_NTIPAliasColor["black"] = 3;
 	_NTIPAliasColor["lightblue"] = 4;
@@ -497,7 +576,6 @@ Unit.prototype.getColor = function () {
 			"Godly": Color.darkgold,
 			"Visionary": Color.white,
 			"Mnemonic": Color.crystalblue,
-			// changed skill tabs to 15 from 14 because it looks more appropriate
 			"Bowyer's": Color.lightgold,
 			"Gymnastic": Color.lightgold,
 			"Spearmaiden's": Color.lightgold,

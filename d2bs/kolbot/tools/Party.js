@@ -33,7 +33,7 @@ function main() {
 
 			while (player.getNext()) {
 				switch (Config.PublicMode) {
-				case 1:
+				case 1: // Invite others
 					if (getPlayerFlag(me.gid, player.gid, 8)) {
 						if (Config.ShitList && shitList.indexOf(player.name) === -1) {
 							say(player.name + " has been shitlisted.");
@@ -59,7 +59,11 @@ function main() {
 					}
 
 					break;
-				case 2:
+				case 2: // Accept invites
+					if (Config.Leader && player.name !== Config.Leader) {
+						break;
+					}
+
 					/*if (myPartyId !== 65535) {
 						return;
 					}*/
