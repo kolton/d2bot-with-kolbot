@@ -109,9 +109,13 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		var needRepair;
+
 		Precast.doPrecast(false);
 
-		if (Town.needRepair()) { // Repair check, mainly to restock arrows
+		needRepair = Town.needRepair();
+
+		if (needRepair && needRepair.length) { // Repair check, mainly to restock arrows
 			Town.visitTown();
 		}
 

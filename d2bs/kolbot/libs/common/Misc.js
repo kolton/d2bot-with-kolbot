@@ -266,7 +266,6 @@ var Misc = {
 	},
 
 	// Open all chests that have preset units in an area
-	// Open all chests that have preset units in an area
 	openChestsInArea: function (area) {
 		if (!area) {
 			area = me.area;
@@ -305,45 +304,6 @@ var Misc = {
 
 		return true;
 	},
-
-	/*openChestsInArea: function (area) {
-		var room, presetUnits,
-			rooms = [],
-			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
-						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
-
-		if (!area) {
-			area = me.area;
-		}
-
-		room = getRoom(area);
-
-		if (room) {
-			do {
-				presetUnits = room.getPresetUnits(2);
-
-				while (presetUnits.length) {
-					presetUnits.sort(Sort.presetUnits);
-
-					if (chestIds.indexOf(presetUnits[0].id) > -1) {
-						rooms.push({x: presetUnits[0].roomx * 5 + presetUnits[0].x, y: presetUnits[0].roomy * 5 + presetUnits[0].y});
-
-						break;
-					}
-
-					presetUnits.shift();
-				}
-			} while (room.getNext());
-		}
-
-		while (rooms.length) {
-			rooms.sort(Sort.units);
-			this.openChestsInRoom(rooms[0].x, rooms[0].y);
-			rooms.shift();
-		}
-
-		return true;
-	},*/
 
 	openChestsInRoom: function (x, y) {
 		var unit, room,
@@ -507,6 +467,10 @@ var Misc = {
 
 	// Use a shrine Unit
 	getShrine: function (unit) {
+		if (unit.mode) {
+			return false;
+		}
+
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
@@ -554,14 +518,12 @@ var Misc = {
 
 			if (shrine) {
 				do {
-					if (shrine.objtype === type) {
+					if (shrine.objtype === type && shrine.mode === 0) {
 						Pather.moveTo(shrine.x - 2, shrine.y - 2);
 
-						if (use) {
-							return this.getShrine(shrine);
+						if (!use || this.getShrine(shrine)) {
+							return true;
 						}
-
-						return true;
 					}
 				} while (shrine.getNext());
 			}
@@ -608,7 +570,7 @@ var Misc = {
 		color = unit.getColor();
 		//desc += ("\nÿc0Item Level: " + unit.ilvl);
 
-		if (action === "Kept") {
+		if (action.match("kept", "i")) {
 			lastArea = DataFile.getStats().lastArea;
 
 			if (lastArea) {

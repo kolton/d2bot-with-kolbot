@@ -360,6 +360,11 @@ function Diablo() {
 	Precast.doPrecast(true);
 	this.infectorSeal();
 	Pather.moveTo(7788, 5292);
+
+	if (Config.PublicMode) {
+		say(Config.Diablo.DiabloMsg);
+	}
+
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();

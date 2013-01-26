@@ -154,6 +154,8 @@ var Town = {
 			Misc.useMenu(0x0FB4);
 			delay(1000);
 			me.cancel();
+
+			break;
 		}
 
 		return npc;
@@ -853,11 +855,11 @@ MainLoop:
 	},
 
 	repair: function () {
-		var quiver, myQuiver, npc, repairCheck, bowCheck;
+		var i, quiver, myQuiver, npc, repairAction, bowCheck;
 
-		repairCheck = this.needRepair();
+		repairAction = this.needRepair();
 
-		if (!repairCheck) {
+		if (!repairAction || !repairAction.length) {
 			return true;
 		}
 
@@ -867,43 +869,32 @@ MainLoop:
 			return false;
 		}
 
-		//print("Repair trigger: " + repairCheck);
+		for (i = 0; i < repairAction.length; i += 1) {
+			switch (repairAction[i]) {
+			case "repair":
+				me.repair();
 
-		switch (repairCheck) {
-		case "durability":
-		case "charges":
-		case "quantity":
-			me.repair();
+				break;
+			case "buyQuiver":
+				bowCheck = Attack.usingBow();
 
-			break;
-		case "quiver":
-			bowCheck = Attack.usingBow();
+				if (bowCheck) {
+					quiver = bowCheck === "bow" ? npc.getItem("aqv") : quiver = npc.getItem("cqv");
 
-			if (bowCheck) {
-				switch (bowCheck) {
-				case "bow":
-					quiver = npc.getItem("aqv");
+					if (quiver) {
+						myQuiver = me.getItem(quiver.code, 1);
 
-					break;
-				case "crossbow":
-					quiver = npc.getItem("cqv");
+						if (myQuiver) {
+							myQuiver.sell();
+							delay(500);
+						}
 
-					break;
-				}
-
-				if (quiver) {
-					myQuiver = me.getItem(quiver.code, 1);
-
-					if (myQuiver) {
-						myQuiver.sell();
-						delay(500);
+						quiver.buy();
 					}
-
-					quiver.buy();
 				}
-			}
 
-			break;
+				break;
+			}
 		}
 
 		//this.shopItems();
@@ -912,60 +903,10 @@ MainLoop:
 	},
 
 	needRepair: function () {
-		if (me.getStat(14) + me.getStat(15) < me.getRepairCost()) { // Check if we can afford repairs
-			return false;
-		}
-
-		var i, durability, quantity, charge, quiver, bowCheck,
+		var i, durability, quantity, charge, quiver, bowCheck, item,
+			repairAction = [],
 			repairPercent = 40, // TODO: Move this somewhere else
-			item = me.getItem(-1, 1); // Id -1 = any, Mode 1 = equipped
-
-		if (!item) { // No equipped items
-			return false;
-		}
-
-		do {
-			if (!item.getFlag(0x400000)) { // Skip ethereal items
-				switch (item.itemType) {
-				// Quantity check
-				case 42: // Throwing knives
-				case 43: // Throwing axes
-				case 44: // Javelins
-				case 87: // Amazon javelins
-					quantity = item.getStat(70);
-
-					if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
-						return "quantity";
-					}
-
-					break;
-				// Durability check
-				default:
-					durability = item.getStat(72);
-
-					if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
-						return "durability";
-					}
-
-					break;
-				}
-
-				// Charged item check
-				charge = item.getStat(-2)[204];
-
-				if (typeof (charge) === "object") {
-					if (charge instanceof Array) {
-						for (i = 0; i < charge.length; i += 1) {
-							if (typeof charge[i] !== "undefined" && charge[i].hasOwnProperty("charges") && charge[i].charges * 100 / charge[i].maxcharges <= repairPercent) {
-								return "charges";
-							}
-						}
-					} else if (charge.charges * 100 / charge.maxcharges <= repairPercent) {
-						return "charges";
-					}
-				}
-			}
-		} while (item.getNext());
+			canAfford = me.getStat(14) + me.getStat(15) >= me.getRepairCost();
 
 		// Arrow/Bolt check
 		bowCheck = Attack.usingBow();
@@ -974,24 +915,87 @@ MainLoop:
 			switch (bowCheck) {
 			case "bow":
 				quiver = me.getItem("aqv", 1); // Equipped arrow quiver
+
 				break;
 			case "crossbow":
 				quiver = me.getItem("cqv", 1); // Equipped bolt quiver
+
 				break;
 			}
 
 			if (!quiver) { // Out of arrows/bolts
-				return "quiver";
-			}
+				repairAction.push("buyQuiver");
+			} else {
+				quantity = quiver.getStat(70);
 
-			quantity = quiver.getStat(70);
-
-			if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= repairPercent) {
-				return "quiver";
+				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= repairPercent) {
+					repairAction.push("buyQuiver");
+				}
 			}
 		}
 
-		return false;
+		// Repair durability/quantity/charges
+		if (canAfford) {
+			item = me.getItem(-1, 1);
+
+			if (item) {
+RepairLoop:
+				do {
+					if (!item.getFlag(0x400000)) { // Skip ethereal items
+						switch (item.itemType) {
+						// Quantity check
+						case 42: // Throwing knives
+						case 43: // Throwing axes
+						case 44: // Javelins
+						case 87: // Amazon javelins
+							quantity = item.getStat(70);
+
+							if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+								repairAction.push("repair");
+
+								break RepairLoop;
+							}
+
+							break;
+						// Durability check
+						default:
+							durability = item.getStat(72);
+
+							if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
+								repairAction.push("repair");
+
+								break RepairLoop;
+							}
+
+							break;
+						}
+
+						// Charged item check
+						charge = item.getStat(-2)[204];
+
+						if (typeof (charge) === "object") {
+							if (charge instanceof Array) {
+								for (i = 0; i < charge.length; i += 1) {
+									if (typeof charge[i] !== "undefined" && charge[i].hasOwnProperty("charges") && charge[i].charges * 100 / charge[i].maxcharges <= repairPercent) {
+										repairAction.push("repair");
+
+										break RepairLoop;
+									}
+								}
+							} else if (charge.charges * 100 / charge.maxcharges <= repairPercent) {
+								repairAction.push("repair");
+
+								break RepairLoop;
+							}
+						}
+					}
+				} while (item.getNext());
+			}
+		} else {
+			print("ÿc4Town: ÿc1Can't afford repairs.");
+		}
+
+		return repairAction;
 	},
 
 	reviveMerc: function () {

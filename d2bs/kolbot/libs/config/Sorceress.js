@@ -80,6 +80,7 @@ function LoadConfig() {
 		Config.Diablo.SealWarning = "Leave the seals alone!";
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
+		Config.Diablo.DiabloMsg = "Diablo";
 
 	// *** act 5 ***
 	Scripts.Pindleskin = false;
@@ -137,22 +138,6 @@ function LoadConfig() {
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
 		Config.BaalHelper.SkipTP = true; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
-	Scripts.BaalAssistant = false; // Used to leech or help in baal runs.
-		Config.BaalAssistant.Wait = 120; // Seconds to wait for a runner to be in the throne / portal wait / safe TP wait / hot TP wait...
-		Config.BaalAssistant.KillNihlathak = false; // Kill Nihlathak before going to Throne
-		Config.BaalAssistant.FastChaos = false; // Kill Diablo before going to Throne
-		Config.BaalAssistant.Helper = true; // Set to true to help attack, set false to to leech.
-		Config.BaalAssistant.GetShrine = false; // Set to true to get a experience shrine at the start of the run.
-		Config.BaalAssistant.GetShrineWaitForHotTP = false; // Set to true to get a experience shrine after leader shouts the hot tp message as defined in Config.BaalAssistant.HotTPMessage
-		Config.BaalAssistant.SkipTP = false; // Set to true to enable the helper to skip the TP and teleport down to the throne room.
-		Config.BaalAssistant.WaitForSafeTP = false; // Set to true to wait for a safe TP message (defined in SafeTPMessage)
-		Config.BaalAssistant.DollQuit = false; // Quit on dolls. (Hardcore players?)
-		Config.BaalAssistant.SoulQuit = false; // Quit on Souls. (Hardcore players?)
-		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely. 
-		Config.BaalAssistant.HotTPMessage = ["Hot"]; // Configure safe TP messages.
-		Config.BaalAssistant.SafeTPMessage = ["Safe", "Clear"]; // Configure safe TP messages.
-		Config.BaalAssistant.BaalMessage = ["Baal"]; // Configure baal messages, this is a precautionary measure.
-		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 
 	// *** special scripts ***
@@ -188,7 +173,24 @@ function LoadConfig() {
 		Config.ChestMania.Act5 = [115, 116, 119, 125, 126, 127]; // List of act 5 areas to open chests in
 
 	// *** Guest scripts ***
-	
+
+	// Baal Assistant by YourGreatestMember
+	Scripts.BaalAssistant = false; // Used to leech or help in baal runs.
+		Config.BaalAssistant.Wait = 120; // Seconds to wait for a runner to be in the throne / portal wait / safe TP wait / hot TP wait...
+		Config.BaalAssistant.KillNihlathak = false; // Kill Nihlathak before going to Throne
+		Config.BaalAssistant.FastChaos = false; // Kill Diablo before going to Throne
+		Config.BaalAssistant.Helper = true; // Set to true to help attack, set false to to leech.
+		Config.BaalAssistant.GetShrine = false; // Set to true to get a experience shrine at the start of the run.
+		Config.BaalAssistant.GetShrineWaitForHotTP = false; // Set to true to get a experience shrine after leader shouts the hot tp message as defined in Config.BaalAssistant.HotTPMessage
+		Config.BaalAssistant.SkipTP = false; // Set to true to enable the helper to skip the TP and teleport down to the throne room.
+		Config.BaalAssistant.WaitForSafeTP = false; // Set to true to wait for a safe TP message (defined in SafeTPMessage)
+		Config.BaalAssistant.DollQuit = false; // Quit on dolls. (Hardcore players?)
+		Config.BaalAssistant.SoulQuit = false; // Quit on Souls. (Hardcore players?)
+		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely. 
+		Config.BaalAssistant.HotTPMessage = ["Hot"]; // Configure safe TP messages.
+		Config.BaalAssistant.SafeTPMessage = ["Safe", "Clear"]; // Configure safe TP messages.
+		Config.BaalAssistant.BaalMessage = ["Baal"]; // Configure baal messages, this is a precautionary measure.
+		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
 
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
@@ -319,8 +321,8 @@ function LoadConfig() {
 	Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
 	// General config
-	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
-	Config.LastMessage = ""; // Message to say at the end of the run.
+	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable. If Config.Leader is set, the bot will only accept invites from leader.
+	Config.LastMessage = ""; // Message or array of messages to say at the end of the run. Use $nextgame to say next game - "Next game: $nextgame" (works with lead entry point)
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will TP to town and stay in game if the run is completed before.
 	Config.MaxGameTime = 0; // Maximum game time in seconds. Quit game when limit is reached.

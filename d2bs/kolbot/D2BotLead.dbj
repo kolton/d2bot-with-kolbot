@@ -77,6 +77,18 @@ function ReceiveCopyData(mode, msg) {
 	}
 }
 
+function setNextGame() {
+	var nextGame = gameInfo.gameName;
+
+	if (StarterConfig.ResetCount && gameCount + 1 >= StarterConfig.ResetCount) {
+		nextGame += 1;
+	} else {
+		nextGame += (gameCount + 1);
+	}
+
+	DataFile.updateStats("nextGame", nextGame);
+}
+
 function locationTimeout(time, location) {
 	var endtime = getTickCount() + time;
 
@@ -227,6 +239,10 @@ MainSwitch:
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
 
+		if (lastGameStatus === "pending") {
+			gameCount += 1;
+		}
+
 		loginFail = 0;
 
 		if (StarterConfig.PingQuitDelay && pingQuit) {
@@ -330,6 +346,10 @@ MainSwitch:
 		break;
 	case 3: // Lobby Chat
 		D2Bot.updateStatus("Lobby Chat");
+
+		if (lastGameStatus === "pending") {
+			gameCount += 1;
+		}
 
 		if (ingame || gameInfo.error === "@error") {
 			if (!gameStart) {
@@ -486,14 +506,13 @@ MainSwitch:
 			D2Bot.printToConsole("Failed to create game");
 			ControlAction.timeoutDelay("FTJ delay", StarterConfig.FTJDelay * 1e3);
 			D2Bot.updateRuns();
-
-			gameCount += 1;
 		}
 
 		ControlAction.createGame(gameInfo.gameName + gameCount, gameInfo.gamePass, gameInfo.difficulty, StarterConfig.CreateGameDelay * 1000);
 
 		lastGameStatus = "pending";
 
+		setNextGame();
 		locationTimeout(5000, location);
 
 		break;
