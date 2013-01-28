@@ -1341,6 +1341,7 @@ MainLoop:
 	},
 
 	act : [{}, {}, {}, {}, {}],
+
 	initialize: function () {
 		//print("Initialize town " + me.act);
 

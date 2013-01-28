@@ -216,179 +216,181 @@ function main() {
 
 	// Main Loop
 	while (true) {
-		// Scan for hostiles or quit
-		if (findTrigger) {
-			this.findHostiles();
+		if (me.gameReady) {
+			// Scan for hostiles or quit
+			if (findTrigger) {
+				this.findHostiles();
 
-			if (Config.HostileAction === 0 || (Config.HostileAction === 1 && me.inTown)) {
-				if (Config.TownOnHostile) {
-					this.pause();
-					Town.goToTown();
+				if (Config.HostileAction === 0 || (Config.HostileAction === 1 && me.inTown)) {
+					if (Config.TownOnHostile) {
+						this.pause();
+						Town.goToTown();
 
-					while (hostiles.length > 0) {
-						delay(500);
-					}
+						while (hostiles.length > 0) {
+							delay(500);
+						}
 
-					Pather.usePortal(null, me.name);
-					this.resume();
-				} else {
-					quit();
-				}
-
-				return;
-			}
-
-			findTrigger = false;
-		}
-
-		// Mode 3 - Spam entrance (still experimental)
-		if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131) {
-			switch (me.classid) {
-			case 1: // Sorceress
-				prevPos = {x: me.x, y: me.y};
-				this.pause();
-				Pather.moveTo(15103, 5247);
-
-				while (!this.findPlayer() && hostiles.length > 0) {
-					if (!me.getState(121)) {
-						Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
+						Pather.usePortal(null, me.name);
+						this.resume();
 					} else {
-						if (Config.AttackSkill[2] > -1) {
-							Skill.cast(Config.AttackSkill[2], ClassAttack.skillHand[2], 15099, 5237);
-						} else {
-							while (me.getState(121)) {
-								delay(40);
-							}
-						}
-					}
-				}
-
-				break;
-			case 5: // Druid
-				// Don't bother if it's not a tornado druid
-				if (Config.AttackSkill[1] !== 245) {
-					break;
-				}
-
-				prevPos = {x: me.x, y: me.y};
-				this.pause();
-				Pather.moveTo(15103, 5247);
-
-				while (!this.findPlayer() && hostiles.length > 0) {
-					// Tornado path is a function of target x. Slight randomization will make sure it can't always miss
-					Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099 + rand(-2, 2), 5237);
-				}
-
-				break;
-			case 6: // Assassin
-				prevPos = {x: me.x, y: me.y};
-				this.pause();
-				Pather.moveTo(15103, 5247);
-
-				while (!this.findPlayer() && hostiles.length > 0) {
-					if (Config.UseTraps) {
-						check = ClassAttack.checkTraps({x: 15099, y: 5242, classid: 544});
-
-						if (check) {
-							ClassAttack.placeTraps({x: 15099, y: 5242, classid: 544}, 5);
-						}
+						quit();
 					}
 
-					Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
-
-					while (me.getState(121)) {
-						delay(40);
-					}
+					return;
 				}
 
-				break;
-			}
-		}
-
-		// Player left, return to old position
-		if (!hostiles.length && prevPos) {
-			Pather.moveTo(prevPos.x, prevPos.y);
-			this.resume();
-
-			// Reset position
-			prevPos = false;
-		}
-
-		player = this.findPlayer();
-
-		if (player) {
-			// Mode 1 - Quit if hostile player is nearby
-			if (Config.HostileAction === 1) {
-				if (Config.TownOnHostile) {
-					this.pause();
-					Town.goToTown();
-
-					while (hostiles.length > 0) {
-						delay(500);
-					}
-
-					Pather.usePortal(null, me.name);
-					this.resume();
-				} else {
-					quit();
-				}
-
-				return;
+				findTrigger = false;
 			}
 
-			// Kill the hostile player
-			if (!prevPos) {
-				prevPos = {x: me.x, y: me.y};
-			}
-
-			this.pause();
-			this.startFlash(player.gid); // might need to be expanded
-
-			Config.UseMerc = false; // Don't go revive the merc mid-fight
-			attackCount = 0;
-
-			while (attackCount < 100) {
-				if (!copyUnit(player).x || player.inTown || me.mode === 17) { // Invalidated Unit (out of getUnit range) or player in town
-					break;
-				}
-
-				// Specific attack additions
+			// Mode 3 - Spam entrance (still experimental)
+			if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131) {
 				switch (me.classid) {
 				case 1: // Sorceress
-				case 2: // Necromancer
-					// Dodge missiles - experimental
-					missile = getUnit(3);
+					prevPos = {x: me.x, y: me.y};
+					this.pause();
+					Pather.moveTo(15103, 5247);
 
-					if (missile) {
-						do {
-							if (getPlayerFlag(me.gid, missile.owner, 8) && (getDistance(me, missile) < 15 || (missile.targetx && getDistance(me, missile.targetx, missile.targety) < 15))) {
-								this.moveAway(missile, ClassAttack.skillRange[1]);
-
-								break;
+					while (!this.findPlayer() && hostiles.length > 0) {
+						if (!me.getState(121)) {
+							Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
+						} else {
+							if (Config.AttackSkill[2] > -1) {
+								Skill.cast(Config.AttackSkill[2], ClassAttack.skillHand[2], 15099, 5237);
+							} else {
+								while (me.getState(121)) {
+									delay(40);
+								}
 							}
-						} while (missile.getNext());
-					}
-
-					// Move away if the player is too close or if he tries to move too close (telestomp)
-					if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || (player.targetx && getDistance(me, player.targetx, player.targety) < 15))) {
-						this.moveAway(player, ClassAttack.skillRange[1]);
+						}
 					}
 
 					break;
-				}
+				case 5: // Druid
+					// Don't bother if it's not a tornado druid
+					if (Config.AttackSkill[1] !== 245) {
+						break;
+					}
 
-				ClassAttack.doAttack(player, false);
+					prevPos = {x: me.x, y: me.y};
+					this.pause();
+					Pather.moveTo(15103, 5247);
 
-				attackCount += 1;
+					while (!this.findPlayer() && hostiles.length > 0) {
+						// Tornado path is a function of target x. Slight randomization will make sure it can't always miss
+						Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099 + rand(-2, 2), 5237);
+					}
 
-				if (player.mode === 0 || player.mode === 17) {
+					break;
+				case 6: // Assassin
+					prevPos = {x: me.x, y: me.y};
+					this.pause();
+					Pather.moveTo(15103, 5247);
+
+					while (!this.findPlayer() && hostiles.length > 0) {
+						if (Config.UseTraps) {
+							check = ClassAttack.checkTraps({x: 15099, y: 5242, classid: 544});
+
+							if (check) {
+								ClassAttack.placeTraps({x: 15099, y: 5242, classid: 544}, 5);
+							}
+						}
+
+						Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
+
+						while (me.getState(121)) {
+							delay(40);
+						}
+					}
+
 					break;
 				}
 			}
 
-			Pather.moveTo(prevPos.x, prevPos.y);
-			this.resume();
-			this.stopFlash();
+			// Player left, return to old position
+			if (!hostiles.length && prevPos) {
+				Pather.moveTo(prevPos.x, prevPos.y);
+				this.resume();
+
+				// Reset position
+				prevPos = false;
+			}
+
+			player = this.findPlayer();
+
+			if (player) {
+				// Mode 1 - Quit if hostile player is nearby
+				if (Config.HostileAction === 1) {
+					if (Config.TownOnHostile) {
+						this.pause();
+						Town.goToTown();
+
+						while (hostiles.length > 0) {
+							delay(500);
+						}
+
+						Pather.usePortal(null, me.name);
+						this.resume();
+					} else {
+						quit();
+					}
+
+					return;
+				}
+
+				// Kill the hostile player
+				if (!prevPos) {
+					prevPos = {x: me.x, y: me.y};
+				}
+
+				this.pause();
+				this.startFlash(player.gid); // might need to be expanded
+
+				Config.UseMerc = false; // Don't go revive the merc mid-fight
+				attackCount = 0;
+
+				while (attackCount < 100) {
+					if (!copyUnit(player).x || player.inTown || me.mode === 17) { // Invalidated Unit (out of getUnit range) or player in town
+						break;
+					}
+
+					// Specific attack additions
+					switch (me.classid) {
+					case 1: // Sorceress
+					case 2: // Necromancer
+						// Dodge missiles - experimental
+						missile = getUnit(3);
+
+						if (missile) {
+							do {
+								if (getPlayerFlag(me.gid, missile.owner, 8) && (getDistance(me, missile) < 15 || (missile.targetx && getDistance(me, missile.targetx, missile.targety) < 15))) {
+									this.moveAway(missile, ClassAttack.skillRange[1]);
+
+									break;
+								}
+							} while (missile.getNext());
+						}
+
+						// Move away if the player is too close or if he tries to move too close (telestomp)
+						if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || (player.targetx && getDistance(me, player.targetx, player.targety) < 15))) {
+							this.moveAway(player, ClassAttack.skillRange[1]);
+						}
+
+						break;
+					}
+
+					ClassAttack.doAttack(player, false);
+
+					attackCount += 1;
+
+					if (player.mode === 0 || player.mode === 17) {
+						break;
+					}
+				}
+
+				Pather.moveTo(prevPos.x, prevPos.y);
+				this.resume();
+				this.stopFlash();
+			}
 		}
 
 		delay(200);
