@@ -6,6 +6,12 @@ var StarterConfig = {
 	CharacterDifference: 99, // Character level difference. Set to false to disable character difference.
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
+	// ChannelConfig can override these options for individual profiles.
+	JoinChannel: "", // Default channel. Can be an array of channels - ["channel 1", "channel 2"]
+	FirstJoinMessage: "", // Default join message. Can be an array of messages
+	AnnounceGames: false, // Default value
+	AfterGameMessage: "", // Default message after a finished game. Can be an array of messages
+
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 	CrashDelay: 10, // Seconds to wait after a d2 window crash
 	FTJDelay: 60, // Seconds to wait after failing to create a game
@@ -19,12 +25,40 @@ var StarterConfig = {
 };
 
 var ChannelConfig = {
-	// Now you can join separate channels for separate profiles, use separate join messages etc
-	// Format 1 - single channel: "Profile Name": {JoinChannel: "channel", FirstJoinMessage: "login message", AnnounceGames: true}
-	// Format 2 - multiple channels: "Profile Name": {JoinChannel: ["channel 1", "channel 2"], FirstJoinMessage: ["channel 1 login", "channel 2 login"], AnnounceGames: true}
-	// Multiple entries are separated by a comma
+	/* Override default values for JoinChannel, FirstJoinMessage, AnnounceGames and AfterGameMessage per profile
+		It's possible to override any number of these options (you don't have to put all of them)
 
-	//"Example": {JoinChannel: "my channel", FirstJoinMessage: ".login", AnnounceGames: true}
+		**** DO NOT EDIT ANYTHING INSIDE THIS COMMENT BLOCK ***
+
+		Format:
+
+		"Profile Name": {
+			JoinChannel: "channel name", -OR- ["channel 1", "channel 2"],
+			FirstJoinMessage: "first message", -OR- ["join msg 1", "join msg 2"],
+			AnnounceGames: true,
+			AfterGameMessage: "message after a finished run" -OR- ["msg 1", msg 2"]
+		}
+
+		Multiple entries are separated by a comma
+
+		Examples:
+
+		"Profile 1": {
+			JoinChannel: "my channel",
+			FirstJoinMessage: ".login",
+			AnnounceGames: true,
+			AfterGameMessage: "follow my runs or die"
+		},
+		"Profile 2": {
+			JoinChannel: ["channel 1", "channel 2"],
+			FirstJoinMessage: [".login", "^login"],
+			AfterGameMessage: ["follow my runs or die", "seriously, you'll die"]
+		}
+	*/
+
+	// Add your lines here
+
+
 };
 
 
@@ -46,7 +80,13 @@ var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
 	loginFail = 0,
-	isUp = "no";
+	isUp = "no",
+	chanInfo = {
+		joinChannel: "",
+		firstMsg: "",
+		afterMsg: "",
+		announce: false
+	};
 
 function ReceiveCopyData(mode, msg) {
 	//print(mode + " " + msg);
@@ -251,7 +291,7 @@ MainSwitch:
 			pingQuit = false;
 		}
 
-		if (ChannelConfig.hasOwnProperty(me.profile) && ChannelConfig[me.profile].JoinChannel !== "") {
+		if (StarterConfig.JoinChannel !== "" || (ChannelConfig[me.profile] && ChannelConfig[me.profile].JoinChannel !== "")) {
 			ControlAction.click(6, 27, 480, 120, 20);
 
 			break;
@@ -401,6 +441,23 @@ MainSwitch:
 
 				DataFile.updateStats("runs", gameCount);
 			}
+
+			if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("AfterGameMessage")) {
+				chanInfo.afterMsg = ChannelConfig[me.profile].AfterGameMessage;
+			} else {
+				chanInfo.afterMsg = StarterConfig.AfterGameMessage;
+			}
+
+			if (chanInfo.afterMsg) {
+				if (typeof chanInfo.afterMsg === "string") {
+					chanInfo.afterMsg = [chanInfo.afterMsg];
+				}
+
+				for (i = 0; i < chanInfo.afterMsg.length; i += 1) {
+					say(chanInfo.afterMsg[i]);
+					delay(500);
+				}
+			}
 		}
 
 		// #### experimental gambling system start ####
@@ -419,48 +476,48 @@ MainSwitch:
 		if (!chatActionsDone) {
 			chatActionsDone = true;
 
-			// Single channel
-			if (typeof ChannelConfig[me.profile].JoinChannel === "string") {
-				ControlAction.timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-				say("/j " + ChannelConfig[me.profile].JoinChannel);
-				delay(2000);
-
-				if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
-					say(ChannelConfig[me.profile].FirstJoinMessage);
-					delay(500);
-				}
+			if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("JoinChannel")) {
+				chanInfo.joinChannel = ChannelConfig[me.profile].JoinChannel;
+			} else {
+				chanInfo.joinChannel = StarterConfig.JoinChannel;
 			}
 
-			// Multiple channels
-			if (typeof ChannelConfig[me.profile].JoinChannel === "object") {
-				for (i = 0; i < ChannelConfig[me.profile].JoinChannel.length; i += 1) {
+			if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("FirstJoinMessage")) {
+				chanInfo.firstMsg = ChannelConfig[me.profile].FirstJoinMessage;
+			} else {
+				chanInfo.firstMsg = StarterConfig.FirstJoinMessage;
+			}
+
+			if (chanInfo.joinChannel) {
+				if (typeof chanInfo.joinChannel === "string") {
+					chanInfo.joinChannel = [chanInfo.joinChannel];
+				}
+
+				if (typeof chanInfo.firstMsg === "string") {
+					chanInfo.firstMsg = [chanInfo.firstMsg];
+				}
+
+				for (i = 0; i < chanInfo.joinChannel.length; i += 1) {
 					ControlAction.timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-					say("/j " + ChannelConfig[me.profile].JoinChannel[i]);
+					say("/j " + chanInfo.joinChannel[i]);
 					delay(2000);
 
-					if (ChannelConfig[me.profile].FirstJoinMessage[i] !== "") {
-						say(ChannelConfig[me.profile].FirstJoinMessage[i]);
+					if (chanInfo.firstMsg[i] !== "") {
+						say(chanInfo.firstMsg[i]);
 						delay(500);
 					}
 				}
 			}
 		}
 
-		if (!chatActionsDone) {
-			chatActionsDone = true;
-
-			ControlAction.timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-			say("/j " + ChannelConfig[me.profile].JoinChannel);
-			delay(1000);
-
-			if (ChannelConfig[me.profile].FirstJoinMessage !== "") {
-				say(ChannelConfig[me.profile].FirstJoinMessage);
-				delay(500);
-			}
+		// Announce game
+		if (ChannelConfig[me.profile] && ChannelConfig[me.profile].hasOwnProperty("AnnounceGames")) {
+			chanInfo.announce = ChannelConfig[me.profile].AnnounceGames;
+		} else {
+			chanInfo.announce = StarterConfig.AnnounceGames;
 		}
 
-		// Announce game
-		if (ChannelConfig[me.profile] && ChannelConfig[me.profile].AnnounceGames) {
+		if (chanInfo.announce) {
 			say("Next game is " + gameInfo.gameName + gameCount + (gameInfo.gamePass === "" ? "" : "//" + gameInfo.gamePass));
 		}
 

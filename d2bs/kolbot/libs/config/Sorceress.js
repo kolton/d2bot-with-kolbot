@@ -304,6 +304,12 @@ function LoadConfig() {
 	Config.Recipes.push([Recipe.Socket.Armor, 442]); // Socket Sacred Armor
 	Config.Recipes.push([Recipe.Socket.Armor, 443]); // Socket Archon Plate
 
+	Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 335]); // Upgrade Bloodfist to Exceptional
+	Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 337]); // Upgrade Magefist to Exceptional
+	Config.Recipes.push([Recipe.Unique.Armor.ToElite, 381]); // Upgrade Bloodfist or Grave Palm to Elite
+	Config.Recipes.push([Recipe.Unique.Armor.ToElite, 383]); // Upgrade Magefist or Lavagout to Elite
+	Config.Recipes.push([Recipe.Unique.Armor.ToElite, 389]); // Upgrade Gore Rider to Elite
+
 	/* Runeword config. All recipes are available in Templates/Runewords.txt
 	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
 	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them

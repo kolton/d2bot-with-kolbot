@@ -502,12 +502,13 @@ MainLoop:
 	loginAccount: function (info) {
 		me.blockMouse = true;
 
-		var tick, realms = {
-			"uswest": 0,
-			"useast": 1,
-			"asia": 2,
-			"europe": 3
-		};
+		var tick,
+			realms = {
+				"uswest": 0,
+				"useast": 1,
+				"asia": 2,
+				"europe": 3
+			};
 
 		tick = getTickCount();
 

@@ -13,6 +13,10 @@ var Pather = {
 	recursion: true,
 
 	moveTo: function (x, y, retry, clearPath, pop) {
+		while (!me.gameReady) {
+			delay(100);
+		}
+
 		if (me.dead) { // Abort if dead
 			return false;
 		}
