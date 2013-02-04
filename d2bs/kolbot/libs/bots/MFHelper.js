@@ -162,7 +162,7 @@ MainLoop:
 			playerAct = this.getPlayerAct(player);
 
 			if (playerAct && playerAct !== me.act) {
-				Town.goToTown(this.getPlayerAct(player));
+				Town.goToTown(playerAct);
 				Town.move("portalspot");
 			}
 

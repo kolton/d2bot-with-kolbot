@@ -84,6 +84,7 @@ function LoadConfig() {
 
 	// *** act 5 ***
 	Scripts.Pindleskin = false;
+		Config.Pindleskin.UseWaypoint = false;
 		Config.Pindleskin.KillNihlathak = true;
 		Config.Pindleskin.ViperQuit = false; // End script if Tomb Vipers are found.
 	Scripts.Nihlathak = false;
@@ -161,8 +162,8 @@ function LoadConfig() {
 	Scripts.IPHunter = false;
 		Config.IPHunter.IPList = []; // List of IPs to look for. example: [165, 201, 64]
 		Config.IPHunter.GameLength = 3; // Number of minutes to stay in game if ip wasn't found
-	Scripts.ShopBot = false; // Fast waypoint-based shopbot, alpha version
-		Config.ShopBot.ShopNPC = "Anya"; // Only Anya for now
+	Scripts.ShopBot = false; // Fast waypoint-based shopbot
+		Config.ShopBot.ShopNPC = "Anya"; // Supported NPCs: Fara, Ormus, Anya
 		// Scan only selected classids for maximum speed. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [187, 188, 194, 195, 326, 327, 338, 373, 397, 443, 449];
 	Scripts.ChestMania = false; // Open chests in configured areas
@@ -171,8 +172,10 @@ function LoadConfig() {
 		Config.ChestMania.Act3 = [79, 80, 81, 92, 93, 84, 85, 90]; // List of act 3 areas to open chests in
 		Config.ChestMania.Act4 = []; // List of act 4 areas to open chests in
 		Config.ChestMania.Act5 = [115, 116, 119, 125, 126, 127]; // List of act 5 areas to open chests in
+	Scripts.ClearAnyArea = false; // Clear any area
+		Config.ClearAnyArea.AreaList = []; // List of area ids to clear. See sdk/areas.txt
 
-	// *** Guest scripts ***
+		// *** Guest scripts ***
 
 	// Baal Assistant by YourGreatestMember
 	Scripts.BaalAssistant = false; // Used to leech or help in baal runs.

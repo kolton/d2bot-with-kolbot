@@ -588,19 +588,18 @@ MainLoop:
 	},
 
 	getUnids: function () {
-		var i,
-			list = [],
-			items = me.getItems();
+		var list = [],
+			item = me.getItem(-1, 0);
 
-		if (!items || !items.length) {
+		if (!item) {
 			return false;
 		}
 
-		for (i = 0; i < items.length; i += 1) {
-			if (items[i].location === 3 && !items[i].getFlag(0x10)) {
-				list.push(items[i]);
+		do {
+			if (item.location === 3 && !item.getFlag(0x10)) {
+				list.push(copyUnit(item));
 			}
-		}
+		} while (item.getNext());
 
 		if (!list.length) {
 			return false;
@@ -666,38 +665,43 @@ MainLoop:
 			return true;
 		}
 
-		var i, items, result,
+		var i, item, result,
+			items = [],
 			npc = getInteractedNPC();
 
 		if (!npc || !getUIFlag(0x0C) || !npc.itemcount) {
 			return false;
 		}
 
-		items = npc.getItems();
+		item = npc.getItem();
 
-		if (!items || !items.length) {
+		if (!item) {
 			return false;
 		}
 
-		print("ÿc4MiniShopBotÿc0: Scanning " + items.length + " items.");
+		print("ÿc4MiniShopBotÿc0: Scanning " + npc.itemcount + " items.");
+
+		do {
+			if (this.ignoredItemTypes.indexOf(item.itemType) === -1) {
+				items.push(copyUnit(item));
+			}
+		} while (item.getNext());
 
 		for (i = 0; i < items.length; i += 1) {
-			if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1) {
-				result = Pickit.checkItem(items[i]);
+			result = Pickit.checkItem(items[i]);
 
-				if (result.result === 1) {
-					try {
-						if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
-							Misc.logItem("Shopped", items[i], result.line);
-							items[i].buy();
-						}
-					} catch (e) {
-						print(e);
+			if (result.result === 1) {
+				try {
+					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
+						Misc.logItem("Shopped", items[i], result.line);
+						items[i].buy();
 					}
+				} catch (e) {
+					print(e);
 				}
-
-				delay(2);
 			}
+
+			delay(2);
 		}
 
 		return true;
@@ -712,7 +716,7 @@ MainLoop:
 			me.cancel(); // cancel trade screen so it doesn't buy certain sold items back from Jamella
 		}
 
-		var i, items, npc, newItem, result,
+		var i, item, items, npc, newItem, result,
 			list = [];
 
 		npc = this.initNPC("Gamble");
@@ -727,46 +731,49 @@ MainLoop:
 			list.push(items.shift().gid);
 		}
 
-		me.cancel();
-
 		while (me.getStat(14) + me.getStat(15) >= Config.GambleGoldStop) {
 			if (!getInteractedNPC()) {
 				npc.startTrade("Gamble");
 			}
 
-			items = npc.getItems();
+			item = npc.getItem();
+			items = [];
 
-			if (items) {
+			if (item) {
+				do {
+					if (Config.GambleItems.indexOf(item.classid) > -1) {
+						items.push(copyUnit(item));
+					}
+				} while (item.getNext());
+				
 				for (i = 0; i < items.length; i += 1) {
-					if (Config.GambleItems.indexOf(items[i].classid) > -1) {
-						if (!Storage.Inventory.CanFit(items[i])) {
-							return false;
-						}
+					if (!Storage.Inventory.CanFit(items[i])) {
+						return false;
+					}
 
-						items[i].buy();
+					items[i].buy();
 
-						newItem = this.getGambledItem(list);
+					newItem = this.getGambledItem(list);
 
-						if (newItem) {
-							result = Pickit.checkItem(newItem);
+					if (newItem) {
+						result = Pickit.checkItem(newItem);
 
-							switch (result.result) {
-							case 1:
-								Misc.logItem("Gambled", newItem, result.line);
-								list.push(newItem.gid);
+						switch (result.result) {
+						case 1:
+							Misc.logItem("Gambled", newItem, result.line);
+							list.push(newItem.gid);
 
-								break;
-							case 2:
-								list.push(newItem.gid);
-								Cubing.buildLists();
+							break;
+						case 2:
+							list.push(newItem.gid);
+							Cubing.buildLists();
 
-								break;
-							default:
-								newItem.sell();
-								delay(500);
+							break;
+						default:
+							newItem.sell();
+							delay(500);
 
-								break;
-							}
+							break;
 						}
 					}
 				}
@@ -832,26 +839,26 @@ MainLoop:
 		return true;
 	},
 
-	checkKeys: function (min) {
+	checkKeys: function () {
 		if (!Config.OpenChests || me.classid === 6) {
-			return false;
+			return 12;
 		}
 
 		var key = me.findItem("key", 0, 3);
 
-		if (key && key.getStat(70) > min) {
-			return false;
+		if (key) {
+			return key.getStat(70);
 		}
 
-		return true;
+		return 0;
 	},
 
 	needKeys: function () {
-		return this.checkKeys(0);
+		return this.checkKeys() <= 0;
 	},
 
 	wantKeys: function () {
-		return this.checkKeys(6);
+		return this.checkKeys() <= 6;
 	},
 
 	repair: function () {
@@ -1273,35 +1280,38 @@ MainLoop:
 		var i, loseItemAction,
 			dropAction = 0,
 			sellAction = 1,
-			items = me.getItems();
+			item = me.getItem(-1, 0),
+			items = [];
 
-		if (items) {
-			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 3) {
-					switch (items[i].itemType) {
+		if (item) {
+			do {
+				if (item.location === 3) {
+					switch (item.itemType) {
 					case 76:
 						if (!Config.HPBuffer) {
-							items[i].interact();
-							delay(200);
+							items.push(copyUnit(item));
 						}
 
 						break;
 					case 77:
 						if (!Config.MPBuffer) {
-							items[i].interact();
-							delay(200);
+							items.push(copyUnit(item));
 						}
 
 						break;
 					case 78:
 						if (!Config.RejuvBuffer) {
-							items[i].interact();
-							delay(200);
+							items.push(copyUnit(item));
 						}
 
 						break;
 					}
 				}
+			} while (item.getNext());
+
+			while (items.length) {
+				items.shift().interact();
+				delay(200);
 			}
 		}
 

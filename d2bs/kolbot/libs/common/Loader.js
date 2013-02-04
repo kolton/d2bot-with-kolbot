@@ -8,8 +8,6 @@ var global = this;
 
 var Loader = {
 	scriptList: [],
-	printToOOG: false,
-	screenshotErrors: false,
 
 	init: function () {
 		this.getScripts();
@@ -122,17 +120,9 @@ ScriptLoop:
 
 							global[i]();
 						} catch (e) {
-							if (this.printToOOG) {
-								D2Bot.printToConsole(e.message + " in " + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line " + e.lineNumber + ". Ping:" + me.ping, 9);
-							}
-
-							Misc.errorReport("ÿc1Error in ÿc0" + i + " ÿc1(" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " line ÿc1" + e.lineNumber + "): ÿc1" + e.message);
-
-							if (this.screenshotErrors) {
-								takeScreenshot();
-								delay(500);
-							}
+							Misc.errorReport(e, i);
 						}
+
 						if (reconfiguration) {
 							print("ÿc2Reverting back unmodified config properties.");
 							this.copy(unmodifiedConfig, Config);

@@ -57,7 +57,7 @@ var ClassAttack = {
 				break;
 			// oskills
 			case 106: // Zeal
-				this.skillRange[i] = 2;
+				this.skillRange[i] = 3;
 
 				break;
 			default: // Every other skill

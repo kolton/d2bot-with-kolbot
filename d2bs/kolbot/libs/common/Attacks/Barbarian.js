@@ -22,7 +22,7 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -33,7 +33,7 @@ var ClassAttack = {
 			case 147: // Frenzy
 			case 152: // Berserk
 			case 232: // Feral Rage
-				this.skillRange[i] = 2;
+				this.skillRange[i] = 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -47,7 +47,7 @@ var ClassAttack = {
 
 				break;
 			case 151: // Whirlwind
-				this.skillRange[i] = 10;
+				this.skillRange[i] = 8;
 
 				break;
 			case 132: // Leap
@@ -191,13 +191,13 @@ MainLoop:
 
 	whirlwind: function (unit, index) {
 		var i, coords, angle,
-			//angles = [180, 45, -45, 90, -90]; // Angle offsets
-			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
+			angles = [180, 165, -165, 150, -150, 135, -135, 45, -45, 90, -90]; // Angle offsets
+			//angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
 
 		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
 
 		for (i = 0; i < angles.length; i += 1) { // get a better spot
-			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 5 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 5 + unit.y)];
+			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 4 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 4 + unit.y)];
 
 			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1)) {
 				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);

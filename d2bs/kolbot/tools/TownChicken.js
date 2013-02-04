@@ -98,7 +98,7 @@ function main() {
 					Pather.makePortal();
 				}
 			} catch (e) {
-				Misc.errorReport("TownChicken fail");
+				Misc.errorReport(e, "TownChicken.js");
 				quit();
 			} finally {
 				this.togglePause();

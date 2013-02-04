@@ -1,8 +1,15 @@
 var Hooks = {
 	monsters: {
 		hooks: [],
+		enabled: true,
 
 		check: function () {
+			if (!this.enabled) {
+				this.flush();
+
+				return;
+			}
+
 			var i, unit;
 
 			for (i = 0; i < this.hooks.length; i += 1) {
@@ -93,13 +100,36 @@ var Hooks = {
 			}
 
 			return false;
+		},
+
+		flush: function () {
+			while (this.hooks.length) {
+				this.hooks[0].hook[0].remove();
+				this.hooks[0].hook[1].remove();
+				this.hooks.shift();
+			}
 		}
 	},
 
 	text: {
 		hooks: [],
+		enabled: true,
 
 		check: function () {
+			if (!this.enabled) {
+				this.flush();
+
+				return;
+			}
+
+			if (!this.getHook("monsterStatus")) {
+				this.add("monsterStatus");
+			}
+
+			if (!this.getHook("vectorStatus")) {
+				this.add("vectorStatus");
+			}
+
 			if (!this.getHook("ping")) {
 				this.add("ping");
 			} else {
@@ -137,6 +167,20 @@ var Hooks = {
 				this.hooks.push({
 					name: "ip",
 					hook: new Text("IP: " + (me.gameserverip.length > 0 ? me.gameserverip.split(".")[3] : "0"), 785, 88 + 16 * (Number(!!me.diff) + Number(!!me.gamepassword) + Number(!!me.gametype) + Number(!!me.gamename)), 4, 1, 1)
+				});
+
+				break;
+			case "monsterStatus":
+				this.hooks.push({
+					name: "monsterStatus",
+					hook: new Text("Num 7: Disable Monsters", 525, 515)
+				});
+
+				break;
+			case "vectorStatus":
+				this.hooks.push({
+					name: "vectorStatus",
+					hook: new Text("Num 8: Disable Vectors", 525, 525)
 				});
 
 				break;
@@ -187,8 +231,15 @@ var Hooks = {
 	vector: {
 		hooks: [],
 		currArea: 0,
+		enabled: true,
 
 		check: function () {
+			if (!this.enabled) {
+				this.flush();
+
+				return;
+			}
+
 			if (me.area !== this.currArea) {
 				this.flush();
 
@@ -199,7 +250,7 @@ var Hooks = {
 
 				if (exits) {
 					for (i = 0; i < exits.length; i += 1) {
-						this.add(exits[i].x, exits[i].y, me.area === 46 && exits[i].target === getRoom().correcttomb ? 0x8F : 0x99);
+						this.add(exits[i].x, exits[i].y, me.area === 46 && exits[i].target === getRoom().correcttomb ? 0x69 : 0x99);
 					}
 				}
 
@@ -241,16 +292,20 @@ var Hooks = {
 		},
 
 		getWP: function () {
-			var i, presets,
+			if (Pather.wpAreas.indexOf(me.area) === -1) {
+				return false;
+			}
+
+			var i, preset,
 				wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
 
-			presets = getPresetUnits(me.area, 2);
+			for (i = 0; i < wpIDs.length; i += 1) {
+				preset = getPresetUnit(me.area, 2, wpIDs[i]);
 
-			for (i = 0; i < presets.length; i += 1) {
-				if (wpIDs.indexOf(presets[i].id) > -1) {
+				if (preset) {
 					return {
-						x: presets[i].roomx * 5 + presets[i].x,
-						y: presets[i].roomy * 5 + presets[i].y
+						x: preset.roomx * 5 + preset.x,
+						y: preset.roomy * 5 + preset.y
 					};
 				}
 			}
@@ -374,36 +429,50 @@ var Hooks = {
 					46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102,
 					103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129,
 					130, 131, 109, 109, 109, 109],
-
 		event: function (keycode) {
 			Hooks.tele.action = keycode;
 		},
+		enabled: true,
 
 		check: function () {
-			if (this.action) {
-				var hook;
+			if (!this.enabled) {
+				return;
+			}
 
+			var hook,
+				obj = {
+					type: false,
+					dest: false
+				};
+
+			if (this.action) {
 				switch (this.action) {
 				case 96: // Numpad 0
 					hook = this.getHook("Next Area");
+					obj.type = "area";
 
 					break;
 				case 97: // Numpad 1
 					hook = this.getHook("Previous Area");
+					obj.type = "area";
 
 					break;
 				case 98: // Numpad 2
 					hook = this.getHook("Waypoint");
+					obj.type = "wp";
 
 					break;
 				case 99: // Numpad 3
 					hook = this.getHook("POI");
+					obj.type = "unit";
 
 					break;
 				}
 
 				if (hook) {
-					scriptBroadcast(typeof hook.destination === "number" ? hook.destination.toString() : hook.destination.x + "," + hook.destination.y);
+					obj.dest = hook.destination;
+
+					scriptBroadcast(JSON.stringify(obj));
 				}
 
 				this.action = null;
@@ -419,7 +488,20 @@ var Hooks = {
 		},
 
 		add: function (area) {
-			var i, exits, wp, poi;
+			var i, exits, wp, poi, nextCheck,
+				nextAreas = [];
+
+			// Specific area override
+			nextAreas[7] = 26;
+			nextAreas[76] = 78;
+			nextAreas[77] = 78;
+			nextAreas[113] = 115;
+			nextAreas[115] = 117;
+			nextAreas[118] = 120;
+
+			if (me.area === 46) {
+				nextAreas[46] = getRoom().correcttomb;
+			}
 
 			poi = Hooks.vector.getPOI();
 
@@ -449,16 +531,40 @@ var Hooks = {
 						this.hooks.push({
 							name: "Previous Area",
 							destination: this.prevAreas[me.area],
-							hook: new Text("Num 1: " + getArea(this.prevAreas[me.area]).name, 150, 525 - (this.hooks.length * 10))
+							hook: new Text("Num 1: " + Pather.getAreaName(this.prevAreas[me.area]), 150, 525 - (this.hooks.length * 10))
 						});
-					}
 
-					if (exits[i].target === this.prevAreas.indexOf(me.area)) {
+						break;
+					}
+				}
+
+				// Check nextAreas first
+				for (i = 0; i < exits.length; i += 1) {
+					if (exits[i].target === nextAreas[me.area]) {
 						this.hooks.push({
 							name: "Next Area",
-							destination: this.prevAreas.indexOf(me.area),
-							hook: new Text("Num 0: " + getArea(this.prevAreas.indexOf(me.area)).name, 150, 525 - (this.hooks.length * 10))
+							destination: nextAreas[me.area],
+							hook: new Text("Num 0: " + Pather.getAreaName(nextAreas[me.area]), 150, 525 - (this.hooks.length * 10))
 						});
+
+						nextCheck = true;
+
+						break;
+					}
+				}
+
+				// In case the area isn't in nextAreas array, use this.prevAreas array
+				if (!nextCheck) {
+					for (i = 0; i < exits.length; i += 1) {
+						if (exits[i].target === this.prevAreas.indexOf(me.area)) {
+							this.hooks.push({
+								name: "Next Area",
+								destination: this.prevAreas.indexOf(me.area),
+								hook: new Text("Num 0: " + Pather.getAreaName(this.prevAreas.indexOf(me.area)), 150, 525 - (this.hooks.length * 10))
+							});
+
+							break;
+						}
 					}
 				}
 			}
@@ -499,12 +605,7 @@ var Hooks = {
 	},
 
 	flush: function () {
-		while (this.monsters.hooks.length) {
-			this.monsters.hooks[0].hook[0].remove();
-			this.monsters.hooks[0].hook[1].remove();
-			this.monsters.hooks.shift();
-		}
-
+		this.monsters.flush();
 		this.text.flush();
 		this.vector.flush();
 		this.tele.flush();
@@ -514,7 +615,9 @@ var Hooks = {
 };
 
 function main() {
+	include("json2.js");
 	include("common/attack.js");
+	include("common/pather.js");
 	load("tools/maphelper.js");
 	print("ÿc9Map Thread Loaded");
 
@@ -529,6 +632,36 @@ function main() {
 			this.revealedAreas.push(area);
 		}
 	};
+
+	this.keyEvent = function (key) {
+		switch (key) {
+		case 103: // Numpad 7
+			if (Hooks.monsters.enabled) {
+				Hooks.monsters.enabled = false;
+				Hooks.text.getHook("monsterStatus").hook.text = "Num 7: Enable Monsters";
+			} else {
+				Hooks.monsters.enabled = true;
+				Hooks.text.getHook("monsterStatus").hook.text = "Num 7: Disable Monsters";
+			}
+
+			break;
+		case 104: // Numpad 8
+			if (Hooks.vector.enabled) {
+				Hooks.vector.enabled = false;
+				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Enable Monsters";
+			} else {
+				Hooks.vector.enabled = true;
+				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Disable Monsters";
+			}
+
+			break;
+		}
+	};
+
+	var i,
+		hideFlags = [0x09, 0x0C, 0x0D, 0x01, 0x02, 0x0F, 0x18, 0x19, 0x21];
+
+	addEventListener("keyup", this.keyEvent);
 
 	while (true) {
 		while (!me.area || !me.gameReady) {
@@ -545,9 +678,11 @@ function main() {
 
 		delay(20);
 
-		while (getUIFlag(0x09) || getUIFlag(0x0C) || getUIFlag(0x0D)) {
-			Hooks.flush();
-			delay(100);
+		for (i = 0; i < hideFlags.length; i += 1) {
+			while (getUIFlag(hideFlags[i])) {
+				Hooks.flush();
+				delay(100);
+			}
 		}
 	}
 }

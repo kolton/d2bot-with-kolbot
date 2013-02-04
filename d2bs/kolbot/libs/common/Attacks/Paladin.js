@@ -22,7 +22,7 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -30,7 +30,7 @@ var ClassAttack = {
 			case 97: // Smite
 			case 106: // Zeal
 			case 116: // Conversion
-				this.skillRange[i] = 2;
+				this.skillRange[i] = 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -272,8 +272,12 @@ var ClassAttack = {
 
 		if (getDistance(me, x, y) > 0) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
-				//Pather.teleportTo(x, y);
-				Skill.cast(54, 0, x, y);
+				if (getDistance(me, x, y) > 40) {
+					Pather.moveTo(x, y);
+				} else {
+					//Pather.teleportTo(x, y);
+					Skill.cast(54, 0, x, y);
+				}
 			} else {
 				if (Config.Vigor) {
 					Skill.setSkill(115, 0);

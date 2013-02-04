@@ -145,7 +145,7 @@ Unit.prototype.buy = function (shiftBuy) {
 		throw new Error("Unit.buy: Must be used on items.");
 	}
 
-	if (!getUIFlag(0xC) || this.getParent().gid !== getInteractedNPC().gid) { // Check if it's an item belonging to a NPC
+	if (!getUIFlag(0xC) || this.getParent() && this.getParent().gid !== getInteractedNPC().gid) { // Check if it's an item belonging to a NPC
 		throw new Error("Unit.buy: Must be used in shops.");
 	}
 
@@ -157,6 +157,8 @@ Unit.prototype.buy = function (shiftBuy) {
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 3; i += 1) {
+		//print("BUY " + this.name + " " + i);
+
 		this.shop(shiftBuy ? 6 : 2);
 
 		tick = getTickCount();
@@ -165,7 +167,7 @@ Unit.prototype.buy = function (shiftBuy) {
 			if (shiftBuy) {
 				switch (this.classid) {
 				case 529: // tp scroll
-					container = me.getItem(518); // tp tome
+					container = me.findItem(518, 0, 3); // tp tome
 
 					if (container && container.getStat(70) === 20) {
 						delay(500);
@@ -175,7 +177,7 @@ Unit.prototype.buy = function (shiftBuy) {
 
 					break;
 				case 530: // id scroll
-					container = me.getItem(519); // id tome
+					container = me.findItem(519, 0, 3); // id tome
 
 					if (container && container.getStat(70) === 20) {
 						delay(500);
@@ -185,7 +187,7 @@ Unit.prototype.buy = function (shiftBuy) {
 
 					break;
 				case 543: // key
-					container = me.getItem(543); // key stack
+					container = me.findItem(543, 0, 3); // key stack
 
 					if (container && container.getStat(70) === 12) {
 						delay(500);
@@ -436,7 +438,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return Number(temp[i].match(/\d+/)[0]);
+					return parseInt(temp[i], 10);
 				}
 			}
 
@@ -479,7 +481,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return Number(temp[i].match(/\d+/)[0]);
+					return parseInt(temp[i], 10);
 				}
 			}
 
@@ -489,7 +491,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return Number(temp[i].match(/\d+/)[0]);
+					return parseInt(temp[i], 10);
 				}
 			}
 
@@ -524,24 +526,25 @@ Unit.prototype.getStatEx = function (id, subid) {
 */
 
 Unit.prototype.getColor = function () {
-	var i, colors, Color = {
-		black: 3,
-		lightblue: 4,
-		darkblue: 5,
-		crystalblue: 6,
-		lightred: 7,
-		darkred: 8,
-		crystalred: 9,
-		darkgreen: 11,
-		crystalgreen: 12,
-		lightyellow: 13,
-		darkyellow: 14,
-		lightgold: 15,
-		darkgold: 16,
-		lightpurple: 17,
-		orange: 19,
-		white: 20
-	};
+	var i, colors,
+		Color = {
+			black: 3,
+			lightblue: 4,
+			darkblue: 5,
+			crystalblue: 6,
+			lightred: 7,
+			darkred: 8,
+			crystalred: 9,
+			darkgreen: 11,
+			crystalgreen: 12,
+			lightyellow: 13,
+			darkyellow: 14,
+			lightgold: 15,
+			darkgold: 16,
+			lightpurple: 17,
+			orange: 19,
+			white: 20
+		};
 
 	// check type
 	if ([2, 3, 15, 16, 19, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 42, 43, 44, 67, 68, 71, 72, 85, 86, 87, 88].indexOf(this.itemType) === -1) {
@@ -714,13 +717,17 @@ Unit.prototype.getColor = function () {
 
 			break;
 		}
-	} else if (this.quality === 5) {
-		for (i = 0; i < 127; i += 1) {
-			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
-				return getBaseStat(16, i, 12) > 20 ? -1 : getBaseStat(16, i, 12);
+	} else if (this.quality === 5) { // Set
+		if (this.getFlag(0x10)) {
+			for (i = 0; i < 127; i += 1) {
+				if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
+					return getBaseStat(16, i, 12) > 20 ? -1 : getBaseStat(16, i, 12);
+				}
 			}
+		} else {
+			return Color.lightyellow; // Unidentified set item
 		}
-	} else if (this.quality === 7) {
+	} else if (this.quality === 7) { // Unique
 		for (i = 0; i < 401; i += 1) {
 			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 				return getBaseStat(17, i, 13) > 20 ? -1 : getBaseStat(17, i, 13);

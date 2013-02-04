@@ -579,132 +579,134 @@ var Misc = {
 		}
 
 		// experimental
-		switch (unit.quality) {
-		case 5: // Set
-			switch (unit.classid) {
-			case 27: // Angelic sabre
-				code = "inv9sbu";
+		if (unit.getFlag(0x10)) {
+			switch (unit.quality) {
+			case 5: // Set
+				switch (unit.classid) {
+				case 27: // Angelic sabre
+					code = "inv9sbu";
 
-				break;
-			case 74: // Arctic short war bow
-				code = "invswbu";
+					break;
+				case 74: // Arctic short war bow
+					code = "invswbu";
 
-				break;
-			case 308: // Berserker's helm
-				code = "invhlmu";
+					break;
+				case 308: // Berserker's helm
+					code = "invhlmu";
 
-				break;
-			case 330: // Civerb's large shield
-				code = "invlrgu";
+					break;
+				case 330: // Civerb's large shield
+					code = "invlrgu";
 
-				break;
-			case 31: // Cleglaw's long sword
-			case 227: // Szabi's cryptic sword
-				code = "invlsdu";
+					break;
+				case 31: // Cleglaw's long sword
+				case 227: // Szabi's cryptic sword
+					code = "invlsdu";
 
-				break;
-			case 329: // Cleglaw's small shield
-				code = "invsmlu";
+					break;
+				case 329: // Cleglaw's small shield
+					code = "invsmlu";
 
-				break;
-			case 328: // Hsaru's buckler
-				code = "invbucu";
+					break;
+				case 328: // Hsaru's buckler
+					code = "invbucu";
 
-				break;
-			case 306: // Infernal cap / Sander's cap
-				code = "invcapu";
+					break;
+				case 306: // Infernal cap / Sander's cap
+					code = "invcapu";
 
-				break;
-			case 30: // Isenhart's broad sword
-				code = "invbsdu";
+					break;
+				case 30: // Isenhart's broad sword
+					code = "invbsdu";
 
-				break;
-			case 309: // Isenhart's full helm
-				code = "invfhlu";
+					break;
+				case 309: // Isenhart's full helm
+					code = "invfhlu";
 
-				break;
-			case 333: // Isenhart's gothic shield
-				code = "invgtsu";
+					break;
+				case 333: // Isenhart's gothic shield
+					code = "invgtsu";
 
-				break;
-			case 326: // Milabrega's ancient armor
-			case 442: // Immortal King's sacred armor
-				code = "invaaru";
+					break;
+				case 326: // Milabrega's ancient armor
+				case 442: // Immortal King's sacred armor
+					code = "invaaru";
 
-				break;
-			case 331: // Milabrega's kite shield
-				code = "invkitu";
+					break;
+				case 331: // Milabrega's kite shield
+					code = "invkitu";
 
-				break;
-			case 332: // Sigon's tower shield
-				code = "invtowu";
+					break;
+				case 332: // Sigon's tower shield
+					code = "invtowu";
 
-				break;
-			case 325: // Tancred's full plate mail
-				code = "invfulu";
+					break;
+				case 325: // Tancred's full plate mail
+					code = "invfulu";
 
-				break;
-			case 3: // Tancred's military pick
-				code = "invmpiu";
+					break;
+				case 3: // Tancred's military pick
+					code = "invmpiu";
 
-				break;
-			case 113: // Aldur's jagged star
-				code = "invmstu";
+					break;
+				case 113: // Aldur's jagged star
+					code = "invmstu";
 
-				break;
-			case 234: // Bul-Kathos' colossus blade
-				code = "invgsdu";
+					break;
+				case 234: // Bul-Kathos' colossus blade
+					code = "invgsdu";
 
-				break;
-			case 372: // Grizwold's ornate plate
-				code = "invxaru";
+					break;
+				case 372: // Grizwold's ornate plate
+					code = "invxaru";
 
-				break;
-			case 366: // Heaven's cuirass
-			case 215: // Heaven's reinforced mace
-			case 449: // Heaven's ward
-			case 426: // Heaven's spired helm
-				code = "inv" + unit.code + "s";
+					break;
+				case 366: // Heaven's cuirass
+				case 215: // Heaven's reinforced mace
+				case 449: // Heaven's ward
+				case 426: // Heaven's spired helm
+					code = "inv" + unit.code + "s";
 
-				break;
-			case 357: // Hwanin's grand crown
-				code = "invxrnu";
+					break;
+				case 357: // Hwanin's grand crown
+					code = "invxrnu";
 
-				break;
-			case 195: // Nalya's scissors suwayyah
-				code = "invskru";
+					break;
+				case 195: // Nalya's scissors suwayyah
+					code = "invskru";
 
-				break;
-			case 395: // Nalya's grim helm
-			case 465: // Trang-Oul's bone visage
-				code = "invbhmu";
+					break;
+				case 395: // Nalya's grim helm
+				case 465: // Trang-Oul's bone visage
+					code = "invbhmu";
 
-				break;
-			case 261: // Naj's elder staff
-				code = "invcstu";
+					break;
+				case 261: // Naj's elder staff
+					code = "invcstu";
 
-				break;
-			case 375: // Orphan's round shield
-				code = "invxmlu";
+					break;
+				case 375: // Orphan's round shield
+					code = "invxmlu";
 
-				break;
-			case 12: // Sander's bone wand
-				code = "invbwnu";
-
-				break;
-			}
-
-			break;
-		case 7: // Unique
-			for (i = 0; i < 401; i += 1) {
-				if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
-					code = getBaseStat(17, i, "invfile");
+					break;
+				case 12: // Sander's bone wand
+					code = "invbwnu";
 
 					break;
 				}
-			}
 
-			break;
+				break;
+			case 7: // Unique
+				for (i = 0; i < 401; i += 1) {
+					if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+						code = getBaseStat(17, i, "invfile");
+
+						break;
+					}
+				}
+
+				break;
+			}
 		}
 
 		if (!code) {
@@ -721,15 +723,15 @@ var Misc = {
 			}
 		}
 
-		sock = unit.getItems();
+		sock = unit.getItem();
 
 		if (sock) {
-			for (i = 0; i < sock.length; i += 1) {
-				if (sock[i].itemType === 58) {
+			do {
+				if (sock.itemType === 58) {
 					desc += "\n\n";
-					desc += this.getItemDesc(sock[i]);
+					desc += this.getItemDesc(sock);
 				}
-			}
+			} while (sock.getNext());
 		}
 
 		if (keptLine) {
@@ -878,7 +880,7 @@ var Misc = {
 			include("common/prototypes.js");
 		}
 
-		var i, items,
+		var i, item,
 			unit = getUnit(0, name);
 
 		if (!unit) {
@@ -887,10 +889,12 @@ var Misc = {
 			return false;
 		}
 
-		items = unit.getItems();
+		item = unit.getItem();
 
-		for (i = 0; i < items.length; i += 1) {
-			this.logItem(name, items[i]);
+		if (item) {
+			do {
+				this.logItem(name, item);
+			} while (item.getNext());
 		}
 
 		return true;
@@ -931,18 +935,34 @@ MainLoop:
 		return mode === 0 ? contents : true;
 	},
 
+	errorConsolePrint: true,
+	screenshotErrors: false,
+
 	// Report script errors to logs/ScriptErrorLog.txt
-	errorReport: function (msg) {
-		var h, m, s, date;
+	errorReport: function (error, script) {
+		var h, m, s, date, msg, oogmsg, filemsg;
 
 		date = new Date();
 		h = date.getHours();
 		m = date.getMinutes();
 		s = date.getSeconds();
 
+		msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
+		oogmsg = error.message + " in " + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line " + error.lineNumber + ". Ping:" + me.ping;
+		filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+
+		if (this.errorConsolePrint) {
+			D2Bot.printToConsole(oogmsg, 9);
+		}
+
 		showConsole();
 		print(msg);
-		this.fileAction("logs/ScriptErrorLog.txt", 2, "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n");
+		this.fileAction("logs/ScriptErrorLog.txt", 2, filemsg);
+
+		if (this.screenshotErrors) {
+			takeScreenshot();
+			delay(500);
+		}
 	},
 
 	// Use a NPC menu. Experimental function, subject to change

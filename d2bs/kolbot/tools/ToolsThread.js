@@ -5,7 +5,7 @@
 */
 
 function main() {
-	var i, mercHP, ironGolem, area, tick,
+	var i, mercHP, ironGolem, tick,
 		pingTimer = [],
 		configCache = {},
 		quitFlag = false,
@@ -218,7 +218,7 @@ function main() {
 
 		if (monster) {
 			do {
-				if (monster.hp > 0 && Attack.checkMonster(monster)) {
+				if (monster.hp > 0 && Attack.checkMonster(monster) && !monster.getParent()) {
 					distance = getDistance(me, monster);
 
 					if (distance < range) {
@@ -288,13 +288,7 @@ function main() {
 
 			break;
 		case 123: // F12 key
-			area = getArea();
-
-			if (typeof area !== "object") {
-				break;
-			}
-
-			me.overhead("Revealing " + area.name);
+			me.overhead("Revealing " + Pather.getAreaName(me.area));
 			this.revealArea(me.area);
 
 			break;
@@ -415,13 +409,7 @@ function main() {
 				}
 
 				if (configCache.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * configCache.LifeChicken / 100)) {
-					area = getArea();
-
-					if (typeof area !== "object") {
-						area = {name: "unknown"};
-					}
-
-					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + area.name + ". Ping: " + me.ping, 9);
+					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + Pather.getAreaName(me.area) + ". Ping: " + me.ping, 9);
 					D2Bot.updateChickens();
 					quit();
 
@@ -437,13 +425,7 @@ function main() {
 				}
 
 				if (configCache.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * configCache.ManaChicken / 100)) {
-					area = getArea();
-
-					if (typeof area !== "object") {
-						area = {name: "unknown"};
-					}
-
-					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + area.name, 9);
+					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + Pather.getAreaName(me.area), 9);
 					D2Bot.updateChickens();
 					quit();
 
@@ -457,13 +439,7 @@ function main() {
 
 					if (ironGolem) {
 						if (ironGolem.hp <= Math.floor(128 * configCache.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
-							area = getArea();
-
-							if (typeof area !== "object") {
-								area = {name: "unknown"};
-							}
-
-							D2Bot.printToConsole("Irom Golem Chicken in " + area.name, 9);
+							D2Bot.printToConsole("Irom Golem Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
 							quit();
 
@@ -477,13 +453,7 @@ function main() {
 
 					if (mercHP > 0) {
 						if (mercHP < configCache.MercChicken) {
-							area = getArea();
-
-							if (typeof area !== "object") {
-								area = {name: "unknown"};
-							}
-
-							D2Bot.printToConsole("Merc Chicken in " + area.name, 9);
+							D2Bot.printToConsole("Merc Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
 							quit();
 
@@ -513,7 +483,7 @@ function main() {
 				}
 			}
 		} catch (e) {
-			D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name, 9);
+			D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + Pather.getAreaName(me.area), 9);
 			quit();
 
 			return;

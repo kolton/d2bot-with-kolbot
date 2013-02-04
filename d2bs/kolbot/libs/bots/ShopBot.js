@@ -1,9 +1,12 @@
 function ShopBot() {
-	var npc, tickCount, town, wpArea, path,
+	var npc, tickCount, town, wpArea, path, menuId,
 		cycles = 0,
-		cyclesText2 = new Text(cycles.toString(), 240, 260, 2, 1), // Crash fix (2+ hooks don't crash)
-		cyclesText = new Text("Cycles in last minute: ", 50, 260, 2, 1),
+		cyclesText = new Text("Cycles in last minute:", 50, 260, 2, 1),
+		frequency = new Text("Valid item frequency:", 50, 275, 2, 1),
+		totalCyclesText = new Text("Total cycles:", 50, 290, 2, 1),
+		validItems = 0,
 		leadRetry = 10,
+		totalCycles = 0,
 		leadTimeout = 20; // NPC move timeout in seconds
 
 	this.mover = function (npc, path) {
@@ -75,7 +78,8 @@ function ShopBot() {
 	};
 
 	this.shopItems = function () {
-		var i, items,
+		var i, item,
+			items = [],
 			npc = getInteractedNPC();
 
 		if (!npc) {
@@ -86,7 +90,6 @@ function ShopBot() {
 			delay(150);
 
 			if (i % 2 === 0) {
-				//sendPacket(1, 0x2f, 4, 1, 4, npc.gid);
 				sendPacket(1, 0x38, 4, 1, 4, npc.gid, 4, 0);
 			}
 
@@ -97,31 +100,40 @@ function ShopBot() {
 			}
 		}
 
-		items = npc.getItems();
+		item = npc.getItem();
 
-		if (!items || !items.length) {
+		if (!item) {
 			return false;
 		}
 
-		me.overhead(items.length + " items");
+		me.overhead(npc.itemcount + " items");
+
+		do {
+			if (Config.ShopBot.ScanIDs.indexOf(item.classid) > -1) {
+				items.push(copyUnit(item));
+			}
+		} while (item.getNext());
+
+		validItems += items.length;
+		frequency.text = "Valid item frequency: " + ((validItems * 100 / totalCycles).toFixed(2).toString());
 
 		for (i = 0; i < items.length; i += 1) {
-			if (Config.ShopBot.ScanIDs.indexOf(items[i].classid) > -1) {
-				//print("Scanning " + items[i].name);
+			print("Scanning " + items[i].name);
 
-				if (Pickit.checkItem(items[i]).result === 1) {
-					try {
-						if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
-							delay(1000);
+			if (Pickit.checkItem(items[i]).result === 1) {
+				D2Bot.printToConsole("Match found!", 7);
 
-							if (npc.startTrade()) {
-								Misc.logItem("Shopped", items[i]);
-								items[i].buy();
-							}
+				try {
+					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
+						delay(1000);
+
+						if (npc.startTrade(menuId)) {
+							Misc.logItem("Shopped", items[i]);
+							items[i].buy();
 						}
-					} catch (e) {
-						print(e);
 					}
+				} catch (e) {
+					print(e);
 				}
 			}
 		}
@@ -172,6 +184,7 @@ function ShopBot() {
 		wpArea = 101;
 		town = 75;
 		path = [5147, 5089, 5156, 5075, 5157, 5063, 5160, 5050];
+		menuId = "Shop";
 
 		if (!Town.goToTown(3) || !Town.move(NPC.Ormus)) {
 			throw new Error("Failed to get to NPC");
@@ -184,12 +197,26 @@ function ShopBot() {
 		wpArea = 129;
 		town = 109;
 		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5068];
+		menuId = "Shop";
 
 		if (!Town.goToTown(5) || !Town.move(NPC.Anya)) {
 			throw new Error("Failed to get to NPC");
 		}
 
 		npc = getUnit(1, NPC.Anya);
+
+		break;
+	case "fara":
+		wpArea = 48;
+		town = 40;
+		path = [5112, 5094, 5092, 5096, 5078, 5098, 5070, 5085];
+		menuId = "Repair";
+
+		if (!Town.goToTown(2) || !Town.move(NPC.Fara)) {
+			throw new Error("Failed to get to NPC");
+		}
+
+		npc = getUnit(1, NPC.Fara);
 
 		break;
 	default:
@@ -210,7 +237,8 @@ function ShopBot() {
 
 	while (true) {
 		if (getTickCount() - tickCount >= 60 * 1000) {
-			cyclesText2.text = cycles.toString();
+			cyclesText.text = "Cycles in last minute: " + cycles.toString();
+			totalCyclesText.text = "Total cycles: " + totalCycles.toString();
 			tickCount = getTickCount();
 			cycles = 0;
 		}
@@ -232,6 +260,7 @@ function ShopBot() {
 		}
 
 		cycles += 1;
+		totalCycles += 1;
 	}
 
 	return true;

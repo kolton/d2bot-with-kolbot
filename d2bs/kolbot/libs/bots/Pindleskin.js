@@ -5,16 +5,27 @@
 */
 
 function Pindleskin() {
-	Town.goToTown(5);
+	Town.goToTown(Config.Pindleskin.UseWaypoint ? undefined : 5);
 	Town.doChores();
-	Town.move("anya");
 
-	if (!Pather.usePortal(121)) {
-		throw new Error("Failed to use portal.");
+	if (Config.Pindleskin.UseWaypoint) {
+		Pather.useWaypoint(123);
+		Precast.doPrecast(true);
+
+		if (!Pather.moveToExit([122, 121], true)) {
+			throw new Error("Failed to move to Nihlahak's Temple");
+		}
+	} else {
+		Town.move("anya");
+
+		if (!Pather.usePortal(121)) {
+			throw new Error("Failed to use portal.");
+		}
+
+		Precast.doPrecast(true);
+		Pather.moveTo(10058, 13234);
 	}
 
-	Precast.doPrecast(true);
-	Pather.moveTo(10058, 13234);
 	try {
 		Attack.clear(15, 0, getLocaleString(22497)); // Pindleskin
 	} catch (e) {
