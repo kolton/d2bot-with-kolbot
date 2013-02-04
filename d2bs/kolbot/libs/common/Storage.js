@@ -83,9 +83,9 @@ var Container = function (name, width, height, location) {
 		Storage.Reload();
 
 		//Loop buffer looking for spot to place item.
-		for (x = 0; x < this.height - (item.sizey - 1); x += 1) {
+		for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
 Loop:
-			for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
+			for (x = 0; x < this.height - (item.sizey - 1); x += 1) {
 				//Check if there is something in this spot.
 				if (this.buffer[x][y] > 0) {
 					continue;

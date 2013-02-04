@@ -11,7 +11,7 @@ var CollMap = new function () {
 	this.addRoom = function (x, y) {
 		// In case a room is passed directly
 		if (x instanceof Room) {
-			this.rooms.push(x);
+			this.rooms.push({x: x.x, y: x.y, xsize: x.xsize, ysize: x.ysize});
 			this.maps.push(x.getCollision());
 
 			return true;
@@ -20,7 +20,7 @@ var CollMap = new function () {
 		var room = getRoom(x, y);
 
 		if (room instanceof Room && this.coordsInRoom(x, y, room)) {
-			this.rooms.push(room);
+			this.rooms.push({x: room.x, y: room.y, xsize: room.xsize, ysize: room.ysize});
 			this.maps.push(room.getCollision());
 		} else {
 			return false;
@@ -39,7 +39,7 @@ var CollMap = new function () {
 
 		j = x - this.rooms[index].x * 5;
 		i = y - this.rooms[index].y * 5;
-		
+
 		if (typeof this.maps[index] !== "undefined" && typeof this.maps[index][i] !== "undefined" && typeof this.maps[index][i][j] !== "undefined") {
 			return this.maps[index][i][j];
 		}
@@ -48,6 +48,10 @@ var CollMap = new function () {
 	};
 
 	this.getRoomIndex = function (x, y) {
+		if (this.rooms.length > 25) {
+			this.reset();
+		}
+
 		var i;
 
 		for (i = 0; i < this.rooms.length; i += 1) {

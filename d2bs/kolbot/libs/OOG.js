@@ -277,7 +277,7 @@ var DataFile = {
 	},
 
 	updateStats: function (arg, value) {
-		var i, obj, string, area,
+		var i, obj, string,
 			statArr = [];
 
 		if (typeof arg === "object") {
@@ -302,17 +302,11 @@ var DataFile = {
 
 				break;
 			case "lastArea":
-				area = getArea();
-
-				if (typeof area !== "object") {
+				if (obj.lastArea === Pather.getAreaName(me.area)) {
 					return;
 				}
 
-				if (obj.lastArea === getArea().name) {
-					return;
-				}
-
-				obj.lastArea = getArea().name;
+				obj.lastArea = Pather.getAreaName(me.area);
 
 				break;
 			case "gold":

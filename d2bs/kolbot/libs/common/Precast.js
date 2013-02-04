@@ -6,6 +6,8 @@
 
 var Precast = new function () {
 	this.haveCTA = -1;
+	this.BODuration = 0;
+	this.BOTick = 0;
 
 	this.weaponSwitch = function (slot) {
 		if (me.gametype === 0) {
@@ -53,6 +55,10 @@ var Precast = new function () {
 		if (this.BOSwitch()) {
 			Skill.cast(155, 0); // Battle Command
 			Skill.cast(149, 0); // Battle Orders
+
+			this.BODuration = (20 + me.getSkill(149, 1) * 10 + (me.getSkill(138, 0) + me.getSkill(155, 0)) * 5) * 1000;
+			this.BOTick = getTickCount();
+
 			this.weaponSwitch(Math.abs(this.haveCTA - 1));
 
 			return true;
@@ -64,9 +70,8 @@ var Precast = new function () {
 	this.doPrecast = function (force) {
 		var buffSummons = false;
 
-		if (!me.getState(32) || force) {
-			this.precastCTA(force);
-		}
+		// Force BO 15 seconds before it expires
+		this.precastCTA(!me.getState(32) || force || (getTickCount() - this.BOTick >= this.BODuration - 15000));
 
 		switch (me.classid) {
 		case 0: // Amazon
@@ -127,7 +132,7 @@ var Precast = new function () {
 			}
 
 			break;
-		case 4: // Barbarian
+		case 4: // Barbarian - TODO: BO duration
 			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
 				if (Config.BOSwitch) {
 					Precast.weaponSwitch(Config.BOSwitch);

@@ -231,11 +231,15 @@ MainLoop:
 
 				if (item.mode !== 3 && item.mode !== 5) {
 					switch (stats.classid) {
+					case 543: // Key
+						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkKeys() + "/12)");
+
+						return true;
 					case 529: // Scroll of Town Portal
 					case 530: // Scroll of Identify
 						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkScrolls(stats.classid === 529 ? "tbk" : "ibk") + "/20)");
 
-						break MainLoop;
+						return true;
 					}
 
 					break MainLoop;
@@ -317,7 +321,7 @@ MainLoop:
 	},
 
 	canPick: function (unit) {
-		var tome, charm, i, potion, needPots, buffers, pottype, key;
+		var tome, charm, i, potion, needPots, buffers, pottype, myKey, key;
 
 		switch (unit.itemType) {
 		case 4: // Gold
@@ -341,14 +345,19 @@ MainLoop:
 
 			break;
 		case 41: // Key (new 26.1.2013)
-			key = me.getItem(543, 0);
+			if (me.classid === 6) { // Assassins don't ever need keys
+				return false;
+			}
 
-			if (key) {
+			myKey = me.getItem(543, 0);
+			key = getUnit(4, -1, -1, unit.gid); // Passed argument isn't an actual unit, we need to get it
+
+			if (myKey && key) {
 				do {
-					if (key.location === 3 && key.getStat(70) + unit.getStat(70) > 12) {
+					if (myKey.location === 3 && myKey.getStat(70) + key.getStat(70) > 12) {
 						return false;
 					}
-				} while (key.getNext());
+				} while (myKey.getNext());
 			}
 
 			break;

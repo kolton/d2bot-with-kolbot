@@ -867,10 +867,153 @@ MainLoop:
 		say("Done clearing area: " + area);
 	};
 
+	// Quests
+	this.izual = function () {
+		var izualCoords, myPosition, merc, izualPreset, timer, izual, monster,
+			moveAway = function (unit, range) {
+				var i, coordx, coordy,
+					angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
+					angles = [0, 45, -45, 90, -90, 135, -135, 180];
+
+				for (i = 0; i < angles.length; i += 1) {
+					coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * range + unit.x);
+					coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * range + unit.y);
+
+					try {
+						if (!(getCollision(unit.area, coordx, coordy) & 0x1)) {
+							return Pather.moveTo(coordx, coordy);
+						}
+					} catch (e) {
+
+					}
+				}
+
+				return false;
+			},
+			nearbyMonsterCheck = function (range) {
+				var monster = getUnit(1);
+
+				if (monster) {
+					do {
+						if (Attack.checkMonster(monster) && getDistance(me, monster) < range) {
+							return monster;
+						}
+					} while (monster.getNext());
+				}
+
+				return false;
+			};
+
+		Pather.useWaypoint(106);
+		Precast.doPrecast(false);
+
+		izualPreset = getPresetUnit(105, 1, 256);
+		izualCoords = {
+			area: 105,
+			x: izualPreset.roomx * 5 + izualPreset.x,
+			y: izualPreset.roomy * 5 + izualPreset.y
+		};
+
+		moveAway(izualCoords, 55);
+
+		izual = getUnit(1, 256);
+
+		if (izual) {
+			moveAway(izual, 55);
+		}
+
+		merc = me.getMerc();
+		myPosition = {
+			x: me.x,
+			y: me.y
+		};
+
+		while (true) {
+			monster = nearbyMonsterCheck(35);
+
+			if (!monster) {
+				if (!timer) {
+					me.overhead("Safe Timer Start");
+
+					timer = getTickCount();
+				}
+
+				if (timer && getTickCount() - timer >= 5000) {
+					break;
+				}
+			} else {
+				timer = 0;
+			}
+
+			izual = getUnit(1, 256);
+
+			if (izual && getDistance(me, izual) < 40) {
+				moveAway(izual, 55);
+
+				myPosition = {
+					x: me.x,
+					y: me.y
+				};
+			}
+
+			if (izual && getDistance(monster, izual) > 35) {
+				try {
+					Attack.kill(monster);
+				} catch (e) {
+
+				}
+			} else {
+				if (!izual || getDistance(me, izual) > 35) {
+					Attack.clear(15);
+				}
+			}
+
+			if (getDistance(me, myPosition) > 5 || (merc && getDistance(me, merc) > 10)) {
+				Pather.teleportTo(myPosition.x, myPosition.y);
+			}
+
+			delay(200);
+		}
+
+		Pather.makePortal();
+		say("1");
+
+		while (!this.playerIn()) {
+			monster = nearbyMonsterCheck(35);
+			izual = getUnit(1, 256);
+
+			if (monster) {
+				if (izual && getDistance(monster, izual) > 35) {
+					try {
+						Attack.kill(monster);
+					} catch (e) {
+
+					}
+				} else {
+					if (!izual || getDistance(me, izual) > 35) {
+						Attack.clear(15);
+					}
+				}
+			}
+
+			if (getDistance(me, myPosition) > 5 || (merc && getDistance(me, merc) > 10)) {
+				Pather.teleportTo(myPosition.x, myPosition.y);
+			}
+
+			delay(200);
+		}
+
+		Pather.moveToUnit(izualCoords); // Temporary line until hdin attack fix is up
+		Attack.kill(256); // Izual
+		Pather.usePortal(null, null);
+
+		return true;
+	};
+
 	var command,
 		current = 0,
 		thisThread = getScript("tools/rushthread.js"),
-		sequence = ["andariel", "cube", "amulet", "staff", "summoner", "duriel", "travincal", "mephisto", "diablo", "ancients", "baal"];
+		sequence = ["andariel", "cube", "amulet", "staff", "summoner", "duriel", "travincal", "mephisto", "izual", "diablo", "ancients", "baal"];
 
 	this.scriptEvent = function (msg) {
 		command = msg;

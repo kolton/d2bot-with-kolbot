@@ -114,7 +114,7 @@ function UnitInfo() {
 
 		this.hooks.push(new Text("Classid: ÿc0" + unit.classid, this.x, this.y, 4, 13, 2));
 
-		items = unit.getItems(-1, 1);
+		items = unit.getItems();
 
 		if (items) {
 			this.hooks.push(new Text("Equipped items:", this.x, this.y + 15, 4, 13, 2));

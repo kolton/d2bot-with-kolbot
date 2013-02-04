@@ -27,7 +27,7 @@ var Attack = {
 
 	// Check if player or his merc are using Infinity, and adjust resistance checks based on that
 	checkInfinity: function () {
-		var i, merc, items;
+		var i, merc, item;
 
 		for (i = 0; i < 3; i += 1) {
 			merc = me.getMerc();
@@ -41,34 +41,30 @@ var Attack = {
 
 		// Check merc infinity
 		if (merc) {
-			items = merc.getItems();
+			item = merc.getItem();
 
-			if (items) {
-				for (i = 0; i < items.length; i += 1) {
-					if (items[i].getPrefix(20566)) {
-						//print("Infinity detected");
-
+			if (item) {
+				do {
+					if (item.getPrefix(20566)) {
 						this.infinity = true;
 
 						return true;
 					}
-				}
+				} while (item.getNext());
 			}
 		}
 
 		// Check player infinity
-		items = me.findItems(-1, 1);
+		item = me.getItem(-1, 1);
 
-		if (items) {
-			for (i = 0; i < items.length; i += 1) {
-				if (items[i].getPrefix(20566)) {
-					//print("Infinity detected");
-
+		if (item) {
+			do {
+				if (item.getPrefix(20566)) {
 					this.infinity = true;
 
 					return true;
 				}
-			}
+			} while (item.getNext());
 		}
 
 		return false;
@@ -83,6 +79,10 @@ var Attack = {
 		var i, target, test,
 			dodgeList = [],
 			attackCount = 0;
+
+		if (typeof classId === "object") {
+			target = classId;
+		}
 
 		for (i = 0; !target && i < 5; i += 1) {
 			target = getUnit(1, classId);
@@ -272,7 +272,7 @@ var Attack = {
 					((Math.abs(orgx - target.x) <= range && Math.abs(orgy - target.y) <= range) ||
 					(this.getScarinessLevel(target) > 7 && Math.abs(me.x - target.x) <= range && Math.abs(me.y - target.y) <= range)) &&
 					(!spectype || (target.spectype & spectype)) && this.checkMonster(target) &&
-					(me.getSkill(54, 1) || !checkCollision(me, target, 0x1))
+					(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))
 					) {
 				if (Config.Dodge) {
 					if (attackCount % 5 === 0) {
@@ -933,6 +933,7 @@ AuraLoop: // Skip monsters with auras
 
 		switch (skillId) {
 		case 74: // Corpse Explosion
+		case 144: // Concentrate
 		case 147: // Frenzy
 		case 273: // Minge Blast
 		case 500: // Summoner
@@ -1035,7 +1036,7 @@ AuraLoop: // Skip monsters with auras
 		var n, i, cx, cy, t,
 			coords = [],
 			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
-			angles = [0, 45, 90, 135, 180, 225, 270, 305];
+			angles = [0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 135, -135, 180];
 
 		t = getTickCount();
 
@@ -1048,30 +1049,27 @@ AuraLoop: // Skip monsters with auras
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				//if (this.validSpot(cx, cy)) {
 				if (Pather.checkSpot(cx, cy)) {
-					coords.push([cx, cy]);
+					coords.push({x: cx, y: cy});
 				}
 			}
 
 			//print("ÿc9potential spots: ÿc2" + coords.length);
 
 			if (coords.length > 0) {
-				coords.sort(Sort.points); // sort angles by final spot distance
+				coords.sort(Sort.units);
 
-				for (i = 0; i < coords.length; i += 1) { // sorted angles are coords[i][2]
-					if (!CollMap.checkColl(unit, {x: coords[i][0], y: coords[i][1]}, coll)) {
-						CollMap.reset();
-						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
+				for (i = 0; i < coords.length; i += 1) {
+					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll)) {
+						print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						return (walk ? Pather.walkTo(coords[i][0], coords[i][1]) : Pather.moveTo(coords[i][0], coords[i][1], 3));
+						return (walk ? Pather.walkTo(coords[i].x, coords[i].y) : Pather.moveTo(coords[i].x, coords[i].y, 3));
 					}
 				}
 			}
 		}
 
 		//print("optimal pos fail.");
-		CollMap.reset();
 
 		return false;
 	}

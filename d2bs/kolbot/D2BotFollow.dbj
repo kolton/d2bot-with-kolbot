@@ -56,7 +56,7 @@ include("automule.js");
 include("torchsystem.js");
 include("common/misc.js");
 
-var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone,
+var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone, lastGame,
 	connectFail, torchTrigger, muleTrigger, torchMuleTrigger, firstLogin,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
@@ -389,7 +389,7 @@ JoinLoop:
 			delay(100);
 		}
 
-		if (joinInfo && joinInfo.gameName !== "" && (joinInfo.gameName !== joinInfo.lastGame || lastGameStatus === "pending")) {
+		if (joinInfo && joinInfo.gameName !== "" && (joinInfo.gameName !== lastGame || lastGameStatus === "pending")) {
 			ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
 			ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
 
@@ -403,7 +403,7 @@ JoinLoop:
 						D2Bot.requestGame(leader);
 						delay(500);
 
-						if (!joinInfo.inGame || (joinInfo.lastGame && joinInfo.gameName !== joinInfo.lastGame)) {
+						if (!joinInfo.inGame || (lastGame && joinInfo.gameName !== lastGame)) {
 							D2Bot.printToConsole("Game is finished. Stopping join delay.");
 
 							return true;
@@ -438,7 +438,7 @@ JoinLoop:
 			ControlAction.click(6, 594, 433, 172, 32);
 
 			me.blockMouse = false;
-			joinInfo.lastGame = joinInfo.gameName;
+			lastGame = joinInfo.gameName;
 			lastGameStatus = "pending";
 
 			DataFile.updateStats("gameName", joinInfo.gameName);
@@ -580,6 +580,7 @@ JoinLoop:
 		D2Bot.updateStatus("Disconnected");
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
+
 		break;
 	case 15: // New Character
 		break;
@@ -592,6 +593,7 @@ JoinLoop:
 	case 17: // Lobby - Lost Connection - just click okay, since we're toast anyway
 		delay(1000);
 		ControlAction.click(6, 351, 337, 96, 32);
+
 		break;
 	case 19: // Login - Cdkey In Use
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
