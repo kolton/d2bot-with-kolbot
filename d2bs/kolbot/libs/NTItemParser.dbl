@@ -34,17 +34,18 @@ NTIP.OpenFile = function (filepath, notify) {
 	}
 
 	var i, nipfile, line, lines, info, item,
-		hash = md5_file(filepath),
+		tick = getTickCount(),
+		//hash = md5_file(filepath),
 		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
 		entries = 0;
 
-	if (!FileTools.exists("pickit/minified/" + hash + "." + filename)) {
+	/*if (!FileTools.exists("pickit/minified/" + hash + "." + filename)) {
 		NTIP.Minify(filepath);
 	}
 
 	if (FileTools.exists("pickit/minified/" + hash + "." + filename)) {
 		filepath = "pickit/minified/" + hash + "." + filename;
-	}
+	}*/
 
 	try {
 		nipfile = File.open(filepath, 0);
@@ -62,8 +63,6 @@ NTIP.OpenFile = function (filepath, notify) {
 	//item = me.getItem();
 
 	nipfile.close();
-
-	var tick = getTickCount();
 
 	for (i = 0; i < lines.length; i += 1) {
 		info = {
@@ -104,17 +103,15 @@ NTIP.OpenFile = function (filepath, notify) {
 		}
 	}
 
-	print(getTickCount() - tick);
-
 	if (notify) {
-		print("ÿc4Loaded NIP: ÿc2" + filename + "ÿc4. Lines: ÿc2" + lines.length + "ÿc4. Valid entries: ÿc2" + entries);
+		print("ÿc4Loaded NIP: ÿc2" + filename + "ÿc4. Lines: ÿc2" + lines.length + "ÿc4. Valid entries: ÿc2" + entries + ". ÿc4Time: ÿc2" + (getTickCount() - tick) + " ms");
 	}
 
 	return true;
 };
 
-NTIP.Minify = function (filepath) {
-	var i, nipfile, lines, hash,
+/*NTIP.Minify = function (filepath) {
+	var i, nipfile, lines, hash, fileList,
 		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length);
 
 	try {
@@ -138,8 +135,16 @@ NTIP.Minify = function (filepath) {
 
 	Misc.fileAction("pickit/minified/" + hash + "." + filename, 1, lines.join("\n"));
 
+	fileList = dopen("pickit/minified/").getFiles();
+
+	for (i = 0; i < fileList.length; i += 1) {
+		if (fileList[i].indexOf(filename) > -1 && fileList[i].indexOf(hash) === -1) {
+			FileTools.remove("pickit/minified/" + fileList[i]);
+		}
+	}
+
 	return true;
-};
+};*/
 
 NTIP.CheckQuantityOwned = function (item_type, item_stats) {
 	var i, item,
