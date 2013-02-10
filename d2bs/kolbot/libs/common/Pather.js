@@ -123,10 +123,10 @@ var Pather = {
 
 					path.reverse();
 
-					//print("move retry " + fail);
+					print("move retry " + fail);
 				}
 
-				if (fail >= retry) {
+				if (fail > 0 && fail >= retry) {
 					break;
 				}
 
