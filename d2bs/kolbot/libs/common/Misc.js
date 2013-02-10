@@ -947,9 +947,15 @@ MainLoop:
 		m = date.getMinutes();
 		s = date.getSeconds();
 
-		msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
-		oogmsg = error.message + " in " + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line " + error.lineNumber + ". Ping:" + me.ping;
-		filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+		if (typeof error === "string") {
+			msg = error;
+			oogmsg = error.replace(/ÿc[0-9!"+<;.*]/gi, "");
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+		} else {
+			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
+			oogmsg = error.message + " in " + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line " + error.lineNumber + ". Ping:" + me.ping;
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+		}
 
 		if (this.errorConsolePrint) {
 			D2Bot.printToConsole(oogmsg, 9);

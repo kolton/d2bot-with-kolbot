@@ -82,7 +82,11 @@ var CollMap = new function () {
 
 	// Check collision between unitA and unitB. true = collision present, false = collision not present
 	// If checking for blocking collisions (0x1, 0x4), true means blocked, false means not blocked
-	this.checkColl = function (unitA, unitB, coll) {
+	this.checkColl = function (unitA, unitB, coll, thickness) {
+		if (typeof thickness === "undefined") {
+			thickness = 1;
+		}
+
 		var i, k, l, cx, cy, angle, distance;
 
 		angle = Math.round(Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x) * 180 / Math.PI);
@@ -92,8 +96,8 @@ var CollMap = new function () {
 			cx = Math.round((Math.cos(angle * Math.PI / 180)) * i + unitB.x);
 			cy = Math.round((Math.sin(angle * Math.PI / 180)) * i + unitB.y);
 
-			for (k = cx - 1; k <= cx + 1; k += 1) { // check thicker line
-				for (l = cy - 1; l <= cy + 1; l += 1) {
+			for (k = cx - thickness; k <= cx + thickness; k += 1) { // check thicker line
+				for (l = cy - thickness; l <= cy + thickness; l += 1) {
 					if (this.getColl(k, l) & coll) {
 						return true;
 					}

@@ -8,7 +8,7 @@ var Pather = {
 	teleport: true,
 	walkDistance: 15,
 	teleDistance: 40,
-	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f],
+	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 	recursion: true,
 
@@ -103,22 +103,25 @@ var Pather = {
 			/* Right now getPath's first node is our own position so it's not necessary to take it into account
 				This will be removed if getPath changes
 			*/
-			if (!this.useTeleport || getDistance(me, node) > 2) {
+			if (getDistance(me, node) > 2) {
 				if (!(this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y))) {
 					// Reduce node distance in new path
-					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? 30 : 10);
+					if (fail > 0 && !this.useTeleport && !me.inTown) {
+						Attack.clear(5);
+
+						if (fail > 1 && me.getSkill(143, 1)) {
+							Skill.cast(143, 0, node.x, node.y);
+						}
+					}
+
+					fail += 1;
+					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? rand(20, 30) : 10);
 
 					if (!path) {
 						throw new Error("moveTo: Failed to generate path.");
 					}
 
 					path.reverse();
-
-					if (fail > 0 && !this.useTeleport && !me.inTown) {
-						Attack.clear(5);
-					}
-
-					fail += 1;
 
 					//print("move retry " + fail);
 				}
@@ -127,35 +130,37 @@ var Pather = {
 					break;
 				}
 
-				if (this.recursion) {
-					this.recursion = false;
+				if (!me.inTown) {
+					if (this.recursion) {
+						this.recursion = false;
 
-					if (Config.OpenChests) {
-						Misc.openChests(15);
-					}
-
-					Misc.scanShrines();
-
-					if (clearPath) {
-						Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
-					}
-
-					if (Config.Countess.KillGhosts) { // TODO: expand&improve
-						mob = Attack.getMob("ghost", 0, 30);
-
-						if (mob) {
-							Attack.clearList(mob);
+						if (Config.OpenChests) {
+							Misc.openChests(15);
 						}
+
+						Misc.scanShrines();
+
+						if (clearPath) {
+							Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
+						}
+
+						if (Config.Countess.KillGhosts) { // TODO: expand&improve
+							mob = Attack.getMob("ghost", 0, 30);
+
+							if (mob) {
+								Attack.clearList(mob);
+							}
+						}
+
+						if (getDistance(me, node.x, node.y) > 5) {
+							this.moveTo(node.x, node.y);
+						}
+
+						this.recursion = true;
 					}
 
-					if (getDistance(me, node.x, node.y) > 5) {
-						this.moveTo(node.x, node.y);
-					}
-
-					this.recursion = true;
+					Misc.townCheck();
 				}
-
-				Misc.townCheck();
 			}
 		}
 
@@ -231,8 +236,7 @@ MainLoop:
 			nTimer = getTickCount();
 
 ModeLoop:
-			while (getDistance(me.x, me.y, x, y) > 4 &&
-					me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
+			while (getDistance(me.x, me.y, x, y) > 4 && me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
 				if (me.dead) {
 					return false;
 				}
@@ -314,6 +318,8 @@ ModeLoop:
 		If you want to go to a preset unit based on its area, type and id, use Pather.moveToPreset().
 	*/
 	moveToUnit: function (unit, offX, offY, clearPath, pop) { // Maybe use range instead of XY offset
+		this.useTeleport = this.teleport && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+
 		if (typeof offX === "undefined") {
 			offX = 0;
 		}
@@ -335,7 +341,7 @@ ModeLoop:
 		}
 
 		if (unit instanceof PresetUnit) {
-			return this.moveTo(unit.roomx * 5 + unit.x + offX, unit.roomy * 5 + unit.y + offY, 3, clearPath);
+			return this.moveTo(unit.roomx * 5 + unit.x + offX, unit.roomy * 5 + unit.y + offY, this.useTeleport ? 3 : 0, clearPath);
 		}
 
 		return this.moveTo(unit.x + offX, unit.y + offY, 3, clearPath, pop);
@@ -504,7 +510,7 @@ ModeLoop:
 		}
 
 		if (!unit) {
-			throw new Error("useUnit: Unit not found.");
+			throw new Error("useUnit: Unit not found. ID: " + id);
 		}
 
 		for (i = 0; i < 3; i += 1) {
@@ -647,6 +653,8 @@ ModeLoop:
 			} else {
 				this.moveToUnit(wp);
 			}
+
+			me.cancel(); // In case lag causes the wp menu to stay open
 		}
 
 		throw new Error("Pather.useWaypoint: Failed to use waypoint");
@@ -1058,7 +1066,7 @@ MainLoop:
 		var node, prevArea, tick, i, wp,
 			useWP = false,
 			arr = [],
-			previousAreas = [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46, 46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102, 103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129, 130, 131, 109, 109, 109, 109],
+			previousAreas = [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46, 46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 1, 103, 104, 105, 106, 107, 1, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129, 130, 131, 109, 109, 109, 109],
 			visitedNodes = [],
 			toVisitNodes = [{from: dest, to: null}];
 
@@ -1107,7 +1115,7 @@ MainLoop:
 				// If we have this wp we can start from there
 				if ((me.inTown || // check wp in town
 						((src !== previousAreas[dest] && dest !== previousAreas[src]) && // check wp if areas aren't linked
-							previousAreas[src] !== previousAreas[dest])) &&   // check wp if areas aren't linked with a common area
+							previousAreas[src] !== previousAreas[dest])) && // check wp if areas aren't linked with a common area
 								Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))
 									) {
 					if (node.from !== src) {

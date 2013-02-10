@@ -25,13 +25,32 @@ var NTIP = {},
 	stringArray = [];
 
 NTIP.OpenFile = function (filepath, notify) {
-	var i, nipfile, line, lines, info;
+	if (!FileTools.exists(filepath)) {
+		if (notify) {
+			Misc.errorReport("ÿc1NIP file doesn't exist: ÿc0" + filepath);
+		}
+
+		return false;
+	}
+
+	var i, nipfile, line, lines, info, item,
+		hash = md5_file(filepath),
+		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
+		entries = 0;
+
+	if (!FileTools.exists("pickit/minified/" + hash + "." + filename)) {
+		NTIP.Minify(filepath);
+	}
+
+	if (FileTools.exists("pickit/minified/" + hash + "." + filename)) {
+		filepath = "pickit/minified/" + hash + "." + filename;
+	}
 
 	try {
 		nipfile = File.open(filepath, 0);
 	} catch (fileError) {
 		if (notify) {
-			Misc.errorReport("ÿc1Failed to load NIP: ÿc0" + filepath);
+			Misc.errorReport("ÿc1Failed to load NIP: ÿc0" + filename);
 		}
 	}
 
@@ -40,27 +59,84 @@ NTIP.OpenFile = function (filepath, notify) {
 	}
 
 	lines = nipfile.readAllLines();
+	//item = me.getItem();
 
 	nipfile.close();
+
+	var tick = getTickCount();
 
 	for (i = 0; i < lines.length; i += 1) {
 		info = {
 			line: i + 1,
-			file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
+			file: filename,
 			string: lines[i]
 		};
 
 		line = NTIP.ParseLineInt(lines[i], info);
 
+		// frickaline try/catch method
+		// switching to this would mean adding a separate check for runeword entries
+		/*if (line) {
+			try {
+				if (line[0] && line[0].length) {
+					eval(line[0]);
+				}
+
+				if (line[1] && line[1].length) {
+					eval(line[1]);
+				}
+
+				if (line[2] && line[2].length) {
+					eval(line[2]);
+				}
+			} catch (lineError) {
+				Misc.errorReport("Bad Line: " + lines[i]);
+				
+				line = false;
+			}
+		}*/
+
 		if (line) {
+			entries += 1;
+
 			NTIP_CheckList.push(line);
 			stringArray.push(info);
 		}
 	}
 
+	print(getTickCount() - tick);
+
 	if (notify) {
-		print("ÿc4Loaded NIP: ÿc0" + filepath + "ÿc4. Lines: ÿc0" + lines.length);
+		print("ÿc4Loaded NIP: ÿc2" + filename + "ÿc4. Lines: ÿc2" + lines.length + "ÿc4. Valid entries: ÿc2" + entries);
 	}
+
+	return true;
+};
+
+NTIP.Minify = function (filepath) {
+	var i, nipfile, lines, hash,
+		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length);
+
+	try {
+		nipfile = File.open(filepath, 0);
+	} catch (fileError) {
+
+	}
+
+	if (!nipfile) {
+		return false;
+	}
+
+	hash = md5_file(filepath);
+	lines = nipfile.readAllLines();
+
+	nipfile.close();
+
+	for (i = 0; i < lines.length; i += 1) {
+		lines[i] = lines[i].replace(/\s+/g, "").toLowerCase();
+	}
+
+	Misc.fileAction("pickit/minified/" + hash + "." + filename, 1, lines.join("\n"));
 
 	return true;
 };
@@ -234,7 +310,7 @@ NTIP.ParseLineInt = function (input, info) {
 		input = input.substring(0, p_end);
 	}
 
-	input = input.replace(/ |;|\t/g, "").toLowerCase();
+	input = input.replace(/\s+/g, "").toLowerCase();
 
 	if (input.length < 5) {
 		return null;
@@ -287,7 +363,6 @@ NTIP.ParseLineInt = function (input, info) {
 
 				break;
 			case 'prefix':
-				//p_result[0] += "item.prefixnum";
 				if (p_section[i][p_end] === '!') {
 					p_result[0] += "!item.getPrefix(";
 				} else {
@@ -298,7 +373,6 @@ NTIP.ParseLineInt = function (input, info) {
 
 				break;
 			case 'suffix':
-				//p_result[0] += "item.suffixnum";
 				if (p_section[i][p_end] === '!') {
 					p_result[0] += "!item.getSuffix(";
 				} else {
@@ -309,7 +383,7 @@ NTIP.ParseLineInt = function (input, info) {
 
 				break;
 			default:
-				Misc.errorReport("Unknown Keyword : " + input + " File: " + info.file + " Line: " + info.line);
+				Misc.errorReport("Unknown Keyword : " + property + " File: " + info.file + " Line: " + info.line);
 
 				break;
 			}

@@ -451,7 +451,7 @@ function main() {
 				if (configCache.UseMerc) {
 					mercHP = getMercHP();
 
-					if (mercHP > 0) {
+					if (me.getMerc() && mercHP > 0) {
 						if (mercHP < configCache.MercChicken) {
 							D2Bot.printToConsole("Merc Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();

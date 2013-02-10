@@ -93,6 +93,16 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
+	updateDeaths: function () {
+		var obj = {
+			profile: me.profile,
+			func: "updateDeaths",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	requestGameInfo: function () {
 		var obj = {
 			profile: me.profile,
@@ -103,7 +113,7 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
-	restart: function (keySwap) {
+	restart: function (keySwap, profile) {
 		var obj = {
 			profile: me.profile,
 			func: "restartProfile",
