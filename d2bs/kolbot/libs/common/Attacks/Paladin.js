@@ -125,8 +125,7 @@ var ClassAttack = {
 	doCast: function (unit, index) {
 		var i,
 			atkSkill = index,
-			aura = index + 1,
-			dodgeList = [];
+			aura = index + 1;
 
 		// Low mana skill
 		if (Config.AttackSkill[atkSkill] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[atkSkill]) > me.mp) {
@@ -139,13 +138,8 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[atkSkill] === 112) {
-			if (unit.classid === 691) {
-				dodgeList = Attack.buildDodgeList();
-
-				if (dodgeList.length) {
-					dodgeList.sort(Sort.units);
-					Attack.dodge(unit, 15, dodgeList);
-				}
+			if (unit.classid === 691 && Config.AvoidDolls) {
+				Attack.deploy(unit.x - 15, unit.x + 15, unit.y - 15, unit.y + 15, 5, 15);
 
 				if (Config.AttackSkill[aura] > -1) {
 					Skill.setSkill(Config.AttackSkill[aura], 0);
