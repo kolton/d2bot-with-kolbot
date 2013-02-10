@@ -95,22 +95,29 @@ var Loader = {
 ScriptLoop:
 		for (i in Scripts) {
 			if (Scripts.hasOwnProperty(i) && this.scriptList.indexOf(i) > -1 && Scripts[i]) {
-				include("bots/" + i + ".js");
-				reconfiguration = typeof Scripts[i] === 'object';
+				try {
+					if (!include("bots/" + i + ".js")) {
+						/*
+						This can expose the error message in case of illegal character errors, but unfortunately it can't get the line number
 
-				if (typeof (global[i]) === "function") {
-					if (i !== "Test" && i !== "Follower") {
-						try {
-							townCheck = Town.goToTown();
-						} catch (e1) {
-							print("ÿc1Loader: Failed to go to town, skipping to next script.");
-						}
-					} else {
-						townCheck = true;
+						var text = FileTools.readText("libs/bots/test.js");
+
+						eval(text);
+						*/
+
+						throw new Error("Failed to include script");
 					}
 
-					if (townCheck) {
-						try {
+					reconfiguration = typeof Scripts[i] === 'object';
+
+					if (typeof (global[i]) === "function") {
+						if (i !== "Test" && i !== "Follower") {
+							townCheck = Town.goToTown();
+						} else {
+							townCheck = true;
+						}
+
+						if (townCheck) {
 							print("ÿc2Starting script: ÿc9" + i);
 
 							if (reconfiguration) {
@@ -119,17 +126,17 @@ ScriptLoop:
 							}
 
 							global[i]();
-						} catch (e) {
-							Misc.errorReport(e, i);
-						}
 
-						if (reconfiguration) {
-							print("ÿc2Reverting back unmodified config properties.");
-							this.copy(unmodifiedConfig, Config);
+							if (reconfiguration) {
+								print("ÿc2Reverting back unmodified config properties.");
+								this.copy(unmodifiedConfig, Config);
+							}
 						}
+					} else {
+						throw new Error("Invalid script function name");
 					}
-				} else {
-					print("ÿc1Loader: Error in script, skipping;");
+				} catch (error) {
+					Misc.errorReport(error, i);
 				}
 			}
 		}

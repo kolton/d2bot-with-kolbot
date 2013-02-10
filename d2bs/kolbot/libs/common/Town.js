@@ -1091,7 +1091,7 @@ MainLoop:
 		if (stashGold) {
 			if (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5 && this.openStash()) {
 				gold(me.getStat(14), 3);
-				delay(500);
+				delay(1000);
 				me.cancel();
 			}
 		}
@@ -1408,7 +1408,7 @@ MainLoop:
 			this.act[2].spot[NPC.Alkor] = [5083, 5016];
 			this.act[2].spot.cain = [5148, 5066];
 			this.act[2].spot.stash = [5144, 5059];
-			this.act[2].spot.portalspot = [5156, 5063];
+			this.act[2].spot.portalspot = [5150, 5063];
 			this.act[2].spot.waypoint = [5158, 5050];
 			this.act[2].initialized = true;
 
@@ -1450,11 +1450,8 @@ MainLoop:
 			throw new Error("Town.move: Failed to go to town!");
 		}
 
-		/*while (!me.idle) {
-			delay(40);
-		}*/
-
 		var i, townSpot, path,
+			rval = false,
 			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
 
 		if (!this.act[me.act - 1].initialized) {
@@ -1469,8 +1466,6 @@ MainLoop:
 
 		// Act 5 wp->portalspot override - ActMap.cpp crash
 		if (me.act === 5 && spot === "portalspot" && getDistance(me.x, me.y, 5113, 5068) <= 8) {
-			//print("a5 path override");
-
 			path = [5113, 5068, 5108, 5051, 5106, 5046, 5104, 5041, 5102, 5027, 5098, 5018];
 
 			for (i = 0; i < path.length; i += 2) {
@@ -1482,26 +1477,35 @@ MainLoop:
 
 		if (useTK) {
 			if (getDistance(me.x, me.y, townSpot[0], townSpot[1]) > 14) {
-				Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
+				return Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
 			}
 		} else {
 			print("Townmove: " + spot + " from " + me.x + ", " + me.y);
 			delay(100);
-			Pather.moveTo(townSpot[0], townSpot[1]);
 
-			// If unit has more than one location and it's not here, search
-			if (townSpot.length > 2 && !getUnit(1, spot)) {
-				for (i = 0; i < townSpot.length / 2; i += 1) {
-					Pather.moveTo(townSpot[i * 2], townSpot[i * 2 + 1]);
+			for (i = 0; i < 3; i += 1) {
+				rval = Pather.moveTo(townSpot[0], townSpot[1]);
 
-					if (!!getUnit(1, spot)) {
-						break;
+				// If unit has more than one location and it's not here, search
+				if (townSpot.length > 2 && !getUnit(1, spot)) {
+					for (i = 0; i < townSpot.length / 2; i += 1) {
+						rval = Pather.moveTo(townSpot[i * 2], townSpot[i * 2 + 1]);
+
+						if (!!getUnit(1, spot)) {
+							break;
+						}
 					}
 				}
+
+				if (rval) {
+					break;
+				}
+
+				Packet.flash(me.gid);
 			}
 		}
 
-		return true;
+		return rval;
 	},
 
 	goToTown: function (act) {

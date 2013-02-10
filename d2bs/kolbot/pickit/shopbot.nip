@@ -11,7 +11,9 @@
 //[name] == barbedshield && [quality] == magic # [palicombatskilltab] == 2 && [fbr] == 30 // LLD
 //[type] == gloves && [quality] == magic # [javelinandspearskilltab] == 3 && [ias] == 20 // 3/20 gloves
 
-[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
-[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
+//[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
+//[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
 
-[type] == staff # [sorceressskills]+[skillenchant] == 5
+//[type] == staff # [sorceressskills]+[skillenchant] == 5
+
+[name] == handscythe # ([trapsskilltab] == 2 || [assassinskills] == 1) && ([skilllightningsentry] == 3 || [skillwakeoffire] == 3)

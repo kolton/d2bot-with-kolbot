@@ -96,6 +96,7 @@ function main() {
 		D2Bot.printToConsole("You died in last game", 9);
 		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)), 9);
 		DataFile.updateStats("deaths");
+		D2Bot.updateDeaths();
 	}
 
 	DataFile.updateStats(["experience", "name"]);

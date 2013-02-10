@@ -2,12 +2,13 @@ function ShopBot() {
 	var npc, tickCount, town, wpArea, path, menuId,
 		cycles = 0,
 		cyclesText = new Text("Cycles in last minute:", 50, 260, 2, 1),
+		title = new Text("kolbot shopbot", 50, 245, 2, 1),
 		frequency = new Text("Valid item frequency:", 50, 275, 2, 1),
 		totalCyclesText = new Text("Total cycles:", 50, 290, 2, 1),
 		validItems = 0,
 		leadRetry = 10,
 		totalCycles = 0,
-		leadTimeout = 20; // NPC move timeout in seconds
+		leadTimeout = 60; // NPC move timeout in seconds
 
 	this.mover = function (npc, path) {
 		var i, j;

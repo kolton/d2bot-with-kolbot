@@ -596,7 +596,7 @@ IngredientLoop:
 					return true;
 				}
 			// Main item, NOT matching a pickit entry
-			} else if (unit.quality === 4 && Math.floor((me.charlvl + unit.ilvl) / 2) >= recipe.Level && NTIP.CheckItem(unit) === 0) {
+			} else if (unit.quality === 4 && Math.floor(me.charlvl / 2) + Math.floor(unit.ilvl / 2) >= recipe.Level && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
 		}
