@@ -393,10 +393,10 @@ function LoadConfig() {
 
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
+	Config.Wereform = false; // 0 / false - don't shapeshift, 1 / "Werewolf" - change to werewolf, 2 / "Werebear" - change to werebear
 
 	// Class specific config
 	Config.BOSwitch = 0; // Precast weapon slot - 0 = slot I, 1 = slot II
 	Config.FindItem = false; // Use Find Item skill on corpses after clearing.
 	Config.FindItemSwitch = 0; // Find Item weapon slot - 0 = slot I, 1 = slot II
-	Config.Werewolf = false; // EXPERIMENTAL werewolf attack for Wolfhowl Barbarians. Set attacks to feral rage.
 }

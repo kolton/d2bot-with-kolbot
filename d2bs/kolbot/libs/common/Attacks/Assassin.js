@@ -51,6 +51,7 @@ var ClassAttack = {
 			// oskills
 			case 151: // Whirlwind
 				this.skillRange[i] = 10;
+				this.skillHand[i] = 0;
 
 				break;
 			default: // Every other skill
@@ -126,11 +127,12 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		Misc.unShift();
 		Precast.doPrecast(false);
 	},
 
 	doCast: function (unit, index) {
-		var i,
+		var i, walk,
 			timed = index,
 			untimed = index + 1;
 
@@ -151,7 +153,9 @@ var ClassAttack = {
 
 		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
+				walk = (this.skillRange[timed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
+				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4, walk)) {
 					return 0;
 				}
 			}
@@ -166,7 +170,9 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[untimed] > -1) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4)) {
+				walk = (this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
+				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4, walk)) {
 					return 0;
 				}
 			}
@@ -235,31 +241,27 @@ var ClassAttack = {
 	},
 
 	whirlwind: function (unit, index) {
-		var i, j, coords, angle,
-			//angles = [180, 45, -45, 90, -90]; // Angle offsets
-			angles = [120, -120, 180, 45, -45, 90, -90]; // Angle offsets
+		if (!Attack.checkMonster(unit)) {
+			return true;
+		}
+
+		var i, coords, angle,
+			angles = [180, 175, -175, 170, -170, 165, -165, 150, -150, 135, -135, 45, -45, 90, -90];
 
 		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
 
-MainLoop:
 		for (i = 0; i < angles.length; i += 1) { // get a better spot
-			for (j = 0; j < 5; j += 1) {
-				coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * j + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * j + unit.y)];
+			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 4 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 4 + unit.y)];
 
-				if (CollMap.getColl(coords[0], coords[1]) & 0x1) {
-					continue MainLoop;
-				}
-			}
-
-			if (getDistance(me, coords[0], coords[1]) >= 3) {
-				CollMap.reset();
-
+			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1, 0)) {
 				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
 			}
 		}
 
-		CollMap.reset();
+		if (!Attack.validSpot(unit.x, unit.y)) {
+			return false;
+		}
 
-		return false;
+		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], me.x, me.y);
 	}
 };

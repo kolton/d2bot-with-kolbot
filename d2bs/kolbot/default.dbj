@@ -43,6 +43,8 @@ function main() {
 		delay(50);
 	}
 
+	//debugLog("start game - " + me.name);
+
 	// don't load default for mules
 	if (AutoMule.getMuleObject(0) || AutoMule.getMuleObject(1)) {
 		return true;
@@ -185,7 +187,9 @@ function main() {
 		}
 	}
 
-	quit();
+	//debugLog("end game");
+	scriptBroadcast("quit");
+	delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
 
 	return true;
 }

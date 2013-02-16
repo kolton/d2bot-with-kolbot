@@ -95,48 +95,42 @@ var Loader = {
 ScriptLoop:
 		for (i in Scripts) {
 			if (Scripts.hasOwnProperty(i) && this.scriptList.indexOf(i) > -1 && Scripts[i]) {
-				try {
-					if (!include("bots/" + i + ".js")) {
-						/*
-						This can expose the error message in case of illegal character errors, but unfortunately it can't get the line number
+				if (!include("bots/" + i + ".js")) {
+					Misc.errorReport("Failed to include script: " + i);
+				}
 
-						var text = FileTools.readText("libs/bots/test.js");
+				if (isIncluded("bots/" + i + ".js")) {
+					try {
+						reconfiguration = typeof Scripts[i] === 'object';
 
-						eval(text);
-						*/
+						if (typeof (global[i]) === "function") {
+							if (i !== "Test" && i !== "Follower") {
+								townCheck = Town.goToTown();
+							} else {
+								townCheck = true;
+							}
 
-						throw new Error("Failed to include script");
-					}
+							if (townCheck) {
+								print("ÿc2Starting script: ÿc9" + i);
 
-					reconfiguration = typeof Scripts[i] === 'object';
+								if (reconfiguration) {
+									print("ÿc2Copying Config properties from " + i + " object.");
+									this.copy(Scripts[i], Config);
+								}
 
-					if (typeof (global[i]) === "function") {
-						if (i !== "Test" && i !== "Follower") {
-							townCheck = Town.goToTown();
+								global[i]();
+
+								if (reconfiguration) {
+									print("ÿc2Reverting back unmodified config properties.");
+									this.copy(unmodifiedConfig, Config);
+								}
+							}
 						} else {
-							townCheck = true;
+							throw new Error("Invalid script function name");
 						}
-
-						if (townCheck) {
-							print("ÿc2Starting script: ÿc9" + i);
-
-							if (reconfiguration) {
-								print("ÿc2Copying Config properties from " + i + " object.");
-								this.copy(Scripts[i], Config);
-							}
-
-							global[i]();
-
-							if (reconfiguration) {
-								print("ÿc2Reverting back unmodified config properties.");
-								this.copy(unmodifiedConfig, Config);
-							}
-						}
-					} else {
-						throw new Error("Invalid script function name");
+					} catch (error) {
+						Misc.errorReport(error, i);
 					}
-				} catch (error) {
-					Misc.errorReport(error, i);
 				}
 			}
 		}

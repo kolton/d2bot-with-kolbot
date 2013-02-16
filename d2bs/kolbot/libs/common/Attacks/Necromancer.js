@@ -212,6 +212,7 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		Misc.unShift();
 		Precast.doPrecast(false);
 		this.raiseArmy();
 		this.novaTick = 0;
@@ -385,25 +386,23 @@ MainLoop:
 						delay(10);
 					}
 				} else if (me.getMinionCount(6) < maxRevives) {
-					if (!this.checkCorpse(corpse, true)) {
-						continue MainLoop;
-					}
+					if (this.checkCorpse(corpse, true)) {
+						print("Reviving " + corpse.name);
 
-					print("Reviving " + corpse.name);
-
-					if (!Skill.cast(95, 0, corpse)) {
-						return false;
-					}
-
-					count = me.getMinionCount(6);
-					tick = getTickCount();
-
-					while (getTickCount() - tick < 200) {
-						if (me.getMinionCount(6) > count) {
-							break;
+						if (!Skill.cast(95, 0, corpse)) {
+							return false;
 						}
 
-						delay(10);
+						count = me.getMinionCount(6);
+						tick = getTickCount();
+
+						while (getTickCount() - tick < 200) {
+							if (me.getMinionCount(6) > count) {
+								break;
+							}
+
+							delay(10);
+						}
 					}
 				} else {
 					return true;

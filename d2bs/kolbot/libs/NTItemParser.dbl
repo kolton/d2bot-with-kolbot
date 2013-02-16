@@ -60,7 +60,28 @@ NTIP.OpenFile = function (filepath, notify) {
 	}
 
 	lines = nipfile.readAllLines();
-	//item = me.getItem();
+	/*item = {
+		itemType: 0,
+		classid: 0,
+		itemclass: 0,
+		quality: 0,
+		ilvl: 0,
+		getFlag: function () {
+			return false;
+		},
+		getColor: function () {
+			return false;
+		},
+		getPrefix: function () {
+			return false;
+		},
+		getSuffix: function () {
+			return false;
+		},
+		getStatEx: function () {
+			return false;
+		}
+	};*/
 
 	nipfile.close();
 
@@ -388,9 +409,9 @@ NTIP.ParseLineInt = function (input, info) {
 
 				break;
 			default:
-				Misc.errorReport("Unknown Keyword : " + property + " File: " + info.file + " Line: " + info.line);
+				Misc.errorReport("Unknown property: " + property + " File: " + info.file + " Line: " + info.line);
 
-				break;
+				return false;
 			}
 
 			for (p_start = p_end; p_end < p_section[i].length; p_end += 1) {
@@ -414,55 +435,61 @@ NTIP.ParseLineInt = function (input, info) {
 				case 'color':
 					if (typeof NTIPAliasColor[p_keyword] === "undefined") {
 						Misc.errorReport("Unknown color: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-						p_result[0] += "false";
-					} else {
-						p_result[0] += NTIPAliasColor[p_keyword];
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasColor[p_keyword];
 
 					break;
 				case 'type':
 					if (typeof NTIPAliasType[p_keyword] === "undefined") {
 						Misc.errorReport("Unknown type: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-						p_result[0] += "false";
-					} else {
-						p_result[0] += NTIPAliasType[p_keyword];
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasType[p_keyword];
 
 					break;
 				case 'name':
 					if (typeof NTIPAliasClassID[p_keyword] === "undefined") {
 						Misc.errorReport("Unknown name: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-						p_result[0] += "false";
-					} else {
-						p_result[0] += NTIPAliasClassID[p_keyword];
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasClassID[p_keyword];
 
 					break;
 				case 'class':
 					if (typeof NTIPAliasClass[p_keyword] === "undefined") {
 						Misc.errorReport("Unknown class: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-						p_result[0] += "false";
-					} else {
-						p_result[0] += NTIPAliasClass[p_keyword];
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasClass[p_keyword];
 
 					break;
 				case 'quality':
 					if (typeof NTIPAliasQuality[p_keyword] === "undefined") {
 						Misc.errorReport("Unknown quality: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-						p_result[0] += "false";
-					} else {
-						p_result[0] += NTIPAliasQuality[p_keyword];
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasQuality[p_keyword];
 
 					break;
 				case 'flag':
 					if (typeof NTIPAliasFlag[p_keyword] === "undefined") {
 						Misc.errorReport("Unknown flag: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-						p_result[0] += "false)";
-					} else {
-						p_result[0] += NTIPAliasFlag[p_keyword] + ")";
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasFlag[p_keyword] + ")";
 
 					break;
 				}
@@ -491,10 +518,11 @@ NTIP.ParseLineInt = function (input, info) {
 			if (isNaN(p_keyword)) {
 				if (typeof NTIPAliasStat[p_keyword] === "undefined") {
 					Misc.errorReport("Unknown stat: " + p_keyword + " File: " + info.file + " Line: " + info.line);
-					p_result[1] += "false";
-				} else {
-					p_result[1] += "item.getStatEx(" + NTIPAliasStat[p_keyword] + ")";
+
+					return false;
 				}
+
+				p_result[1] += "item.getStatEx(" + NTIPAliasStat[p_keyword] + ")";
 			} else {
 				p_result[1] += "item.getStatEx(" + p_keyword + ")";
 			}
@@ -523,7 +551,9 @@ NTIP.ParseLineInt = function (input, info) {
 				p_quantity = Number(p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").substring(0, p_end));
 				p_result[2].MaxQuantity = p_quantity;
 			} else {
-				Misc.errorReport("Error in your NIP file - unknown 3rd part keyword: " + p_keyword.toLowerCase().replace(/^\s+|\s+$/, ""));
+				Misc.errorReport("Unknown 3rd part keyword: " + p_keyword.toLowerCase().replace(/^\s+|\s+$/, ""));
+
+				return false;
 			}
 		}
 	}

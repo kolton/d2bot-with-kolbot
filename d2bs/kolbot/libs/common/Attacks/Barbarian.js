@@ -47,7 +47,7 @@ var ClassAttack = {
 
 				break;
 			case 151: // Whirlwind
-				this.skillRange[i] = 8;
+				this.skillRange[i] = 10;
 				this.skillHand[i] = 0;
 
 				break;
@@ -87,8 +87,8 @@ var ClassAttack = {
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 2;
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (Config.Werewolf && !me.getState(139)) {
-				Misc.shapeShift(0);
+			if (Config.Wereform) {
+				Misc.shapeShift(Config.Wereform);
 			}
 
 			switch (this.doCast(unit, index)) {
@@ -116,18 +116,17 @@ var ClassAttack = {
 	},
 
 	afterAttack: function (pickit) {
+		Misc.unShift();
 		Precast.doPrecast(false);
 
 		if (pickit) {
 			this.findItem(me.area === 83 ? 60 : 20);
 		}
-
-		if (me.getState(139)) {
-			Misc.unShift();
-		}
 	},
 
 	doCast: function (unit, index) {
+		var walk;
+
 		// Low mana skill
 		if (Config.AttackSkill[index] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[index]) > me.mp) {
 			index = Config.AttackSkill.length - 1;
@@ -154,8 +153,10 @@ var ClassAttack = {
 		}
 
 		if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
+			walk = (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
 			// walk short distances instead of tele for melee attacks
-			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, me.getState(139) || (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x7)))) {
+			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, walk)) {
 				return 0;
 			}
 		}

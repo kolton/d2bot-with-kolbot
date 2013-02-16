@@ -383,12 +383,22 @@ function main() {
 		}
 	};
 
+	this.scriptEvent = function (msg) {
+		switch (msg) {
+		case "quit":
+			quitFlag = true;
+
+			break;
+		}
+	};
+
 	// Cache variables to prevent a bug where d2bs loses the reference to Config object
 	configCache = this.cacheConfig(Config);
 	tick = getTickCount();
 
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
+	addEventListener("scriptmsg", this.scriptEvent);
 
 	// Load Fastmod
 	Packet.changeStat(105, Config.FCR);
@@ -483,7 +493,7 @@ function main() {
 				}
 			}
 		} catch (e) {
-			D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + Pather.getAreaName(me.area), 9);
+			Misc.errorReport(e, "ToolsThread");
 			quit();
 
 			return;

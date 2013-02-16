@@ -56,6 +56,10 @@ Unit.prototype.__defineGetter__("attacking",
 
 // Open NPC menu
 Unit.prototype.openMenu = function (addDelay) {
+	if (Config.PacketShopping) {
+		return Packet.openMenu(this);
+	}
+
 	if (this.type !== 1) {
 		throw new Error("Unit.openMenu: Must be used on NPCs.");
 	}
@@ -105,6 +109,10 @@ Unit.prototype.openMenu = function (addDelay) {
 
 // mode = "Gamble", "Repair" or "Shop"
 Unit.prototype.startTrade = function (mode) {
+	if (Config.PacketShopping) {
+		return Packet.startTrade(this, mode);
+	}
+
 	if (this.type !== 1) {
 		throw new Error("Unit.startTrade: Must be used on NPCs.");
 	}
@@ -141,11 +149,15 @@ Unit.prototype.startTrade = function (mode) {
 };
 
 Unit.prototype.buy = function (shiftBuy) {
+	if (Config.PacketShopping) {
+		return Packet.buyItem(this, shiftBuy);
+	}
+
 	if (this.type !== 4) { // Check if it's an item we want to buy
 		throw new Error("Unit.buy: Must be used on items.");
 	}
 
-	if (!getUIFlag(0xC) || this.getParent() && this.getParent().gid !== getInteractedNPC().gid) { // Check if it's an item belonging to a NPC
+	if (!getUIFlag(0xC) || (this.getParent() && this.getParent().gid !== getInteractedNPC().gid)) { // Check if it's an item belonging to a NPC
 		throw new Error("Unit.buy: Must be used in shops.");
 	}
 
@@ -216,6 +228,10 @@ Unit.prototype.buy = function (shiftBuy) {
 
 // You MUST use a delay after Unit.sell() if using custom scripts. delay(500) works best, dynamic delay is used when identifying/selling (500 - item id time)
 Unit.prototype.sell = function () {
+	if (Config.PacketShopping) {
+		return Packet.sellItem(this);
+	}
+
 	if (this.type !== 4) { // Check if it's an item we want to buy
 		throw new Error("Unit.sell: Must be used on items.");
 	}
@@ -430,10 +446,18 @@ Unit.prototype.__defineGetter__('itemclass',
 Unit.prototype.getStatEx = function (id, subid) {
 	var i, temp, regex;
 
+	if (!this.desc) {
+		if (this.mode === 0) {
+			this.desc = this.description; // cache description - possible unit_getProperty crash fix
+		} else {
+			this.desc = "";
+		}
+	}
+
 	switch (id) {
 	case 31: // plusdefense
 		if (subid === 0) {
-			temp = this.description.split("\n");
+			temp = this.desc.split("\n");
 			regex = new RegExp("\\+\\d+ " + getLocaleString(3481));
 
 			for (i = 0; i < temp.length; i += 1) {
@@ -477,7 +501,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 	if (this.getFlag(0x04000000)) { // Runeword
 		switch (id) {
 		case 16: // enhanceddefense
-			temp = this.description.split("\n");
+			temp = this.desc.split("\n");
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
@@ -487,7 +511,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			return 0;
 		case 18: // enhanceddamage
-			temp = this.description.split("\n");
+			temp = this.desc.split("\n");
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {

@@ -453,8 +453,6 @@ MainLoop:
 
 						timer = getTickCount() - this.sellTimer; // shop speedup test
 
-						//print("sell timer: " + timer);
-
 						if (timer > 0 && timer < 500) {
 							delay(timer);
 						}
@@ -609,6 +607,10 @@ MainLoop:
 	},
 
 	identifyItem: function (unit, tome) {
+		if (Config.PacketShopping) {
+			return Packet.identifyItem(unit, tome);
+		}
+
 		var i, tick;
 
 		if (!unit || unit.getFlag(0x10)) {
@@ -617,6 +619,7 @@ MainLoop:
 
 		this.sellTimer = getTickCount(); // shop speedup test
 
+CursorLoop:
 		for (i = 0; i < 3; i += 1) {
 			clickItem(1, tome);
 
@@ -624,7 +627,7 @@ MainLoop:
 
 			while (getTickCount() - tick < 500) {
 				if (getCursorType() === 6) {
-					break;
+					break CursorLoop;
 				}
 
 				delay(10);
@@ -745,7 +748,7 @@ MainLoop:
 						items.push(copyUnit(item));
 					}
 				} while (item.getNext());
-				
+
 				for (i = 0; i < items.length; i += 1) {
 					if (!Storage.Inventory.CanFit(items[i])) {
 						return false;
