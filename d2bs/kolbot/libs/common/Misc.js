@@ -15,6 +15,10 @@ var Skill = {
 			return false;
 		}
 
+		if (!this.wereFormCheck(skillId)) {
+			return false;
+		}
+
 		// No mana to cast
 		if (this.getManaCost(skillId) > me.mp) {
 			if (Config.AttackSkill.indexOf(skillId) > -1) {
@@ -146,6 +150,30 @@ MainLoop:
 	// Timed skills
 	isTimed: function (skillId) {
 		return [15, 25, 27, 51, 56, 59, 62, 64, 121, 225, 223, 228, 229, 234, 244, 247, 249, 250, 256, 268, 275, 277, 279].indexOf(skillId) > -1;
+	},
+
+	// Wereform skills
+	wereFormCheck: function (skillId) {
+		if (!me.getState(139) && !me.getState(140)) {
+			return true;
+		}
+
+		// Can be cast by both
+		if ([1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
+			return true;
+		}
+
+		// Can be cast by werewolf only
+		if (me.getState(139) && [223, 232, 238, 248].indexOf(skillId) > -1) {
+			return true;
+		}
+
+		// Can be cast by werebear only
+		if (me.getState(140) && [228, 233, 243].indexOf(skillId) > -1) {
+			return true;
+		}
+
+		return false;
 	},
 
 	// Skills that cn be cast in town
@@ -744,14 +772,31 @@ var Misc = {
 	},
 
 	// Change into werewolf or werebear
-	shapeShift: function (mode) { // 0 = werewolf, 1 = werebear
-		if (arguments.length === 0 || mode < 0 || mode > 2) {
-			throw new Error("Misc.shapeShift: Invalid parameter");
+	shapeShift: function (mode) {
+		var i, tick, skill, state;
+
+		switch (mode.toString().toLowerCase()) {
+		case "0":
+			return false;
+		case "1":
+		case "werewolf":
+			state = 139;
+			skill = 223;
+
+			break;
+		case "2":
+		case "werebear":
+			state = 140;
+			skill = 228;
+
+			break;
+		default:
+			throw new Error("shapeShift: Invalid parameter");
 		}
 
-		var i, tick,
-			state = mode === 0 ? 139 : 140,
-			skill = mode === 0 ? 223 : 228;
+		if (me.getState(state)) {
+			return true;
+		}
 
 		for (i = 0; i < 3; i += 1) {
 			Skill.cast(skill, 0);
@@ -760,6 +805,8 @@ var Misc = {
 
 			while (getTickCount() - tick < 2000) {
 				if (me.getState(state)) {
+					delay(200);
+
 					return true;
 				}
 
@@ -1111,7 +1158,76 @@ var Experience = {
 };
 
 var Packet = {
-	buyItem: function (item, shiftBuy) {
+	openMenu: function (unit) {
+		if (unit.type !== 1) {
+			throw new Error("openMenu: Must be used on NPCs.");
+		}
+
+		if (getUIFlag(0x08)) {
+			return true;
+		}
+
+		var i, j;
+
+		for (i = 0; i < 3; i += 1) {
+			if (getDistance(me, unit) > 5) {
+				Pather.moveToUnit(unit);
+			}
+
+			sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+
+			for (j = 0; j < 40; j += 1) {
+				if (j % 8 === 0) {
+					me.cancel();
+					delay(300);
+					sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+				}
+
+				if (getUIFlag(0x08)) {
+					delay(Math.max(500, me.ping * 2));
+
+					return true;
+				}
+
+				delay(25);
+			}
+		}
+
+		return false;
+	},
+
+	startTrade: function (unit, mode) {
+		if (unit.type !== 1) {
+			throw new Error("Unit.startTrade: Must be used on NPCs.");
+		}
+
+		if (getUIFlag(0x0C)) {
+			return true;
+		}
+
+		var i, tick,
+			gamble = mode === "Gamble";
+
+		if (this.openMenu(unit)) {
+			for (i = 0; i < 10; i += 1) {
+				delay(200);
+
+				if (i % 2 === 0) {
+					sendPacket(1, 0x38, 4, gamble? 2 : 1, 4, unit.gid, 4, 0);
+				}
+
+				if (unit.itemcount > 0) {
+					delay(200);
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	},
+
+	buyItem: function (unit, shiftBuy) {
 		var i, tick, container,
 			itemCount = me.itemcount,
 			npc = getInteractedNPC();
@@ -1120,20 +1236,20 @@ var Packet = {
 			throw new Error("buyItem: No NPC menu open.");
 		}
 
-		if (me.getStat(14) + me.getStat(15) < item.getItemCost(0)) { // Can we afford the item?
+		if (me.getStat(14) + me.getStat(15) < unit.getItemCost(0)) { // Can we afford the item?
 			return false;
 		}
 
 		for (i = 0; i < 3; i += 1) {
-			sendPacket(1, 0x32, 4, npc.gid, 4, item.gid, 4, shiftBuy ? 0x80000000 : 0, 4, 0);
+			sendPacket(1, 0x32, 4, npc.gid, 4, unit.gid, 4, shiftBuy ? 0x80000000 : 0, 4, 0);
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 2000) {
 				if (shiftBuy) {
-					switch (item.classid) {
+					switch (unit.classid) {
 					case 529: // tp scroll
-						container = me.getItem(518);
+						container = me.findItem(518, 0, 3); // tp tome
 
 						if (container && container.getStat(70) === 20) {
 							return true;
@@ -1141,7 +1257,7 @@ var Packet = {
 
 						break;
 					case 530: // id scroll
-						container = me.getItem(519);
+						container = me.findItem(519, 0, 3); // id tome
 
 						if (container && container.getStat(70) === 20) {
 							return true;
@@ -1149,7 +1265,7 @@ var Packet = {
 
 						break;
 					case 543: // key
-						container = me.getItem(543);
+						container = me.findItem(543, 0, 3); // key stack
 
 						if (container && container.getStat(70) === 12) {
 							return true;
@@ -1169,26 +1285,112 @@ var Packet = {
 
 		return false;
 	},
+
+	sellItem: function (unit) {
+		if (unit.type !== 4) { // Check if it's an item we want to buy
+			throw new Error("Unit.sell: Must be used on items.");
+		}
+
+		var i, tick, npc,
+			itemCount = me.itemcount;
+
+		npc = getInteractedNPC();
+
+		if (!npc) {
+			return false;
+		}
+
+		for (i = 0; i < 5; i += 1) {
+			sendPacket(1, 0x33, 4, npc.gid, 4, unit.gid, 4, 0, 4, 0);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (me.itemcount !== itemCount) {
+					//delay(500);
+
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
+	identifyItem: function (unit, tome) {
+		var i, tick;
+
+		if (!unit || unit.getFlag(0x10)) {
+			return false;
+		}
+
+CursorLoop:
+		for (i = 0; i < 3; i += 1) {
+			sendPacket(1, 0x27, 4, unit.gid, 4, tome.gid);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (getCursorType() === 6) {
+					break CursorLoop;
+				}
+
+				delay(10);
+			}
+		}
+
+		if (getCursorType() !== 6) {
+			return false;
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			if (getCursorType() === 6) {
+				sendPacket(1, 0x27, 4, unit.gid, 4, tome.gid);
+			}
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (unit.getFlag(0x10)) {
+					delay(50);
+
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
 	castSkill: function (hand, wX, wY) {
 		hand = (hand === 0) ? 0x0c : 0x05;
 		sendPacket(1, hand, 2, wX, 2, wY);
 	},
+
 	unitCast: function (hand, who) {
 		hand = (hand === 0) ? 0x11 : 0x0a;
 		sendPacket(1, hand, 4, who.type, 4, who.gid);
 	},
+
 	moveNPC: function (npc, dwX, dwY) {
 		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
 	},
+
 	teleWalk: function (wX, wY) {
 		sendPacket(1, 0x5f, 2, wX, 2, wY);
 		delay(200);
 		sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
 		delay(200);
 	},
+
 	flash: function (gid) {
 		sendPacket(1, 0x4b, 4, 0, 4, gid);
 	},
+
 	changeStat: function (stat, value) {
 		if (value > 0) {
 			getPacket(1, 0x1d, 1, stat, 1, value);

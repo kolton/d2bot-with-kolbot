@@ -111,6 +111,7 @@ var ClassAttack = {
 	afterAttack: function () {
 		var needRepair;
 
+		Misc.unShift();
 		Precast.doPrecast(false);
 
 		needRepair = Town.needRepair();
@@ -123,7 +124,7 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
-		var i,
+		var i, walk,
 			timed = index,
 			untimed = index + 1;
 
@@ -168,8 +169,10 @@ var ClassAttack = {
 			}
 		} else if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed])) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
+				walk = (this.skillRange[timed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
 				// Walk short distances instead of tele for melee attacks
-				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4, this.skillRange[timed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4, walk)) {
 					return 0;
 				}
 			}
@@ -184,8 +187,10 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[untimed] > -1) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
+				walk = (this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
 				// Walk short distances instead of tele for melee attacks
-				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4, this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
+				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4, walk)) {
 					return 0;
 				}
 			}

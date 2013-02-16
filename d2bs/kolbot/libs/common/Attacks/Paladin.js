@@ -115,6 +115,7 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		Misc.unShift();
 		Precast.doPrecast(false);
 
 		if (Config.Redemption instanceof Array && (me.hp * 100 / me.hpmax < Config.Redemption[0] || me.mp * 100 / me.mpmax < Config.Redemption[1]) && Skill.setSkill(124, 0)) {
@@ -123,7 +124,7 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
-		var i,
+		var i, walk,
 			atkSkill = index,
 			aura = index + 1;
 
@@ -180,32 +181,19 @@ var ClassAttack = {
 				}
 			}
 
-			CollMap.reset();
-
 			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x2004, true)) {
 					return 0;
 				}
 			}
 		} else if (getDistance(me, unit) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
+			walk = (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
 			// walk short distances instead of tele for melee attacks. teleport if failed to walk
-			switch (Config.AttackSkill[atkSkill]) {
-			case 0:
-			case 96:
-			case 106:
-			case 116:
-				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
-					return 0;
-				}
-
-				break;
-			default:
-				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4)) {
-					return 0;
-				}
-
-				break;
+			if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, walk)) {
+				return 0;
 			}
+
 		}
 
 		if (Config.AttackSkill[aura] > -1) {

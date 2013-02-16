@@ -125,6 +125,8 @@ var Attack = {
 			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
 		}
 
+		ClassAttack.afterAttack();
+
 		if (!copyUnit(target).x) {
 			return true;
 		}
@@ -240,7 +242,10 @@ var Attack = {
 		}
 
 		while (monsterList.length > 0) {
-			delay(5);
+			if (boss) {
+				orgx = boss.x;
+				orgy = boss.y;
+			}
 
 			if (me.dead) {
 				return false;
@@ -251,16 +256,9 @@ var Attack = {
 
 			target = copyUnit(monsterList[0]);
 
-			if (typeof target.x !== "undefined" &&
-					((Math.abs(orgx - target.x) <= range && Math.abs(orgy - target.y) <= range) ||
-					(this.getScarinessLevel(target) > 7 && Math.abs(me.x - target.x) <= range && Math.abs(me.y - target.y) <= range)) &&
-					(!spectype || (target.spectype & spectype)) && this.checkMonster(target) &&
-					(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))
-					) {
-				if (Config.Dodge) {
-					if (attackCount % 2 === 0) {
-						this.deploy(target.x - 15, target.x + 15, target.y - 15, target.y + 15, 5, 15);
-					}
+			if (typeof target.x !== "undefined" && (!spectype || (target.spectype & spectype)) && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target) && (me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+				if (Config.Dodge && attackCount % 2 === 0) {
+					this.deploy(target.x - 15, target.x + 15, target.y - 15, target.y + 15, 5, 15);
 				}
 
 				Misc.townCheck(true);
@@ -269,7 +267,7 @@ var Attack = {
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				switch (result) {
-				case 1:
+					case 1:
 					monsterList.shift();
 
 					break;
@@ -307,6 +305,8 @@ var Attack = {
 			} else {
 				monsterList.shift();
 			}
+
+			delay(5);
 		}
 
 		ClassAttack.afterAttack(pickit);
@@ -553,6 +553,10 @@ var Attack = {
 
 	// Sort monsters based on distance, spectype and classId (summoners are attacked first)
 	sortMonsters: function (unitA, unitB) {
+		if (Config.Wereform) {
+			return 0;
+		}
+
 		var ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
 
 		if (ids.indexOf(unitA.classid) > -1 &&
@@ -1047,6 +1051,14 @@ AuraLoop: // Skip monsters with auras
 			walk = false;
 		}
 
+		if (walk && distance < 4) {
+			if (getDistance(me, unit) > 8 || checkCollision(me, unit, coll)) {
+				Pather.moveToUnit(unit, 0, 0, 0, 1);
+			}
+
+			return true;
+		}
+
 		var n, i, cx, cy, t,
 			coords = [],
 			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
@@ -1075,9 +1087,9 @@ AuraLoop: // Skip monsters with auras
 
 				for (i = 0; i < coords.length; i += 1) {
 					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll)) {
-						print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
+						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						return (walk ? Pather.walkTo(coords[i].x, coords[i].y) : Pather.moveTo(coords[i].x, coords[i].y, 0));
+						return walk ? Pather.walkTo(coords[i].x, coords[i].y) : Pather.moveTo(coords[i].x, coords[i].y, 0);
 					}
 				}
 			}

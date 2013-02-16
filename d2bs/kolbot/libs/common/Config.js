@@ -163,6 +163,7 @@ var Config = {
 	LogExperience: false,
 	TownCheck: false,
 	PingQuit: [{Ping: 0, Duration: 0}],
+	PacketShopping: false,
 
 	// Fastmod
 	FCR: 0,
@@ -220,6 +221,7 @@ var Config = {
 	FindItemSwitch: 1,
 
 	// Druid specific
+	Wereform: 0,
 	SummonRaven: 0,
 	SummonAnimal: 0,
 	SummonVine: 0,

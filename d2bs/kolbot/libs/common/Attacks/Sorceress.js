@@ -58,6 +58,7 @@ var ClassAttack = {
 			// oskills
 			case 106: // Zeal
 				this.skillRange[i] = 3;
+				this.skillHand[i] = 2; // shift bypass
 
 				break;
 			default: // Every other skill
@@ -157,6 +158,7 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		Misc.unShift();
 		Precast.doPrecast(false);
 	},
 

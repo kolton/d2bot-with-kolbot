@@ -55,10 +55,13 @@ var Pather = {
 			pop = false;
 		}
 
-		this.useTeleport = this.teleport && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown
+							&& ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
+			Misc.townCheck();
+
 			return this.teleportTo(x, y);
 		}
 
@@ -236,7 +239,7 @@ MainLoop:
 			nTimer = getTickCount();
 
 ModeLoop:
-			while (getDistance(me.x, me.y, x, y) > 4 && me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
+			while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
 				if (me.dead) {
 					return false;
 				}
@@ -318,7 +321,8 @@ ModeLoop:
 		If you want to go to a preset unit based on its area, type and id, use Pather.moveToPreset().
 	*/
 	moveToUnit: function (unit, offX, offY, clearPath, pop) { // Maybe use range instead of XY offset
-		this.useTeleport = this.teleport && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+				this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown
+							&& ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
 		if (typeof offX === "undefined") {
 			offX = 0;
@@ -344,7 +348,7 @@ ModeLoop:
 			return this.moveTo(unit.roomx * 5 + unit.x + offX, unit.roomy * 5 + unit.y + offY, this.useTeleport ? 3 : 0, clearPath);
 		}
 
-		return this.moveTo(unit.x + offX, unit.y + offY, 3, clearPath, pop);
+		return this.moveTo(unit.x + offX, unit.y + offY, this.useTeleport ? 3 : 0, clearPath, pop);
 	},
 
 	/*
@@ -415,7 +419,9 @@ ModeLoop:
 						return false;
 					}
 
-					Pather.moveTo(dest[0], dest[1], 3, clearPath);
+					if (!Pather.moveTo(dest[0], dest[1], 3, clearPath)) {
+						return false;
+					}
 
 					/* i < areas.length - 1 is for crossing multiple areas.
 						In that case we must use the exit before the last area.

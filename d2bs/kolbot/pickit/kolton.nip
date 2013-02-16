@@ -778,7 +778,7 @@
 //[name] == tulwar && [quality] == unique # # [maxquantity] == 1
 //[name] == trollnest && [quality] <= superior && [flag] != ethereal # [sockets] == 2 # [maxquantity] == 1
 [name] == demonhideboots && [quality] == unique # [itemgoldbonus] == 70
-[type] == boots && [quality] == rare # [itemgoldbonus] == 80 && [fireresist] >= 30
+//[type] == boots && [quality] == rare # [itemgoldbonus] == 80 && [fireresist] >= 30
 //[name] == phaseblade && [quality] <= superior # [sockets] == 5
 //[name] == heavybelt && [quality] == unique && [flag] != ethereal # [itemgoldbonus] == 80 // goldwrap
 //[type] == belt && [quality] == rare && [flag] != ethereal # [itemgoldbonus] == 80
