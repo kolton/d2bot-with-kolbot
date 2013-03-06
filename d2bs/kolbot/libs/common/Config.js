@@ -77,7 +77,7 @@ var Config = {
 		}
 
 		try {
-			LoadConfig();
+			LoadConfig.call();
 		} catch (e2) {
 			if (notify) {
 				print("ÿc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
@@ -182,9 +182,12 @@ var Config = {
 	// DClone
 	StopOnDClone: false,
 	SoJWaitTime: 0,
+	KillDclone: true,
 
 	// Attack specific
 	Dodge: false,
+	DodgeRange: 15,
+	DodgeHP: 100,
 	AttackSkill: [],
 	LowManaSkill: [],
 	TeleStomp: false,

@@ -172,6 +172,11 @@ var ClassAttack = {
 		var i, coords, angle,
 			angles = [180, 175, -175, 170, -170, 165, -165, 150, -150, 135, -135, 45, -45, 90, -90];
 
+		if (unit.spectype & 0x7) {
+			angles.unshift(120);
+		}
+
+		me.runwalk = me.gametype;
 		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
 
 		for (i = 0; i < angles.length; i += 1) { // get a better spot

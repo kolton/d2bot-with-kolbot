@@ -67,6 +67,7 @@ function main() {
 		);
 
 	// Init config and attacks
+	D2Bot.init();
 	Config.init();
 	Pickit.init();
 	Attack.init();
@@ -81,7 +82,7 @@ function main() {
 			this.togglePause();
 
 			while (!me.gameReady) {
-				delay(200);
+				delay(100);
 			}
 
 			try {
@@ -99,7 +100,9 @@ function main() {
 				}
 			} catch (e) {
 				Misc.errorReport(e, "TownChicken.js");
-				quit();
+				scriptBroadcast("quit");
+
+				return;
 			} finally {
 				this.togglePause();
 

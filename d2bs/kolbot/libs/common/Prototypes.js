@@ -4,6 +4,11 @@
 *	@desc		various 'Unit' and 'me' prototypes
 */
 
+// Trim String
+String.prototype.trim = function () {
+	return this.replace(/^\s+|\s+$/g, "");
+};
+
 // Check if unit is idle
 Unit.prototype.__defineGetter__("idle",
 	function () {
@@ -64,7 +69,7 @@ Unit.prototype.openMenu = function (addDelay) {
 		throw new Error("Unit.openMenu: Must be used on NPCs.");
 	}
 
-	if (typeof addDelay === "undefined") {
+	if (addDelay === undefined) {
 		addDelay = 0;
 	}
 
@@ -83,14 +88,16 @@ Unit.prototype.openMenu = function (addDelay) {
 			Packet.flash(me.gid);
 		}
 
-		this.interact();
+		Misc.click(0, 0, this);
+		//this.interact();
 		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 
 		for (j = 0; j < 40; j += 1) {
 			if (j % 10 === 0) {
 				me.cancel();
 				delay(400);
-				this.interact();
+				Misc.click(0, 0, this);
+				//this.interact();
 				//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 			}
 
@@ -127,7 +134,6 @@ Unit.prototype.startTrade = function (mode) {
 	for (i = 0; i < 3; i += 1) {
 		if (this.openMenu(i)) { // Incremental delay on retries
 			Misc.useMenu(menuId);
-			delay(1000);
 
 			tick = getTickCount();
 
@@ -325,15 +331,15 @@ Unit.prototype.drop = function () {
 };
 
 me.findItem = function (id, mode, loc) {
-	if (typeof id === "undefined") {
+	if (id === undefined) {
 		id = -1;
 	}
 
-	if (typeof mode === "undefined") {
+	if (mode === undefined) {
 		mode = -1;
 	}
 
-	if (typeof loc === "undefined") {
+	if (loc === undefined) {
 		loc = false;
 	}
 
@@ -359,15 +365,15 @@ me.findItem = function (id, mode, loc) {
 };
 
 me.findItems = function (id, mode, loc) {
-	if (typeof id === "undefined") {
+	if (id === undefined) {
 		id = -1;
 	}
 
-	if (typeof mode === "undefined") {
+	if (mode === undefined) {
 		mode = -1;
 	}
 
-	if (typeof loc === "undefined") {
+	if (loc === undefined) {
 		loc = false;
 	}
 
@@ -446,23 +452,47 @@ Unit.prototype.__defineGetter__('itemclass',
 Unit.prototype.getStatEx = function (id, subid) {
 	var i, temp, regex;
 
-	if (!this.desc) {
-		if (this.mode === 0) {
-			this.desc = this.description; // cache description - possible unit_getProperty crash fix
-		} else {
-			this.desc = "";
-		}
-	}
-
 	switch (id) {
+	case 21: // plusmindamage
+	case 22: // plusmaxdamage
+		if (subid === 1) {
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
+			temp = this.desc.split("\n");
+			regex = new RegExp("\\+\\d+ " + getLocaleString(3478 - 21 + id));
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(regex, "i")) {
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
 	case 31: // plusdefense
 		if (subid === 0) {
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
 			temp = this.desc.split("\n");
 			regex = new RegExp("\\+\\d+ " + getLocaleString(3481));
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i], 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -471,7 +501,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 		break;
 	case 83: // itemaddclassskills
-		if (typeof subid === "undefined") {
+		if (subid === undefined) {
 			for (i = 0; i < 7; i += 1) {
 				if (this.getStat(83, i)) {
 					return this.getStat(83, i);
@@ -483,7 +513,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 		break;
 	case 188: // itemaddskilltab
-		if (typeof subid === "undefined") {
+		if (subid === undefined) {
 			temp = [0, 1, 2, 8, 9, 10, 16, 17, 18, 24, 25, 26, 32, 33, 34, 40, 41, 42, 48, 49, 50];
 
 			for (i = 0; i < temp.length; i += 1) {
@@ -501,21 +531,37 @@ Unit.prototype.getStatEx = function (id, subid) {
 	if (this.getFlag(0x04000000)) { // Runeword
 		switch (id) {
 		case 16: // enhanceddefense
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
 			temp = this.desc.split("\n");
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return parseInt(temp[i], 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
 			return 0;
 		case 18: // enhanceddamage
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
 			temp = this.desc.split("\n");
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return parseInt(temp[i], 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -523,7 +569,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 		}
 	}
 
-	if (typeof subid === "undefined") {
+	if (subid === undefined) {
 		return this.getStat(id);
 	}
 

@@ -180,46 +180,38 @@ MainLoop:
 
 					split = command.split("kill ")[1];
 
-					if (!Pather.usePortal(player.area, player.name)) {
-						me.overhead("Failed to use TP");
+					if (Pather.usePortal(player.area, player.name)) {
+						Precast.doPrecast(false);
 
-						break;
-					}
+						try {
+							if (!!parseInt(split, 10)) {
+								split = parseInt(split, 10);
+							}
 
-					Precast.doPrecast(false);
-
-					try {
-						if (!!parseInt(split, 10)) {
-							split = parseInt(split, 10);
+							Attack.kill(split);
+							Pickit.pickItems();
+						} catch (killerror) {
+							print(killerror);
 						}
 
-						Attack.kill(split);
-						Pickit.pickItems();
-					} catch (killerror) {
-						print(killerror);
-					}
+						delay(1000);
 
-					delay(1000);
-
-					if (!me.inTown && !Pather.usePortal(null, player.name)) {
-						Town.goToTown();
+						if (!me.inTown && !Pather.usePortal(null, player.name)) {
+							Town.goToTown();
+						}
 					}
 				} else if (command.indexOf("clearlevel") > -1) {
 					print("Received command: clearlevel");
 					delay(500);
 
-					if (!Pather.usePortal(player.area, player.name)) {
-						me.overhead("Failed to use TP");
+					if (Pather.usePortal(player.area, player.name)) {
+						Precast.doPrecast(false);
+						Attack.clearLevel(Config.ClearType);
+						Precast.doPrecast(true);
 
-						break;
-					}
-
-					Precast.doPrecast(false);
-					Attack.clearLevel(Config.ClearType);
-					Precast.doPrecast(true);
-
-					if (!Pather.usePortal(null, player.name)) {
-						Town.goToTown();
+						if (!Pather.usePortal(null, player.name)) {
+							Town.goToTown();
+						}
 					}
 				} else if (command.indexOf("clear") > -1) {
 					print("Received command: clear");
@@ -227,28 +219,24 @@ MainLoop:
 
 					split = command.split("clear ")[1];
 
-					if (!Pather.usePortal(player.area, player.name)) {
-						me.overhead("Failed to use TP");
+					if (Pather.usePortal(player.area, player.name)) {
+						Precast.doPrecast(false);
 
-						break;
-					}
+						try {
+							if (!!parseInt(split, 10)) {
+								split = parseInt(split, 10);
+							}
 
-					Precast.doPrecast(false);
-
-					try {
-						if (!!parseInt(split, 10)) {
-							split = parseInt(split, 10);
+							Attack.clear(15, 0, split);
+						} catch (killerror2) {
+							print(killerror2);
 						}
 
-						Attack.clear(15, 0, split);
-					} catch (killerror2) {
-						print(killerror2);
-					}
+						delay(1000);
 
-					delay(1000);
-
-					if (!me.inTown && !Pather.usePortal(null, player.name)) {
-						Town.goToTown();
+						if (!me.inTown && !Pather.usePortal(null, player.name)) {
+							Town.goToTown();
+						}
 					}
 				} else if (command.indexOf("quit") > -1) {
 					break MainLoop;
@@ -256,18 +244,14 @@ MainLoop:
 					print("Received command: clear cows");
 					delay(500);
 
-					if (!Pather.usePortal(39)) {
-						me.overhead("Failed to use the portal");
+					if (Pather.usePortal(39)) {
+						Precast.doPrecast(false);
+						this.clearCowLevel();
+						delay(1000);
 
-						break;
-					}
-
-					Precast.doPrecast(false);
-					this.clearCowLevel();
-					delay(1000);
-
-					if (!Pather.usePortal(null, player.name)) {
-						Town.goToTown();
+						if (!Pather.usePortal(null, player.name)) {
+							Town.goToTown();
+						}
 					}
 				}
 			}

@@ -9,24 +9,19 @@ var CollMap = new function () {
 	this.maps = [];
 
 	this.addRoom = function (x, y) {
-		// In case a room is passed directly
-		if (x instanceof Room) {
-			this.rooms.push({x: x.x, y: x.y, xsize: x.xsize, ysize: x.ysize});
-			this.maps.push(x.getCollision());
+		var room, coll;
+
+		room = x instanceof Room ? x : getRoom(x, y);
+		coll = room.getCollision();
+
+		if (room && coll) {
+			this.rooms.push({x: room.x, y: room.y, xsize: room.xsize, ysize: room.ysize});
+			this.maps.push(coll);
 
 			return true;
 		}
 
-		var room = getRoom(x, y);
-
-		if (room instanceof Room && this.coordsInRoom(x, y, room)) {
-			this.rooms.push({x: room.x, y: room.y, xsize: room.xsize, ysize: room.ysize});
-			this.maps.push(room.getCollision());
-		} else {
-			return false;
-		}
-
-		return true;
+		return false;
 	};
 
 	this.getColl = function (x, y) {
@@ -40,7 +35,7 @@ var CollMap = new function () {
 		j = x - this.rooms[index].x * 5;
 		i = y - this.rooms[index].y * 5;
 
-		if (typeof this.maps[index] !== "undefined" && typeof this.maps[index][i] !== "undefined" && typeof this.maps[index][i][j] !== "undefined") {
+		if (this.maps[index] !== undefined && this.maps[index][i] !== undefined && this.maps[index][i][j] !== undefined) {
 			return this.maps[index][i][j];
 		}
 
@@ -83,7 +78,7 @@ var CollMap = new function () {
 	// Check collision between unitA and unitB. true = collision present, false = collision not present
 	// If checking for blocking collisions (0x1, 0x4), true means blocked, false means not blocked
 	this.checkColl = function (unitA, unitB, coll, thickness) {
-		if (typeof thickness === "undefined") {
+		if (thickness === undefined) {
 			thickness = 1;
 		}
 
@@ -107,24 +102,4 @@ var CollMap = new function () {
 
 		return false;
 	};
-
-	/*this.checkColl = function (unitA, unitB, coll) {
-		var i, x, y, a, b,
-			lineLength = Math.sqrt((unitA.x - unitB.x) * (unitA.x - unitB.x) + (unitA.y - unitB.y) * (unitA.y - unitB.y));
-
-		for (i = 0; i < lineLength; i += 1) {
-			x = Math.round(unitA.x + (unitB.x - unitA.x) * i / lineLength);
-			y = Math.round(unitA.y + (unitB.y - unitA.y) * i / lineLength);
-
-			for (a = x - 1; a <= x + 1; a += 1) {
-				for (b = y - 1; b <= y + 1; b += 1) {
-					if (this.getColl(a, b) & coll) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	};*/
 };

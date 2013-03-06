@@ -303,7 +303,13 @@ function main() {
 				print("ÿc2Mule triggered");
 				scriptBroadcast("mule");
 				quit();
+			} else {
+				me.overhead("Profile not enabled for muling.");
 			}
+
+			break;
+		case 109: // Numpad -
+			Misc.spy(me.name);
 
 			break;
 		case 110: // decimal point
@@ -334,6 +340,8 @@ function main() {
 	};
 
 	this.gameEvent = function (mode, param1, param2, name1, name2) {
+		var i;
+
 		switch (mode) {
 		case 0x00: // "%Name1(%Name2) dropped due to time out."
 		case 0x01: // "%Name1(%Name2) dropped due to errors."
@@ -377,6 +385,10 @@ function main() {
 				print("ÿc4Diablo Walks the Earth");
 
 				me.maxgametime = 0;
+
+				if (Config.KillDclone) {
+					load("tools/clonekilla.js");
+				}
 			}
 
 			break;
@@ -512,6 +524,6 @@ function main() {
 			break;
 		}
 
-		delay(10);
+		delay(20);
 	}
 }

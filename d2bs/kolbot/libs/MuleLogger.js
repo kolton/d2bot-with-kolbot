@@ -50,7 +50,7 @@ var MuleLogger = {
 		}
 
 		if (this.LogItemLevel && desc[desc.length - 1]) {
-			desc[desc.length - 1] += (" (" + unit.ilvl + ")");
+			desc[desc.length - 1] = desc[desc.length - 1].trim() + " (" + unit.ilvl + ")";
 		}
 
 		desc = desc.reverse().join("\\n");
@@ -60,6 +60,8 @@ var MuleLogger = {
 
 	inGameCheck: function () {
 		if (this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
+			print("ÿc4MuleLoggerÿc0: Logging items.");
+			D2Bot.printToConsole("MuleLogger: Logging items.", 7);
 			this.logChar();
 
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
@@ -80,7 +82,7 @@ var MuleLogger = {
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "");
 
 		desc = this.getItemDesc(unit);
 		color = unit.getColor();

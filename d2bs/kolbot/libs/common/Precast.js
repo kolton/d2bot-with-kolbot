@@ -16,7 +16,7 @@ var Precast = new function () {
 
 		var i, tick;
 
-		if (typeof slot === "undefined") {
+		if (slot === undefined) {
 			slot = me.weaponswitch === 0 ? 1 : 0;
 		} else if (me.weaponswitch === slot) {
 			return true;

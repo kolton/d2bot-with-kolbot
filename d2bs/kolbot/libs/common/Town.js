@@ -35,6 +35,7 @@ var NPC = {
 
 var Town = {
 	sellTimer: getTickCount(), // shop speedup test
+	beltSize: false,
 
 	tasks: [
 		{Heal: NPC.Akara, Shop: NPC.Akara, Gamble: NPC.Gheed, Repair: NPC.Charsi, Merc: NPC.Kashya, Key: NPC.Akara, CainID: NPC.Cain},
@@ -110,8 +111,6 @@ var Town = {
 
 	// Start a task and return the NPC Unit
 	initNPC: function (task) {
-		//print(task);
-
 		var npc = getInteractedNPC();
 
 		if (npc && npc.name.toLowerCase() !== this.tasks[me.act - 1][task]) {
@@ -150,9 +149,7 @@ var Town = {
 
 			break;
 		case "CainID":
-			//cain.useMenu(0x0FB4);
 			Misc.useMenu(0x0FB4);
-			delay(1000);
 			me.cancel();
 
 			break;
@@ -188,14 +185,15 @@ var Town = {
 		return false;
 	},
 
-	// Buy potions from a NPC
 	buyPotions: function () {
-		var i, j, pot, npc, beltSize, col,
-			emptyColumns = 0,
-			useShift = true;
+		var i, j, npc, useShift, col, beltSize, pot;
 
-		col = this.checkColumns();
-		beltSize = Storage.BeltSize();
+		if (!this.beltSize) {
+			this.beltSize = Storage.BeltSize();
+		}
+
+		beltSize = this.beltSize;
+		col = this.checkColumns(beltSize);
 
 		// Check if we need to buy potions based on Config.MinColumn
 		for (i = 0; i < 4; i += 1) {
@@ -215,32 +213,15 @@ var Town = {
 		}
 
 		for (i = 0; i < 4; i += 1) {
-			switch (Config.BeltColumn[i]) {
-			case "hp":
-			case "mp": // Increase emptyColumns if a buyable column is empty
-				if (col[i] === beltSize) {
-					emptyColumns += 1;
-				}
-
-				break;
-			case "rv": // can't use shift buy if "rv" column is empty
-				if (col[i] === beltSize) {
-					useShift = false;
-				}
-
-				break;
-			}
-		}
-
-		for (i = 0; i < 4; i += 1) {
 			if (col[i] > 0) {
+				useShift = this.shiftCheck(col, beltSize);
 				pot = this.getPotion(npc, Config.BeltColumn[i]);
 
 				if (pot) {
 					//print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
 
 					// Shift+buy will trigger if there's no empty columns or if only the current column is empty
-					if (useShift && (emptyColumns === 0 || (emptyColumns === 1 && col[i] === beltSize))) {
+					if (useShift) {
 						pot.buy(true);
 					} else {
 						for (j = 0; j < col[i]; j += 1) {
@@ -250,21 +231,58 @@ var Town = {
 				}
 			}
 
-			// Switch to shift+buy on the fly (if possible, happens if 2+ buyable potion columns are empty)
-			if (col[i] === beltSize && emptyColumns > 0) {
-				emptyColumns -= 1;
+			col = this.checkColumns(beltSize); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
+		}
+
+		return true;
+	},
+
+	// Check when to shift-buy potions
+	shiftCheck: function (col, beltSize) {
+		var i, fillType;
+
+		for (i = 0; i < col.length; i += 1) {
+			// Set type based on non-empty column
+			if (!fillType && col[i] > 0 && col[i] < beltSize) {
+				fillType = Config.BeltColumn[i];
 			}
 
-			col = this.checkColumns(); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
+			if (col[i] >= beltSize) {
+				switch (Config.BeltColumn[i]) {
+				case "hp":
+					// Set type based on empty column
+					if (!fillType) {
+						fillType = "hp";
+					}
+
+					// Can't shift+buy if we need to get differnt potion types
+					if (fillType !== "hp") {
+						return false;
+					}
+
+					break;
+				case "mp":
+					if (!fillType) {
+						fillType = "mp";
+					}
+
+					if (fillType !== "mp") {
+						return false;
+					}
+
+					break;
+				case "rv": // Empty rejuv column = can't shift-buy
+					return false;
+				}
+			}
 		}
 
 		return true;
 	},
 
 	// Return column status (needed potions in each column)
-	checkColumns: function () {
-		var beltSize = Storage.BeltSize(),
-			col = [beltSize, beltSize, beltSize, beltSize],
+	checkColumns: function (beltSize) {
+		var col = [beltSize, beltSize, beltSize, beltSize],
 			pot = me.getItem(-1, 2); // Mode 2 = in belt
 
 		if (!pot) { // No potions
@@ -915,7 +933,7 @@ CursorLoop:
 	needRepair: function () {
 		var i, durability, quantity, charge, quiver, bowCheck, item,
 			repairAction = [],
-			repairPercent = 40, // TODO: Move this somewhere else
+			repairPercent = 40,
 			canAfford = me.getStat(14) + me.getStat(15) >= me.getRepairCost();
 
 		// Arrow/Bolt check
@@ -986,7 +1004,7 @@ RepairLoop:
 						if (typeof (charge) === "object") {
 							if (charge instanceof Array) {
 								for (i = 0; i < charge.length; i += 1) {
-									if (typeof charge[i] !== "undefined" && charge[i].hasOwnProperty("charges") && charge[i].charges * 100 / charge[i].maxcharges <= repairPercent) {
+									if (charge[i] !== undefined && charge[i].hasOwnProperty("charges") && charge[i].charges * 100 / charge[i].maxcharges <= repairPercent) {
 										repairAction.push("repair");
 
 										break RepairLoop;
@@ -1022,22 +1040,20 @@ RepairLoop:
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			//npc.useMenu(0x1507);
 			Misc.useMenu(0x1507);
-			delay(1000);
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 1000) {
+			while (getTickCount() - tick < 2000) {
 				if (me.getMerc()) {
 					break MainLoop;
 				}
 
-				delay(100);
+				delay(200);
 			}
 		}
 
-		delay(750);
+		delay(Math.max(750, me.ping * 2));
 		Attack.checkInfinity();
 
 		return !!me.getMerc();
@@ -1069,7 +1085,7 @@ MainLoop:
 	},
 
 	stash: function (stashGold) {
-		if (typeof stashGold === "undefined") {
+		if (stashGold === undefined) {
 			stashGold = true;
 		}
 
@@ -1137,7 +1153,8 @@ MainLoop:
 				if (useTK) {
 					Skill.cast(43, 0, stash);
 				} else {
-					stash.interact();
+					Misc.click(0, 0, stash);
+					//stash.interact();
 				}
 
 				tick = getTickCount();
@@ -1176,7 +1193,8 @@ MainLoop:
 					}
 
 					Pather.moveToUnit(corpse, rand(-2, 2), rand(-2, 2));
-					corpse.interact();
+					Misc.click(0, 0, corpse);
+					//corpse.interact();
 					delay(500);
 				}
 			}
@@ -1241,7 +1259,6 @@ MainLoop:
 		return true;
 	},
 
-	// TODO: Determine if this func can be avoided with better potion pickup code.
 	clearBelt: function () {
 		var item = me.getItem(-1, 2),
 			clearList = [];
@@ -1332,12 +1349,13 @@ MainLoop:
 
 		for (i = 0; !!items && i < items.length; i += 1) {
 			if ([18, 41, 78].indexOf(items[i].itemType) === -1 &&
+					items[i].classid !== 549 &&
 					(items[i].code !== "tsc" || !!me.findItem("tbk", 0, 3)) &&
 					(items[i].code !== "isc" || !!me.findItem("ibk", 0, 3)) &&
-					(Pickit.checkItem(items[i]).result === 0 ||
-					 Pickit.checkItem(items[i]).result === 4) &&
+					(Pickit.checkItem(items[i]).result === 0 || Pickit.checkItem(items[i]).result === 4) &&
 					!Cubing.keepItem(items[i]) &&
-					!Runewords.keepItem(items[i])) {
+					!Runewords.keepItem(items[i])
+					) {
 				try {
 					if (loseItemAction === sellAction) {
 						items[i].sell();
@@ -1449,8 +1467,8 @@ MainLoop:
 	},
 
 	move: function (spot) {
-		if (!me.inTown && !this.goToTown()) { // To prevent long trips if tp to town failed
-			throw new Error("Town.move: Failed to go to town!");
+		if (!me.inTown) {
+			throw new Error("move: Not in town");
 		}
 
 		var i, townSpot, path,
@@ -1480,8 +1498,10 @@ MainLoop:
 
 		if (useTK) {
 			if (getDistance(me.x, me.y, townSpot[0], townSpot[1]) > 14) {
-				return Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
+				rval = Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
 			}
+
+			rval = true;
 		} else {
 			print("Townmove: " + spot + " from " + me.x + ", " + me.y);
 			delay(100);
@@ -1524,18 +1544,16 @@ MainLoop:
 			}
 		}
 
-		if (typeof act === "undefined") {
+		if (act === undefined) {
 			return true;
 		}
 
 		if (act < 1 || act > 5) {
-			throw new Error("Town.goToTown: Invalid act!");
+			throw new Error("Town.goToTown: Invalid act");
 		}
 
-		if (act !== me.act) {
-			if (!Pather.useWaypoint(towns[act - 1])) {
-				throw new Error("Town.goToTown: Failed to go to town");
-			}
+		if (act !== me.act && !Pather.useWaypoint(towns[act - 1])) {
+			throw new Error("Town.goToTown: Failed to go to town");
 		}
 
 		return true;
@@ -1561,7 +1579,7 @@ MainLoop:
 		this.move("portalspot");
 
 		if (!Pather.usePortal(preArea, me.name)) { // this part is essential
-			throw new Error("Town.VisitTown: Failed to go back from town.");
+			throw new Error("Town.visitTown: Failed to go back from town");
 		}
 
 		if (Config.PublicMode) {

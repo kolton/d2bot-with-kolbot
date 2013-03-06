@@ -69,18 +69,21 @@ var AutoMule = {
 	},
 
 	// Get the item dropper for current Mule. Returns [profilename, mulemode]
-	getMaster: function (profile) {
+	getMaster: function (info) {
 		var i, j, k, muleObj;
 
-		muleObj = profile.toLowerCase().indexOf("|torch") > -1 ? this.TorchMules : this.Mules;
+		muleObj = info.mode === 1 ? this.TorchMules : this.Mules;
 
 		for (i in muleObj) {
 			if (muleObj.hasOwnProperty(i)) {
 				for (j in muleObj[i]) {
 					if (muleObj[i].hasOwnProperty(j) && j === "enabledProfiles") {
 						for (k = 0; k < muleObj[i][j].length; k += 1) {
-							if (muleObj[i][j][k].toLowerCase() === profile.split("|torch")[0].toLowerCase()) {
-								return [muleObj[i][j][k], profile.toLowerCase().indexOf("|torch") > -1 ? 1 : 0];
+							if (muleObj[i][j][k].toLowerCase() === info.profile.toLowerCase()) {
+								return {
+									profile: muleObj[i][j][k],
+									mode: info.mode
+								};
 							}
 						}
 					}
@@ -137,33 +140,49 @@ MainLoop:
 		mode = mode || 0;
 
 		var muleObj,
-			status = "",
+			stopCheck = false,
+			muleInfo = {status: ""},
 			failCount = 0;
 
 		muleObj = this.getMule(mode);
 
+		// Sanity check
+		if (!muleObj) {
+			return false;
+		}
+
 		function MuleCheckEvent(mode, msg) {
 			if (mode === 10) {
-				status = msg;
+				print(msg);
+
+				muleInfo = JSON.parse(msg);
 			}
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
 		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile, 7);
 
-		if (muleObj.stopProfile) {
-			D2Bot.stop(muleObj.stopProfile);
-		}
-
-		delay(1000);
-		D2Bot.start(muleObj.muleProfile);
-
 MainLoop:
 		while (true) {
-			sendCopyData(null, muleObj.muleProfile, 10, me.profile + (mode === 1 ? "|torch" : ""));
+			// If nothing received our copy data start the mule profile
+			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: mode}))) {
+				D2Bot.start(muleObj.muleProfile);
+			}
+
 			delay(1000);
 
-			switch (status) {
+			switch (muleInfo.status) {
+			case "loading":
+				if (!stopCheck && muleObj.stopProfile && me.profile.toLowerCase() !== muleObj.stopProfile.toLowerCase()) {
+					D2Bot.stop(muleObj.stopProfile);
+
+					stopCheck = true;
+				}
+
+				failCount += 1;
+
+				break;
+			case "busy":
 			case "begin":
 				D2Bot.printToConsole("Mule profile is busy.", 9);
 
@@ -177,11 +196,11 @@ MainLoop:
 			default:
 				failCount += 1;
 
-				if (failCount >= 60) {
-					D2Bot.printToConsole("No response from mule profile.", 9);
+				break;
+			}
 
-					break MainLoop;
-				}
+			if (failCount >= 60) {
+				D2Bot.printToConsole("No response from mule profile.", 9);
 
 				break;
 			}
@@ -193,10 +212,13 @@ MainLoop:
 			delay(1000);
 		}
 
-		D2Bot.stop(muleObj.muleProfile);
-		delay(1000);
+		// No response - stop mule profile
+		if (failCount >= 60) {
+			D2Bot.stop(muleObj.muleProfile);
+			delay(1000);
+		}
 
-		if (muleObj.stopProfile) {
+		if (stopCheck && muleObj.stopProfile) {
 			D2Bot.start(muleObj.stopProfile);
 		}
 
@@ -222,12 +244,14 @@ MainLoop:
 		function CheckModeEvent(msg) {
 			switch (msg) {
 			case "torch":
+				print("ÿc4AutoMuleÿc0: In torch mule game.");
 				D2Bot.printToConsole("In torch mule game.", 7);
 
 				mode = 1;
 
 				break;
 			case "normal":
+				print("ÿc4AutoMuleÿc0: In mule game.");
 				D2Bot.printToConsole("In mule game.", 7);
 
 				mode = 0;
@@ -237,15 +261,19 @@ MainLoop:
 		}
 
 		function DropStatusEvent(mode, msg) {
-			switch (msg) {
-			case "report": // reply to status request
-				sendCopyData(null, muleObj.muleProfile, 12, status);
+			if (mode === 10) {
+				print(msg);
 
-				break;
-			case "quit": // quit command
-				status = "quit";
+				switch (JSON.parse(msg).status) {
+				case "report": // reply to status request
+					sendCopyData(null, muleObj.muleProfile, 12, JSON.stringify({status: status}));
 
-				break;
+					break;
+				case "quit": // quit command
+					status = "quit";
+
+					break;
+				}
 			}
 		}
 
@@ -309,6 +337,10 @@ MainLoop:
 
 		if (muleObj.stopProfile) {
 			D2Bot.start(muleObj.stopProfile);
+		}
+
+		if (getScript("AnniStarter.dbj")) {
+			scriptBroadcast("exit");
 		}
 
 		quit();
@@ -415,7 +447,7 @@ MainLoop:
 			return false;
 		}
 
-		var item = me.getItem("cm2");
+		var item = me.getItem(getScript("AnniStarter.dbj") ? "cm1" : "cm2");
 
 		if (item) {
 			do {

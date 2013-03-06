@@ -75,7 +75,7 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone,
+var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone, quit,
 	firstLogin, connectFail, torchTrigger, torchMuleTrigger, pingQuit,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
@@ -110,7 +110,11 @@ function ReceiveCopyData(mode, msg) {
 		if (gameInfo) {
 			obj = JSON.parse(msg);
 
-			D2Bot.joinMe(obj.profile, gameInfo.gameName, gameCount, gameInfo.gamePass, isUp);
+			if (me.gameReady) {
+				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
+			} else {
+				D2Bot.joinMe(obj.profile, gameInfo.gameName.toLowerCase(), gameCount, gameInfo.gamePass.toLowerCase(), isUp);
+			}
 		}
 
 		break;
@@ -176,6 +180,10 @@ function ScriptMsgEvent(msg) {
 		break;
 	case "pingquit":
 		pingQuit = true;
+
+		break;
+	case "quit":
+		quit = true;
 
 		break;
 	}
@@ -313,6 +321,10 @@ MainSwitch:
 		}
 
 		if (ingame) {
+			/*if (!quit) {
+				D2Bot.printToConsole("Game finished unexpectedly", 10);
+			}*/
+
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
 				removeEventListener('copydata', ReceiveCopyData);
@@ -342,6 +354,7 @@ MainSwitch:
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
+			quit = false;
 
 			if (StarterConfig.ResetCount && gameCount >= StarterConfig.ResetCount) {
 				gameCount = 1;
@@ -570,7 +583,7 @@ MainSwitch:
 		lastGameStatus = "pending";
 
 		setNextGame();
-		locationTimeout(5000, location);
+		locationTimeout(10000, location);
 
 		break;
 	case 5: // Join Game
@@ -634,7 +647,7 @@ MainSwitch:
 				break;
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
-				D2Bot.printToConsole("Disabled CDKey");
+				D2Bot.printToConsole("Disabled CDKey: " + gameInfo.mpq, 6);
 				D2Bot.CDKeyDisabled();
 
 				if (gameInfo.switchKeys) {
@@ -732,7 +745,7 @@ MainSwitch:
 
 		break;
 	case 19: // Login - Cdkey In Use
-		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+		D2Bot.printToConsole(gameInfo.mpq + " is in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
 		D2Bot.CDKeyInUse();
 
 		if (gameInfo.switchKeys) {
@@ -768,7 +781,7 @@ MainSwitch:
 
 		switch (string) {
 		case getLocaleString(10914):
-			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+			D2Bot.printToConsole(gameInfo.mpq + " LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
 			D2Bot.CDKeyInUse();
 
 			if (gameInfo.switchKeys) {
@@ -828,7 +841,7 @@ MainSwitch:
 		D2Bot.printToConsole("Game doesn't exist");
 
 		if (gameInfo.rdBlocker) {
-			D2Bot.printToConsole("CDKey is probably flagged.");
+			D2Bot.printToConsole(gameInfo.mpq + " is probably flagged.", 6);
 
 			if (gameInfo.switchKeys) {
 				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
