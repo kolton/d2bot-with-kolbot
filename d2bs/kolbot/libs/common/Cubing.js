@@ -98,6 +98,37 @@ var Cubing = {
 		this.buildLists();
 	},
 
+	getCube: function () {
+		var i, cube, chest;
+
+		Pather.useWaypoint(57);
+		Precast.doPrecast(true);
+
+		if (Pather.moveToExit(60, true) && Pather.moveToPreset(me.area, 2, 354)) {
+			chest = getUnit(2, 354);
+
+			if (chest) {
+				Misc.openChest(chest);
+
+				for (i = 0; i < 5; i += 1) {
+					cube = getUnit(4, 549);
+
+					if (cube) {
+						Pickit.pickItem(cube);
+
+						break;
+					}
+
+					delay(200);
+				}
+			}
+		}
+
+		Town.goToTown();
+
+		return !!me.getItem(549);
+	},
+
 	buildRecipes: function () {
 		var i;
 
@@ -507,7 +538,7 @@ IngredientLoop:
 		}
 	},
 
-	update: function () { // TODO: expand or remove
+	update: function () {
 		Cubing.buildLists();
 	},
 
@@ -643,6 +674,10 @@ IngredientLoop:
 
 	doCubing: function () {
 		if (!Config.Cubing) {
+			return false;
+		}
+
+		if (!me.getItem(549) && !this.getCube()) {
 			return false;
 		}
 

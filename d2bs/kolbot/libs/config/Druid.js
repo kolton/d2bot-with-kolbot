@@ -138,7 +138,7 @@ function LoadConfig() {
 		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
-		Config.BaalHelper.SkipTP = true; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
+		Config.BaalHelper.SkipTP = false; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 
 	// *** special scripts ***
@@ -163,7 +163,7 @@ function LoadConfig() {
 		Config.IPHunter.IPList = []; // List of IPs to look for. example: [165, 201, 64]
 		Config.IPHunter.GameLength = 3; // Number of minutes to stay in game if ip wasn't found
 	Scripts.ShopBot = false; // Fast waypoint-based shopbot
-		Config.ShopBot.ShopNPC = "Anya"; // Supported NPCs: Fara, Ormus, Anya
+		Config.ShopBot.ShopNPC = "Anya"; // Supported NPCs: Fara, Ormus, Anya, Elzix
 		// Scan only selected classids for maximum speed. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [187, 188, 194, 195, 326, 327, 338, 373, 397, 443, 449];
 	Scripts.ChestMania = false; // Open chests in configured areas
@@ -367,6 +367,7 @@ function LoadConfig() {
 	// DClone config
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth
 	Config.SoJWaitTime = 5; // Time in minutes to wait for another SoJ sale before leaving game. 0 = disabled
+	Config.KillDclone = false; // Go to Palace Cellar 3 and try to kill Diablo Clone. Pointless if you already have Annihilus.
 
 	// Monster skip config
 	// Skip immune monsters. Possible options: "fire", "cold", "lightning", "poison", "physical", "magic".
@@ -400,7 +401,7 @@ function LoadConfig() {
 	Config.Wereform = false; // 0 / false - don't shapeshift, 1 / "Werewolf" - change to werewolf, 2 / "Werebear" - change to werebear
 
 	// Class specific config
-	Config.SummonRaven = true;
+	Config.SummonRaven = false;
 	Config.SummonAnimal = "Grizzly"; // 0 = disabled, 1 or "Spirit Wolf" = summon spirit wolf, 2 or "Dire Wolf" = summon dire wolf, 3 or "Grizzly" = summon grizzly
 	Config.SummonSpirit = "Oak Sage"; // 0 = disabled, 1 / "Oak Sage", 2 / "Heart of Wolverine", 3 / "Spirit of Barbs"
 	Config.SummonVine = "Poison Creeper"; // 0 = disabled, 1 / "Poison Creeper", 2 / "Carrion Vine", 3 / "Solar Creeper"

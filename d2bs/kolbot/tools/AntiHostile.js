@@ -147,6 +147,24 @@ function main() {
 		return false;
 	};
 
+	this.checkSummons = function (player) {
+		var unit,
+			name = player.name;
+
+		unit = getUnit(1);
+
+		if (unit) {
+			do {
+				// Revives and spirit wolves
+				if (unit.getParent() && unit.getParent().name === name && (unit.getState(96) || unit.classid === 420)) {
+					return true;
+				}
+			} while (unit.getNext());
+		}
+
+		return false;
+	};
+
 	// Init config and attacks
 	D2Bot.init();
 	Config.init();
@@ -155,7 +173,7 @@ function main() {
 
 	// Load flash thread
 	if (Config.HostileAction > 1) {
-		load("tools/FlashThread.js");
+		//load("tools/FlashThread.js");
 	}
 
 	// Attack sequence adjustments - this only affects the AntiHostile thread
@@ -353,6 +371,8 @@ function main() {
 						break;
 					}
 
+					ClassAttack.doAttack(player, false);
+
 					// Specific attack additions
 					switch (me.classid) {
 					case 1: // Sorceress
@@ -376,9 +396,16 @@ function main() {
 						}
 
 						break;
-					}
+					case 3: // Paladin
+						// Smite summoners
+						if (Config.AttackSkill[1] === 112 && me.getSkill(97, 1)) {
+							if ([2, 5].indexOf(player.classid) > -1 && getDistance(me, player) < 4 && this.checkSummons(player)) {
+								Skill.cast(97, 1, player);
+							}
+						}
 
-					ClassAttack.doAttack(player, false);
+						break;
+					}
 
 					attackCount += 1;
 

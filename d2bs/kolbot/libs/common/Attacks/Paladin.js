@@ -140,7 +140,7 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[atkSkill] === 112) {
 			if (unit.classid === 691 && Config.AvoidDolls) {
-				Attack.deploy(unit.x - 15, unit.x + 15, unit.y - 15, unit.y + 15, 5, 15);
+				Attack.deploy(unit, 15, 5, 10);
 
 				if (Config.AttackSkill[aura] > -1) {
 					Skill.setSkill(Config.AttackSkill[aura], 0);

@@ -14,14 +14,59 @@ var Attack = {
 			ClassAttack.init();
 		}
 
-		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
+		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[me.classid === 4 ? 2 : 3] < 0) {
 			showConsole();
 			print("ÿc1Bad attack config. Don't expect your bot to attack.");
 		}
 
 		if (me.gametype === 1) {
 			this.checkInfinity();
+			this.getCharges();
 		}
+	},
+
+	// Get items with charges
+	getCharges: function () {
+		if (!Skill.charges) {
+			Skill.charges = [];
+		}
+
+		var i, stats,
+			item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				stats = item.getStat(-2);
+
+				if (stats.hasOwnProperty(204)) {
+					if (stats[204] instanceof Array) {
+						for (i = 0; i < stats[204].length; i += 1) {
+							if (stats[204][i] !== undefined) {
+								Skill.charges.push({
+									unit: copyUnit(item),
+									gid: item.gid,
+									skill: stats[204][i].skill,
+									level: stats[204][i].level,
+									charges: stats[204][i].charges,
+									maxcharges: stats[204][i].maxcharges
+								});
+							}
+						}
+					} else {
+						Skill.charges.push({
+							unit: copyUnit(item),
+							gid: item.gid,
+							skill: stats[204].skill,
+							level: stats[204].level,
+							charges: stats[204].charges,
+							maxcharges: stats[204].maxcharges
+						});
+					}
+				}
+			} while (item.getNext());
+		}
+
+		return true;
 	},
 
 	// Check if player or his merc are using Infinity, and adjust resistance checks based on that
@@ -98,10 +143,8 @@ var Attack = {
 		}
 
 		while (attackCount < 300 && this.checkMonster(target) && this.skipCheck(target)) {
-			if (Config.Dodge) {
-				if (attackCount % 2 === 0) {
-					this.deploy(target.x - 15, target.x + 15, target.y - 15, target.y + 15, 5, 15);
-				}
+			if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
+				this.deploy(target, Config.DodgeRange, 5, 9);
 			}
 
 			Misc.townCheck();
@@ -176,23 +219,23 @@ var Attack = {
 			say("clear " + bossId);
 		}
 
-		if (typeof range === "undefined") {
+		if (range === undefined) {
 			range = 25;
 		}
 
-		if (typeof spectype === "undefined") {
+		if (spectype === undefined) {
 			spectype = 0;
 		}
 
-		if (typeof bossId === "undefined") {
+		if (bossId === undefined) {
 			bossId = false;
 		}
 
-		if (typeof sortfunc === "undefined") {
+		if (sortfunc === undefined) {
 			sortfunc = false;
 		}
 
-		if (typeof pickit === "undefined") {
+		if (pickit === undefined) {
 			pickit = true;
 		}
 
@@ -200,7 +243,7 @@ var Attack = {
 			throw new Error("Attack.clear: range must be a number.");
 		}
 
-		var i, boss, orgx, orgy, target, result, monsterList,
+		var i, boss, orgx, orgy, target, result, monsterList, start,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -236,9 +279,18 @@ var Attack = {
 		if (target) {
 			do {
 				if (this.checkMonster(target) && this.skipCheck(target)) {
+					// Speed optimization - don't go through monster list until there's at least one within clear range
+					if (!start && getDistance(target, orgx, orgy) <= range) {
+						start = true;
+					}
+
 					monsterList.push(copyUnit(target));
 				}
 			} while (target.getNext());
+		}
+
+		if (!start) {
+			return true;
 		}
 
 		while (monsterList.length > 0) {
@@ -256,9 +308,9 @@ var Attack = {
 
 			target = copyUnit(monsterList[0]);
 
-			if (typeof target.x !== "undefined" && (!spectype || (target.spectype & spectype)) && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target) && (me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
-				if (Config.Dodge && attackCount % 2 === 0) {
-					this.deploy(target.x - 15, target.x + 15, target.y - 15, target.y + 15, 5, 15);
+			if (target.x !== undefined && (!spectype || (target.spectype & spectype)) && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target) && (me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
+					this.deploy(target, Config.DodgeRange, 5, 9);
 				}
 
 				Misc.townCheck(true);
@@ -267,7 +319,7 @@ var Attack = {
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				switch (result) {
-					case 1:
+				case 1:
 					monsterList.shift();
 
 					break;
@@ -374,11 +426,9 @@ var Attack = {
 
 			target = copyUnit(monsterList[0]);
 
-			if (typeof target.x !== "undefined" && this.checkMonster(target)) {
-				if (Config.Dodge) {
-					if (attackCount % 2 === 0) {
-						this.deploy(target.x - 15, target.x + 15, target.y - 15, target.y + 15, 5, 15);
-					}
+			if (target.x !== undefined && this.checkMonster(target)) {
+				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
+					this.deploy(target, Config.DodgeRange, 5, 9);
 				}
 
 				Misc.townCheck(true);
@@ -507,7 +557,7 @@ var Attack = {
 			return false;
 		}
 
-		if (typeof spectype === "undefined") {
+		if (spectype === undefined) {
 			spectype = 0;
 		}
 
@@ -645,34 +695,71 @@ var Attack = {
 		return true;
 	},
 
-	// xmin, xmax, ymin, ymax = grid limits, spread = distance between individual coords, range = range to check for monsters
-	deploy: function (xmin, xmax, ymin, ymax, spread, range) {
-		if (arguments.length < 6) {
-			throw new Error("deploy: Not enough arguments supplied");
+	buildDodgeList: function () {
+		var monster,
+			monList = [];
+
+		if (this.dodgeList !== undefined && getDistance(me, this.dodgeList.x, this.dodgeList.y) <= 30) {
+			return true;
 		}
 
-		if (xmin >= xmax || ymin >= ymax || range < 1 || spread < 1) {
-			throw new Error("deploy: Bad parameters");
-		}
+		monster = getUnit(1);
 
-		var i, grid, index, currCount,
-			count = 999,
-			monList = [],
-			monster = getUnit(1);
-
-		// build monster list
 		if (monster) {
 			do {
-				if (Attack.checkMonster(monster)) {
+				if (this.checkMonster(monster)) {
 					monList.push(copyUnit(monster));
 				}
 			} while (monster.getNext());
 		}
 
-		grid = this.buildGrid(xmin, xmax, ymin, ymax, spread);
+		print("Built dodge list with " + monList.length + " monsters.");
+
+		this.dodgeList = {
+			monsters: monList,
+			x: me.x,
+			y: me.y
+		};
+
+		return true;
+	},
+
+	deploy: function (unit, distance, spread, range) {
+		if (arguments.length < 4) {
+			throw new Error("deploy: Not enough arguments supplied");
+		}
+
+		var i, grid, index, currCount,
+			monList = [],
+			count = 999,
+			idealPos = {
+				x: Math.round(Math.cos(Math.atan2(me.y - unit.y, me.x - unit.x)) * Config.DodgeRange + unit.x),
+				y: Math.round(Math.sin(Math.atan2(me.y - unit.y, me.x - unit.x)) * Config.DodgeRange + unit.y)
+			};
+
+		this.buildDodgeList();
+
+		monList = this.dodgeList.monsters;
+		monList.sort(Sort.units);
+
+		if (this.getMonsterCount(me.x, me.y, range, monList) === 0) {
+			return true;
+		}
+
+		grid = this.buildGrid(unit.x - distance, unit.x + distance, unit.y - distance, unit.y + distance, spread);
+
+		if (!grid.length) {
+			return false;
+		}
+
+		function sortGrid(a, b) {
+			return getDistance(a.x, a.y, idealPos.x, idealPos.y) - getDistance(b.x, b.y, idealPos.x, idealPos.y);
+		}
+
+		grid.sort(sortGrid);
 
 		for (i = 0; i < grid.length; i += 1) {
-			if (!(grid[i].coll & 0x1)) {
+			if (!(CollMap.getColl(grid[i].x, grid[i].y) & 0x1) && !CollMap.checkColl(unit, {x: grid[i].x, y: grid[i].y}, 0x4)) {
 				currCount = this.getMonsterCount(grid[i].x, grid[i].y, range, monList);
 
 				if (currCount < count) {
@@ -680,24 +767,16 @@ var Attack = {
 					count = currCount;
 				}
 
-				if (i === Math.ceil(grid.length / 2) && currCount === 0) {
-					break; // center position optimization
+				if (currCount === 0) {
+					break;
 				}
 			}
-		}
-
-		if (!grid.length) {
-			print("Grid didn't build (!?)");
-
-			return false;
 		}
 
 		//print("Safest spot with " + count + " monsters.");
 
 		if (typeof index === "number") {
-			me.overhead("deploy");
-
-			return Pather.moveTo(grid[index].x, grid[index].y);
+			return Pather.moveTo(grid[index].x, grid[index].y, 0);
 		}
 
 		return false;
@@ -708,7 +787,7 @@ var Attack = {
 			count = 0;
 
 		for (i = 0; i < list.length; i += 1) {
-			if (list[i].hp > 0 && getDistance(x, y, list[i].x, list[i].y) <= range) {
+			if (this.checkMonster(list[i]) && getDistance(x, y, list[i].x, list[i].y) <= range) {
 				count += 1;
 			}
 		}
@@ -717,6 +796,10 @@ var Attack = {
 	},
 
 	buildGrid: function (xmin, xmax, ymin, ymax, spread) {
+		if (xmin >= xmax || ymin >= ymax || spread < 1) {
+			throw new Error("buildGrid: Bad parameters");
+		}
+
 		var i, j, coll,
 			grid = [];
 
@@ -1047,7 +1130,7 @@ AuraLoop: // Skip monsters with auras
 
 	// Find an optimal attack position and move or walk to it
 	getIntoPosition: function (unit, distance, coll, walk) {
-		if (typeof walk === "undefined") {
+		if (walk === undefined) {
 			walk = false;
 		}
 

@@ -157,9 +157,11 @@ var Pickit = {
 				case 0:
 					break;
 				default: // check if a kept item can be stashed
-					if (Storage.Stash.CanFit(items[i])) {
+					if (Town.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
 						return true;
 					}
+
+					break;
 				}
 			}
 		}
@@ -213,7 +215,8 @@ MainLoop:
 			if (stats.useTk) {
 				Skill.cast(43, 0, item);
 			} else if (getDistance(me, item) < 4 || Pather.moveToUnit(item)) {
-				item.interact();
+				Misc.click(0, 0, item);
+				//item.interact();
 			}
 
 			tick = getTickCount();
@@ -279,7 +282,7 @@ MainLoop:
 	},
 
 	itemColor: function (unit, type) {
-		if (typeof type === "undefined") {
+		if (type === undefined) {
 			type = true;
 		}
 
@@ -315,8 +318,6 @@ MainLoop:
 	},
 
 	sortItems: function (unitA, unitB) {
-		// TODO: Add some kind of advanced sorting
-
 		return getDistance(me, unitA) - getDistance(me, unitB);
 	},
 

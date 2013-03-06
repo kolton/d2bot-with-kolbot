@@ -61,6 +61,7 @@ var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone, lastGa
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
 	leader = "",
+	cachedInfo = {gameName: "", password: ""},
 	loginFail = 0;
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -390,8 +391,14 @@ JoinLoop:
 		}
 
 		if (joinInfo && joinInfo.gameName !== "" && (joinInfo.gameName !== lastGame || lastGameStatus === "pending")) {
-			ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
-			ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
+			// Shave off a few milliseconds
+			if (cachedInfo.gameName !== joinInfo.gameName || cachedInfo.password !== joinInfo.gamePass) {
+				ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
+				ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
+
+				cachedInfo.gameName = joinInfo.gameName;
+				cachedInfo.password = joinInfo.gamePass;
+			}
 
 			if (lastGameStatus === "pending" || (gameInfo.error === "@error" && DataFile.getStats().gameName === joinInfo.gameName)) {
 				if (gameInfo.error === "@error") {
@@ -506,7 +513,7 @@ JoinLoop:
 				break;
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
-				D2Bot.printToConsole("Disabled CDKey");
+				D2Bot.printToConsole("Disabled CDKey: " + gameInfo.mpq, 6);
 				D2Bot.CDKeyDisabled();
 
 				if (gameInfo.switchKeys) {
@@ -596,7 +603,7 @@ JoinLoop:
 
 		break;
 	case 19: // Login - Cdkey In Use
-		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+		D2Bot.printToConsole(gameInfo.mpq + " is in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
 		D2Bot.CDKeyInUse();
 
 		if (gameInfo.switchKeys) {
@@ -632,7 +639,7 @@ JoinLoop:
 
 		switch (string) {
 		case getLocaleString(10914):
-			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+			D2Bot.printToConsole(gameInfo.mpq + " LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
 			D2Bot.CDKeyInUse();
 
 			if (gameInfo.switchKeys) {
@@ -687,7 +694,7 @@ JoinLoop:
 		D2Bot.printToConsole("Game doesn't exist");
 
 		if (gameInfo.rdBlocker) {
-			D2Bot.printToConsole("CDKey is probably flagged.");
+			D2Bot.printToConsole(gameInfo.mpq + " is probably flagged.", 6);
 
 			if (gameInfo.switchKeys) {
 				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
