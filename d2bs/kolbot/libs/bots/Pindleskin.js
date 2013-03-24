@@ -5,6 +5,8 @@
 */
 
 function Pindleskin() {
+	var anya;
+
 	Town.goToTown(Config.Pindleskin.UseWaypoint ? undefined : 5);
 	Town.doChores();
 
@@ -18,13 +20,23 @@ function Pindleskin() {
 	} else {
 		Town.move("anya");
 
+		if (!Pather.getPortal(121) && me.getQuest(37, 1)) {
+			anya = getUnit(1, NPC.Anya);
+
+			if (anya) {
+				anya.openMenu();
+				me.cancel();
+			}
+		}
+
 		if (!Pather.usePortal(121)) {
 			throw new Error("Failed to use portal.");
 		}
 
 		Precast.doPrecast(true);
-		Pather.moveTo(10058, 13234);
 	}
+
+	Pather.moveTo(10058, 13234);
 
 	try {
 		Attack.clear(15, 0, getLocaleString(22497)); // Pindleskin

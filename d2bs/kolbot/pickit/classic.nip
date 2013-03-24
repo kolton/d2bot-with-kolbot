@@ -29,9 +29,8 @@
 
 //------ armor ------
 
-//[type] == armor && [quality] == rare # [maxhp] >= 50 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
 [type] == armor && [quality] == rare # [fhr] == 24 && [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
-[name] == ornateplate && [quality] == rare # [enhanceddefense] >= 90 && ([itemreqpercent] < 0 || [maxhp] > 30 || [strength] >= 10)
+[name] == ornateplate && [quality] == rare # ([enhanceddefense] >= 90) + ([itemreqpercent] < 0) + ([maxhp] >= 30) + ([strength] >= 10) >= 3
 [name] == mageplate && [quality] == rare # [enhanceddefense] >= 60 && [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
 [type] == armor && [quality] == rare # [fireresist]+[coldresist]+[lightresist] >= 50 && [itemlightradius] == 2 // BANANA
 
@@ -63,7 +62,7 @@
 [type] == wand && [quality] == rare # [fcr] == 20 && ([coldresist] >= 30) + ([fireresist] >= 30) + ([lightresist] >= 30) >= 2 && [maxmana] >= 30
 //[type] == wand && [quality] <= rare # [fcr] == 20 && [necromancerskills] == 2 && [skillbonespear] >= 3
 //[type] == wand && [quality] <= rare # [fcr] == 20 && [necromancerskills] == 2 && [skillcorpseexplosion] >= 3
-[type] == scepter && [quality] <= rare # [paladinskills] == 2 && ([fcr] >= 10 && [skillblessedhammer]+[skillconcentration] >= 5 || [skillholyshield] >= 3)
+[type] == scepter && [quality] <= rare # [paladinskills] == 2 && ([fcr] >= 10 && ([skillblessedhammer] == 3 || [skillconcentration] == 3) || [skillblessedhammer]+[skillconcentration] >= 6 || [skillholyshield] >= 3)
 ([type] == mace || [type] == club || [type] == sword) && [quality] == rare # [barbarianskills] == 2 && ([fireresist] >= 25 || [coldresist] >= 25 || [lightresist] >= 25)
 //[type] == staff && [quality] <= rare # [sorceressskills]+[skillenchant] == 5
 
@@ -243,11 +242,9 @@
 
 [Type] == gold # [Gold] >= 10000
 
-[type] == scepter && [quality] <= rare # [paladinskills] == 2 && [fcr] >= 10 && ([skillblessedhammer] == 3 || [skillconcentration] >= 3)
-
 //ladder reset
 
-[type] == ring && [quality] == rare # [fcr] == 10 && [maxmana] >= 40
+//[type] == ring && [quality] == rare # [fcr] == 10 && [maxmana] >= 40
 
 //[type] == armor && [quality] >= magic # [strength] > 100
 //[type] == helm && [quality] >= magic # [strength] > 100
@@ -258,14 +255,11 @@
 //[type] == amulet && [quality] <= rare # [maxmana] >= 60
 //[name] == mask && [quality] <= rare # [energy] == 9 # [maxquantity] == 1
 
+//[name] == mask && [quality] == unique # # [maxquantity] == 1
+//[name] == platedbelt && [quality] == set # # [maxquantity] == 1
+//[name] == greaves && [quality] == set # # [maxquantity] == 1
+
 //[name] == flawlessskull
 //[name] == flawlessdiamond
-[type] == amulet && [quality] == rare # [sorceressskills]+[paladinskills] >= 1 && [fireresist]+[lightresist]+[coldresist]+[poisonresist] >= 64
+
 [type] == belt && [name] >= platedbelt && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
-[type] == armor && [quality] == rare # [maxhp] >= 30 && ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2
-
-[type] == boots && [quality] == rare # ([coldresist] >= 20) + ([fireresist] >= 20) + ([lightresist] >= 20) >= 2 && [itemmagicbonus] >= 20
-//[name] == heavybelt && [quality] == unique
-
-[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
-[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6

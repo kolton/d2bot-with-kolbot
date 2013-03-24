@@ -1,6 +1,7 @@
 // Use only this pickit when running Scripts.ShopBot for maximum speed
 // Comment out the lines for items you don't want to scan
 
+// Anya
 //[name] == greatertalons && [quality] == magic # ([assassinskills] == 2 || [trapsskilltab] == 3) && [skilllightningsentry] == 3 // 5/6LS GT
 //([name] == greatertalons || [name] == runictalons) && [quality] == magic # [itemtohitperlevel] > 15 && [ias] >= 30 && [skilllightningsentry] == 3 // fool's ias LS claw
 //([name] == greatertalons || [name] == runictalons) && [quality] == magic # [sockets] == 3 && [ias] >= 30 // 3os ias claw
@@ -11,9 +12,11 @@
 //[name] == barbedshield && [quality] == magic # [palicombatskilltab] == 2 && [fbr] == 30 // LLD
 //[type] == gloves && [quality] == magic # [javelinandspearskilltab] == 3 && [ias] == 20 // 3/20 gloves
 
+// Ormus
 //[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
 //[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
 
 //[type] == staff # [sorceressskills]+[skillenchant] == 5
 
-[name] == handscythe # ([trapsskilltab] == 2 || [assassinskills] == 1) && ([skilllightningsentry] == 3 || [skillwakeoffire] == 3)
+// Fara/Elzix
+//[name] == handscythe # ([trapsskilltab] == 2 || [assassinskills] == 1) && ([skilllightningsentry] == 3 || [skillwakeoffire] == 3) && [itemlevelreq] <= 30

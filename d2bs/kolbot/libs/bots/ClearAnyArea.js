@@ -13,8 +13,6 @@ function ClearAnyArea() {
 		if (Pather.journeyTo(Config.ClearAnyArea.AreaList[i])) {
 			Attack.clearLevel(Config.ClearType);
 		}
-
-		Town.doChores();
 	}
 
 	return true;

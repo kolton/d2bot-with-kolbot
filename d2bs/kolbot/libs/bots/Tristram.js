@@ -5,7 +5,7 @@
 */
 
 function Tristram() {
-	if (!me.getQuest(4, 0)) {
+	if (!me.getQuest(4, 3)) {
 		throw new Error("You don't have the Cain quest");
 	}
 
@@ -28,17 +28,13 @@ function Tristram() {
 
 		delay(1000);
 	}
-	
-	if (Config.Tristram.PortalLeech) {
 
+	if (Config.Tristram.PortalLeech) {
 		Pather.makePortal();
 		delay(1000);
 		Attack.clearLevel(0);
-
 	} else {
-
 		Attack.clearLevel(Config.ClearType);
-
 	}
 
 	return true;

@@ -91,16 +91,18 @@
 
 [name] == warscepter && [quality] <= superior && [flag] != ethereal # ([sockets] == 0 || [sockets] == 5) && [skillzeal]+[skillconcentration] >= 6 && [itemlevelreq] <= 18
 [name] == warscepter && [quality] <= superior && [flag] != ethereal # ([sockets] == 0 || [sockets] == 5) && [skillcharge]+[skillconcentration] >= 6 && [itemlevelreq] <= 18
-[name] == warscepter && [quality] <= superior  && [flag] != ethereal# ([sockets] == 0 || [sockets] == 5) && [skilldefiance]+[skillsacrifice] >= 6 && [itemlevelreq] <= 9
 
 [name] == stagbow && [quality] == superior # ([sockets] == 0 || [sockets] == 5) && [enhanceddamage] == 15 && [tohit] == 3 && [bowandcrossbowskilltab] == 3
 ([name] == throwingspear || [name] == warjavelin) && [quality] <= rare && [flag] == ethereal # [enhanceddamage] > 50 && [itemreplenishquantity] > 0 && [itemlevelreq] <= 18
 ([name] == bonewand || [name] == grimwand) && [quality] == magic # [poisonandboneskilltab] == 1 && [fcr] == 10 && [skillbonespear] == 3 && [itemlevelreq] <= 18
 ([name] == bonewand || [name] == grimwand) && [quality] == rare # [poisonandboneskilltab] == 1 && [fcr] == 10 && [skillbonespear] == 3 && [sockets] == 2 && [itemlevelreq] <= 18
+
+[name] == warscepter && [quality] <= superior && [flag] != ethereal# ([sockets] == 0 || [sockets] == 5) && [skilldefiance]+[skillsacrifice] >= 6 && [itemlevelreq] <= 9
 //[name] == throwingspear && [quality] <= rare && [flag] == ethereal # [itemreplenishquantity] > 0 && [itemlevelreq] <= 9 // basic
 ([name] == throwingspear || [name] == pilum) && [quality] == rare && [flag] == ethereal # [amplifydamageonhit] > 0 && [itemreplenishquantity] > 0 && [itemlevelreq] <= 9
 ([name] == bladetalons || [name] == throwingspear) && [quality] <= rare && [flag] == ethereal # [enhanceddamage] >= 30 && [itemreplenishquantity] > 0 && [itemlevelreq] <= 9
-[name] == warscepter && [quality] == magic && [suffix] == 605 && [flag] != ethereal # [enhanceddamage] >= 30 && [itemlevelreq] <= 9 // sacrifice
+[name] == warscepter && [quality] <= rare && [suffix] == 605 && [flag] != ethereal # [enhanceddamage] >= 30 && [itemlevelreq] <= 9 // sacrifice
+[type] == wand && [class] == normal && [quality] <= rare # [skillamplifydamage] == 3 && [skillbonearmor] == 3 && [skillclaygolem] == 3 && [itemlevelreq] <= 9
 
 //[name] == longsword && [quality] == set
 
@@ -184,7 +186,8 @@
 
 //---vlld-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-[name] == boneshield && [quality] == magic # [fbr] == 30 && [itemdamagetomana] >= 12 
+[name] == boneshield && [quality] == magic # [fbr] == 30 && [itemdamagetomana] >= 12
+[name] == boneshield && [quality] <= rare # [fbr] == 30 && [itemdamagetomana] >= 10 && [sockets] == 2 && [itemlevelreq] <= 9
 
 //=================================================================================================================================================================================
 //=== BELTS =======================================================================================================================================================================
@@ -248,6 +251,7 @@
 [name] == jewel && [quality] <= rare # [enhanceddamage] == 20 && ([maxdamage] == 15 || [dexterity] == 6) && [itemlevelreq] <= 18
 
 // 9
+[name] == jewel && [quality] == rare # ([maxdamage] >= 9 || [mindamage] >= 4) && [itemreqpercent] < 0 && [itemlevelreq] <= 9
 [name] == jewel && [quality] <= rare # ([maxdamage] >= 14 || [mindamage] >= 8 || [mindamage] >= 4 && [maxdamage] >= 9) && [itemlevelreq] <= 9
 [name] == jewel && [quality] <= rare # ([tohit] >= 40 || [enhanceddamage] >= 20 || [defense] >= 8) && ([maxdamage] >= 9 || [mindamage] >= 4) && [itemlevelreq] <= 9
 [name] == jewel && [quality] <= rare # ([itemdamagetomana] == 12 || [maxmana] == 10) && ([dexterity] >= 3 || [maxhp] >= 8 || [itemreqpercent] < 0) && [itemlevelreq] <= 9
@@ -348,6 +352,8 @@
 
 [type] == voodooheads && [quality] <= rare && [flag] != ethereal # [poisonandboneskilltab] == 1 && [fbr] == 30 && [skillbonespear] == 3 && [itemlevelreq] <= 18
 
+([name] == preservedhead || [name] == zombiehead) && [quality] <= rare # [skillamplifydamage] == 3 && [skillbonearmor] == 3 && [skillclaygolem] == 3 && [itemlevelreq] <= 9
+
 //---PALADIN----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ([name] == akarantarge || [name] == akaranrondache) && [quality] <= superior # [enhanceddamage] == 65 && [tohit] == 121 && ([sockets] == 0 || [sockets] == 4)
@@ -368,8 +374,8 @@
 
 //---vlld-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-[type] == orb && [quality] <= rare # [fcr] == 10 && [skilliceblast] == 3 && [coldskilltab] == 1
-[type] == orb && [quality] <= rare # [fcr] == 10 && [skillfireball] == 3 && [fireskilltab] == 1
+[type] == orb && [class] == normal && [quality] <= rare # [fcr] == 10 && [skilliceblast] == 3 && [coldskilltab] == 1 && [itemlevelreq] <= 18
+[type] == orb && [class] == normal && [quality] <= rare # [fcr] == 10 && [skillfireball] == 3 && [fireskilltab] == 1 && [itemlevelreq] <= 18
 
 //=================================================================================================================================================================================
 //=== IMBUEABLES ==================================================================================================================================================================

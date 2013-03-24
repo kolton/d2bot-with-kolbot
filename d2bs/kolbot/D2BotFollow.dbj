@@ -56,11 +56,12 @@ include("automule.js");
 include("torchsystem.js");
 include("common/misc.js");
 
-var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone, lastGame,
+var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone,
 	connectFail, torchTrigger, muleTrigger, torchMuleTrigger, firstLogin,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
 	leader = "",
+	lastGame = [],
 	cachedInfo = {gameName: "", password: ""},
 	loginFail = 0;
 
@@ -129,6 +130,8 @@ function ReceiveCopyData(mode, msg) {
 
 	switch (mode) {
 	case 1: // JoinInfo
+		//print("Got Join Info");
+
 		joinInfo = JSON.parse(msg);
 
 		break;
@@ -216,6 +219,21 @@ function main() {
 		locationAction(getLocation());
 		delay(1000);
 	}
+}
+
+function joinCheck(leader) {
+	D2Bot.requestGame(leader);
+	delay(500);
+
+	//print(leader + " " + joinInfo.inGame + " " + lastGame.toSource() + " " + joinInfo.gameName);
+	
+	if (!joinInfo.inGame || (lastGame.length && lastGame.indexOf(joinInfo.gameName) === -1)) {
+		D2Bot.printToConsole("Game is finished. Stopping join delay.");
+
+		return true;
+	}
+
+	return false;
 }
 
 function locationAction(location) {
@@ -362,94 +380,86 @@ MainSwitch:
 		D2Bot.updateStatus("Join Game");
 
 		if (!leader) {
-JoinLoop:
+			leader = [];
+
 			for (i in JoinSettings) {
 				if (JoinSettings.hasOwnProperty(i) && typeof i === "string") {
 					for (j = 0; j < JoinSettings[i].length; j += 1) {
 						if (JoinSettings[i][j] === me.profile || JoinSettings[i][j] === "all") {
-							leader = i;
-
-							break JoinLoop;
+							leader.push(i);
 						}
 					}
 				}
 			}
 		}
 
-		if (!leader) {
+		if (!leader || !leader.length) {
 			break;
 		}
 
+JoinLoop2:
 		for (i = 0; i < 5; i += 1) {
-			D2Bot.requestGame(leader);
+			for (j = 0; j < leader.length; j += 1) {
+				D2Bot.requestGame(leader[j]);
+				delay(100);
 
-			if (joinInfo && joinInfo.gameName !== "") {
-				break;
-			}
+				if (joinInfo && joinInfo.gameName !== "" && (lastGame.indexOf(joinInfo.gameName) === -1 || lastGameStatus === "pending")) {
+					// Shave off a few milliseconds
+					if (cachedInfo.gameName !== joinInfo.gameName || cachedInfo.password !== joinInfo.gamePass) {
+						ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
+						ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
 
-			delay(100);
-		}
+						cachedInfo.gameName = joinInfo.gameName;
+						cachedInfo.password = joinInfo.gamePass;
+					}
 
-		if (joinInfo && joinInfo.gameName !== "" && (joinInfo.gameName !== lastGame || lastGameStatus === "pending")) {
-			// Shave off a few milliseconds
-			if (cachedInfo.gameName !== joinInfo.gameName || cachedInfo.password !== joinInfo.gamePass) {
-				ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
-				ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
-
-				cachedInfo.gameName = joinInfo.gameName;
-				cachedInfo.password = joinInfo.gamePass;
-			}
-
-			if (lastGameStatus === "pending" || (gameInfo.error === "@error" && DataFile.getStats().gameName === joinInfo.gameName)) {
-				if (gameInfo.error === "@error") {
-					gameInfo.error = "";
-				}
-
-				ControlAction.timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000,
-					function () {
-						D2Bot.requestGame(leader);
-						delay(500);
-
-						if (!joinInfo.inGame || (lastGame && joinInfo.gameName !== lastGame)) {
-							D2Bot.printToConsole("Game is finished. Stopping join delay.");
-
-							return true;
+					if (lastGameStatus === "pending" || (gameInfo.error === "@error" && DataFile.getStats().gameName === joinInfo.gameName)) {
+						if (gameInfo.error === "@error") {
+							gameInfo.error = "";
 						}
 
-						return false;
+						ControlAction.timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000, joinCheck, leader[j]);
+						D2Bot.updateRuns();
+						D2Bot.requestGame(leader[j]);
+						delay(200);
+
+						if (!joinInfo.inGame) {
+							lastGameStatus = "ready";
+
+							break;
+						}
 					}
-					);
-				D2Bot.updateRuns();
-				D2Bot.requestGame(leader);
-				delay(200);
 
-				if (!joinInfo.inGame) {
-					lastGameStatus = "ready";
+					if (!joinInfo.inGame) {
+						break;
+					}
 
-					break;
+					print("joining game " + joinInfo.gameName);
+
+					if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
+						ControlAction.timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
+					}
+
+					me.blockMouse = true;
+
+					ControlAction.click(6, 594, 433, 172, 32);
+
+					me.blockMouse = false;
+
+					lastGame.push(joinInfo.gameName);
+
+					if (lastGame.length > 5) {
+						lastGame.shift();
+					}
+
+					lastGameStatus = "pending";
+
+					DataFile.updateStats("gameName", joinInfo.gameName);
+					locationTimeout(5000, location);
+
+					break JoinLoop2;
 				}
 			}
-
-			if (!joinInfo.inGame) {
-				break;
-			}
-
-			print("joining game " + joinInfo.gameName);
-
-			if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
-				ControlAction.timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
-			}
-
-			me.blockMouse = true;
-
-			ControlAction.click(6, 594, 433, 172, 32);
-
-			me.blockMouse = false;
-			lastGame = joinInfo.gameName;
-			lastGameStatus = "pending";
-
-			DataFile.updateStats("gameName", joinInfo.gameName);
-			locationTimeout(5000, location);
 		}
 
 		break;

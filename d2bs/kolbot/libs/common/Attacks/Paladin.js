@@ -140,7 +140,7 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[atkSkill] === 112) {
 			if (unit.classid === 691 && Config.AvoidDolls) {
-				Attack.deploy(unit, 15, 5, 10);
+				this.dollAvoid(unit);
 
 				if (Config.AttackSkill[aura] > -1) {
 					Skill.setSkill(Config.AttackSkill[aura], 0);
@@ -155,7 +155,7 @@ var ClassAttack = {
 				return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
 			}
 
-			if (getDistance(me, unit) > 5) { // increase pvp aggressiveness
+			if (getDistance(me, unit) > 7) { // increase pvp aggressiveness
 				return false;
 			}
 
@@ -181,7 +181,9 @@ var ClassAttack = {
 				}
 			}
 
-			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004)) {
+			CollMap.reset();
+
+			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004, 2)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x2004, true)) {
 					return 0;
 				}
@@ -193,7 +195,6 @@ var ClassAttack = {
 			if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, walk)) {
 				return 0;
 			}
-
 		}
 
 		if (Config.AttackSkill[aura] > -1) {
@@ -201,6 +202,19 @@ var ClassAttack = {
 		}
 
 		return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
+	},
+
+	dollAvoid: function (unit) {
+		var i,
+			positions = [[10, 10], [-10, 10], [10, -10], [-10, -10]];
+
+		for (i = 0; i < positions.length; i += 1) {
+			if (Attack.validSpot(unit.x + positions[i][0], unit.y + positions[i][1])) {
+				return Pather.moveTo(unit.x + positions[i][0], unit.y + positions[i][1]);
+			}
+		}
+
+		return false;
 	},
 
 	getHammerPosition: function (unit) {

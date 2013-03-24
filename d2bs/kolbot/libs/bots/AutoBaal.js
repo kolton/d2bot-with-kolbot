@@ -44,8 +44,7 @@ function AutoBaal() {
 					}
 				}
 			}
-		}
-		);
+		});
 
 	// test
 	this.longRangeSupport = function () {

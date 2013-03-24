@@ -617,6 +617,11 @@ IngredientLoop:
 				return false;
 			}
 
+			// Don't cube runeword runes
+			if (unit.itemType === 74 && Runewords.validGids.indexOf(unit.gid) > -1) {
+				return false;
+			}
+
 			return true;
 		}
 

@@ -59,7 +59,7 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		if (this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
+		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("ÿc4MuleLoggerÿc0: Logging items.");
 			D2Bot.printToConsole("MuleLogger: Logging items.", 7);
 			this.logChar();

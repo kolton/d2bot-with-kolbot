@@ -182,7 +182,7 @@ var Config = {
 	// DClone
 	StopOnDClone: false,
 	SoJWaitTime: 0,
-	KillDclone: true,
+	KillDclone: false,
 
 	// Attack specific
 	Dodge: false,
@@ -192,6 +192,7 @@ var Config = {
 	LowManaSkill: [],
 	TeleStomp: false,
 	ClearType: false,
+	ClearPath: false,
 	BossPriority: false,
 
 	// Amazon specific

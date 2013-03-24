@@ -358,11 +358,11 @@ var DataFile = {
 };
 
 var ControlAction = {
-	timeoutDelay: function (text, time, stopfunc) {
+	timeoutDelay: function (text, time, stopfunc, arg) {
 		var endTime = getTickCount() + time;
 
 		while (getTickCount() < endTime) {
-			if (typeof stopfunc === "function" && stopfunc.call()) {
+			if (typeof stopfunc === "function" && stopfunc(arg)) {
 				break;
 			}
 
