@@ -7,7 +7,6 @@
 function main() {
 	var i, mercHP, ironGolem, tick,
 		pingTimer = [],
-		configCache = {},
 		quitFlag = false,
 		timerLastDrink = [];
 
@@ -35,45 +34,21 @@ function main() {
 	me.chickenmp = -1;
 
 	// General functions
-	this.cacheConfig = function (obj) {
-		var newObj = {};
-
-		newObj.QuitList = obj.QuitList.slice();
-		newObj.AntiHostile = obj.AntiHostile;
-		newObj.SoJWaitTime = obj.SoJWaitTime;
-		newObj.StopOnDClone = obj.StopOnDClone;
-		newObj.UseHP = obj.UseHP;
-		newObj.UseRejuvHP = obj.UseRejuvHP;
-		newObj.LifeChicken = obj.LifeChicken;
-		newObj.UseMP = obj.UseMP;
-		newObj.UseRejuvMP = obj.UseRejuvMP;
-		newObj.ManaChicken = obj.ManaChicken;
-		newObj.IronGolemChicken = obj.IronGolemChicken;
-		newObj.UseMerc = obj.UseMerc;
-		newObj.MercChicken = obj.MercChicken;
-		newObj.UseMercRejuv = obj.UseMercRejuv;
-		newObj.UseMercHP = obj.UseMercHP;
-		newObj.LogExperience = obj.LogExperience;
-		newObj.PingQuit = obj.PingQuit.slice();
-
-		return newObj;
-	};
-
 	this.checkPing = function (print) {
 		var i;
 
-		for (i = 0; i < configCache.PingQuit.length; i += 1) {
-			if (configCache.PingQuit[i].Ping > 0) {
-				if (me.ping >= configCache.PingQuit[i].Ping) {
+		for (i = 0; i < Config.PingQuit.length; i += 1) {
+			if (Config.PingQuit[i].Ping > 0) {
+				if (me.ping >= Config.PingQuit[i].Ping) {
 					me.overhead("High Ping");
 
 					if (pingTimer[i] === undefined || pingTimer[i] === 0) {
 						pingTimer[i] = getTickCount();
 					}
 
-					if (getTickCount() - pingTimer[i] >= configCache.PingQuit[i].Duration * 1000) {
+					if (getTickCount() - pingTimer[i] >= Config.PingQuit[i].Duration * 1000) {
 						if (print) {
-							D2Bot.printToConsole("High ping (" + me.ping + "/" + configCache.PingQuit[i].Ping + ") - leaving game.", 9);
+							D2Bot.printToConsole("High ping (" + me.ping + "/" + Config.PingQuit[i].Ping + ") - leaving game.", 9);
 						}
 
 						scriptBroadcast("pingquit");
@@ -340,44 +315,42 @@ function main() {
 	};
 
 	this.gameEvent = function (mode, param1, param2, name1, name2) {
-		var i;
-
 		switch (mode) {
 		case 0x00: // "%Name1(%Name2) dropped due to time out."
 		case 0x01: // "%Name1(%Name2) dropped due to errors."
 		case 0x03: // "%Name1(%Name2) left our world. Diablo's minions weaken."
-			if (configCache.QuitList.indexOf(name1) > -1) {
+			if (Config.QuitList.indexOf(name1) > -1) {
 				print(name1 + (mode === 0 ? " timed out" : " left"));
 
 				quitFlag = true;
 			}
 
-			if (configCache.AntiHostile) {
+			if (Config.AntiHostile) {
 				scriptBroadcast("remove " + name1);
 			}
 
 			break;
 		case 0x06: // "%Name1 was Slain by %Name2" 
-			if (configCache.AntiHostile && param2 === 0x00 && name2 === me.name) {
+			if (Config.AntiHostile && param2 === 0x00 && name2 === me.name) {
 				scriptBroadcast("mugshot " + name1);
 			}
 
 			break;
 		case 0x07:
-			if (configCache.AntiHostile && param2 === 0x03) { // "%Player has declared hostility towards you."
+			if (Config.AntiHostile && param2 === 0x03) { // "%Player has declared hostility towards you."
 				scriptBroadcast("findHostiles");
 			}
 
 			break;
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
-			if (configCache.SoJWaitTime) {
+			if (Config.SoJWaitTime) {
 				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3], 7);
 				scriptBroadcast("soj");
 			}
 
 			break;
 		case 0x12: // "Diablo Walks the Earth"
-			if (configCache.StopOnDClone) {
+			if (Config.StopOnDClone) {
 				D2Bot.printToConsole("Diablo Walks the Earth", 7);
 				this.togglePause();
 				Town.goToTown();
@@ -386,7 +359,9 @@ function main() {
 
 				me.maxgametime = 0;
 
-				if (Config.KillDclone) {
+				if (AnniSystem.checkProfile()) {
+					AnniSystem.cloneTrigger();
+				} else if (Config.KillDclone) {
 					load("tools/clonekilla.js");
 				}
 			}
@@ -405,7 +380,7 @@ function main() {
 	};
 
 	// Cache variables to prevent a bug where d2bs loses the reference to Config object
-	configCache = this.cacheConfig(Config);
+	Config = Misc.copy(Config);
 	tick = getTickCount();
 
 	addEventListener("keyup", this.keyEvent);
@@ -419,18 +394,18 @@ function main() {
 	Packet.changeStat(93, Config.IAS);
 
 	// Start
-	while (me.ingame) {
+	while (true) {
 		try {
-			if (!me.inTown && me.gameReady) {
-				if (configCache.UseHP > 0 && me.hp < Math.floor(me.hpmax * configCache.UseHP / 100)) {
+			if (me.gameReady && !me.inTown) {
+				if (Config.UseHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseHP / 100)) {
 					this.drinkPotion(0);
 				}
 
-				if (configCache.UseRejuvHP > 0 && me.hp < Math.floor(me.hpmax * configCache.UseRejuvHP / 100)) {
+				if (Config.UseRejuvHP > 0 && me.hp < Math.floor(me.hpmax * Config.UseRejuvHP / 100)) {
 					this.drinkPotion(2);
 				}
 
-				if (configCache.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * configCache.LifeChicken / 100)) {
+				if (Config.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
 					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + Pather.getAreaName(me.area) + ". Ping: " + me.ping, 9);
 					D2Bot.updateChickens();
 					quit();
@@ -438,15 +413,15 @@ function main() {
 					break;
 				}
 
-				if (configCache.UseMP > 0 && me.mp < Math.floor(me.mpmax * configCache.UseMP / 100)) {
+				if (Config.UseMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseMP / 100)) {
 					this.drinkPotion(1);
 				}
 
-				if (configCache.UseRejuvMP > 0 && me.mp < Math.floor(me.mpmax * configCache.UseRejuvMP / 100)) {
+				if (Config.UseRejuvMP > 0 && me.mp < Math.floor(me.mpmax * Config.UseRejuvMP / 100)) {
 					this.drinkPotion(2);
 				}
 
-				if (configCache.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * configCache.ManaChicken / 100)) {
+				if (Config.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
 					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + Pather.getAreaName(me.area), 9);
 					D2Bot.updateChickens();
 					quit();
@@ -454,13 +429,13 @@ function main() {
 					break;
 				}
 
-				if (configCache.IronGolemChicken > 0 && me.classid === 2) {
-					if (!ironGolem || !copyUnit(ironGolem).x) {
+				if (Config.IronGolemChicken > 0 && me.classid === 2) {
+					if (!ironGolem || copyUnit(ironGolem).x === undefined) {
 						ironGolem = this.getIronGolem();
 					}
 
 					if (ironGolem) {
-						if (ironGolem.hp <= Math.floor(128 * configCache.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
+						if (ironGolem.hp <= Math.floor(128 * Config.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
 							D2Bot.printToConsole("Irom Golem Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
 							quit();
@@ -470,11 +445,11 @@ function main() {
 					}
 				}
 
-				if (configCache.UseMerc) {
+				if (Config.UseMerc) {
 					mercHP = getMercHP();
 
-					if (me.getMerc() && mercHP > 0) {
-						if (mercHP < configCache.MercChicken) {
+					if (mercHP > 0 && me.getMinionCount(7) > 0) {
+						if (mercHP < Config.MercChicken) {
 							D2Bot.printToConsole("Merc Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
 							quit();
@@ -482,11 +457,11 @@ function main() {
 							break;
 						}
 
-						if (mercHP < configCache.UseMercHP) {
+						if (mercHP < Config.UseMercHP) {
 							this.drinkPotion(3);
 						}
 
-						if (mercHP < configCache.UseMercRejuv) {
+						if (mercHP < Config.UseMercRejuv) {
 							this.drinkPotion(4);
 						}
 					}
@@ -514,7 +489,7 @@ function main() {
 		if (quitFlag) {
 			print("ÿc8Run duration ÿc2" + ((getTickCount() - me.gamestarttime) / 1000));
 
-			if (configCache.LogExperience) {
+			if (Config.LogExperience) {
 				Experience.log();
 			}
 

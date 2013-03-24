@@ -115,25 +115,35 @@ var AutoMule = {
 	},
 
 	getMuleFilename: function (mode) {
-		var i, j, mule, name;
+		var i, mule, jsonObj, jsonStr, file;
 
 		mode = mode || 0;
 		mule = mode === 1 ? this.TorchMules : this.Mules;
 
-MainLoop:
 		for (i in mule) {
 			if (mule.hasOwnProperty(i)) {
-				for (j in mule[i]) {
-					if (mule[i].hasOwnProperty(j) && j === "muleProfile" && mule[i][j].toLowerCase() === me.profile.toLowerCase()) {
-						name = i;
+				if (mule[i].muleProfile && mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase()) {
+					file = mode === 0 ? "logs/AutoMule." + i + ".json" : "logs/TorchMule." + i + ".json";
 
-						break MainLoop;
+					if (FileTools.exists(file)) {
+						try {
+							jsonStr = FileTools.readText(file);
+							jsonObj = JSON.parse(jsonStr);
+
+							if (mule[i].accountPrefix && jsonObj.account && jsonObj.account.match(mule[i].accountPrefix)) {
+								return file;
+							}
+						} catch (e) {
+							print(e);
+						}
+					} else {
+						return file;
 					}
 				}
 			}
 		}
 
-		return mode === 0 ? "logs/AutoMule." + name + ".json" : "logs/TorchMule." + name + ".json";
+		return false;
 	},
 
 	outOfGameCheck: function (mode) {

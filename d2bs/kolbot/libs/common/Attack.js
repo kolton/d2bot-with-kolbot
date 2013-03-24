@@ -243,6 +243,8 @@ var Attack = {
 			throw new Error("Attack.clear: range must be a number.");
 		}
 
+		this.dodgeList = undefined;
+
 		var i, boss, orgx, orgy, target, result, monsterList, start,
 			gidAttack = [],
 			attackCount = 0;
@@ -278,7 +280,7 @@ var Attack = {
 
 		if (target) {
 			do {
-				if (this.checkMonster(target) && this.skipCheck(target)) {
+				if ((!spectype || (target.spectype & spectype)) && this.checkMonster(target) && this.skipCheck(target)) {
 					// Speed optimization - don't go through monster list until there's at least one within clear range
 					if (!start && getDistance(target, orgx, orgy) <= range) {
 						start = true;
@@ -303,12 +305,12 @@ var Attack = {
 				return false;
 			}
 
-			monsterList.sort(Sort.units);
+			//monsterList.sort(Sort.units);
 			monsterList.sort(sortfunc);
 
 			target = copyUnit(monsterList[0]);
 
-			if (target.x !== undefined && (!spectype || (target.spectype & spectype)) && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target) && (me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+			if (target.x !== undefined && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target) && (me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
 				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
 					this.deploy(target, Config.DodgeRange, 5, 9);
 				}
@@ -357,8 +359,6 @@ var Attack = {
 			} else {
 				monsterList.shift();
 			}
-
-			delay(5);
 		}
 
 		ClassAttack.afterAttack(pickit);
@@ -374,11 +374,23 @@ var Attack = {
 	// Filter monsters based on classId, spectype and range
 	getMob: function (classid, spectype, range) {
 		var monsterList = [],
-			monster = getUnit(1, classid);
+			monster = getUnit(1);
+
+		switch (classid) {
+		case -1:
+			break;
+		default:
+			if (typeof classid === "number") {
+				classid = [classid];
+			}
+
+			break;
+		}
 
 		if (monster) {
 			do {
-				if (getDistance(me, monster) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+				if ((classid === -1 || classid.indexOf(monster.classid) > -1) && getDistance(me, monster) <= range &&
+						(!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
 					monsterList.push(copyUnit(monster));
 				}
 			} while (monster.getNext());
@@ -406,6 +418,8 @@ var Attack = {
 			monsterList = mainArg.slice(0);
 
 			break;
+		case "boolean":
+			return false;
 		default:
 			throw new Error("clearList: Invalid argument");
 		}
@@ -590,7 +604,7 @@ var Attack = {
 				//this.markRoom(getRoom(room[0], room[1]), 0x84);
 				Pather.moveTo(result[0], result[1], 3);
 
-				if (!this.clear(30, spectype)) {
+				if (!this.clear(40, spectype)) {
 					return false;
 				}
 			}/* else {
@@ -603,29 +617,28 @@ var Attack = {
 
 	// Sort monsters based on distance, spectype and classId (summoners are attacked first)
 	sortMonsters: function (unitA, unitB) {
+		// No special sorting for were-form
 		if (Config.Wereform) {
-			return 0;
+			return getDistance(me, unitA) - getDistance(me, unitB);
 		}
 
 		var ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
 
-		if (ids.indexOf(unitA.classid) > -1 &&
-				ids.indexOf(unitB.classid) > -1) {
+		if (ids.indexOf(unitA.classid) > -1 && ids.indexOf(unitB.classid) > -1) {
 			// Kill "scary" uniques first (like Bishibosh)
-			if ((unitA.spectype & 0x04) !== 0 &&
-					(unitB.spectype & 0x04) !== 0) {
-				return 0;
+			if ((unitA.spectype & 0x04) && (unitB.spectype & 0x04)) {
+				return getDistance(me, unitA) - getDistance(me, unitB);
 			}
 
-			if ((unitA.spectype & 0x04) !== 0) {
+			if (unitA.spectype & 0x04) {
 				return -1;
 			}
 
-			if ((unitB.spectype & 0x04) !== 0) {
+			if (unitB.spectype & 0x04) {
 				return 1;
 			}
 
-			return 0;
+			return getDistance(me, unitA) - getDistance(me, unitB);
 		}
 
 		if (ids.indexOf(unitA.classid) > -1) {
@@ -637,6 +650,10 @@ var Attack = {
 		}
 
 		if (Config.BossPriority) {
+			if ((unitA.spectype & 0x5) && (unitB.spectype & 0x5)) {
+				return getDistance(me, unitA) - getDistance(me, unitB);
+			}
+
 			if (unitA.spectype & 0x5) {
 				return -1;
 			}
@@ -646,7 +663,7 @@ var Attack = {
 			}
 		}
 
-		return 0;
+		return getDistance(me, unitA) - getDistance(me, unitB);
 	},
 
 	// Check if a set of coords is valid/accessable
@@ -713,7 +730,7 @@ var Attack = {
 			} while (monster.getNext());
 		}
 
-		print("Built dodge list with " + monList.length + " monsters.");
+		//print("Built dodge list with " + monList.length + " monsters.");
 
 		this.dodgeList = {
 			monsters: monList,
@@ -776,7 +793,7 @@ var Attack = {
 		//print("Safest spot with " + count + " monsters.");
 
 		if (typeof index === "number") {
-			return Pather.moveTo(grid[index].x, grid[index].y, 0);
+			return Pather.moveTo(grid[index].x, grid[index].y, 3);
 		}
 
 		return false;
@@ -1172,7 +1189,7 @@ AuraLoop: // Skip monsters with auras
 					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll)) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						return walk ? Pather.walkTo(coords[i].x, coords[i].y) : Pather.moveTo(coords[i].x, coords[i].y, 0);
+						return walk ? Pather.walkTo(coords[i].x, coords[i].y, 2) : Pather.moveTo(coords[i].x, coords[i].y, 0);
 					}
 				}
 			}

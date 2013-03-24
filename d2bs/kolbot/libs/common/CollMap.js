@@ -12,9 +12,12 @@ var CollMap = new function () {
 		var room, coll;
 
 		room = x instanceof Room ? x : getRoom(x, y);
-		coll = room.getCollision();
 
-		if (room && coll) {
+		if (room) {
+			coll = room.getCollision();
+		}
+
+		if (coll) {
 			this.rooms.push({x: room.x, y: room.y, xsize: room.xsize, ysize: room.ysize});
 			this.maps.push(coll);
 
@@ -84,12 +87,12 @@ var CollMap = new function () {
 
 		var i, k, l, cx, cy, angle, distance;
 
-		angle = Math.round(Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x) * 180 / Math.PI);
+		angle = Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x);
 		distance = Math.round(getDistance(unitA, unitB));
 
 		for (i = 1; i < distance; i += 1) {
-			cx = Math.round((Math.cos(angle * Math.PI / 180)) * i + unitB.x);
-			cy = Math.round((Math.sin(angle * Math.PI / 180)) * i + unitB.y);
+			cx = Math.round((Math.cos(angle)) * i + unitB.x);
+			cy = Math.round((Math.sin(angle)) * i + unitB.y);
 
 			for (k = cx - thickness; k <= cx + thickness; k += 1) { // check thicker line
 				for (l = cy - thickness; l <= cy + thickness; l += 1) {

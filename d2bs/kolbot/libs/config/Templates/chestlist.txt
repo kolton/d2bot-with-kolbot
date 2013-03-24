@@ -23,6 +23,6 @@ ID		Act1
 115 		- Glacial Trail
 116 		- Drifter Cavern
 119 		- FrozenCellar
-126 		- Abbadon
-127 		- Archeon
-128 		- Infernal
+125 		- Abbadon
+126 		- Archeon
+127 		- Infernal

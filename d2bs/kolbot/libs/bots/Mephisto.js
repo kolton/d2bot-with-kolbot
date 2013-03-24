@@ -113,41 +113,15 @@ function Mephisto() {
 	};
 
 	this.killCouncil = function () {
-		//left maffer
-		Pather.moveTo(17600, 8125);
+		var i, mob,
+			coords = [17600, 8125, 17600, 8015, 17643, 8068];
 
-		if (getUnit(1, getLocaleString(2858))) {
-			try {
-				Attack.kill(getLocaleString(2858));
-				Attack.clear(15, 0, getLocaleString(2858));
-			} catch (e1) {
-
-			}
+		for (i = 0; i < coords.length; i += 2) {
+			Pather.moveTo(coords[i], coords[i + 1]);
+			Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
 		}
 
-		//right voidbringer
-		Pather.moveTo(17600, 8015);
-
-		if (getUnit(1, getLocaleString(2859))) {
-			try {
-				Attack.kill(getLocaleString(2859));
-				Attack.clear(15, 0, getLocaleString(2859));
-			} catch (e2) {
-
-			}
-		}
-
-		//middle bremm
-		Pather.moveTo(17635, 8070);
-
-		if (getUnit(1, getLocaleString(2861))) {
-			try {
-				Attack.kill(getLocaleString(2861));
-				Attack.clear(15, 0, getLocaleString(2861));
-			} catch (e3) {
-
-			}
-		}
+		return true;
 	};
 
 	Town.doChores();
@@ -160,13 +134,6 @@ function Mephisto() {
 
 	if (Config.Mephisto.KillCouncil) {
 		this.killCouncil();
-	}
-
-	if (Config.OpenChests) {
-		Pather.moveTo(17572, 8011);
-		Attack.openChests(5);
-		Pather.moveTo(17572, 8125);
-		Attack.openChests(5);
 	}
 
 	Pather.moveTo(17566, 8069);
@@ -186,6 +153,10 @@ function Mephisto() {
 	Pickit.pickItems();
 
 	if (Config.OpenChests) {
+		Pather.moveTo(17572, 8011);
+		Attack.openChests(5);
+		Pather.moveTo(17572, 8125);
+		Attack.openChests(5);
 		Pather.moveTo(17515, 8061);
 		Attack.openChests(5);
 	}

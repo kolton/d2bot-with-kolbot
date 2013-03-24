@@ -69,6 +69,7 @@
 [name] == sacredarmor && [quality] == unique && [flag] == ethereal # [enhanceddefense] >= 220 // templar's might
 [name] == sacredarmor && [quality] == unique # [strength] >= 20 // tyrael's might
 [name] == serpentskinarmor && [quality] == unique # [fireresist] == 35 && [magicdamagereduction] == 13 // skin of the vipermagi
+[name] == wyrmhide && [quality] == unique # [defense] == 1034 // skin of the vipermagi x1
 [name] == demonhidearmor && [quality] == unique && [flag] == ethereal # [enhanceddefense] == 190 // skin of the flayed one eth
 [name] == linkedmail && [quality] == unique && [flag] == ethereal # [enhanceddefense] == 160 // spirit forge eth
 [name] == cuirass && [quality] == unique && [flag] == ethereal # [enhanceddefense] == 200 // duriel's shell eth
@@ -97,15 +98,20 @@
 //[name] == monarch && [quality] <= superior # [sockets] == 4 # [maxquantity] == 1
 
 //          ==unique==
-[name] == spikedshield && [quality] == unique # [enhanceddefense] == 60 // swordback hold
-[name] == barbedshield && [quality] == unique && [flag] == identified # [defense] == 134 || [defense] == 197 // swordback hold x1
-//[name] == monarch && [quality] == unique # [defense] == 148 // stormshield
+//[name] == spikedshield && [quality] == unique # [enhanceddefense] == 60 // swordback hold
+[name] == spikedshield && [quality] == unique && [flag] == ethereal # [enhanceddefense] == 60 // swordback hold eth
+[name] == monarch && [quality] == unique # [defense] == 148 // stormshield
 //[name] == trollnest && [quality] == unique && [flag] == ethereal # [sockets] == 3 // head hunter's glory
 //[name] == defender && [quality] == unique # [enhanceddefense] == 150 // visceratuant
 [name] == roundshield && [quality] == unique # [enhanceddefense] == 220 // moser
-[name] == luna && [quality] == unique && [flag] == identified # [defense] == 393 || [defense] == 588 // moser x1
 [name] == barbedshield && [quality] == unique && [flag] == ethereal # [enhanceddefense] == 120 // lanceguard eth
 //[name] == grimshield && [quality] == unique # [enhanceddefense] == 130 && [itemmanaafterkill] == 5 // lidless wall
+
+// upgrades
+[name] == barbedshield && [quality] == unique && [flag] == identified // # [defense] == 134 || [defense] == 197 // swordback hold x1 (noneth/eth)
+[name] == bladebarrier && [quality] == unique && [flag] == identified # [defense] == 270 || [defense] == 401 // swordback hold x2 (noneth/eth)
+[name] == bladebarrier && [quality] == unique && [flag] == identified # [defense] == 536 // lanceguard eth x1
+[name] == luna && [quality] == unique && [flag] == identified # [defense] == 393 || [defense] == 588 // moser x1 (noneth/eth)
 
 //          ==rare==
 
@@ -274,7 +280,7 @@
 //[name] == hydrabow && [quality] == unique # [manaleech] == 8 //windforce
 
 //          ==rare==
-//[type] == bow && [quality] == rare # [enhanceddamage] >= 400 && ([ias] == 20 || [sockets] == 2)
+[type] == bow && [quality] == rare # [enhanceddamage] >= 400 && ([ias] == 20 || [sockets] == 2)
 
 //          ==magic==
 
@@ -691,7 +697,7 @@
 [name] == grandcharm && [quality] == magic # [maxmana] == 59 && ([maxhp] >= 30 || [fhr] == 12)
 //[name] == grandcharm && [quality] == magic # [itemgoldbonus] == 40
 
-[name] == grandcharm && [quality] == unique # [itemmagicbonus] >= 35 || [itemgoldbonus] >= 150
+[name] == grandcharm && [quality] == unique # [itemmagicbonus] >= 35 // || [itemgoldbonus] >= 150
 
 // --set items--
 
@@ -759,9 +765,8 @@
 [type] == boots && [quality] == crafted # [maxmana] >= 40 && [itemmaxmanapercent] >= 4
 
 // unid packs
-([name] == assaulthelmet || [name] == avengerguard || [name] == savagehelmet || [name] == slayerguard || [name] == conquerorcrown || [name] == guardiancrown) && [quality] == rare && [prefix] == 1286
-([name] == antlers || [name] == hunter'sguise || [name] == earthspirit) && [quality] == rare && [prefix] == 1286
-[type] == pelt && [quality] == rare && [color] == white
+([name] == assaulthelmet || [name] == avengerguard || [name] == savagehelmet || [name] == slayerguard || [name] == conquerorcrown || [name] == guardiancrown) && [quality] == rare && [color] == white
+([name] == antlers || [name] == hunter'sguise || [name] == earthspirit) && [quality] == rare && [color] == white
 
 [name] == tokenofabsolution
 
@@ -777,7 +782,7 @@
 //[name] == demonhead && [quality] == unique
 //[name] == tulwar && [quality] == unique # # [maxquantity] == 1
 //[name] == trollnest && [quality] <= superior && [flag] != ethereal # [sockets] == 2 # [maxquantity] == 1
-[name] == demonhideboots && [quality] == unique # [itemgoldbonus] == 70
+//[name] == demonhideboots && [quality] == unique # [itemgoldbonus] == 70
 //[type] == boots && [quality] == rare # [itemgoldbonus] == 80 && [fireresist] >= 30
 //[name] == phaseblade && [quality] <= superior # [sockets] == 5
 //[name] == heavybelt && [quality] == unique && [flag] != ethereal # [itemgoldbonus] == 80 // goldwrap
@@ -799,12 +804,4 @@
 //[name] == eldritchorb && [quality] == unique # [sorceressskills] == 3 && [passiveltngmastery] == 20
 //[name] == crystalsword && [quality] <= superior && [flag] == ethereal # [sockets] == 4
 //[name] == balancedknife && [quality] == magic # [warcriesskilltab] == 3
-[name] == vambraces && [quality] == unique # [itemmagicbonus] > 0
-
-// Tr0uble@jsp
-([name] == gnarledstaff || [name] == battlestaff || [name] == gothicstaff || [name] == cedarstaff || [name] == shillelagh || [name] == elderstaff) && [quality] <= superior # ([sockets] == 0 || [sockets] == 4) && ([skillcoldmastery] > 0 && ([skillblizzard] > 0 && [skillglacialspike] > 0 || [skillfrozenorb] > 0 && [skillenchant]+[skillthunderstorm] > 0) || [skillicebolt] > 0 && [skilliceblast] > 0 && [skillwarmth] > 0)
-([name] == warstaff || [name] == runestaff || [name] == archonstaff) && [quality] <= superior # [sockets] == 4 && ([skillcoldmastery] > 0 && ([skillblizzard] > 0 && [skillglacialspike] > 0 || [skillfrozenorb] > 0 && [skillenchant]+[skillthunderstorm] > 0) || [skillicebolt] > 0 && [skilliceblast] > 0 && [skillwarmth] > 0)
-
-//([name] == crystalsword || [name] == flail || [name] == waraxe || [name] == militarypick) && [quality] <= superior # [sockets] == 5 # [maxquantity] == 1
-
-[name] == grandcharm && [quality] == magic # [coldskilltab] == 1
+//[name] == vambraces && [quality] == unique # [itemmagicbonus] > 0

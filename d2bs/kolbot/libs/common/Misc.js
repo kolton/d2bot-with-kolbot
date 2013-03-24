@@ -301,7 +301,7 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (Pather.moveTo(unit.x + 2, unit.y, 0)) {
+			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
 				Misc.click(0, 0, unit);
 				//unit.interact();
 			}
@@ -350,10 +350,10 @@ var Misc = {
 		while (coords.length) {
 			coords.sort(Sort.units);
 			Pather.moveToUnit(coords[0], 2, 0);
-			this.openChests(15);
+			this.openChests(20);
 
 			for (i = 0; i < coords.length; i += 1) {
-				if (getDistance(coords[i].x, coords[i].y, coords[0].x, coords[0].y) < 15) {
+				if (getDistance(coords[i].x, coords[i].y, coords[0].x, coords[0].y) < 20) {
 					coords.shift();
 				}
 			}
@@ -413,7 +413,7 @@ var Misc = {
 						];
 		}
 
-		unit = getUnit(2);
+		unit = getUnit(2, -1, 0);
 
 		if (unit) {
 			do {
@@ -1064,7 +1064,7 @@ MainLoop:
 	// Use a NPC menu. Experimental function, subject to change
 	// id = string number (with exception of Ressurect merc). http://www.blizzhackers.cc/viewtopic.php?f=209&t=378493
 	useMenu: function (id) {
-		print("useMenu " + getLocaleString(id));
+		//print("useMenu " + getLocaleString(id));
 
 		var i, npc, lines;
 
@@ -1099,13 +1099,70 @@ MainLoop:
 		}
 
 		return false;
+	},
+
+	clone: function (obj) {
+		var i, copy, attr;
+
+		// Handle the 3 simple types, and null or undefined
+		if (null === obj || "object" !== typeof obj) {
+			return obj;
+		}
+
+		// Handle Date
+		if (obj instanceof Date) {
+			copy = new Date();
+
+			copy.setTime(obj.getTime());
+
+			return copy;
+		}
+
+		// Handle Array
+		if (obj instanceof Array) {
+			copy = [];
+
+			for (i = 0; i < obj.length; i += 1) {
+				copy[i] = this.clone(obj[i]);
+			}
+
+			return copy;
+		}
+
+		// Handle Object
+		if (obj instanceof Object) {
+			copy = {};
+
+			for (attr in obj) {
+				if (obj.hasOwnProperty(attr)) {
+					copy[attr] = this.clone(obj[attr]);
+				}
+			}
+
+			return copy;
+		}
+
+		throw new Error("Unable to copy obj! Its type isn't supported.");
+	},
+
+	copy: function (from) {
+		var i,
+			obj = {};
+
+		for (i in from) {
+			if (from.hasOwnProperty(i)) {
+				obj[i] = this.clone(from[i]);
+			}
+		}
+
+		return obj;
 	}
 };
 
 var Sort = {
 	// Sort units by comparing distance between the player
 	units: function (a, b) {
-		return getDistance(me.x, me.y, a.x, a.y) - getDistance(me.x, me.y, b.x, b.y);
+		return Math.round(getDistance(me.x, me.y, a.x, a.y)) - Math.round(getDistance(me.x, me.y, b.x, b.y));
 	},
 
 	// Sort preset units by comparing distance between the player (using preset x/y calculations)

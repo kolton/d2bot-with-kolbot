@@ -57,7 +57,7 @@ function main() {
 		print("done");
 	};
 
-	//addEventListener("keydown", this.keyDownEvent);
+	addEventListener("keydown", this.keyDownEvent);
 	addEventListener('copydata', this.copyDataEvent);
 
 	while (!handle) {

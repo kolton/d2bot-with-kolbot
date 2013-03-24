@@ -4,6 +4,59 @@
 *	@desc		handle player movement
 */
 
+// Perform certain actions after moving to each node
+var NodeAction = {
+	// Run all the functions within NodeAction (except for itself)
+	go: function (arg) {
+		var i;
+
+		for (i in this) {
+			if (this.hasOwnProperty(i) && typeof this[i] === "function" && i !== "go") {
+				this[i](arg);
+			}
+		}
+	},
+
+	// Open chests while pathing
+	popChests: function () {
+		if (Config.OpenChests) {
+			Misc.openChests(15);
+		}
+	},
+
+	// Scan shrines while pathing
+	getShrines: function () {
+		if (Config.ScanShrines && Config.ScanShrines.length) {
+			Misc.scanShrines();
+		}
+	},
+
+	// Kill monsters while pathing
+	killMonsters: function (arg) {
+		var monList;
+
+		if (Config.Countess.KillGhosts) {
+			monList = Attack.getMob("ghost", 0, 30);
+
+			if (monList) {
+				Attack.clearList(monList);
+			}
+		}
+
+		if (typeof Config.ClearPath === "number" && arg.clearPath === false) {
+			monList = Attack.getMob(-1, Config.ClearPath, 30);
+
+			if (monList) {
+				Attack.clearList(monList);
+			}
+		}
+
+		if (arg.clearPath !== false) {
+			Attack.clear(15, typeof arg.clearPath === "number" ? arg.clearPath : 0);
+		}
+	}
+};
+
 var Pather = {
 	teleport: true,
 	walkDistance: 15,
@@ -21,7 +74,7 @@ var Pather = {
 			return false;
 		}
 
-		var i, path, mob,
+		var i, path,
 			node = {x: x, y: y},
 			fail = 0;
 
@@ -133,23 +186,7 @@ var Pather = {
 					if (this.recursion) {
 						this.recursion = false;
 
-						if (Config.OpenChests) {
-							Misc.openChests(15);
-						}
-
-						Misc.scanShrines();
-
-						if (clearPath) {
-							Attack.clear(15, typeof clearPath === "number" ? clearPath : false);
-						}
-
-						if (Config.Countess.KillGhosts) { // TODO: expand&improve
-							mob = Attack.getMob("ghost", 0, 30);
-
-							if (mob) {
-								Attack.clearList(mob);
-							}
-						}
+						NodeAction.go({clearPath: clearPath});
 
 						if (getDistance(me, node.x, node.y) > 5) {
 							this.moveTo(node.x, node.y);
@@ -196,7 +233,11 @@ MainLoop:
 		return false;
 	},
 
-	walkTo: function (x, y) {
+	walkTo: function (x, y, minDist) {
+		if (minDist === undefined) {
+			minDist = 4;
+		}
+
 		var nTimer,
 			nFail = 0,
 			attemptCount = 0;
@@ -220,12 +261,12 @@ MainLoop:
 			}
 		}
 
-		while (getDistance(me.x, me.y, x, y) > 4 && !me.dead) {
+		while (getDistance(me.x, me.y, x, y) > minDist && !me.dead) {
 			if (me.classid === 3 && Config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
 
-			if (this.openDoors(x, y) && getDistance(me.x, me.y, x, y) < 4) {
+			if (this.openDoors(x, y) && getDistance(me.x, me.y, x, y) <= minDist) {
 				return true;
 			}
 
@@ -267,7 +308,7 @@ ModeLoop:
 			delay(5);
 		}
 
-		return !me.dead && getDistance(me.x, me.y, x, y) < 5;
+		return !me.dead && getDistance(me.x, me.y, x, y) <= minDist;
 	},
 
 	openDoors: function (x, y) {
@@ -676,7 +717,7 @@ ModeLoop:
 			delay(me.ping + 1);
 		}
 
-		throw new Error("Pather.useWaypoint: Failed to use waypoint");
+		throw new Error("useWaypoint: Failed to use waypoint");
 	},
 
 	makePortal: function (use) {
@@ -943,7 +984,9 @@ MainLoop:
 		var i, j, wp, preset,
 			wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
 
-		this.journeyTo(area);
+		if (area !== me.area) {
+			this.journeyTo(area);
+		}
 
 		for (i = 0; i < wpIDs.length; i += 1) {
 			preset = getPresetUnit(area, 2, wpIDs[i]);
@@ -1007,6 +1050,10 @@ MainLoop:
 		while (target.course.length) {
 			if (!me.inTown) {
 				Precast.doPrecast(false);
+			}
+
+			if (this.wpAreas.indexOf(me.area) > -1 && !getWaypoint(this.wpAreas.indexOf(me.area))) {
+				this.getWP(me.area);
 			}
 
 			if (me.inTown && this.wpAreas.indexOf(target.course[0]) > -1 && getWaypoint(this.wpAreas.indexOf(target.course[0]))) {
@@ -1294,7 +1341,7 @@ MainLoop:
 			"Ancient's Way",
 			"Icy Cellar",
 			"Arreat Summit",
-			"Nihlathaks Temple",
+			"Nihlathak's Temple",
 			"Halls Of Anguish",
 			"Halls Of Pain",
 			"Halls Of Vaught",
