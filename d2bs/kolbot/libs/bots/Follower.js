@@ -602,6 +602,10 @@ function Follower() {
 	Config.TownMP = 0;
 	charClass = classes[me.classid];
 
+	if (!me.inTown) {
+		Town.goToTown();
+	}	
+
 	for (i = 0; i < 20; i += 1) {
 		leader = this.getLeader(Config.Leader);
 
