@@ -37,12 +37,17 @@ var AdvancedConfig = {
 		"MyProfile1": {JoinDelay: 3},
 		"MyProfile2": {JoinChannel: "some channel"},
 		"MyProfile3": {JoinChannel: "some other channel", JoinDelay: 11}
-
+		"MyProfile4": {AnnounceGames: true, AnnounceMessage: "Joining game"} // announce game you are joining
 	*/
 
 	// Put your lines under this one. Multiple entries are separated by commas. No comma after the last one.
 
-	"Test": {JoinChannel: "op nnqry", JoinDelay: 3}
+	"Test": {
+		JoinChannel: "op nnqry",
+		JoinDelay: 3,
+		AnnounceGames: true,
+		AnnounceMessage: "Joining game" // output: Joining game Baals-23
+	}
 };
 
 
@@ -385,6 +390,11 @@ MainLoop:
 		D2Bot.updateStatus("Join Game");
 
 		if (joinInfo.gameName !== "") {
+			if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].AnnounceGame === "boolean" && AdvancedConfig[me.profile].AnnounceGame) {
+				if (typeof AdvancedConfig[me.profile].AnnounceMessage === "string")
+					say(AdvancedConfig[me.profile].AnnounceMessage + " " + gameName);
+			}
+
 			if (retry === 0 || lastGameStatus === "pending") { // Only delay on first join - the rest is handled by GameDoesNotExistTimeout. Any other case is instant fail (ie. full game).
 				if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
 					timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
