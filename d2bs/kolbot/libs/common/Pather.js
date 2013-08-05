@@ -119,7 +119,7 @@ var Pather = {
 		}
 
 		// Walk without calling getPath if the spot is close enough
-		if (!this.useTeleport && getDistance(me, x, y) <= 5) {
+		if (!this.useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
 			return this.walkTo(x, y);
 		}
 
@@ -234,6 +234,10 @@ MainLoop:
 	},
 
 	walkTo: function (x, y, minDist) {
+		while (!me.gameReady) {
+			delay(100);
+		}
+
 		if (minDist === undefined) {
 			minDist = 4;
 		}
@@ -252,9 +256,7 @@ MainLoop:
 				Skill.setSkill(115, 0);
 			}
 
-			clickMap(0, 1, x, y);
-			delay(40);
-			clickMap(2, 1, x, y);
+			Misc.click(0, 1, x, y);
 
 			while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
 				delay(40);
@@ -584,7 +586,7 @@ ModeLoop:
 	},
 
 	// If there is no check, it will try to take the waypoint directly, without opening the waypoint screen
-	useWaypoint: function (targetArea, check) {
+	useWaypoint: function useWaypoint(targetArea, check) {
 		switch (targetArea) {
 		case undefined:
 			throw new Error("useWaypoint: Invalid targetArea parameter");
@@ -620,7 +622,7 @@ ModeLoop:
 
 			wp = getUnit(2, "waypoint");
 
-			if (wp) {
+			if (wp && wp.area === me.area) {
 				if (!me.inTown && getDistance(me, wp) > 5) {
 					this.moveToUnit(wp);
 				}
@@ -683,8 +685,6 @@ ModeLoop:
 					}
 
 					if (me.area === targetArea) {
-						delay(200);
-
 						return true;
 					}
 
@@ -717,7 +717,7 @@ ModeLoop:
 			delay(me.ping + 1);
 		}
 
-		throw new Error("useWaypoint: Failed to use waypoint");
+		throw new Error("useWaypoint: Failed to use waypoint " + (getTickCount() - timer));
 	},
 
 	makePortal: function (use) {
@@ -812,25 +812,26 @@ MainLoop:
 			if (portal) {
 				useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
 
-				if (useTK) {
-					if (getDistance(me, portal) > 13) {
-						Attack.getIntoPosition(portal, 13, 0x4);
-					}
+				if (portal.area === me.area) {
+					if (useTK) {
+						if (getDistance(me, portal) > 13) {
+							Attack.getIntoPosition(portal, 13, 0x4);
+						}
 
-					Skill.cast(43, 0, portal);
-				} else {
-					if (getDistance(me, portal) > 2) {
-						this.moveToUnit(portal);
-					}
+						Skill.cast(43, 0, portal);
+					} else {
+						if (getDistance(me, portal) > (i > 1) ? 3 : 6) {
+							this.moveToUnit(portal);
+						}
 
-					Misc.click(0, 0, portal);
-					//portal.interact();
-					//sendPacket(1, 0x13, 4, 2, 4, portal.gid);
+						//Misc.click(0, 0, portal);
+						sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
+					}
 				}
 
 				if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary
-					Misc.click(0, 0, portal);
-					//portal.interact();
+					//Misc.click(0, 0, portal);
+					portal.interact();
 
 					tick = getTickCount();
 
@@ -845,13 +846,15 @@ MainLoop:
 
 				tick = getTickCount();
 
-				while (getTickCount() - tick < 2000) {
+				while (getTickCount() - tick < Math.max(2000, me.ping * 5)) {
 					while (!me.area || !me.gameReady) {
 						delay(100);
 					}
 
 					if (me.area !== preArea) {
-						delay(200);
+						if (me.inTown) {
+							Misc.click(0, 0, me.x, me.y);
+						}
 
 						return true;
 					}

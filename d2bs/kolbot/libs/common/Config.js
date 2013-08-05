@@ -146,6 +146,7 @@ var Config = {
 	SkipImmune: [],
 	SkipAura: [],
 	ScanShrines: [],
+	Debug: false,
 
 	Cubing: false,
 	Recipes: [],

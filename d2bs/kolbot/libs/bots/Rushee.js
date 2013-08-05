@@ -1,6 +1,6 @@
 function Rushee() {
 	var quester, leader, target,
-		leaderName = "kolxi-d",
+		leaderName = Config.Leader,
 		action = "";
 
 	this.findLeader = function (name) {
@@ -115,108 +115,132 @@ function Rushee() {
 	};
 
 	this.changeAct = function (act) {
-		var npc,
+		var npc, check,
 			preArea = me.area;
 
-		switch (act) {
-		case 2:
-			if (me.act >= 2) {
+		if (me.mode === 17) {
+			me.revive();
+			delay(2000);
+		}
+
+		if (me.act === act) {
+			return true;
+		}
+
+		try {
+			switch (act) {
+			case 2:
+				if (me.act >= 2) {
+					break;
+				}
+
+				Town.move("warriv");
+
+				npc = getUnit(1, "warriv");
+
+				if (!npc || !npc.openMenu()) {
+					return false;
+				}
+
+				Misc.useMenu(0x0D36);
+
 				break;
-			}
+			case 3:
+				if (me.act >= 3) {
+					break;
+				}
 
-			Town.move("warriv");
+				Town.move("palace");
 
-			npc = getUnit(1, "warriv");
+				npc = getUnit(1, "jerhyn");
 
-			if (!npc || !npc.openMenu()) {
-				return false;
-			}
+				if (!npc || !npc.openMenu()) {
+					Pather.moveTo(5166, 5206);
 
-			Misc.useMenu(0x0D36);
+					return false;
+				}
 
-			break;
-		case 3:
-			if (me.act >= 3) {
+				me.cancel();
+				Town.move("meshif");
+
+				npc = getUnit(1, "meshif");
+
+				if (!npc || !npc.openMenu()) {
+					return false;
+				}
+
+				Misc.useMenu(0x0D38);
+
 				break;
-			}
+			case 4:
+				if (me.act >= 4) {
+					break;
+				}
 
-			Town.move("palace");
+				if (me.inTown) {
+					Town.move("cain");
 
-			npc = getUnit(1, "jerhyn");
+					npc = getUnit(1, "deckard cain");
 
-			if (!npc || !npc.openMenu()) {
-				return false;
-			}
+					if (!npc || !npc.openMenu()) {
+						return false;
+					}
 
-			me.cancel();
-			Town.move("meshif");
+					me.cancel();
+					Pather.usePortal(102, leaderName);
+				}
 
-			npc = getUnit(1, "meshif");
+				Pather.moveTo(17591, 8070);
+				Pather.usePortal(null);
 
-			if (!npc || !npc.openMenu()) {
-				return false;
-			}
-
-			Misc.useMenu(0x0D38);
-
-			break;
-		case 4:
-			if (me.act >= 4) {
 				break;
-			}
+			case 5:
+				if (me.act >= 5) {
+					break;
+				}
 
-			if (me.inTown) {
-				Town.move("cain");
+				Town.move("tyrael");
 
-				npc = getUnit(1, "deckard cain");
+				npc = getUnit(1, "tyrael");
 
 				if (!npc || !npc.openMenu()) {
 					return false;
 				}
 
 				me.cancel();
-				Pather.usePortal(102, null);
-			}
-
-			Pather.usePortal(null);
-			break;
-		case 5:
-			if (me.act >= 5) {
+				Pather.usePortal(null);
 				break;
 			}
 
-			Town.move("tyrael");
+			delay(1000 + me.ping * 2);
 
-			npc = getUnit(1, "tyrael");
+			while (!me.area) {
+				delay(500);
+			}
 
-			if (!npc || !npc.openMenu()) {
+			if (me.area === preArea) {
+				me.cancel();
+				Town.move("portalspot");
+				say("Act change failed.");
+
 				return false;
 			}
 
-			me.cancel();
-			Pather.usePortal(null);
-			break;
-		}
+			if (AutoRush.Target.length && me.diff === AutoRush.Target[0] && me.act === AutoRush.Target[1]) {
+				AutoRush.finishRush();
+				D2Bot.restart();
 
-		delay(2000 + me.ping);
+				return true;
+			}
 
-		while (!me.area) {
-			delay(500);
-		}
-
-		if (me.area === preArea) {
-			me.cancel();
-			Town.move("portalspot");
-			say("Act change failed.");
-
+			say("Act change done.");
+		} catch (e) {
 			return false;
 		}
 
-		Town.move("portalspot");
-		say("Act change done.");
-
 		return true;
 	};
+
 
 	addEventListener("chatmsg",
 		function (who, msg) {

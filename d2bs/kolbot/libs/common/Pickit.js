@@ -73,12 +73,12 @@ var Pickit = {
 
 		Town.clearBelt();
 
-		while (!me.idle) {
-			delay(40);
-		}
-
 		if (me.dead) {
 			return false;
+		}
+
+		while (!me.idle) {
+			delay(40);
 		}
 
 		item = getUnit(4);
@@ -95,6 +95,10 @@ var Pickit = {
 		this.pickList.sort(this.sortItems);
 
 		while (this.pickList.length > 0) {
+			if (me.dead) {
+				return false;
+			}
+
 			gid = this.pickList[0].gid;
 
 			if (gid) {
@@ -129,7 +133,7 @@ var Pickit = {
 						} else {
 							print("ÿc7Not enough room for " + color + this.pickList[0].name);
 
-							if (!!AutoMule.getMule()) {
+							if (!!AutoMule.getMule() && AutoMule.getMuleItems().length > 0) {
 								scriptBroadcast("mule");
 								quit();
 							}

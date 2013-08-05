@@ -93,11 +93,12 @@ function pickItems() {
 
 	if (items) {
 		for (i = 0; i < items.length; i += 1) {
-			if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1) { // drop trash (id/tp scroll primarily)
+			if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1  // drop trash (id/tp scroll primarily)
+					&& (muleMode !== 1 || items[i].classid !== 530)) { // don't drop ID scroll with torch mules
 				try {
 					items[i].drop();
 				} catch (dropError) {
-					print("Failed to drop an item. Not like it matters.");
+					print("Failed to drop an item.");
 				}
 			}
 		}
@@ -175,6 +176,13 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 3: // request game
+		break;
+	case 4:
+		// Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
+		}
+
 		break;
 	// automule specific
 	case 10: // mule request
@@ -348,6 +356,7 @@ include("common/pather.js");
 include("common/misc.js");
 include("common/config.js");
 include("common/prototypes.js");
+include("common/collmap.js");
 
 addEventListener("copydata", ReceiveCopyData);
 
@@ -663,6 +672,13 @@ MainSwitch:
 	case 15: // new character (selected)
 	case 29: // new character (list)
 	case 42: // empty char screen
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
 		// Can't create character, button greyed out = high likelyhood of realm down
 		if (getLocation() === 42 && getControl(6, 33, 528, 168, 60).disabled === 4) {
 			D2Bot.updateStatus("Realm Down");

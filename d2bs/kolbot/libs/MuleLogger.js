@@ -60,8 +60,8 @@ var MuleLogger = {
 
 	inGameCheck: function () {
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("ÿc4MuleLoggerÿc0: Logging items.");
-			D2Bot.printToConsole("MuleLogger: Logging items.", 7);
+			print("ÿc4MuleLoggerÿc0: Logging items on " + me.name + ".");
+			D2Bot.printToConsole("MuleLogger: Logging items on " + me.name + ".", 7);
 			this.logChar();
 
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
@@ -84,7 +84,7 @@ var MuleLogger = {
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "");
 
-		desc = this.getItemDesc(unit);
+		desc = this.getItemDesc(unit) + "$" + unit.gid;
 		color = unit.getColor();
 
 		// experimental
@@ -245,8 +245,6 @@ var MuleLogger = {
 			header = (me.account || "Single Player") + " / " + me.name;
 		}
 
-		//return (name + "$" + desc + "$" + code + "$" + header + "$" + gid);
-
 		return {
 			itemColor: color,
 			image: code,
@@ -262,7 +260,7 @@ var MuleLogger = {
 			delay(500);
 		}
 
-		var i, folder, string,
+		var i, folder, string, parsedItem,
 			items = me.getItems(),
 			realm = me.realm || "Single Player",
 			finalString = "";
@@ -285,12 +283,12 @@ var MuleLogger = {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (items[i].mode === 0) {
-				string = JSON.stringify(this.logItem(items[i]));
+				parsedItem = this.logItem(items[i]);
+				string = JSON.stringify(parsedItem);
 				finalString += (string + "\n");
 
 				if (this.SaveScreenShot) {
-					D2Bot.saveItem(string);
-					delay(500);
+					D2Bot.saveItem(parsedItem);
 				}
 			}
 		}

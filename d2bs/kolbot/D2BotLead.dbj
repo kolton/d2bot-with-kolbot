@@ -12,9 +12,9 @@ var StarterConfig = {
 	AnnounceGames: false, // Default value
 	AfterGameMessage: "", // Default message after a finished game. Can be an array of messages
 
-	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
-	CrashDelay: 10, // Seconds to wait after a d2 window crash
-	FTJDelay: 60, // Seconds to wait after failing to create a game
+	SwitchKeyDelay: 5, // Seconds to wait before switching a used/banned key or after realm down
+	CrashDelay: 5, // Seconds to wait after a d2 window crash
+	FTJDelay: 10, // Seconds to wait after failing to create a game
 	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use.
@@ -58,7 +58,6 @@ var ChannelConfig = {
 
 	// Add your lines here
 
-
 };
 
 
@@ -75,7 +74,7 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone, quit,
+var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone, quit, useChat,
 	firstLogin, connectFail, torchTrigger, torchMuleTrigger, pingQuit,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
@@ -87,6 +86,14 @@ var gameInfo, gameStart, ingame, muleTrigger, handle, chatActionsDone, quit,
 		afterMsg: "",
 		announce: false
 	};
+
+function sayMsg(string) {
+	if (!useChat) {
+		return;
+	}
+
+	say(string);
+}
 
 function ReceiveCopyData(mode, msg) {
 	//print(mode + " " + msg);
@@ -107,6 +114,10 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 3: // Game request
+		if (muleTrigger || torchMuleTrigger) {
+			break;
+		}
+
 		if (gameInfo) {
 			obj = JSON.parse(msg);
 
@@ -115,6 +126,13 @@ function ReceiveCopyData(mode, msg) {
 			} else {
 				D2Bot.joinMe(obj.profile, gameInfo.gameName.toLowerCase(), gameCount, gameInfo.gamePass.toLowerCase(), isUp);
 			}
+		}
+
+		break;
+	case 4:
+		// Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
 		}
 
 		break;
@@ -327,9 +345,7 @@ MainSwitch:
 
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -421,9 +437,7 @@ MainSwitch:
 
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -467,7 +481,7 @@ MainSwitch:
 				}
 
 				for (i = 0; i < chanInfo.afterMsg.length; i += 1) {
-					say(chanInfo.afterMsg[i]);
+					sayMsg(chanInfo.afterMsg[i]);
 					delay(500);
 				}
 			}
@@ -512,11 +526,17 @@ MainSwitch:
 
 				for (i = 0; i < chanInfo.joinChannel.length; i += 1) {
 					ControlAction.timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
-					say("/j " + chanInfo.joinChannel[i]);
-					delay(2000);
+
+					if (ControlAction.joinChannel(chanInfo.joinChannel[i])) {
+						useChat = true;
+					} else {
+						print("ÿc1Unable to join channel, disabling chat messages.");
+
+						useChat = false;
+					}
 
 					if (chanInfo.firstMsg[i] !== "") {
-						say(chanInfo.firstMsg[i]);
+						sayMsg(chanInfo.firstMsg[i]);
 						delay(500);
 					}
 				}
@@ -531,7 +551,7 @@ MainSwitch:
 		}
 
 		if (chanInfo.announce) {
-			say("Next game is " + gameInfo.gameName + gameCount + (gameInfo.gamePass === "" ? "" : "//" + gameInfo.gamePass));
+			sayMsg("Next game is " + gameInfo.gameName + gameCount + (gameInfo.gamePass === "" ? "" : "//" + gameInfo.gamePass));
 		}
 
 		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
@@ -594,7 +614,15 @@ MainSwitch:
 		break;
 	case 8: // Main Menu
 	case 9: // Login
+	case 12: // Character Select
 	case 18: // D2 Splash
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
 		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
@@ -695,14 +723,6 @@ MainSwitch:
 		connectFail = true;
 
 		break;
-	case 12: // Character Select
-		try {
-			login(me.profile);
-		} catch (e2) {
-
-		}
-
-		break;
 	case 13: // Realm Down - Character Select screen
 		D2Bot.updateStatus("Realm Down");
 		delay(1000);
@@ -730,8 +750,6 @@ MainSwitch:
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
 
-		break;
-	case 15: // New Character
 		break;
 	case 16: // Character Select - Please Wait popup
 		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {

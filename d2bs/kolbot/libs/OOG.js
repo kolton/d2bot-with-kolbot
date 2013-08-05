@@ -17,6 +17,10 @@ var D2Bot = {
 		return this.handle;
 	},
 
+	sendMessage: function (handle, mode, msg) {
+		sendCopyData(null, handle, mode, msg);
+	},
+
 	printToConsole: function (msg, color, tooltip, trigger) {
 		var printObj = {
 				msg: msg,
@@ -24,6 +28,7 @@ var D2Bot = {
 				tooltip: tooltip || "",
 				trigger: trigger || ""
 			},
+
 			obj = {
 				profile: me.profile,
 				func: "printToConsole",
@@ -33,17 +38,8 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
-	printToItemLog: function (msg, desc, code, color1, color2, header) {
-		var itemObj = {
-				textColor: color1,
-				itemColor: color2,
-				image: code,
-				title: msg,
-				header: header || "",
-				description: desc,
-				sockets: [] // not yet implemented
-			},
-			obj = {
+	printToItemLog: function (itemObj) {
+		var obj = {
 				profile: me.profile,
 				func: "printToItemLog",
 				args: [JSON.stringify(itemObj)]
@@ -52,13 +48,12 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
-	// arg is a JSON string here, this might change in the future, but only mule logger uses this at the moment
-	saveItem: function (arg) {
+	saveItem: function (itemObj) {
 		var obj = {
-			profile: me.profile,
-			func: "saveItem",
-			args: [arg]
-		};
+				profile: me.profile,
+				func: "saveItem",
+				args: [JSON.stringify(itemObj)]
+			};
 
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
@@ -113,7 +108,7 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
-	restart: function (keySwap, profile) {
+	restart: function (keySwap) {
 		var obj = {
 			profile: me.profile,
 			func: "restartProfile",
@@ -206,6 +201,22 @@ var D2Bot = {
 
 		//print("ÿc1Heart beat " + this.handle);
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	sendWinMsg: function (wparam, lparam) {
+		var obj = {
+			profile: me.profile,
+			func: "winmsg",
+			args: [wparam, lparam]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	ingame: function () {
+		this.sendWinMsg(0x0086, 0x0000);
+		this.sendWinMsg(0x0006, 0x0002);
+		this.sendWinMsg(0x001c, 0x0000);
 	},
 
 	// Profile to profile communication
@@ -414,9 +425,60 @@ var ControlAction = {
 		return control.getText();
 	},
 
-	createGame: function (name, pass, diff, delay) {
+	joinChannel: function (channel) {
 		me.blockMouse = true;
 
+		var i, currChan, lines, fullText, tick,
+			rval = false,
+			timeout = 5000;
+
+MainLoop:
+		while (true) {
+			switch (getLocation()) {
+			case 1: // Lobby
+				this.click(6, 27, 480, 120, 20);
+
+				break;
+			case 3: // Chat
+				currChan = this.getText(4, 28, 138, 354, 60); // returns array
+
+				if (currChan) {
+					for (i = 0; i < currChan.length; i += 1) {
+						if (currChan[i].split(" (") && currChan[i].split(" (")[0].toLowerCase() === channel.toLowerCase()) {
+							rval = true;
+
+							break MainLoop;
+						}
+					}
+				}
+
+				if (!tick) {
+					this.click(6, 535, 490, 80, 20);
+
+					tick = getTickCount();
+				}
+
+				break;
+			case 7: // Channel
+				this.setText(1, 432, 162, 155, 20, channel);
+				this.click(6, 671, 433, 96, 32);
+
+				break;
+			}
+
+			if (getTickCount() - tick >= timeout) {
+				break MainLoop;
+			}
+
+			delay(1000);
+		}
+
+		me.blockMouse = false;
+
+		return rval;
+	},
+
+	createGame: function (name, pass, diff, delay) {
 		ControlAction.setText(1, 432, 162, 158, 20, name);
 		ControlAction.setText(1, 432, 217, 158, 20, pass);
 
@@ -438,6 +500,8 @@ var ControlAction = {
 		if (delay) {
 			this.timeoutDelay("Make Game Delay", delay);
 		}
+
+		me.blockMouse = true;
 
 		print("Creating Game: " + name);
 		ControlAction.click(6, 594, 433, 172, 32);

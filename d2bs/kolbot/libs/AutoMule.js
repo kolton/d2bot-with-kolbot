@@ -120,16 +120,20 @@ var AutoMule = {
 		mode = mode || 0;
 		mule = mode === 1 ? this.TorchMules : this.Mules;
 
+		// Iterate through mule object
 		for (i in mule) {
 			if (mule.hasOwnProperty(i)) {
+				// Mule profile matches config
 				if (mule[i].muleProfile && mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase()) {
 					file = mode === 0 ? "logs/AutoMule." + i + ".json" : "logs/TorchMule." + i + ".json";
 
+					// If file exists check for valid info
 					if (FileTools.exists(file)) {
 						try {
 							jsonStr = FileTools.readText(file);
 							jsonObj = JSON.parse(jsonStr);
 
+							// Return filename containing correct mule info
 							if (mule[i].accountPrefix && jsonObj.account && jsonObj.account.match(mule[i].accountPrefix)) {
 								return file;
 							}
@@ -143,7 +147,10 @@ var AutoMule = {
 			}
 		}
 
-		return false;
+		// File exists but doesn't contain valid info - remake
+		FileTools.remove(file);
+
+		return file;
 	},
 
 	outOfGameCheck: function (mode) {
@@ -360,56 +367,40 @@ MainLoop:
 	},
 
 	dropStuff: function () {
-		this.emptyStash();
-		this.emptyInventory();
+		if (!Town.openStash()) {
+			return false;
+		}
+
+		var i,
+			items = this.getMuleItems();
+
+		for (i = 0; i < items.length; i += 1) {
+			items[i].drop();
+		}
+
 		delay(1000);
 		me.cancel();
-	},
-
-	// empty the stash while ignoring cubing/runeword ingredients
-	emptyStash: function () {
-		if (!Town.openStash()) {
-			return false;
-		}
-
-		var i,
-			items = me.getItems();
-
-		if (items) {
-			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 7 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
-						[76, 77, 78].indexOf(items[i].itemType) === -1 && // don't drop potions
-						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(items[i].classid) === -1) &&
-						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
-					items[i].drop();
-				}
-			}
-		}
 
 		return true;
 	},
 
-	// empty the inventory while ignoring cubing/runeword ingredients
-	emptyInventory: function () {
-		if (!Town.openStash()) {
-			return false;
-		}
-
-		var i,
-			items = Storage.Inventory.Compare(Config.Inventory);
+	// get a list of items to mule
+	getMuleItems: function () {
+		var items = [],
+			item = me.getItem(-1, 0);
 
 		if (items) {
-			for (i = 0; i < items.length; i += 1) {
-				if (items[i].mode === 0 && items[i].location === 3 && Pickit.checkItem(items[i]).result > 0 && items[i].classid !== 549 &&
-						[76, 77, 78].indexOf(items[i].itemType) === -1 && // don't drop potions
-						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(items[i].classid) === -1) &&
-						!this.cubingIngredient(items[i]) && !this.runewordIngredient(items[i])) {
-					items[i].drop();
+			do {
+				if (Pickit.checkItem(item).result > 0 && item.classid !== 549 &&
+						[76, 77, 78].indexOf(item.itemType) === -1 && // don't drop potions
+						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) &&
+						!this.cubingIngredient(item) && !this.runewordIngredient(item)) {
+					items.push(copyUnit(item));
 				}
-			}
+			} while (item.getNext());
 		}
 
-		return true;
+		return items;
 	},
 
 	// check if an item is a cubing ingredient

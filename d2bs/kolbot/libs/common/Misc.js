@@ -211,11 +211,128 @@ MainLoop:
 	}
 };
 
+var Items = {
+	// Equips an item and throws away the old equipped item
+	equip: function (unit) {
+		if (unit.type !== 4) {
+			throw new Error("Items.equp: Unit must be an item");
+		}
+
+		if (!unit.getFlag(0x10)) { // Unid item
+			return false;
+		}
+
+		if (unit.getStat(92) > me.getStat(12)) { // Higher level req item
+			return false;
+		}
+
+		var i, bodyLoc;
+
+		switch (unit.itemType) {
+		case 2: // Shield
+		case 70: // Auric Shields
+			bodyLoc = [4, 5];
+
+			break;
+		case 3: // Armor
+			bodyLoc = 3;
+
+			break;
+		case 5: // Arrows
+		case 6: // Bolts
+			bodyLoc = [4, 5];
+
+			break;
+		case 10: // Ring
+			bodyLoc = [6, 7];
+
+			break;
+		case 12: // Amulet
+			bodyLoc = 2;
+
+			break;
+		case 15: // Boots
+			bodyLoc = 9;
+
+			break;
+		case 16: // Gloves
+			bodyLoc = 10;
+
+			break;
+		case 19: // Belt
+			bodyLoc = 8;
+
+			break;
+		case 37: // Helm
+		case 71: // Barb Helm
+		case 75: // Circlet
+			bodyLoc = 1;
+
+			break;
+		case 24: // 
+		case 25: // 
+		case 26: // 
+		case 27: // 
+		case 28: // 
+		case 29: // 
+		case 30: // 
+		case 31: // 
+		case 32: // 
+		case 33: // 
+		case 34: // 
+		case 35: // 
+		case 36: // 
+		case 42: // 
+		case 43: // 
+		case 44: // 
+		case 67: // Handtohand (Assasin Claw)
+		case 68: // 
+		case 69: // 
+		case 72: // 
+		case 85: // 
+		case 86: // 
+		case 87: // 
+		case 88: // 
+			bodyLoc = [4, 5];
+
+			break;
+		default:
+			throw new Error("Items.equip: Bad item type");
+		}
+
+		if (typeof bodyLoc === "object") {
+			// Temporary
+			bodyLoc = bodyLoc[0];
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			if (unit.toCursor()) {
+				clickItem(0, bodyLoc);
+				delay(me.ping * 2 + 500);
+
+				if (unit.bodylocation === bodyLoc) {
+					if (getCursorType() === 3) {
+						Misc.click(0, 0, me);
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+};
+
 var Misc = {
 	// Click something
 	click: function (button, shift, x, y) {
 		if (arguments.length < 2) {
 			throw new Error("Misc.click: Needs at least 2 arguments.");
+		}
+
+		while (!me.gameReady) {
+			delay(100);
 		}
 
 		switch (arguments.length) {
@@ -250,6 +367,10 @@ var Misc = {
 	inMyParty: function (name) {
 		if (me.name === name) {
 			return true;
+		}
+
+		while (!me.gameReady) {
+			delay(100);
 		}
 
 		var player, myPartyId;
@@ -301,9 +422,9 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
+			// Try to get an unobstructed position
+			if (Attack.getIntoPosition(unit, 2, 0x1 | 0x400)) {
 				Misc.click(0, 0, unit);
-				//unit.interact();
 			}
 
 			tick = getTickCount();
@@ -315,6 +436,10 @@ var Misc = {
 
 				delay(10);
 			}
+		}
+
+		if (!me.idle) {
+			Misc.click(0, 0, me); // Click to stop walking in case we got stuck
 		}
 
 		return false;
@@ -628,9 +753,76 @@ var Misc = {
 		return desc;
 	},
 
+	getItemSockets: function (unit) {
+		var i, code,
+			sockets = unit.getStat(194),
+			subItems = unit.getItems(),
+			tempArray = [];
+
+		if (subItems) {
+			switch (unit.sizex) {
+			case 2:
+				switch (unit.sizey) {
+				case 3: // 2 x 3
+					switch (sockets) {
+					case 4:
+						tempArray = [subItems[0], subItems[3], subItems[2], subItems[1]];
+
+						break;
+					case 5:
+						tempArray = [subItems[1], subItems[4], subItems[0], subItems[3], subItems[2]];
+
+						break;
+					case 6:
+						tempArray = [subItems[0], subItems[3], subItems[1], subItems[4], subItems[2], subItems[5]];
+
+						break;
+					}
+
+					break;
+				case 4: // 2 x 4
+					switch (sockets) {
+					case 5:
+						tempArray = [subItems[1], subItems[4], subItems[0], subItems[3], subItems[2]];
+
+						break;
+					case 6:
+						tempArray = [subItems[0], subItems[3], subItems[1], subItems[4], subItems[2], subItems[5]];
+
+						break;
+					}
+
+					break;
+				}
+
+				break;
+			}
+
+			if (!tempArray.length) {
+				tempArray = subItems.slice(0);
+			}
+		}
+
+		for (i = 0; i < sockets; i += 1) {
+			if (tempArray[i]) {
+				code = tempArray[i].code;
+
+				if ([10, 12, 58, 82, 83, 84].indexOf(tempArray[i].itemType) > -1) {
+					code += (tempArray[i].gfx + 1);
+				}
+			} else {
+				code = "gemsocket";
+			}
+
+			tempArray[i] = code;
+		}
+
+		return tempArray;
+	},
+
 	// Log kept item stats in the manager.
 	logItem: function (action, unit, keptLine) {
-		var i, lastArea, code, desc, sock,
+		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim();
 
@@ -805,7 +997,17 @@ var Misc = {
 			desc += ("\nÿc0Line: " + keptLine);
 		}
 
-		D2Bot.printToItemLog(action + " " + name, desc, code, unit.quality, color);
+		itemObj = {
+			title: action + " " + name,
+			description: desc,
+			image: code,
+			textColor: unit.quality,
+			itemColor: color,
+			header: "",
+			sockets: this.getItemSockets(unit)
+		};
+
+		D2Bot.printToItemLog(itemObj);
 
 		return true;
 	},
@@ -844,7 +1046,7 @@ var Misc = {
 
 			while (getTickCount() - tick < 2000) {
 				if (me.getState(state)) {
-					delay(200);
+					delay(250);
 
 					return true;
 				}
@@ -868,6 +1070,8 @@ var Misc = {
 
 				while (getTickCount() - tick < 2000) {
 					if (!me.getState(139) && !me.getState(140)) {
+						delay(250);
+
 						return true;
 					}
 
@@ -898,7 +1102,7 @@ var Misc = {
 
 		// Can't tp from uber trist or when dead
 		if (me.area === 136 || me.dead) {
-			return true;
+			return false;
 		}
 
 		if (Config.TownCheck && !me.inTown) {
@@ -955,9 +1159,12 @@ var Misc = {
 
 		if (check) {
 			scriptBroadcast("townCheck");
+			delay(500);
+
+			return true;
 		}
 
-		return true;
+		return false;
 	},
 
 	// Log someone's gear
@@ -991,7 +1198,7 @@ var Misc = {
 	},
 
 	// hopefully multi-thread and multi-profile friendly txt func
-	fileAction: function (path, mode, msg) {
+	/*fileAction: function (path, mode, msg) {
 		var i, file,
 			contents = "";
 
@@ -1017,6 +1224,37 @@ MainLoop:
 				if (file) {
 					file.close();
 				}
+			}
+
+			delay(100);
+		}
+
+		return mode === 0 ? contents : true;
+	},*/
+
+	fileAction: function (path, mode, msg) {
+		var i,
+			contents = "";
+
+MainLoop:
+		for (i = 0; i < 30; i += 1) {
+			try {
+				switch (mode) {
+				case 0: // read
+					contents = FileTools.readText(path);
+
+					break MainLoop;
+				case 1: // write
+					FileTools.writeText(path, msg);
+
+					break MainLoop;
+				case 2: // append
+					FileTools.appendText(path, msg);
+
+					break MainLoop;
+				}
+			} catch (e) {
+
 			}
 
 			delay(100);
@@ -1059,6 +1297,14 @@ MainLoop:
 			takeScreenshot();
 			delay(500);
 		}
+	},
+
+	debugLog: function (msg) {
+		if (!Config.Debug) {
+			return;
+		}
+
+		debugLog(me.profile + ": " + msg);
 	},
 
 	// Use a NPC menu. Experimental function, subject to change
@@ -1329,7 +1575,7 @@ var Packet = {
 		return false;
 	},
 
-	buyItem: function (unit, shiftBuy) {
+	buyItem: function (unit, shiftBuy, gamble) {
 		var i, tick, container,
 			itemCount = me.itemcount,
 			npc = getInteractedNPC();
@@ -1343,7 +1589,7 @@ var Packet = {
 		}
 
 		for (i = 0; i < 3; i += 1) {
-			sendPacket(1, 0x32, 4, npc.gid, 4, unit.gid, 4, shiftBuy ? 0x80000000 : 0, 4, 0);
+			sendPacket(1, 0x32, 4, npc.gid, 4, unit.gid, 4, shiftBuy ? 0x80000000 : gamble ? 0x2 : 0x0, 4, 0);
 
 			tick = getTickCount();
 

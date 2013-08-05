@@ -42,20 +42,6 @@ var ClassAttack = {
 				this.skillRange[i] = 5;
 
 				break;
-			case 232: // Feral Rage
-			case 233: // Maul
-			case 238: // Rabies
-			case 239: // Fire Claws
-			case 242: // Hunger
-			case 248: // Fury
-				this.skillRange[i] = 3;
-				this.skillHand[i] = 2;
-
-				break;
-			case 243: // Shock Wave
-				this.skillRange[i] = 8;
-
-				break;
 			default: // Every other skill
 				this.skillRange[i] = 20;
 
@@ -96,10 +82,6 @@ var ClassAttack = {
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (Config.Wereform) {
-				Misc.shapeShift(Config.Wereform);
-			}
-
 			switch (this.doCast(unit, index)) {
 			case 0: // total fail
 				return 1;

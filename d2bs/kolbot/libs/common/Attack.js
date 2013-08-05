@@ -10,11 +10,15 @@ var Attack = {
 
 	// Initialize attacks
 	init: function () {
-		if (include("common/Attacks/" + this.classes[me.classid] + ".js")) {
-			ClassAttack.init();
+		if (Config.Wereform) {
+			include("common/Attacks/wereform.js");
+		} else {
+			include("common/Attacks/" + this.classes[me.classid] + ".js");
 		}
 
-		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[me.classid === 4 ? 2 : 3] < 0) {
+		ClassAttack.init();
+
+		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
 			showConsole();
 			print("ÿc1Bad attack config. Don't expect your bot to attack.");
 		}
@@ -114,13 +118,13 @@ var Attack = {
 		return false;
 	},
 
-	// Kill a monster based on its classId
+	// Kill a monster based on its classId, can pass a unit as well
 	kill: function (classId) {
 		if (Config.AttackSkill[1] < 0) {
 			return false;
 		}
 
-		var i, target,
+		var i, target, gid,
 			attackCount = 0;
 
 		if (typeof classId === "object") {
@@ -137,27 +141,32 @@ var Attack = {
 			throw new Error("Attack.kill: Target not found");
 		}
 
+		gid = target.gid;
+
 		if (Config.MFLeader) {
 			Pather.makePortal();
 			say("kill " + classId);
 		}
 
 		while (attackCount < 300 && this.checkMonster(target) && this.skipCheck(target)) {
+			// Get the target again if the bot went to town and back
+			if (Misc.townCheck()) {
+				target = getUnit(1, -1, -1, gid);
+			}
+
+			if (copyUnit(target).x === undefined) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
+				break;
+			}
+
 			if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
 				this.deploy(target, Config.DodgeRange, 5, 9);
 			}
-
-			Misc.townCheck();
 
 			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
 				Precast.weaponSwitch(Math.abs(Config.MFSwitch));
 			}
 
 			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
-				break;
-			}
-
-			if (!copyUnit(target).x) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
 				break;
 			}
 
@@ -170,7 +179,7 @@ var Attack = {
 
 		ClassAttack.afterAttack();
 
-		if (!copyUnit(target).x) {
+		if (copyUnit(target).x === undefined) {
 			return true;
 		}
 
@@ -249,7 +258,7 @@ var Attack = {
 			gidAttack = [],
 			attackCount = 0;
 
-		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[me.classid === 4 ? 2 : 3] < 0) {
+		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
 			return false;
 		}
 
@@ -282,7 +291,8 @@ var Attack = {
 			do {
 				if ((!spectype || (target.spectype & spectype)) && this.checkMonster(target) && this.skipCheck(target)) {
 					// Speed optimization - don't go through monster list until there's at least one within clear range
-					if (!start && getDistance(target, orgx, orgy) <= range) {
+					if (!start && getDistance(target, orgx, orgy) <= range &&
+							(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
 						start = true;
 					}
 
@@ -310,7 +320,7 @@ var Attack = {
 
 			target = copyUnit(monsterList[0]);
 
-			if (target.x !== undefined && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target) && (me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+			if (target.x !== undefined && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target)) {
 				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
 					this.deploy(target, Config.DodgeRange, 5, 9);
 				}
@@ -514,7 +524,8 @@ var Attack = {
 
 			if (monster) {
 				do {
-					if (getDistance(monster, x, y) <= range && this.checkMonster(monster)) {
+					if (getDistance(monster, x, y) <= range && this.checkMonster(monster) &&
+							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54) || !checkCollision(me, monster, 0x1))) {
 						monList.push(copyUnit(monster));
 					}
 				} while (monster.getNext());
@@ -622,9 +633,20 @@ var Attack = {
 			return getDistance(me, unitA) - getDistance(me, unitB);
 		}
 
+		// Classic barb optimization
+		if (me.gametype === 0 && me.classid === 4) {
+			if (!Attack.checkResist(unitA, ClassAttack.skillElement[(unitA.spectype & 0x7) ? 1 : 3])) {
+				return 1;
+			}
+
+			if (!Attack.checkResist(unitB, ClassAttack.skillElement[(unitB.spectype & 0x7) ? 1 : 3])) {
+				return -1;
+			}
+		}
+
 		var ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
 
-		if (ids.indexOf(unitA.classid) > -1 && ids.indexOf(unitB.classid) > -1) {
+		if (me.area !== 61 && ids.indexOf(unitA.classid) > -1 && ids.indexOf(unitB.classid) > -1) {
 			// Kill "scary" uniques first (like Bishibosh)
 			if ((unitA.spectype & 0x04) && (unitB.spectype & 0x04)) {
 				return getDistance(me, unitA) - getDistance(me, unitB);

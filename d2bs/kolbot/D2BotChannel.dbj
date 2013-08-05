@@ -97,6 +97,13 @@ function ReceiveCopyData(mode, msg) {
 		}
 
 		break;
+	case 4:
+		// Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
+		}
+
+		break;
 	}
 }
 
@@ -393,8 +400,15 @@ MainLoop:
 				}
 			}
 
-			joinGame(joinInfo.gameName, joinInfo.gamePass);
+			me.blockmouse = true;
 
+			try {
+				joinGame(joinInfo.gameName, joinInfo.gamePass);
+			} catch (joinErr) {
+
+			}
+
+			me.blockmouse = false;
 			lastGameStatus = "pending";
 
 			locationTimeout(5000, location);
@@ -409,6 +423,13 @@ MainLoop:
 	case 9: // Login
 	case 12: // Character Select
 	case 18: // D2 Splash
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
 		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
@@ -532,8 +553,6 @@ MainLoop:
 		D2Bot.updateStatus("Disconnected");
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
-		break;
-	case 15: // New Character
 		break;
 	case 16: // Character Select - Please Wait popup
 		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {

@@ -5,7 +5,7 @@
 */
 
 function main() {
-	var i, mercHP, ironGolem, tick,
+	var i, mercHP, ironGolem, tick, merc,
 		pingTimer = [],
 		quitFlag = false,
 		timerLastDrink = [];
@@ -35,6 +35,11 @@ function main() {
 
 	// General functions
 	this.checkPing = function (print) {
+		// Quit after at least 5 seconds in game
+		if (getTickCount() - me.gamestarttime < 5000) {
+			return false;
+		}
+
 		var i;
 
 		for (i = 0; i < Config.PingQuit.length; i += 1) {
@@ -206,6 +211,8 @@ function main() {
 
 		if (gid) {
 			monster = getUnit(1, -1, -1, gid);
+		} else {
+			monster = false;
 		}
 
 		if (monster) {
@@ -359,9 +366,7 @@ function main() {
 
 				me.maxgametime = 0;
 
-				if (AnniSystem.checkProfile()) {
-					AnniSystem.cloneTrigger();
-				} else if (Config.KillDclone) {
+				if (Config.KillDclone) {
 					load("tools/clonekilla.js");
 				}
 			}
@@ -447,8 +452,9 @@ function main() {
 
 				if (Config.UseMerc) {
 					mercHP = getMercHP();
+					merc = me.getMerc();
 
-					if (mercHP > 0 && me.getMinionCount(7) > 0) {
+					if (mercHP > 0 && merc && merc.mode !== 12) {
 						if (mercHP < Config.MercChicken) {
 							D2Bot.printToConsole("Merc Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
@@ -469,6 +475,8 @@ function main() {
 
 				if (Config.ViperCheck && getTickCount() - tick >= 250) {
 					if (this.checkVipers()) {
+						D2Bot.printToConsole("Revived Tomb Vipers found. Leaving game.", 9);
+
 						quitFlag = true;
 					}
 
@@ -481,9 +489,8 @@ function main() {
 			}
 		} catch (e) {
 			Misc.errorReport(e, "ToolsThread");
-			quit();
 
-			return;
+			quitFlag = true;
 		}
 
 		if (quitFlag) {

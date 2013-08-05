@@ -2,6 +2,7 @@
 *	@filename	OrgTorch.js
 *	@author		kolton
 *	@desc		Convert keys to organs and organs to torches. It can work with TorchSystem to get keys from other characters
+*	@notes		Search for the word "Start" and follow the comments if you want to know what this script does and when.
 */
 
 function OrgTorch() {
@@ -42,7 +43,7 @@ function OrgTorch() {
 	};
 
 	// Check whether the killer is alone in the game
-	this.foreverAlone = function () {
+	this.aloneInGame = function () {
 		var party = getParty();
 
 		if (party) {
@@ -56,6 +57,7 @@ function OrgTorch() {
 		return true;
 	};
 
+	// Try to lure a monster - wait until it's close enough
 	this.lure = function (bossId) {
 		var tick,
 			unit = getUnit(1, bossId);
@@ -75,10 +77,20 @@ function OrgTorch() {
 		return false;
 	};
 
-	this.checkUneven = function () {
-		return Config.MakeTorch && me.getItem("mbr") && me.getItem("bey") && me.getItem("dhn");
+	// Check if we have complete sets of organs
+	this.completeSetCheck = function () {
+		var horns = me.findItems("dhn"),
+			brains = me.findItems("mbr"),
+			eyes = me.findItems("bey");
+
+		if (!horns || !brains || !eyes) {
+			return false;
+		}
+
+		return horns.length === brains.length && horns.length === eyes.length && brains.length === eyes.length;
 	};
 
+	// Get fade in River of Flames
 	this.getFade = function () {
 		if (Config.OrgTorch.GetFade && me.classid === 3) {
 			if (!me.getState(159)) {
@@ -102,7 +114,8 @@ function OrgTorch() {
 		return true;
 	};
 
-	this.openPortal = function (mode) { // 0 = orgs, 1 = torch
+	// Open a red portal. Mode 0 = mini ubers, mode 1 = Tristram
+	this.openPortal = function (mode) {
 		var portal,
 			item1 = mode === 0 ? me.findItem("pk1", 0) : me.findItem("dhn", 0),
 			item2 = mode === 0 ? me.findItem("pk2", 0) : me.findItem("bey", 0),
@@ -150,20 +163,21 @@ function OrgTorch() {
 		return false;
 	};
 
+	// Do mini ubers or Tristram based on area we're already in
 	this.pandemoniumRun = function () {
 		var i, findLoc, skillBackup;
 
 		switch (me.area) {
 		case 133: // Matron's Den
 			Precast.doPrecast(true);
-			Pather.moveToPreset(133, 2, 397);
+			Pather.moveToPreset(133, 2, 397, 3, 3);
 			Attack.kill(707);
-			Attack.clear(5);
+			//Attack.clear(5);
 			Pickit.pickItems();
 			Town.goToTown();
 
 			break;
-		case 134: // Faggotten Sands
+		case 134: // Forgotten Sands
 			Precast.doPrecast(true);
 
 			findLoc = [20196, 8694, 20308, 8588, 20187, 8639, 20100, 8550, 20103, 8688, 20144, 8709, 20263, 8811, 20247, 8665];
@@ -249,11 +263,16 @@ function OrgTorch() {
 	// Start
 	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer;
 
-	this.checkTorch(); // does town chores too
+	// Do town chores and quit if MakeTorch is true and we have a torch.
+	this.checkTorch();
 
+	// Wait for other bots to drop off their keys. This works only if TorchSystem.js is configured properly.
 	if (Config.OrgTorch.WaitForKeys) {
 		timer = getTickCount();
+
+		// Check if current character is the farmer
 		farmer = TorchSystem.isFarmer();
+
 		this.torchSystemEvent = function (mode, msg) {
 			var farmer = TorchSystem.isFarmer();
 
@@ -263,58 +282,70 @@ function OrgTorch() {
 			}
 		};
 
+		// Register event that will communicate with key hunters, go to Act 1 town and wait by stash
 		addEventListener('copydata', this.torchSystemEvent);
 		Town.goToTown(1);
 		Town.move("stash");
 
 		while (true) {
+			// Abort if the current character isn't a farmer
 			if (!farmer) {
 				break;
 			}
 
+			// Free up inventory
 			if (Town.needStash()) {
 				Town.stash();
 			}
 
-			tkeys = me.findItems("pk1", 0).length;
-			hkeys = me.findItems("pk2", 0).length;
-			dkeys = me.findItems("pk3", 0).length;
+			// Get the number keys
+			tkeys = me.findItems("pk1", 0).length || 0;
+			hkeys = me.findItems("pk2", 0).length || 0;
+			dkeys = me.findItems("pk3", 0).length || 0;
 
-			if (((tkeys >= 3 && hkeys >= 3 && dkeys >= 3) || (Config.OrgTorch.WaitTimeout && (getTickCount() - timer > Config.OrgTorch.WaitTimeout * 1000 * 60))) && this.foreverAlone()) {
+			// Stop the loop if we  have enough keys or if wait time expired
+			if (((tkeys >= 3 && hkeys >= 3 && dkeys >= 3) || (Config.OrgTorch.WaitTimeout && (getTickCount() - timer > Config.OrgTorch.WaitTimeout * 1000 * 60))) && this.aloneInGame()) {
 				removeEventListener('copydata', this.torchSystemEvent);
 
 				break;
 			}
 
-			while (!this.foreverAlone()) {
+			// Wait for other characters to leave
+			while (!this.aloneInGame()) {
 				delay(500);
 			}
 
 			delay(1000);
+
+			// Pick the keys after the hunters drop them and leave the game
 			Pickit.pickItems();
 		}
 	}
 
-	tkeys = me.findItems("pk1", 0).length;
-	hkeys = me.findItems("pk2", 0).length;
-	dkeys = me.findItems("pk3", 0).length;
-	brains = me.findItems("mbr", 0).length;
-	eyes = me.findItems("bey", 0).length;
-	horns = me.findItems("dhn", 0).length;
+	// Count keys and organs
+	tkeys = me.findItems("pk1", 0).length || 0;
+	hkeys = me.findItems("pk2", 0).length || 0;
+	dkeys = me.findItems("pk3", 0).length || 0;
+	brains = me.findItems("mbr", 0).length || 0;
+	eyes = me.findItems("bey", 0).length || 0;
+	horns = me.findItems("dhn", 0).length || 0;
 
+	// End the script if we don't have enough keys nor organs
 	if ((tkeys < 3 || hkeys < 3 || dkeys < 3) && (brains < 1 || eyes < 1 || horns < 1)) {
 		print("Not enough keys or organs.");
 
 		return true;
 	}
 
+	// We have enough keys, do mini ubers
 	if (tkeys >= 3 && hkeys >= 3 && dkeys >= 3) {
 		this.getFade();
-
 		print("Making organs.");
 
 		for (i = 0; i < 3; i += 1) {
-			if (this.checkUneven()) {
+			// Abort if we have a complete set of organs
+			// If Config.OrgTorch.MakeTorch is false, check after at least one portal is made
+			if ((Config.OrgTorch.MakeTorch || i > 0) && this.completeSetCheck()) {
 				break;
 			}
 
@@ -333,13 +364,14 @@ function OrgTorch() {
 		return true;
 	}
 
-	brains = me.findItems("mbr", 0).length;
-	eyes = me.findItems("bey", 0).length;
-	horns = me.findItems("dhn", 0).length;
+	// Count organs
+	brains = me.findItems("mbr", 0).length || 0;
+	eyes = me.findItems("bey", 0).length || 0;
+	horns = me.findItems("dhn", 0).length || 0;
 
+	// We have enough organs, do Tristram
 	if (brains && eyes && horns) {
 		this.getFade();
-
 		print("Making torch");
 
 		portal = this.openPortal(1);

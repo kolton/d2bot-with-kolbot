@@ -58,6 +58,13 @@ function ReceiveCopyData(mode, msg) {
 		gameInfo = JSON.parse(msg);
 
 		break;
+	case 4:
+		// Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
+		}
+
+		break;
 	}
 }
 
@@ -343,6 +350,13 @@ MainSwitch:
 
 		break;
 	case 12: // Character Select
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
 		if (!charList.length) {
 			ControlAction.click(6, 33, 572, 128, 35);
 
@@ -516,8 +530,9 @@ MainSwitch:
 
 		break;
 	case 42: // Empty character screen
-		// Game glitches and doesn't show connecting for 2-3 seconds.
-		if (!locationTimeout(3000, location)) {
+		if (!locationTimeout(5000, location)) {
+			nextAcc = true; // Go to next account
+
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
