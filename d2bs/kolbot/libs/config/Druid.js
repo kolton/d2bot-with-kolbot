@@ -250,8 +250,8 @@ function LoadConfig() {
 	Config.MinColumn[2] = 0;
 	Config.MinColumn[3] = 0;
 
-	// Pickit config
-	Config.PickitFiles.push("kolton.nip"); // Pickit filenames in /pickit/ folder
+	// Pickit config. Default folder is kolbot/pickit.
+	Config.PickitFiles.push("kolton.nip");
 	Config.PickitFiles.push("LLD.nip");
 	Config.PickRange = 40; // Pick radius
 	Config.FastPick = false; // Check and pick items between attacks
@@ -266,17 +266,20 @@ function LoadConfig() {
 	Config.Gamble = false;
 	Config.GambleGoldStart = 1000000;
 	Config.GambleGoldStop = 500000;
-	
+
 	// Check libs/NTItemAlias.dbl file for other item classids
 	Config.GambleItems.push(520); // Amulet
 	Config.GambleItems.push(522); // Ring
 	Config.GambleItems.push(418); // Circlet
 	Config.GambleItems.push(419); // Coronet
-	
-	// Cubing config. All recipes are available in Templates/Cubing.txt
+
+	/* Cubing config. All recipe names are available in Templates/Cubing.txt
+	 * The format is Config.Recipes.push([recipe_name, item_id, etherealness]). Etherealness is optional and only applies to some recipes.
+	 */
 	Config.Cubing = false; // Set to true to enable cubing.
 
-	// All ingredients will be auto-picked, for classids check libs/NTItemAlias.dbl
+	// Ingredients for the following recipes will be auto-picked, for classids check libs/NTItemAlias.dbl
+
 	//Config.Recipes.push([Recipe.Gem, 560]); // perfect amethyst
 	//Config.Recipes.push([Recipe.Gem, 565]); // perfect topaz
 	//Config.Recipes.push([Recipe.Gem, 570]); // perfect sapphire
@@ -287,31 +290,37 @@ function LoadConfig() {
 
 	//Config.Recipes.push([Recipe.Token]); // token of absolution
 	
-	Config.Recipes.push([Recipe.Rune, 630]); // pul -> um
-	Config.Recipes.push([Recipe.Rune, 631]); // um -> mal
-	Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
-	Config.Recipes.push([Recipe.Rune, 633]); // ist -> gul
-	Config.Recipes.push([Recipe.Rune, 634]); // gul -> vex
+	//Config.Recipes.push([Recipe.Rune, 630]); // pul -> um
+	//Config.Recipes.push([Recipe.Rune, 631]); // um -> mal
+	//Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
+	//Config.Recipes.push([Recipe.Rune, 633]); // ist -> gul
+	//Config.Recipes.push([Recipe.Rune, 634]); // gul -> vex
 
-	Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
-	Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
-	Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
-	Config.Recipes.push([Recipe.HitPower.Gloves, 452]); // Craft Hit Power Vambraces
+	//Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
+	//Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
+	//Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
+	//Config.Recipes.push([Recipe.HitPower.Gloves, 452]); // Craft Hit Power Vambraces
 
-	Config.Recipes.push([Recipe.Reroll.Magic, 421]); // Reroll magic Diadem
-	Config.Recipes.push([Recipe.Reroll.Rare, 421]); // Reroll rare Diadem
+	// The gems not used by other recipes will be used for magic item rerolling.
 
-	// Base item must be in the pickit, rest is auto-picked
-	Config.Recipes.push([Recipe.Socket.Weapon, 255]); // Socket Thresher
-	Config.Recipes.push([Recipe.Socket.Weapon, 256]); // Socket Cryptic Axe
-	Config.Recipes.push([Recipe.Socket.Armor, 442]); // Socket Sacred Armor
-	Config.Recipes.push([Recipe.Socket.Armor, 443]); // Socket Archon Plate
+	//Config.Recipes.push([Recipe.Reroll.Magic, 421]); // Reroll magic Diadem
+	//Config.Recipes.push([Recipe.Reroll.Magic, 605]); // Reroll magic Grand Charm (ilvl 91+)
 
-	Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 335]); // Upgrade Bloodfist to Exceptional
-	Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 337]); // Upgrade Magefist to Exceptional
-	Config.Recipes.push([Recipe.Unique.Armor.ToElite, 381]); // Upgrade Bloodfist or Grave Palm to Elite
-	Config.Recipes.push([Recipe.Unique.Armor.ToElite, 383]); // Upgrade Magefist or Lavagout to Elite
-	Config.Recipes.push([Recipe.Unique.Armor.ToElite, 389]); // Upgrade Gore Rider to Elite
+	//Config.Recipes.push([Recipe.Reroll.Rare, 421]); // Reroll rare Diadem
+
+	/* Base item for the following recipes must be in pickit. The rest of the ingredients will be auto-picked.
+	 * Use Roll.Eth, Roll.NonEth or Roll.All to determine what kind of base item to roll - ethereal, non-ethereal or all.
+	 */
+	//Config.Recipes.push([Recipe.Socket.Weapon, 255, Roll.Eth]); // Socket ethereal Thresher
+	//Config.Recipes.push([Recipe.Socket.Weapon, 256, Roll.Eth]); // Socket ethereal Cryptic Axe
+	//Config.Recipes.push([Recipe.Socket.Armor, 442, Roll.Eth]); // Socket ethereal Sacred Armor
+	//Config.Recipes.push([Recipe.Socket.Armor, 443, Roll.Eth]); // Socket ethereal Archon Plate
+
+	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 335, Roll.NonEth]); // Upgrade Bloodfist to Exceptional
+	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 337, Roll.NonEth]); // Upgrade Magefist to Exceptional
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 381, Roll.NonEth]); // Upgrade Bloodfist or Grave Palm to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 383, Roll.NonEth]); // Upgrade Magefist or Lavagout to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 389, Roll.NonEth]); // Upgrade Gore Rider to Elite
 
 	/* Runeword config. All recipes are available in Templates/Runewords.txt
 	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
@@ -319,15 +328,15 @@ function LoadConfig() {
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
 
-	Config.Runewords.push([Runeword.Insight, 255]); // Thresher
-	Config.Runewords.push([Runeword.Insight, 256]); // Cryptic Axe
+	//Config.Runewords.push([Runeword.Insight, 255]); // Thresher
+	//Config.Runewords.push([Runeword.Insight, 256]); // Cryptic Axe
 
-	Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
+	//Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
 
-	Config.Runewords.push([Runeword.Spirit, 447]); // Monarch
-	Config.Runewords.push([Runeword.Spirit, 498]); // Sacred Targe
+	//Config.Runewords.push([Runeword.Spirit, 447]); // Monarch
+	//Config.Runewords.push([Runeword.Spirit, 498]); // Sacred Targe
 
-	Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
+	//Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
 	// General config
 	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable. If Config.Leader is set, the bot will only accept invites from leader.
@@ -362,7 +371,7 @@ function LoadConfig() {
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
 	Config.TownOnHostile = false; // Go to town instead of quitting when HostileAction is 0 or 1
-	Config.RandomPrecast = true; // Anti-PK measure, only supported in Baal and BaalHelper and BaalAssisstant at the moment.
+	Config.RandomPrecast = false; // Anti-PK measure, only supported in Baal and BaalHelper and BaalAssisstant at the moment.
 	Config.ViperCheck = false; // Quit if revived Tomb Vipers are sighted
 
 	// DClone config
@@ -399,6 +408,8 @@ function LoadConfig() {
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
 	Config.TeleStomp = false; // Use merc to attack bosses if they're immune to attacks, but not to physical damage
+
+	// Wereform setup. Make sure you read Templates/Attacks.txt for attack skill format.
 	Config.Wereform = false; // 0 / false - don't shapeshift, 1 / "Werewolf" - change to werewolf, 2 / "Werebear" - change to werebear
 
 	// Class specific config

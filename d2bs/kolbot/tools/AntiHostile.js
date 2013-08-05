@@ -128,7 +128,7 @@ function main() {
 
 	// Find a missile type
 	this.findMissile = function (owner, id, range) {
-		if (typeof range === "undefined") {
+		if (range === undefined) {
 			range = 999;
 		}
 
@@ -173,7 +173,7 @@ function main() {
 
 	// Load flash thread
 	if (Config.HostileAction > 1) {
-		//load("tools/FlashThread.js");
+		load("tools/FlashThread.js");
 	}
 
 	// Attack sequence adjustments - this only affects the AntiHostile thread
@@ -235,29 +235,29 @@ function main() {
 	// Main Loop
 	while (true) {
 		if (me.gameReady) {
-			// Scan for hostiles or quit
+			// Scan for hostiles
 			if (findTrigger) {
 				this.findHostiles();
 
-				if (Config.HostileAction === 0 || (Config.HostileAction === 1 && me.inTown)) {
-					if (Config.TownOnHostile) {
-						this.pause();
-						Town.goToTown();
+				findTrigger = false;
+			}
 
-						while (hostiles.length > 0) {
-							delay(500);
-						}
+			if (hostiles.length > 0 && (Config.HostileAction === 0 || (Config.HostileAction === 1 && me.inTown))) {
+				if (Config.TownOnHostile) {
+					this.pause();
+					Town.goToTown();
 
-						Pather.usePortal(null, me.name);
-						this.resume();
-					} else {
-						quit();
+					while (hostiles.length > 0) {
+						delay(500);
 					}
 
-					return;
+					Pather.usePortal(null, me.name);
+					this.resume();
+				} else {
+					quit();
 				}
 
-				findTrigger = false;
+				return;
 			}
 
 			// Mode 3 - Spam entrance (still experimental)

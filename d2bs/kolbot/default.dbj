@@ -25,6 +25,9 @@ include("common/Town.js");
 var gidList = []; // fast pickit
 
 function main() {
+	D2Bot.init(); // Get D2Bot# handle
+	D2Bot.ingame();
+
 	if (!getScript("tools/heartbeat.js")) {
 		load("tools/heartbeat.js");
 	}
@@ -42,8 +45,6 @@ function main() {
 	while (!me.gameReady || copyUnit(me).classid === undefined) {
 		delay(50);
 	}
-
-	//debugLog("start game - " + me.name);
 
 	// don't load default for mules
 	if (AutoMule.getMuleObject(0) || AutoMule.getMuleObject(1)) {
@@ -74,7 +75,6 @@ function main() {
 	};
 
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
-	D2Bot.init();
 	Config.init(true);
 	Pickit.init(true);
 	Attack.init();
@@ -94,7 +94,8 @@ function main() {
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
 
-	if (stats.name === me.name && me.getStat(13) < stats.experience && !Scripts.CSFiller) { // check for experience decrease -> log death
+	// Check for experience decrease -> log death. Skip report if life chicken is disabled.
+	if (stats.name === me.name && me.getStat(13) < stats.experience && Config.LifeChicken > 0) {
 		D2Bot.printToConsole("You died in last game", 9);
 		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)), 9);
 		DataFile.updateStats("deaths");
@@ -187,7 +188,6 @@ function main() {
 		}
 	}
 
-	//debugLog("end game");
 	scriptBroadcast("quit");
 	delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
 

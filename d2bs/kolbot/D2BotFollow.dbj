@@ -3,10 +3,10 @@ var StarterConfig = {
 	FirstJoinMessage: "", // Message to say when first joining a channel, usually ".login"
 	ChatActionsDelay: 2, // Seconds to wait in lobby before entering a channel
 
-	JoinRetryDelay: 15, // Time in seconds to wait before next join attempt
-	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
+	JoinRetryDelay: 5, // Time in seconds to wait before next join attempt
+	SwitchKeyDelay: 5, // Seconds to wait before switching a used/banned key or after realm down
 
-	CrashDelay: 0, // Seconds to wait after a d2 window crash
+	CrashDelay: 5, // Seconds to wait after a d2 window crash
 	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
@@ -56,13 +56,12 @@ include("automule.js");
 include("torchsystem.js");
 include("common/misc.js");
 
-var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone,
+var i, j, gameInfo, joinInfo, gameStart, ingame, handle, chatActionsDone, lastGameTick,
 	connectFail, torchTrigger, muleTrigger, torchMuleTrigger, firstLogin,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
 	leader = "",
 	lastGame = [],
-	cachedInfo = {gameName: "", password: ""},
 	loginFail = 0;
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
@@ -72,7 +71,7 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 function locationTimeout(time, location) {
 	var endtime = getTickCount() + time;
 
-	while (getLocation() === location && endtime > getTickCount()) {
+	while (!me.ingame && getLocation() === location && endtime > getTickCount()) {
 		delay(500);
 	}
 
@@ -142,10 +141,21 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 3: // Game request
+		if (muleTrigger || torchMuleTrigger) {
+			break;
+		}
+
 		if (joinInfo) {
 			obj = JSON.parse(msg);
 
 			D2Bot.joinMe(msg, joinInfo.gameName, gameCount, joinInfo.gamePass, joinInfo.inGame);
+		}
+
+		break;
+	case 4:
+		// Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
 		}
 
 		break;
@@ -216,7 +226,7 @@ function main() {
 			delay(1000);
 		}
 
-		locationAction(getLocation());
+		locationAction();
 		delay(1000);
 	}
 }
@@ -226,7 +236,7 @@ function joinCheck(leader) {
 	delay(500);
 
 	//print(leader + " " + joinInfo.inGame + " " + lastGame.toSource() + " " + joinInfo.gameName);
-	
+
 	if (!joinInfo.inGame || (lastGame.length && lastGame.indexOf(joinInfo.gameName) === -1)) {
 		D2Bot.printToConsole("Game is finished. Stopping join delay.");
 
@@ -236,8 +246,14 @@ function joinCheck(leader) {
 	return false;
 }
 
-function locationAction(location) {
-	var i, string, text;
+function locationAction() {
+	if (me.ingame) {
+		return;
+	}
+
+	var i, string, text, location;
+
+	location = getLocation();
 
 MainSwitch:
 	switch (location) {
@@ -261,9 +277,7 @@ MainSwitch:
 		if (ingame) {
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -285,6 +299,7 @@ MainSwitch:
 			print("updating runs");
 			D2Bot.updateRuns();
 
+			lastGameTick = getTickCount();
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
@@ -317,9 +332,7 @@ MainSwitch:
 		if (ingame) {
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -341,6 +354,7 @@ MainSwitch:
 			print("updating runs");
 			D2Bot.updateRuns();
 
+			lastGameTick = getTickCount();
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
@@ -404,14 +418,8 @@ JoinLoop2:
 				delay(100);
 
 				if (joinInfo && joinInfo.gameName !== "" && (lastGame.indexOf(joinInfo.gameName) === -1 || lastGameStatus === "pending")) {
-					// Shave off a few milliseconds
-					if (cachedInfo.gameName !== joinInfo.gameName || cachedInfo.password !== joinInfo.gamePass) {
-						ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
-						ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
-
-						cachedInfo.gameName = joinInfo.gameName;
-						cachedInfo.password = joinInfo.gamePass;
-					}
+					ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
+					ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
 
 					if (lastGameStatus === "pending" || (gameInfo.error === "@error" && DataFile.getStats().gameName === joinInfo.gameName)) {
 						if (gameInfo.error === "@error") {
@@ -434,6 +442,11 @@ JoinLoop2:
 						break;
 					}
 
+					// Don't join immediately after previous game to avoid FTJ
+					if (getTickCount() - lastGameTick < 5000) {
+						ControlAction.timeoutDelay("Game Delay", (lastGameTick - getTickCount() + 5000));
+					}
+
 					print("joining game " + joinInfo.gameName);
 
 					if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
@@ -442,6 +455,7 @@ JoinLoop2:
 
 					me.blockMouse = true;
 
+					DataFile.updateStats("gameName", joinInfo.gameName);
 					ControlAction.click(6, 594, 433, 172, 32);
 
 					me.blockMouse = false;
@@ -454,8 +468,7 @@ JoinLoop2:
 
 					lastGameStatus = "pending";
 
-					DataFile.updateStats("gameName", joinInfo.gameName);
-					locationTimeout(5000, location);
+					locationTimeout(15000, location);
 
 					break JoinLoop2;
 				}
@@ -471,6 +484,13 @@ JoinLoop2:
 	case 9: // Login
 	case 12: // Character Select
 	case 18: // D2 Splash
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
 		if (firstLogin && getLocation() === 9) { // multiple realm botting fix in case of R/D or disconnect
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
@@ -598,8 +618,6 @@ JoinLoop2:
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
 
-		break;
-	case 15: // New Character
 		break;
 	case 16: // Character Select - Please Wait popup
 		if (!locationTimeout(StarterConfig.PleaseWaitTimeout * 1e3, location)) {

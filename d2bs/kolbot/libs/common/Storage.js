@@ -49,6 +49,36 @@ var Container = function (name, width, height, location) {
 		return true;
 	};
 
+	/* Container.isLocked(item)
+	 *	Checks if the item is in a locked spot
+	 */
+	this.IsLocked = function (item, baseRef) {
+		var h, w, reference;
+
+		reference = baseRef.slice(0, baseRef.length);
+
+		//Make sure it is in this container.
+		if (item.mode !== 0 || item.location !== this.location) {
+			return false;
+		}
+
+		//Insure valid reference.
+		if (typeof (reference) !== "object" || reference.length !== this.buffer.length || reference[0].length !== this.buffer[0].length) {
+			return false;
+		}
+
+		// Check if the item lies in a locked spot.
+		for (h = item.y; h < (item.y + item.sizey); h += 1) {
+			for (w = item.x; w < (item.x + item.sizex); w += 1) {
+				if (reference[h][w] === 0) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	};
+
 	this.Reset = function () {
 		var h, w;
 

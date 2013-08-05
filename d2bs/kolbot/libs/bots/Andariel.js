@@ -13,6 +13,11 @@ function Andariel() {
 			throw new Error("Andariel not found.");
 		}
 
+		if (Config.MFLeader) {
+			Pather.makePortal();
+			say("kill " + 156);
+		}
+
 		for (i = 0; i < 300; i += 1) {
 			if (!me.getState(121)) {
 				Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], target);

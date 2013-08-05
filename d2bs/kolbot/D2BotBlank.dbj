@@ -4,7 +4,7 @@ function main() {
 	include("OOG.js");
 	include("common/misc.js");
 
-	var handle, c,
+	var handle,
 		isUp = "no";
 
 	this.copyDataEvent = function (mode, msg) {
@@ -24,40 +24,19 @@ function main() {
 			if (me.gameReady) {
 				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
 			}
-		}
-	};
 
-	this.keyDownEvent = function (key) {
-		if (key === 45) {
-			c = true;
-		}
-	};
-
-	this.test = function () {
-		if (me.ingame) {
-			return;
-		}
-
-		var n, i, j, c;
-		
-		for (n = 1; n <= 12; n += 1) {
-			for (i = 0; i < 801; i += 1) {
-				for (j = 0; j < 601; j += 1) {
-					c = getControl(n, i, j);
-
-					if (c) {
-						if (c.text.toLowerCase() === "ok") {
-							print(c.type, c.x, c.y, c.xsize, c.ysize);
-						}
-					}
-				}
+			break;
+		case 4:
+			// Heartbeat ping
+			if (msg === "pingreq") {
+				sendCopyData(null, me.windowtitle, 4, "pingrep");
 			}
-		}
 
-		print("done");
+			break;
+		}
 	};
 
-	addEventListener("keydown", this.keyDownEvent);
+
 	addEventListener('copydata', this.copyDataEvent);
 
 	while (!handle) {
@@ -74,12 +53,6 @@ function main() {
 	}
 
 	while (true) {
-		if (c) {
-			this.test();
-
-			c = false;
-		}
-
 		if (me.ingame) {
 			isUp = "yes";
 		} else {

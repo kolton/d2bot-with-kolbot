@@ -55,15 +55,15 @@ function ShopBot() {
 		var i, j;
 
 		for (i = 0; i < 3; i += 1) {
-			if (getDistance(me, npc) > 5) {
-				Pather.moveToUnit(npc);
+			if (getDistance(me.x, me.y, npc.x, npc.y) > 5) {
+				Pather.walkTo(npc.x, npc.y);
 			}
 
 			//npc.interact();
 			sendPacket(1, 0x13, 4, 1, 4, npc.gid);
 
-			for (j = 0; j < 40; j += 1) {
-				if (j % 8 === 0) {
+			for (j = 0; j < 20; j += 1) {
+				if (j % 4 === 0) {
 					me.cancel();
 					delay(300);
 					//npc.interact();
@@ -74,20 +74,25 @@ function ShopBot() {
 					return true;
 				}
 
-				delay(25);
+				delay(50);
 			}
 		}
+
+		D2Bot.printToConsole("Failed to open NPC menu");
 
 		return false;
 	};
 
-	this.shopItems = function () {
+	this.shopItems = function (npc) {
 		var i, item,
-			items = [],
-			npc = getInteractedNPC();
+			items = [];
 
 		if (!npc) {
 			return false;
+		}
+
+		while (me.ping > 700) {
+			delay(100);
 		}
 
 		for (i = 0; i < 10; i += 1) {
@@ -113,27 +118,28 @@ function ShopBot() {
 		me.overhead(npc.itemcount + " items");
 
 		do {
-			if (Config.ShopBot.ScanIDs.indexOf(item.classid) > -1) {
+			if (Config.ShopBot.ScanIDs.length === 0 || Config.ShopBot.ScanIDs.indexOf(item.classid) > -1) {
 				items.push(copyUnit(item));
 			}
 		} while (item.getNext());
 
 		validItems += items.length;
-		frequency.text = "Valid item frequency: " + ((validItems * 100 / totalCycles).toFixed(2).toString());
+		frequency.text = "Valid item frequency: " + ((validItems * 100 / totalCycles).toFixed(2).toString()) + " %";
 
 		for (i = 0; i < items.length; i += 1) {
-			print("Scanning " + items[i].name);
+			//print("Scanning " + items[i].name);
 
-			if (Pickit.checkItem(items[i]).result === 1) {
+			if (Storage.Inventory.CanFit(items[i]) &&
+					Pickit.canPick(items[i]) &&
+					me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0) &&
+					Pickit.checkItem(items[i]).result === 1
+					) {
 				D2Bot.printToConsole("Match found!", 7);
+				delay(1000);
 
-				if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
-					delay(1000);
-
-					if (npc.startTrade(menuId)) {
-						Misc.logItem("Shopped", items[i]);
-						items[i].buy();
-					}
+				if (npc.startTrade(menuId)) {
+					Misc.logItem("Shopped", items[i]);
+					items[i].buy();
 				}
 			}
 		}
@@ -160,7 +166,7 @@ function ShopBot() {
 
 		for (i = 0; i < 80; i += 1) {
 			if (i % 20 === 0) {
-				if (getDistance(me, unit.x, unit.y) > 5) {
+				if (getDistance(me.x, me.y, unit.x, unit.y) > 5) {
 					Pather.walkTo(unit.x, unit.y);
 				}
 
@@ -178,38 +184,14 @@ function ShopBot() {
 			}
 		}
 
+		print("Failed to use WP");
+
 		return false;
 	};
 
 	Town.doChores();
 
 	switch (Config.ShopBot.ShopNPC.toLowerCase()) {
-	case "ormus":
-		wpArea = 101;
-		town = 75;
-		path = [5147, 5089, 5156, 5075, 5157, 5063, 5160, 5050];
-		menuId = "Shop";
-
-		if (!Town.goToTown(3) || !Town.move(NPC.Ormus)) {
-			throw new Error("Failed to get to NPC");
-		}
-
-		npc = getUnit(1, NPC.Ormus);
-
-		break;
-	case "anya":
-		wpArea = 129;
-		town = 109;
-		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5068];
-		menuId = "Shop";
-
-		if (!Town.goToTown(5) || !Town.move(NPC.Anya)) {
-			throw new Error("Failed to get to NPC");
-		}
-
-		npc = getUnit(1, NPC.Anya);
-
-		break;
 	case "fara":
 		wpArea = 48;
 		town = 40;
@@ -236,6 +218,58 @@ function ShopBot() {
 		npc = getUnit(1, NPC.Elzix);
 
 		break;
+	case "drognan":
+		wpArea = 48;
+		town = 40;
+		path = [5093, 5049, 5088, 5060, 5093, 5079, 5078, 5087, 5070, 5085];
+		menuId = "Shop";
+
+		if (!Town.goToTown(2) || !Town.move(NPC.Drognan)) {
+			throw new Error("Failed to get to NPC");
+		}
+
+		npc = getUnit(1, NPC.Drognan);
+
+		break;
+	case "ormus":
+		wpArea = 101;
+		town = 75;
+		path = [5147, 5089, 5156, 5075, 5157, 5063, 5160, 5050];
+		menuId = "Shop";
+
+		if (!Town.goToTown(3) || !Town.move(NPC.Ormus)) {
+			throw new Error("Failed to get to NPC");
+		}
+
+		npc = getUnit(1, NPC.Ormus);
+
+		break;
+	case "anya":
+		wpArea = 129;
+		town = 109;
+		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5068];
+		menuId = "Shop";
+
+		if (!Town.goToTown(5) || !Town.move(NPC.Anya)) {
+			throw new Error("Failed to get to NPC");
+		}
+
+		npc = getUnit(1, NPC.Anya);
+
+		break;
+	case "malah":
+		wpArea = 113;
+		town = 109;
+		path = [5077, 5032, 5089, 5025, 5100, 5021, 5106, 5051, 5116, 5071];
+		menuId = "Shop";
+
+		if (!Town.goToTown(5) || !Town.move(NPC.Malah)) {
+			throw new Error("Failed to get to NPC");
+		}
+
+		npc = getUnit(1, NPC.Malah);
+
+		break;
 	default:
 		throw new Error("Invalid shopbot NPC.");
 	}
@@ -256,20 +290,28 @@ function ShopBot() {
 		if (getTickCount() - tickCount >= 60 * 1000) {
 			cyclesText.text = "Cycles in last minute: " + cycles.toString();
 			totalCyclesText.text = "Total cycles: " + totalCycles.toString();
-			tickCount = getTickCount();
 			cycles = 0;
+			tickCount = getTickCount();
 		}
 
 		if (me.area === town) {
+			if (copyUnit(npc).x === undefined) {
+				throw new Error("NPC unit reference lost");
+			}
+
 			if (this.openMenu(npc)) {
-				this.shopItems();
+				this.shopItems(npc);
 			}
 
 			me.cancel();
 		}
 
 		if (me.area === town) {
-			this.useWp(wpArea);
+			if (totalCycles === 0) {
+				Pather.useWaypoint(wpArea, true);
+			} else {
+				this.useWp(wpArea);
+			}
 		}
 
 		if (me.area === wpArea) {

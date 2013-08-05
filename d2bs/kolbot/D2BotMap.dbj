@@ -16,7 +16,18 @@ function main() {
 
 		switch (mode) {
 		case 3: // request game
-			D2Bot.joinMe(msg, me.gamename || "", "", me.gamepassword || "", isUp);
+			var obj = JSON.parse(msg);
+
+			if (me.gameReady) {
+				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
+			}
+
+			break;
+		case 4:
+			// Heartbeat ping
+			if (msg === "pingreq") {
+				sendCopyData(null, me.windowtitle, 4, "pingrep");
+			}
 
 			break;
 		}

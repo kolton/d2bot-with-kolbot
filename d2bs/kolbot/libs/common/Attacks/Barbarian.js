@@ -52,7 +52,7 @@ var ClassAttack = {
 
 				break;
 			case 132: // Leap
-				this.skillRange[i] = 10; // TODO: Calculation
+				this.skillRange[i] = 10;
 
 				break;
 			default: // Every other skill
@@ -84,35 +84,9 @@ var ClassAttack = {
 
 		var index;
 
-		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 2;
+		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
-		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (Config.Wereform) {
-				Misc.shapeShift(Config.Wereform);
-			}
-
-			switch (this.doCast(unit, index)) {
-			case 0: // total fail
-				return 1;
-			case false: // fail to cast
-				return 2;
-			}
-
-			return 3;
-		}
-
-		if (Config.AttackSkill[3] > -1 && Attack.checkResist(unit, this.skillElement[3])) {
-			switch (this.doCast(unit, 3)) {
-			case 0: // total fail
-				return 1;
-			case false: // fail to cast
-				return 2;
-			}
-
-			return 3;
-		}
-
-		return 1;
+		return this.doCast(unit, index);
 	},
 
 	afterAttack: function (pickit) {
@@ -132,39 +106,48 @@ var ClassAttack = {
 			index = Config.AttackSkill.length - 1;
 		}
 
+		// Check Immunities
+		if (!Attack.checkResist(unit, this.skillElement[index])) {
+			if (Config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, this.skillElement[index + 1])) {
+				index = index + 1;
+			} else {
+				return 1;
+			}
+		}
+
 		if (Config.AttackSkill[index] === 151) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
 				Pather.moveToUnit(unit, 0, 0, false, true);
 
 				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x1)) {
-					return 0;
+					return 1;
 				}
 			}
 
-			if (!this.whirlwind(unit, index)) {
-				if (Config.AttackSkill[4] > 0) {
-					index = 4;
+			if (!this.whirlwind(unit)) {
+				if (Config.AttackSkill[index + 1] > 0) {
+					index = index + 1;
 				} else {
-					return false;
+					return 2;
 				}
 			} else {
-				return true;
+				return 3;
 			}
 		}
 
 		if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-			walk = (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+			walk = (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
 
 			// walk short distances instead of tele for melee attacks
 			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, walk)) {
-				return 0;
+				return 1;
 			}
 		}
 
-		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit);
+		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit) ? 3 : 2;
 	},
 
-	whirlwind: function (unit, index) {
+	whirlwind: function (unit) {
 		if (!Attack.checkMonster(unit)) {
 			return true;
 		}
@@ -183,7 +166,7 @@ var ClassAttack = {
 			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 4 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 4 + unit.y)];
 
 			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1, 0)) {
-				return Skill.cast(Config.AttackSkill[index], this.skillHand[index], coords[0], coords[1]);
+				return Skill.cast(151, 0, coords[0], coords[1]);
 			}
 		}
 
@@ -191,7 +174,7 @@ var ClassAttack = {
 			return false;
 		}
 
-		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], me.x, me.y);
+		return Skill.cast(151, 0, me.x, me.y);
 	},
 
 	checkCloseMonsters: function (range) {
@@ -202,7 +185,7 @@ var ClassAttack = {
 		if (monster) {
 			do {
 				if (getDistance(me, monster) <= range && Attack.checkMonster(monster) && !checkCollision(me, monster, 0x4) &&
-						(Attack.checkResist(monster, this.skillElement[(monster.spectype & 0x7) ? 1 : 2]) ||
+						(Attack.checkResist(monster, this.skillElement[(monster.spectype & 0x7) ? 1 : 3]) ||
 						(Config.AttackSkill[3] > -1 && Attack.checkResist(monster, this.skillElement[3])))) {
 					return true;
 				}

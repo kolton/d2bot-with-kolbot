@@ -94,6 +94,7 @@ var Town = {
 		Cubing.doCubing();
 		Runewords.makeRunewords();
 		this.stash(true);
+		this.clearScrolls();
 
 		for (i = 0; i < cancelFlags.length; i += 1) {
 			if (getUIFlag(cancelFlags[i])) {
@@ -202,8 +203,13 @@ var Town = {
 			}
 		}
 
+		// No columns to fill
 		if (i === 4) {
 			return true;
+		}
+
+		if (me.diff === 0 && Pather.accessToAct(4)) {
+			Town.goToTown(4);
 		}
 
 		npc = this.initNPC("Shop");
@@ -329,7 +335,7 @@ var Town = {
 			return false;
 		}
 
-		delay(500); // this was at the top
+		delay(500);
 
 		if (!me.findItem("tbk", 0, 3)) {
 			tome = npc.getItem("tbk");
@@ -772,7 +778,7 @@ CursorLoop:
 						return false;
 					}
 
-					items[i].buy();
+					items[i].buy(false, true);
 
 					newItem = this.getGambledItem(list);
 
@@ -1181,22 +1187,44 @@ MainLoop:
 	},
 
 	getCorpse: function () {
-		var i, corpse;
+		var corpse, gid,
+			corpseList = [],
+			timer = getTickCount();
 
-		for (i = 0; i < 3; i += 1) {
-			corpse = getUnit(0, me.name, 17);
+		corpse = getUnit(0, me.name, 17);
 
-			if (corpse && getDistance(me.x, me.y, corpse.x, corpse.y) <= 20) {
-				while (copyUnit(corpse).x) {
-					if (me.dead) {
-						return false;
-					}
+		if (!corpse) {
+			return true;
+		}
 
-					Pather.moveToUnit(corpse, rand(-2, 2), rand(-2, 2));
-					Misc.click(0, 0, corpse);
-					//corpse.interact();
-					delay(500);
-				}
+		do {
+			if (getDistance(me.x, me.y, corpse.x, corpse.y) <= 20) {
+				corpseList.push(copyUnit(corpse));
+			}
+		} while (corpse.getNext());
+
+		while (corpseList.length > 0) {
+			if (me.dead) {
+				return false;
+			}
+
+			gid = corpseList[0].gid;
+
+			Pather.moveToUnit(corpseList[0]);
+			Misc.click(0, 0, corpseList[0]);
+			delay(500);
+
+			if (getTickCount() - timer > 3000) {
+				Pather.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4);
+			}
+
+			if (getTickCount() - timer > 30000) {
+				D2Bot.printToConsole("Failed to get corpse, stopping.", 9);
+				D2Bot.stop();
+			}
+
+			if (!getUnit(0, -1, -1, gid)) {
+				corpseList.shift();
 			}
 		}
 
@@ -1290,6 +1318,19 @@ MainLoop:
 			while (clearList.length > 0) {
 				clearList.shift().interact();
 				delay(200);
+			}
+		}
+
+		return true;
+	},
+
+	clearScrolls: function () {
+		var i,
+			items = me.getItems();
+
+		for (i = 0; !!items && i < items.length; i += 1) {
+			if (items[i].location === 3 && items[i].mode === 0 && items[i].itemType === 22) {
+				items[i].drop();
 			}
 		}
 
@@ -1567,7 +1608,8 @@ MainLoop:
 			return true;
 		}
 
-		var preArea = me.area;
+		var preArea = me.area,
+			preAct = me.act;
 
 		try { // not an essential function -> handle thrown errors
 			this.goToTown();
@@ -1576,6 +1618,11 @@ MainLoop:
 		}
 
 		this.doChores();
+
+		if (me.act !== preAct) {
+			this.goToTown(preAct);
+		}
+
 		this.move("portalspot");
 
 		if (!Pather.usePortal(preArea, me.name)) { // this part is essential

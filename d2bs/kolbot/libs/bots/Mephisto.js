@@ -113,7 +113,7 @@ function Mephisto() {
 	};
 
 	this.killCouncil = function () {
-		var i, mob,
+		var i,
 			coords = [17600, 8125, 17600, 8015, 17643, 8068];
 
 		for (i = 0; i < coords.length; i += 2) {
@@ -160,7 +160,7 @@ function Mephisto() {
 		Pather.moveTo(17515, 8061);
 		Attack.openChests(5);
 	}
-	
+
 	if (Config.Mephisto.TakeRedPortal) {
 		Pather.moveTo(17590, 8068);
 		delay(1500);

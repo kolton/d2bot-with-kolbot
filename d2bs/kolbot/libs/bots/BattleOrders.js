@@ -33,7 +33,7 @@ function BattleOrders() {
 	Town.doChores();
 
 	try {
-		Pather.useWaypoint(35); // catacombs
+		Pather.useWaypoint(35, true); // catacombs
 	} catch (wperror) {
 		showConsole();
 		print("ÿc1Failed to take waypoint.");

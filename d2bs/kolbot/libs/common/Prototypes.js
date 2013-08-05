@@ -4,6 +4,29 @@
 *	@desc		various 'Unit' and 'me' prototypes
 */
 
+// Shuffle Array
+// http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
+Array.prototype.shuffle = function () {
+	var temp, index,
+		counter = this.length;
+
+	// While there are elements in the array
+	while (counter > 0) {
+		// Pick a random index
+		index = Math.floor(Math.random() * counter);
+
+		// Decrease counter by 1
+		counter -= 1;
+
+		// And swap the last element with it
+		temp = this[counter];
+		this[counter] = this[index];
+		this[index] = temp;
+	}
+
+	return this;
+};
+
 // Trim String
 String.prototype.trim = function () {
 	return this.replace(/^\s+|\s+$/g, "");
@@ -154,9 +177,9 @@ Unit.prototype.startTrade = function (mode) {
 	return false;
 };
 
-Unit.prototype.buy = function (shiftBuy) {
+Unit.prototype.buy = function (shiftBuy, gamble) {
 	if (Config.PacketShopping) {
-		return Packet.buyItem(this, shiftBuy);
+		return Packet.buyItem(this, shiftBuy, gamble);
 	}
 
 	if (this.type !== 4) { // Check if it's an item we want to buy
@@ -398,34 +421,66 @@ me.findItems = function (id, mode, loc) {
 };
 
 Unit.prototype.getPrefix = function (id) {
-	if (typeof this.prefixnums !== "object") {
-		return this.prefixnum === id;
-	}
+	var i;
 
-	var i,
-		prefixList = this.prefixnums;
-
-	for (i = 0; i < prefixList.length; i += 1) {
-		if (id === prefixList[i]) {
-			return true;
+	switch (typeof id) {
+	case "number":
+		if (typeof this.prefixnums !== "object") {
+			return this.prefixnum === id;
 		}
+
+		for (i = 0; i < this.prefixnums.length; i += 1) {
+			if (id === this.prefixnums[i]) {
+				return true;
+			}
+		}
+
+		break;
+	case "string":
+		if (typeof this.prefixes !== "object") {
+			return this.prefix.replace(/\s+/g, "").toLowerCase() === id.replace(/\s+/g, "").toLowerCase();
+		}
+
+		for (i = 0; i < this.prefixes.length; i += 1) {
+			if (id.replace(/\s+/g, "").toLowerCase() === this.prefixes[i].replace(/\s+/g, "").toLowerCase()) {
+				return true;
+			}
+		}
+
+		break;
 	}
 
 	return false;
 };
 
 Unit.prototype.getSuffix = function (id) {
-	if (typeof this.suffixnums !== "object") {
-		return this.suffixnum === id;
-	}
+	var i;
 
-	var i,
-		suffixList = this.suffixnums;
-
-	for (i = 0; i < suffixList.length; i += 1) {
-		if (id === suffixList[i]) {
-			return true;
+	switch (typeof id) {
+	case "number":
+		if (typeof this.suffixnums !== "object") {
+			return this.suffixnum === id;
 		}
+
+		for (i = 0; i < this.suffixnums.length; i += 1) {
+			if (id === this.suffixnums[i]) {
+				return true;
+			}
+		}
+
+		break;
+	case "string":
+		if (typeof this.suffixes !== "object") {
+			return this.suffix.replace(/\s+/g, "").toLowerCase() === id.replace(/\s+/g, "").toLowerCase();
+		}
+
+		for (i = 0; i < this.suffixes.length; i += 1) {
+			if (id.replace(/\s+/g, "").toLowerCase() === this.suffixes[i].replace(/\s+/g, "").toLowerCase()) {
+				return true;
+			}
+		}
+
+		break;
 	}
 
 	return false;
@@ -519,6 +574,27 @@ Unit.prototype.getStatEx = function (id, subid) {
 			for (i = 0; i < temp.length; i += 1) {
 				if (this.getStat(188, temp[i])) {
 					return this.getStat(188, temp[i]);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 198: // itemskillonhit
+	case 204: // itemchargedskill
+		if (subid === undefined) {
+			temp = this.getStat(-2);
+
+			if (temp.hasOwnProperty(id)) {
+				if (temp[id] instanceof Array) {
+					for (i = 0; i < temp[id].length; i += 1) {
+						if (temp[id][i] !== undefined) {
+							return temp[id][i].skill;
+						}
+					}
+				} else {
+					return temp[id].skill;
 				}
 			}
 
