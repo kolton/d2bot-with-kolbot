@@ -161,7 +161,7 @@ var Cubing = {
 		this.recipes = [];
 
 		for (i = 0; i < Config.Recipes.length; i += 1) {
-			if (typeof Config.Recipes[i] !== "object" || (Config.Recipes[i].length > 2 && typeof Config.Recipes[i][2] !== "boolean") || Config.Recipes[i].length < 1) {
+			if (typeof Config.Recipes[i] !== "object" || (Config.Recipes[i].length > 2 && typeof Config.Recipes[i][2] !== "number") || Config.Recipes[i].length < 1) {
 				throw new Error("Cubing.buildRecipes: Invalid recipe format.");
 			}
 
