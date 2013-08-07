@@ -252,8 +252,6 @@ var Attack = {
 			throw new Error("Attack.clear: range must be a number.");
 		}
 
-		this.dodgeList = undefined;
-
 		var i, boss, orgx, orgy, target, result, monsterList, start,
 			gidAttack = [],
 			attackCount = 0;
@@ -556,12 +554,14 @@ var Attack = {
 	},
 
 	// Draw lines around a room on minimap
-	/*markRoom: function (room, color) {
-		new Line(room.x * 5, room.y * 5, room.x * 5, room.y * 5 + room.ysize, color, true);
-		new Line(room.x * 5, room.y * 5, room.x * 5 + room.xsize, room.y * 5, color, true);
-		new Line(room.x * 5 + room.xsize, room.y * 5, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
-		new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true);
-	},*/
+	markRoom: function (room, color) {
+		var arr = [];
+
+		arr.push(new Line(room.x * 5, room.y * 5, room.x * 5, room.y * 5 + room.ysize, color, true));
+		arr.push(new Line(room.x * 5, room.y * 5, room.x * 5 + room.xsize, room.y * 5, color, true));
+		arr.push(new Line(room.x * 5 + room.xsize, room.y * 5, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true));
+		arr.push(new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true));
+	},
 
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
@@ -738,10 +738,6 @@ var Attack = {
 		var monster,
 			monList = [];
 
-		if (this.dodgeList !== undefined && getDistance(me, this.dodgeList.x, this.dodgeList.y) <= 30) {
-			return true;
-		}
-
 		monster = getUnit(1);
 
 		if (monster) {
@@ -752,15 +748,7 @@ var Attack = {
 			} while (monster.getNext());
 		}
 
-		//print("Built dodge list with " + monList.length + " monsters.");
-
-		this.dodgeList = {
-			monsters: monList,
-			x: me.x,
-			y: me.y
-		};
-
-		return true;
+		return monList;
 	},
 
 	deploy: function (unit, distance, spread, range) {
@@ -769,6 +757,7 @@ var Attack = {
 		}
 
 		var i, grid, index, currCount,
+			tick = getTickCount(),
 			monList = [],
 			count = 999,
 			idealPos = {
@@ -776,16 +765,19 @@ var Attack = {
 				y: Math.round(Math.sin(Math.atan2(me.y - unit.y, me.x - unit.x)) * Config.DodgeRange + unit.y)
 			};
 
-		this.buildDodgeList();
+		monList = this.buildDodgeList();
 
-		monList = this.dodgeList.monsters;
 		monList.sort(Sort.units);
 
 		if (this.getMonsterCount(me.x, me.y, range, monList) === 0) {
 			return true;
 		}
 
+		CollMap.getNearbyRooms(unit.x, unit.y);
+
 		grid = this.buildGrid(unit.x - distance, unit.x + distance, unit.y - distance, unit.y + distance, spread);
+
+		//print("Grid build time: " + (getTickCount() - tick));
 
 		if (!grid.length) {
 			return false;
@@ -798,7 +790,7 @@ var Attack = {
 		grid.sort(sortGrid);
 
 		for (i = 0; i < grid.length; i += 1) {
-			if (!(CollMap.getColl(grid[i].x, grid[i].y) & 0x1) && !CollMap.checkColl(unit, {x: grid[i].x, y: grid[i].y}, 0x4)) {
+			if (!(CollMap.getColl(grid[i].x, grid[i].y, true) & 0x1) && !CollMap.checkColl(unit, {x: grid[i].x, y: grid[i].y}, 0x4)) {
 				currCount = this.getMonsterCount(grid[i].x, grid[i].y, range, monList);
 
 				if (currCount < count) {
@@ -815,6 +807,8 @@ var Attack = {
 		//print("Safest spot with " + count + " monsters.");
 
 		if (typeof index === "number") {
+			//print("Dodge build time: " + (getTickCount() - tick));
+
 			return Pather.moveTo(grid[index].x, grid[index].y, 3);
 		}
 
@@ -844,7 +838,7 @@ var Attack = {
 
 		for (i = xmin; i <= xmax; i += spread) {
 			for (j = ymin; j <= ymax; j += spread) {
-				coll = CollMap.getColl(i, j);
+				coll = CollMap.getColl(i, j, true);
 
 				if (typeof coll === "number") {
 					grid.push({x: i, y: j, coll: coll});
@@ -1188,6 +1182,8 @@ AuraLoop: // Skip monsters with auras
 
 		t = getTickCount();
 
+		CollMap.getNearbyRooms(unit.x, unit.y);
+
 		for (n = 0; n < 3; n += 1) {
 			if (n > 0) {
 				distance = Math.floor(distance / 2);
@@ -1197,7 +1193,7 @@ AuraLoop: // Skip monsters with auras
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				if (Pather.checkSpot(cx, cy)) {
+				if (Pather.checkSpot(cx, cy, true)) {
 					coords.push({x: cx, y: cy});
 				}
 			}
@@ -1208,7 +1204,7 @@ AuraLoop: // Skip monsters with auras
 				coords.sort(Sort.units);
 
 				for (i = 0; i < coords.length; i += 1) {
-					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll)) {
+					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll, 2)) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						return walk ? Pather.walkTo(coords[i].x, coords[i].y, 2) : Pather.moveTo(coords[i].x, coords[i].y, 0);

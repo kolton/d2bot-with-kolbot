@@ -47,7 +47,7 @@ function main() {
 	}
 
 	// don't load default for mules
-	if (AutoMule.getMuleObject(0) || AutoMule.getMuleObject(1)) {
+	if (getScript("D2BotMule.dbj")) {
 		return true;
 	}
 

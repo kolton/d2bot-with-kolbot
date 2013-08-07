@@ -95,18 +95,17 @@ var AutoMule = {
 	},
 
 	// Get the object for the given Mule profile
-	getMuleObject: function (mode) {
-		var i, j, mule;
+	getMuleObject: function (mode, master) {
+		var i, mule;
 
 		mode = mode || 0;
 		mule = mode === 1 ? this.TorchMules : this.Mules;
 
 		for (i in mule) {
 			if (mule.hasOwnProperty(i)) {
-				for (j in mule[i]) {
-					if (mule[i].hasOwnProperty(j) && j === "muleProfile" && mule[i][j].toLowerCase() === me.profile.toLowerCase()) {
-						return mule[i];
-					}
+				if (mule[i].muleProfile && mule[i].enabledProfiles &&
+						mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase() && mule[i].enabledProfiles.indexOf(master) > -1) {
+					return mule[i];
 				}
 			}
 		}
@@ -389,9 +388,10 @@ MainLoop:
 		var items = [],
 			item = me.getItem(-1, 0);
 
-		if (items) {
+		if (item) {
 			do {
 				if (Pickit.checkItem(item).result > 0 && item.classid !== 549 &&
+						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) &&
 						[76, 77, 78].indexOf(item.itemType) === -1 && // don't drop potions
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) &&
 						!this.cubingIngredient(item) && !this.runewordIngredient(item)) {

@@ -820,7 +820,7 @@ MainLoop:
 
 						Skill.cast(43, 0, portal);
 					} else {
-						if (getDistance(me, portal) > (i > 1) ? 3 : 6) {
+						if (getDistance(me, portal) > (i > 3) ? 3 : 6) {
 							this.moveToUnit(portal);
 						}
 
@@ -852,9 +852,7 @@ MainLoop:
 					}
 
 					if (me.area !== preArea) {
-						if (me.inTown) {
-							Misc.click(0, 0, me.x, me.y);
-						}
+						delay(200);
 
 						return true;
 					}
@@ -947,12 +945,12 @@ MainLoop:
 		return result;
 	},
 
-	checkSpot: function (x, y) {
+	checkSpot: function (x, y, cacheOnly) {
 		var dx, dy, value;
 
 		for (dx = -1; dx <= 1; dx += 1) {
 			for (dy = -1; dy <= 1; dy += 1) {
-				value = CollMap.getColl(x + dx, y + dy);
+				value = CollMap.getColl(x + dx, y + dy, cacheOnly);
 
 				//if (value !== 0 && value !== 16) {
 				if (value & 0x1) {
