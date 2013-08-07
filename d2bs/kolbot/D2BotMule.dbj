@@ -381,7 +381,7 @@ function main() {
 
 	print("Master found: " + master);
 
-	muleObj = AutoMule.getMuleObject(muleMode);
+	muleObj = AutoMule.getMuleObject(muleMode, master);
 	muleFilename = AutoMule.getMuleFilename(muleMode);
 
 	var obj, statusTimeout;

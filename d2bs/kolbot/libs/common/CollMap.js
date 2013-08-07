@@ -8,9 +8,22 @@ var CollMap = new function () {
 	this.rooms = [];
 	this.maps = [];
 
+	this.getNearbyRooms = function (x, y) {
+		var i,
+			rooms = getRoom(x, y).getNearby();
+
+		for (i = 0; i < rooms.length; i += 1) {
+			if (this.getRoomIndex(rooms[i].x * 5, rooms[i].y * 5, true) === undefined) {
+				this.addRoom(rooms[i]);
+			}
+		}
+
+		return true;
+	};
+
 	this.addRoom = function (x, y) {
 		var room, coll;
-
+		
 		room = x instanceof Room ? x : getRoom(x, y);
 
 		if (room) {
@@ -27,9 +40,9 @@ var CollMap = new function () {
 		return false;
 	};
 
-	this.getColl = function (x, y) {
+	this.getColl = function (x, y, cacheOnly) {
 		var i, j,
-			index = this.getRoomIndex(x, y, true);
+			index = this.getRoomIndex(x, y, cacheOnly);
 
 		if (index === undefined) {
 			return 5;
@@ -45,7 +58,7 @@ var CollMap = new function () {
 		return 5;
 	};
 
-	this.getRoomIndex = function (x, y) {
+	this.getRoomIndex = function (x, y, cacheOnly) {
 		if (this.rooms.length > 25) {
 			this.reset();
 		}
@@ -58,7 +71,7 @@ var CollMap = new function () {
 			}
 		}
 
-		if (this.addRoom(x, y)) {
+		if (!cacheOnly && this.addRoom(x, y)) {
 			return i;
 		}
 

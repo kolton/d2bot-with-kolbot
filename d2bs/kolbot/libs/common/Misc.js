@@ -422,8 +422,7 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			// Try to get an unobstructed position
-			if (Attack.getIntoPosition(unit, 2, 0x1 | 0x400)) {
+			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
 				Misc.click(0, 0, unit);
 			}
 
@@ -798,7 +797,7 @@ var Misc = {
 				break;
 			}
 
-			if (!tempArray.length) {
+			if (tempArray.length === 0 && subItems.length > 0) {
 				tempArray = subItems.slice(0);
 			}
 		}

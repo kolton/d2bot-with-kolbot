@@ -103,7 +103,7 @@ var TorchSystem = {
 					// Search for one of each key and put them in drop array
 					for (j = 0; j < 3; j += 1) {
 						// Find a key (one type per cycle)
-						item = me.getItem(keyIds[i]);
+						item = me.getItem(keyIds[j]);
 
 						// Build an array of keys to drop
 						if (item) {
@@ -118,7 +118,7 @@ var TorchSystem = {
 
 					// Drop a keyset
 					for (j = 0; j < 3; j += 1) {
-						dropArray[i].drop();
+						dropArray[j].drop();
 					}
 				}
 
