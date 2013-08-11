@@ -529,37 +529,45 @@ IngredientLoop:
 				}
 
 				// if the recipe is enabled (we have the main item), add flawless gem recipes (if needed)
-				if (subRecipes.indexOf(561) === -1 && this.recipes[i].Ingredients[j] === 561) {
+
+				// Make perf amethyst
+				if (subRecipes.indexOf(561) === -1 && (this.recipes[i].Ingredients[j] === 561 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(561) > -1))) {
 					this.recipes.push({Ingredients: [560, 560, 560], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(561);
 				}
 
+				// Make perf topaz
 				if (subRecipes.indexOf(566) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(566) > -1))) {
 					this.recipes.push({Ingredients: [565, 565, 565], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(566);
 				}
 
-				if (subRecipes.indexOf(571) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(571) > -1))) {
+				// Make perf sapphire
+				if (subRecipes.indexOf(571) === -1 && (this.recipes[i].Ingredients[j] === 571 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(571) > -1))) {
 					this.recipes.push({Ingredients: [570, 570, 570], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(571);
 				}
 
-				if (subRecipes.indexOf(576) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(576) > -1))) {
+				// Make perf emerald
+				if (subRecipes.indexOf(576) === -1 && (this.recipes[i].Ingredients[j] === 576 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(576) > -1))) {
 					this.recipes.push({Ingredients: [575, 575, 575], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(576);
 				}
 
-				if (subRecipes.indexOf(581) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(581) > -1))) {
+				// Make perf ruby
+				if (subRecipes.indexOf(581) === -1 && (this.recipes[i].Ingredients[j] === 581 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(581) > -1))) {
 					this.recipes.push({Ingredients: [580, 580, 580], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(581);
 				}
 
-				if (subRecipes.indexOf(586) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(586) > -1))) {
+				// Make perf diamond
+				if (subRecipes.indexOf(586) === -1 && (this.recipes[i].Ingredients[j] === 586 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(586) > -1))) {
 					this.recipes.push({Ingredients: [585, 585, 585], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(586);
 				}
 
-				if (subRecipes.indexOf(601) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(601) > -1))) {
+				// Make perf skull
+				if (subRecipes.indexOf(601) === -1 && (this.recipes[i].Ingredients[j] === 601 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(601) > -1))) {
 					this.recipes.push({Ingredients: [600, 600, 600], Index: Recipe.Gem, Enabled: true});
 					subRecipes.push(601);
 				}
