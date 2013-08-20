@@ -717,7 +717,7 @@ ModeLoop:
 			delay(me.ping + 1);
 		}
 
-		throw new Error("useWaypoint: Failed to use waypoint " + (getTickCount() - timer));
+		throw new Error("useWaypoint: Failed to use waypoint");
 	},
 
 	makePortal: function (use) {

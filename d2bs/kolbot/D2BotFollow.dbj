@@ -117,7 +117,6 @@ function ScriptMsgEvent(msg) {
 }
 
 function ReceiveCopyData(mode, msg) {
-	//print(mode + " " + msg);
 	var obj;
 
 	switch (msg) {
@@ -141,14 +140,14 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 3: // Game request
-		if (muleTrigger || torchMuleTrigger) {
+		if (muleTrigger || torchMuleTrigger || torchTrigger) {
 			break;
 		}
 
-		if (joinInfo) {
+		if (gameInfo) {
 			obj = JSON.parse(msg);
 
-			D2Bot.joinMe(msg, joinInfo.gameName, gameCount, joinInfo.gamePass, joinInfo.inGame);
+			D2Bot.joinMe(obj.profile, me.gamename || "", "", me.gamepassword || "", me.gameReady ? "yes" : "no");
 		}
 
 		break;

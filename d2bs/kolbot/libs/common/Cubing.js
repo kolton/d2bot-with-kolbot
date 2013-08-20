@@ -99,7 +99,7 @@ var Cubing = {
 			return;
 		}
 
-		//print("We have " + Config.Recipes.length + " cubing recipe(s).");
+		print("We have " + Config.Recipes.length + " cubing recipe(s).");
 
 		this.buildRecipes();
 		this.buildGemList();
@@ -797,7 +797,8 @@ IngredientLoop:
 
 							break;
 						case 1:
-							Misc.logItem("Cubing kept", items[j], result.line);
+							Misc.itemLogger("Cubing Kept", items[j]);
+							Misc.logItem("Cubing Kept", items[j], result.line);
 
 							break;
 						}

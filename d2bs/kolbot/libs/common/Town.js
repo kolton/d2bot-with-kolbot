@@ -427,6 +427,7 @@ MainLoop:
 				// Items for gold, will sell magics, etc. w/o id, but at low levels
 				// magics are often not worth iding.
 				case 4:
+					Misc.itemLogger("Sold", item);
 					item.sell();
 
 					break;
@@ -465,6 +466,7 @@ MainLoop:
 
 					switch (result.result) {
 					case 1:
+						Misc.itemLogger("Kept", item);
 						Misc.logItem("Kept", item, result.line);
 
 						break;
@@ -473,6 +475,7 @@ MainLoop:
 					case 3: // just in case
 						break;
 					default:
+						Misc.itemLogger("Sold", item);
 						item.sell();
 
 						timer = getTickCount() - this.sellTimer; // shop speedup test
@@ -547,10 +550,12 @@ MainLoop:
 
 				switch (result.result) {
 				case 0:
+					Misc.itemLogger("Dropped", unids[i]);
 					unids[i].drop();
 
 					break;
 				case 1:
+					Misc.itemLogger("Kept", unids[i]);
 					Misc.logItem("Kept", unids[i], result.line);
 
 					break;
@@ -590,10 +595,12 @@ MainLoop:
 
 				switch (result.result) {
 				case 0:
+					Misc.itemLogger("Dropped", item);
 					item.drop();
 
 					break;
 				case 1:
+					Misc.itemLogger("Field Kept", item);
 					Misc.logItem("Field Kept", item, result.line);
 
 					break;
@@ -720,6 +727,7 @@ CursorLoop:
 			if (result.result === 1) {
 				try {
 					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
+						Misc.itemLogger("Shopped", items[i]);
 						Misc.logItem("Shopped", items[i], result.line);
 						items[i].buy();
 					}
@@ -787,6 +795,7 @@ CursorLoop:
 
 						switch (result.result) {
 						case 1:
+							Misc.itemLogger("Gambled", newItem);
 							Misc.logItem("Gambled", newItem, result.line);
 							list.push(newItem.gid);
 
@@ -797,6 +806,7 @@ CursorLoop:
 
 							break;
 						default:
+							Misc.itemLogger("Sold", newItem);
 							newItem.sell();
 							delay(500);
 
@@ -1101,13 +1111,20 @@ MainLoop:
 
 		me.cancel();
 
-		var i,
+		var i, result,
 			items = Storage.Inventory.Compare(Config.Inventory);
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && ((Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]))) {
-					Storage.Stash.MoveTo(items[i]);
+				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
+					result = Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4 ? "pickit" :
+							Cubing.keepItem(items[i]) ? "cubing" :
+									Runewords.keepItem(items[i]) ? "runewords" : false;
+
+					if (result) {
+						Misc.itemLogger("Stashed", items[i]);
+						Storage.Stash.MoveTo(items[i]);
+					}
 				}
 			}
 		}
@@ -1330,6 +1347,7 @@ MainLoop:
 
 		for (i = 0; !!items && i < items.length; i += 1) {
 			if (items[i].location === 3 && items[i].mode === 0 && items[i].itemType === 22) {
+				Misc.itemLogger("Dropped", items[i]);
 				items[i].drop();
 			}
 		}
@@ -1399,8 +1417,10 @@ MainLoop:
 					) {
 				try {
 					if (loseItemAction === sellAction) {
+						Misc.itemLogger("Sold", items[i]);
 						items[i].sell();
 					} else {
+						Misc.itemLogger("Dropped", items[i]);
 						items[i].drop();
 					}
 				} catch (e) {

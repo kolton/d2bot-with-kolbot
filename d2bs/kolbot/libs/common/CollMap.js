@@ -9,8 +9,19 @@ var CollMap = new function () {
 	this.maps = [];
 
 	this.getNearbyRooms = function (x, y) {
-		var i,
-			rooms = getRoom(x, y).getNearby();
+		var i, room, rooms;
+		
+		room = getRoom(x, y);
+		
+		if (!room) {
+			return false;
+		}
+
+		rooms = getRoom(x, y).getNearby();
+
+		if (!rooms) {
+			return false;
+		}
 
 		for (i = 0; i < rooms.length; i += 1) {
 			if (this.getRoomIndex(rooms[i].x * 5, rooms[i].y * 5, true) === undefined) {

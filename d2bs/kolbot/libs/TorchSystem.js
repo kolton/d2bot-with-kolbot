@@ -192,6 +192,10 @@ var TorchSystem = {
 
 			delay(5000);
 
+			while (me.ingame) {
+				delay(1000);
+			}
+
 			return true;
 		}
 

@@ -256,6 +256,10 @@ function LoadConfig() {
 	Config.PickRange = 40; // Pick radius
 	Config.FastPick = false; // Check and pick items between attacks
 
+	// Additional item info log settings. All info goes to \logs\ItemLog.txt
+	Config.ItemInfo = false; // Log stashed, skipped (due to no space) or sold items.
+	Config.ItemInfoQuality = []; // The quality of sold items to log.
+
 	// Item identification settings
 	Config.CainID.Enable = false; // Identify items at Cain
 	Config.CainID.MinGold = 2500000; // Minimum gold (stash + character) to have in order to use Cain.
