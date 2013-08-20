@@ -208,7 +208,8 @@ MainLoop:
 				joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
 				delay(5000);
 
-				return true;
+				//return true;
+				break MainLoop;
 			default:
 				failCount += 1;
 

@@ -348,7 +348,8 @@ RuneLoop:
 			D2Bot.printToConsole("Made runeword: " + items[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""), 5);
 
 			if (NTIP.CheckItem(items[0], this.pickitEntries)) {
-				Misc.logItem("Runeword kept", items[0]);
+				Misc.itemLogger("Runeword Kept", items[0]);
+				Misc.logItem("Runeword Kept", items[0]);
 			}
 		}
 

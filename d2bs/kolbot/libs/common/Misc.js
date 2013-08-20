@@ -438,7 +438,7 @@ var Misc = {
 		}
 
 		if (!me.idle) {
-			Misc.click(0, 0, me); // Click to stop walking in case we got stuck
+			Misc.click(0, 0, me.x, me.y); // Click to stop walking in case we got stuck
 		}
 
 		return false;
@@ -817,6 +817,40 @@ var Misc = {
 		}
 
 		return tempArray;
+	},
+
+	itemLogger: function (action, unit) {
+		if (!Config.ItemInfo) {
+			return false;
+		}
+
+		var desc;
+
+		switch (action) {
+		case "Sold":
+			if (Config.ItemInfoQuality.indexOf(unit.quality) === -1) {
+				return false;
+			}
+
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+
+			break;
+		case "Kept":
+		case "Field Kept":
+		case "Runeword Kept":
+		case "Cubing Kept":
+		case "Shopped":
+		case "Gambled":
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+
+			break;
+		default:
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+
+			break;
+		}
+
+		return this.fileAction("logs/ItemLog.txt", 2, "[" + me.profile + "] <" + action + "> " + desc + "\n");
 	},
 
 	// Log kept item stats in the manager.

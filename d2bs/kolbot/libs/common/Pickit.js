@@ -131,6 +131,7 @@ var Pickit = {
 						if (canFit) {
 							this.pickItem(item, status.result, status.line);
 						} else {
+							Misc.itemLogger("No room for", this.pickList[0]);
 							print("ÿc7Not enough room for " + color + this.pickList[0].name);
 
 							if (!!AutoMule.getMule() && AutoMule.getMuleItems().length > 0) {
@@ -267,6 +268,7 @@ MainLoop:
 			switch (status) {
 			case 1:
 				if (this.ignoreLog.indexOf(stats.type) === -1) {
+					Misc.itemLogger("Kept", item);
 					Misc.logItem("Kept", item, keptLine);
 				}
 

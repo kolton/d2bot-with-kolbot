@@ -154,7 +154,7 @@ var Attack = {
 				target = getUnit(1, -1, -1, gid);
 			}
 
-			if (copyUnit(target).x === undefined) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
+			if (!target || !copyUnit(target).x) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
 				break;
 			}
 
@@ -179,7 +179,7 @@ var Attack = {
 
 		ClassAttack.afterAttack();
 
-		if (copyUnit(target).x === undefined) {
+		if (!target || !copyUnit(target).x) {
 			return true;
 		}
 

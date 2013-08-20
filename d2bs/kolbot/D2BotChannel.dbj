@@ -90,10 +90,14 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 3: // Game request
+		if (muleTrigger || torchMuleTrigger || torchTrigger) {
+			break;
+		}
+
 		if (gameInfo) {
 			obj = JSON.parse(msg);
 
-			D2Bot.joinMe(obj.profile, me.gamename || "", "", me.gamepassword || "", joinInfo.inGame);
+			D2Bot.joinMe(obj.profile, me.gamename || "", "", me.gamepassword || "", me.gameReady ? "yes" : "no");
 		}
 
 		break;
@@ -265,9 +269,7 @@ MainSwitch:
 		if (ingame) {
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here

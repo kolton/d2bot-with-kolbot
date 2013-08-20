@@ -148,6 +148,9 @@ var Config = {
 	ScanShrines: [],
 	Debug: false,
 
+	ItemInfo: false,
+	ItemInfoQuality: [],
+
 	Cubing: false,
 	Recipes: [],
 	MakeRunewords: false,

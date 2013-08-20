@@ -96,7 +96,6 @@ function sayMsg(string) {
 }
 
 function ReceiveCopyData(mode, msg) {
-	//print(mode + " " + msg);
 	var obj;
 
 	switch (msg) {
@@ -114,7 +113,7 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 3: // Game request
-		if (muleTrigger || torchMuleTrigger) {
+		if (muleTrigger || torchMuleTrigger || torchTrigger) {
 			break;
 		}
 

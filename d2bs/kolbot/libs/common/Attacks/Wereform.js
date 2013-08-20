@@ -1,7 +1,7 @@
 /**
-*	@filename	Amazon.js
+*	@filename	Wereform.js
 *	@author		kolton
-*	@desc		Amazon attack sequence
+*	@desc		Wereform attack sequence
 */
 
 var ClassAttack = {
