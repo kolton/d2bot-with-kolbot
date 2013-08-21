@@ -49,6 +49,45 @@ var Container = function (name, width, height, location) {
 		return true;
 	};
 
+	/* Container.isLocked(item)
+	 *	Checks if the item is in a locked spot
+	 */
+	this.IsLocked = function (item, baseRef) {
+		var h, w, reference;
+
+		reference = baseRef.slice(0);
+
+		//Make sure it is in this container.
+		if (item.mode !== 0 || item.location !== this.location) {
+			return false;
+		}
+
+		// Make sure the item is ours
+		if (!item.getParent() || item.getParent().gid !== me.gid) {
+			return false;
+		}
+
+		//Insure valid reference.
+		if (typeof (reference) !== "object" || reference.length !== this.buffer.length || reference[0].length !== this.buffer[0].length) {
+			throw new Error("Storage.IsLocked: Invalid inventory reference");
+		}
+
+		try {
+			// Check if the item lies in a locked spot.
+			for (h = item.y; h < (item.y + item.sizey); h += 1) {
+				for (w = item.x; w < (item.x + item.sizex); w += 1) {
+					if (reference[h][w] === 0) {
+						return true;
+					}
+				}
+			}
+		} catch (e2) {
+			throw new Error("Storage.IsLocked error! Item info: " + item.name + " " + item.y + " " + item.sizey + " " + item.x + " " + item.sizex + " " + item.mode + " " + item.location);
+		}
+
+		return false;
+	};
+
 	this.Reset = function () {
 		var h, w;
 
@@ -83,9 +122,9 @@ var Container = function (name, width, height, location) {
 		Storage.Reload();
 
 		//Loop buffer looking for spot to place item.
-		for (x = 0; x < this.height - (item.sizey - 1); x += 1) {
+		for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
 Loop:
-			for (y = 0; y < this.width - (item.sizex - 1); y += 1) {
+			for (x = 0; x < this.height - (item.sizey - 1); x += 1) {
 				//Check if there is something in this spot.
 				if (this.buffer[x][y] > 0) {
 					continue;

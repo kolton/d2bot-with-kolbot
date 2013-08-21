@@ -11,7 +11,83 @@
 //[name] == barbedshield && [quality] == magic # [palicombatskilltab] == 2 && [fbr] == 30 // LLD
 //[type] == gloves && [quality] == magic # [javelinandspearskilltab] == 3 && [ias] == 20 // 3/20 gloves
 
-[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
-[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
+//[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillconcentration] == 3 || [skillblessedhammer] == 3)
+//[type] == scepter # [paladinskills] == 2 && [skillconcentration]+[skillblessedhammer] == 6
 
-[type] == staff # [sorceressskills]+[skillenchant] == 5
+//[type] == staff # [sorceressskills]+[skillenchant] == 5
+
+//		===============
+//		=== Classic ===
+//		===============
+
+// High level Paladin scepter (Ormus; Nightmare - Grand Scepter type, Hell - War Scepter type)
+[type] == scepter # [paladinskills] == 2 && [fcr] == 10 && ([skillblessedhammer] == 3 || [skillconcentration] == 3)
+[type] == scepter # [paladinskills] == 2 && [skillblessedhammer]+[skillconcentration] == 6
+[type] == scepter # [paladinskills] == 2 && [fcr] == 10
+
+// Enchant staff (Ormus)
+//[type] == staff # [sorceressskills] == 2 && [skillenchant] == 3 // Any color (green is plain +2)
+//[type] == staff && [color] == darkred # [sorceressskills] == 2 && [skillenchant] == 3
+//[type] == staff && [color] == darkblue # [sorceressskills] == 2 && [skillenchant] == 3
+//[type] == staff && [color] == darkyellow # [sorceressskills] == 2 && [skillenchant] == 3
+//[type] == staff && [color] == darkgold # [sorceressskills] == 2 && [skillenchant] == 3
+//[type] == staff && [color] == crystalred # [sorceressskills] == 2 && [skillenchant] == 3
+
+//[name] == crystalsword # [barbarianskills] == 2
+
+//		==================
+//		===  Expansion ===
+//		==================
+
+// VLLD lvl 9 Bone Shield (Anya, Ormus)
+//[name] == boneshield # [fbr] == 30 && [itemdamagetomana] == 12
+
+// VLLD lvl 9 sacrifice War Scepter (Ormus; Hell; Shop with a level 95+ character to get level 11 charges)
+//[name] == warscepter # ([enhanceddamage] >= 40 || [tohit] >= 80 || [enhanceddamage] >= 30 && [tohit] >= 40) && [itemchargedskill] == 96 && [itemlevelreq] <= 9
+
+// VLLD lvl 18 wand (Ormus)
+//[name] == bonewand || [name] == grimwand # [fcr] == 10 && [poisonandboneskilltab] == 1 && [skillbonespear] == 3 && [itemlevelreq] <= 18
+
+// VLLD lvl 18 scepter (Ormus)
+//[type] == scepter # [palicombatskilltab] == 1 && [fcr] == 10 && [skillconcentration]+[skillblessedhammer] == 6 && [itemlevelreq] <= 18
+
+// LLD lvl 30 wand
+//[type] == wand # [poisonandboneskilltab] == 2 && [fcr] == 20 && [skillbonespear]+[skillbonespirit] == 6 && [itemlevelreq] <= 30
+
+// LLD lvl 30 Paladin scepters (Ormus)
+//[name] == warscepter || [name] == divinescepter # [sockets] == 3 && [skillfanaticism] == 3 && [itemskillonhit] == 66 && [itemlevelreq] <= 30
+//[type] == scepter # [palicombatskilltab] == 2 && [fcr] == 10 && [skillconcentration]+[skillblessedhammer] == 6 && [itemlevelreq] <= 30
+
+// LLD lvl 30 Hand Scythe - WoF, LS (Fara, Elzix; Nightmare)
+//[name] == handscythe # ([trapsskilltab] == 2 || [assassinskills] == 1) && [skillwakeoffire] == 3 && [itemlevelreq] <= 30
+//[name] == handscythe # ([trapsskilltab] == 2 || [assassinskills] == 1) && [skilllightningsentry] == 3 && [itemlevelreq] <= 30
+
+// LLD lvl 30 Cutlass - Fury (Fara, Elzix; Nightmare)
+//[name] == cutlass # [enhanceddamage] == 100 && [ias] == 30 && [itemlevelreq] <= 30
+
+// LLD lvl 30 Smiter Amplify Damage Mace (Fara; Flail - Hell, Knout - Nightmare)
+//[name] == flail # [sockets] == 3 && [itemskillonhit] == 66 && [itemlevelreq] <= 30
+//[name] == knout # [sockets] == 3 && [itemskillonhit] == 66 && [itemlevelreq] <= 30
+
+// LLD lvl 30 shields - perfect defense (Fara; Nightmare)
+// [name] == towershield # [defense] == 25 && [fbr] == 30 && [sockets] == 3 && [itemlevelreq] <= 30
+// [name] == dragonshield # [defense] == 67 && [fbr] == 30 && [sockets] == 3 && [itemlevelreq] <= 30
+// [name] == pavise # [defense] == 78 && [fbr] == 30 && [sockets] == 3 && [itemlevelreq] <= 30
+
+// Paladin scepters - FoH, BH, HS (Ormus)
+//[type] == scepter # ([paladinskills] == 2 || [palicombatskilltab] == 3) && [skillconcentration]+[skillblessedhammer] == 6
+//[type] == scepter # ([paladinskills] == 2 || [palicombatskilltab] == 3) && [skillfistoftheheavens]+[skillconviction] == 6
+//[type] == scepter # [palicombatskilltab]+[skillholyshield] == 6
+
+// Fury Druid Fanged Knife (Malah)
+//[name] == fangedknife # [enhanceddamage] == 300 && [ias] == 40
+
+// BO switch Crystal Sword (Ormus)
+//[name] == crystalsword # [warcriesskilltab] == 3 && [strength] == 30
+
+// 4-socketed Gothic Plate (Ormus)
+//[name] == gothicplate # [sockets] == 4 && [maxhp] == 100
+//[name] == gothicplate # [sockets] == 4 && [fhr] == 24
+
+// Amazon gloves (Nightmare)
+// [type] == gloves # [javelinandspearskilltab] == 3 && [ias] == 20

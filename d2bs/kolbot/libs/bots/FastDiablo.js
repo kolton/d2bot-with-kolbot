@@ -11,7 +11,7 @@ function FastDiablo() {
 		var sealPreset = getPresetUnit(108, 2, seal);
 
 		if (!seal) {
-			throw new Error("Seal preset not found. Can't continue.");
+			throw new Error("Seal preset not found");
 		}
 
 		if (sealPreset.roomy * 5 + sealPreset.y === value || sealPreset.roomx * 5 + sealPreset.x === value) {
@@ -31,15 +31,18 @@ function FastDiablo() {
 		var i, boss,
 			glow = getUnit(2, 131);
 
-		for (i = 0; i < (name === getLocaleString(2853) ? 14 : 12); i += 1) {
+		for (i = 0; i < 24; i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
-				if (name === getLocaleString(2852)) {
-					this.chaosPreattack(getLocaleString(2852), 8);
+				this.chaosPreattack(name, 8);
+
+				try {
+					Attack.kill(name);
+				} catch (e) {
+					Attack.clear(10, 0, name);
 				}
 
-				Attack.kill(name);
 				Pickit.pickItems();
 
 				return true;
@@ -165,7 +168,11 @@ function FastDiablo() {
 		seal = getUnit(2, id);
 
 		if (seal) {
-			for (i = 0; i < 3; i += 1) {
+			for (i = 0; i < 5; i += 1) {
+				if (getDistance(me, seal) > 5) {
+					Pather.moveToUnit(seal, 4, 0);
+				}
+
 				seal.interact();
 
 				tick = getTickCount();
@@ -176,6 +183,10 @@ function FastDiablo() {
 					}
 
 					delay(10);
+				}
+
+				if (i > 2) {
+					Attack.clear(5);
 				}
 			}
 		}

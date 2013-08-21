@@ -231,7 +231,7 @@ WSKLoop:
 		Town.move("portalspot");
 
 		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
-			if (Pather.usePortal(131, null)) {
+			if (Pather.usePortal(131, Config.Leader || null)) {
 				break;
 			}
 

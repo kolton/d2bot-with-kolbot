@@ -20,168 +20,154 @@
 
 include("NTItemAlias.dbl");
 
-var _NTIP_CheckList = new Array();
-var stringArray = [];
+var NTIP = {},
+	NTIP_CheckList = [],
+	stringArray = [];
 
-function NTIPOpenFile(filepath)
-{
-	var i, nipfile;
-	var line;
-	var string;
-	var lines;
-	var info;
+NTIP.OpenFile = function (filepath, notify) {
+	if (!FileTools.exists(filepath)) {
+		if (notify) {
+			Misc.errorReport("ÿc1NIP file doesn't exist: ÿc0" + filepath);
+		}
 
-	nipfile = File.open(filepath, 0);
+		return false;
+	}
+
+	var i, nipfile, line, lines, info, item,
+		tick = getTickCount(),
+		//hash = md5_file(filepath),
+		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
+		entries = 0;
+
+	/*if (!FileTools.exists("pickit/minified/" + hash + "." + filename)) {
+		NTIP.Minify(filepath);
+	}
+
+	if (FileTools.exists("pickit/minified/" + hash + "." + filename)) {
+		filepath = "pickit/minified/" + hash + "." + filename;
+	}*/
+
+	try {
+		nipfile = File.open(filepath, 0);
+	} catch (fileError) {
+		if (notify) {
+			Misc.errorReport("ÿc1Failed to load NIP: ÿc0" + filename);
+		}
+	}
 
 	if (!nipfile) {
 		return false;
 	}
 
 	lines = nipfile.readAllLines();
+	/*item = {
+		itemType: 0,
+		classid: 0,
+		itemclass: 0,
+		quality: 0,
+		ilvl: 0,
+		getFlag: function () {
+			return false;
+		},
+		getColor: function () {
+			return false;
+		},
+		getPrefix: function () {
+			return false;
+		},
+		getSuffix: function () {
+			return false;
+		},
+		getStatEx: function () {
+			return false;
+		}
+	};*/
 
 	nipfile.close();
 
 	for (i = 0; i < lines.length; i += 1) {
 		info = {
 			line: i + 1,
-			file: filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
+			file: filename,
 			string: lines[i]
 		};
 
-		line = NTIPParseLineInt(lines[i], info);
+		line = NTIP.ParseLineInt(lines[i], info);
+
+		// frickaline try/catch method
+		// switching to this would mean adding a separate check for runeword entries
+		/*if (line) {
+			try {
+				if (line[0] && line[0].length) {
+					eval(line[0]);
+				}
+
+				if (line[1] && line[1].length) {
+					eval(line[1]);
+				}
+
+				if (line[2] && line[2].length) {
+					eval(line[2]);
+				}
+			} catch (lineError) {
+				Misc.errorReport("Bad Line: " + lines[i]);
+				
+				line = false;
+			}
+		}*/
 
 		if (line) {
-			_NTIP_CheckList.push(line);
+			entries += 1;
+
+			NTIP_CheckList.push(line);
 			stringArray.push(info);
 		}
 	}
-	
-	//print(filepath + ": " + lines.length);
+
+	if (notify) {
+		print("ÿc4Loaded NIP: ÿc2" + filename + "ÿc4. Lines: ÿc2" + lines.length + "ÿc4. Valid entries: ÿc2" + entries + ". ÿc4Time: ÿc2" + (getTickCount() - tick) + " ms");
+	}
 
 	return true;
-}
+};
 
-function NTIPClear()
-{
-   _NTIP_CheckList = [];
-   stringArray = [];
-}
+/*NTIP.Minify = function (filepath) {
+	var i, nipfile, lines, hash, fileList,
+		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length);
 
-function NTIPCheckItem(item, entryList, verbose) {
-	var i, list, identified, num,
-		result = 0;
+	try {
+		nipfile = File.open(filepath, 0);
+	} catch (fileError) {
 
-	if (!entryList) {
-		list = _NTIP_CheckList;
-	} else {
-		list = entryList;
 	}
 
-	identified = item.getFlag(0x10);
+	if (!nipfile) {
+		return false;
+	}
 
-	for (i = 0 ; i < list.length ; i++) {
-		try {
-			if (list[i][0].length > 0) {
-				if (eval(list[i][0])) {
-					if (list[i][1].length > 0) {
-						if (eval(list[i][1])) {
-							if (list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) {
-								num = NTIP_CheckQuantityOwned(list[i][0],list[i][1]);
+	hash = md5_file(filepath);
+	lines = nipfile.readAllLines();
 
-								if (num < list[i][2]["MaxQuantity"]) {
-									result = 1;
+	nipfile.close();
 
-									break;
-								} else {
-									if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2]["MaxQuantity"]) { // attempt at inv fix for maxquantity
-										result = 1;
+	for (i = 0; i < lines.length; i += 1) {
+		lines[i] = lines[i].replace(/\s+/g, "").toLowerCase();
+	}
 
-										break;
-									}
-								}
-							} else {
-								result = 1;
+	Misc.fileAction("pickit/minified/" + hash + "." + filename, 1, lines.join("\n"));
 
-								break;
-							}
-						} else if (!identified && result == 0) {
-							result = -1;
-						}
-					} else {
-						if (list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) {
-							num = NTIP_CheckQuantityOwned(list[i][0], null);
+	fileList = dopen("pickit/minified/").getFiles();
 
-							if (num < list[i][2]["MaxQuantity"]) {
-								result = 1;
-
-								break;
-							} else {
-								if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2]["MaxQuantity"]) { // attempt at inv fix for maxquantity
-									result = 1;
-
-									break;
-								}
-							}
-						} else {
-							result = 1;
-
-							break;
-						}
-					}
-				}
-			} else if(list[i][1].length > 0) {
-				if (eval(list[i][1])) {
-					if (list[i][2] && list[i][2]["MaxQuantity"] && !isNaN(list[i][2]["MaxQuantity"])) {
-						num = NTIP_CheckQuantityOwned(null, list[i][1]);
-
-						if (num < list[i][2]["MaxQuantity"]) {
-							result = 1;
-
-							break;
-						} else {
-							if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2]["MaxQuantity"]) { // attempt at inv fix for maxquantity
-								result = 1;
-
-								break;
-							}
-						}
-					} else {
-						result = 1;
-
-						break;
-					}
-				} else if (!identified && result == 0) {
-					result = -1;
-				}
-			}
-		} catch (pickError) {
-			showConsole();
-
-			if (!entryList) {
-				print("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
-
-				_NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
-			} else {
-				print("ÿc1Pickit error in runeword config!");
-			}
-
-			result = 0;
+	for (i = 0; i < fileList.length; i += 1) {
+		if (fileList[i].indexOf(filename) > -1 && fileList[i].indexOf(hash) === -1) {
+			FileTools.remove("pickit/minified/" + fileList[i]);
 		}
 	}
 
-	if (verbose) {
-		if (result > 0) {
-			return {line: stringArray[i].file + " #" + stringArray[i].line, result: result};
-		} else {
-			return {line: null, result: result};
-		}
-	}
+	return true;
+};*/
 
-	return result;
-}
-
-// Internal function
-function NTIP_CheckQuantityOwned(item_type, item_stats) {
+NTIP.CheckQuantityOwned = function (item_type, item_stats) {
 	var i, item,
 		num = 0,
 		items = me.getItems();
@@ -196,19 +182,16 @@ function NTIP_CheckQuantityOwned(item_type, item_stats) {
 		if (items[i].mode === 0 && items[i].location === 7) {
 			item = items[i];
 
-			if ((item_type != null && item_type.length > 0 && eval(item_type)) || item_type === null) {
-				if ((item_stats != null && item_stats.length > 0 && eval(item_stats)) || item_stats === null) {
+			if ((item_type !== null && item_type.length > 0 && eval(item_type)) || item_type === null) {
+				if ((item_stats !== null && item_stats.length > 0 && eval(item_stats)) || item_stats === null) {
 					num += 1;
 				}
 			}
-		}
-
-		// inv check
-		else if (items[i].mode === 0 && items[i].location === 3) {
+		} else if (items[i].mode === 0 && items[i].location === 3) { // inv check
 			item = items[i];
 
-			if ((item_type != null && item_type.length > 0 && eval(item_type)) || item_type === null) {
-				if ((item_stats != null && item_stats.length > 0 && eval(item_stats)) || item_stats === null) {
+			if ((item_type !== null && item_type.length > 0 && eval(item_type)) || item_type === null) {
+				if ((item_stats !== null && item_stats.length > 0 && eval(item_stats)) || item_stats === null) {
 					if (Config.Inventory[items[i].y][items[i].x] > 0) { // we check only space that is supposed to be free
 						num += 1;
 					}
@@ -220,238 +203,398 @@ function NTIP_CheckQuantityOwned(item_type, item_stats) {
 	//print("I have "+num+" of these.");
 
 	return num;
-}
+};
 
-function NTIPParseLineInt(input, info) {
-	var i, property, _start, _end, _section, _keyword, _result;
+NTIP.Clear = function () {
+	NTIP_CheckList = [];
+	stringArray = [];
+};
 
-	_end = input.indexOf("//");
+NTIP.CheckItem = function (item, entryList, verbose) {
+	var i, list, identified, num, tier, rval,
+		result = 0;
 
-	if (_end !== -1) {
-		input = input.substring(0, _end);
+	if (!entryList) {
+		list = NTIP_CheckList;
+	} else {
+		list = entryList;
 	}
 
-	input = input.replace(/ |;|\t/g, "").toLowerCase();
+	identified = item.getFlag(0x10);
+
+	for (i = 0; i < list.length; i += 1) {
+		try {
+			if (list[i][0].length > 0) {
+				if (eval(list[i][0])) {
+					if (list[i][1].length > 0) {
+						if (eval(list[i][1])) {
+							if (list[i][2] && list[i][2].Tier && !isNaN(list[i][2].Tier)) {
+								tier = list[i][2].Tier;
+							}
+
+							if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
+								num = NTIP.CheckQuantityOwned(list[i][0], list[i][1]);
+
+								if (num < list[i][2].MaxQuantity) {
+									result = 1;
+
+									break;
+								} else {
+									if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2].MaxQuantity) { // attempt at inv fix for maxquantity
+										result = 1;
+
+										break;
+									}
+								}
+							} else {
+								result = 1;
+
+								break;
+							}
+						} else if (!identified && result === 0) {
+							result = -1;
+						}
+					} else {
+						if (list[i][2] && list[i][2].Tier && !isNaN(list[i][2].Tier)) {
+							tier = list[i][2].Tier;
+						}
+
+						if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
+							num = NTIP.CheckQuantityOwned(list[i][0], null);
+
+							if (num < list[i][2].MaxQuantity) {
+								result = 1;
+
+								break;
+							} else {
+								if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2].MaxQuantity) { // attempt at inv fix for maxquantity
+									result = 1;
+
+									break;
+								}
+							}
+						} else {
+							result = 1;
+
+							break;
+						}
+					}
+				}
+			} else if (list[i][1].length > 0) {
+				if (eval(list[i][1])) {
+					if (list[i][2] && list[i][2].Tier && !isNaN(list[i][2].Tier)) {
+						tier = list[i][2].Tier;
+					}
+
+					if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
+						num = NTIP.CheckQuantityOwned(null, list[i][1]);
+
+						if (num < list[i][2].MaxQuantity) {
+							result = 1;
+
+							break;
+						} else {
+							if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2].MaxQuantity) { // attempt at inv fix for maxquantity
+								result = 1;
+
+								break;
+							}
+						}
+					} else {
+						result = 1;
+
+						break;
+					}
+				} else if (!identified && result === 0) {
+					result = -1;
+				}
+			}
+		} catch (pickError) {
+			showConsole();
+
+			if (!entryList) {
+				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
+
+				NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
+			} else {
+				Misc.errorReport("ÿc1Pickit error in runeword config!");
+			}
+
+			result = 0;
+		}
+	}
+
+	if (verbose) {
+		rval = {};
+
+		if (result > 0) {
+			rval.line = stringArray[i].file + " #" + stringArray[i].line;
+		} else {
+			rval.line = null;
+		}
+
+		rval.result = result;
+		rval.tier = tier;
+
+		return rval;
+	}
+
+	return result;
+};
+
+NTIP.IsSyntaxInt = function (ch) {
+	return (ch === '!' || ch === '%' || ch === '&' || (ch >= '(' && ch <= '+') || ch === '-' || ch === '/' || (ch >= ':' && ch <= '?') || ch === '|');
+};
+
+NTIP.ParseLineInt = function (input, info) {
+	var i, property, p_start, p_end, p_section, p_keyword, p_result, value;
+
+	p_end = input.indexOf("//");
+
+	if (p_end !== -1) {
+		input = input.substring(0, p_end);
+	}
+
+	input = input.replace(/\s+/g, "").toLowerCase();
 
 	if (input.length < 5) {
 		return null;
 	}
 
-	_result = input.split("#");
+	p_result = input.split("#");
 
-	if (_result[0] && _result[0].length > 4) {
-		_section = _result[0].split("[");
+	if (p_result[0] && p_result[0].length > 4) {
+		p_section = p_result[0].split("[");
 
-		_result[0] = _section[0];
+		p_result[0] = p_section[0];
 
-		for (i = 1 ; i < _section.length ; i += 1) {
-			_end = _section[i].indexOf("]") + 1;
-			property = _section[i].substring(0, _end - 1);
+		for (i = 1; i < p_section.length; i += 1) {
+			p_end = p_section[i].indexOf("]") + 1;
+			property = p_section[i].substring(0, p_end - 1);
 
 			switch (property) {
 			case 'color':
-				_result[0] += "item.getColor()";
+				p_result[0] += "item.getColor()";
 
 				break;
 			case 'type':
-				_result[0] += "item.itemType";
+				p_result[0] += "item.itemType";
 
 				break;
 			case 'name':
-				_result[0] += "item.classid";
+				p_result[0] += "item.classid";
 
 				break;
 			case 'class':
-				_result[0] += "item.itemclass";
+				p_result[0] += "item.itemclass";
 
 				break;
 			case 'quality':
-				_result[0] += "item.quality";
+				p_result[0] += "item.quality";
 
 				break;
 			case 'flag':
-				if(_section[i][_end] == '!')
-					_result[0] += "!item.getFlag(";
-				else
-					_result[0] += "item.getFlag(";
+				if (p_section[i][p_end] === '!') {
+					p_result[0] += "!item.getFlag(";
+				} else {
+					p_result[0] += "item.getFlag(";
+				}
 
-				_end += 2;
+				p_end += 2;
 
 				break;
 			case 'level':
-				_result[0] += "item.ilvl";
+				p_result[0] += "item.ilvl";
 
 				break;
 			case 'prefix':
-				//_result[0] += "item.prefixnum";
-				if(_section[i][_end] == '!')
-					_result[0] += "!item.getPrefix(";
-				else
-					_result[0] += "item.getPrefix(";
+				if (p_section[i][p_end] === '!') {
+					p_result[0] += "!item.getPrefix(";
+				} else {
+					p_result[0] += "item.getPrefix(";
+				}
 
-				_end += 2;
+				p_end += 2;
 
 				break;
 			case 'suffix':
-				//_result[0] += "item.suffixnum";
-				if(_section[i][_end] == '!')
-					_result[0] += "!item.getSuffix(";
-				else
-					_result[0] += "item.getSuffix(";
+				if (p_section[i][p_end] === '!') {
+					p_result[0] += "!item.getSuffix(";
+				} else {
+					p_result[0] += "item.getSuffix(";
+				}
 
-				_end += 2;
+				p_end += 2;
 
 				break;
 			default:
-				print("Unknown Keyword : " + input + " File: " + info.file + " Line: " + info.line);
+				Misc.errorReport("Unknown property: " + property + " File: " + info.file + " Line: " + info.line);
 
-				break;
+				return false;
 			}
 
-			for(_start = _end ; _end < _section[i].length ; _end++)
-			{
-				if(!NTIPIsSyntaxInt(_section[i][_end]))
+			for (p_start = p_end; p_end < p_section[i].length; p_end += 1) {
+				if (!NTIP.IsSyntaxInt(p_section[i][p_end])) {
 					break;
+				}
 			}
 
-			_result[0] += _section[i].substring(_start, _end);
+			p_result[0] += p_section[i].substring(p_start, p_end);
 
-			for(_start = _end ; _end < _section[i].length ; _end++)
-			{
-				if(NTIPIsSyntaxInt(_section[i][_end]))
+			for (p_start = p_end; p_end < p_section[i].length; p_end += 1) {
+				if (NTIP.IsSyntaxInt(p_section[i][p_end])) {
 					break;
+				}
 			}
 
-			_keyword = _section[i].substring(_start, _end);
-			
-			if (isNaN(_keyword)) {
+			p_keyword = p_section[i].substring(p_start, p_end);
+
+			if (isNaN(p_keyword)) {
 				switch (property) {
 				case 'color':
-					if (typeof _NTIPAliasColor[_keyword] === "undefined") {
-						print("Unknown color: " + _keyword + " File: " + info.file + " Line: " + info.line);
-						_result[0] += "false";
-					} else {
-						_result[0] += _NTIPAliasColor[_keyword];
+					if (NTIPAliasColor[p_keyword] === undefined) {
+						Misc.errorReport("Unknown color: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasColor[p_keyword];
 
 					break;
 				case 'type':
-					if (typeof _NTIPAliasType[_keyword] === "undefined") {
-						print("Unknown type: " + _keyword + " File: " + info.file + " Line: " + info.line);
-						_result[0] += "false";
-					} else {
-						_result[0] += _NTIPAliasType[_keyword];
+					if (NTIPAliasType[p_keyword] === undefined) {
+						Misc.errorReport("Unknown type: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasType[p_keyword];
 
 					break;
 				case 'name':
-					if (typeof _NTIPAliasClassID[_keyword] === "undefined") {
-						print("Unknown name: " + _keyword + " File: " + info.file + " Line: " + info.line);
-						_result[0] += "false";
-					} else {
-						_result[0] += _NTIPAliasClassID[_keyword];
+					if (NTIPAliasClassID[p_keyword] === undefined) {
+						Misc.errorReport("Unknown name: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasClassID[p_keyword];
 
 					break;
 				case 'class':
-					if (typeof _NTIPAliasClass[_keyword] === "undefined") {
-						print("Unknown class: " + _keyword + " File: " + info.file + " Line: " + info.line);
-						_result[0] += "false";
-					} else {
-						_result[0] += _NTIPAliasClass[_keyword];
+					if (NTIPAliasClass[p_keyword] === undefined) {
+						Misc.errorReport("Unknown class: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasClass[p_keyword];
 
 					break;
 				case 'quality':
-					if (typeof _NTIPAliasQuality[_keyword] === "undefined") {
-						print("Unknown quality: " + _keyword + " File: " + info.file + " Line: " + info.line);
-						_result[0] += "false";
-					} else {
-						_result[0] += _NTIPAliasQuality[_keyword];
+					if (NTIPAliasQuality[p_keyword] === undefined) {
+						Misc.errorReport("Unknown quality: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasQuality[p_keyword];
 
 					break;
 				case 'flag':
-					if (typeof _NTIPAliasFlag[_keyword] === "undefined") {
-						print("Unknown flag: " + _keyword + " File: " + info.file + " Line: " + info.line);
-						_result[0] += "false)";
-					} else {
-						_result[0] += _NTIPAliasFlag[_keyword] + ")";
+					if (NTIPAliasFlag[p_keyword] === undefined) {
+						Misc.errorReport("Unknown flag: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+						return false;
 					}
+
+					p_result[0] += NTIPAliasFlag[p_keyword] + ")";
+
+					break;
+				case 'prefix':
+				case 'suffix':
+					p_result[0] += "\"" + p_keyword + "\")";
 
 					break;
 				}
 			} else {
-				if (property == 'flag' || property == 'prefix' || property == 'suffix') {
-					_result[0] += _keyword + ")";
+				if (property === 'flag' || property === 'prefix' || property === 'suffix') {
+					p_result[0] += p_keyword + ")";
 				} else {
-					_result[0] += _keyword;
+					p_result[0] += p_keyword;
 				}
 			}
 
-			_result[0] += _section[i].substring(_end);
+			p_result[0] += p_section[i].substring(p_end);
 		}
+	} else {
+		p_result[0] = "";
 	}
-	else
-		_result[0] = "";
 
-	if(_result[1] && _result[1].length > 4)
-	{
-		_section = _result[1].split("[");
-		_result[1] = _section[0];
+	if (p_result[1] && p_result[1].length > 4) {
+		p_section = p_result[1].split("[");
+		p_result[1] = p_section[0];
 
-		for(i = 1 ; i < _section.length ; i++)
-		{
-			_end = _section[i].indexOf("]");
-			_keyword = _section[i].substring(0, _end);
+		for (i = 1; i < p_section.length; i += 1) {
+			p_end = p_section[i].indexOf("]");
+			p_keyword = p_section[i].substring(0, p_end);
 
-			if (isNaN(_keyword)) {
-				if (typeof _NTIPAliasStat[_keyword] === "undefined") {
-					print("Unknown stat: " + _keyword + " File: " + info.file + " Line: " + info.line);
-					_result[1] += "false";
-				} else {
-					_result[1] += "item.getStat(" + _NTIPAliasStat[_keyword] + ")";
+			if (isNaN(p_keyword)) {
+				if (NTIPAliasStat[p_keyword] === undefined) {
+					Misc.errorReport("Unknown stat: " + p_keyword + " File: " + info.file + " Line: " + info.line);
+
+					return false;
 				}
+
+				p_result[1] += "item.getStatEx(" + NTIPAliasStat[p_keyword] + ")";
 			} else {
-				_result[1] += "item.getStat(" + _keyword + ")";
+				p_result[1] += "item.getStatEx(" + p_keyword + ")";
 			}
 
-			_result[1] += _section[i].substring(_end+1);
+			p_result[1] += p_section[i].substring(p_end + 1);
 		}
-	}
-	else
-		_result[1] = "";
-
-	if(_result[2] && _result[2].replace(/^\s+|\s+$/, "").length > 0)
-	{
-		_section = _result[2].split("[");
-		_result[2] = new Array();
-
-		for(i = 1 ; i < _section.length ; i++)
-		{
-			_end = _section[i].indexOf("]");
-
-			_keyword = _section[i].substring(0, _end);
-
-			if(_keyword.toLowerCase().replace(/^\s+|\s+$/, "") == "maxquantity")
-			{
-				_end = _section[i].split("==")[1].replace(/^\s+|\s+$/, "").indexOf("//");
-				if(_end == -1)
-					_end = _section[i].split("==")[1].replace(/^\s+|\s+$/, "").length;
-				var _quantity = parseInt(_section[i].split("==")[1].replace(/^\s+|\s+$/, "").substring(0, _end));
-				_result[2]["MaxQuantity"] = _quantity;
-			}
-			else
-			{
-				print("Error in your NIP file : unknown 3rd part keyword.");
-			}
-		}
+	} else {
+		p_result[1] = "";
 	}
 
-	return _result;
-}
+	if (p_result[2] && p_result[2].replace(/^\s+|\s+$/, "").length > 0) {
+		p_section = p_result[2].split("[");
+		p_result[2] = {};
 
-function NTIPIsSyntaxInt(ch)
-{
-	return (ch == '!' || ch == '%' || ch == '&' || (ch >= '(' && ch <= '+') || ch == '-' || ch == '/' || (ch >= ':' && ch <= '?') || ch == '|');
-}
+		for (i = 1; i < p_section.length; i += 1) {
+			p_end = p_section[i].indexOf("]");
+			p_keyword = p_section[i].substring(0, p_end);
+
+			switch (p_keyword.toLowerCase().replace(/^\s+|\s+$/, "")) {
+			case "maxquantity":
+				p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").indexOf("//");
+
+				if (p_end === -1) {
+					p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").length;
+				}
+
+				value = Number(p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").substring(0, p_end));
+				p_result[2].MaxQuantity = value;
+
+				break;
+			case "tier":
+				p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").indexOf("//");
+
+				if (p_end === -1) {
+					p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").length;
+				}
+
+				value = Number(p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").substring(0, p_end));
+				p_result[2].Tier = value;
+
+				break;
+			default:
+				Misc.errorReport("Unknown 3rd part keyword: " + p_keyword.toLowerCase().replace(/^\s+|\s+$/, ""));
+
+				return false;
+			}
+		}
+	}
+
+	return p_result;
+};

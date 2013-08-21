@@ -9,13 +9,13 @@ var Pickit = {
 	beltSize: 1,
 	ignoreLog: [4, 5, 6, 22, 41, 76, 77, 78, 79, 80, 81], // Ignored item types for item logging
 
-	init: function () {
+	init: function (notify) {
 		var i, filename;
 
 		for (i = 0; i < Config.PickitFiles.length; i += 1) {
 			filename = "pickit/" + Config.PickitFiles[i];
 
-			NTIPOpenFile(filename);
+			NTIP.OpenFile(filename, notify);
 		}
 
 		this.beltSize = Storage.BeltSize();
@@ -29,7 +29,7 @@ var Pickit = {
 	// 3 - Runeword wants
 	// 4 - Pickup to sell (triggered when low on gold)
 	checkItem: function (unit) {
-		var rval = NTIPCheckItem(unit, false, true);
+		var rval = NTIP.CheckItem(unit, false, true);
 
 		if (Cubing.checkItem(unit)) {
 			return {result: 2, line: null};
@@ -73,12 +73,12 @@ var Pickit = {
 
 		Town.clearBelt();
 
-		while (!me.idle) {
-			delay(40);
-		}
-
 		if (me.dead) {
 			return false;
+		}
+
+		while (!me.idle) {
+			delay(40);
 		}
 
 		item = getUnit(4);
@@ -95,6 +95,10 @@ var Pickit = {
 		this.pickList.sort(this.sortItems);
 
 		while (this.pickList.length > 0) {
+			if (me.dead) {
+				return false;
+			}
+
 			gid = this.pickList[0].gid;
 
 			if (gid) {
@@ -127,9 +131,10 @@ var Pickit = {
 						if (canFit) {
 							this.pickItem(item, status.result, status.line);
 						} else {
+							Misc.itemLogger("No room for", this.pickList[0]);
 							print("ÿc7Not enough room for " + color + this.pickList[0].name);
 
-							if (!!AutoMule.getMule()) {
+							if (!!AutoMule.getMule() && AutoMule.getMuleItems().length > 0) {
 								scriptBroadcast("mule");
 								quit();
 							}
@@ -157,9 +162,11 @@ var Pickit = {
 				case 0:
 					break;
 				default: // check if a kept item can be stashed
-					if (Storage.Stash.CanFit(items[i])) {
+					if (Town.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
 						return true;
 					}
+
+					break;
 				}
 			}
 		}
@@ -213,7 +220,8 @@ MainLoop:
 			if (stats.useTk) {
 				Skill.cast(43, 0, item);
 			} else if (getDistance(me, item) < 4 || Pather.moveToUnit(item)) {
-				item.interact();
+				Misc.click(0, 0, item);
+				//item.interact();
 			}
 
 			tick = getTickCount();
@@ -231,11 +239,15 @@ MainLoop:
 
 				if (item.mode !== 3 && item.mode !== 5) {
 					switch (stats.classid) {
+					case 543: // Key
+						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkKeys() + "/12)");
+
+						return true;
 					case 529: // Scroll of Town Portal
 					case 530: // Scroll of Identify
 						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkScrolls(stats.classid === 529 ? "tbk" : "ibk") + "/20)");
 
-						break MainLoop;
+						return true;
 					}
 
 					break MainLoop;
@@ -256,6 +268,7 @@ MainLoop:
 			switch (status) {
 			case 1:
 				if (this.ignoreLog.indexOf(stats.type) === -1) {
+					Misc.itemLogger("Kept", item);
 					Misc.logItem("Kept", item, keptLine);
 				}
 
@@ -275,7 +288,7 @@ MainLoop:
 	},
 
 	itemColor: function (unit, type) {
-		if (typeof type === "undefined") {
+		if (type === undefined) {
 			type = true;
 		}
 
@@ -311,13 +324,11 @@ MainLoop:
 	},
 
 	sortItems: function (unitA, unitB) {
-		// TODO: Add some kind of advanced sorting
-
 		return getDistance(me, unitA) - getDistance(me, unitB);
 	},
 
 	canPick: function (unit) {
-		var tome, charm, i, potion, needPots, buffers, pottype;
+		var tome, charm, i, potion, needPots, buffers, pottype, myKey, key;
 
 		switch (unit.itemType) {
 		case 4: // Gold
@@ -337,6 +348,23 @@ MainLoop:
 				} while (tome.getNext());
 			} else {
 				return false; // Don't pick scrolls if there's no tome
+			}
+
+			break;
+		case 41: // Key (new 26.1.2013)
+			if (me.classid === 6) { // Assassins don't ever need keys
+				return false;
+			}
+
+			myKey = me.getItem(543, 0);
+			key = getUnit(4, -1, -1, unit.gid); // Passed argument isn't an actual unit, we need to get it
+
+			if (myKey && key) {
+				do {
+					if (myKey.location === 3 && myKey.getStat(70) + key.getStat(70) > 12) {
+						return false;
+					}
+				} while (myKey.getNext());
 			}
 
 			break;

@@ -8,39 +8,51 @@ var Scripts = {};
 
 var Config = {
 	init: function (notify) {
-		var i,
+		var i, n,
 			configFilename = "",
 			classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
-		for (i = 0; i < 6; i += 1) {
+		for (i = 0; i < 5; i += 1) {
 			switch (i) {
-			case 0:
-				configFilename = me.realm + "." + classes[me.classid] + "." + me.profile + ".js";
+			case 0: // Custom config
+				if (!isIncluded("config/_customconfig.js")) {
+					include("config/_customconfig.js");
+				}
+
+				for (n in CustomConfig) {
+					if (CustomConfig.hasOwnProperty(n)) {
+						if (CustomConfig[n].indexOf(me.profile) > -1) {
+							if (notify) {
+								print("ÿc2Loading custom config: ÿc9" + n + ".js");
+							}
+
+							configFilename = n + ".js";
+
+							break;
+						}
+					}
+				}
 
 				break;
-			case 1:
+			case 1:// Class.Profile.js
 				configFilename = classes[me.classid] + "." + me.profile + ".js";
 
 				break;
-			case 2:
+			case 2: // Realm.Class.Charname.js
 				configFilename = me.realm + "." + classes[me.classid] + "." + me.charname + ".js";
 
 				break;
-			case 3:
+			case 3: // Class.Charname.js
 				configFilename = classes[me.classid] + "." + me.charname + ".js";
 
 				break;
-			case 4:
+			case 4: // Profile.js
 				configFilename = me.profile + ".js";
-
-				break;
-			case 5:
-				configFilename =  me.profile + "." + classes[me.classid] + "." + me.charname + ".js";
 
 				break;
 			}
 
-			if (FileTools.exists("libs/config/" + configFilename)) {
+			if (configFilename && FileTools.exists("libs/config/" + configFilename)) {
 				break;
 			}
 		}
@@ -65,7 +77,7 @@ var Config = {
 		}
 
 		try {
-			LoadConfig();
+			LoadConfig.call();
 		} catch (e2) {
 			if (notify) {
 				print("ÿc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
@@ -134,6 +146,10 @@ var Config = {
 	SkipImmune: [],
 	SkipAura: [],
 	ScanShrines: [],
+	Debug: false,
+
+	ItemInfo: false,
+	ItemInfoQuality: [],
 
 	Cubing: false,
 	Recipes: [],
@@ -151,6 +167,7 @@ var Config = {
 	LogExperience: false,
 	TownCheck: false,
 	PingQuit: [{Ping: 0, Duration: 0}],
+	PacketShopping: false,
 
 	// Fastmod
 	FCR: 0,
@@ -169,13 +186,17 @@ var Config = {
 	// DClone
 	StopOnDClone: false,
 	SoJWaitTime: 0,
+	KillDclone: false,
 
 	// Attack specific
 	Dodge: false,
+	DodgeRange: 15,
+	DodgeHP: 100,
 	AttackSkill: [],
 	LowManaSkill: [],
 	TeleStomp: false,
 	ClearType: false,
+	ClearPath: false,
 	BossPriority: false,
 
 	// Amazon specific
@@ -208,6 +229,7 @@ var Config = {
 	FindItemSwitch: 1,
 
 	// Druid specific
+	Wereform: 0,
 	SummonRaven: 0,
 	SummonAnimal: 0,
 	SummonVine: 0,
@@ -236,6 +258,7 @@ var Config = {
 		KillDacFarren: false
 	},
 	Pindleskin: {
+		UseWaypoint: false,
 		KillNihlathak: false,
 		ViperQuit: false
 	},
@@ -310,7 +333,8 @@ var Config = {
 		Entrance: false,
 		SealWarning: "Leave the seals alone!",
 		EntranceTP: "Entrance TP up",
-		StarTP: "Star TP up"
+		StarTP: "Star TP up",
+		DiabloMsg: "Diablo"
 	},
 	DiabloHelper: {
 		Wait: 120,
@@ -383,5 +407,8 @@ var Config = {
 		Act3: [],
 		Act4: [],
 		Act5: []
+	},
+	ClearAnyArea: {
+		AreaList: []
 	}
 };

@@ -5,77 +5,240 @@
 */
 
 var D2Bot = {
-	printToConsole: function (msg, color) {
-		if (arguments.length < 2) {
-			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg);
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg + ";" + color);
-		}
-	},
-	printToItemLog: function (msg, tooltip, code, color1, color2, header, gid) {
-		header = header || "";
-		gid = gid || "";
+	handle: 0,
 
-		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg + "$" + tooltip + "$" + code + "$" + header + "$" + gid + ";" + color1 + ";" + color2 + ";" + header);
+	init: function () {
+		var handle = DataFile.getStats().handle;
+
+		if (handle) {
+			this.handle = handle;
+		}
+
+		return this.handle;
 	},
-	saveItem: function (filename, tooltip, code, color1, color2) {
-		sendCopyData(null, "D2Bot #", 0, "saveItem;" + filename + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);
+
+	sendMessage: function (handle, mode, msg) {
+		sendCopyData(null, handle, mode, msg);
 	},
+
+	printToConsole: function (msg, color, tooltip, trigger) {
+		var printObj = {
+				msg: msg,
+				color: color || 0,
+				tooltip: tooltip || "",
+				trigger: trigger || ""
+			},
+
+			obj = {
+				profile: me.profile,
+				func: "printToConsole",
+				args: [JSON.stringify(printObj)]
+			};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	printToItemLog: function (itemObj) {
+		var obj = {
+				profile: me.profile,
+				func: "printToItemLog",
+				args: [JSON.stringify(itemObj)]
+			};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	saveItem: function (itemObj) {
+		var obj = {
+				profile: me.profile,
+				func: "saveItem",
+				args: [JSON.stringify(itemObj)]
+			};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	updateStatus: function (msg) {
-		sendCopyData(null, "D2Bot #", 0, "updateStatus;" + msg);
+		var obj = {
+			profile: me.profile,
+			func: "updateStatus",
+			args: [msg]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	updateRuns: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateRuns");
+		var obj = {
+			profile: me.profile,
+			func: "updateRuns",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	updateChickens: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateChickens");
+		var obj = {
+			profile: me.profile,
+			func: "updateChickens",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
+	updateDeaths: function () {
+		var obj = {
+			profile: me.profile,
+			func: "updateDeaths",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	requestGameInfo: function () {
-		sendCopyData(null, "D2Bot #", 0, "requestGameInfo");
-		delay(500);
+		var obj = {
+			profile: me.profile,
+			func: "requestGameInfo",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
-	restart: function (reset) {
-		if (arguments.length > 0) {
-			sendCopyData(null, "D2Bot #", 0, "restartProfile;" + reset.toString());
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "restartProfile");
-		}
+
+	restart: function (keySwap) {
+		var obj = {
+			profile: me.profile,
+			func: "restartProfile",
+			args: arguments.length > 0 ? [me.profile, keySwap] : [me.profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	CDKeyInUse: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyInUse");
+		var obj = {
+			profile: me.profile,
+			func: "CDKeyInUse",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	CDKeyDisabled: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyDisabled");
+		var obj = {
+			profile: me.profile,
+			func: "CDKeyDisabled",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	CDKeyRD: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyRD");
+		var obj = {
+			profile: me.profile,
+			func: "CDKeyRD",
+			args: []
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
-	joinMe: function (window, gameName, gameCount, gamePass, isUp) {
-		sendCopyData(null, window, 1, gameName + gameCount + "/" + gamePass + "/" + isUp);
-	},
-	requestGame: function (who) {
-		sendCopyData(null, who, 3, me.profile);
-	},
+
 	stop: function (profile) {
-		if (profile) {
-			sendCopyData(null, "D2Bot #", 0, "stop;" + profile);
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "stop");
+		if (!profile) {
+			profile = me.profile;
 		}
+
+		var obj = {
+			profile: me.profile,
+			func: "stop",
+			args: [profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	start: function (profile) {
-		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
+		var obj = {
+			profile: me.profile,
+			func: "start",
+			args: [profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	updateCount: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateCount;" + "nnqq");
+		var obj = {
+			profile: me.profile,
+			func: "updateCount",
+			args: ["1"]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	shoutGlobal: function (msg, mode) {
-		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");
+		var obj = {
+			profile: me.profile,
+			func: "shoutGlobal",
+			args: [msg, mode]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+
 	heartBeat: function () {
-		sendCopyData(null, "D2Bot #", 0, "heartBeat");
+		var obj = {
+			profile: me.profile,
+			func: "heartBeat",
+			args: []
+		};
+
+		//print("ÿc1Heart beat " + this.handle);
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	sendWinMsg: function (wparam, lparam) {
+		var obj = {
+			profile: me.profile,
+			func: "winmsg",
+			args: [wparam, lparam]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	ingame: function () {
+		this.sendWinMsg(0x0086, 0x0000);
+		this.sendWinMsg(0x0006, 0x0002);
+		this.sendWinMsg(0x001c, 0x0000);
+	},
+
+	// Profile to profile communication
+	joinMe: function (profile, gameName, gameCount, gamePass, isUp) {
+		var obj = {
+			gameName: gameName + gameCount,
+			gamePass: gamePass,
+			inGame: isUp === "yes"
+		};
+
+		sendCopyData(null, profile, 1, JSON.stringify(obj));
+	},
+
+	requestGame: function (profile) {
+		var obj = {
+			profile: me.profile
+		};
+
+		sendCopyData(null, profile, 3, JSON.stringify(obj));
 	}
 };
+
 var DataFile = {
 	create: function () {
 		var obj, string;
@@ -89,7 +252,9 @@ var DataFile = {
 			level: 0,
 			name: "",
 			gameName: "",
-			ingameTick: 0
+			ingameTick: 0,
+			handle: 0,
+			nextGame: ""
 		};
 
 		string = JSON.stringify(obj);
@@ -123,17 +288,17 @@ var DataFile = {
 
 		print("Error reading DataFile. Using null values.");
 
-		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0};
+		return {runs: 0, experience: 0, lastArea: "", gold: 0, level: 0, name: "", gameName: "", ingameTick: 0, handle: 0, nextGame: ""};
 	},
 
 	getStats: function () {
 		var obj = this.getObj();
 
-		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick};
+		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick, handle: obj.handle, nextGame: obj.nextGame};
 	},
 
 	updateStats: function (arg, value) {
-		var i, obj, string, area,
+		var i, obj, string,
 			statArr = [];
 
 		if (typeof arg === "object") {
@@ -158,17 +323,11 @@ var DataFile = {
 
 				break;
 			case "lastArea":
-				area = getArea();
-
-				if (typeof area !== "object") {
+				if (obj.lastArea === Pather.getAreaName(me.area)) {
 					return;
 				}
 
-				if (obj.lastArea === getArea().name) {
-					return;
-				}
-
-				obj.lastArea = getArea().name;
+				obj.lastArea = Pather.getAreaName(me.area);
 
 				break;
 			case "gold":
@@ -191,6 +350,14 @@ var DataFile = {
 				obj.deaths = (obj.deaths || 0) + 1;
 
 				break;
+			case "handle":
+				obj.handle = value;
+
+				break;
+			case "nextGame":
+				obj.nextGame = value;
+
+				break;
 			}
 		}
 
@@ -202,6 +369,19 @@ var DataFile = {
 };
 
 var ControlAction = {
+	timeoutDelay: function (text, time, stopfunc, arg) {
+		var endTime = getTickCount() + time;
+
+		while (getTickCount() < endTime) {
+			if (typeof stopfunc === "function" && stopfunc(arg)) {
+				break;
+			}
+
+			D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+			delay(500);
+		}
+	},
+
 	click: function (type, x, y, xsize, ysize, targetx, targety) {
 		var control = getControl(type, x, y, xsize, ysize);
 
@@ -243,6 +423,90 @@ var ControlAction = {
 		}
 
 		return control.getText();
+	},
+
+	joinChannel: function (channel) {
+		me.blockMouse = true;
+
+		var i, currChan, lines, fullText, tick,
+			rval = false,
+			timeout = 5000;
+
+MainLoop:
+		while (true) {
+			switch (getLocation()) {
+			case 1: // Lobby
+				this.click(6, 27, 480, 120, 20);
+
+				break;
+			case 3: // Chat
+				currChan = this.getText(4, 28, 138, 354, 60); // returns array
+
+				if (currChan) {
+					for (i = 0; i < currChan.length; i += 1) {
+						if (currChan[i].split(" (") && currChan[i].split(" (")[0].toLowerCase() === channel.toLowerCase()) {
+							rval = true;
+
+							break MainLoop;
+						}
+					}
+				}
+
+				if (!tick) {
+					this.click(6, 535, 490, 80, 20);
+
+					tick = getTickCount();
+				}
+
+				break;
+			case 7: // Channel
+				this.setText(1, 432, 162, 155, 20, channel);
+				this.click(6, 671, 433, 96, 32);
+
+				break;
+			}
+
+			if (getTickCount() - tick >= timeout) {
+				break MainLoop;
+			}
+
+			delay(1000);
+		}
+
+		me.blockMouse = false;
+
+		return rval;
+	},
+
+	createGame: function (name, pass, diff, delay) {
+		ControlAction.setText(1, 432, 162, 158, 20, name);
+		ControlAction.setText(1, 432, 217, 158, 20, pass);
+
+		switch (diff) {
+		case "Normal":
+			ControlAction.click(6, 430, 381, 16, 16);
+
+			break;
+		case "Nightmare":
+			ControlAction.click(6, 555, 381, 16, 16);
+
+			break;
+		default:
+			ControlAction.click(6, 698, 381, 16, 16);
+
+			break;
+		}
+
+		if (delay) {
+			this.timeoutDelay("Make Game Delay", delay);
+		}
+
+		me.blockMouse = true;
+
+		print("Creating Game: " + name);
+		ControlAction.click(6, 594, 433, 172, 32);
+
+		me.blockMouse = false;
 	},
 
 	clickRealm: function (realm) {
@@ -306,12 +570,13 @@ MainLoop:
 	loginAccount: function (info) {
 		me.blockMouse = true;
 
-		var tick, realms = {
-			"uswest": 0,
-			"useast": 1,
-			"asia": 2,
-			"europe": 3
-		};
+		var tick,
+			realms = {
+				"uswest": 0,
+				"useast": 1,
+				"asia": 2,
+				"europe": 3
+			};
 
 		tick = getTickCount();
 

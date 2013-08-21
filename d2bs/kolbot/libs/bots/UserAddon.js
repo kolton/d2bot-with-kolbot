@@ -8,10 +8,10 @@
 */
 
 function UserAddon() {
-	var i, unit,
+	var i, unit, title, dummy,
+		info = new UnitInfo(),
 		classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
-		flags = [0x1, 0x2, 0x3, 0x4, 0x5, 0xf, 0x18, 0x19, 0xc, 0x9],
-		title = new Text(":: kolbot user addon ::", 400, 525, 4, 13, 2);
+		flags = [0x1, 0x2, 0x3, 0x4, 0x5, 0xf, 0x18, 0x19, 0xc, 0x9];
 
 	this.keyEvent = function (key) {
 		switch (key) {
@@ -38,26 +38,33 @@ function UserAddon() {
 	while (true) {
 		for (i = 0; i < flags.length; i += 1) {
 			if (getUIFlag(flags[i])) {
-				title.visible = false;
+				if (title) {
+					title.remove();
+					dummy.remove();
+
+					title = false;
+					dummy = false;
+				}
 
 				break;
 			}
 		}
 
-		if (!title.visible && i === flags.length) {
-			title.visible = true;
+		if (i === flags.length && !title) {
+			title = new Text(":: kolbot user addon ::", 400, 525, 4, 0, 2);
+			dummy = new Text("`", 1, 1); // Prevents crash
 		}
 
 		Pickit.fastPick();
 
 		unit = getUnit(101);
 
-		UnitInfo.createInfo(unit);
-		delay(10);
+		info.createInfo(unit);
+		delay(20);
 	}
 }
 
-var UnitInfo = new function () {
+function UnitInfo() {
 	this.x = 200;
 	this.y = 250;
 	this.hooks = [];
@@ -107,7 +114,7 @@ var UnitInfo = new function () {
 
 		this.hooks.push(new Text("Classid: ÿc0" + unit.classid, this.x, this.y, 4, 13, 2));
 
-		items = unit.getItems(-1, 1);
+		items = unit.getItems();
 
 		if (items) {
 			this.hooks.push(new Text("Equipped items:", this.x, this.y + 15, 4, 13, 2));
@@ -226,4 +233,4 @@ var UnitInfo = new function () {
 
 		this.cleared = true;
 	};
-};
+}

@@ -5,6 +5,8 @@
 */
 
 var Skill = {
+	charges: [],
+
 	// Cast a skill on self, Unit or coords
 	cast: function (skillId, hand, x, y) {
 		if (me.inTown && !this.townSkill(skillId)) {
@@ -12,6 +14,10 @@ var Skill = {
 		}
 
 		if (!me.getSkill(skillId, 1)) {
+			return false;
+		}
+
+		if (!this.wereFormCheck(skillId)) {
 			return false;
 		}
 
@@ -24,21 +30,21 @@ var Skill = {
 			return false;
 		}
 
-		if (typeof skillId === "undefined") {
+		if (skillId === undefined) {
 			throw new Error("Skill.cast: Must supply a skill ID");
 		}
 
 		var i, n, clickType, shift;
 
-		if (typeof hand === "undefined") {
+		if (hand === undefined) {
 			hand = 0;
 		}
 
-		if (typeof x === "undefined") {
+		if (x === undefined) {
 			x = me.x;
 		}
 
-		if (typeof y === "undefined") {
+		if (y === undefined) {
 			y = me.y;
 		}
 
@@ -61,17 +67,17 @@ var Skill = {
 			}
 		} else {
 			switch (hand) {
-			case 0:
+			case 0: // Right hand
 				clickType = 3;
 				shift = 0;
 
 				break;
-			case 1:
+			case 1: // Left hand + Shift
 				clickType = 0;
 				shift = 1;
 
 				break;
-			case 2: // For melee skills that don't need shift
+			case 2: // Left hand + No Shift
 				clickType = 0;
 				shift = 0;
 
@@ -127,7 +133,11 @@ MainLoop:
 			return false;
 		}
 
-		if (typeof hand === "undefined") {
+		if (this.isCharge(skillId)) {
+			return false;
+		}
+
+		if (hand === undefined) {
 			hand = 0;
 		}
 
@@ -143,9 +153,46 @@ MainLoop:
 		return false;
 	},
 
+	// Charged skill
+	isCharge: function (skillId) {
+		var i;
+
+		for (i = 0; i < this.charges.length; i += 1) {
+			if (this.charges[i].skill === skillId && me.getSkill(skillId, 0) === this.charges[i].level && me.getSkill(skillId, 0) === me.getSkill(skillId, 1)) {
+				return true;
+			}
+		}
+
+		return false;
+	},
+
 	// Timed skills
 	isTimed: function (skillId) {
 		return [15, 25, 27, 51, 56, 59, 62, 64, 121, 225, 223, 228, 229, 234, 244, 247, 249, 250, 256, 268, 275, 277, 279].indexOf(skillId) > -1;
+	},
+
+	// Wereform skill check
+	wereFormCheck: function (skillId) {
+		if (!me.getState(139) && !me.getState(140)) {
+			return true;
+		}
+
+		// Can be cast by both
+		if ([1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
+			return true;
+		}
+
+		// Can be cast by werewolf only
+		if (me.getState(139) && [223, 232, 238, 248].indexOf(skillId) > -1) {
+			return true;
+		}
+
+		// Can be cast by werebear only
+		if (me.getState(140) && [228, 233, 243].indexOf(skillId) > -1) {
+			return true;
+		}
+
+		return false;
 	},
 
 	// Skills that cn be cast in town
@@ -164,6 +211,119 @@ MainLoop:
 	}
 };
 
+var Items = {
+	// Equips an item and throws away the old equipped item
+	equip: function (unit) {
+		if (unit.type !== 4) {
+			throw new Error("Items.equp: Unit must be an item");
+		}
+
+		if (!unit.getFlag(0x10)) { // Unid item
+			return false;
+		}
+
+		if (unit.getStat(92) > me.getStat(12)) { // Higher level req item
+			return false;
+		}
+
+		var i, bodyLoc;
+
+		switch (unit.itemType) {
+		case 2: // Shield
+		case 70: // Auric Shields
+			bodyLoc = [4, 5];
+
+			break;
+		case 3: // Armor
+			bodyLoc = 3;
+
+			break;
+		case 5: // Arrows
+		case 6: // Bolts
+			bodyLoc = [4, 5];
+
+			break;
+		case 10: // Ring
+			bodyLoc = [6, 7];
+
+			break;
+		case 12: // Amulet
+			bodyLoc = 2;
+
+			break;
+		case 15: // Boots
+			bodyLoc = 9;
+
+			break;
+		case 16: // Gloves
+			bodyLoc = 10;
+
+			break;
+		case 19: // Belt
+			bodyLoc = 8;
+
+			break;
+		case 37: // Helm
+		case 71: // Barb Helm
+		case 75: // Circlet
+			bodyLoc = 1;
+
+			break;
+		case 24: // 
+		case 25: // 
+		case 26: // 
+		case 27: // 
+		case 28: // 
+		case 29: // 
+		case 30: // 
+		case 31: // 
+		case 32: // 
+		case 33: // 
+		case 34: // 
+		case 35: // 
+		case 36: // 
+		case 42: // 
+		case 43: // 
+		case 44: // 
+		case 67: // Handtohand (Assasin Claw)
+		case 68: // 
+		case 69: // 
+		case 72: // 
+		case 85: // 
+		case 86: // 
+		case 87: // 
+		case 88: // 
+			bodyLoc = [4, 5];
+
+			break;
+		default:
+			throw new Error("Items.equip: Bad item type");
+		}
+
+		if (typeof bodyLoc === "object") {
+			// Temporary
+			bodyLoc = bodyLoc[0];
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			if (unit.toCursor()) {
+				clickItem(0, bodyLoc);
+				delay(me.ping * 2 + 500);
+
+				if (unit.bodylocation === bodyLoc) {
+					if (getCursorType() === 3) {
+						Misc.click(0, 0, me);
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+};
+
 var Misc = {
 	// Click something
 	click: function (button, shift, x, y) {
@@ -171,11 +331,16 @@ var Misc = {
 			throw new Error("Misc.click: Needs at least 2 arguments.");
 		}
 
+		while (!me.gameReady) {
+			delay(100);
+		}
+
 		switch (arguments.length) {
 		case 2:
 			clickMap(button, shift, me.x, me.y);
 			delay(20);
 			clickMap(button + 2, shift, me.x, me.y);
+
 			break;
 		case 3:
 			if (typeof (x) !== "object") {
@@ -185,11 +350,13 @@ var Misc = {
 			clickMap(button, shift, x);
 			delay(20);
 			clickMap(button + 2, shift, x);
+
 			break;
 		case 4:
 			clickMap(button, shift, x, y);
 			delay(20);
 			clickMap(button + 2, shift, x, y);
+
 			break;
 		}
 
@@ -200,6 +367,10 @@ var Misc = {
 	inMyParty: function (name) {
 		if (me.name === name) {
 			return true;
+		}
+
+		while (!me.gameReady) {
+			delay(100);
 		}
 
 		var player, myPartyId;
@@ -236,8 +407,12 @@ var Misc = {
 
 	// Open a chest Unit
 	openChest: function (unit) {
-		if (!unit || unit.mode || unit.x === 12526 || unit.x === 12565) { // Skip invalid, opened and Countess chests
+		if (!unit || unit.x === 12526 || unit.x === 12565) { // Skip invalid and Countess chests
 			return false;
+		}
+
+		if (unit.mode) {
+			return true;
 		}
 
 		if (me.classid !== 6 && unit.islocked && !me.findItem("key", 0, 3)) { // locked chest, no keys
@@ -247,8 +422,8 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 2, 0)) {
-				unit.interact();
+			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
+				Misc.click(0, 0, unit);
 			}
 
 			tick = getTickCount();
@@ -262,17 +437,21 @@ var Misc = {
 			}
 		}
 
+		if (!me.idle) {
+			Misc.click(0, 0, me.x, me.y); // Click to stop walking in case we got stuck
+		}
+
 		return false;
 	},
 
-	// Open all chests that have preset units in an area
 	// Open all chests that have preset units in an area
 	openChestsInArea: function (area) {
 		if (!area) {
 			area = me.area;
 		}
 
-		var chest,
+		var i,
+			coords = [],
 			presetUnits = getPresetUnits(area),
 			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
 						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
@@ -282,68 +461,30 @@ var Misc = {
 		}
 
 		while (presetUnits.length > 0) {
-			presetUnits.sort(Sort.presetUnits);
-
 			if (chestIds.indexOf(presetUnits[0].id) > -1) {
-				Pather.moveToUnit(presetUnits[0], 2, 0);
-
-				chest = getUnit(2, -1, 0);
-
-				if (chest) {
-					do {
-						if (chestIds.indexOf(chest.classid) > -1 && getDistance(me, chest) < 5 && this.openChest(chest)) {
-							Pickit.pickItems();
-
-							break;
-						}
-					} while (chest.getNext());
-				}
+				coords.push({
+					x: presetUnits[0].roomx * 5 + presetUnits[0].x,
+					y: presetUnits[0].roomy * 5 + presetUnits[0].y
+				});
 			}
 
 			presetUnits.shift();
 		}
 
+		while (coords.length) {
+			coords.sort(Sort.units);
+			Pather.moveToUnit(coords[0], 2, 0);
+			this.openChests(20);
+
+			for (i = 0; i < coords.length; i += 1) {
+				if (getDistance(coords[i].x, coords[i].y, coords[0].x, coords[0].y) < 20) {
+					coords.shift();
+				}
+			}
+		}
+
 		return true;
 	},
-
-	/*openChestsInArea: function (area) {
-		var room, presetUnits,
-			rooms = [],
-			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
-						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
-
-		if (!area) {
-			area = me.area;
-		}
-
-		room = getRoom(area);
-
-		if (room) {
-			do {
-				presetUnits = room.getPresetUnits(2);
-
-				while (presetUnits.length) {
-					presetUnits.sort(Sort.presetUnits);
-
-					if (chestIds.indexOf(presetUnits[0].id) > -1) {
-						rooms.push({x: presetUnits[0].roomx * 5 + presetUnits[0].x, y: presetUnits[0].roomy * 5 + presetUnits[0].y});
-
-						break;
-					}
-
-					presetUnits.shift();
-				}
-			} while (room.getNext());
-		}
-
-		while (rooms.length) {
-			rooms.sort(Sort.units);
-			this.openChestsInRoom(rooms[0].x, rooms[0].y);
-			rooms.shift();
-		}
-
-		return true;
-	},*/
 
 	openChestsInRoom: function (x, y) {
 		var unit, room,
@@ -386,7 +527,17 @@ var Misc = {
 			range = 15;
 		}
 
-		unit = getUnit(2);
+		// Testing all container code
+		if (Config.OpenChests === 2) {
+			containers = ["chest", "loose rock", "hidden stash", "loose boulder", "corpseonstick", "casket", "armorstand", "weaponrack", "barrel", "holeanim",
+							"roguecorpse", "ratnest", "corpse", "goo pile", "largeurn", "urn", "chest3", "jug", "skeleton", "guardcorpse", "sarcophagus",
+							"cocoon", "basket", "stash", "hollow log", "hungskeleton", "pillar", "skullpile", "skull pile", "jar3", "jar2", "jar1", "bonechest", "woodchestl",
+							"woodchestr", "barrel wilderness", "burialchestr", "burialchestl", "explodingchest", "chestl", "chestr", "icecavejar1", "icecavejar2",
+							"icecavejar3", "icecavejar4", "deadperson", "deadperson2", "evilurn", "tomb1l", "tomb3l", "tomb2", "tomb3", "object2", "groundtomb", "groundtombl"
+						];
+		}
+
+		unit = getUnit(2, -1, 0);
 
 		if (unit) {
 			do {
@@ -507,11 +658,16 @@ var Misc = {
 
 	// Use a shrine Unit
 	getShrine: function (unit) {
+		if (unit.mode) {
+			return false;
+		}
+
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 3, 0)) {
-				unit.interact();
+				Misc.click(0, 0, unit);
+				//unit.interact();
 			}
 
 			tick = getTickCount();
@@ -554,14 +710,12 @@ var Misc = {
 
 			if (shrine) {
 				do {
-					if (shrine.objtype === type) {
+					if (shrine.objtype === type && shrine.mode === 0) {
 						Pather.moveTo(shrine.x - 2, shrine.y - 2);
 
-						if (use) {
-							return this.getShrine(shrine);
+						if (!use || this.getShrine(shrine)) {
+							return true;
 						}
-
-						return true;
 					}
 				} while (shrine.getNext());
 			}
@@ -590,7 +744,7 @@ var Misc = {
 		}
 
 		if (desc[desc.length - 1]) {
-			desc[desc.length - 1] += (" (" + unit.ilvl + ")");
+			desc[desc.length - 1] = desc[desc.length - 1].trim() + " (" + unit.ilvl + ")";
 		}
 
 		desc = desc.reverse().join("\n");
@@ -598,17 +752,121 @@ var Misc = {
 		return desc;
 	},
 
+	getItemSockets: function (unit) {
+		var i, code,
+			sockets = unit.getStat(194),
+			subItems = unit.getItems(),
+			tempArray = [];
+
+		if (subItems) {
+			switch (unit.sizex) {
+			case 2:
+				switch (unit.sizey) {
+				case 3: // 2 x 3
+					switch (sockets) {
+					case 4:
+						tempArray = [subItems[0], subItems[3], subItems[2], subItems[1]];
+
+						break;
+					case 5:
+						tempArray = [subItems[1], subItems[4], subItems[0], subItems[3], subItems[2]];
+
+						break;
+					case 6:
+						tempArray = [subItems[0], subItems[3], subItems[1], subItems[4], subItems[2], subItems[5]];
+
+						break;
+					}
+
+					break;
+				case 4: // 2 x 4
+					switch (sockets) {
+					case 5:
+						tempArray = [subItems[1], subItems[4], subItems[0], subItems[3], subItems[2]];
+
+						break;
+					case 6:
+						tempArray = [subItems[0], subItems[3], subItems[1], subItems[4], subItems[2], subItems[5]];
+
+						break;
+					}
+
+					break;
+				}
+
+				break;
+			}
+
+			if (tempArray.length === 0 && subItems.length > 0) {
+				tempArray = subItems.slice(0);
+			}
+		}
+
+		for (i = 0; i < sockets; i += 1) {
+			if (tempArray[i]) {
+				code = tempArray[i].code;
+
+				if ([10, 12, 58, 82, 83, 84].indexOf(tempArray[i].itemType) > -1) {
+					code += (tempArray[i].gfx + 1);
+				}
+			} else {
+				code = "gemsocket";
+			}
+
+			tempArray[i] = code;
+		}
+
+		return tempArray;
+	},
+
+	itemLogger: function (action, unit) {
+		if (!Config.ItemInfo) {
+			return false;
+		}
+
+		var desc;
+
+		switch (action) {
+		case "Sold":
+			if (Config.ItemInfoQuality.indexOf(unit.quality) === -1) {
+				return false;
+			}
+
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+
+			break;
+		case "Kept":
+		case "Field Kept":
+		case "Runeword Kept":
+		case "Cubing Kept":
+		case "Shopped":
+		case "Gambled":
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+
+			break;
+		case "No room for":
+			desc = unit.name;
+
+			break;
+		default:
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+
+			break;
+		}
+
+		return this.fileAction("logs/ItemLog.txt", 2, "[" + me.profile + "] <" + action + "> " + desc + "\n");
+	},
+
 	// Log kept item stats in the manager.
 	logItem: function (action, unit, keptLine) {
-		var i, lastArea, code, desc, sock,
+		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim();
 
 		desc = this.getItemDesc(unit);
 		color = unit.getColor();
-		//desc += ("\nÿc0Item Level: " + unit.ilvl);
 
-		if (action === "Kept") {
+		if (action.match("kept", "i")) {
 			lastArea = DataFile.getStats().lastArea;
 
 			if (lastArea) {
@@ -617,132 +875,134 @@ var Misc = {
 		}
 
 		// experimental
-		switch (unit.quality) {
-		case 5: // Set
-			switch (unit.classid) {
-			case 27: // Angelic sabre
-				code = "inv9sbu";
+		if (unit.getFlag(0x10)) {
+			switch (unit.quality) {
+			case 5: // Set
+				switch (unit.classid) {
+				case 27: // Angelic sabre
+					code = "inv9sbu";
 
-				break;
-			case 74: // Arctic short war bow
-				code = "invswbu";
+					break;
+				case 74: // Arctic short war bow
+					code = "invswbu";
 
-				break;
-			case 308: // Berserker's helm
-				code = "invhlmu";
+					break;
+				case 308: // Berserker's helm
+					code = "invhlmu";
 
-				break;
-			case 330: // Civerb's large shield
-				code = "invlrgu";
+					break;
+				case 330: // Civerb's large shield
+					code = "invlrgu";
 
-				break;
-			case 31: // Cleglaw's long sword
-			case 227: // Szabi's cryptic sword
-				code = "invlsdu";
+					break;
+				case 31: // Cleglaw's long sword
+				case 227: // Szabi's cryptic sword
+					code = "invlsdu";
 
-				break;
-			case 329: // Cleglaw's small shield
-				code = "invsmlu";
+					break;
+				case 329: // Cleglaw's small shield
+					code = "invsmlu";
 
-				break;
-			case 328: // Hsaru's buckler
-				code = "invbucu";
+					break;
+				case 328: // Hsaru's buckler
+					code = "invbucu";
 
-				break;
-			case 306: // Infernal cap / Sander's cap
-				code = "invcapu";
+					break;
+				case 306: // Infernal cap / Sander's cap
+					code = "invcapu";
 
-				break;
-			case 30: // Isenhart's broad sword
-				code = "invbsdu";
+					break;
+				case 30: // Isenhart's broad sword
+					code = "invbsdu";
 
-				break;
-			case 309: // Isenhart's full helm
-				code = "invfhlu";
+					break;
+				case 309: // Isenhart's full helm
+					code = "invfhlu";
 
-				break;
-			case 333: // Isenhart's gothic shield
-				code = "invgtsu";
+					break;
+				case 333: // Isenhart's gothic shield
+					code = "invgtsu";
 
-				break;
-			case 326: // Milabrega's ancient armor
-			case 442: // Immortal King's sacred armor
-				code = "invaaru";
+					break;
+				case 326: // Milabrega's ancient armor
+				case 442: // Immortal King's sacred armor
+					code = "invaaru";
 
-				break;
-			case 331: // Milabrega's kite shield
-				code = "invkitu";
+					break;
+				case 331: // Milabrega's kite shield
+					code = "invkitu";
 
-				break;
-			case 332: // Sigon's tower shield
-				code = "invtowu";
+					break;
+				case 332: // Sigon's tower shield
+					code = "invtowu";
 
-				break;
-			case 325: // Tancred's full plate mail
-				code = "invfulu";
+					break;
+				case 325: // Tancred's full plate mail
+					code = "invfulu";
 
-				break;
-			case 3: // Tancred's military pick
-				code = "invmpiu";
+					break;
+				case 3: // Tancred's military pick
+					code = "invmpiu";
 
-				break;
-			case 113: // Aldur's jagged star
-				code = "invmstu";
+					break;
+				case 113: // Aldur's jagged star
+					code = "invmstu";
 
-				break;
-			case 234: // Bul-Kathos' colossus blade
-				code = "invgsdu";
+					break;
+				case 234: // Bul-Kathos' colossus blade
+					code = "invgsdu";
 
-				break;
-			case 372: // Grizwold's ornate plate
-				code = "invxaru";
+					break;
+				case 372: // Grizwold's ornate plate
+					code = "invxaru";
 
-				break;
-			case 366: // Heaven's cuirass
-			case 215: // Heaven's reinforced mace
-			case 449: // Heaven's ward
-			case 426: // Heaven's spired helm
-				code = "inv" + unit.code + "s";
+					break;
+				case 366: // Heaven's cuirass
+				case 215: // Heaven's reinforced mace
+				case 449: // Heaven's ward
+				case 426: // Heaven's spired helm
+					code = "inv" + unit.code + "s";
 
-				break;
-			case 357: // Hwanin's grand crown
-				code = "invxrnu";
+					break;
+				case 357: // Hwanin's grand crown
+					code = "invxrnu";
 
-				break;
-			case 195: // Nalya's scissors suwayyah
-				code = "invskru";
+					break;
+				case 195: // Nalya's scissors suwayyah
+					code = "invskru";
 
-				break;
-			case 395: // Nalya's grim helm
-			case 465: // Trang-Oul's bone visage
-				code = "invbhmu";
+					break;
+				case 395: // Nalya's grim helm
+				case 465: // Trang-Oul's bone visage
+					code = "invbhmu";
 
-				break;
-			case 261: // Naj's elder staff
-				code = "invcstu";
+					break;
+				case 261: // Naj's elder staff
+					code = "invcstu";
 
-				break;
-			case 375: // Orphan's round shield
-				code = "invxmlu";
+					break;
+				case 375: // Orphan's round shield
+					code = "invxmlu";
 
-				break;
-			case 12: // Sander's bone wand
-				code = "invbwnu";
-
-				break;
-			}
-
-			break;
-		case 7: // Unique
-			for (i = 0; i < 401; i += 1) {
-				if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
-					code = getBaseStat(17, i, "invfile");
+					break;
+				case 12: // Sander's bone wand
+					code = "invbwnu";
 
 					break;
 				}
-			}
 
-			break;
+				break;
+			case 7: // Unique
+				for (i = 0; i < 401; i += 1) {
+					if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+						code = getBaseStat(17, i, "invfile");
+
+						break;
+					}
+				}
+
+				break;
+			}
 		}
 
 		if (!code) {
@@ -759,35 +1019,62 @@ var Misc = {
 			}
 		}
 
-		sock = unit.getItems();
+		sock = unit.getItem();
 
 		if (sock) {
-			for (i = 0; i < sock.length; i += 1) {
-				if (sock[i].itemType === 58) {
+			do {
+				if (sock.itemType === 58) {
 					desc += "\n\n";
-					desc += this.getItemDesc(sock[i]);
+					desc += this.getItemDesc(sock);
 				}
-			}
+			} while (sock.getNext());
 		}
 
 		if (keptLine) {
 			desc += ("\nÿc0Line: " + keptLine);
 		}
 
-		D2Bot.printToItemLog(action + " " + name, desc, code, unit.quality, color);
+		itemObj = {
+			title: action + " " + name,
+			description: desc,
+			image: code,
+			textColor: unit.quality,
+			itemColor: color,
+			header: "",
+			sockets: this.getItemSockets(unit)
+		};
+
+		D2Bot.printToItemLog(itemObj);
 
 		return true;
 	},
 
 	// Change into werewolf or werebear
-	shapeShift: function (mode) { // 0 = werewolf, 1 = werebear
-		if (arguments.length === 0 || mode < 0 || mode > 2) {
-			throw new Error("Misc.shapeShift: Invalid parameter");
+	shapeShift: function (mode) {
+		var i, tick, skill, state;
+
+		switch (mode.toString().toLowerCase()) {
+		case "0":
+			return false;
+		case "1":
+		case "werewolf":
+			state = 139;
+			skill = 223;
+
+			break;
+		case "2":
+		case "werebear":
+			state = 140;
+			skill = 228;
+
+			break;
+		default:
+			throw new Error("shapeShift: Invalid parameter");
 		}
 
-		var i, tick,
-			state = mode === 0 ? 139 : 140,
-			skill = mode === 0 ? 223 : 228;
+		if (me.getState(state)) {
+			return true;
+		}
 
 		for (i = 0; i < 3; i += 1) {
 			Skill.cast(skill, 0);
@@ -796,6 +1083,8 @@ var Misc = {
 
 			while (getTickCount() - tick < 2000) {
 				if (me.getState(state)) {
+					delay(250);
+
 					return true;
 				}
 
@@ -818,6 +1107,8 @@ var Misc = {
 
 				while (getTickCount() - tick < 2000) {
 					if (!me.getState(139) && !me.getState(140)) {
+						delay(250);
+
 						return true;
 					}
 
@@ -846,64 +1137,71 @@ var Misc = {
 			needhp = true,
 			needmp = true;
 
-		// Can't tp from uber trist
-		if (me.area === 136) {
-			return true;
+		// Can't tp from uber trist or when dead
+		if (me.area === 136 || me.dead) {
+			return false;
 		}
 
 		if (Config.TownCheck && !me.inTown) {
-			for (i = 0; i < 4; i += 1) {
-				if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
-					potion = me.getItem(-1, 2); // belt item
+			try {
+				for (i = 0; i < 4; i += 1) {
+					if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
+						potion = me.getItem(-1, 2); // belt item
 
-					if (potion) {
-						do {
-							if (potion.code.indexOf("hp") > -1) {
-								needhp = false;
+						if (potion) {
+							do {
+								if (potion.code.indexOf("hp") > -1) {
+									needhp = false;
 
-								break;
-							}
-						} while (potion.getNext());
+									break;
+								}
+							} while (potion.getNext());
+						}
+
+						if (needhp) {
+							print("We need healing potions");
+
+							check = true;
+						}
 					}
 
-					if (needhp) {
-						print("We need healing potions");
+					if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
+						potion = me.getItem(-1, 2); // belt item
 
-						check = true;
+						if (potion) {
+							do {
+								if (potion.code.indexOf("mp") > -1) {
+									needmp = false;
+
+									break;
+								}
+							} while (potion.getNext());
+						}
+
+						if (needmp) {
+							print("We need mana potions");
+
+							check = true;
+						}
 					}
 				}
 
-				if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
-					potion = me.getItem(-1, 2); // belt item
-
-					if (potion) {
-						do {
-							if (potion.code.indexOf("mp") > -1) {
-								needmp = false;
-
-								break;
-							}
-						} while (potion.getNext());
-					}
-
-					if (needmp) {
-						print("We need mana potions");
-
-						check = true;
-					}
+				if (Config.OpenChests && Town.needKeys()) {
+					check = true;
 				}
-			}
-
-			if (Config.OpenChests && Town.needKeys()) {
-				check = true;
+			} catch (e) {
+				check = false;
 			}
 		}
 
 		if (check) {
 			scriptBroadcast("townCheck");
+			delay(500);
+
+			return true;
 		}
 
-		return true;
+		return false;
 	},
 
 	// Log someone's gear
@@ -916,7 +1214,7 @@ var Misc = {
 			include("common/prototypes.js");
 		}
 
-		var i, items,
+		var item,
 			unit = getUnit(0, name);
 
 		if (!unit) {
@@ -925,17 +1223,19 @@ var Misc = {
 			return false;
 		}
 
-		items = unit.getItems();
+		item = unit.getItem();
 
-		for (i = 0; i < items.length; i += 1) {
-			this.logItem(name, items[i]);
+		if (item) {
+			do {
+				this.logItem(name, item);
+			} while (item.getNext());
 		}
 
 		return true;
 	},
 
 	// hopefully multi-thread and multi-profile friendly txt func
-	fileAction: function (path, mode, msg) {
+	/*fileAction: function (path, mode, msg) {
 		var i, file,
 			contents = "";
 
@@ -967,36 +1267,98 @@ MainLoop:
 		}
 
 		return mode === 0 ? contents : true;
+	},*/
+
+	fileAction: function (path, mode, msg) {
+		var i,
+			contents = "";
+
+MainLoop:
+		for (i = 0; i < 30; i += 1) {
+			try {
+				switch (mode) {
+				case 0: // read
+					contents = FileTools.readText(path);
+
+					break MainLoop;
+				case 1: // write
+					FileTools.writeText(path, msg);
+
+					break MainLoop;
+				case 2: // append
+					FileTools.appendText(path, msg);
+
+					break MainLoop;
+				}
+			} catch (e) {
+
+			}
+
+			delay(100);
+		}
+
+		return mode === 0 ? contents : true;
 	},
 
+	errorConsolePrint: true,
+	screenshotErrors: false,
+
 	// Report script errors to logs/ScriptErrorLog.txt
-	errorReport: function (msg) {
-		var h, m, s, date;
+	errorReport: function (error, script) {
+		var h, m, s, date, msg, oogmsg, filemsg;
 
 		date = new Date();
 		h = date.getHours();
 		m = date.getMinutes();
 		s = date.getSeconds();
 
+		if (typeof error === "string") {
+			msg = error;
+			oogmsg = error.replace(/ÿc[0-9!"+<;.*]/gi, "");
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+		} else {
+			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
+			oogmsg = error.message + " in " + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line " + error.lineNumber + ". Ping:" + me.ping;
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+		}
+
+		if (this.errorConsolePrint) {
+			D2Bot.printToConsole(oogmsg, 10);
+		}
+
 		showConsole();
 		print(msg);
-		this.fileAction("logs/ScriptErrorLog.txt", 2, "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n");
+		this.fileAction("logs/ScriptErrorLog.txt", 2, filemsg);
+
+		if (this.screenshotErrors) {
+			takeScreenshot();
+			delay(500);
+		}
+	},
+
+	debugLog: function (msg) {
+		if (!Config.Debug) {
+			return;
+		}
+
+		debugLog(me.profile + ": " + msg);
 	},
 
 	// Use a NPC menu. Experimental function, subject to change
 	// id = string number (with exception of Ressurect merc). http://www.blizzhackers.cc/viewtopic.php?f=209&t=378493
 	useMenu: function (id) {
-		print("useMenu " + getLocaleString(id));
+		//print("useMenu " + getLocaleString(id));
 
 		var i, npc, lines;
 
 		switch (id) {
-		case 0x1507: // Resurrect
-		case 0x0D44: // Trade
+		case 0x1507: // Resurrect (non-English dialog)
+		case 0x0D44: // Trade (crash dialog)
 			npc = getInteractedNPC();
 
 			if (npc) {
 				npc.useMenu(id);
+				delay(750);
 
 				return true;
 			}
@@ -1013,19 +1375,77 @@ MainLoop:
 		for (i = 0; i < lines.length; i += 1) {
 			if (lines[i].selectable && lines[i].text.indexOf(getLocaleString(id)) > -1) {
 				getDialogLines()[i].handler();
+				delay(750);
 
 				return true;
 			}
 		}
 
 		return false;
+	},
+
+	clone: function (obj) {
+		var i, copy, attr;
+
+		// Handle the 3 simple types, and null or undefined
+		if (null === obj || "object" !== typeof obj) {
+			return obj;
+		}
+
+		// Handle Date
+		if (obj instanceof Date) {
+			copy = new Date();
+
+			copy.setTime(obj.getTime());
+
+			return copy;
+		}
+
+		// Handle Array
+		if (obj instanceof Array) {
+			copy = [];
+
+			for (i = 0; i < obj.length; i += 1) {
+				copy[i] = this.clone(obj[i]);
+			}
+
+			return copy;
+		}
+
+		// Handle Object
+		if (obj instanceof Object) {
+			copy = {};
+
+			for (attr in obj) {
+				if (obj.hasOwnProperty(attr)) {
+					copy[attr] = this.clone(obj[attr]);
+				}
+			}
+
+			return copy;
+		}
+
+		throw new Error("Unable to copy obj! Its type isn't supported.");
+	},
+
+	copy: function (from) {
+		var i,
+			obj = {};
+
+		for (i in from) {
+			if (from.hasOwnProperty(i)) {
+				obj[i] = this.clone(from[i]);
+			}
+		}
+
+		return obj;
 	}
 };
 
 var Sort = {
 	// Sort units by comparing distance between the player
 	units: function (a, b) {
-		return getDistance(me.x, me.y, a.x, a.y) - getDistance(me.x, me.y, b.x, b.y);
+		return Math.round(getDistance(me.x, me.y, a.x, a.y)) - Math.round(getDistance(me.x, me.y, b.x, b.y));
 	},
 
 	// Sort preset units by comparing distance between the player (using preset x/y calculations)
@@ -1113,17 +1533,86 @@ var Experience = {
 		string = "[Game: " + me.gamename + (me.gamepassword ? "//" + me.gamepassword : "") + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP: " + gain + "] [Games ETA: " + runsToLevel + "]";
 
 		if (gain) {
-			D2Bot.printToConsole(string + ";4");
+			D2Bot.printToConsole(string, 4);
 
 			if (me.getStat(12) > DataFile.getStats().level) {
-				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";5");
+				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12), 5);
 			}
 		}
 	}
 };
 
 var Packet = {
-	buyItem: function (item, shiftBuy) {
+	openMenu: function (unit) {
+		if (unit.type !== 1) {
+			throw new Error("openMenu: Must be used on NPCs.");
+		}
+
+		if (getUIFlag(0x08)) {
+			return true;
+		}
+
+		var i, j;
+
+		for (i = 0; i < 3; i += 1) {
+			if (getDistance(me, unit) > 5) {
+				Pather.moveToUnit(unit);
+			}
+
+			sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+
+			for (j = 0; j < 40; j += 1) {
+				if (j % 8 === 0) {
+					me.cancel();
+					delay(300);
+					sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+				}
+
+				if (getUIFlag(0x08)) {
+					delay(Math.max(500, me.ping * 2));
+
+					return true;
+				}
+
+				delay(25);
+			}
+		}
+
+		return false;
+	},
+
+	startTrade: function (unit, mode) {
+		if (unit.type !== 1) {
+			throw new Error("Unit.startTrade: Must be used on NPCs.");
+		}
+
+		if (getUIFlag(0x0C)) {
+			return true;
+		}
+
+		var i, tick,
+			gamble = mode === "Gamble";
+
+		if (this.openMenu(unit)) {
+			for (i = 0; i < 10; i += 1) {
+				delay(200);
+
+				if (i % 2 === 0) {
+					sendPacket(1, 0x38, 4, gamble ? 2 : 1, 4, unit.gid, 4, 0);
+				}
+
+				if (unit.itemcount > 0) {
+					delay(200);
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	},
+
+	buyItem: function (unit, shiftBuy, gamble) {
 		var i, tick, container,
 			itemCount = me.itemcount,
 			npc = getInteractedNPC();
@@ -1132,20 +1621,20 @@ var Packet = {
 			throw new Error("buyItem: No NPC menu open.");
 		}
 
-		if (me.getStat(14) + me.getStat(15) < item.getItemCost(0)) { // Can we afford the item?
+		if (me.getStat(14) + me.getStat(15) < unit.getItemCost(0)) { // Can we afford the item?
 			return false;
 		}
 
 		for (i = 0; i < 3; i += 1) {
-			sendPacket(1, 0x32, 4, npc.gid, 4, item.gid, 4, shiftBuy ? 0x80000000 : 0, 4, 0);
+			sendPacket(1, 0x32, 4, npc.gid, 4, unit.gid, 4, shiftBuy ? 0x80000000 : gamble ? 0x2 : 0x0, 4, 0);
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 2000) {
 				if (shiftBuy) {
-					switch (item.classid) {
+					switch (unit.classid) {
 					case 529: // tp scroll
-						container = me.getItem(518);
+						container = me.findItem(518, 0, 3); // tp tome
 
 						if (container && container.getStat(70) === 20) {
 							return true;
@@ -1153,7 +1642,7 @@ var Packet = {
 
 						break;
 					case 530: // id scroll
-						container = me.getItem(519);
+						container = me.findItem(519, 0, 3); // id tome
 
 						if (container && container.getStat(70) === 20) {
 							return true;
@@ -1161,7 +1650,7 @@ var Packet = {
 
 						break;
 					case 543: // key
-						container = me.getItem(543);
+						container = me.findItem(543, 0, 3); // key stack
 
 						if (container && container.getStat(70) === 12) {
 							return true;
@@ -1181,26 +1670,112 @@ var Packet = {
 
 		return false;
 	},
+
+	sellItem: function (unit) {
+		if (unit.type !== 4) { // Check if it's an item we want to buy
+			throw new Error("Unit.sell: Must be used on items.");
+		}
+
+		var i, tick, npc,
+			itemCount = me.itemcount;
+
+		npc = getInteractedNPC();
+
+		if (!npc) {
+			return false;
+		}
+
+		for (i = 0; i < 5; i += 1) {
+			sendPacket(1, 0x33, 4, npc.gid, 4, unit.gid, 4, 0, 4, 0);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (me.itemcount !== itemCount) {
+					//delay(500);
+
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
+	identifyItem: function (unit, tome) {
+		var i, tick;
+
+		if (!unit || unit.getFlag(0x10)) {
+			return false;
+		}
+
+CursorLoop:
+		for (i = 0; i < 3; i += 1) {
+			sendPacket(1, 0x27, 4, unit.gid, 4, tome.gid);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (getCursorType() === 6) {
+					break CursorLoop;
+				}
+
+				delay(10);
+			}
+		}
+
+		if (getCursorType() !== 6) {
+			return false;
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			if (getCursorType() === 6) {
+				sendPacket(1, 0x27, 4, unit.gid, 4, tome.gid);
+			}
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000) {
+				if (unit.getFlag(0x10)) {
+					delay(50);
+
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
 	castSkill: function (hand, wX, wY) {
 		hand = (hand === 0) ? 0x0c : 0x05;
 		sendPacket(1, hand, 2, wX, 2, wY);
 	},
+
 	unitCast: function (hand, who) {
 		hand = (hand === 0) ? 0x11 : 0x0a;
 		sendPacket(1, hand, 4, who.type, 4, who.gid);
 	},
+
 	moveNPC: function (npc, dwX, dwY) {
 		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
 	},
+
 	teleWalk: function (wX, wY) {
 		sendPacket(1, 0x5f, 2, wX, 2, wY);
 		delay(200);
 		sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
 		delay(200);
 	},
+
 	flash: function (gid) {
 		sendPacket(1, 0x4b, 4, 0, 4, gid);
 	},
+
 	changeStat: function (stat, value) {
 		if (value > 0) {
 			getPacket(1, 0x1d, 1, stat, 1, value);

@@ -67,6 +67,7 @@ function main() {
 		);
 
 	// Init config and attacks
+	D2Bot.init();
 	Config.init();
 	Pickit.init();
 	Attack.init();
@@ -81,25 +82,17 @@ function main() {
 			this.togglePause();
 
 			while (!me.gameReady) {
-				delay(200);
+				delay(100);
 			}
 
 			try {
 				me.overhead("Going to town");
-				Town.goToTown();
-				Town.doChores();
-				Town.move("portalspot");
-
-				if (!Pather.usePortal(null, me.name)) {
-					throw new Error("TownChicken: Failed to use portal.");
-				}
-
-				if (Config.PublicMode) {
-					Pather.makePortal();
-				}
+				Town.visitTown();
 			} catch (e) {
-				Misc.errorReport("TownChicken fail");
-				quit();
+				Misc.errorReport(e, "TownChicken.js");
+				scriptBroadcast("quit");
+
+				return;
 			} finally {
 				this.togglePause();
 

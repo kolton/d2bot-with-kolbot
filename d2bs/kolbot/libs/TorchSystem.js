@@ -77,7 +77,8 @@ var TorchSystem = {
 	},
 
 	inGameCheck: function () {
-		var i, items, farmers;
+		var i, j, farmers, dropArray, item,
+			keyIds = ["pk1", "pk2", "pk3"];
 
 		farmers = this.getFarmers();
 
@@ -88,16 +89,36 @@ var TorchSystem = {
 		for (i = 0; i < farmers.length; i += 1) {
 			if (farmers[i].FarmGame.length > 0 && me.gamename.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
 				print("ÿc4Torch Systemÿc0: In Farm game.");
+				D2Bot.printToConsole("Torch System: In Farm game.", 7);
 				Town.goToTown(1);
-				Town.openStash();
 
-				items = me.getItems();
+				if (!Town.openStash()) {
+					return false;
+				}
 
-				if (items) {
-					for (i = 0; i < items.length; i += 1) {
-						if (["pk1", "pk2", "pk3"].indexOf(items[i].code) > -1) {
-							items[i].drop();
+				while (true) {
+					// Reset array
+					dropArray = [];
+
+					// Search for one of each key and put them in drop array
+					for (j = 0; j < 3; j += 1) {
+						// Find a key (one type per cycle)
+						item = me.getItem(keyIds[j]);
+
+						// Build an array of keys to drop
+						if (item) {
+							dropArray.push(copyUnit(item));
 						}
+					}
+
+					// Abort if there's no complete sets of keys
+					if (dropArray.length !== 3) {
+						break;
+					}
+
+					// Drop a keyset
+					for (j = 0; j < 3; j += 1) {
+						dropArray[j].drop();
 					}
 				}
 
@@ -160,7 +181,7 @@ var TorchSystem = {
 		removeEventListener('copydata', CheckEvent);
 
 		if (game) {
-			D2Bot.printToConsole("Joining key drop game." + ";7");
+			D2Bot.printToConsole("Joining key drop game.", 7);
 			delay(2000);
 
 			me.blockMouse = true;
@@ -170,6 +191,10 @@ var TorchSystem = {
 			me.blockMouse = false;
 
 			delay(5000);
+
+			while (me.ingame) {
+				delay(1000);
+			}
 
 			return true;
 		}

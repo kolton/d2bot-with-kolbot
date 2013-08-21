@@ -19,12 +19,14 @@ function main() {
 	);
 
 	while (true) {
-		if (flashList.length > 0) {
-			for (i = 0; i < flashList.length; i += 1) {
-				Packet.flash(flashList[i]);
+		if (me.gameReady) {
+			if (flashList.length > 0) {
+				for (i = 0; i < flashList.length; i += 1) {
+					Packet.flash(flashList[i]);
 
-				if (i < flashList.length - 1) {
-					delay(100);
+					if (i < flashList.length - 1) {
+						delay(100);
+					}
 				}
 			}
 		}

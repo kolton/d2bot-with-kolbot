@@ -8,30 +8,52 @@ var CollMap = new function () {
 	this.rooms = [];
 	this.maps = [];
 
-	this.addRoom = function (x, y) {
-		// In case a room is passed directly
-		if (x instanceof Room) {
-			this.rooms.push(x);
-			this.maps.push(x.getCollision());
-
-			return true;
+	this.getNearbyRooms = function (x, y) {
+		var i, room, rooms;
+		
+		room = getRoom(x, y);
+		
+		if (!room) {
+			return false;
 		}
 
-		var room = getRoom(x, y);
+		rooms = getRoom(x, y).getNearby();
 
-		if (room instanceof Room && this.coordsInRoom(x, y, room)) {
-			this.rooms.push(room);
-			this.maps.push(room.getCollision());
-		} else {
+		if (!rooms) {
 			return false;
+		}
+
+		for (i = 0; i < rooms.length; i += 1) {
+			if (this.getRoomIndex(rooms[i].x * 5, rooms[i].y * 5, true) === undefined) {
+				this.addRoom(rooms[i]);
+			}
 		}
 
 		return true;
 	};
 
-	this.getColl = function (x, y) {
+	this.addRoom = function (x, y) {
+		var room, coll;
+		
+		room = x instanceof Room ? x : getRoom(x, y);
+
+		if (room) {
+			coll = room.getCollision();
+		}
+
+		if (coll) {
+			this.rooms.push({x: room.x, y: room.y, xsize: room.xsize, ysize: room.ysize});
+			this.maps.push(coll);
+
+			return true;
+		}
+
+		return false;
+	};
+
+	this.getColl = function (x, y, cacheOnly) {
 		var i, j,
-			index = this.getRoomIndex(x, y, true);
+			index = this.getRoomIndex(x, y, cacheOnly);
 
 		if (index === undefined) {
 			return 5;
@@ -39,15 +61,19 @@ var CollMap = new function () {
 
 		j = x - this.rooms[index].x * 5;
 		i = y - this.rooms[index].y * 5;
-		
-		if (typeof this.maps[index] !== "undefined" && typeof this.maps[index][i] !== "undefined" && typeof this.maps[index][i][j] !== "undefined") {
+
+		if (this.maps[index] !== undefined && this.maps[index][i] !== undefined && this.maps[index][i][j] !== undefined) {
 			return this.maps[index][i][j];
 		}
 
 		return 5;
 	};
 
-	this.getRoomIndex = function (x, y) {
+	this.getRoomIndex = function (x, y, cacheOnly) {
+		if (this.rooms.length > 25) {
+			this.reset();
+		}
+
 		var i;
 
 		for (i = 0; i < this.rooms.length; i += 1) {
@@ -56,7 +82,7 @@ var CollMap = new function () {
 			}
 		}
 
-		if (this.addRoom(x, y)) {
+		if (!cacheOnly && this.addRoom(x, y)) {
 			return i;
 		}
 
@@ -78,18 +104,22 @@ var CollMap = new function () {
 
 	// Check collision between unitA and unitB. true = collision present, false = collision not present
 	// If checking for blocking collisions (0x1, 0x4), true means blocked, false means not blocked
-	this.checkColl = function (unitA, unitB, coll) {
+	this.checkColl = function (unitA, unitB, coll, thickness) {
+		if (thickness === undefined) {
+			thickness = 1;
+		}
+
 		var i, k, l, cx, cy, angle, distance;
 
-		angle = Math.round(Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x) * 180 / Math.PI);
+		angle = Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x);
 		distance = Math.round(getDistance(unitA, unitB));
 
 		for (i = 1; i < distance; i += 1) {
-			cx = Math.round((Math.cos(angle * Math.PI / 180)) * i + unitB.x);
-			cy = Math.round((Math.sin(angle * Math.PI / 180)) * i + unitB.y);
+			cx = Math.round((Math.cos(angle)) * i + unitB.x);
+			cy = Math.round((Math.sin(angle)) * i + unitB.y);
 
-			for (k = cx - 1; k <= cx + 1; k += 1) { // check thicker line
-				for (l = cy - 1; l <= cy + 1; l += 1) {
+			for (k = cx - thickness; k <= cx + thickness; k += 1) { // check thicker line
+				for (l = cy - thickness; l <= cy + thickness; l += 1) {
 					if (this.getColl(k, l) & coll) {
 						return true;
 					}
@@ -99,24 +129,4 @@ var CollMap = new function () {
 
 		return false;
 	};
-
-	/*this.checkColl = function (unitA, unitB, coll) {
-		var i, x, y, a, b,
-			lineLength = Math.sqrt((unitA.x - unitB.x) * (unitA.x - unitB.x) + (unitA.y - unitB.y) * (unitA.y - unitB.y));
-
-		for (i = 0; i < lineLength; i += 1) {
-			x = Math.round(unitA.x + (unitB.x - unitA.x) * i / lineLength);
-			y = Math.round(unitA.y + (unitB.y - unitA.y) * i / lineLength);
-
-			for (a = x - 1; a <= x + 1; a += 1) {
-				for (b = y - 1; b <= y + 1; b += 1) {
-					if (this.getColl(a, b) & coll) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	};*/
 };

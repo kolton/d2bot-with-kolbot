@@ -25,6 +25,9 @@ include("common/Town.js");
 var gidList = []; // fast pickit
 
 function main() {
+	D2Bot.init(); // Get D2Bot# handle
+	D2Bot.ingame();
+
 	if (!getScript("tools/heartbeat.js")) {
 		load("tools/heartbeat.js");
 	}
@@ -39,28 +42,17 @@ function main() {
 	}
 
 	// wait until game is ready
-	while (!me.gameReady || typeof copyUnit(me).classid === "undefined") {
+	while (!me.gameReady || copyUnit(me).classid === undefined) {
 		delay(50);
 	}
 
 	// don't load default for mules
-	if (AutoMule.getMuleObject(0) || AutoMule.getMuleObject(1)) {
+	if (getScript("D2BotMule.dbj")) {
 		return true;
 	}
 
-	// mule logger stuff
-	if (me.gamename.toLowerCase().indexOf(MuleLogger.LogGame[0].toLowerCase()) > -1) {
-		MuleLogger.logChar();
-
-		while ((getTickCount() - me.gamestarttime) < MuleLogger.IngameTime * 1000) {
-			delay(1000);
-		}
-
-		quit();
-		delay(10000);
-
-		return true;
-	}
+	// MuleLogger handler
+	MuleLogger.inGameCheck();
 
 	var i, sojPause, stats,
 		sojCounter = 0,
@@ -82,22 +74,9 @@ function main() {
 		}
 	};
 
-	// If game name is a part of Gambling System, don't load scripts
-	if (Gambling.goldFinders.indexOf(me.profile) > -1) {
-		for (i = 0; i < Gambling.gambleGames.length; i += 1) {
-			if (me.gamename.match(Gambling.gambleGames[i])) {
-				Gambling.dropGold();
-				DataFile.updateStats("gold");
-				delay(5000);
-				quit();
-				delay(10000);
-			}
-		}
-	}
-
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
 	Config.init(true);
-	Pickit.init();
+	Pickit.init(true);
 	Attack.init();
 	Storage.Init();
 	Cubing.init();
@@ -109,14 +88,18 @@ function main() {
 	// TorchSystem handler
 	TorchSystem.inGameCheck();
 
-	// TODO: Consolidate Gambling System
+	// Gambling System handler
+	Gambling.inGameCheck();
+
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
 
-	if (stats.name === me.name && me.getStat(13) < stats.experience) { // check for experience decrease -> log death
-		D2Bot.printToConsole("You died in last game;9");
-		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)) + ";9");
+	// Check for experience decrease -> log death. Skip report if life chicken is disabled.
+	if (stats.name === me.name && me.getStat(13) < stats.experience && Config.LifeChicken > 0) {
+		D2Bot.printToConsole("You died in last game", 9);
+		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)), 9);
 		DataFile.updateStats("deaths");
+		D2Bot.updateDeaths();
 	}
 
 	DataFile.updateStats(["experience", "name"]);
@@ -191,10 +174,22 @@ function main() {
 	}
 
 	if (Config.LastMessage) {
-		say(Config.LastMessage);
+		switch (typeof Config.LastMessage) {
+		case "string":
+			say(Config.LastMessage.replace("$nextgame", DataFile.getStats().nextGame, "i"));
+
+			break;
+		case "object":
+			for (i = 0; i < Config.LastMessage.length; i += 1) {
+				say(Config.LastMessage[i].replace("$nextgame", DataFile.getStats().nextGame, "i"));
+			}
+
+			break;
+		}
 	}
 
 	scriptBroadcast("quit");
+	delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
 
 	return true;
 }

@@ -4,6 +4,34 @@
 *	@desc		various 'Unit' and 'me' prototypes
 */
 
+// Shuffle Array
+// http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
+Array.prototype.shuffle = function () {
+	var temp, index,
+		counter = this.length;
+
+	// While there are elements in the array
+	while (counter > 0) {
+		// Pick a random index
+		index = Math.floor(Math.random() * counter);
+
+		// Decrease counter by 1
+		counter -= 1;
+
+		// And swap the last element with it
+		temp = this[counter];
+		this[counter] = this[index];
+		this[index] = temp;
+	}
+
+	return this;
+};
+
+// Trim String
+String.prototype.trim = function () {
+	return this.replace(/^\s+|\s+$/g, "");
+};
+
 // Check if unit is idle
 Unit.prototype.__defineGetter__("idle",
 	function () {
@@ -56,11 +84,15 @@ Unit.prototype.__defineGetter__("attacking",
 
 // Open NPC menu
 Unit.prototype.openMenu = function (addDelay) {
+	if (Config.PacketShopping) {
+		return Packet.openMenu(this);
+	}
+
 	if (this.type !== 1) {
 		throw new Error("Unit.openMenu: Must be used on NPCs.");
 	}
 
-	if (typeof addDelay === "undefined") {
+	if (addDelay === undefined) {
 		addDelay = 0;
 	}
 
@@ -79,14 +111,16 @@ Unit.prototype.openMenu = function (addDelay) {
 			Packet.flash(me.gid);
 		}
 
-		this.interact();
+		Misc.click(0, 0, this);
+		//this.interact();
 		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 
 		for (j = 0; j < 40; j += 1) {
 			if (j % 10 === 0) {
 				me.cancel();
 				delay(400);
-				this.interact();
+				Misc.click(0, 0, this);
+				//this.interact();
 				//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 			}
 
@@ -105,6 +139,10 @@ Unit.prototype.openMenu = function (addDelay) {
 
 // mode = "Gamble", "Repair" or "Shop"
 Unit.prototype.startTrade = function (mode) {
+	if (Config.PacketShopping) {
+		return Packet.startTrade(this, mode);
+	}
+
 	if (this.type !== 1) {
 		throw new Error("Unit.startTrade: Must be used on NPCs.");
 	}
@@ -119,7 +157,6 @@ Unit.prototype.startTrade = function (mode) {
 	for (i = 0; i < 3; i += 1) {
 		if (this.openMenu(i)) { // Incremental delay on retries
 			Misc.useMenu(menuId);
-			delay(1000);
 
 			tick = getTickCount();
 
@@ -140,12 +177,16 @@ Unit.prototype.startTrade = function (mode) {
 	return false;
 };
 
-Unit.prototype.buy = function (shiftBuy) {
+Unit.prototype.buy = function (shiftBuy, gamble) {
+	if (Config.PacketShopping) {
+		return Packet.buyItem(this, shiftBuy, gamble);
+	}
+
 	if (this.type !== 4) { // Check if it's an item we want to buy
 		throw new Error("Unit.buy: Must be used on items.");
 	}
 
-	if (!getUIFlag(0xC) || this.getParent().gid !== getInteractedNPC().gid) { // Check if it's an item belonging to a NPC
+	if (!getUIFlag(0xC) || (this.getParent() && this.getParent().gid !== getInteractedNPC().gid)) { // Check if it's an item belonging to a NPC
 		throw new Error("Unit.buy: Must be used in shops.");
 	}
 
@@ -157,6 +198,8 @@ Unit.prototype.buy = function (shiftBuy) {
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 3; i += 1) {
+		//print("BUY " + this.name + " " + i);
+
 		this.shop(shiftBuy ? 6 : 2);
 
 		tick = getTickCount();
@@ -165,7 +208,7 @@ Unit.prototype.buy = function (shiftBuy) {
 			if (shiftBuy) {
 				switch (this.classid) {
 				case 529: // tp scroll
-					container = me.getItem(518); // tp tome
+					container = me.findItem(518, 0, 3); // tp tome
 
 					if (container && container.getStat(70) === 20) {
 						delay(500);
@@ -175,7 +218,7 @@ Unit.prototype.buy = function (shiftBuy) {
 
 					break;
 				case 530: // id scroll
-					container = me.getItem(519); // id tome
+					container = me.findItem(519, 0, 3); // id tome
 
 					if (container && container.getStat(70) === 20) {
 						delay(500);
@@ -185,7 +228,7 @@ Unit.prototype.buy = function (shiftBuy) {
 
 					break;
 				case 543: // key
-					container = me.getItem(543); // key stack
+					container = me.findItem(543, 0, 3); // key stack
 
 					if (container && container.getStat(70) === 12) {
 						delay(500);
@@ -214,6 +257,10 @@ Unit.prototype.buy = function (shiftBuy) {
 
 // You MUST use a delay after Unit.sell() if using custom scripts. delay(500) works best, dynamic delay is used when identifying/selling (500 - item id time)
 Unit.prototype.sell = function () {
+	if (Config.PacketShopping) {
+		return Packet.sellItem(this);
+	}
+
 	if (this.type !== 4) { // Check if it's an item we want to buy
 		throw new Error("Unit.sell: Must be used on items.");
 	}
@@ -307,15 +354,15 @@ Unit.prototype.drop = function () {
 };
 
 me.findItem = function (id, mode, loc) {
-	if (typeof id === "undefined") {
+	if (id === undefined) {
 		id = -1;
 	}
 
-	if (typeof mode === "undefined") {
+	if (mode === undefined) {
 		mode = -1;
 	}
 
-	if (typeof loc === "undefined") {
+	if (loc === undefined) {
 		loc = false;
 	}
 
@@ -341,15 +388,15 @@ me.findItem = function (id, mode, loc) {
 };
 
 me.findItems = function (id, mode, loc) {
-	if (typeof id === "undefined") {
+	if (id === undefined) {
 		id = -1;
 	}
 
-	if (typeof mode === "undefined") {
+	if (mode === undefined) {
 		mode = -1;
 	}
 
-	if (typeof loc === "undefined") {
+	if (loc === undefined) {
 		loc = false;
 	}
 
@@ -374,34 +421,66 @@ me.findItems = function (id, mode, loc) {
 };
 
 Unit.prototype.getPrefix = function (id) {
-	if (typeof this.prefixnums !== "object") {
-		return this.prefixnum === id;
-	}
+	var i;
 
-	var i,
-		prefixList = this.prefixnums;
-
-	for (i = 0; i < prefixList.length; i += 1) {
-		if (id === prefixList[i]) {
-			return true;
+	switch (typeof id) {
+	case "number":
+		if (typeof this.prefixnums !== "object") {
+			return this.prefixnum === id;
 		}
+
+		for (i = 0; i < this.prefixnums.length; i += 1) {
+			if (id === this.prefixnums[i]) {
+				return true;
+			}
+		}
+
+		break;
+	case "string":
+		if (typeof this.prefixes !== "object") {
+			return this.prefix.replace(/\s+/g, "").toLowerCase() === id.replace(/\s+/g, "").toLowerCase();
+		}
+
+		for (i = 0; i < this.prefixes.length; i += 1) {
+			if (id.replace(/\s+/g, "").toLowerCase() === this.prefixes[i].replace(/\s+/g, "").toLowerCase()) {
+				return true;
+			}
+		}
+
+		break;
 	}
 
 	return false;
 };
 
 Unit.prototype.getSuffix = function (id) {
-	if (typeof this.suffixnums !== "object") {
-		return this.suffixnum === id;
-	}
+	var i;
 
-	var i,
-		suffixList = this.suffixnums;
-
-	for (i = 0; i < suffixList.length; i += 1) {
-		if (id === suffixList[i]) {
-			return true;
+	switch (typeof id) {
+	case "number":
+		if (typeof this.suffixnums !== "object") {
+			return this.suffixnum === id;
 		}
+
+		for (i = 0; i < this.suffixnums.length; i += 1) {
+			if (id === this.suffixnums[i]) {
+				return true;
+			}
+		}
+
+		break;
+	case "string":
+		if (typeof this.suffixes !== "object") {
+			return this.suffix.replace(/\s+/g, "").toLowerCase() === id.replace(/\s+/g, "").toLowerCase();
+		}
+
+		for (i = 0; i < this.suffixes.length; i += 1) {
+			if (id.replace(/\s+/g, "").toLowerCase() === this.suffixes[i].replace(/\s+/g, "").toLowerCase()) {
+				return true;
+			}
+		}
+
+		break;
 	}
 
 	return false;
@@ -425,6 +504,154 @@ Unit.prototype.__defineGetter__('itemclass',
 	}
 	);
 
+Unit.prototype.getStatEx = function (id, subid) {
+	var i, temp, regex;
+
+	switch (id) {
+	case 21: // plusmindamage
+	case 22: // plusmaxdamage
+		if (subid === 1) {
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
+			temp = this.desc.split("\n");
+			regex = new RegExp("\\+\\d+ " + getLocaleString(3478 - 21 + id));
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(regex, "i")) {
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 31: // plusdefense
+		if (subid === 0) {
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
+			temp = this.desc.split("\n");
+			regex = new RegExp("\\+\\d+ " + getLocaleString(3481));
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(regex, "i")) {
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 83: // itemaddclassskills
+		if (subid === undefined) {
+			for (i = 0; i < 7; i += 1) {
+				if (this.getStat(83, i)) {
+					return this.getStat(83, i);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 188: // itemaddskilltab
+		if (subid === undefined) {
+			temp = [0, 1, 2, 8, 9, 10, 16, 17, 18, 24, 25, 26, 32, 33, 34, 40, 41, 42, 48, 49, 50];
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (this.getStat(188, temp[i])) {
+					return this.getStat(188, temp[i]);
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	case 198: // itemskillonhit
+	case 204: // itemchargedskill
+		if (subid === undefined) {
+			temp = this.getStat(-2);
+
+			if (temp.hasOwnProperty(id)) {
+				if (temp[id] instanceof Array) {
+					for (i = 0; i < temp[id].length; i += 1) {
+						if (temp[id][i] !== undefined) {
+							return temp[id][i].skill;
+						}
+					}
+				} else {
+					return temp[id].skill;
+				}
+			}
+
+			return 0;
+		}
+
+		break;
+	}
+
+	if (this.getFlag(0x04000000)) { // Runeword
+		switch (id) {
+		case 16: // enhanceddefense
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
+			temp = this.desc.split("\n");
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(getLocaleString(3520), "i")) {
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+				}
+			}
+
+			return 0;
+		case 18: // enhanceddamage
+			if (this.mode !== 0) {
+				break;
+			}
+
+			if (!this.desc) {
+				this.desc = this.description;
+			}
+
+			temp = this.desc.split("\n");
+
+			for (i = 0; i < temp.length; i += 1) {
+				if (temp[i].match(getLocaleString(10038), "i")) {
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+				}
+			}
+
+			return 0;
+		}
+	}
+
+	if (subid === undefined) {
+		return this.getStat(id);
+	}
+
+	return this.getStat(id, subid);
+};
+
 /*
 	_NTIPAliasColor["black"] = 3;
 	_NTIPAliasColor["lightblue"] = 4;
@@ -445,24 +672,25 @@ Unit.prototype.__defineGetter__('itemclass',
 */
 
 Unit.prototype.getColor = function () {
-	var i, colors, Color = {
-		black: 3,
-		lightblue: 4,
-		darkblue: 5,
-		crystalblue: 6,
-		lightred: 7,
-		darkred: 8,
-		crystalred: 9,
-		darkgreen: 11,
-		crystalgreen: 12,
-		lightyellow: 13,
-		darkyellow: 14,
-		lightgold: 15,
-		darkgold: 16,
-		lightpurple: 17,
-		orange: 19,
-		white: 20
-	};
+	var i, colors,
+		Color = {
+			black: 3,
+			lightblue: 4,
+			darkblue: 5,
+			crystalblue: 6,
+			lightred: 7,
+			darkred: 8,
+			crystalred: 9,
+			darkgreen: 11,
+			crystalgreen: 12,
+			lightyellow: 13,
+			darkyellow: 14,
+			lightgold: 15,
+			darkgold: 16,
+			lightpurple: 17,
+			orange: 19,
+			white: 20
+		};
 
 	// check type
 	if ([2, 3, 15, 16, 19, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 42, 43, 44, 67, 68, 71, 72, 85, 86, 87, 88].indexOf(this.itemType) === -1) {
@@ -497,7 +725,6 @@ Unit.prototype.getColor = function () {
 			"Godly": Color.darkgold,
 			"Visionary": Color.white,
 			"Mnemonic": Color.crystalblue,
-			// changed skill tabs to 15 from 14 because it looks more appropriate
 			"Bowyer's": Color.lightgold,
 			"Gymnastic": Color.lightgold,
 			"Spearmaiden's": Color.lightgold,
@@ -636,13 +863,17 @@ Unit.prototype.getColor = function () {
 
 			break;
 		}
-	} else if (this.quality === 5) {
-		for (i = 0; i < 127; i += 1) {
-			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
-				return getBaseStat(16, i, 12) > 20 ? -1 : getBaseStat(16, i, 12);
+	} else if (this.quality === 5) { // Set
+		if (this.getFlag(0x10)) {
+			for (i = 0; i < 127; i += 1) {
+				if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
+					return getBaseStat(16, i, 12) > 20 ? -1 : getBaseStat(16, i, 12);
+				}
 			}
+		} else {
+			return Color.lightyellow; // Unidentified set item
 		}
-	} else if (this.quality === 7) {
+	} else if (this.quality === 7) { // Unique
 		for (i = 0; i < 401; i += 1) {
 			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 				return getBaseStat(17, i, 13) > 20 ? -1 : getBaseStat(17, i, 13);

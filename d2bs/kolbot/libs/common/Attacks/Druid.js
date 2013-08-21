@@ -22,7 +22,7 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -40,19 +40,6 @@ var ClassAttack = {
 			case 240: // Twister
 			case 245: // Tornado
 				this.skillRange[i] = 5;
-
-				break;
-			case 232: // Feral Rage
-			case 233: // Maul
-			case 238: // Rabies
-			case 239: // Fire Claws
-			case 242: // Hunger
-			case 248: // Fury
-				this.skillRange[i] = 2;
-
-				break;
-			case 243: // Shock Wave
-				this.skillRange[i] = 8;
 
 				break;
 			default: // Every other skill
@@ -77,7 +64,7 @@ var ClassAttack = {
 		}
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
+			if (Math.floor(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
 					return 1;
 				}
@@ -130,11 +117,12 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		Misc.unShift();
 		Precast.doPrecast(false);
 	},
 
 	doCast: function (unit, index) {
-		var i,
+		var i, walk,
 			timed = index,
 			untimed = index + 1;
 
@@ -144,8 +132,10 @@ var ClassAttack = {
 		}
 
 		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed])) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4)) {
+			if (Math.floor(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
+				walk = (this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
+				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4, walk)) {
 					return 0;
 				}
 			}
@@ -163,8 +153,10 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[untimed] > -1) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4)) {
+			if (Math.floor(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
+				walk = (this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
+				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4, walk)) {
 					return 0;
 				}
 			}

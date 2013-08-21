@@ -9,9 +9,13 @@ var StarterConfig = {
 };
 
 
-var master, masterStatus, keyswap, connectFail, makeAcc, muleMode, muleFilename, muleObj,
+var master, gameInfo, connectFail, makeAcc,
+	muleMode, muleFilename, muleObj, handle,
 	makeNext = false,
-	status = "loading";
+	status = "loading",
+	masterStatus = {
+		status: ""
+	};
 
 // Mule Data object manipulates external mule datafile
 var MuleData = {
@@ -89,18 +93,19 @@ function pickItems() {
 
 	if (items) {
 		for (i = 0; i < items.length; i += 1) {
-			if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1) { // drop trash (id/tp scroll primarily)
+			if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1  // drop trash (id/tp scroll primarily)
+					&& (muleMode !== 1 || items[i].classid !== 530)) { // don't drop ID scroll with torch mules
 				try {
 					items[i].drop();
 				} catch (dropError) {
-					print("Failed to drop an item. Not like it matters.");
+					print("Failed to drop an item.");
 				}
 			}
 		}
 	}
 
 	while (me.gameReady) {
-		if (masterStatus === "done") {
+		if (masterStatus.status === "done") {
 			item = getUnit(4, -1, 3); // item, on ground
 
 			if (item) {
@@ -139,7 +144,7 @@ function pickItems() {
 				break;
 			}
 		} else {
-			sendCopyData(null, master, 10, "report");
+			sendCopyData(null, master, 10, JSON.stringify({status: "report"}));
 			//D2Bot.shoutGlobal("report", 0);
 		}
 
@@ -151,7 +156,14 @@ function pickItems() {
 
 // master/mule communication function
 function ReceiveCopyData(mode, msg) {
-	var masterInfo;
+	var obj, masterInfo;
+
+	switch (msg) {
+	case "Handle":
+		handle = mode;
+
+		break;
+	}
 
 	// mode check instead of msg check because of crashes
 	switch (mode) {
@@ -160,24 +172,35 @@ function ReceiveCopyData(mode, msg) {
 	case 2: // game info
 		print("Recieved Game Info");
 
-		keyswap = parseInt(msg.split('/')[4], 10);
+		gameInfo = JSON.parse(msg);
 
 		break;
 	case 3: // request game
 		break;
+	case 4:
+		// Heartbeat ping
+		if (msg === "pingreq") {
+			sendCopyData(null, me.windowtitle, 4, "pingrep");
+		}
 
+		break;
 	// automule specific
 	case 10: // mule request
+		obj = JSON.parse(msg);
+
 		if (!master) {
-			masterInfo = AutoMule.getMaster(msg);
+			masterInfo = AutoMule.getMaster(obj);
 
 			if (masterInfo) {
-				master = masterInfo[0];
-				muleMode = masterInfo[1];
+				master = masterInfo.profile;
+				muleMode = masterInfo.mode;
 			}
 		} else {
-			sendCopyData(null, master, 10, status);
-			//D2Bot.shoutGlobal(status, 0);
+			if (obj.profile === master) {
+				sendCopyData(null, master, 10, JSON.stringify({status: status}));
+			} else {
+				sendCopyData(null, obj.profile, 10, JSON.stringify({status: "busy"}));
+			}
 		}
 
 		break;
@@ -186,7 +209,7 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 12: // get master's status
-		masterStatus = msg;
+		masterStatus = JSON.parse(msg);
 
 		break;
 	}
@@ -292,6 +315,17 @@ function checkTorch() {
 		} while (item.getNext());
 	}
 
+	// Hacky anni add-on
+	item = me.getItem("cm1");
+
+	if (item) {
+		do {
+			if (item.quality === 7) {
+				return true;
+			}
+		} while (item.getNext());
+	}
+
 	return false;
 }
 
@@ -322,13 +356,23 @@ include("common/pather.js");
 include("common/misc.js");
 include("common/config.js");
 include("common/prototypes.js");
-load("tools/heartbeat.js");
+include("common/collmap.js");
 
 addEventListener("copydata", ReceiveCopyData);
 
 function main() {
-	delay(rand(1, 2) * 1000);
-	D2Bot.requestGameInfo();
+	while (!handle) {
+		delay(100);
+	}
+
+	DataFile.updateStats("handle", handle);
+	D2Bot.init();
+	load("tools/heartbeat.js");
+
+	while (!gameInfo) {
+		D2Bot.requestGameInfo();
+		delay(500);
+	}
 
 	// Wait for master before login = give room to determine muling mode (normal or torch)
 	while (!master) {
@@ -337,7 +381,7 @@ function main() {
 
 	print("Master found: " + master);
 
-	muleObj = AutoMule.getMuleObject(muleMode);
+	muleObj = AutoMule.getMuleObject(muleMode, master);
 	muleFilename = AutoMule.getMuleFilename(muleMode);
 
 	var obj, statusTimeout;
@@ -371,7 +415,7 @@ function main() {
 					status = "ready";
 
 					D2Bot.updateStatus("In mule game.");
-					D2Bot.printToConsole("In mule game." + ";7");
+					D2Bot.printToConsole("In mule game.", 7);
 					Storage.Init();
 				}
 
@@ -380,7 +424,7 @@ function main() {
 				}
 
 				if (status !== "begin") {
-					D2Bot.printToConsole("Nobody joined - stopping." + ";9");
+					D2Bot.printToConsole("Nobody joined - stopping.", 9);
 					D2Bot.stop();
 				}
 
@@ -398,8 +442,8 @@ function main() {
 					}
 
 					MuleData.write(obj);
-					D2Bot.printToConsole("Done muling." + ";7");
-					sendCopyData(null, master, 10, "quit");
+					D2Bot.printToConsole("Done muling.", 7);
+					sendCopyData(null, master, 10, JSON.stringify({status: "quit"}));
 					delay(500);
 					D2Bot.stop();
 
@@ -419,7 +463,7 @@ function main() {
 					obj.fullChars.push(me.name);
 					MuleData.write(obj);
 					nextChar();
-					D2Bot.printToConsole("Mule full, getting next character." + ";7");
+					D2Bot.printToConsole("Mule full, getting next character.", 7);
 					quit();
 
 					break;
@@ -511,7 +555,7 @@ MainSwitch:
 		if (makeAcc) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
-			D2Bot.printToConsole("Made account: " + info.account + ";7");
+			D2Bot.printToConsole("Made account: " + info.account, 7);
 
 			makeAcc = false;
 
@@ -544,7 +588,7 @@ MainSwitch:
 				D2Bot.printToConsole("Disabled CDKey");
 				D2Bot.CDKeyDisabled();
 
-				if (keyswap) {
+				if (gameInfo.switchKeys) {
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
@@ -605,7 +649,7 @@ MainSwitch:
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 		D2Bot.CDKeyRD();
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			D2Bot.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
@@ -628,6 +672,13 @@ MainSwitch:
 	case 15: // new character (selected)
 	case 29: // new character (list)
 	case 42: // empty char screen
+		// Single Player screen fix
+		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			break;
+		}
+
 		// Can't create character, button greyed out = high likelyhood of realm down
 		if (getLocation() === 42 && getControl(6, 33, 528, 168, 60).disabled === 4) {
 			D2Bot.updateStatus("Realm Down");
@@ -641,7 +692,7 @@ MainSwitch:
 			timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
 			D2Bot.CDKeyRD();
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Realm Down - Changing CD-Key");
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
@@ -701,7 +752,7 @@ MainSwitch:
 				break;
 			}
 
-			D2Bot.printToConsole("Made character: " + info.charName + ";7");
+			D2Bot.printToConsole("Made character: " + info.charName, 7);
 		}
 
 		break;
@@ -720,7 +771,7 @@ MainSwitch:
 		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 		D2Bot.CDKeyInUse();
 
-		if (keyswap) {
+		if (gameInfo.switchKeys) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
@@ -756,7 +807,7 @@ MainSwitch:
 			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
 			D2Bot.CDKeyInUse();
 
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
@@ -766,7 +817,7 @@ MainSwitch:
 
 			break;
 		default:
-			if (keyswap) {
+			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Invalid CD-Key");
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);

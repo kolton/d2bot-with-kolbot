@@ -1,7 +1,58 @@
 function main() {
+	include("json2.js");
+	include("OOG.js");
+	include("common/misc.js");
+
+	var handle,
+		isUp = "no";
+
+	function copyDataEvent(mode, msg) {
+		switch (msg) {
+		case "Handle":
+			handle = mode;
+
+			break;
+		}
+
+		switch (mode) {
+		case 3: // request game
+			var obj = JSON.parse(msg);
+
+			if (me.gameReady) {
+				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
+			}
+
+			break;
+		case 4:
+			// Heartbeat ping
+			if (msg === "pingreq") {
+				sendCopyData(null, me.windowtitle, 4, "pingrep");
+			}
+
+			break;
+		}
+	}
+
+	addEventListener('copydata', copyDataEvent);
+
+	while (!handle) {
+		delay(100);
+	}
+
+	DataFile.updateStats("handle", handle);
+	delay(500);
+	D2Bot.init();
 	load("tools/heartbeat.js");
 
 	while (true) {
+		if (me.gameReady) {
+			if (isUp === "no") {
+				isUp = "yes";
+			}
+		} else {
+			isUp = "no";
+		}
+
 		delay(1000);
 	}
 }

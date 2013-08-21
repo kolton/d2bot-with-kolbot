@@ -22,7 +22,7 @@ var ClassAttack = {
 
 			switch (Config.AttackSkill[i]) {
 			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 2;
+				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -30,7 +30,7 @@ var ClassAttack = {
 			case 97: // Smite
 			case 106: // Zeal
 			case 116: // Conversion
-				this.skillRange[i] = 2;
+				this.skillRange[i] = 3;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -115,6 +115,7 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
+		Misc.unShift();
 		Precast.doPrecast(false);
 
 		if (Config.Redemption instanceof Array && (me.hp * 100 / me.hpmax < Config.Redemption[0] || me.mp * 100 / me.mpmax < Config.Redemption[1]) && Skill.setSkill(124, 0)) {
@@ -123,10 +124,9 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, index) {
-		var i,
+		var i, walk,
 			atkSkill = index,
-			aura = index + 1,
-			dodgeList = [];
+			aura = index + 1;
 
 		// Low mana skill
 		if (Config.AttackSkill[atkSkill] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[atkSkill]) > me.mp) {
@@ -139,13 +139,8 @@ var ClassAttack = {
 		}
 
 		if (Config.AttackSkill[atkSkill] === 112) {
-			if (unit.classid === 691) {
-				dodgeList = Attack.buildDodgeList();
-
-				if (dodgeList.length) {
-					dodgeList.sort(Sort.units);
-					Attack.dodge(unit, 15, dodgeList);
-				}
+			if (unit.classid === 691 && Config.AvoidDolls) {
+				this.dollAvoid(unit);
 
 				if (Config.AttackSkill[aura] > -1) {
 					Skill.setSkill(Config.AttackSkill[aura], 0);
@@ -160,7 +155,7 @@ var ClassAttack = {
 				return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
 			}
 
-			if (getDistance(me, unit) > 5) { // increase pvp aggressiveness
+			if (getDistance(me, unit) > 7) { // increase pvp aggressiveness
 				return false;
 			}
 
@@ -188,29 +183,17 @@ var ClassAttack = {
 
 			CollMap.reset();
 
-			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004)) {
+			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004, 2)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x2004, true)) {
 					return 0;
 				}
 			}
 		} else if (getDistance(me, unit) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
+			walk = (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+
 			// walk short distances instead of tele for melee attacks. teleport if failed to walk
-			switch (Config.AttackSkill[atkSkill]) {
-			case 0:
-			case 96:
-			case 106:
-			case 116:
-				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) {
-					return 0;
-				}
-
-				break;
-			default:
-				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4)) {
-					return 0;
-				}
-
-				break;
+			if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, walk)) {
+				return 0;
 			}
 		}
 
@@ -219,6 +202,19 @@ var ClassAttack = {
 		}
 
 		return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
+	},
+
+	dollAvoid: function (unit) {
+		var i,
+			positions = [[10, 10], [-10, 10], [10, -10], [-10, -10]];
+
+		for (i = 0; i < positions.length; i += 1) {
+			if (Attack.validSpot(unit.x + positions[i][0], unit.y + positions[i][1])) {
+				return Pather.moveTo(unit.x + positions[i][0], unit.y + positions[i][1]);
+			}
+		}
+
+		return false;
 	},
 
 	getHammerPosition: function (unit) {
@@ -272,8 +268,12 @@ var ClassAttack = {
 
 		if (getDistance(me, x, y) > 0) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
-				//Pather.teleportTo(x, y);
-				Skill.cast(54, 0, x, y);
+				if (getDistance(me, x, y) > 40) {
+					Pather.moveTo(x, y);
+				} else {
+					//Pather.teleportTo(x, y);
+					Skill.cast(54, 0, x, y);
+				}
 			} else {
 				if (Config.Vigor) {
 					Skill.setSkill(115, 0);

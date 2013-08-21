@@ -80,9 +80,11 @@ function LoadConfig() {
 		Config.Diablo.SealWarning = "Leave the seals alone!";
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
+		Config.Diablo.DiabloMsg = "Diablo";
 
 	// *** act 5 ***
 	Scripts.Pindleskin = false;
+		Config.Pindleskin.UseWaypoint = false;
 		Config.Pindleskin.KillNihlathak = true;
 		Config.Pindleskin.ViperQuit = false; // End script if Tomb Vipers are found.
 	Scripts.Nihlathak = false;
@@ -136,23 +138,7 @@ function LoadConfig() {
 		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
-		Config.BaalHelper.SkipTP = true; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
-	Scripts.BaalAssistant = false; // Used to leech or help in baal runs.
-		Config.BaalAssistant.Wait = 120; // Seconds to wait for a runner to be in the throne / portal wait / safe TP wait / hot TP wait...
-		Config.BaalAssistant.KillNihlathak = false; // Kill Nihlathak before going to Throne
-		Config.BaalAssistant.FastChaos = false; // Kill Diablo before going to Throne
-		Config.BaalAssistant.Helper = true; // Set to true to help attack, set false to to leech.
-		Config.BaalAssistant.GetShrine = false; // Set to true to get a experience shrine at the start of the run.
-		Config.BaalAssistant.GetShrineWaitForHotTP = false; // Set to true to get a experience shrine after leader shouts the hot tp message as defined in Config.BaalAssistant.HotTPMessage
-		Config.BaalAssistant.SkipTP = false; // Set to true to enable the helper to skip the TP and teleport down to the throne room.
-		Config.BaalAssistant.WaitForSafeTP = false; // Set to true to wait for a safe TP message (defined in SafeTPMessage)
-		Config.BaalAssistant.DollQuit = false; // Quit on dolls. (Hardcore players?)
-		Config.BaalAssistant.SoulQuit = false; // Quit on Souls. (Hardcore players?)
-		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely. 
-		Config.BaalAssistant.HotTPMessage = ["Hot"]; // Configure safe TP messages.
-		Config.BaalAssistant.SafeTPMessage = ["Safe", "Clear"]; // Configure safe TP messages.
-		Config.BaalAssistant.BaalMessage = ["Baal"]; // Configure baal messages, this is a precautionary measure.
-		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
+		Config.BaalHelper.SkipTP = false; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
 	Scripts.Follower = false; // Script that follows a manually played leader around like a merc. For a list of commands, see Follower.js
 
 	// *** special scripts ***
@@ -176,8 +162,9 @@ function LoadConfig() {
 	Scripts.IPHunter = false;
 		Config.IPHunter.IPList = []; // List of IPs to look for. example: [165, 201, 64]
 		Config.IPHunter.GameLength = 3; // Number of minutes to stay in game if ip wasn't found
-	Scripts.ShopBot = false; // Fast waypoint-based shopbot, alpha version
-		Config.ShopBot.ShopNPC = "Anya"; // Only Anya for now
+	Scripts.KillDclone = false; // Kill Diablo Clone by using Arcane Sanctuary waypoint. Diablo needs to walk the Earth in the game.
+	Scripts.ShopBot = false; // Fast waypoint-based shopbot
+		Config.ShopBot.ShopNPC = "Anya"; // Supported NPCs: Fara, Ormus, Anya, Elzix
 		// Scan only selected classids for maximum speed. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [187, 188, 194, 195, 326, 327, 338, 373, 397, 443, 449];
 	Scripts.ChestMania = false; // Open chests in configured areas
@@ -186,14 +173,33 @@ function LoadConfig() {
 		Config.ChestMania.Act3 = [79, 80, 81, 92, 93, 84, 85, 90]; // List of act 3 areas to open chests in
 		Config.ChestMania.Act4 = []; // List of act 4 areas to open chests in
 		Config.ChestMania.Act5 = [115, 116, 119, 125, 126, 127]; // List of act 5 areas to open chests in
+	Scripts.ClearAnyArea = false; // Clear any area
+		Config.ClearAnyArea.AreaList = []; // List of area ids to clear. See sdk/areas.txt
 
 	// *** Guest scripts ***
-	
+
+	// Baal Assistant by YourGreatestMember
+	Scripts.BaalAssistant = false; // Used to leech or help in baal runs.
+		Config.BaalAssistant.Wait = 120; // Seconds to wait for a runner to be in the throne / portal wait / safe TP wait / hot TP wait...
+		Config.BaalAssistant.KillNihlathak = false; // Kill Nihlathak before going to Throne
+		Config.BaalAssistant.FastChaos = false; // Kill Diablo before going to Throne
+		Config.BaalAssistant.Helper = true; // Set to true to help attack, set false to to leech.
+		Config.BaalAssistant.GetShrine = false; // Set to true to get a experience shrine at the start of the run.
+		Config.BaalAssistant.GetShrineWaitForHotTP = false; // Set to true to get a experience shrine after leader shouts the hot tp message as defined in Config.BaalAssistant.HotTPMessage
+		Config.BaalAssistant.SkipTP = false; // Set to true to enable the helper to skip the TP and teleport down to the throne room.
+		Config.BaalAssistant.WaitForSafeTP = false; // Set to true to wait for a safe TP message (defined in SafeTPMessage)
+		Config.BaalAssistant.DollQuit = false; // Quit on dolls. (Hardcore players?)
+		Config.BaalAssistant.SoulQuit = false; // Quit on Souls. (Hardcore players?)
+		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely. 
+		Config.BaalAssistant.HotTPMessage = ["Hot"]; // Configure safe TP messages.
+		Config.BaalAssistant.SafeTPMessage = ["Safe", "Clear"]; // Configure safe TP messages.
+		Config.BaalAssistant.BaalMessage = ["Baal"]; // Configure baal messages, this is a precautionary measure.
+		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
 
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
 	Config.HealMP = 0; // Go to a healer if under designated percent of mana.
-	Config.HealStatus = false // Go to a healer if poisoned or cursed
+	Config.HealStatus = false; // Go to a healer if poisoned or cursed
 	Config.UseMerc = true; // Use merc. This is ignored and always false in d2classic.
 	Config.MercWatch = false; // Instant merc revive during battle.
 
@@ -245,11 +251,15 @@ function LoadConfig() {
 	Config.MinColumn[2] = 0;
 	Config.MinColumn[3] = 0;
 
-	// Pickit config
-	Config.PickitFiles.push("kolton.nip"); // Pickit filenames in /pickit/ folder
+	// Pickit config. Default folder is kolbot/pickit.
+	Config.PickitFiles.push("kolton.nip");
 	Config.PickitFiles.push("LLD.nip");
 	Config.PickRange = 40; // Pick radius
 	Config.FastPick = false; // Check and pick items between attacks
+
+	// Additional item info log settings. All info goes to \logs\ItemLog.txt
+	Config.ItemInfo = false; // Log stashed, skipped (due to no space) or sold items.
+	Config.ItemInfoQuality = []; // The quality of sold items to log.
 
 	// Item identification settings
 	Config.CainID.Enable = false; // Identify items at Cain
@@ -261,17 +271,20 @@ function LoadConfig() {
 	Config.Gamble = false;
 	Config.GambleGoldStart = 1000000;
 	Config.GambleGoldStop = 500000;
-	
+
 	// Check libs/NTItemAlias.dbl file for other item classids
 	Config.GambleItems.push(520); // Amulet
 	Config.GambleItems.push(522); // Ring
 	Config.GambleItems.push(418); // Circlet
 	Config.GambleItems.push(419); // Coronet
-	
-	// Cubing config. All recipes are available in Templates/Cubing.txt
+
+	/* Cubing config. All recipe names are available in Templates/Cubing.txt
+	 * The format is Config.Recipes.push([recipe_name, item_id, etherealness]). Etherealness is optional and only applies to some recipes.
+	 */
 	Config.Cubing = false; // Set to true to enable cubing.
 
-	// All ingredients will be auto-picked, for classids check libs/NTItemAlias.dbl
+	// Ingredients for the following recipes will be auto-picked, for classids check libs/NTItemAlias.dbl
+
 	//Config.Recipes.push([Recipe.Gem, 560]); // perfect amethyst
 	//Config.Recipes.push([Recipe.Gem, 565]); // perfect topaz
 	//Config.Recipes.push([Recipe.Gem, 570]); // perfect sapphire
@@ -282,25 +295,37 @@ function LoadConfig() {
 
 	//Config.Recipes.push([Recipe.Token]); // token of absolution
 	
-	Config.Recipes.push([Recipe.Rune, 630]); // pul -> um
-	Config.Recipes.push([Recipe.Rune, 631]); // um -> mal
-	Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
-	Config.Recipes.push([Recipe.Rune, 633]); // ist -> gul
-	Config.Recipes.push([Recipe.Rune, 634]); // gul -> vex
+	//Config.Recipes.push([Recipe.Rune, 630]); // pul -> um
+	//Config.Recipes.push([Recipe.Rune, 631]); // um -> mal
+	//Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
+	//Config.Recipes.push([Recipe.Rune, 633]); // ist -> gul
+	//Config.Recipes.push([Recipe.Rune, 634]); // gul -> vex
 
-	Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
-	Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
-	Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
-	Config.Recipes.push([Recipe.HitPower.Gloves, 452]); // Craft Hit Power Vambraces
+	//Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
+	//Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
+	//Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
+	//Config.Recipes.push([Recipe.HitPower.Gloves, 452]); // Craft Hit Power Vambraces
 
-	Config.Recipes.push([Recipe.Reroll.Magic, 421]); // Reroll magic Diadem
-	Config.Recipes.push([Recipe.Reroll.Rare, 421]); // Reroll rare Diadem
+	// The gems not used by other recipes will be used for magic item rerolling.
 
-	// Base item must be in the pickit, rest is auto-picked
-	Config.Recipes.push([Recipe.Socket.Weapon, 255]); // Socket Thresher
-	Config.Recipes.push([Recipe.Socket.Weapon, 256]); // Socket Cryptic Axe
-	Config.Recipes.push([Recipe.Socket.Armor, 442]); // Socket Sacred Armor
-	Config.Recipes.push([Recipe.Socket.Armor, 443]); // Socket Archon Plate
+	//Config.Recipes.push([Recipe.Reroll.Magic, 421]); // Reroll magic Diadem
+	//Config.Recipes.push([Recipe.Reroll.Magic, 605]); // Reroll magic Grand Charm (ilvl 91+)
+
+	//Config.Recipes.push([Recipe.Reroll.Rare, 421]); // Reroll rare Diadem
+
+	/* Base item for the following recipes must be in pickit. The rest of the ingredients will be auto-picked.
+	 * Use Roll.Eth, Roll.NonEth or Roll.All to determine what kind of base item to roll - ethereal, non-ethereal or all.
+	 */
+	//Config.Recipes.push([Recipe.Socket.Weapon, 255, Roll.Eth]); // Socket ethereal Thresher
+	//Config.Recipes.push([Recipe.Socket.Weapon, 256, Roll.Eth]); // Socket ethereal Cryptic Axe
+	//Config.Recipes.push([Recipe.Socket.Armor, 442, Roll.Eth]); // Socket ethereal Sacred Armor
+	//Config.Recipes.push([Recipe.Socket.Armor, 443, Roll.Eth]); // Socket ethereal Archon Plate
+
+	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 335, Roll.NonEth]); // Upgrade Bloodfist to Exceptional
+	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 337, Roll.NonEth]); // Upgrade Magefist to Exceptional
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 381, Roll.NonEth]); // Upgrade Bloodfist or Grave Palm to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 383, Roll.NonEth]); // Upgrade Magefist or Lavagout to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 389, Roll.NonEth]); // Upgrade Gore Rider to Elite
 
 	/* Runeword config. All recipes are available in Templates/Runewords.txt
 	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
@@ -308,25 +333,26 @@ function LoadConfig() {
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
 
-	Config.Runewords.push([Runeword.Insight, 255]); // Thresher
-	Config.Runewords.push([Runeword.Insight, 256]); // Cryptic Axe
+	//Config.Runewords.push([Runeword.Insight, 255]); // Thresher
+	//Config.Runewords.push([Runeword.Insight, 256]); // Cryptic Axe
 
-	Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
+	//Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
 
-	Config.Runewords.push([Runeword.Spirit, 447]); // Monarch
-	Config.Runewords.push([Runeword.Spirit, 498]); // Sacred Targe
+	//Config.Runewords.push([Runeword.Spirit, 447]); // Monarch
+	//Config.Runewords.push([Runeword.Spirit, 498]); // Sacred Targe
 
-	Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
+	//Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
 	// General config
-	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
-	Config.LastMessage = ""; // Message to say at the end of the run.
+	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable. If Config.Leader is set, the bot will only accept invites from leader.
+	Config.LastMessage = ""; // Message or array of messages to say at the end of the run. Use $nextgame to say next game - "Next game: $nextgame" (works with lead entry point)
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will TP to town and stay in game if the run is completed before.
 	Config.MaxGameTime = 0; // Maximum game time in seconds. Quit game when limit is reached.
 	Config.TeleSwitch = false; // Switch to slot II when teleporting more than 1 node.
 	Config.OpenChests = false; // Open chests. Controls key buying.
 	Config.MiniShopBot = true; // Scan items in NPC shops.
+	Config.PacketShopping = false; // Use packets to shop. Imporves shopping speed.
 	Config.TownCheck = false; // Go to town if out of potions
 	Config.LogExperience = false; // Print experience statistics in the manager.
 	Config.PingQuit = [{Ping: 0, Duration: 0}]; // Quit if ping is over the given value for over the given time period in seconds.
@@ -350,12 +376,13 @@ function LoadConfig() {
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
 	Config.TownOnHostile = false; // Go to town instead of quitting when HostileAction is 0 or 1
-	Config.RandomPrecast = true; // Anti-PK measure, only supported in Baal and BaalHelper and BaalAssisstant at the moment.
+	Config.RandomPrecast = false; // Anti-PK measure, only supported in Baal and BaalHelper and BaalAssisstant at the moment.
 	Config.ViperCheck = false; // Quit if revived Tomb Vipers are sighted
 
 	// DClone config
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth
 	Config.SoJWaitTime = 5; // Time in minutes to wait for another SoJ sale before leaving game. 0 = disabled
+	Config.KillDclone = false; // Go to Palace Cellar 3 and try to kill Diablo Clone. Pointless if you already have Annihilus.
 
 	// Monster skip config
 	// Skip immune monsters. Possible options: "fire", "cold", "lightning", "poison", "physical", "magic".
@@ -384,9 +411,14 @@ function LoadConfig() {
 	Config.LowManaSkill[1] = -1; // Untimed low mana skill.
 
 	Config.Dodge = false; // Move away from monsters that get too close. Don't use with short-ranged attacks like Poison Dagger.
+	Config.DodgeRange = 15; // Distance to keep from monsters.
+	Config.DodgeHP = 100; // Dodge only if HP percent is less than or equal to Config.DodgeHP. 100 = always dodge.
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
 	Config.TeleStomp = false; // Use merc to attack bosses if they're immune to attacks, but not to physical damage
+	
+	// Wereform setup. Make sure you read Templates/Attacks.txt for attack skill format.
+	Config.Wereform = false; // 0 / false - don't shapeshift, 1 / "Werewolf" - change to werewolf, 2 / "Werebear" - change to werebear
 
 	// Class specific config
 	Config.Curse[0] = 0; // Boss curse. Use skill number or set to 0 to disable.
