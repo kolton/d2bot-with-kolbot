@@ -793,6 +793,7 @@ IngredientLoop:
 
 						switch (result.result) {
 						case 0:
+							Misc.itemLogger("Dropped", items[j]);
 							items[j].drop();
 
 							break;
