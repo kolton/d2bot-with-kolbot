@@ -844,6 +844,10 @@ var Misc = {
 			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
 
 			break;
+		case "No room for":
+			desc = unit.name;
+
+			break;
 		default:
 			desc = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
 
