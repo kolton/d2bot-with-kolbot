@@ -17,7 +17,7 @@ var CollMap = new function () {
 			return false;
 		}
 
-		rooms = getRoom(x, y).getNearby();
+		rooms = room.getNearby();
 
 		if (!rooms) {
 			return false;

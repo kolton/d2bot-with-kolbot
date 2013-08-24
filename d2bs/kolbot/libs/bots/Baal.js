@@ -9,82 +9,54 @@ function Baal() {
 
 	this.preattack = function () {
 		var check;
+
 		switch (me.classid) {
-		case 1:
-			// Sorceress
-			switch (Config.AttackSkill[1]) {
+		case 1: // Sorceress
+			switch (Config.AttackSkill[3]) {
 			case 49:
 			case 53:
+			case 56:
+			case 59:
 			case 64:
 				if (me.getState(121)) {
-					delay(500);
+					while (me.getState(121)) {
+						delay(100);
+					}
 				} else {
-					Skill.cast(Config.AttackSkill[1], 0, 15094, 5028);
-				}
-
-				break;
-			case 56:
-				if (me.getState(121)) {
-					delay(500);
-				} else {
-					Skill.cast(Config.AttackSkill[1], 0, 15093, 5028);
-				}
-
-				break;
-			case 59:
-				if (me.getState(121)) {
-					delay(500);
-				} else {
-					Skill.cast(Config.AttackSkill[1], 0, 15095, 5028);
+					return Skill.cast(Config.AttackSkill[1], 0, 15094 + rand(-1, 1), 5028);
 				}
 
 				break;
 			}
 
-			return true;
-		case 3:
-			// Paladin
-			if (Config.AttackSkill[3] !== 112) {
-				return false;
-			}
-
-			if (getDistance(me, 15094, 5029) > 3) {
-				Pather.moveTo(15094, 5029);
-			}
-
-			if (Config.AttackSkill[4] > 0) {
-				Skill.setSkill(Config.AttackSkill[4], 0);
-			}
-
-			Skill.cast(Config.AttackSkill[3], 1);
-
-			return true;
-		case 5:
-			// Druid
-			if (Config.AttackSkill[3] === 245) {
-				Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
-				return true;
-			}
 			break;
-		case 6:
-			// Assassin
+		case 3: // Paladin
+			if (Config.AttackSkill[3] === 112) {
+				if (Config.AttackSkill[4] > 0) {
+					Skill.setSkill(Config.AttackSkill[4], 0);
+				}
+
+				return Skill.cast(Config.AttackSkill[3], 1);
+			}
+
+			break;
+		case 5: // Druid
+			if (Config.AttackSkill[3] === 245) {
+				return Skill.cast(Config.AttackSkill[3], 0, 15094 + rand(-1, 1), 5028);
+			}
+
+			break;
+		case 6: // Assassin
 			if (Config.UseTraps) {
-				check = ClassAttack.checkTraps({
-					x: 15094,
-					y: 5028
-				});
+				check = ClassAttack.checkTraps({x: 15094, y: 5028});
 
 				if (check) {
-					ClassAttack.placeTraps({
-						x: 15094,
-						y: 5028
-					}, 5);
+					return ClassAttack.placeTraps({x: 15094, y: 5028}, 5);
+				}
+			}
 
-					return true;
-				}
-				else if (Config.AttackSkill[3] === 256) { // shock-web
-					return Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
-				}
+			if (Config.AttackSkill[3] === 256) { // shock-web
+				return Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
 			}
 
 			break;

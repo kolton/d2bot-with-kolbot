@@ -810,7 +810,9 @@ MainLoop:
 			portal = unit ? copyUnit(unit) : this.getPortal(targetArea, owner);
 
 			if (portal) {
-				useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
+				if (i === 0) {
+					useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
+				}
 
 				if (portal.area === me.area) {
 					if (useTK) {

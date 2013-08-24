@@ -79,8 +79,8 @@ function main() {
 	Pickit.init(true);
 	Attack.init();
 	Storage.Init();
-	Cubing.init();
 	Runewords.init();
+	Cubing.init();
 
 	// AutoMule handler
 	AutoMule.inGameCheck();

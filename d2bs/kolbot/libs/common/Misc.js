@@ -841,6 +841,7 @@ var Misc = {
 		case "Cubing Kept":
 		case "Shopped":
 		case "Gambled":
+		case "Dropped":
 			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
 
 			break;

@@ -119,6 +119,16 @@ function main() {
 		return true;
 	};
 
+	this.stopDefault = function () {
+		var script = getScript("default.dbj");
+
+		if (script) {
+			script.stop();
+		}
+
+		return true;
+	};
+
 	this.drinkPotion = function (type) {
 		var pottype, potion,
 			tNow = getTickCount();
@@ -501,6 +511,7 @@ function main() {
 			}
 
 			this.checkPing(false); // In case of quitlist triggering first
+			this.stopDefault();
 			quit();
 
 			break;
