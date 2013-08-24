@@ -72,8 +72,8 @@ function main() {
 	Pickit.init();
 	Attack.init();
 	Storage.Init();
-	Cubing.init();
 	Runewords.init();
+	Cubing.init();
 
 	while (true) {
 		if (!me.inTown && (townCheck ||

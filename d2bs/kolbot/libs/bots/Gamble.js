@@ -33,7 +33,7 @@ function Gamble() {
 			while (true) {
 				gold = getUnit(4, 523, 3);
 
-				if (!gold) {
+				if (!gold || !Pickit.canPick(gold)) {
 					break;
 				}
 
@@ -45,7 +45,7 @@ function Gamble() {
 					needGold = false;
 				}
 			}
-			
+
 			delay(500);
 		}
 

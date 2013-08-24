@@ -99,7 +99,7 @@ var Cubing = {
 			return;
 		}
 
-		print("We have " + Config.Recipes.length + " cubing recipe(s).");
+		//print("We have " + Config.Recipes.length + " cubing recipe(s).");
 
 		this.buildRecipes();
 		this.buildGemList();
@@ -767,6 +767,8 @@ IngredientLoop:
 					return false;
 				}
 
+				this.cursorCheck();
+
 				i = -1;
 
 				while (items.length) {
@@ -815,6 +817,32 @@ IngredientLoop:
 		while (getUIFlag(0x1A) || getUIFlag(0x19)) {
 			me.cancel();
 			delay(300);
+		}
+
+		return true;
+	},
+
+	cursorCheck: function () {
+		var item;
+
+		if (me.itemoncursor) {
+			item = getUnit(4, -1, 4);
+
+			if (item) {
+				if (Storage.Inventory.CanFit(item) && Storage.Inventory.MoveTo(item)) {
+					return true;
+				}
+
+				if (Storage.Stash.CanFit(item) && Storage.Stash.MoveTo(item)) {
+					return true;
+				}
+
+				if (item.drop()) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		return true;

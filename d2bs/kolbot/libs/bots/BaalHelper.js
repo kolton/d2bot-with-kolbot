@@ -9,49 +9,52 @@ function BaalHelper() { // experi-mental
 		var check;
 
 		switch (me.classid) {
-		case 1:
-			if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
+		case 1: // Sorceress
+			switch (Config.AttackSkill[3]) {
+			case 49:
+			case 53:
+			case 56:
+			case 59:
+			case 64:
 				if (me.getState(121)) {
-					delay(500);
+					while (me.getState(121)) {
+						delay(100);
+					}
 				} else {
-					Skill.cast(Config.AttackSkill[1], 0, 15093, 5024);
+					return Skill.cast(Config.AttackSkill[1], 0, 15094 + rand(-1, 1), 5028);
 				}
+
+				break;
 			}
 
-			return true;
+			break;
 		case 3: // Paladin
-			if (Config.AttackSkill[3] !== 112) {
-				return false;
+			if (Config.AttackSkill[3] === 112) {
+				if (Config.AttackSkill[4] > 0) {
+					Skill.setSkill(Config.AttackSkill[4], 0);
+				}
+
+				return Skill.cast(Config.AttackSkill[3], 1);
 			}
 
-			if (getDistance(me, 15093, 5029) > 3) {
-				Pather.moveTo(15093, 5029);
-			}
-
-			if (Config.AttackSkill[4] > 0) {
-				Skill.setSkill(Config.AttackSkill[4], 0);
-			}
-
-			Skill.cast(Config.AttackSkill[3], 1);
-
-			return true;
+			break;
 		case 5: // Druid
 			if (Config.AttackSkill[3] === 245) {
-				Skill.cast(Config.AttackSkill[3], 0, 15093, 5029);
-
-				return true;
+				return Skill.cast(Config.AttackSkill[3], 0, 15094 + rand(-1, 1), 5028);
 			}
 
 			break;
 		case 6: // Assassin
 			if (Config.UseTraps) {
-				check = ClassAttack.checkTraps({x: 15093, y: 5029});
+				check = ClassAttack.checkTraps({x: 15094, y: 5028});
 
 				if (check) {
-					ClassAttack.placeTraps({x: 15093, y: 5029}, 5);
-
-					return true;
+					return ClassAttack.placeTraps({x: 15094, y: 5028}, 5);
 				}
+			}
+
+			if (Config.AttackSkill[3] === 256) { // shock-web
+				return Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
 			}
 
 			break;
