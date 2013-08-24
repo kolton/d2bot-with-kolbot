@@ -82,6 +82,9 @@ function Baal() {
 
 					return true;
 				}
+				else if (Config.AttackSkill[3] === 256) { // shock-web
+					return Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
+				}
 			}
 
 			break;
