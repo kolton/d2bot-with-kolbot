@@ -1163,16 +1163,16 @@ AuraLoop: // Skip monsters with auras
 
 	// Find an optimal attack position and move or walk to it
 	getIntoPosition: function (unit, distance, coll, walk) {
-		if (walk === undefined) {
-			walk = false;
-		}
+		if (distance < 4) {
+			if (walk) {
+				if (getDistance(me, unit) > 8 || checkCollision(me, unit, coll)) {
+					Pather.moveToUnit(unit, 0, 0, 0, 1);
+				}
 
-		if (walk && distance < 4) {
-			if (getDistance(me, unit) > 8 || checkCollision(me, unit, coll)) {
-				Pather.moveToUnit(unit, 0, 0, 0, 1);
+				return true;
 			}
 
-			return true;
+			return Pather.moveToUnit(unit);
 		}
 
 		var n, i, cx, cy, t,

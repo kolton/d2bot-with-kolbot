@@ -625,7 +625,10 @@ function Follower() {
 	}
 
 	say("Partied.");
-	Town.move("portalspot");
+
+	if (me.inTown) {
+		Town.move("portalspot");
+	}
 
 	// Main Loop
 	while (Misc.inMyParty(Config.Leader)) {

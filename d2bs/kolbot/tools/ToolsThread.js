@@ -291,7 +291,7 @@ function main() {
 
 			break;
 		case 101: // numpad 5
-			if (!!AutoMule.getMule()) {
+			if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo")) {
 				print("ÿc2Mule triggered");
 				scriptBroadcast("mule");
 				quit();

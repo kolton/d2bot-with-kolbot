@@ -81,6 +81,8 @@ function pickItems() {
 		delay(500);
 	}
 
+	delay(1000);
+
 	for (i = 0; i < 10; i += 1) {
 		items = me.getItems();
 
@@ -414,8 +416,8 @@ function main() {
 				if (status === "loading") {
 					status = "ready";
 
-					D2Bot.updateStatus("In mule game.");
-					D2Bot.printToConsole("In mule game.", 7);
+					D2Bot.updateStatus("In " + (muleMode ? "torch" : "") + " mule game.");
+					D2Bot.printToConsole("In " + (muleMode ? "torch" : "") + " mule game.", 7);
 					Storage.Init();
 				}
 

@@ -43,6 +43,9 @@ var TorchSystem = {
 	},
 
 	// Don't touch
+	inGame: false,
+	check: false,
+
 	getFarmers: function () {
 		var i, j,
 			list = [];
@@ -146,6 +149,12 @@ var TorchSystem = {
 	},
 
 	outOfGameCheck: function () {
+		if (!this.check) {
+			return false;
+		}
+
+		this.check = false;
+
 		var i, game, farmers;
 
 		function CheckEvent(mode, msg) {
@@ -184,6 +193,7 @@ var TorchSystem = {
 			D2Bot.printToConsole("Joining key drop game.", 7);
 			delay(2000);
 
+			this.inGame = true;
 			me.blockMouse = true;
 
 			joinGame(game[0], game[1]);
@@ -195,6 +205,8 @@ var TorchSystem = {
 			while (me.ingame) {
 				delay(1000);
 			}
+
+			this.inGame = false;
 
 			return true;
 		}
