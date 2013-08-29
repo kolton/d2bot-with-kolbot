@@ -819,7 +819,7 @@ var Misc = {
 		return tempArray;
 	},
 
-	itemLogger: function (action, unit) {
+	itemLogger: function (action, unit, text) {
 		if (!Config.ItemInfo) {
 			return false;
 		}
@@ -855,7 +855,7 @@ var Misc = {
 			break;
 		}
 
-		return this.fileAction("logs/ItemLog.txt", 2, "[" + me.profile + "] <" + action + "> " + desc + "\n");
+		return this.fileAction("logs/ItemLog.txt", 2, "[" + me.profile + "] <" + action + "> (" + Pickit.itemQualityToName(unit.quality) + ") " + desc + (text ? " {" + text + "}" : "") + "\n");
 	},
 
 	// Log kept item stats in the manager.
@@ -875,7 +875,6 @@ var Misc = {
 			}
 		}
 
-		// experimental
 		if (unit.getFlag(0x10)) {
 			switch (unit.quality) {
 			case 5: // Set

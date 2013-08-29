@@ -42,7 +42,7 @@ function main() {
 	}
 
 	// wait until game is ready
-	while (!me.gameReady || copyUnit(me).classid === undefined) {
+	while (!me.gameReady) {
 		delay(50);
 	}
 

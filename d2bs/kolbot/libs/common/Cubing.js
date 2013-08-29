@@ -110,11 +110,12 @@ var Cubing = {
 		var i, j,
 			gemList = [561, 566, 571, 576, 581, 586, 601];
 
-		for (i = 0; i < Cubing.recipes.length; i += 1) {
-			for (j = 0; j < Cubing.recipes[i].Ingredients.length; j += 1) {
-				if ([0, 49].indexOf(Cubing.recipes[i].Index) === -1 // Don't remove gems from gem recipes and other magic reroll recipes
-						&& gemList.indexOf(Cubing.recipes[i].Ingredients[j]) > -1) {
-					gemList.splice(gemList.indexOf(Cubing.recipes[i].Ingredients[j]), 1);
+		for (i = 0; i < this.recipes.length; i += 1) {
+			if ([0, 49].indexOf(this.recipes[i].Index) === -1) { // Skip gems and other magic rerolling recipes
+				for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
+					if (gemList.indexOf(this.recipes[i].Ingredients[j]) > -1) {
+						gemList.splice(gemList.indexOf(this.recipes[i].Ingredients[j]), 1);
+					}
 				}
 			}
 		}
@@ -127,7 +128,7 @@ var Cubing = {
 	getCube: function () {
 		var i, cube, chest;
 
-		Pather.useWaypoint(57);
+		Pather.useWaypoint(57, true);
 		Precast.doPrecast(true);
 
 		if (Pather.moveToExit(60, true) && Pather.moveToPreset(me.area, 2, 354)) {
@@ -152,7 +153,13 @@ var Cubing = {
 
 		Town.goToTown();
 
-		return !!me.getItem(549);
+		cube = me.getItem(549);
+
+		if (cube) {
+			return Storage.Stash.MoveTo(cube);
+		}
+
+		return false;
 	},
 
 	buildRecipes: function () {
@@ -489,10 +496,10 @@ var Cubing = {
 
 	validIngredients: [], // What we have
 	neededIngredients: [], // What we need
+	subRecipes: [],
 
 	buildLists: function () {
-		var i, j, k, items,
-			subRecipes = [];
+		var i, j, k, items;
 
 		this.validIngredients = [];
 		this.neededIngredients = [];
@@ -531,45 +538,45 @@ IngredientLoop:
 				// if the recipe is enabled (we have the main item), add flawless gem recipes (if needed)
 
 				// Make perf amethyst
-				if (subRecipes.indexOf(561) === -1 && (this.recipes[i].Ingredients[j] === 561 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(561) > -1))) {
+				if (this.subRecipes.indexOf(561) === -1 && (this.recipes[i].Ingredients[j] === 561 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(561) > -1))) {
 					this.recipes.push({Ingredients: [560, 560, 560], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(561);
+					this.subRecipes.push(561);
 				}
 
 				// Make perf topaz
-				if (subRecipes.indexOf(566) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(566) > -1))) {
+				if (this.subRecipes.indexOf(566) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(566) > -1))) {
 					this.recipes.push({Ingredients: [565, 565, 565], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(566);
+					this.subRecipes.push(566);
 				}
 
 				// Make perf sapphire
-				if (subRecipes.indexOf(571) === -1 && (this.recipes[i].Ingredients[j] === 571 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(571) > -1))) {
+				if (this.subRecipes.indexOf(571) === -1 && (this.recipes[i].Ingredients[j] === 571 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(571) > -1))) {
 					this.recipes.push({Ingredients: [570, 570, 570], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(571);
+					this.subRecipes.push(571);
 				}
 
 				// Make perf emerald
-				if (subRecipes.indexOf(576) === -1 && (this.recipes[i].Ingredients[j] === 576 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(576) > -1))) {
+				if (this.subRecipes.indexOf(576) === -1 && (this.recipes[i].Ingredients[j] === 576 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(576) > -1))) {
 					this.recipes.push({Ingredients: [575, 575, 575], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(576);
+					this.subRecipes.push(576);
 				}
 
 				// Make perf ruby
-				if (subRecipes.indexOf(581) === -1 && (this.recipes[i].Ingredients[j] === 581 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(581) > -1))) {
+				if (this.subRecipes.indexOf(581) === -1 && (this.recipes[i].Ingredients[j] === 581 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(581) > -1))) {
 					this.recipes.push({Ingredients: [580, 580, 580], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(581);
+					this.subRecipes.push(581);
 				}
 
 				// Make perf diamond
-				if (subRecipes.indexOf(586) === -1 && (this.recipes[i].Ingredients[j] === 586 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(586) > -1))) {
+				if (this.subRecipes.indexOf(586) === -1 && (this.recipes[i].Ingredients[j] === 586 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(586) > -1))) {
 					this.recipes.push({Ingredients: [585, 585, 585], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(586);
+					this.subRecipes.push(586);
 				}
 
 				// Make perf skull
-				if (subRecipes.indexOf(601) === -1 && (this.recipes[i].Ingredients[j] === 601 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(601) > -1))) {
+				if (this.subRecipes.indexOf(601) === -1 && (this.recipes[i].Ingredients[j] === 601 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(601) > -1))) {
 					this.recipes.push({Ingredients: [600, 600, 600], Index: Recipe.Gem, Enabled: true});
-					subRecipes.push(601);
+					this.subRecipes.push(601);
 				}
 			}
 		}
@@ -580,8 +587,6 @@ IngredientLoop:
 	},
 
 	checkRecipe: function (recipe) {
-		//print(recipe.toSource());
-
 		var i, j, item,
 			usedGids = [],
 			matchList = [];
@@ -595,7 +600,7 @@ IngredientLoop:
 					item = me.getItem(this.validIngredients[j].classid, -1, this.validIngredients[j].gid);
 
 					if (item && this.validItem(item, recipe)) { // 26.11.2012. check if the item actually belongs to the given recipe
-						// don't repeat the same item. TODO: determine if this is still needed since it's older code
+						// don't repeat the same item
 						usedGids.push(this.validIngredients[j].gid);
 						// push the item into the match list
 						matchList.push(copyUnit(item));
@@ -772,7 +777,7 @@ IngredientLoop:
 				i = -1;
 
 				while (items.length) {
-					string += (items[0].name + (items.length > 1 ? " + " : ""));
+					string += (items[0].name.trim() + (items.length > 1 ? " + " : ""));
 					Storage.Cube.MoveTo(items[0]);
 					items.shift();
 				}
@@ -795,7 +800,7 @@ IngredientLoop:
 
 						switch (result.result) {
 						case 0:
-							Misc.itemLogger("Dropped", items[j]);
+							Misc.itemLogger("Dropped", items[j], "doCubing");
 							items[j].drop();
 
 							break;
@@ -836,6 +841,8 @@ IngredientLoop:
 				if (Storage.Stash.CanFit(item) && Storage.Stash.MoveTo(item)) {
 					return true;
 				}
+
+				Misc.itemLogger("Dropped", item, "cursorCheck");
 
 				if (item.drop()) {
 					return true;

@@ -6,19 +6,23 @@
 
 function Gamble() {
 	var gold,
+		info = Gambling.getInfo(),
 		needGold = false;
+
+	if (!info) {
+		throw new Error("Bad Gambling System config.");
+	}
 
 	me.maxgametime = 0;
 	Town.goToTown(1);
 
 	addEventListener('copydata',
 		function (mode, msg) {
-			if (needGold && mode === 0 && Gambling.goldFinders.indexOf(msg) > -1) {
-				print("got game request from " + msg);
+			if (needGold && mode === 0 && info.goldFinders.indexOf(msg) > -1) {
+				print("Got game request from " + msg);
 				sendCopyData(null, msg, 4, me.gamename + "/" + me.gamepassword);
 			}
-		}
-		);
+		});
 
 	while (true) {
 		if (Town.needGamble()) {

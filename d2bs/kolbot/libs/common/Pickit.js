@@ -134,7 +134,7 @@ var Pickit = {
 							Misc.itemLogger("No room for", this.pickList[0]);
 							print("ÿc7Not enough room for " + color + this.pickList[0].name);
 
-							if (!!AutoMule.getMule() && AutoMule.getMuleItems().length > 0) {
+							if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo") && AutoMule.getMuleItems().length > 0) {
 								scriptBroadcast("mule");
 								quit();
 							}
@@ -274,10 +274,12 @@ MainLoop:
 
 				break;
 			case 2:
+				Misc.itemLogger("Kept", item, "Cubing");
 				Cubing.update(stats.classid);
 
 				break;
 			case 3:
+				Misc.itemLogger("Kept", item, "Runewords");
 				Runewords.update(stats.classid, gid);
 
 				break;
@@ -285,6 +287,12 @@ MainLoop:
 		}
 
 		return true;
+	},
+
+	itemQualityToName: function (quality) {
+		var qualNames = ["", "lowquality", "normal", "superior", "magic", "set", "rare", "unique", "crafted"];
+
+		return qualNames[quality];
 	},
 
 	itemColor: function (unit, type) {

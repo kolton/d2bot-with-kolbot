@@ -41,147 +41,95 @@ var AutoMule = {
 			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
 			stopProfile: ""
 		}
+//##########################################################################################
 	},
 
-	// Get the Mule of the current profile
-	getMule: function (mode) {
-		var mule, i, j, k;
+	inGame: false,
+	check: false,
+	torchCheck: false,
 
-		mode = mode || 0;
-		mule = mode === 1 ? this.TorchMules : this.Mules;
+	// *** Master functions ***
+	getInfo: function () {
+		var i, j, info;
 
-		for (i in mule) {
-			if (mule.hasOwnProperty(i)) {
-				for (j in mule[i]) {
-					if (mule[i].hasOwnProperty(j) && j === "enabledProfiles") {
-						for (k = 0; k < mule[i][j].length; k += 1) {
-							if (mule[i][j][k].toLowerCase() === me.profile.toLowerCase()) {
-								// Return the Mule it belongs to
-								return mule[i];
-							}
+		for (i in this.Mules) {
+			if (this.Mules.hasOwnProperty(i)) {
+				for (j = 0; j < this.Mules[i].enabledProfiles.length; j += 1) {
+					if (this.Mules[i].enabledProfiles[j].toLowerCase() === me.profile.toLowerCase()) {
+						if (!info) {
+							info = {};
 						}
+
+						info.muleInfo = this.Mules[i];
 					}
 				}
+			}
+		}
+
+		for (i in this.TorchMules) {
+			if (this.TorchMules.hasOwnProperty(i)) {
+				for (j = 0; j < this.TorchMules[i].enabledProfiles.length; j += 1) {
+					if (this.TorchMules[i].enabledProfiles[j].toLowerCase() === me.profile.toLowerCase()) {
+						if (!info) {
+							info = {};
+						}
+
+						info.torchMuleInfo = this.TorchMules[i];
+					}
+				}
+			}
+		}
+
+		return info;
+	},
+
+	getMule: function () {
+		var info;
+
+		info = this.getInfo();
+
+		if (info) {
+			if (this.check && info.hasOwnProperty("muleInfo")) {
+				return info.muleInfo;
+			}
+
+			if (this.torchCheck && info.hasOwnProperty("torchMuleInfo")) {
+				return info.torchMuleInfo;
 			}
 		}
 
 		return false;
 	},
 
-	// Get the item dropper for current Mule. Returns [profilename, mulemode]
-	getMaster: function (info) {
-		var i, j, k, muleObj;
-
-		muleObj = info.mode === 1 ? this.TorchMules : this.Mules;
-
-		for (i in muleObj) {
-			if (muleObj.hasOwnProperty(i)) {
-				for (j in muleObj[i]) {
-					if (muleObj[i].hasOwnProperty(j) && j === "enabledProfiles") {
-						for (k = 0; k < muleObj[i][j].length; k += 1) {
-							if (muleObj[i][j][k].toLowerCase() === info.profile.toLowerCase()) {
-								return {
-									profile: muleObj[i][j][k],
-									mode: info.mode
-								};
-							}
-						}
-					}
-				}
-			}
+	outOfGameCheck: function () {
+		if (!this.check && !this.torchCheck) {
+			return false;
 		}
-
-		return false;
-	},
-
-	// Get the object for the given Mule profile
-	getMuleObject: function (mode, master) {
-		var i, mule;
-
-		mode = mode || 0;
-		mule = mode === 1 ? this.TorchMules : this.Mules;
-
-		for (i in mule) {
-			if (mule.hasOwnProperty(i)) {
-				if (mule[i].muleProfile && mule[i].enabledProfiles &&
-						mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase() && mule[i].enabledProfiles.indexOf(master) > -1) {
-					return mule[i];
-				}
-			}
-		}
-
-		return false;
-	},
-
-	getMuleFilename: function (mode) {
-		var i, mule, jsonObj, jsonStr, file;
-
-		mode = mode || 0;
-		mule = mode === 1 ? this.TorchMules : this.Mules;
-
-		// Iterate through mule object
-		for (i in mule) {
-			if (mule.hasOwnProperty(i)) {
-				// Mule profile matches config
-				if (mule[i].muleProfile && mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase()) {
-					file = mode === 0 ? "logs/AutoMule." + i + ".json" : "logs/TorchMule." + i + ".json";
-
-					// If file exists check for valid info
-					if (FileTools.exists(file)) {
-						try {
-							jsonStr = FileTools.readText(file);
-							jsonObj = JSON.parse(jsonStr);
-
-							// Return filename containing correct mule info
-							if (mule[i].accountPrefix && jsonObj.account && jsonObj.account.match(mule[i].accountPrefix)) {
-								return file;
-							}
-						} catch (e) {
-							print(e);
-						}
-					} else {
-						return file;
-					}
-				}
-			}
-		}
-
-		// File exists but doesn't contain valid info - remake
-		FileTools.remove(file);
-
-		return file;
-	},
-
-	outOfGameCheck: function (mode) {
-		mode = mode || 0;
 
 		var muleObj,
 			stopCheck = false,
 			muleInfo = {status: ""},
 			failCount = 0;
 
-		muleObj = this.getMule(mode);
+		muleObj = this.getMule();
 
-		// Sanity check
 		if (!muleObj) {
 			return false;
 		}
 
 		function MuleCheckEvent(mode, msg) {
 			if (mode === 10) {
-				print(msg);
-
 				muleInfo = JSON.parse(msg);
 			}
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile, 7);
+		D2Bot.printToConsole("Starting" + (this.torchCheck ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile, 7);
 
 MainLoop:
 		while (true) {
 			// If nothing received our copy data start the mule profile
-			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: mode}))) {
+			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: this.torchCheck ? 1 : 0}))) {
 				D2Bot.start(muleObj.muleProfile);
 			}
 
@@ -205,10 +153,16 @@ MainLoop:
 				break MainLoop;
 			case "ready":
 				delay(2000);
+
+				this.inGame = true;
+				me.blockMouse = true;
+
 				joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
+
+				me.blockMouse = false;
+
 				delay(5000);
 
-				//return true;
 				break MainLoop;
 			default:
 				failCount += 1;
@@ -229,6 +183,10 @@ MainLoop:
 			delay(1000);
 		}
 
+		this.inGame = false;
+		this.check = false;
+		this.torchCheck = false;
+
 		// No response - stop mule profile
 		if (failCount >= 60) {
 			D2Bot.stop(muleObj.muleProfile);
@@ -239,48 +197,34 @@ MainLoop:
 			D2Bot.start(muleObj.stopProfile);
 		}
 
-		return false;
+		return true;
 	},
 
 	inGameCheck: function () {
+		var muleObj, tick, info,
+			timeout = 150 * 1000, // Ingame mule timeout
+			status = "muling";
+
 		// Single player
 		if (!me.gamename) {
 			return false;
 		}
 
-		// Check if we're in mule or torch mule game
-		if ((!this.getMule(0) || me.gamename.toLowerCase() !== this.getMule(0).muleGameName[0].toLowerCase()) &&
-				(!this.getMule(1) || me.gamename.toLowerCase() !== this.getMule(1).muleGameName[0].toLowerCase())) {
+		info = this.getInfo();
+
+		// Profile is not a part of AutoMule
+		if (!info) {
 			return false;
 		}
 
-		var mode, muleObj, tick,
-			timeout = 150 * 1000, // Ingame mule timeout
-			status = "muling";
-
-		function CheckModeEvent(msg) {
-			switch (msg) {
-			case "torch":
-				print("ÿc4AutoMuleÿc0: In torch mule game.");
-				D2Bot.printToConsole("In torch mule game.", 7);
-
-				mode = 1;
-
-				break;
-			case "normal":
-				print("ÿc4AutoMuleÿc0: In mule game.");
-				D2Bot.printToConsole("In mule game.", 7);
-
-				mode = 0;
-
-				break;
-			}
+		// Profile is not in mule or torch mule game
+		if (!((info.hasOwnProperty("muleInfo") && me.gamename.toLowerCase() === info.muleInfo.muleGameName[0].toLowerCase()) ||
+				(info.hasOwnProperty("torchMuleInfo") && me.gamename.toLowerCase() === info.torchMuleInfo.muleGameName[0].toLowerCase()))) {
+			return false;
 		}
 
 		function DropStatusEvent(mode, msg) {
 			if (mode === 10) {
-				print(msg);
-
 				switch (JSON.parse(msg).status) {
 				case "report": // reply to status request
 					sendCopyData(null, muleObj.muleProfile, 12, JSON.stringify({status: status}));
@@ -294,40 +238,51 @@ MainLoop:
 			}
 		}
 
-		addEventListener("copydata", DropStatusEvent);
-		addEventListener("scriptmsg", CheckModeEvent);
-		scriptBroadcast("requestMuleMode");
-		delay(500);
-		muleObj = this.getMule(mode);
+		function MuleModeEvent(msg) {
+			switch (msg) {
+			case "1":
+				AutoMule.torchCheck = true;
 
-		if (me.gamename.toLowerCase() !== muleObj.muleGameName[0].toLowerCase()) {
+				break;
+			case "0":
+				AutoMule.check = true;
+
+				break;
+			}
+		}
+
+		addEventListener("copydata", DropStatusEvent);
+		addEventListener("scriptmsg", MuleModeEvent);
+		scriptBroadcast("getMuleMode");
+		delay(500);
+
+		if (!this.check && !this.torchCheck) {
+			print("Error - Unable to determine mule mode");
+			quit();
+
 			return false;
 		}
 
-		print("ÿc4AutoMuleÿc0: In mule game.");
-
+		muleObj = this.getMule();
 		me.maxgametime = 0;
 
 		if (!Town.goToTown(1)) {
-			throw new Error("Failed to go to stash in act 1");
+			print("Error - Failed to go to Act 1");
+			quit();
+
+			return false;
 		}
 
 		sendCopyData(null, muleObj.muleProfile, 11, "begin");
 
-		switch (mode) {
-		case 0:
-			this.dropStuff();
-
-			break;
-		case 1:
+		if (this.torchCheck) {
+			print("ÿc4AutoMuleÿc0: In torch mule game.");
+			D2Bot.printToConsole("In torch mule game.", 7);
 			this.dropTorch();
-
-			break;
-		default:
-			//D2Bot.printToConsole("Something got bjorked");
-			print("Something got bjorked");
-
-			break;
+		} else {
+			print("ÿc4AutoMuleÿc0: In mule game.");
+			D2Bot.printToConsole("In mule game.", 7);
+			this.dropStuff();
 		}
 
 		status = "done";
@@ -464,5 +419,88 @@ MainLoop:
 		}
 
 		return false;
+	},
+
+	// *** Mule functions ***
+	getMaster: function (info) {
+		var i, j, k, muleObj;
+
+		muleObj = info.mode === 1 ? this.TorchMules : this.Mules;
+
+		for (i in muleObj) {
+			if (muleObj.hasOwnProperty(i)) {
+				for (j in muleObj[i]) {
+					if (muleObj[i].hasOwnProperty(j) && j === "enabledProfiles") {
+						for (k = 0; k < muleObj[i][j].length; k += 1) {
+							if (muleObj[i][j][k].toLowerCase() === info.profile.toLowerCase()) {
+								return {
+									profile: muleObj[i][j][k],
+									mode: info.mode
+								};
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	},
+
+	getMuleObject: function (mode, master) {
+		var i, mule;
+
+		mode = mode || 0;
+		mule = mode === 1 ? this.TorchMules : this.Mules;
+
+		for (i in mule) {
+			if (mule.hasOwnProperty(i)) {
+				if (mule[i].muleProfile && mule[i].enabledProfiles &&
+						mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase() && mule[i].enabledProfiles.indexOf(master) > -1) {
+					return mule[i];
+				}
+			}
+		}
+
+		return false;
+	},
+
+	getMuleFilename: function (mode) {
+		var i, mule, jsonObj, jsonStr, file;
+
+		mode = mode || 0;
+		mule = mode === 1 ? this.TorchMules : this.Mules;
+
+		// Iterate through mule object
+		for (i in mule) {
+			if (mule.hasOwnProperty(i)) {
+				// Mule profile matches config
+				if (mule[i].muleProfile && mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase()) {
+					file = mode === 0 ? "logs/AutoMule." + i + ".json" : "logs/TorchMule." + i + ".json";
+
+					// If file exists check for valid info
+					if (FileTools.exists(file)) {
+						try {
+							jsonStr = FileTools.readText(file);
+							jsonObj = JSON.parse(jsonStr);
+
+							// Return filename containing correct mule info
+							if (mule[i].accountPrefix && jsonObj.account && jsonObj.account.match(mule[i].accountPrefix)) {
+								return file;
+							}
+						} catch (e) {
+							print(e);
+						}
+					} else {
+						return file;
+					}
+				}
+			}
+		}
+
+		// File exists but doesn't contain valid info - remake
+		FileTools.remove(file);
+
+		return file;
 	}
 };

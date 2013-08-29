@@ -79,15 +79,18 @@ var MuleLogger = {
 
 	// Log kept item stats in the manager.
 	logItem: function (unit) {
+		if (!isIncluded("common/misc.js")) {
+			include("common/misc.js");
+		}
+
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "");
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim();
 
 		desc = this.getItemDesc(unit) + "$" + unit.gid;
 		color = unit.getColor();
 
-		// experimental
 		switch (unit.quality) {
 		case 5: // Set
 			switch (unit.classid) {
@@ -251,7 +254,7 @@ var MuleLogger = {
 			title: name,
 			description: desc,
 			header: header,
-			sockets: [] // not yet implemented
+			sockets: Misc.getItemSockets(unit) // not yet implemented
 		};
 	},
 

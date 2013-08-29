@@ -550,7 +550,7 @@ MainLoop:
 
 				switch (result.result) {
 				case 0:
-					Misc.itemLogger("Dropped", unids[i]);
+					Misc.itemLogger("Dropped", unids[i], "cainID");
 					unids[i].drop();
 
 					break;
@@ -595,7 +595,7 @@ MainLoop:
 
 				switch (result.result) {
 				case 0:
-					Misc.itemLogger("Dropped", item);
+					Misc.itemLogger("Dropped", item, "fieldID");
 					item.drop();
 
 					break;
@@ -1117,9 +1117,7 @@ MainLoop:
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
 				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
-					result = Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4 ? "pickit" :
-							Cubing.keepItem(items[i]) ? "cubing" :
-									Runewords.keepItem(items[i]) ? "runewords" : false;
+					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]);
 
 					if (result) {
 						Misc.itemLogger("Stashed", items[i]);
@@ -1305,6 +1303,10 @@ MainLoop:
 	},
 
 	clearBelt: function () {
+		while (!me.gameReady) {
+			delay(100);
+		}
+
 		var item = me.getItem(-1, 2),
 			clearList = [];
 
@@ -1347,7 +1349,7 @@ MainLoop:
 
 		for (i = 0; !!items && i < items.length; i += 1) {
 			if (items[i].location === 3 && items[i].mode === 0 && items[i].itemType === 22) {
-				Misc.itemLogger("Dropped", items[i]);
+				Misc.itemLogger("Dropped", items[i], "clearScrolls");
 				items[i].drop();
 			}
 		}
@@ -1420,7 +1422,7 @@ MainLoop:
 						Misc.itemLogger("Sold", items[i]);
 						items[i].sell();
 					} else {
-						Misc.itemLogger("Dropped", items[i]);
+						Misc.itemLogger("Dropped", items[i], "clearInventory");
 						items[i].drop();
 					}
 				} catch (e) {

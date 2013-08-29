@@ -26,15 +26,13 @@ function OrgTorch() {
 		if (item) {
 			do {
 				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
-					if (!!AutoMule.getMule(1)) {
-						//D2Bot.printToConsole("torch found");
+					if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
 						scriptBroadcast("muleTorch");
-
 						quit();
 						delay(10000);
-					} else {
-						return true;
 					}
+
+					return true;
 				}
 			} while (item.getNext());
 		}
