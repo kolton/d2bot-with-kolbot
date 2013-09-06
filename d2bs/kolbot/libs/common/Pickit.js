@@ -186,7 +186,8 @@ var Pickit = {
 			this.picked = false;
 		}
 
-		var i, item, tick, gid, stats;
+		var i, item, tick, gid, stats,
+			itemCount = me.itemcount;
 
 		if (unit.gid) {
 			gid = unit.gid;
@@ -201,7 +202,7 @@ var Pickit = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			if (!getUnit(4, -1, -1, gid)) {
+			if (!getUnit(4, -1, -1, gid)) { // Someone else picked it
 				break MainLoop;
 			}
 
@@ -233,7 +234,7 @@ MainLoop:
 					if (!item.getStat(14) || item.getStat(14) < stats.gold) {
 						print("ÿc7Picked up " + stats.color + (item.getStat(14) ? (item.getStat(14) - stats.gold) : stats.gold) + " " + stats.name);
 
-						break MainLoop;
+						return true;
 					}
 				}
 
@@ -259,7 +260,8 @@ MainLoop:
 			//print("pick retry");
 		}
 
-		stats.picked = !!me.getItem(-1, -1, gid);
+		//stats.picked = !!me.getItem(-1, -1, gid);
+		stats.picked = me.itemcount > itemCount;
 
 		if (stats.picked) {
 			print("ÿc7Picked up " + stats.color + stats.name);
@@ -274,8 +276,8 @@ MainLoop:
 
 				break;
 			case 2:
-				Misc.itemLogger("Kept", item, "Cubing");
-				Cubing.update(stats.classid);
+				Misc.itemLogger("Kept", item, "Cubing " + me.findItems(item.classid).length);
+				Cubing.update();
 
 				break;
 			case 3:

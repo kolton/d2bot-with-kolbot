@@ -259,6 +259,8 @@ MainSwitch:
 						accounts.splice(0, i);
 						chars.splice(0, i);
 
+						i -= 1;
+
 						break;
 					}
 				}
@@ -374,6 +376,8 @@ MainSwitch:
 				for (i = 0; i < charList.length; i += 1) {
 					if (charList[i] === obj.currChar) {
 						charList.splice(0, i);
+
+						i -= 1;
 
 						break;
 					}

@@ -17,7 +17,12 @@ var AutoMule = {
 			enabledProfiles: [""],
 
 			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
-			stopProfile: ""
+			stopProfile: "",
+
+			// Trigger muling at the end of a game if used space in stash and inventory is equal to or more than given percent.
+			// Both conditions need to be met in order to trigger muling.
+			usedStashTrigger: 80,
+			usedInventoryTrigger: 80
 		}
 	},
 
@@ -81,6 +86,20 @@ var AutoMule = {
 		}
 
 		return info;
+	},
+
+	muleCheck: function () {
+		var info = this.getInfo();
+
+		if (info && info.hasOwnProperty("muleInfo") && info.muleInfo.hasOwnProperty("usedStashTrigger") && info.muleInfo.hasOwnProperty("usedInventoryTrigger") &&
+				Storage.Inventory.UsedSpacePercent() >= info.muleInfo.usedInventoryTrigger && Storage.Stash.UsedSpacePercent() >= info.muleInfo.usedStashTrigger &&
+					this.getMuleItems().length > 0) {
+			D2Bot.printToConsole("MuleCheck triggered!", 7);
+
+			return true;
+		}
+
+		return false;
 	},
 
 	getMule: function () {
@@ -346,7 +365,7 @@ MainLoop:
 
 		if (item) {
 			do {
-				if (Pickit.checkItem(item).result > 0 && item.classid !== 549 &&
+				if (Town.ignoredItemTypes.indexOf(item.itemType) === -1 && Pickit.checkItem(item).result > 0 && item.classid !== 549 &&
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) &&
 						[76, 77, 78].indexOf(item.itemType) === -1 && // don't drop potions
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) &&

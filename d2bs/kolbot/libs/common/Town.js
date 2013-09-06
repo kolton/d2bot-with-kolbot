@@ -77,6 +77,7 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
 		}
 
+		this.clearInventory();
 		this.heal();
 		this.fillTome("tbk");
 
@@ -208,7 +209,7 @@ var Town = {
 			return true;
 		}
 
-		if (me.diff === 0 && Pather.accessToAct(4)) {
+		if (me.diff === 0 && Pather.accessToAct(4) && me.act < 4) {
 			Town.goToTown(4);
 		}
 
@@ -420,9 +421,10 @@ var Town = {
 MainLoop:
 		while (list.length > 0) {
 			item = list.shift();
-			result = Pickit.checkItem(item);
 
-			if (item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
+			if (!item.getFlag(0x10) && item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
+				result = Pickit.checkItem(item);
+
 				switch (result.result) {
 				// Items for gold, will sell magics, etc. w/o id, but at low levels
 				// magics are often not worth iding.
@@ -470,9 +472,14 @@ MainLoop:
 						Misc.logItem("Kept", item, result.line);
 
 						break;
-					case -1:
-					case 2:
-					case 3: // just in case
+					case -1: // unidentified
+						break;
+					case 2: // cubing
+						Misc.itemLogger("Kept", item, "Cubing-Town");
+						Cubing.update();
+
+						break;
+					case 3: // runeword (doesn't trigger normally)
 						break;
 					default:
 						Misc.itemLogger("Sold", item);
@@ -751,7 +758,7 @@ CursorLoop:
 			me.cancel(); // cancel trade screen so it doesn't buy certain sold items back from Jamella
 		}
 
-		var i, item, items, npc, newItem, result,
+		var i, item, items, npc, newItem, result, timer,
 			list = [];
 
 		npc = this.initNPC("Gamble");
@@ -786,6 +793,7 @@ CursorLoop:
 						return false;
 					}
 
+					me.overhead("Buy: " + items[i].name);
 					items[i].buy(false, true);
 
 					newItem = this.getGambledItem(list);
@@ -806,9 +814,13 @@ CursorLoop:
 
 							break;
 						default:
-							Misc.itemLogger("Sold", newItem);
+							Misc.itemLogger("Sold", newItem, "Gambling");
+							me.overhead("Sell: " + newItem.name);
 							newItem.sell();
-							delay(500);
+
+							if (!Config.PacketShopping) {
+								delay(500);
+							}
 
 							break;
 						}

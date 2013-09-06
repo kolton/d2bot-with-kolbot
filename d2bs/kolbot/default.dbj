@@ -188,6 +188,10 @@ function main() {
 		}
 	}
 
+	if (AutoMule.muleCheck()) {
+		scriptBroadcast("mule");
+	}
+
 	scriptBroadcast("quit");
 	delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
 

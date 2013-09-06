@@ -158,7 +158,6 @@ var ClassAttack = {
 	},
 
 	afterAttack: function () {
-		Misc.unShift();
 		Precast.doPrecast(false);
 	},
 
