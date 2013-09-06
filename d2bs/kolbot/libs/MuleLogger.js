@@ -38,6 +38,8 @@ var MuleLogger = {
 		for (i = 0; i < desc.length; i += 1) {
 			if (desc[i].indexOf(getLocaleString(3331)) > -1) { // Remove sell value
 				desc.splice(i, 1);
+
+				i -= 1;
 			} else {
 				if (desc[i].match(/^ÿ/)) {
 					stringColor = desc[i].substring(0, 3);

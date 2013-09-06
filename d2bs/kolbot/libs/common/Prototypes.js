@@ -194,7 +194,8 @@ Unit.prototype.buy = function (shiftBuy, gamble) {
 		return false;
 	}
 
-	var i, tick, container,
+	var i, tick,
+		oldGold = me.getStat(14) + me.getStat(15),
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 3; i += 1) {
@@ -204,42 +205,11 @@ Unit.prototype.buy = function (shiftBuy, gamble) {
 
 		tick = getTickCount();
 
-		while (getTickCount() - tick < 2000) {
-			if (shiftBuy) {
-				switch (this.classid) {
-				case 529: // tp scroll
-					container = me.findItem(518, 0, 3); // tp tome
+		while (getTickCount() - tick < Math.max(2000, me.ping * 2 + 500)) {
+			if (shiftBuy && me.getStat(14) + me.getStat(15) < oldGold) {
+				delay(500);
 
-					if (container && container.getStat(70) === 20) {
-						delay(500);
-
-						return true;
-					}
-
-					break;
-				case 530: // id scroll
-					container = me.findItem(519, 0, 3); // id tome
-
-					if (container && container.getStat(70) === 20) {
-						delay(500);
-
-						return true;
-					}
-
-					break;
-				case 543: // key
-					container = me.findItem(543, 0, 3); // key stack
-
-					if (container && container.getStat(70) === 12) {
-						delay(500);
-
-						return true;
-					}
-
-					break;
-				}
-
-				delay(90);
+				return true;
 			}
 
 			if (itemCount !== me.itemcount) {
@@ -505,7 +475,7 @@ Unit.prototype.__defineGetter__('itemclass',
 	);
 
 Unit.prototype.getStatEx = function (id, subid) {
-	var i, temp, regex;
+	var i, temp, rval, regex;
 
 	switch (id) {
 	case 21: // plusmindamage
@@ -515,16 +485,25 @@ Unit.prototype.getStatEx = function (id, subid) {
 				break;
 			}
 
-			if (!this.desc) {
-				this.desc = this.description;
-			}
-
-			temp = this.desc.split("\n");
-			regex = new RegExp("\\+\\d+ " + getLocaleString(3478 - 21 + id));
+			temp = this.getStat(-1);
+			rval = 0;
 
 			for (i = 0; i < temp.length; i += 1) {
-				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+				switch (temp[i][0]) {
+				case id: // plus one handed dmg
+				case id + 2: // plus two handed dmg
+					// There are 2 occurrences of min/max if the item has +damage. Total damage is the sum of both.
+					// First occurrence is +damage, second is base item damage.
+
+					if (rval) { // First occurence stored, return if the second one exists
+						return rval;
+					}
+
+					if (this.getStat(temp[i][0]) > 0 && this.getStat(temp[i][0]) > temp[i][2]) {
+						rval = temp[i][2]; // Store the potential +dmg value
+					}
+
+					break;
 				}
 			}
 
@@ -536,6 +515,15 @@ Unit.prototype.getStatEx = function (id, subid) {
 		if (subid === 0) {
 			if (this.mode !== 0) {
 				break;
+			}
+
+			switch (this.itemType) {
+			case 58: // jewel
+			case 82: // charms
+			case 83:
+			case 84:
+				// defense is the same as plusdefense for these items
+				return this.getStat(31);
 			}
 
 			if (!this.desc) {

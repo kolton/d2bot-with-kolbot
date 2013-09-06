@@ -125,6 +125,7 @@ var Attack = {
 		}
 
 		var i, target, gid,
+			errorInfo = "",
 			attackCount = 0;
 
 		if (typeof classId === "object") {
@@ -167,10 +168,16 @@ var Attack = {
 			}
 
 			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
+				errorInfo = " (doAttack failed)";
+
 				break;
 			}
 
 			attackCount += 1;
+		}
+
+		if (attackCount === 300) {
+			errorInfo = " (attackCount exceeded)";
 		}
 
 		if (Config.MFSwitchPercent) {
@@ -184,7 +191,7 @@ var Attack = {
 		}
 
 		if (target.hp > 0 && target.mode !== 0 && target.mode !== 12) {
-			throw new Error("Failed to kill " + target.name);
+			throw new Error("Failed to kill " + target.name + errorInfo);
 		}
 
 		return true;

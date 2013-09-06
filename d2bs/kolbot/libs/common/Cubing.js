@@ -174,7 +174,7 @@ var Cubing = {
 
 			switch (Config.Recipes[i][0]) {
 			case Recipe.Gem:
-				this.recipes.push({Ingredients: [Config.Recipes[i][1], Config.Recipes[i][1], Config.Recipes[i][1]], Index: Recipe.Gem, Enabled: true});
+				this.recipes.push({Ingredients: [Config.Recipes[i][1], Config.Recipes[i][1], Config.Recipes[i][1]], Index: Recipe.Gem, AlwaysEnabled: true});
 
 				break;
 			case Recipe.HitPower.Helm:
@@ -388,7 +388,7 @@ var Cubing = {
 				case 616: // tal
 				case 617: // ral
 				case 618: // ort
-					this.recipes.push({Ingredients: [Config.Recipes[i][1], Config.Recipes[i][1], Config.Recipes[i][1]], Index: Recipe.Rune, Enabled: true});
+					this.recipes.push({Ingredients: [Config.Recipes[i][1], Config.Recipes[i][1], Config.Recipes[i][1]], Index: Recipe.Rune, AlwaysEnabled: true});
 
 					break;
 				case 619: // thul
@@ -487,7 +487,7 @@ var Cubing = {
 
 				break;
 			case Recipe.Token:
-				this.recipes.push({Ingredients: [654, 655, 656, 657], Index: Recipe.Token, Enabled: true});
+				this.recipes.push({Ingredients: [654, 655, 656, 657], Index: Recipe.Token, AlwaysEnabled: true});
 
 				break;
 			}
@@ -506,6 +506,9 @@ var Cubing = {
 		items = me.findItems(-1, 0);
 
 		for (i = 0; i < this.recipes.length; i += 1) {
+			// Set default Enabled property - true if recipe is always enabled, false otherwise
+			this.recipes[i].Enabled = this.recipes[i].hasOwnProperty("AlwaysEnabled");
+
 IngredientLoop:
 			for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 				for (k = 0; k < items.length; k += 1) {
@@ -518,8 +521,10 @@ IngredientLoop:
 						// Remove from item list to prevent counting the same item more than once
 						items.splice(k, 1);
 
-						// enable the recipe if the first item is found. ingredients are organized in the way that the first item is always the base of the recipe (ring for ring crafting, armor for armor upgrading etc.)
-						if (this.recipes[i].Index !== Recipe.Rune || j === 1) { // Enable rune recipe after 2 found runes
+						k -= 1;
+
+						// Enable recipes for gem/jewel pickup
+						if (this.recipes[i].Index !== Recipe.Rune || (this.recipes[i].Index === Recipe.Rune && j >= 1)) { // Enable rune recipe after 2 bases are found
 							this.recipes[i].Enabled = true;
 						}
 
@@ -539,51 +544,67 @@ IngredientLoop:
 
 				// Make perf amethyst
 				if (this.subRecipes.indexOf(561) === -1 && (this.recipes[i].Ingredients[j] === 561 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(561) > -1))) {
-					this.recipes.push({Ingredients: [560, 560, 560], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [560, 560, 560], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(561);
 				}
 
 				// Make perf topaz
 				if (this.subRecipes.indexOf(566) === -1 && (this.recipes[i].Ingredients[j] === 566 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(566) > -1))) {
-					this.recipes.push({Ingredients: [565, 565, 565], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [565, 565, 565], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(566);
 				}
 
 				// Make perf sapphire
 				if (this.subRecipes.indexOf(571) === -1 && (this.recipes[i].Ingredients[j] === 571 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(571) > -1))) {
-					this.recipes.push({Ingredients: [570, 570, 570], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [570, 570, 570], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(571);
 				}
 
 				// Make perf emerald
 				if (this.subRecipes.indexOf(576) === -1 && (this.recipes[i].Ingredients[j] === 576 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(576) > -1))) {
-					this.recipes.push({Ingredients: [575, 575, 575], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [575, 575, 575], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(576);
 				}
 
 				// Make perf ruby
 				if (this.subRecipes.indexOf(581) === -1 && (this.recipes[i].Ingredients[j] === 581 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(581) > -1))) {
-					this.recipes.push({Ingredients: [580, 580, 580], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [580, 580, 580], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(581);
 				}
 
 				// Make perf diamond
 				if (this.subRecipes.indexOf(586) === -1 && (this.recipes[i].Ingredients[j] === 586 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(586) > -1))) {
-					this.recipes.push({Ingredients: [585, 585, 585], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [585, 585, 585], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(586);
 				}
 
 				// Make perf skull
 				if (this.subRecipes.indexOf(601) === -1 && (this.recipes[i].Ingredients[j] === 601 || (this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(601) > -1))) {
-					this.recipes.push({Ingredients: [600, 600, 600], Index: Recipe.Gem, Enabled: true});
+					this.recipes.push({Ingredients: [600, 600, 600], Index: Recipe.Gem, AlwaysEnabled: true, MainRecipe: this.recipes[i].Index});
 					this.subRecipes.push(601);
 				}
 			}
 		}
 	},
 
+	// Remove unneeded flawless gem recipes
+	clearSubRecipes: function () {
+		var i;
+
+		this.subRecipes = [];
+
+		for (i = 0; i < this.recipes.length; i += 1) {
+			if (this.recipes[i].hasOwnProperty("MainRecipe")) {
+				this.recipes.splice(i, 1);
+
+				i -= 1;
+			}
+		}
+	},
+
 	update: function () {
-		Cubing.buildLists();
+		this.clearSubRecipes();
+		this.buildLists();
 	},
 
 	checkRecipe: function (recipe) {
@@ -625,10 +646,16 @@ IngredientLoop:
 			return false;
 		}
 
+		if (this.keepItem(unit)) {
+			return true;
+		}
+
 		var i;
 
 		for (i = 0; i < this.neededIngredients.length; i += 1) {
-			if (this.keepItem(unit) || (unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe))) {
+			if (unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe)) {
+				//debugLog("Cubing: " + unit.name + " " + this.neededIngredients[i].recipe.Index + " " + (this.neededIngredients[i].recipe.hasOwnProperty("MainRecipe") ? this.neededIngredients[i].recipe.MainRecipe : ""));
+
 				return true;
 			}
 		}
@@ -682,6 +709,8 @@ IngredientLoop:
 			} else if (unit.quality === 4 && Math.floor(me.charlvl / 2) + Math.floor(unit.ilvl / 2) >= recipe.Level && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
+
+			return false;
 		}
 
 		if (recipe.Index >= Recipe.Unique.Weapon.ToExceptional && recipe.Index <= Recipe.Unique.Armor.ToElite) {
@@ -697,6 +726,8 @@ IngredientLoop:
 					return !unit.getFlag(0x400000) && NTIP.CheckItem(unit) === 1;
 				}
 			}
+
+			return false;
 		}
 
 		if (recipe.Index >= Recipe.Rare.Weapon.ToExceptional && recipe.Index <= Recipe.Rare.Armor.ToElite) {
@@ -712,6 +743,8 @@ IngredientLoop:
 					return !unit.getFlag(0x400000) && NTIP.CheckItem(unit) === 1;
 				}
 			}
+
+			return false;
 		}
 
 		if (recipe.Index >= Recipe.Socket.Shield && recipe.Index <= Recipe.Socket.Helm) {
@@ -727,18 +760,24 @@ IngredientLoop:
 					return !unit.getFlag(0x400000) && NTIP.CheckItem(unit) === 1;
 				}
 			}
+
+			return false;
 		}
 
 		if (recipe.Index === Recipe.Reroll.Magic) {
 			if (unit.quality === 4 && unit.ilvl >= recipe.Level && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
+
+			return false;
 		}
 
 		if (recipe.Index === Recipe.Reroll.Rare) {
 			if (unit.quality === 6 && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
+
+			return false;
 		}
 
 		if (recipe.Index === Recipe.Token) {
@@ -790,7 +829,7 @@ IngredientLoop:
 				delay(700 + me.ping);
 				print("ÿc4Cubing: " + string);
 				D2Bot.printToConsole(string, 5);
-				this.buildLists();
+				this.update();
 
 				items = me.findItems(-1, -1, 6);
 

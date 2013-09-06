@@ -734,6 +734,8 @@ var Misc = {
 		for (i = 0; i < desc.length; i += 1) {
 			if (desc[i].indexOf(getLocaleString(3331)) > -1) { // Remove sell value
 				desc.splice(i, 1);
+
+				i -= 1;
 			} else {
 				if (desc[i].match(/^ÿ/)) {
 					stringColor = desc[i].substring(0, 3);
@@ -824,7 +826,12 @@ var Misc = {
 			return false;
 		}
 
-		var desc;
+		var desc,
+			date = new Date(),
+			h = date.getHours(),
+			m = date.getMinutes(),
+			s = date.getSeconds(),
+			dateString = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
 
 		switch (action) {
 		case "Sold":
@@ -855,7 +862,7 @@ var Misc = {
 			break;
 		}
 
-		return this.fileAction("logs/ItemLog.txt", 2, "[" + me.profile + "] <" + action + "> (" + Pickit.itemQualityToName(unit.quality) + ") " + desc + (text ? " {" + text + "}" : "") + "\n");
+		return this.fileAction("logs/ItemLog.txt", 2, dateString + " <" + me.profile + "> <" + action + "> (" + Pickit.itemQualityToName(unit.quality) + ") " + desc + (text ? " {" + text + "}" : "") + "\n");
 	},
 
 	// Log kept item stats in the manager.
@@ -1613,7 +1620,8 @@ var Packet = {
 	},
 
 	buyItem: function (unit, shiftBuy, gamble) {
-		var i, tick, container,
+		var i, tick,
+			oldGold = me.getStat(14) + me.getStat(15),
 			itemCount = me.itemcount,
 			npc = getInteractedNPC();
 
@@ -1630,34 +1638,9 @@ var Packet = {
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 2000) {
-				if (shiftBuy) {
-					switch (unit.classid) {
-					case 529: // tp scroll
-						container = me.findItem(518, 0, 3); // tp tome
-
-						if (container && container.getStat(70) === 20) {
-							return true;
-						}
-
-						break;
-					case 530: // id scroll
-						container = me.findItem(519, 0, 3); // id tome
-
-						if (container && container.getStat(70) === 20) {
-							return true;
-						}
-
-						break;
-					case 543: // key
-						container = me.findItem(543, 0, 3); // key stack
-
-						if (container && container.getStat(70) === 12) {
-							return true;
-						}
-
-						break;
-					}
+			while (getTickCount() - tick < Math.max(2000, me.ping * 2 + 500)) {
+				if (shiftBuy && me.getStat(14) + me.getStat(15) < oldGold) {
+					return true;
 				}
 
 				if (itemCount !== me.itemcount) {
@@ -1692,8 +1675,6 @@ var Packet = {
 
 			while (getTickCount() - tick < 2000) {
 				if (me.itemcount !== itemCount) {
-					//delay(500);
-
 					return true;
 				}
 

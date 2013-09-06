@@ -133,6 +133,8 @@ RuneLoop:
 							this.validGids.push(items[k].gid);
 							items.splice(k, 1);
 
+							k -= 1;
+
 							continue RuneLoop;
 						}
 					}
@@ -167,6 +169,8 @@ RuneLoop:
 			if (this.needList[i] === classid) {
 				this.needList.splice(i, 1);
 
+				i -= 1;
+
 				break;
 			}
 		}
@@ -193,6 +197,8 @@ RuneLoop:
 						if (items[k].classid === Config.Runewords[i][0][j]) { // rune matched
 							itemList.push(items[k]); // push into the item list
 							items.splice(k, 1); // remove from item list as to not count it twice
+
+							k -= 1;
 
 							break; // stop item cycle - we found the item
 						}

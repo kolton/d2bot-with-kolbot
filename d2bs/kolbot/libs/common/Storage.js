@@ -217,6 +217,27 @@ Loop:
 		}
 	};
 
+	/* Container.UsedSpacePercent()
+	 *	Returns percentage of the container used.
+	 */
+	this.UsedSpacePercent = function () {
+		var x, y,
+			usedSpace = 0,
+			totalSpace = this.height * this.width;
+
+		Storage.Reload();
+
+		for (x = 0; x < this.height; x += 1) {
+			for (y = 0; y < this.width; y += 1) {
+				if (this.buffer[x][y] > 0) {
+					usedSpace += 1;
+				}
+			}
+		}
+
+		return usedSpace * 100 / totalSpace;
+	};
+
 	/* Container.compare(reference)
 	 *	Compare given container versus the current one, return all new items in current buffer.
 	 */
@@ -271,6 +292,7 @@ var Storage = new function () {
 	this.Init = function () {
 		this.StashY = me.gametype === 0 ? 4 : 8;
 		this.Inventory = new Container("Inventory", 10, 4, 3);
+		this.TradeScreen = new Container("Inventory", 10, 4, 5);
 		this.Stash = new Container("Stash", 6, this.StashY, 7);
 		this.Belt = new Container("Belt", 4 * this.BeltSize(), 1, 2);
 		this.Cube = new Container("Horadric Cube", 3, 4, 6);
@@ -309,6 +331,7 @@ var Storage = new function () {
 		this.Stash.Reset();
 		this.Belt.Reset();
 		this.Cube.Reset();
+
 		var item = me.getItem();
 
 		if (!item) {
@@ -319,15 +342,19 @@ var Storage = new function () {
 			switch (item.location) {
 			case 3:
 				this.Inventory.Mark(item);
+
 				break;
 			case 2:
 				this.Belt.Mark(item);
+
 				break;
 			case 6:
 				this.Cube.Mark(item);
+
 				break;
 			case 7:
 				this.Stash.Mark(item);
+
 				break;
 			}
 		} while (item.getNext());
