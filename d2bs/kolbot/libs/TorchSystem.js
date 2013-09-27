@@ -142,6 +142,10 @@ var TorchSystem = {
 		var i, j, neededItems,
 			farmers = this.getFarmers();
 
+		if (!farmers) {
+			return false;
+		}
+
 		for (i = 0; i < farmers.length; i += 1) {
 			if (farmers[i].FarmGame.length > 0 && me.gamename.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
 				print("ÿc4Torch Systemÿc0: In Farm game.");
