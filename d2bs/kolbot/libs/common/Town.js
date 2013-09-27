@@ -1141,7 +1141,7 @@ CursorLoop:
 			} else {
 				quantity = quiver.getStat(70);
 
-				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= repairPercent) {
+				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= Config.RepairPercent) {
 					repairAction.push("buyQuiver");
 				}
 			}
