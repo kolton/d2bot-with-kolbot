@@ -182,6 +182,10 @@ var TorchSystem = {
 			neededItems = {},
 			farmers = this.getFarmers();
 
+		if (!farmers) {
+			return false;
+		}
+
 		function keyCheckEvent(mode, msg) {
 			var i, j, obj, item;
 
