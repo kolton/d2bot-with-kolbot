@@ -9,13 +9,21 @@ function main() {
 	include("json2.js");
 	include("common/misc.js");
 	D2Bot.init();
+	print("Heartbeat loaded");
 
 	var tick = getTickCount(),
 		startTick = getTickCount();
 
-	function doubleScriptCheck() {
+	function scriptCheck() {
 		if (getTickCount() - startTick < 2000) {
 			return false;
+		}
+
+		if (!me.ingame && getLocation() && getScript("default.dbj")) {
+			D2Bot.printToConsole("default.dbj was loaded out of game.");
+			D2Bot.restart();
+
+			return true;
 		}
 
 		var list = [],
@@ -30,11 +38,13 @@ function main() {
 				} else if (script.threadid !== threads[list.indexOf(script.name)]) {
 					D2Bot.printToConsole("Script loaded twice " + script.name);
 					D2Bot.restart();
+
+					return true;
 				}
 			} while (script.getNext());
 		}
 
-		return true;
+		return false;
 	}
 
 	function CopyDataEvent(mode, msg) {
@@ -62,6 +72,8 @@ function main() {
 			D2Bot.restart();
 		}*/
 
-		doubleScriptCheck();
+		if (scriptCheck()) {
+			break;
+		}
 	}
 }

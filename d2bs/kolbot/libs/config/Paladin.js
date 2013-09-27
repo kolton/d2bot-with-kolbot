@@ -51,9 +51,13 @@ function LoadConfig() {
 
 	// *** act 2 ***
 	Scripts.Radament = false;
+	Scripts.Coldworm = false;
+		Config.Coldworm.ClearMaggotLair = false; // Clear all 3 levels
 	Scripts.AncientTunnels = false;
+		Config.AncientTunnels.OpenChest = false; // Open special chest in Lost City
+		Config.AncientTunnels.KillDarkElder = false;
 	Scripts.Summoner = false;
-		Config.Summoner.FireEye = false; // Kill Fire Eye
+		Config.Summoner.FireEye = false;
 	Scripts.Tombs = false;
 	Scripts.Duriel = false;
 
@@ -267,6 +271,10 @@ function LoadConfig() {
 	Config.CainID.MinUnids = 3; // Minimum number of unid items in order to use Cain.
 	Config.FieldID = false; // Identify items in the field instead of going to town.
 
+	// Repair settings
+	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune.
+	Config.RepairPercent = 40; // Durability percent of any equipped item that will trigger repairs.
+
 	// Gambling config
 	Config.Gamble = false;
 	Config.GambleGoldStart = 1000000;
@@ -328,7 +336,6 @@ function LoadConfig() {
 	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 389, Roll.NonEth]); // Upgrade Gore Rider to Elite
 
 	/* Runeword config. All recipes are available in Templates/Runewords.txt
-	 * !!!NOTE!!! enhanced damage and enhanced defense on runewords are broken in the core right now
 	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
@@ -343,10 +350,19 @@ function LoadConfig() {
 
 	//Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
-	// General config
-	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable. If Config.Leader is set, the bot will only accept invites from leader.
-	Config.LastMessage = ""; // Message or array of messages to say at the end of the run. Use $nextgame to say next game - "Next game: $nextgame" (works with lead entry point)
+	// Public game options
+
+	// If Config.Leader is set, the bot will only accept invites from leader. If Config.PublicMode is not 0, Baal and Diablo script will open Town Portals.
+	Config.PublicMode = 0; // 1 = invite, 2 = accept, 0 = disable
+	// Party message settings. Each setting represents an array of messages that will be randomly chosen.
+	// $name, $level, $class and $killer are replaced by the player's name, level, class and killer
+	Config.Greetings = []; // Example: ["Hello, $name (level $level $class)"]
+	Config.DeathMessages = []; // Example: ["Watch out for that $killer, $name!"]
+	Config.Congratulations = []; // Example: ["Congrats on level $level, $name!"]
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
+
+	// General config
+	Config.LastMessage = ""; // Message or array of messages to say at the end of the run. Use $nextgame to say next game - "Next game: $nextgame" (works with lead entry point)
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will TP to town and stay in game if the run is completed before.
 	Config.MaxGameTime = 0; // Maximum game time in seconds. Quit game when limit is reached.
 	Config.TeleSwitch = false; // Switch to slot II when teleporting more than 1 node.

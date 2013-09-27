@@ -90,7 +90,6 @@ var ClassAttack = {
 	},
 
 	afterAttack: function (pickit) {
-		Misc.unShift();
 		Precast.doPrecast(false);
 
 		if (pickit) {
@@ -100,6 +99,10 @@ var ClassAttack = {
 
 	doCast: function (unit, index) {
 		var walk;
+
+		if (unit.mode === 0 || unit.mode === 12) {
+			return 3;
+		}
 
 		// Low mana skill
 		if (Config.AttackSkill[index] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[index]) > me.mp) {
@@ -117,7 +120,7 @@ var ClassAttack = {
 
 		if (Config.AttackSkill[index] === 151) {
 			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
-				Pather.moveToUnit(unit, 0, 0, false, true);
+				//Pather.moveToUnit(unit, 0, 0, false, true);
 
 				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x1)) {
 					return 1;
@@ -208,11 +211,11 @@ var ClassAttack = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			corpse = getUnit(1, -1, 12);
+			corpse = getUnit(1);
 
 			if (corpse) {
 				do {
-					if (getDistance(corpse, orgX, orgY) <= range && this.checkCorpse(corpse)) {
+					if ((corpse.mode === 0 || corpse.mode === 12) && getDistance(corpse, orgX, orgY) <= range && this.checkCorpse(corpse)) {
 						corpseList.push(copyUnit(corpse));
 					}
 				} while (corpse.getNext());
@@ -252,6 +255,8 @@ CorpseLoop:
 
 						while (getTickCount() - tick < 1000) {
 							if (corpse.getState(118)) {
+								Pickit.fastPick();
+
 								break CorpseLoop;
 							}
 
@@ -276,7 +281,7 @@ CorpseLoop:
 	},
 
 	checkCorpse: function (unit) {
-		if (unit.mode !== 12) {
+		if (unit.mode !== 0 && unit.mode !== 12) {
 			return false;
 		}
 

@@ -17,26 +17,12 @@ var NodeAction = {
 		}
 	},
 
-	// Open chests while pathing
-	popChests: function () {
-		if (Config.OpenChests) {
-			Misc.openChests(15);
-		}
-	},
-
-	// Scan shrines while pathing
-	getShrines: function () {
-		if (Config.ScanShrines && Config.ScanShrines.length) {
-			Misc.scanShrines();
-		}
-	},
-
 	// Kill monsters while pathing
 	killMonsters: function (arg) {
 		var monList;
 
-		if (Config.Countess.KillGhosts) {
-			monList = Attack.getMob("ghost", 0, 30);
+		if (Config.Countess.KillGhosts && [21, 22, 23, 24, 25].indexOf(me.area) > -1) {
+			monList = Attack.getMob(38, 0, 30);
 
 			if (monList) {
 				Attack.clearList(monList);
@@ -54,12 +40,26 @@ var NodeAction = {
 		if (arg.clearPath !== false) {
 			Attack.clear(15, typeof arg.clearPath === "number" ? arg.clearPath : 0);
 		}
+	},
+
+	// Open chests while pathing
+	popChests: function () {
+		if (Config.OpenChests > 0) {
+			Misc.openChests(15);
+		}
+	},
+
+	// Scan shrines while pathing
+	getShrines: function () {
+		if (Config.ScanShrines && Config.ScanShrines.length) {
+			Misc.scanShrines();
+		}
 	}
 };
 
 var Pather = {
 	teleport: true,
-	walkDistance: 15,
+	walkDistance: 10,
 	teleDistance: 40,
 	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
@@ -74,7 +74,7 @@ var Pather = {
 			return false;
 		}
 
-		var i, path,
+		var i, path, adjustedNode,
 			node = {x: x, y: y},
 			fail = 0;
 
@@ -113,7 +113,7 @@ var Pather = {
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
-			Misc.townCheck();
+			//Misc.townCheck();
 
 			return this.teleportTo(x, y);
 		}
@@ -123,10 +123,18 @@ var Pather = {
 			return this.walkTo(x, y);
 		}
 
-		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? this.teleDistance : this.walkDistance);
+		while (!me.area) {
+			delay(40);
+		}
+
+		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
 		if (!path) {
 			throw new Error("moveTo: Failed to generate path.");
+		}
+
+		while (!me.gameReady) {
+			delay(40);
 		}
 
 		path.reverse();
@@ -156,8 +164,31 @@ var Pather = {
 				This will be removed if getPath changes
 			*/
 			if (getDistance(me, node) > 2) {
+				// Make life in Maggot Lair easier
+				if ([62, 63, 64].indexOf(me.area) > -1) {
+					adjustedNode = this.getNearestWalkable(node.x, node.y, 15, 3, 0x1|0x4|0x800|0x1000);
+
+					if (adjustedNode) {
+						node.x = adjustedNode[0];
+						node.y = adjustedNode[1];
+					}
+				}
+
+				// Adjust town nodes to avoid objects and gaps
+				if (me.inTown) {
+					adjustedNode = this.getNearestWalkable(node.x, node.y, 4, 1, 0x1|0x400);
+
+					if (adjustedNode) {
+						if (node.x !== adjustedNode[0] || node.y !== adjustedNode[1]) {
+							print("Town node adjusted from " + node.x + " " + node.y + " to " + adjustedNode[0] + " " + adjustedNode[1]);
+						}
+
+						node.x = adjustedNode[0];
+						node.y = adjustedNode[1];
+					}
+				}
+
 				if (!(this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y))) {
-					// Reduce node distance in new path
 					if (fail > 0 && !this.useTeleport && !me.inTown) {
 						Attack.clear(5);
 
@@ -166,8 +197,9 @@ var Pather = {
 						}
 					}
 
-					fail += 1;
+					// Reduce node distance in new path
 					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? rand(20, 30) : 10);
+					fail += 1;
 
 					if (!path) {
 						throw new Error("moveTo: Failed to generate path.");
@@ -182,13 +214,13 @@ var Pather = {
 					break;
 				}
 
-				if (!me.inTown) {
+				if (!me.inTown && path.length > 1) { // Don't use NodeAction or TownCheck on last node
 					if (this.recursion) {
 						this.recursion = false;
 
 						NodeAction.go({clearPath: clearPath});
 
-						if (getDistance(me, node.x, node.y) > 5) {
+						if (getDistance(me, node.x, node.y) > 4) {
 							this.moveTo(node.x, node.y);
 						}
 
@@ -198,6 +230,8 @@ var Pather = {
 					Misc.townCheck();
 				}
 			}
+
+			delay(5);
 		}
 
 		if (this.useTeleport && Config.TeleSwitch) {
@@ -239,7 +273,7 @@ MainLoop:
 		}
 
 		if (minDist === undefined) {
-			minDist = 4;
+			minDist = me.inTown ? 2 : 4;
 		}
 
 		var nTimer,
@@ -299,7 +333,7 @@ ModeLoop:
 			}
 
 			// Wait until we're done walking - idle or dead
-			while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
+			while (getDistance(me.x, me.y, x, y) > minDist && me.mode !== 1 && me.mode !== 5 && !me.dead) {
 				delay(40);
 			}
 
@@ -425,7 +459,7 @@ ModeLoop:
 
 	// moveToExit can take a single area or an array of areas as the first argument
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, area, exits, myRoom, targetRoom, dest,
+		var i, j, area, exits, targetRoom, dest,
 			areas = [];
 
 		if (targetArea instanceof Array) {
@@ -449,9 +483,6 @@ ModeLoop:
 
 			for (j = 0; j < exits.length; j += 1) {
 				if (exits[j].target === areas[i]) {
-					//this.moveToUnit(exits[j], 0, 0, clearPath);
-
-					// tile exit fix, helps with a certain crash too
 					dest = this.getNearestWalkable(exits[j].x, exits[j].y, 5, 1);
 
 					if (!dest) {
@@ -468,8 +499,6 @@ ModeLoop:
 					if (use || i < areas.length - 1) {
 						switch (exits[j].type) {
 						case 1: // walk through
-							myRoom = getRoom(me.x, me.y);
-							myRoom = [myRoom.x * 5 + myRoom.xsize / 2, myRoom.y * 5 + myRoom.ysize / 2];
 							targetRoom = this.getNearestRoom(areas[i]);
 
 							if (targetRoom) {
@@ -565,7 +594,6 @@ ModeLoop:
 
 			delay(200);
 			Misc.click(0, 0, unit);
-			//unit.interact();
 
 			tick = getTickCount();
 
@@ -633,7 +661,7 @@ ModeLoop:
 
 					tick = getTickCount();
 
-					while (getTickCount() - tick < 4000) {
+					while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
 						if (getUIFlag(0x14)) { // Waypoint screen is open
 							delay(500);
 
@@ -679,12 +707,14 @@ ModeLoop:
 
 				tick = getTickCount();
 
-				while (getTickCount() - tick < 4000) {
+				while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
 					while (!me.gameReady || !me.area) {
 						delay(100);
 					}
 
 					if (me.area === targetArea) {
+						delay(200);
+
 						return true;
 					}
 
@@ -822,18 +852,20 @@ MainLoop:
 
 						Skill.cast(43, 0, portal);
 					} else {
-						if (getDistance(me, portal) > (i > 3) ? 3 : 6) {
+						if (getDistance(me, portal) > (i > 3 ? 3 : 6)) {
 							this.moveToUnit(portal);
 						}
 
-						//Misc.click(0, 0, portal);
-						sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
+						if (i < 2) {
+							sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
+						} else {
+							Misc.click(0, 0, portal);
+						}
 					}
 				}
 
 				if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary
-					//Misc.click(0, 0, portal);
-					portal.interact();
+					Misc.click(0, 0, portal);
 
 					tick = getTickCount();
 
@@ -848,7 +880,7 @@ MainLoop:
 
 				tick = getTickCount();
 
-				while (getTickCount() - tick < Math.max(2000, me.ping * 5)) {
+				while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
 					while (!me.area || !me.gameReady) {
 						delay(100);
 					}
@@ -910,9 +942,13 @@ MainLoop:
 		return false;
 	},
 
-	getNearestWalkable: function (x, y, range, step) {
+	getNearestWalkable: function (x, y, range, step, coll) {
 		if (!step) {
 			step = 1;
+		}
+
+		if (coll === undefined) {
+			coll = 0x1;
 		}
 
 		var i, j,
@@ -920,7 +956,7 @@ MainLoop:
 			result = false;
 
 		// Check if the original spot is valid
-		if (this.checkSpot(x, y)) {
+		if (this.checkSpot(x, y, coll)) {
 			result = [x, y];
 		}
 
@@ -930,7 +966,7 @@ MainLoop:
 				for (j = -distance; j <= distance; j += 1) {
 					// Check outer layer only (skip previously checked)
 					if (Math.abs(i) >= Math.abs(distance) || Math.abs(j) >= Math.abs(distance)) {
-						if (this.checkSpot(x + i, y + j)) {
+						if (this.checkSpot(x + i, y + j, coll)) {
 							result = [x + i, y + j];
 
 							break MainLoop;
@@ -947,15 +983,18 @@ MainLoop:
 		return result;
 	},
 
-	checkSpot: function (x, y, cacheOnly) {
+	checkSpot: function (x, y, coll, cacheOnly) {
 		var dx, dy, value;
+
+		if (coll === undefined) {
+			coll = 0x1;
+		}
 
 		for (dx = -1; dx <= 1; dx += 1) {
 			for (dy = -1; dy <= 1; dy += 1) {
 				value = CollMap.getColl(x + dx, y + dy, cacheOnly);
 
-				//if (value !== 0 && value !== 16) {
-				if (value & 0x1) {
+				if (value & coll) {
 					return false;
 				}
 			}

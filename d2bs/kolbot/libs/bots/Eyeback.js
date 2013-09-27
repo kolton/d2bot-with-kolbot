@@ -9,7 +9,7 @@ function Eyeback() {
 	Pather.useWaypoint(112);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(111, true)) {
+	if (!Pather.moveToPreset(111, 1, 784)) {
 		throw new Error("Failed to move to Eyeback the Unleashed");
 	}
 

@@ -130,6 +130,10 @@ var Config = {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	],
 	PublicMode: false,
+	PartyAfterScript: false,
+	Greetings: [],
+	DeathMessages: [],
+	Congratulations: [],
 	ShitList: false,
 	Leader: "",
 	QuitList: [],
@@ -152,6 +156,8 @@ var Config = {
 	ItemInfoQuality: [],
 
 	Cubing: false,
+	CubeRepair: false,
+	RepairPercent: 40,
 	Recipes: [],
 	MakeRunewords: false,
 	Runewords: [],
@@ -367,8 +373,15 @@ var Config = {
 		ScanIDs: [],
 		ShopNPC: "anya"
 	},
+	Coldworm: {
+		ClearMaggotLair: false
+	},
 	Summoner: {
 		FireEye: false
+	},
+	AncientTunnels: {
+		OpenChest: false,
+		KillDarkElder: false
 	},
 	OrgTorch: {
 		WaitForKeys: false,

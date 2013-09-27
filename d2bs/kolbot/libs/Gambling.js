@@ -88,7 +88,7 @@ var Gambling = {
 					DataFile.updateStats("gold");
 					delay(5000);
 					quit();
-					delay(10000);
+					//delay(10000);
 
 					return true;
 				}
@@ -176,6 +176,7 @@ var Gambling = {
 		}
 
 		addEventListener('copydata', CheckEvent);
+
 		game = null;
 
 		for (i = 0; i < info.gamblers.length; i += 1) {

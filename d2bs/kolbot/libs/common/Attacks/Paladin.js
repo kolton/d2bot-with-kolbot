@@ -30,7 +30,7 @@ var ClassAttack = {
 			case 97: // Smite
 			case 106: // Zeal
 			case 116: // Conversion
-				this.skillRange[i] = 3;
+				this.skillRange[i] = 4;
 				this.skillHand[i] = 2; // shift bypass
 
 				break;
@@ -188,8 +188,8 @@ var ClassAttack = {
 					return 0;
 				}
 			}
-		} else if (getDistance(me, unit) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
-			walk = (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+		} else if (Math.floor(getDistance(me, unit)) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
+			walk = Config.AttackSkill[atkSkill] !== 97 && (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
 
 			// walk short distances instead of tele for melee attacks. teleport if failed to walk
 			if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, walk)) {
@@ -201,7 +201,7 @@ var ClassAttack = {
 			Skill.setSkill(Config.AttackSkill[aura], 0);
 		}
 
-		return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
+		return unit.mode === 0 || unit.mode === 12 || Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
 	},
 
 	dollAvoid: function (unit) {
@@ -237,7 +237,7 @@ var ClassAttack = {
 		case 1: // Monster
 			x = unit.x;
 			y = unit.y;
-			positions = [[x + size - 1, y + size - 1], [x + 2, y - 1], [x, y + 3], [x - 2, y - 1]];
+			positions = [[x + size - 1, y + size - 1], [x + 2, y], [x, y + 3], [x - 2, y - 1]];
 
 			break;
 		}

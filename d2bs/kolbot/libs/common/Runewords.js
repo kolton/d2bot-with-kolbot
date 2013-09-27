@@ -109,7 +109,25 @@ var Runewords = {
 			this.pickitEntries.push(NTIP.ParseLineInt(Config.KeepRunewords[i]));
 		}
 
+		// change text to classid
+		for (i = 0; i < Config.Runewords.length; i += 1) {
+			if (isNaN(Config.Runewords[i][1])) {
+				if (NTIPAliasClassID.hasOwnProperty(Config.Runewords[i][1].replace(/\s+/g, "").toLowerCase())) {
+					Config.Runewords[i][1] = NTIPAliasClassID[Config.Runewords[i][1].replace(/\s+/g, "").toLowerCase()];
+				} else {
+					Misc.errorReport("ÿc1Invalid runewords entry:ÿc0 " + Config.Runewords[i][1]);
+					Config.Runewords.splice(i, 1);
+
+					i -= 1;
+				}
+			}
+		}
+
 		this.buildLists();
+	},
+
+	validItem: function (item) {
+		return true;
 	},
 
 	// build a list of needed runes. won't count runes until the base item is found for a given runeword
@@ -129,7 +147,7 @@ var Runewords = {
 RuneLoop:
 				for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 					for (k = 0; k < items.length; k += 1) {
-						if (items[k].classid === Config.Runewords[i][0][j]) {
+						if (items[k].classid === Config.Runewords[i][0][j] && this.validItem(items[k])) {
 							this.validGids.push(items[k].gid);
 							items.splice(k, 1);
 
@@ -150,7 +168,7 @@ RuneLoop:
 
 			if (hel) {
 				do {
-					if (this.validGids.indexOf(hel.gid) === -1) {
+					if (this.validGids.indexOf(hel.gid) === -1 && this.validItem(hel)) {
 						this.validGids.push(hel.gid);
 
 						return;

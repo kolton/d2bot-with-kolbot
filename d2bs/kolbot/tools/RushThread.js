@@ -70,7 +70,7 @@ function main() {
 
 	this.andariel = function () {
 		Town.doChores();
-		Pather.useWaypoint(35);
+		Pather.useWaypoint(35, true);
 		Precast.doPrecast(true);
 
 		if (!Pather.moveToExit([36, 37], true) || !Pather.moveTo(22582, 9612)) {
@@ -90,7 +90,7 @@ function main() {
 		Pather.moveTo(22582, 9612);
 		Pather.usePortal(null, me.name);
 		say("a2");
-		Pather.useWaypoint(40);
+		Pather.useWaypoint(40, true);
 
 		while (!this.playersInAct(2)) {
 			delay(250);
@@ -101,7 +101,7 @@ function main() {
 
 	this.cube = function () {
 		if (me.diff === 0) {
-			Pather.useWaypoint(57);
+			Pather.useWaypoint(57, true);
 			Precast.doPrecast(true);
 
 			if (!Pather.moveToExit(60, true) || !Pather.moveToPreset(me.area, 2, 354)) {
@@ -129,7 +129,7 @@ function main() {
 
 	this.amulet = function () {
 		Town.doChores();
-		Pather.useWaypoint(44);
+		Pather.useWaypoint(44, true);
 		Precast.doPrecast(true);
 
 		if (!Pather.moveToExit([45, 58, 61], true) || !Pather.moveTo(15044, 14045)) {
@@ -167,7 +167,7 @@ function main() {
 
 	this.staff = function () {
 		Town.doChores();
-		Pather.useWaypoint(43);
+		Pather.useWaypoint(43, true);
 		Precast.doPrecast(true);
 
 		if (!Pather.moveToExit([62, 63, 64], true) || !Pather.moveToPreset(me.area, 2, 356)) {
@@ -199,7 +199,7 @@ function main() {
 		// left down 25447 5822 (25431, 5861)
 
 		Town.doChores();
-		Pather.useWaypoint(74);
+		Pather.useWaypoint(74, true);
 		Precast.doPrecast(true);
 
 		var i, journal,
@@ -273,7 +273,7 @@ function main() {
 	this.duriel = function () {
 		if (me.inTown) {
 			Town.doChores();
-			Pather.useWaypoint(46);
+			Pather.useWaypoint(46, true);
 		}
 
 		Precast.doPrecast(true);
@@ -316,7 +316,7 @@ function main() {
 
 		Pather.usePortal(null, me.name);
 		say("a3");
-		Pather.useWaypoint(75);
+		Pather.useWaypoint(75, true);
 
 		while (!this.playersInAct(3)) {
 			delay(250);
@@ -327,7 +327,7 @@ function main() {
 
 	this.travincal = function () {
 		Town.doChores();
-		Pather.useWaypoint(83);
+		Pather.useWaypoint(83, true);
 		Precast.doPrecast(true);
 
 		var coords = [me.x, me.y];
@@ -356,7 +356,7 @@ function main() {
 
 	this.mephisto = function () {
 		Town.doChores();
-		Pather.useWaypoint(101);
+		Pather.useWaypoint(101, true);
 		Precast.doPrecast(true);
 		Pather.moveToExit(102, true);
 		Pather.moveTo(17591, 8070);
@@ -505,7 +505,7 @@ function main() {
 		};
 
 		Town.doChores();
-		Pather.useWaypoint(107);
+		Pather.useWaypoint(107, true);
 		Precast.doPrecast(true);
 		Pather.moveTo(7790, 5544);
 		this.initLayout();
@@ -577,7 +577,7 @@ function main() {
 		var altar;
 
 		Town.doChores();
-		Pather.useWaypoint(118);
+		Pather.useWaypoint(118, true);
 		Precast.doPrecast(true);
 
 		if (!Pather.moveToExit(120, true)) {
@@ -591,6 +591,8 @@ function main() {
 		while (!this.playerIn()) {
 			delay(250);
 		}
+
+		Pather.moveTo(10048, 12628);
 
 		altar = getUnit(2, 546);
 
@@ -754,7 +756,7 @@ function main() {
 		};
 
 		Town.doChores();
-		Pather.useWaypoint(129);
+		Pather.useWaypoint(129, true);
 		Precast.doPrecast(true);
 
 		if (!Pather.moveToExit([130, 131], true)) {
@@ -904,7 +906,7 @@ MainLoop:
 				return false;
 			};
 
-		Pather.useWaypoint(106);
+		Pather.useWaypoint(106, true);
 		Precast.doPrecast(false);
 
 		izualPreset = getPresetUnit(105, 1, 256);

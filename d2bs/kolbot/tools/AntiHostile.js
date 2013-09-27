@@ -254,7 +254,7 @@ function main() {
 					Pather.usePortal(null, me.name);
 					this.resume();
 				} else {
-					quit();
+					scriptBroadcast("quit");
 				}
 
 				return;
@@ -349,7 +349,7 @@ function main() {
 						Pather.usePortal(null, me.name);
 						this.resume();
 					} else {
-						quit();
+						scriptBroadcast("quit");
 					}
 
 					return;

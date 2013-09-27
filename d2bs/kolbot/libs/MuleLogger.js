@@ -71,7 +71,7 @@ var MuleLogger = {
 			}
 
 			quit();
-			delay(10000);
+			//delay(10000);
 
 			return true;
 		}
@@ -81,9 +81,9 @@ var MuleLogger = {
 
 	// Log kept item stats in the manager.
 	logItem: function (unit) {
-		if (!isIncluded("common/misc.js")) {
+		/*if (!isIncluded("common/misc.js")) {
 			include("common/misc.js");
-		}
+		}*/
 
 		var i, code, desc, sock,
 			header = "",

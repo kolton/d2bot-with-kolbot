@@ -9,6 +9,14 @@ function AncientTunnels() {
 	Pather.useWaypoint(44);
 	Precast.doPrecast(true);
 
+	if (Config.AncientTunnels.OpenChest && Pather.moveToPreset(me.area, 2, 580) && Misc.openChests(5)) {
+		Pickit.pickItems();
+	}
+
+	if (Config.AncientTunnels.KillDarkElder && Pather.moveToPreset(me.area, 1, 751)) {
+		Attack.clear(15, 0, getLocaleString(2886));
+	}
+
 	if (!Pather.moveToExit(65, true)) {
 		throw new Error("Failed to move to Ancient Tunnels");
 	}

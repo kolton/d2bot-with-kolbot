@@ -12,7 +12,7 @@ function MFHelper() {
 	function ChatEvent(name, msg) {
 		if (!player) {
 			var i,
-				match = ["kill", "clearlevel", "clear", "quit", "cows"];
+				match = ["kill", "clearlevel", "clear", "quit", "cows", "council"];
 
 			if (msg) {
 				for (i = 0; i < match.length; i += 1) {
@@ -150,7 +150,7 @@ function MFHelper() {
 		}
 
 		if (i === 30) {
-			throw new Error("Autobaal: Leader not partied");
+			throw new Error("MFHelper: Leader not partied");
 		}
 
 		player = this.findPlayer(Config.Leader);
@@ -159,6 +159,10 @@ function MFHelper() {
 MainLoop:
 	while (true) {
 		if (player) {
+			while (!player.area) {
+				delay(100);
+			}
+
 			playerAct = this.getPlayerAct(player);
 
 			if (playerAct && playerAct !== me.act) {
@@ -175,8 +179,7 @@ MainLoop:
 				oldCommand = command;
 
 				if (command.indexOf("kill") > -1) {
-					print("Received command: kill");
-					delay(500);
+					print("ÿc4MFHelperÿc0: Kill");
 
 					split = command.split("kill ")[1];
 
@@ -201,8 +204,7 @@ MainLoop:
 						}
 					}
 				} else if (command.indexOf("clearlevel") > -1) {
-					print("Received command: clearlevel");
-					delay(500);
+					print("ÿc4MFHelperÿc0: Clear Level");
 
 					if (Pather.usePortal(player.area, player.name)) {
 						Precast.doPrecast(false);
@@ -214,8 +216,7 @@ MainLoop:
 						}
 					}
 				} else if (command.indexOf("clear") > -1) {
-					print("Received command: clear");
-					delay(500);
+					print("ÿc4MFHelperÿc0: Clear");
 
 					split = command.split("clear ")[1];
 
@@ -241,13 +242,23 @@ MainLoop:
 				} else if (command.indexOf("quit") > -1) {
 					break MainLoop;
 				} else if (command.indexOf("cows") > -1) {
-					print("Received command: clear cows");
-					delay(500);
+					print("ÿc4MFHelperÿc0: Clear Cows");
 
 					if (Pather.usePortal(39)) {
 						Precast.doPrecast(false);
 						this.clearCowLevel();
 						delay(1000);
+
+						if (!Pather.usePortal(null, player.name)) {
+							Town.goToTown();
+						}
+					}
+				} else if (command.indexOf("council") > -1) {
+					print("ÿc4MFHelperÿc0: Kill Council");
+
+					if (Pather.usePortal(player.area, player.name)) {
+						Precast.doPrecast(false);
+						Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
 
 						if (!Pather.usePortal(null, player.name)) {
 							Town.goToTown();

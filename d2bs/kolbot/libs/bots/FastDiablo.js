@@ -173,7 +173,8 @@ function FastDiablo() {
 					Pather.moveToUnit(seal, 4, 0);
 				}
 
-				seal.interact();
+				//seal.interact();
+				sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
 
 				tick = getTickCount();
 

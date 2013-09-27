@@ -160,7 +160,7 @@ var ClassAttack = {
 				}
 			}
 
-			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
+			return unit.mode === 0 || unit.mode === 12 || Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
 		}
 
 		// Low mana untimed skill
@@ -177,7 +177,7 @@ var ClassAttack = {
 				}
 			}
 
-			return Skill.cast(Config.AttackSkill[untimed], this.skillHand[untimed], unit);
+			return unit.mode === 0 || unit.mode === 12 || Skill.cast(Config.AttackSkill[untimed], this.skillHand[untimed], unit);
 		}
 
 		for (i = 0; i < 25; i += 1) {

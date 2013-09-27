@@ -274,9 +274,10 @@ MainSwitch:
 		}
 
 		if (ingame) {
-			AutoMule.outOfGameCheck();
-			TorchSystem.outOfGameCheck();
-			Gambling.outOfGameCheck();
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+				break;
+			}
+
 			print("updating runs");
 			D2Bot.updateRuns();
 
@@ -311,9 +312,10 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby Chat");
 
 		if (ingame) {
-			AutoMule.outOfGameCheck();
-			TorchSystem.outOfGameCheck();
-			Gambling.outOfGameCheck();
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+				break;
+			}
+
 			print("updating runs");
 			D2Bot.updateRuns();
 
@@ -402,7 +404,7 @@ JoinLoop2:
 					}
 
 					if (!joinInfo.inGame) {
-						break;
+						continue;
 					}
 
 					// Don't join immediately after previous game to avoid FTJ

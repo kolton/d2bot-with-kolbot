@@ -29,7 +29,7 @@ function OrgTorch() {
 					if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
 						scriptBroadcast("muleTorch");
 						quit();
-						delay(10000);
+						//delay(10000);
 					}
 
 					return true;
@@ -83,6 +83,11 @@ function OrgTorch() {
 
 		if (!horns || !brains || !eyes) {
 			return false;
+		}
+
+		// We just need one set to make a torch
+		if (Config.OrgTorch.MakeTorch) {
+			return horns.length && brains.length && eyes.length;
 		}
 
 		return horns.length === brains.length && horns.length === eyes.length && brains.length === eyes.length;
@@ -168,7 +173,7 @@ function OrgTorch() {
 		switch (me.area) {
 		case 133: // Matron's Den
 			Precast.doPrecast(true);
-			Pather.moveToPreset(133, 2, 397, 3, 3);
+			Pather.moveToPreset(133, 2, 397, 2, 2);
 			Attack.kill(707);
 			//Attack.clear(5);
 			Pickit.pickItems();
@@ -196,7 +201,7 @@ function OrgTorch() {
 			break;
 		case 135: // Furnace of Pain
 			Precast.doPrecast(true);
-			Pather.moveToPreset(135, 2, 397);
+			Pather.moveToPreset(135, 2, 397, 2, 2);
 			Attack.kill(706);
 			Pickit.pickItems();
 			Town.goToTown();
@@ -258,8 +263,25 @@ function OrgTorch() {
 		}
 	};
 
+	this.juvCheck = function () {
+		var i,
+			needJuvs = 0,
+			col = Town.checkColumns(Storage.BeltSize());
+
+		for (i = 0; i < 4; i += 1) {
+			if (Config.BeltColumn[i] === "rv") {
+				needJuvs += col[i];
+			}
+		}
+
+		print("Need " + needJuvs + " juvs.");
+
+		return needJuvs;
+	};
+
 	// Start
-	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer;
+	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer, busy, busyTick,
+		neededItems = {pk1: 0, pk2: 0, pk3: 0, rv: 0};
 
 	// Do town chores and quit if MakeTorch is true and we have a torch.
 	this.checkTorch();
@@ -272,11 +294,44 @@ function OrgTorch() {
 		farmer = TorchSystem.isFarmer();
 
 		this.torchSystemEvent = function (mode, msg) {
-			var farmer = TorchSystem.isFarmer();
+			var obj, farmer;
 
-			if (farmer && mode === 0 && farmer.KeyFinderProfiles.indexOf(msg) > -1) {
-				print("Got game request from: " + msg);
-				sendCopyData(null, msg, 0, me.gamename + "/" + me.gamepassword);
+			if (mode === 6) {
+				farmer = TorchSystem.isFarmer();
+
+				if (farmer) {
+					obj = JSON.parse(msg);
+
+					if (obj) {
+						switch (obj.name) {
+						case "gameCheck":
+							if (busy) {
+								break;
+							}
+
+							if (farmer.KeyFinderProfiles.indexOf(obj.profile) > -1) {
+								print("Got game request from: " + obj.profile);
+								sendCopyData(null, obj.profile, 6, JSON.stringify({name: "gameName", value: {gameName: me.gamename, password: me.gamepassword}}));
+
+								busy = true;
+								busyTick = getTickCount();
+							}
+
+							break;
+						case "keyCheck":
+							if (farmer.KeyFinderProfiles.indexOf(obj.profile) > -1) {
+								print("Got key count request from: " + obj.profile);
+
+								// Get the number of needed keys
+								neededItems = {pk1: 3 - tkeys, pk2: 3 - hkeys, pk3: 3 - dkeys, rv: this.juvCheck()};
+
+								sendCopyData(null, obj.profile, 6, JSON.stringify({name: "neededItems", value: neededItems}));
+							}
+
+							break;
+						}
+					}
+				}
 			}
 		};
 
@@ -308,6 +363,20 @@ function OrgTorch() {
 				break;
 			}
 
+			if (busy) {
+				while (getTickCount() - busyTick < 30000) {
+					if (!this.aloneInGame()) {
+						break;
+					}
+
+					delay(100);
+				}
+
+				if (getTickCount() - busyTick > 30000 || this.aloneInGame()) {
+					busy = false;
+				}
+			}
+
 			// Wait for other characters to leave
 			while (!this.aloneInGame()) {
 				delay(500);
@@ -334,6 +403,8 @@ function OrgTorch() {
 
 		return true;
 	}
+
+	Config.UseMerc = false;
 
 	// We have enough keys, do mini ubers
 	if (tkeys >= 3 && hkeys >= 3 && dkeys >= 3) {

@@ -13,8 +13,60 @@ function main() {
 	include("common/Misc.js");
 	Config.init();
 
-	var myPartyId, player, otherParty, shitList,
+	var i, myPartyId, player, otherParty, shitList, currScript, scriptList,
+		classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
+		playerLevels = {},
 		partyTick = getTickCount();
+
+	addEventListener("gameevent",
+		function (mode, param1, param2, name1, name2) {
+			var player;
+
+			switch (mode) {
+			case 0x02: // "%Name1(%Name2) joined our world. Diablo's minions grow stronger."
+				if (Config.Greetings.length > 0) {
+					try {
+						player = getParty(name1);
+					} catch (e1) {
+
+					}
+
+					if (player && player.name !== me.name) {
+						say(Config.Greetings[rand(0, Config.Greetings.length - 1)].replace("$name", player.name).replace("$level", player.level).replace("$class", classes[player.classid]));
+					}
+				}
+
+				break;
+			case 0x06: // "%Name1 was Slain by %Name2" 
+				if (Config.DeathMessages.length > 0) {
+					try {
+						player = getParty(name1);
+					} catch (e2) {
+
+					}
+
+					if (player && player.name !== me.name) {
+						say(Config.DeathMessages[rand(0, Config.DeathMessages.length - 1)].replace("$name", player.name).replace("$level", player.level).replace("$class", classes[player.classid]).replace("$killer", name2));
+					}
+				}
+
+				break;
+			}
+		});
+	addEventListener("scriptmsg",
+		function (msg) {
+			var obj;
+
+			try {
+				obj = JSON.parse(msg);
+
+				if (obj && obj.hasOwnProperty("currScript")) {
+					currScript = obj.currScript;
+				}
+			} catch (e3) {
+
+			}
+		});
 
 	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode > 1 ? "Accept" : "Invite"));
 
@@ -24,9 +76,19 @@ function main() {
 		print(shitList.length + " entries in shit list.");
 	}
 
+	if (Config.PartyAfterScript) {
+		scriptList = [];
+
+		for (i in Scripts) {
+			if (Scripts.hasOwnProperty(i) && !!Scripts[i]) {
+				scriptList.push(i);
+			}
+		}
+	}
+
 	// Main loop
 	while (true) {
-		if (me.gameReady) {
+		if (me.gameReady && (!Config.PartyAfterScript || scriptList.indexOf(currScript) > scriptList.indexOf(Config.PartyAfterScript))) {
 			player = getParty();
 
 			if (player) {
@@ -79,7 +141,27 @@ function main() {
 				}
 			}
 
-			delay(500);
+			if (Config.Congratulations.length > 0) {
+				player = getParty();
+
+				if (player) {
+					do {
+						if (player.name !== me.name) {
+							if (!playerLevels[player.name]) {
+								playerLevels[player.name] = player.level;
+							}
+
+							if (player.level > playerLevels[player.name]) {
+								say(Config.Congratulations[rand(0, Config.Congratulations.length - 1)].replace("$name", player.name).replace("$level", player.level).replace("$class", classes[player.classid]));
+
+								playerLevels[player.name] = player.level;
+							}
+						}
+					} while (player.getNext());
+				}
+			}
 		}
+
+		delay(500);
 	}
 }

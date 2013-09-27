@@ -129,10 +129,15 @@ function ReceiveCopyData(mode, msg) {
 		}
 
 		break;
-	case 4:
-		// Heartbeat ping
+	case 4: // Heartbeat ping
 		if (msg === "pingreq") {
 			sendCopyData(null, me.windowtitle, 4, "pingrep");
+		}
+
+		break;
+	case 0xf124: // Cached info retreival
+		if (msg !== "null") {
+			gameInfo.crashInfo = JSON.parse(msg);
 		}
 
 		break;
@@ -240,6 +245,7 @@ function randomString(len) {
 }
 
 function main() {
+	debugLog(me.profile);
 	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
 
@@ -257,10 +263,19 @@ function main() {
 		delay(500);
 	}
 
-	if (gameInfo.error === "@error") {
+	if (gameInfo.error) {
+		D2Bot.retrieve();
+		delay(200);
+
+		if (gameInfo.crashInfo) {
+			D2Bot.printToConsole("Crash Info: Script: " + gameInfo.crashInfo.currScript + " Area: " + gameInfo.crashInfo.area, 10);
+		}
+
 		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
+
+	D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -321,7 +336,7 @@ MainSwitch:
 			break;
 		}
 
-		if (ingame || gameInfo.error === "@error") {
+		if (ingame || gameInfo.error) {
 			if (!gameStart) {
 				gameStart = DataFile.getStats().ingameTick;
 			}
@@ -332,9 +347,12 @@ MainSwitch:
 		}
 
 		if (ingame) {
-			AutoMule.outOfGameCheck();
-			TorchSystem.outOfGameCheck();
-			Gambling.outOfGameCheck();
+			D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+				break;
+			}
+
 			print("updating runs");
 			D2Bot.updateRuns();
 
@@ -377,7 +395,7 @@ MainSwitch:
 			gameCount += 1;
 		}
 
-		if (ingame || gameInfo.error === "@error") {
+		if (ingame || gameInfo.error) {
 			if (!gameStart) {
 				gameStart = DataFile.getStats().ingameTick;
 			}
@@ -388,9 +406,12 @@ MainSwitch:
 		}
 
 		if (ingame) {
-			AutoMule.outOfGameCheck();
-			TorchSystem.outOfGameCheck();
-			Gambling.outOfGameCheck();
+			D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+				break;
+			}
+
 			print("updating runs");
 			D2Bot.updateRuns();
 

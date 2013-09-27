@@ -6,6 +6,7 @@
 
 function main() {
 	var i, mercHP, ironGolem, tick, merc,
+		debugInfo = {area: 0, currScript: "no entry"},
 		pingTimer = [],
 		quitFlag = false,
 		timerLastDrink = [];
@@ -127,6 +128,11 @@ function main() {
 		}
 
 		return true;
+	};
+
+	this.exit = function () {
+		this.stopDefault();
+		quit();
 	};
 
 	this.drinkPotion = function (type) {
@@ -294,7 +300,7 @@ function main() {
 			if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo")) {
 				print("ÿc2Mule triggered");
 				scriptBroadcast("mule");
-				quit();
+				this.exit();
 			} else {
 				me.overhead("Profile not enabled for muling.");
 			}
@@ -386,9 +392,25 @@ function main() {
 	};
 
 	this.scriptEvent = function (msg) {
+		var obj;
+		
 		switch (msg) {
 		case "quit":
 			quitFlag = true;
+
+			break;
+		default:
+			try {
+				obj = JSON.parse(msg);
+			} catch (e) {
+				return;
+			}
+
+			if (obj && obj.hasOwnProperty("currScript")) {
+				debugInfo.currScript = obj.currScript;
+
+				D2Bot.store(JSON.stringify(debugInfo));
+			}
 
 			break;
 		}
@@ -423,7 +445,7 @@ function main() {
 				if (Config.LifeChicken > 0 && me.hp <= Math.floor(me.hpmax * Config.LifeChicken / 100)) {
 					D2Bot.printToConsole("Life Chicken (" + me.hp + "/" + me.hpmax + ")" + this.getNearestMonster() + " in " + Pather.getAreaName(me.area) + ". Ping: " + me.ping, 9);
 					D2Bot.updateChickens();
-					quit();
+					this.exit();
 
 					break;
 				}
@@ -439,7 +461,7 @@ function main() {
 				if (Config.ManaChicken > 0 && me.mp <= Math.floor(me.mpmax * Config.ManaChicken / 100)) {
 					D2Bot.printToConsole("Mana Chicken: (" + me.mp + "/" + me.mpmax + ") in " + Pather.getAreaName(me.area), 9);
 					D2Bot.updateChickens();
-					quit();
+					this.exit();
 
 					break;
 				}
@@ -453,7 +475,7 @@ function main() {
 						if (ironGolem.hp <= Math.floor(128 * Config.IronGolemChicken / 100)) { // ironGolem.hpmax is bugged with BO
 							D2Bot.printToConsole("Irom Golem Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
-							quit();
+							this.exit();
 
 							break;
 						}
@@ -468,7 +490,7 @@ function main() {
 						if (mercHP < Config.MercChicken) {
 							D2Bot.printToConsole("Merc Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();
-							quit();
+							this.exit();
 
 							break;
 						}
@@ -511,10 +533,15 @@ function main() {
 			}
 
 			this.checkPing(false); // In case of quitlist triggering first
-			this.stopDefault();
-			quit();
+			this.exit();
 
 			break;
+		}
+		
+		if (debugInfo.area !== me.area) {
+			debugInfo.area = me.area;
+
+			D2Bot.store(JSON.stringify(debugInfo));
 		}
 
 		delay(20);

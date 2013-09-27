@@ -12,8 +12,8 @@ function AutoBaal() {
 	var i, baalCheck, throneCheck, hotCheck, leader, suspect, solofail, portal, baal,
 		// internal variables
 		safeMsg = ["safe", "throne clear", "leechers can come", "tp is up", "1 clear"], // safe message - casing doesn't matter
-		baalMsg = ["baal", "submortal"], // baal message - casing doesn't matter
-		hotMsg = ["hot", "warm"]; // used for shrine hunt
+		baalMsg = ["baal"], // baal message - casing doesn't matter
+		hotMsg = ["hot", "warm", "dangerous", "lethal"]; // used for shrine hunt
 
 	addEventListener('chatmsg', // chat event, listen to what leader says
 		function (nick, msg) { // handler function

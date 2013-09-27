@@ -236,6 +236,41 @@ var D2Bot = {
 		};
 
 		sendCopyData(null, profile, 3, JSON.stringify(obj));
+	},
+
+	// Store info in d2bot# cache
+	store: function (info) {
+		this.remove();
+
+		var obj = {
+			profile: me.profile,
+			func: "store",
+			args: [me.profile, info]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	// Get info from d2bot# cache
+	retrieve: function () {
+		var obj = {
+			profile: me.profile,
+			func: "retrieve",
+			args: [me.profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	// Delete info from d2bot# cache
+	remove: function () {
+		var obj = {
+			profile: me.profile,
+			func: "delete",
+			args: [me.profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	}
 };
 
@@ -298,6 +333,10 @@ var DataFile = {
 	},
 
 	updateStats: function (arg, value) {
+		while (me.ingame && !me.gameReady) {
+			delay(100);
+		}
+
 		var i, obj, string,
 			statArr = [];
 
@@ -369,6 +408,8 @@ var DataFile = {
 };
 
 var ControlAction = {
+	mutedKey: false,
+
 	timeoutDelay: function (text, time, stopfunc, arg) {
 		var endTime = getTickCount() + time;
 
@@ -387,11 +428,10 @@ var ControlAction = {
 
 		if (!control) {
 			print("control not found " + type + " " + x + " " + y + " location " + getLocation());
+
 			return false;
 		}
 
-		//delay(clickdelay);
-		delay(200);
 		control.click(targetx, targety);
 
 		return true;
@@ -428,7 +468,7 @@ var ControlAction = {
 	joinChannel: function (channel) {
 		me.blockMouse = true;
 
-		var i, currChan, lines, fullText, tick,
+		var i, currChan, tick,
 			rval = false,
 			timeout = 5000;
 
@@ -470,7 +510,7 @@ MainLoop:
 				break MainLoop;
 			}
 
-			delay(1000);
+			delay(100);
 		}
 
 		me.blockMouse = false;
@@ -570,7 +610,7 @@ MainLoop:
 	loginAccount: function (info) {
 		me.blockMouse = true;
 
-		var tick,
+		var tick, locTick,
 			realms = {
 				"uswest": 0,
 				"useast": 1,
@@ -615,8 +655,13 @@ MainLoop:
 				break;
 			case 42: // empty char screen
 				// make sure we're not on connecting screen
-				delay(2000);
+				locTick = getTickCount();
 
+				while (getTickCount() - locTick < 2000 && getLocation() === 42) {
+					delay(25);
+				}
+
+				// char screen connecting
 				if (getLocation() === 23) {
 					break;
 				}
@@ -634,10 +679,10 @@ MainLoop:
 				return false;
 			}
 
-			delay(500);
+			delay(100);
 		}
 
-		delay(1000);
+		//delay(1000);
 
 		me.blockMouse = false;
 
@@ -700,7 +745,7 @@ MainLoop:
 				break;
 			}
 
-			delay(500);
+			delay(100);
 		}
 
 		me.blockMouse = false;
@@ -718,7 +763,7 @@ MainLoop:
 				break;
 			}
 
-			delay(1000);
+			delay(25);
 		}
 
 		if (getLocation() === 12) {
@@ -814,7 +859,7 @@ MainLoop:
 				break;
 			}
 
-			delay(500);
+			delay(100);
 		}
 
 		me.blockMouse = false;
@@ -922,6 +967,28 @@ MainLoop:
 		me.blockMouse = false;
 
 		return true;
+	},
+
+	// Test version - modified core only
+	getGameList: function () {
+		var i, text, gameList;
+
+		text = this.getText(4, 432, 393, 160, 173);
+
+		if (text) {
+			gameList = [];
+
+			for (i = 0; i < text.length; i += 1) {
+				gameList.push({
+					gameName: text[i][0],
+					players: text[i][1]
+				});
+			}
+
+			return gameList;
+		}
+
+		return false;
 	}
 };
 

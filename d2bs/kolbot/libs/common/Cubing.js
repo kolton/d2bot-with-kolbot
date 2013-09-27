@@ -641,6 +641,22 @@ IngredientLoop:
 		return matchList;
 	},
 
+	// debug function - get what each recipe needs
+	getRecipeNeeds: function (index) {
+		var i,
+			rval = " [";
+
+		for (i = 0; i < this.neededIngredients.length; i += 1) {
+			if (this.neededIngredients[i].recipe.Index === index) {
+				rval += this.neededIngredients[i].classid + (i === this.neededIngredients.length - 1 ? "" : " ");
+			}
+		}
+
+		rval += "]";
+
+		return rval;
+	},
+
 	checkItem: function (unit) { // Check an item on ground for pickup
 		if (!Config.Cubing) {
 			return false;
@@ -654,7 +670,7 @@ IngredientLoop:
 
 		for (i = 0; i < this.neededIngredients.length; i += 1) {
 			if (unit.classid === this.neededIngredients[i].classid && this.validItem(unit, this.neededIngredients[i].recipe)) {
-				//debugLog("Cubing: " + unit.name + " " + this.neededIngredients[i].recipe.Index + " " + (this.neededIngredients[i].recipe.hasOwnProperty("MainRecipe") ? this.neededIngredients[i].recipe.MainRecipe : ""));
+				//debugLog("Cubing: " + unit.name + " " + this.neededIngredients[i].recipe.Index + " " + (this.neededIngredients[i].recipe.hasOwnProperty("MainRecipe") ? this.neededIngredients[i].recipe.MainRecipe : "") + this.getRecipeNeeds(this.neededIngredients[i].recipe.Index));
 
 				return true;
 			}
@@ -685,14 +701,14 @@ IngredientLoop:
 			return false;
 		}
 
+		// Excluded items
+		if (Runewords.validGids.indexOf(unit.gid) > -1) {
+			return false;
+		}
+
 		// Gems and runes
 		if ((unit.itemType >= 96 && unit.itemType <= 102) || unit.itemType === 74) {
 			if (!recipe.Enabled && recipe.Ingredients[0] !== unit.classid && recipe.Ingredients[1] !== unit.classid) {
-				return false;
-			}
-
-			// Don't cube runeword runes
-			if (unit.itemType === 74 && Runewords.validGids.indexOf(unit.gid) > -1) {
 				return false;
 			}
 
@@ -858,9 +874,13 @@ IngredientLoop:
 			}
 		}
 
-		while (getUIFlag(0x1A) || getUIFlag(0x19)) {
-			me.cancel();
-			delay(300);
+		if (getUIFlag(0x1A) || getUIFlag(0x19)) {
+			delay(1000);
+
+			while (getUIFlag(0x1A) || getUIFlag(0x19)) {
+				me.cancel();
+				delay(300);
+			}
 		}
 
 		return true;
