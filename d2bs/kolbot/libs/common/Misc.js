@@ -407,15 +407,18 @@ var Misc = {
 
 	// Open a chest Unit
 	openChest: function (unit) {
-		if (!unit || unit.x === 12526 || unit.x === 12565) { // Skip invalid and Countess chests
+		// Skip invalid and Countess chests
+		if (!unit || unit.x === 12526 || unit.x === 12565) {
 			return false;
 		}
 
+		// already open
 		if (unit.mode) {
 			return true;
 		}
 
-		if (me.classid !== 6 && unit.islocked && !me.findItem("key", 0, 3)) { // locked chest, no keys
+		// locked chest, no keys
+		if (me.classid !== 6 && unit.islocked && !me.findItem(543, 0, 3)) {
 			return false;
 		}
 
@@ -445,16 +448,28 @@ var Misc = {
 	},
 
 	// Open all chests that have preset units in an area
-	openChestsInArea: function (area) {
+	openChestsInArea: function (area, chestIds) {
+		var i, coords, presetUnits;
+
 		if (!area) {
 			area = me.area;
 		}
 
-		var i,
-			coords = [],
-			presetUnits = getPresetUnits(area),
-			chestIds = [5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241, 242, 243, 329, 330, 331, 332, 333, 334, 335,
-						336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405, 406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581];
+		// testing
+		if (area !== me.area) {
+			Pather.journeyTo(area);
+		}
+
+		coords = [];
+		presetUnits = getPresetUnits(area);
+
+		if (!chestIds) {
+			chestIds = [
+				5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241,
+				242, 243, 329, 330, 331, 332, 333, 334, 335, 336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405,
+				406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581
+			];
+		}
 
 		if (!presetUnits) {
 			return false;
@@ -486,42 +501,10 @@ var Misc = {
 		return true;
 	},
 
-	openChestsInRoom: function (x, y) {
-		var unit, room,
-			unitList = [],
-			containers = ["chest", "armorstand", "weaponrack"];
-
-		Pather.moveTo(x, y);
-
-		room = getRoom(x, y);
-		unit = getUnit(2);
-
-		if (unit) {
-			do {
-				if (containers.indexOf(unit.name.toLowerCase()) > -1 && room.unitInRoom(unit) && unit.mode === 0) {
-					unitList.push(copyUnit(unit));
-				}
-			} while (unit.getNext());
-		}
-
-		while (unitList.length > 0) {
-			unitList.sort(Sort.units);
-
-			unit = unitList.shift();
-
-			if (unit) {
-				this.openChest(unit);
-				Pickit.pickItems();
-			}
-		}
-
-		return true;
-	},
-
 	openChests: function (range) {
 		var unit,
 			unitList = [],
-			containers = ["chest", "armorstand", "weaponrack"];
+			containers = ["chest", "chest3", "armorstand", "weaponrack"];
 
 		if (!range) {
 			range = 15;
@@ -529,19 +512,20 @@ var Misc = {
 
 		// Testing all container code
 		if (Config.OpenChests === 2) {
-			containers = ["chest", "loose rock", "hidden stash", "loose boulder", "corpseonstick", "casket", "armorstand", "weaponrack", "barrel", "holeanim",
-							"roguecorpse", "ratnest", "corpse", "goo pile", "largeurn", "urn", "chest3", "jug", "skeleton", "guardcorpse", "sarcophagus",
-							"cocoon", "basket", "stash", "hollow log", "hungskeleton", "pillar", "skullpile", "skull pile", "jar3", "jar2", "jar1", "bonechest", "woodchestl",
-							"woodchestr", "barrel wilderness", "burialchestr", "burialchestl", "explodingchest", "chestl", "chestr", "icecavejar1", "icecavejar2",
-							"icecavejar3", "icecavejar4", "deadperson", "deadperson2", "evilurn", "tomb1l", "tomb3l", "tomb2", "tomb3", "object2", "groundtomb", "groundtombl"
-						];
+			containers = [
+				"chest", "loose rock", "hidden stash", "loose boulder", "corpseonstick", "casket", "armorstand", "weaponrack", "barrel", "holeanim", "tomb2",
+				"tomb3", "roguecorpse", "ratnest", "corpse", "goo pile", "largeurn", "urn", "chest3", "jug", "skeleton", "guardcorpse", "sarcophagus", "object2",
+				"cocoon", "basket", "stash", "hollow log", "hungskeleton", "pillar", "skullpile", "skull pile", "jar3", "jar2", "jar1", "bonechest", "woodchestl",
+				"woodchestr", "barrel wilderness", "burialchestr", "burialchestl", "explodingchest", "chestl", "chestr", "groundtomb", "icecavejar1", "icecavejar2",
+				"icecavejar3", "icecavejar4", "deadperson", "deadperson2", "evilurn", "tomb1l", "tomb3l", "groundtombl"
+			];
 		}
 
-		unit = getUnit(2, -1, 0);
+		unit = getUnit(2);
 
 		if (unit) {
 			do {
-				if (unit.name && containers.indexOf(unit.name.toLowerCase()) > -1 && getDistance(me.x, me.y, unit.x, unit.y) <= range && unit.mode === 0) {
+				if (unit.name && unit.mode === 0 && getDistance(me.x, me.y, unit.x, unit.y) <= range && containers.indexOf(unit.name.toLowerCase()) > -1) {
 					unitList.push(copyUnit(unit));
 				}
 			} while (unit.getNext());
@@ -552,8 +536,7 @@ var Misc = {
 
 			unit = unitList.shift();
 
-			if (unit) {
-				this.openChest(unit);
+			if (unit && this.openChest(unit)) {
 				Pickit.pickItems();
 			}
 		}
@@ -1312,7 +1295,7 @@ MainLoop:
 
 	// Report script errors to logs/ScriptErrorLog.txt
 	errorReport: function (error, script) {
-		var h, m, s, date, msg, oogmsg, filemsg;
+		var h, m, s, date, msg, oogmsg, filemsg, source;
 
 		date = new Date();
 		h = date.getHours();
@@ -1324,8 +1307,9 @@ MainLoop:
 			oogmsg = error.replace(/ÿc[0-9!"+<;.*]/gi, "");
 			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
 		} else {
-			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
-			oogmsg = error.message + " in " + error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length) + " line " + error.lineNumber + ". Ping:" + me.ping;
+			source = error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length);
+			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
+			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
 			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
 		}
 
@@ -1463,6 +1447,10 @@ var Sort = {
 	// Sort arrays of x,y coords by comparing distance between the player
 	points: function (a, b) {
 		return getDistance(me, a[0], a[1]) - getDistance(me, b[0], b[1]);
+	},
+
+	numbers: function (a, b) {
+		return a - b;
 	}
 };
 

@@ -129,6 +129,13 @@ function pickItems() {
 				item = list.shift();
 				canFit = Storage.Inventory.CanFit(item);
 
+				// Torch handling
+				if (muleMode === 1 && item.classid === 604 && item.quality === 7 && !Pickit.canPick(item)) {
+					D2Bot.printToConsole("Mule already has a Torch.", 7);
+
+					rval = "next";
+				}
+
 				if (!canFit) {
 					stashItems();
 

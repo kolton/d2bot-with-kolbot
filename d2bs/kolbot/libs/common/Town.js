@@ -77,12 +77,11 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
 		}
 
-		this.clearInventory();
 		this.heal();
-		this.fillTome("tbk");
+		this.fillTome(518);
 
 		if (Config.FieldID) {
-			this.fillTome("ibk");
+			this.fillTome(519);
 		}
 
 		this.buyPotions();
@@ -94,6 +93,9 @@ var Town = {
 		this.reviveMerc();
 		Cubing.doCubing();
 		Runewords.makeRunewords();
+
+		this.clearInventory();
+
 		this.stash(true);
 		this.clearScrolls();
 
@@ -116,6 +118,13 @@ var Town = {
 		var npc = getInteractedNPC();
 
 		if (npc && npc.name.toLowerCase() !== this.tasks[me.act - 1][task]) {
+			me.cancel();
+
+			npc = null;
+		}
+
+		// Jamella gamble fix
+		if (task === "Gamble" && npc && npc.name.toLowerCase() === NPC.Jamella) {
 			me.cancel();
 
 			npc = null;
@@ -199,7 +208,7 @@ var Town = {
 
 		// Check if we need to buy potions based on Config.MinColumn
 		for (i = 0; i < 4; i += 1) {
-			if (["hp", "mp"].indexOf(Config.BeltColumn[i]) > -1 && col[i] > (beltSize - Config.MinColumn[i])) {
+			if (["hp", "mp"].indexOf(Config.BeltColumn[i]) > -1 && col[i] > (beltSize - Math.min(Config.MinColumn[i], beltSize))) {
 				break;
 			}
 		}
@@ -338,8 +347,8 @@ var Town = {
 
 		delay(500);
 
-		if (!me.findItem("tbk", 0, 3)) {
-			tome = npc.getItem("tbk");
+		if (!me.findItem(518, 0, 3)) {
+			tome = npc.getItem(518);
 
 			if (tome) {
 				try {
@@ -350,7 +359,7 @@ var Town = {
 			}
 		}
 
-		scroll = npc.getItem(code === "tbk" ? "tsc" : "isc");
+		scroll = npc.getItem(code === 518 ? 529 : 530);
 
 		if (!scroll) {
 			return false;
@@ -372,9 +381,9 @@ var Town = {
 
 		if (!tome) {
 			switch (id) {
-			case "ibk":
+			case 519:
 				return 20; // Ignore missing ID tome
-			case "tbk":
+			case 518:
 				return 0; // Force TP tome check
 			}
 		}
@@ -412,10 +421,10 @@ var Town = {
 			return false;
 		}
 
-		tome = me.findItem("ibk", 0, 3);
+		tome = me.findItem(519, 0, 3);
 
 		if (tome && tome.getStat(70) < list.length) {
-			this.fillTome("ibk");
+			this.fillTome(519);
 		}
 
 MainLoop:
@@ -437,11 +446,11 @@ MainLoop:
 					if (tome) {
 						this.identifyItem(item, tome);
 					} else {
-						scroll = npc.getItem("isc");
+						scroll = npc.getItem(530);
 
 						if (scroll) {
 							if (!Storage.Inventory.CanFit(scroll)) {
-								tpTome = me.findItem("tbk", 0, 3);
+								tpTome = me.findItem(518, 0, 3);
 
 								if (tpTome) {
 									tpTomePos = {x: tpTome.x, y: tpTome.y};
@@ -455,7 +464,7 @@ MainLoop:
 							scroll.buy();
 						}
 
-						scroll = me.findItem("isc", 0, 3);
+						scroll = me.findItem(530, 0, 3);
 
 						if (!scroll) {
 							break MainLoop;
@@ -499,7 +508,7 @@ MainLoop:
 			}
 		}
 
-		this.fillTome("tbk"); // Check for TP tome in case it got sold for ID scrolls
+		this.fillTome(518); // Check for TP tome in case it got sold for ID scrolls
 
 		return true;
 	},
@@ -584,7 +593,7 @@ MainLoop:
 			return false;
 		}
 
-		tome = me.findItem("ibk", 0, 3);
+		tome = me.findItem(519, 0, 3);
 
 		if (!tome || tome.getStat(70) < list.length) {
 			return false;
@@ -754,12 +763,13 @@ CursorLoop:
 			return true;
 		}
 
-		if (getUIFlag(0x0C)) {
-			me.cancel(); // cancel trade screen so it doesn't buy certain sold items back from Jamella
-		}
-
-		var i, item, items, npc, newItem, result, timer,
+		var i, item, items, npc, newItem, result,
 			list = [];
+
+		// Fuck Alkor
+		if (me.act === 3) {
+			this.goToTown(2);
+		}
 
 		npc = this.initNPC("Gamble");
 
@@ -810,7 +820,7 @@ CursorLoop:
 							break;
 						case 2:
 							list.push(newItem.gid);
-							Cubing.buildLists();
+							Cubing.update();
 
 							break;
 						default:
@@ -864,6 +874,11 @@ CursorLoop:
 			return true;
 		}
 
+		// Fuck Hratli
+		if (me.act === 3) {
+			this.goToTown(Pather.accessToAct(4) ? 4 : 2);
+		}
+
 		var key,
 			npc = this.initNPC("Key");
 
@@ -893,13 +908,17 @@ CursorLoop:
 			return 12;
 		}
 
-		var key = me.findItem("key", 0, 3);
+		var i,
+			count = 0,
+			key = me.findItems(543, 0, 3);
 
 		if (key) {
-			return key.getStat(70);
+			for (i = 0; i < key.length; i += 1) {
+				count += key[i].getStat(70);
+			}
 		}
 
-		return 0;
+		return count;
 	},
 
 	needKeys: function () {
@@ -910,8 +929,147 @@ CursorLoop:
 		return this.checkKeys() <= 6;
 	},
 
+	repairIngredientCheck: function (item) {
+		if (!Config.CubeRepair) {
+			return false;
+		}
+
+		var needRal = 0,
+			needOrt = 0,
+			items = this.getItemsForRepair(Config.RepairPercent, false);
+
+		if (items && items.length) {
+			while (items.length > 0) {
+				switch (items.shift().itemType) {
+				case 2:
+				case 3:
+				case 15:
+				case 16:
+				case 19:
+				case 69:
+				case 70:
+				case 71:
+				case 72:
+				case 75:
+					needRal += 1;
+
+					break;
+				default:
+					needOrt += 1;
+
+					break;
+				}
+			}
+		}
+
+		switch (item.classid) {
+		case 617:
+			if (needRal && (!me.findItems(617) || me.findItems(617) < needRal)) {
+				return true;
+			}
+
+			break;
+		case 618:
+			if (needOrt && (!me.findItems(618) || me.findItems(618) < needOrt)) {
+				return true;
+			}
+
+			break;
+		}
+
+		return false;
+	},
+
+	cubeRepair: function () {
+		if (!Config.CubeRepair || !me.getItem(549)) {
+			return false;
+		}
+
+		var i,
+			items = this.getItemsForRepair(Config.RepairPercent, false);
+
+		items.sort(function (a, b) {
+			return a.getStat(72) * 100 / a.getStat(73) - b.getStat(72) * 100 / b.getStat(73);
+		});
+
+		while (items.length > 0) {
+			this.cubeRepairItem(items.shift());
+		}
+
+		return true;
+	},
+
+	cubeRepairItem: function (item) {
+		var i, rune, cubeItems,
+			bodyLoc = item.bodylocation;
+
+		if (item.mode !== 1) {
+			return false;
+		}
+
+		switch (item.itemType) {
+		case 2:
+		case 3:
+		case 15:
+		case 16:
+		case 19:
+		case 69:
+		case 70:
+		case 71:
+		case 72:
+		case 75:
+			rune = me.getItem(617); // Ral rune
+
+			break;
+		default:
+			rune = me.getItem(618); // Ort rune
+
+			break;
+		}
+
+		if (rune && Town.openStash() && Cubing.openCube() && Cubing.emptyCube()) {
+			for (i = 0; i < 100; i += 1) {
+				if (!me.itemoncursor) {
+					if (Storage.Cube.MoveTo(item) && Storage.Cube.MoveTo(rune)) {
+						transmute();
+						delay(1000 + me.ping);
+					}
+
+					cubeItems = me.findItems(-1, -1, 6); // Get cube contents
+
+					if (cubeItems.length === 1) { // We expect only one item in cube
+						cubeItems[0].toCursor();
+					}
+				}
+
+				if (me.itemoncursor) {
+					for (i = 0; i < 3; i += 1) {
+						clickItem(0, bodyLoc);
+						delay(me.ping * 2 + 500);
+
+						if (cubeItems[0].bodylocation === bodyLoc) {
+							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
+							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
+
+							return true;
+						}
+					}
+				}
+
+				delay(200);
+			}
+
+			Misc.errorReport("Failed to put repaired item back on.");
+			D2Bot.stop();
+		}
+
+		return false;
+	},
+
 	repair: function () {
 		var i, quiver, myQuiver, npc, repairAction, bowCheck;
+
+		this.cubeRepair();
 
 		repairAction = this.needRepair();
 
@@ -959,9 +1117,8 @@ CursorLoop:
 	},
 
 	needRepair: function () {
-		var i, durability, quantity, charge, quiver, bowCheck, item,
+		var quiver, bowCheck, quantity,
 			repairAction = [],
-			repairPercent = 40,
 			canAfford = me.getStat(14) + me.getStat(15) >= me.getRepairCost();
 
 		// Arrow/Bolt check
@@ -992,40 +1149,49 @@ CursorLoop:
 
 		// Repair durability/quantity/charges
 		if (canAfford) {
+			if (this.getItemsForRepair(Config.RepairPercent, true).length > 0) {
+				repairAction.push("repair");
+			}
+		} else {
+			print("ÿc4Town: ÿc1Can't afford repairs.");
+		}
+
+		return repairAction;
+	},
+
+	getItemsForRepair: function (repairPercent, chargedItems) {
+		var i, charge, quantity, durability,
+			itemList = [],
 			item = me.getItem(-1, 1);
 
-			if (item) {
-RepairLoop:
-				do {
-					if (!item.getFlag(0x400000)) { // Skip ethereal items
-						switch (item.itemType) {
-						// Quantity check
-						case 42: // Throwing knives
-						case 43: // Throwing axes
-						case 44: // Javelins
-						case 87: // Amazon javelins
-							quantity = item.getStat(70);
+		if (item) {
+			do {
+				if (!item.getFlag(0x400000)) { // Skip ethereal items
+					switch (item.itemType) {
+					// Quantity check
+					case 42: // Throwing knives
+					case 43: // Throwing axes
+					case 44: // Javelins
+					case 87: // Amazon javelins
+						quantity = item.getStat(70);
 
-							if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
-								repairAction.push("repair");
-
-								break RepairLoop;
-							}
-
-							break;
-						// Durability check
-						default:
-							durability = item.getStat(72);
-
-							if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
-								repairAction.push("repair");
-
-								break RepairLoop;
-							}
-
-							break;
+						if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+							itemList.push(copyUnit(item));
 						}
 
+						break;
+					// Durability check
+					default:
+						durability = item.getStat(72);
+
+						if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
+							itemList.push(copyUnit(item));
+						}
+
+						break;
+					}
+
+					if (chargedItems) {
 						// Charged item check
 						charge = item.getStat(-2)[204];
 
@@ -1033,25 +1199,19 @@ RepairLoop:
 							if (charge instanceof Array) {
 								for (i = 0; i < charge.length; i += 1) {
 									if (charge[i] !== undefined && charge[i].hasOwnProperty("charges") && charge[i].charges * 100 / charge[i].maxcharges <= repairPercent) {
-										repairAction.push("repair");
-
-										break RepairLoop;
+										itemList.push(copyUnit(item));
 									}
 								}
 							} else if (charge.charges * 100 / charge.maxcharges <= repairPercent) {
-								repairAction.push("repair");
-
-								break RepairLoop;
+								itemList.push(copyUnit(item));
 							}
 						}
 					}
-				} while (item.getNext());
-			}
-		} else {
-			print("ÿc4Town: ÿc1Can't afford repairs.");
+				}
+			} while (item.getNext());
 		}
 
-		return repairAction;
+		return itemList;
 	},
 
 	reviveMerc: function () {
@@ -1129,7 +1289,7 @@ MainLoop:
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
 				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
-					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]);
+					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]));
 
 					if (result) {
 						Misc.itemLogger("Stashed", items[i]);
@@ -1169,20 +1329,19 @@ MainLoop:
 	},
 
 	openStash: function () {
-		if (!this.move("stash")) {
-			return false;
-		}
-
 		if (getUIFlag(0x19)) {
 			return true;
 		}
 
-		var i, tick,
-			useTK = me.classid === 1 && me.getSkill(43, 1),
+		var i, tick, stash,
+			useTK = me.classid === 1 && me.getSkill(43, 1);
+
+		for (i = 0; i < 5; i += 1) {
+			this.move("stash");
+
 			stash = getUnit(2, 267);
 
-		if (stash) {
-			for (i = 0; i < 5; i += 1) {
+			if (stash) {
 				if (useTK) {
 					Skill.cast(43, 0, stash);
 				} else {
@@ -1201,12 +1360,18 @@ MainLoop:
 
 					delay(10);
 				}
+			}
 
-				if (i > 1) {
-					Packet.flash(me.gid);
-					this.move("waypoint");
+			if (i > 1) {
+				Packet.flash(me.gid);
+
+				if (stash) {
+					Pather.moveToUnit(stash);
+				} else {
 					this.move("stash");
 				}
+
+				useTK = false;
 			}
 		}
 
@@ -1370,41 +1535,92 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, loseItemAction,
+		var i, loseItemAction, col,
 			dropAction = 0,
 			sellAction = 1,
 			item = me.getItem(-1, 0),
 			items = [];
 
+		// Handle potions
 		if (item) {
 			do {
-				if (item.location === 3) {
-					switch (item.itemType) {
-					case 76:
-						if (!Config.HPBuffer) {
-							items.push(copyUnit(item));
-						}
-
-						break;
-					case 77:
-						if (!Config.MPBuffer) {
-							items.push(copyUnit(item));
-						}
-
-						break;
-					case 78:
-						if (!Config.RejuvBuffer) {
-							items.push(copyUnit(item));
-						}
-
-						break;
-					}
+				if (item.location === 3 && [76, 77, 78].indexOf(item.itemType) > -1) {
+					items.push(copyUnit(item));
 				}
 			} while (item.getNext());
 
+			if (!this.beltSize) {
+				this.beltSize = Storage.BeltSize();
+			}
+
+			col = this.checkColumns(this.beltSize);
+
+			// Sort from HP to RV
+			items.sort(function (a, b) {
+				return a.itemType - b.itemType;
+			});
+
 			while (items.length) {
-				items.shift().interact();
-				delay(200);
+				item = items.shift();
+
+MainSwitch:
+				// Redundant but will do for now
+				switch (item.itemType) {
+				case 76:
+					for (i = 0; i < 4; i += 1) {
+						if (Config.BeltColumn[i] === "hp" && col[i] > 0) {
+							clickItem(2, item.x, item.y, item.location); // Return potion to belt
+							delay(me.ping + 200);
+
+							col = this.checkColumns(this.beltSize);
+
+							break MainSwitch;
+						}
+					}
+
+					if (!Config.HPBuffer) {
+						item.interact();
+						delay(me.ping + 200);
+					}
+
+					break;
+				case 77:
+					for (i = 0; i < 4; i += 1) {
+						if (Config.BeltColumn[i] === "mp" && col[i] > 0) {
+							clickItem(2, item.x, item.y, item.location);
+							delay(me.ping + 200);
+
+							col = this.checkColumns(this.beltSize);
+
+							break MainSwitch;
+						}
+					}
+
+					if (!Config.MPBuffer) {
+						item.interact();
+						delay(me.ping + 200);
+					}
+
+					break;
+				case 78:
+					for (i = 0; i < 4; i += 1) {
+						if (Config.BeltColumn[i] === "rv" && col[i] > 0) {
+							clickItem(2, item.x, item.y, item.location);
+							delay(me.ping + 200);
+
+							col = this.checkColumns(this.beltSize);
+
+							break MainSwitch;
+						}
+					}
+
+					if (!Config.RejuvBuffer) {
+						item.interact();
+						delay(me.ping + 200);
+					}
+
+					break;
+				}
 			}
 		}
 
@@ -1423,8 +1639,8 @@ MainLoop:
 		for (i = 0; !!items && i < items.length; i += 1) {
 			if ([18, 41, 78].indexOf(items[i].itemType) === -1 &&
 					items[i].classid !== 549 &&
-					(items[i].code !== "tsc" || !!me.findItem("tbk", 0, 3)) &&
-					(items[i].code !== "isc" || !!me.findItem("ibk", 0, 3)) &&
+					(items[i].code !== 529 || !!me.findItem(518, 0, 3)) &&
+					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) &&
 					(Pickit.checkItem(items[i]).result === 0 || Pickit.checkItem(items[i]).result === 4) &&
 					!Cubing.keepItem(items[i]) &&
 					!Runewords.keepItem(items[i])
@@ -1435,6 +1651,15 @@ MainLoop:
 						items[i].sell();
 					} else {
 						Misc.itemLogger("Dropped", items[i], "clearInventory");
+
+						// TEMP
+						/*if (items[i].name.match("flawless", "i")) {
+							D2Bot.printToConsole("QQ", 9);
+							D2Bot.stop();
+
+							return true;
+						}*/
+
 						items[i].drop();
 					}
 				} catch (e) {
@@ -1572,11 +1797,11 @@ MainLoop:
 		}
 
 		if (useTK) {
-			if (getDistance(me.x, me.y, townSpot[0], townSpot[1]) > 14) {
-				rval = Attack.getIntoPosition({x: townSpot[0], y: townSpot[1]}, 13, 0x4);
-			}
+			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 11);
 
-			rval = true;
+			if (path && path[1]) {
+				rval = Pather.moveTo(path[1].x, path[1].y);
+			}
 		} else {
 			print("Townmove: " + spot + " from " + me.x + ", " + me.y);
 			delay(100);

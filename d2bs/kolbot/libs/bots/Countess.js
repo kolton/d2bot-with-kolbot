@@ -11,10 +11,8 @@ function Countess() {
 	Pather.useWaypoint(6);
 	Precast.doPrecast(true);
 
-	for (i = 0; i < 6; i += 1) {
-		if (!Pather.moveToExit(20 + i, true)) {
-			throw new Error("Failed to move to Countess");
-		}
+	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true)) {
+		throw new Error("Failed to move to Countess");
 	}
 
 	poi = getPresetUnit(me.area, 2, 580);

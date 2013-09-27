@@ -5,7 +5,7 @@
 */
 
 var Pickit = {
-	pickList: [],
+	gidList: [],
 	beltSize: 1,
 	ignoreLog: [4, 5, 6, 22, 41, 76, 77, 78, 79, 80, 81], // Ignored item types for item logging
 
@@ -30,6 +30,10 @@ var Pickit = {
 	// 4 - Pickup to sell (triggered when low on gold)
 	checkItem: function (unit) {
 		var rval = NTIP.CheckItem(unit, false, true);
+
+		if ((unit.classid === 617 || unit.classid === 618) && Town.repairIngredientCheck(unit)) {
+			return {result: 6, line: null};
+		}
 
 		if (Cubing.checkItem(unit)) {
 			return {result: 2, line: null};
@@ -57,6 +61,7 @@ var Pickit = {
 
 	pickItems: function () {
 		function ItemStats(unit) {
+			this.ilvl = unit.ilvl;
 			this.itemType = unit.itemType;
 			this.quality = unit.quality;
 			this.classid = unit.classid;
@@ -69,7 +74,10 @@ var Pickit = {
 			this.gid = unit.gid;
 		}
 
-		var status, gid, item, canFit, color;
+		var status, gid, item, canFit,
+			needMule = false,
+			pickList = [],
+			noSpaceList = [];
 
 		Town.clearBelt();
 
@@ -82,24 +90,23 @@ var Pickit = {
 		}
 
 		item = getUnit(4);
-		this.pickList = [];
 
 		if (item) {
 			do {
 				if ((item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
-					this.pickList.push(new ItemStats(item));
+					pickList.push(new ItemStats(item));
 				}
 			} while (item.getNext());
 		}
 
-		this.pickList.sort(this.sortItems);
+		pickList.sort(this.sortItems);
 
-		while (this.pickList.length > 0) {
+		while (pickList.length > 0) {
 			if (me.dead) {
 				return false;
 			}
 
-			gid = this.pickList[0].gid;
+			gid = pickList[0].gid;
 
 			if (gid) {
 				item = getUnit(4, -1, -1, gid);
@@ -107,43 +114,74 @@ var Pickit = {
 				if (item && (item.mode === 3 || item.mode === 5)) {
 					status = this.checkItem(item);
 
-					if (status.result && this.canPick(this.pickList[0])) {
-						// Check room, don't check gold, scrolls and potions
-						canFit = Storage.Inventory.CanFit(this.pickList[0]) || [4, 22, 76, 77, 78].indexOf(this.pickList[0].itemType) > -1;
-						color = this.itemColor(this.pickList[0]);
-
-						if (!canFit && Config.FieldID && Town.fieldID()) {
-							canFit = Storage.Inventory.CanFit(this.pickList[0]) || [4, 22, 76, 77, 78].indexOf(this.pickList[0].itemType) > -1;
-						}
-
-						if (!canFit && this.canMakeRoom()) {
-							print("ÿc7Trying to make room for " + color + this.pickList[0].name);
-
-							if (!Town.visitTown()) {
-								print("ÿc7Not enough room for " + color + this.pickList[0].name);
-
-								return false;
-							}
-
-							canFit = Storage.Inventory.CanFit(this.pickList[0]) || [4, 22, 76, 77, 78].indexOf(this.pickList[0].itemType) > -1;
-						}
+					if (status.result && this.canPick(pickList[0])) {
+						canFit = Storage.Inventory.CanFit(pickList[0]) || [4, 22, 76, 77, 78].indexOf(pickList[0].itemType) > -1;
 
 						if (canFit) {
 							this.pickItem(item, status.result, status.line);
 						} else {
-							Misc.itemLogger("No room for", this.pickList[0]);
-							print("ÿc7Not enough room for " + color + this.pickList[0].name);
+							noSpaceList.push(new ItemStats(item));
+						}
+					}
+				}
+			}
 
-							if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo") && AutoMule.getMuleItems().length > 0) {
-								scriptBroadcast("mule");
-								quit();
+			pickList.shift();
+		}
+
+		if (noSpaceList.length) {
+			print(noSpaceList.length + " item(s) can't fit.");
+		}
+
+		while (noSpaceList.length > 0) {
+			gid = noSpaceList[0].gid;
+
+			if (gid) {
+				item = getUnit(4, -1, -1, gid);
+
+				if (item && (item.mode === 3 || item.mode === 5)) {
+					status = this.checkItem(item);
+
+					if (status.result && this.canPick(noSpaceList[0])) {
+						canFit = Storage.Inventory.CanFit(noSpaceList[0]) || [4, 22, 76, 77, 78].indexOf(noSpaceList[0].itemType) > -1;
+
+						if (!canFit && Config.FieldID && Town.fieldID()) {
+							canFit = Storage.Inventory.CanFit(noSpaceList[0]) || [4, 22, 76, 77, 78].indexOf(noSpaceList[0].itemType) > -1;
+						}
+
+						if (!canFit && this.canMakeRoom()) {
+							print("ÿc7Trying to make room for " + this.itemColor(noSpaceList[0]) + noSpaceList[0].name);
+
+							if (!Town.visitTown()) {
+								print("ÿc7Not enough room for " + this.itemColor(noSpaceList[0]) + noSpaceList[0].name);
+
+								return false;
+							}
+
+							item = getUnit(4, -1, -1, gid);
+							canFit = Storage.Inventory.CanFit(noSpaceList[0]) || [4, 22, 76, 77, 78].indexOf(noSpaceList[0].itemType) > -1;
+						}
+
+						if (item) {
+							if (canFit) {
+								this.pickItem(item, status.result, status.line);
+							} else {
+								Misc.itemLogger("No room for", noSpaceList[0]);
+								print("ÿc7Not enough room for " + this.itemColor(noSpaceList[0]) + noSpaceList[0].name);
+
+								needMule = true;
 							}
 						}
 					}
 				}
 			}
 
-			this.pickList.shift();
+			noSpaceList.shift();
+		}
+
+		if (needMule && AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo") && AutoMule.getMuleItems().length > 0) {
+			scriptBroadcast("mule");
+			quit();
 		}
 
 		return true;
@@ -176,6 +214,7 @@ var Pickit = {
 
 	pickItem: function (unit, status, keptLine) {
 		function ItemStats(unit) {
+			this.ilvl = unit.ilvl;
 			this.type = unit.itemType;
 			this.classid = unit.classid;
 			this.name = unit.name;
@@ -202,7 +241,7 @@ var Pickit = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			if (!getUnit(4, -1, -1, gid)) { // Someone else picked it
+			if (!getUnit(4, -1, -1, gid)) {
 				break MainLoop;
 			}
 
@@ -220,9 +259,12 @@ MainLoop:
 
 			if (stats.useTk) {
 				Skill.cast(43, 0, item);
-			} else if (getDistance(me, item) < 4 || Pather.moveToUnit(item)) {
-				Misc.click(0, 0, item);
-				//item.interact();
+			} else if (getDistance(me, item) < (Config.FastPick === 2 && i < 1 ? 6 : 4) || Pather.moveToUnit(item)) {
+				if (Config.FastPick < 2) {
+					Misc.click(0, 0, item);
+				} else {
+					sendPacket(1, 0x16, 4, 0x4, 4, item.gid, 4, 0);
+				}
 			}
 
 			tick = getTickCount();
@@ -260,29 +302,38 @@ MainLoop:
 			//print("pick retry");
 		}
 
-		//stats.picked = !!me.getItem(-1, -1, gid);
-		stats.picked = me.itemcount > itemCount;
+		stats.picked = me.itemcount > itemCount || !!me.getItem(-1, -1, gid);
 
 		if (stats.picked) {
-			print("ÿc7Picked up " + stats.color + stats.name);
 			DataFile.updateStats("lastArea");
 
 			switch (status) {
 			case 1:
+				print("ÿc7Picked up " + stats.color + stats.name + " (ilvl " + stats.ilvl + ")");
+
 				if (this.ignoreLog.indexOf(stats.type) === -1) {
 					Misc.itemLogger("Kept", item);
-					Misc.logItem("Kept", item, keptLine);
+
+					if (["pk1", "pk2", "pk3"].indexOf(item.code) === -1 || TorchSystem.LogKeys) {
+						Misc.logItem("Kept", item, keptLine);
+					}
 				}
 
 				break;
 			case 2:
+				print("ÿc7Picked up " + stats.color + stats.name + " (ilvl " + stats.ilvl + ")" + " ÿc0(Cubing)");
 				Misc.itemLogger("Kept", item, "Cubing " + me.findItems(item.classid).length);
 				Cubing.update();
 
 				break;
 			case 3:
+				print("ÿc7Picked up " + stats.color + stats.name + " (ilvl " + stats.ilvl + ")" + " ÿc0(Runewords)");
 				Misc.itemLogger("Kept", item, "Runewords");
 				Runewords.update(stats.classid, gid);
+
+				break;
+			default:
+				print("ÿc7Picked up " + stats.color + stats.name + " (ilvl " + stats.ilvl + ")");
 
 				break;
 			}
@@ -487,11 +538,11 @@ MainLoop:
 	fastPick: function () {
 		var item, gid, status;
 
-		while (gidList.length > 0) {
-			gid = gidList.shift();
+		while (this.gidList.length > 0) {
+			gid = this.gidList.shift();
 			item = getUnit(4, -1, -1, gid);
 
-			if (item && (item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
+			if (item && (item.mode === 3 || item.mode === 5) && Town.ignoredItemTypes.indexOf(item.itemType) === -1 && getDistance(me, item) <= Config.PickRange) {
 				status = this.checkItem(item);
 
 				if (status.result && this.canPick(item) && (Storage.Inventory.CanFit(item) || [4, 22, 76, 77, 78].indexOf(item.itemType) > -1)) {

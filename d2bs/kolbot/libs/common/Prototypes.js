@@ -40,8 +40,7 @@ Unit.prototype.__defineGetter__("idle",
 		}
 
 		return (this.mode === 1 || this.mode === 5);
-	}
-	);
+	});
 
 // Death check
 Unit.prototype.__defineGetter__("dead",
@@ -51,8 +50,7 @@ Unit.prototype.__defineGetter__("dead",
 		}
 
 		return (this.mode === 0 || this.mode === 17);
-	}
-	);
+	});
 
 // Check if unit is in town
 Unit.prototype.__defineGetter__("inTown",
@@ -62,15 +60,13 @@ Unit.prototype.__defineGetter__("inTown",
 		}
 
 		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
-	}
-	);
+	});
 
 // Check if party unit is in town
 Party.prototype.__defineGetter__("inTown",
 	function () {
 		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
-	}
-	);
+	});
 
 Unit.prototype.__defineGetter__("attacking",
 	function () {
@@ -79,8 +75,7 @@ Unit.prototype.__defineGetter__("attacking",
 		}
 
 		return [7, 8, 10, 11, 12, 13, 14, 15, 16, 18].indexOf(me.mode) > -1;
-	}
-	);
+	});
 
 // Open NPC menu
 Unit.prototype.openMenu = function (addDelay) {
@@ -270,7 +265,7 @@ Unit.prototype.toCursor = function () {
 
 	for (i = 0; i < 3; i += 1) {
 		if (this.mode === 1) {
-			clickItem(0, this.bodylocation); // fix for equipped items (cubing viper staff fro example)
+			clickItem(0, this.bodylocation); // fix for equipped items (cubing viper staff for example)
 		} else {
 			clickItem(0, this);
 		}
@@ -456,6 +451,38 @@ Unit.prototype.getSuffix = function (id) {
 	return false;
 };
 
+Unit.prototype.__defineGetter__("dexreq",
+	function () {
+		var finalReq,
+			ethereal = this.getFlag(0x400000),
+			reqModifier = this.getStat(91),
+			baseReq = getBaseStat("items", this.classid, "reqdex");
+
+		finalReq = baseReq + Math.floor(baseReq * reqModifier / 100);
+
+		if (ethereal) {
+			finalReq -= 10;
+		}
+
+		return Math.max(finalReq, 0);
+	});
+
+Unit.prototype.__defineGetter__("strreq",
+	function () {
+		var finalReq,
+			ethereal = this.getFlag(0x400000),
+			reqModifier = this.getStat(91),
+			baseReq = getBaseStat("items", this.classid, "reqstr");
+
+		finalReq = baseReq + Math.floor(baseReq * reqModifier / 100);
+
+		if (ethereal) {
+			finalReq -= 10;
+		}
+
+		return Math.max(finalReq, 0);
+	});
+
 Unit.prototype.__defineGetter__('itemclass',
 	function () {
 		if (getBaseStat(0, this.classid, 'code') === undefined) {
@@ -471,8 +498,7 @@ Unit.prototype.__defineGetter__('itemclass',
 		}
 
 		return 0;
-	}
-	);
+	});
 
 Unit.prototype.getStatEx = function (id, subid) {
 	var i, temp, rval, regex;

@@ -22,11 +22,14 @@ include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
 
-var gidList = []; // fast pickit
-
 function main() {
 	D2Bot.init(); // Get D2Bot# handle
 	D2Bot.ingame();
+
+	// wait until game is ready
+	while (!me.gameReady) {
+		delay(50);
+	}
 
 	if (!getScript("tools/heartbeat.js")) {
 		load("tools/heartbeat.js");
@@ -41,18 +44,15 @@ function main() {
 		}
 	}
 
-	// wait until game is ready
-	while (!me.gameReady) {
-		delay(50);
-	}
-
 	// don't load default for mules
 	if (getScript("D2BotMule.dbj")) {
 		return true;
 	}
 
 	// MuleLogger handler
-	MuleLogger.inGameCheck();
+	if (MuleLogger.inGameCheck()) {
+		return true;
+	}
 
 	var i, sojPause, stats,
 		sojCounter = 0,
@@ -60,7 +60,7 @@ function main() {
 
 	this.itemEvent = function (gid, mode, code, global) {
 		if (gid > 0 && mode === 0) {
-			gidList.push(gid);
+			Pickit.gidList.push(gid);
 		}
 	};
 
@@ -83,13 +83,19 @@ function main() {
 	Cubing.init();
 
 	// AutoMule handler
-	AutoMule.inGameCheck();
+	if (AutoMule.inGameCheck()) {
+		return true;
+	}
 
 	// TorchSystem handler
-	TorchSystem.inGameCheck();
+	if (TorchSystem.inGameCheck()) {
+		return true;
+	}
 
 	// Gambling System handler
-	Gambling.inGameCheck();
+	if (Gambling.inGameCheck()) {
+		return true;
+	}
 
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
@@ -192,8 +198,12 @@ function main() {
 		scriptBroadcast("mule");
 	}
 
+	if (TorchSystem.keyCheck()) {
+		scriptBroadcast("torch");
+	}
+
 	scriptBroadcast("quit");
-	delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
+	//delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
 
 	return true;
 }

@@ -66,6 +66,55 @@ var Precast = new function () {
 
 		return false;
 	};
+	
+	this.getBetterSlot = function (skillId) {
+		var item,
+			sumCurr = 0,
+			sumSwap = 0;
+
+		switch (skillId) {
+		case 117: // Holy Shield
+			sumCurr = 0;
+			sumSwap = 0;
+			item = me.getItem();
+
+			if (item) {
+				do {
+					if (item.bodylocation === 4 || item.bodylocation === 5) {
+						sumCurr += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+					}
+
+					if (item.bodylocation === 11 || item.bodylocation === 12) {
+						sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+					}
+				} while (item.getNext());
+			}
+
+			break;
+		}
+
+		print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap);
+
+		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
+	};
+
+	this.precastSkill = function (skillId) {
+		var swapped,
+			slot = this.getBetterSlot(skillId);
+
+		if (slot !== me.weaponswitch) {
+			swapped = true;
+		}
+
+		this.weaponSwitch(slot);
+		Skill.cast(skillId, 0);
+
+		if (swapped) {
+			this.weaponSwitch(Math.abs(slot - 1));
+		}
+
+		return true;
+	};
 
 	this.doPrecast = function (force) {
 		var buffSummons = false;
@@ -128,7 +177,7 @@ var Precast = new function () {
 			break;
 		case 3: // Paladin
 			if (!me.getState(101) || force) {
-				Skill.cast(117, 0); // Holy Shield
+				this.precastSkill(117); // Holy Shield
 			}
 
 			break;

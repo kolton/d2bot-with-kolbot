@@ -230,6 +230,10 @@ var Attack = {
 
 	// Clear monsters in a section based on range and spectype or clear monsters around a boss monster
 	clear: function (range, spectype, bossId, sortfunc, pickit) { // probably going to change to passing an object
+		while (!me.gameReady) {
+			delay(40);
+		}
+
 		if (Config.MFLeader && !!bossId) {
 			Pather.makePortal();
 			say("clear " + bossId);
@@ -363,7 +367,7 @@ var Attack = {
 
 					attackCount += 1;
 
-					if (target.mode === 0 || target.mode === 12) {
+					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
 						Pickit.fastPick();
 					}
 
@@ -391,24 +395,32 @@ var Attack = {
 		var monsterList = [],
 			monster = getUnit(1);
 
-		switch (classid) {
-		case -1:
-			break;
-		default:
-			if (typeof classid === "number") {
-				classid = [classid];
+		switch (typeof classid) {
+		case "number":
+		case "string":
+			monster = getUnit(1, classid);
+
+			if (monster) {
+				do {
+					if (getDistance(me, monster) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+						monsterList.push(copyUnit(monster));
+					}
+				} while (monster.getNext());
 			}
 
 			break;
-		}
+		case "object":
+			monster = getUnit(1);
 
-		if (monster) {
-			do {
-				if ((classid === -1 || classid.indexOf(monster.classid) > -1) && getDistance(me, monster) <= range &&
-						(!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
-					monsterList.push(copyUnit(monster));
-				}
-			} while (monster.getNext());
+			if (monster) {
+				do {
+					if (classid.indexOf(monster.classid) > -1 && getDistance(me, monster) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+						monsterList.push(copyUnit(monster));
+					}
+				} while (monster.getNext());
+			}
+
+			break;
 		}
 
 		if (!monsterList.length) {
@@ -433,7 +445,7 @@ var Attack = {
 			monsterList = mainArg.slice(0);
 
 			break;
-		case "boolean":
+		case "boolean": // false from Attack.getMob()
 			return false;
 		default:
 			throw new Error("clearList: Invalid argument");
@@ -492,6 +504,10 @@ var Attack = {
 					}
 
 					attackCount += 1;
+
+					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
+						Pickit.fastPick();
+					}
 
 					break;
 				default:
@@ -570,6 +586,54 @@ var Attack = {
 		arr.push(new Line(room.x * 5, room.y * 5 + room.ysize, room.x * 5 + room.xsize, room.y * 5 + room.ysize, color, true));
 	},
 
+	countUniques: function () {
+		if (!this.uniques) {
+			this.uniques = 0;
+		}
+
+		if (!this.ignoredGids) {
+			this.ignoredGids = [];
+		}
+
+		var monster = getUnit(1);
+
+		if (monster) {
+			do {
+				if ((monster.spectype & 0x5) && this.ignoredGids.indexOf(monster.gid) === -1) {
+					this.uniques += 1;
+					this.ignoredGids.push(monster.gid);
+				}
+			} while (monster.getNext());
+		}
+	},
+
+	storeStatistics: function (area) {
+		var obj;
+
+		if (!FileTools.exists("statistics.json")) {
+			Misc.fileAction("statistics.json", 1, "{}");
+		}
+
+		obj = JSON.parse(Misc.fileAction("statistics.json", 0));
+
+		if (obj) {
+			if (obj[area] === undefined) {
+				obj[area] = {
+					runs: 0,
+					averageUniques: 0
+				};
+			}
+
+			obj[area].averageUniques = ((obj[area].averageUniques * obj[area].runs + this.uniques) / (obj[area].runs + 1)).toFixed(4);
+			obj[area].runs += 1;
+
+			Misc.fileAction("statistics.json", 1, JSON.stringify(obj));
+		}
+
+		this.uniques = 0;
+		this.ignoredGids = [];
+	},
+
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
 		if (Config.MFLeader) {
@@ -616,19 +680,19 @@ var Attack = {
 			rooms.sort(RoomSort);
 			room = rooms.shift();
 
-			result = Pather.getNearestWalkable(room[0], room[1], 15, 3);
+			result = Pather.getNearestWalkable(room[0], room[1], 25, 5);
 
 			if (result) {
-				//this.markRoom(getRoom(room[0], room[1]), 0x84);
 				Pather.moveTo(result[0], result[1], 3);
+				//this.countUniques();
 
 				if (!this.clear(40, spectype)) {
-					return false;
+					break;
 				}
-			}/* else {
-				this.markRoom(getRoom(room[0], room[1]), 0x62);
-			}*/
+			}
 		}
+
+		//this.storeStatistics(Pather.getAreaName(me.area));
 
 		return true;
 	},
@@ -640,8 +704,8 @@ var Attack = {
 			return getDistance(me, unitA) - getDistance(me, unitB);
 		}
 
-		// Classic barb optimization
-		if (me.gametype === 0 && me.classid === 4) {
+		// Barb optimization
+		if (me.classid === 4) {
 			if (!Attack.checkResist(unitA, ClassAttack.skillElement[(unitA.spectype & 0x7) ? 1 : 3])) {
 				return 1;
 			}
@@ -824,10 +888,11 @@ var Attack = {
 
 	getMonsterCount: function (x, y, range, list) {
 		var i,
-			count = 0;
+			count = 0,
+			ignored = [243];
 
 		for (i = 0; i < list.length; i += 1) {
-			if (this.checkMonster(list[i]) && getDistance(x, y, list[i].x, list[i].y) <= range) {
+			if (ignored.indexOf(list[i].classid) === -1 && this.checkMonster(list[i]) && getDistance(x, y, list[i].x, list[i].y) <= range) {
 				count += 1;
 			}
 		}
@@ -1170,16 +1235,22 @@ AuraLoop: // Skip monsters with auras
 
 	// Find an optimal attack position and move or walk to it
 	getIntoPosition: function (unit, distance, coll, walk) {
-		if (distance < 4) {
+		if (!unit || !unit.x || !unit.y) {
+			throw new Error("getIntoPosition: Invalid Unit!");
+		}
+
+		if (distance < 5 && (!unit.hasOwnProperty("mode") || (unit.mode !== 0 && unit.mode !== 12))) {
+			me.overhead("Short range");
+
 			if (walk) {
 				if (getDistance(me, unit) > 8 || checkCollision(me, unit, coll)) {
-					Pather.moveToUnit(unit, 0, 0, 0, 1);
+					Pather.walkTo(unit.x, unit.y, 3);
 				}
 
 				return true;
 			}
 
-			return Pather.moveToUnit(unit);
+			return Pather.moveTo(unit.x, unit.y, 0);
 		}
 
 		var n, i, cx, cy, t,
@@ -1200,7 +1271,7 @@ AuraLoop: // Skip monsters with auras
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				if (Pather.checkSpot(cx, cy, true)) {
+				if (Pather.checkSpot(cx, cy, 0x1, true)) {
 					coords.push({x: cx, y: cy});
 				}
 			}
@@ -1211,16 +1282,23 @@ AuraLoop: // Skip monsters with auras
 				coords.sort(Sort.units);
 
 				for (i = 0; i < coords.length; i += 1) {
+					// Valid position found
 					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll, 2)) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						return walk ? Pather.walkTo(coords[i].x, coords[i].y, 2) : Pather.moveTo(coords[i].x, coords[i].y, 0);
+						if (walk) {
+							Pather.walkTo(coords[i].x, coords[i].y, 2);
+						} else {
+							Pather.moveTo(coords[i].x, coords[i].y, 0);
+						}
+
+						return true;
 					}
 				}
 			}
 		}
 
-		//print("optimal pos fail.");
+		print("optimal pos fail.");
 
 		return false;
 	}

@@ -118,6 +118,12 @@ function Mephisto() {
 
 		for (i = 0; i < coords.length; i += 2) {
 			Pather.moveTo(coords[i], coords[i + 1]);
+
+			if (Config.MFLeader) {
+				Pather.makePortal();
+				say("council " + i);
+			}
+
 			Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
 		}
 

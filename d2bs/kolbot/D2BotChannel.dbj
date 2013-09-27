@@ -11,6 +11,8 @@ var StarterConfig = {
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
+	SkipMutedKey: true,
+	MutedKeyTrigger: "Your account has had all chat privileges suspended.",
 	CrashDelay: 60, // Seconds to wait after a d2 window crash
 	RealmDownDelay: 10, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
@@ -59,7 +61,7 @@ include("gambling.js");
 include("torchsystem.js");
 include("common/misc.js");
 
-var gameStart, handle, ingame, firstLogin,
+var gameStart, handle, ingame, firstLogin, useChat,
 	connectFail, chatActionsDone, gameInfo,
 	gameCount = DataFile.getStats().runs + 1,
 	channelTick = getTickCount(),
@@ -76,6 +78,14 @@ var gameStart, handle, ingame, firstLogin,
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
+}
+
+function sayMsg(string) {
+	if (!useChat) {
+		return;
+	}
+
+	say(string);
 }
 
 function ReceiveCopyData(mode, msg) {
@@ -288,21 +298,53 @@ MainSwitch:
 			retry = 0;
 		}
 
-		if (!chatActionsDone || getTickCount() - channelTick >= 120e3) {
-			if (StarterConfig.JoinChannel !== "") {
-				timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+		// Muted key handler
+		fullText = "";
+		lines = ControlAction.getText(4, 28, 410, 354, 298);
 
-				if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinChannel === "string") {
-					say("/j " + AdvancedConfig[me.profile].JoinChannel);
+		if (!lines) {
+			break;
+		}
+
+		fullText = lines.join(" ").replace(/\s+/g, " ");
+
+		if (fullText.match(StarterConfig.MutedKeyTrigger.replace(/\s+/g, " "), "gi")) {
+			D2Bot.printToConsole(gameInfo.mpq + " is muted.", 6);
+
+			ControlAction.mutedKey = true;
+
+			if (StarterConfig.SkipMutedKey) {
+				if (gameInfo.switchKeys) {
+					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
 				} else {
-					say("/j " + StarterConfig.JoinChannel);
+					D2Bot.stop();
+				}
+			}
+		}
+
+		if (!ControlAction.mutedKey && (!chatActionsDone || getTickCount() - channelTick >= 120e3)) {
+			if (StarterConfig.JoinChannel !== "") {
+				if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinChannel === "string") {
+					joinInfo.joinChannel = AdvancedConfig[me.profile].JoinChannel;
+				} else {
+					joinInfo.joinChannel = StarterConfig.JoinChannel;
 				}
 
-				delay(1000);
+				if (joinInfo.joinChannel) {
+					if (ControlAction.joinChannel(joinInfo.joinChannel)) {
+						useChat = true;
+					} else {
+						print("Unable to join channel, chat messages disabled.");
+
+						useChat = false;
+					}
+				}
 			}
 
 			if (StarterConfig.FirstJoinMessage !== "" && !chatActionsDone) { // Added !chatActionsDone condition to prevent spam
-				say(StarterConfig.FirstJoinMessage);
+				timeoutDelay("Chat delay", StarterConfig.ChatActionsDelay * 1e3);
+				sayMsg(StarterConfig.FirstJoinMessage);
 				delay(500);
 			}
 
@@ -359,12 +401,12 @@ MainSwitch:
 
 MainLoop:
 		for (n = 0; n < StarterConfig.Games.length; n += 1) {
-			regex = new RegExp("\\W*" + StarterConfig.Games[n].toLowerCase() + "\\d*", "gi");
+			regex = new RegExp("\\W+" + StarterConfig.Games[n].toLowerCase() + "\\d+", "gi");
 			joinInfo.gameName = fullText.match(regex);
 
 			if (joinInfo.gameName) {
 				joinInfo.gameName = joinInfo.gameName[joinInfo.gameName.length - 1].toString().replace(/^\W*/, ""); // use last match and trim it
-				joinInfo.gamePass = StarterConfig.Passwords[n];
+				joinInfo.gamePass = StarterConfig.Passwords[n] || "";
 
 				if (joinInfo.gameName !== joinInfo.oldGame) {
 					ControlAction.click(6, 652, 469, 120, 20);
@@ -385,8 +427,10 @@ MainLoop:
 		D2Bot.updateStatus("Join Game");
 
 		if (joinInfo.gameName !== "") {
+			print("ÿc2Joining ÿc0" + joinInfo.gameName);
+
 			if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].AnnounceGame === "boolean" && typeof AdvancedConfig[me.profile].AnnounceMessage === "string") {
-				say(AdvancedConfig[me.profile].AnnounceMessage + " " + joinInfo.gameName);
+				sayMsg(AdvancedConfig[me.profile].AnnounceMessage + " " + joinInfo.gameName);
 			}
 
 			if (retry === 0 || lastGameStatus === "pending") { // Only delay on first join - the rest is handled by GameDoesNotExistTimeout. Any other case is instant fail (ie. full game).

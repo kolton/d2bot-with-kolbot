@@ -112,6 +112,7 @@ ScriptLoop:
 
 							if (townCheck) {
 								print("ÿc2Starting script: ÿc9" + i);
+								scriptBroadcast(JSON.stringify({currScript: i}));
 
 								if (reconfiguration) {
 									print("ÿc2Copying Config properties from " + i + " object.");
