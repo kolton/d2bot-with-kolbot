@@ -1289,7 +1289,7 @@ MainLoop:
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
 				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
-					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]));
+					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]);
 
 					if (result) {
 						Misc.itemLogger("Stashed", items[i]);
