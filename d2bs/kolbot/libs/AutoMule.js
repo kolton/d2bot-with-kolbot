@@ -297,10 +297,12 @@ MainLoop:
 		if (this.torchCheck) {
 			print("ÿc4AutoMuleÿc0: In torch mule game.");
 			D2Bot.printToConsole("AutoMule: Transfering torch.", 7);
+			D2Bot.updateStatus("AutoMule: In game.");
 			this.dropTorch();
 		} else {
 			print("ÿc4AutoMuleÿc0: In mule game.");
 			D2Bot.printToConsole("AutoMule: Transfering items.", 7);
+			D2Bot.updateStatus("AutoMule: In game.");
 			this.dropStuff();
 		}
 

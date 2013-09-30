@@ -99,6 +99,10 @@ function DiabloHelper() {
 			throw new Error("Failed to kill Vizier");
 		}
 
+		if (Config.FieldID) {
+			Town.fieldID();
+		}
+
 		return true;
 	};
 
@@ -115,6 +119,10 @@ function DiabloHelper() {
 			throw new Error("Failed to kill de Seis");
 		}
 
+		if (Config.FieldID) {
+			Town.fieldID();
+		}
+
 		return true;
 	};
 
@@ -129,6 +137,10 @@ function DiabloHelper() {
 
 		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
+		}
+
+		if (Config.FieldID) {
+			Town.fieldID();
 		}
 
 		return true;

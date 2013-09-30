@@ -166,23 +166,9 @@ var Pather = {
 			if (getDistance(me, node) > 2) {
 				// Make life in Maggot Lair easier
 				if ([62, 63, 64].indexOf(me.area) > -1) {
-					adjustedNode = this.getNearestWalkable(node.x, node.y, 15, 3, 0x1|0x4|0x800|0x1000);
+					adjustedNode = this.getNearestWalkable(node.x, node.y, 15, 3, 0x1 | 0x4 | 0x800 | 0x1000);
 
 					if (adjustedNode) {
-						node.x = adjustedNode[0];
-						node.y = adjustedNode[1];
-					}
-				}
-
-				// Adjust town nodes to avoid objects and gaps
-				if (me.inTown) {
-					adjustedNode = this.getNearestWalkable(node.x, node.y, 4, 1, 0x1|0x400);
-
-					if (adjustedNode) {
-						if (node.x !== adjustedNode[0] || node.y !== adjustedNode[1]) {
-							print("Town node adjusted from " + node.x + " " + node.y + " to " + adjustedNode[0] + " " + adjustedNode[1]);
-						}
-
 						node.x = adjustedNode[0];
 						node.y = adjustedNode[1];
 					}
@@ -276,7 +262,7 @@ MainLoop:
 			minDist = me.inTown ? 2 : 4;
 		}
 
-		var nTimer,
+		var i, angle, angles, nTimer, whereToClick,
 			nFail = 0,
 			attemptCount = 0;
 
@@ -324,7 +310,21 @@ ModeLoop:
 						return false;
 					}
 
-					Misc.click(0, 0, me.x + rand(-1, 1) * 4, me.y + rand(-1, 1));
+					angle = Math.atan2(me.y - y, me.x - x);
+					angles = [Math.PI / 2, -Math.PI / 2];
+
+					for (i = 0; i < angles.length; i += 1) {
+						whereToClick = {
+							x: Math.round(Math.cos(angle + angles[i]) * 5 + me.x),
+							y: Math.round(Math.sin(angle + angles[i]) * 5 + me.y)
+						};
+
+						if (Attack.validSpot(whereToClick.x, whereToClick.y)) {
+							Misc.click(0, 0, whereToClick.x, whereToClick.y);
+
+							break;
+						}
+					}
 
 					break ModeLoop;
 				}
@@ -992,10 +992,12 @@ MainLoop:
 
 		for (dx = -1; dx <= 1; dx += 1) {
 			for (dy = -1; dy <= 1; dy += 1) {
-				value = CollMap.getColl(x + dx, y + dy, cacheOnly);
+				if (Math.abs(dx) !== Math.abs(dy)) {
+					value = CollMap.getColl(x + dx, y + dy, cacheOnly);
 
-				if (value & coll) {
-					return false;
+					if (value & coll) {
+						return false;
+					}
 				}
 			}
 		}

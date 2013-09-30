@@ -235,9 +235,13 @@ var ClassAttack = {
 
 			break;
 		case 1: // Monster
-			x = unit.x;
-			y = unit.y;
-			positions = [[x + size - 1, y + size - 1], [x + 2, y], [x, y + 3], [x - 2, y - 1]];
+			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targetx : unit.x;
+			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targety : unit.y;
+			positions = [[x + 2, y], [x, y + 3], [x - 2, y - 1]];
+
+			if (size === 3) {
+				positions.unshift([x + size - 1, y + size - 1]);
+			}
 
 			break;
 		}

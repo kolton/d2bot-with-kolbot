@@ -431,7 +431,7 @@ var Attack = {
 	},
 
 	// Clear an already formed array of monstas
-	clearList: function (mainArg, sortFunc) {
+	clearList: function (mainArg, sortFunc, refresh) {
 		var i, target, result, monsterList,
 			gidAttack = [],
 			attackCount = 0;
@@ -456,13 +456,14 @@ var Attack = {
 		}
 
 		while (monsterList.length > 0) {
-			delay(5);
+			if (refresh && attackCount > 0 && attackCount % refresh === 0) {
+				monsterList = mainArg.call();
+			}
 
 			if (me.dead) {
 				return false;
 			}
 
-			monsterList.sort(Sort.units);
 			monsterList.sort(sortFunc);
 
 			target = copyUnit(monsterList[0]);
@@ -927,6 +928,10 @@ var Attack = {
 			return false;
 		}
 
+		if (unit.area !== me.area) {
+			return false;
+		}
+
 		if (unit.type === 0 && unit.mode !== 17) { // Player
 			return true;
 		}
@@ -1240,7 +1245,7 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		if (distance < 5 && (!unit.hasOwnProperty("mode") || (unit.mode !== 0 && unit.mode !== 12))) {
-			me.overhead("Short range");
+			//me.overhead("Short range");
 
 			if (walk) {
 				if (getDistance(me, unit) > 8 || checkCollision(me, unit, coll)) {
@@ -1255,23 +1260,23 @@ AuraLoop: // Skip monsters with auras
 
 		var n, i, cx, cy, t,
 			coords = [],
+			fullDistance = distance,
+			name = unit.hasOwnProperty("name") ? unit.name : "",
 			angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
 			angles = [0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 135, -135, 180];
 
 		t = getTickCount();
 
-		CollMap.getNearbyRooms(unit.x, unit.y);
-
 		for (n = 0; n < 3; n += 1) {
 			if (n > 0) {
-				distance = Math.floor(distance / 2);
+				distance -= Math.floor(fullDistance / 3 - 1);
 			}
 
 			for (i = 0; i < angles.length; i += 1) {
 				cx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * distance + unit.x);
 				cy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * distance + unit.y);
 
-				if (Pather.checkSpot(cx, cy, 0x1, true)) {
+				if (Pather.checkSpot(cx, cy, 0x1, false)) {
 					coords.push({x: cx, y: cy});
 				}
 			}
@@ -1283,13 +1288,13 @@ AuraLoop: // Skip monsters with auras
 
 				for (i = 0; i < coords.length; i += 1) {
 					// Valid position found
-					if (!CollMap.checkColl(unit, {x: coords[i].x, y: coords[i].y}, coll, 2)) {
+					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, n > 0 ? 0 : 1)) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						if (walk) {
 							Pather.walkTo(coords[i].x, coords[i].y, 2);
 						} else {
-							Pather.moveTo(coords[i].x, coords[i].y, 0);
+							Pather.moveTo(coords[i].x, coords[i].y, 1);
 						}
 
 						return true;
@@ -1298,7 +1303,9 @@ AuraLoop: // Skip monsters with auras
 			}
 		}
 
-		print("optimal pos fail.");
+		if (name) {
+			print("Couldn't get to " + name);
+		}
 
 		return false;
 	}
