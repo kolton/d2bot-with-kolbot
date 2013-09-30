@@ -10,12 +10,16 @@ var CollMap = new function () {
 
 	this.getNearbyRooms = function (x, y) {
 		var i, room, rooms;
-		
+
 		room = getRoom(x, y);
-		
+
 		if (!room) {
 			return false;
 		}
+
+		/*if (!this.coordsInRoom(x, y, room)) {
+			D2Bot.printToConsole("Bad room added");
+		}*/
 
 		rooms = room.getNearby();
 
@@ -24,7 +28,7 @@ var CollMap = new function () {
 		}
 
 		for (i = 0; i < rooms.length; i += 1) {
-			if (this.getRoomIndex(rooms[i].x * 5, rooms[i].y * 5, true) === undefined) {
+			if (this.getRoomIndex(rooms[i].x * 5 + rooms[i].xsize / 2, rooms[i].y * 5 + rooms[i].ysize / 2, true) === undefined) {
 				this.addRoom(rooms[i]);
 			}
 		}
@@ -37,7 +41,7 @@ var CollMap = new function () {
 		
 		room = x instanceof Room ? x : getRoom(x, y);
 
-		if (room) {
+		if (room && this.coordsInRoom(x, y, room)) {
 			coll = room.getCollision();
 		}
 
@@ -114,13 +118,19 @@ var CollMap = new function () {
 		angle = Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x);
 		distance = Math.round(getDistance(unitA, unitB));
 
+		/*if (distance <= 1) {
+			print("dist fail");
+		}*/
+
 		for (i = 1; i < distance; i += 1) {
 			cx = Math.round((Math.cos(angle)) * i + unitB.x);
 			cy = Math.round((Math.sin(angle)) * i + unitB.y);
 
 			for (k = cx - thickness; k <= cx + thickness; k += 1) { // check thicker line
 				for (l = cy - thickness; l <= cy + thickness; l += 1) {
-					if (this.getColl(k, l) & coll) {
+					if (this.getColl(k, l, false) & coll) {
+						//print("coll check true: " + String(this.getColl(k, l, false)));
+
 						return true;
 					}
 				}

@@ -13,7 +13,7 @@ function AncientTunnels() {
 		Pickit.pickItems();
 	}
 
-	if (Config.AncientTunnels.KillDarkElder && Pather.moveToPreset(me.area, 1, 751)) {
+	if (Config.AncientTunnels.KillDarkElder && getPresetUnit(me.area, 1, 751) && Pather.moveToPreset(me.area, 1, 751)) {
 		Attack.clear(15, 0, getLocaleString(2886));
 	}
 

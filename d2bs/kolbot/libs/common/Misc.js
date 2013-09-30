@@ -23,7 +23,7 @@ var Skill = {
 
 		// No mana to cast
 		if (this.getManaCost(skillId) > me.mp) {
-			if (Config.AttackSkill.indexOf(skillId) > -1) {
+			if (Config.AttackSkill.indexOf(skillId) > -1 || skillId === 42) {
 				delay(200);
 			}
 

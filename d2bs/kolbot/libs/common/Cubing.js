@@ -101,6 +101,21 @@ var Cubing = {
 
 		//print("We have " + Config.Recipes.length + " cubing recipe(s).");
 
+		var i;
+
+		for (i = 0; i < Config.Recipes.length; i += 1) {
+			if (Config.Recipes[i].length > 1 && isNaN(Config.Recipes[i][1])) {
+				if (NTIPAliasClassID.hasOwnProperty(Config.Recipes[i][1].replace(/\s+/g, "").toLowerCase())) {
+					Config.Recipes[i][1] = NTIPAliasClassID[Config.Recipes[i][1].replace(/\s+/g, "").toLowerCase()];
+				} else {
+					Misc.errorReport("ÿc1Invalid cubing entry:ÿc0 " + Config.Recipes[i][1]);
+					Config.Recipes.splice(i, 1);
+
+					i -= 1;
+				}
+			}
+		}
+
 		this.buildRecipes();
 		this.buildGemList();
 		this.buildLists();
