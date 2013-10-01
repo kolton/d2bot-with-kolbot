@@ -681,7 +681,7 @@ var Attack = {
 			rooms.sort(RoomSort);
 			room = rooms.shift();
 
-			result = Pather.getNearestWalkable(room[0], room[1], 25, 5);
+			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
 			if (result) {
 				Pather.moveTo(result[0], result[1], 3);
@@ -1241,7 +1241,7 @@ AuraLoop: // Skip monsters with auras
 	// Find an optimal attack position and move or walk to it
 	getIntoPosition: function (unit, distance, coll, walk) {
 		if (!unit || !unit.x || !unit.y) {
-			throw new Error("getIntoPosition: Invalid Unit!");
+			return false;
 		}
 
 		if (distance < 5 && (!unit.hasOwnProperty("mode") || (unit.mode !== 0 && unit.mode !== 12))) {

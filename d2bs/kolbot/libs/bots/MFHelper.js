@@ -183,6 +183,14 @@ MainLoop:
 
 					split = command.split("kill ")[1];
 
+					for (i = 0; i < 5; i += 1) {
+						if (Pather.getPortal(player.area, player.name)) {
+							break;
+						}
+
+						delay(1000);
+					}
+
 					if (Pather.usePortal(player.area, player.name)) {
 						Precast.doPrecast(false);
 
@@ -202,9 +210,19 @@ MainLoop:
 						if (!me.inTown && !Pather.usePortal(null, player.name)) {
 							Town.goToTown();
 						}
+					} else {
+						print("Failed to use portal.");
 					}
 				} else if (command.indexOf("clearlevel") > -1) {
 					print("ÿc4MFHelperÿc0: Clear Level");
+
+					for (i = 0; i < 5; i += 1) {
+						if (Pather.getPortal(player.area, player.name)) {
+							break;
+						}
+
+						delay(1000);
+					}
 
 					if (Pather.usePortal(player.area, player.name)) {
 						Precast.doPrecast(false);
@@ -214,6 +232,8 @@ MainLoop:
 						if (!Pather.usePortal(null, player.name)) {
 							Town.goToTown();
 						}
+					} else {
+						print("Failed to use portal.");
 					}
 				} else if (command.indexOf("clear") > -1) {
 					print("ÿc4MFHelperÿc0: Clear");
@@ -238,11 +258,21 @@ MainLoop:
 						if (!me.inTown && !Pather.usePortal(null, player.name)) {
 							Town.goToTown();
 						}
+					} else {
+						print("Failed to use portal.");
 					}
 				} else if (command.indexOf("quit") > -1) {
 					break MainLoop;
 				} else if (command.indexOf("cows") > -1) {
 					print("ÿc4MFHelperÿc0: Clear Cows");
+
+					for (i = 0; i < 5; i += 1) {
+						if (Town.goToTown(1) && Pather.getPortal(39)) {
+							break;
+						}
+
+						delay(1000);
+					}
 
 					if (Pather.usePortal(39)) {
 						Precast.doPrecast(false);
@@ -252,9 +282,19 @@ MainLoop:
 						if (!Pather.usePortal(null, player.name)) {
 							Town.goToTown();
 						}
+					} else {
+						print("Failed to use portal.");
 					}
 				} else if (command.indexOf("council") > -1) {
 					print("ÿc4MFHelperÿc0: Kill Council");
+
+					for (i = 0; i < 5; i += 1) {
+						if (Pather.getPortal(player.area, player.name)) {
+							break;
+						}
+
+						delay(1000);
+					}
 
 					if (Pather.usePortal(player.area, player.name)) {
 						Precast.doPrecast(false);
@@ -263,6 +303,8 @@ MainLoop:
 						if (!Pather.usePortal(null, player.name)) {
 							Town.goToTown();
 						}
+					} else {
+						print("Failed to use portal.");
 					}
 				}
 			}
