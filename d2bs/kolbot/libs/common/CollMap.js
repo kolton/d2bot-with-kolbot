@@ -17,10 +17,6 @@ var CollMap = new function () {
 			return false;
 		}
 
-		/*if (!this.coordsInRoom(x, y, room)) {
-			D2Bot.printToConsole("Bad room added");
-		}*/
-
 		rooms = room.getNearby();
 
 		if (!rooms) {
@@ -38,10 +34,15 @@ var CollMap = new function () {
 
 	this.addRoom = function (x, y) {
 		var room, coll;
-		
+
 		room = x instanceof Room ? x : getRoom(x, y);
 
-		if (room && this.coordsInRoom(x, y, room)) {
+		// Coords are not in the returned room.
+		if (arguments.length === 2 && !this.coordsInRoom(x, y, room)) {
+			return false;
+		}
+
+		if (room) {
 			coll = room.getCollision();
 		}
 
@@ -118,10 +119,6 @@ var CollMap = new function () {
 		angle = Math.atan2(unitA.y - unitB.y, unitA.x - unitB.x);
 		distance = Math.round(getDistance(unitA, unitB));
 
-		/*if (distance <= 1) {
-			print("dist fail");
-		}*/
-
 		for (i = 1; i < distance; i += 1) {
 			cx = Math.round((Math.cos(angle)) * i + unitB.x);
 			cy = Math.round((Math.sin(angle)) * i + unitB.y);
@@ -129,8 +126,6 @@ var CollMap = new function () {
 			for (k = cx - thickness; k <= cx + thickness; k += 1) { // check thicker line
 				for (l = cy - thickness; l <= cy + thickness; l += 1) {
 					if (this.getColl(k, l, false) & coll) {
-						//print("coll check true: " + String(this.getColl(k, l, false)));
-
 						return true;
 					}
 				}
