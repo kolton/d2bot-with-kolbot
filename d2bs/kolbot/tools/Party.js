@@ -97,6 +97,7 @@ function main() {
 				while (player.getNext()) {
 					switch (Config.PublicMode) {
 					case 1: // Invite others
+					case 3: // Invite others but never accept
 						if (getPlayerFlag(me.gid, player.gid, 8)) {
 							if (Config.ShitList && shitList.indexOf(player.name) === -1) {
 								say(player.name + " has been shitlisted.");
@@ -116,7 +117,7 @@ function main() {
 							break;
 						}
 
-						if (player.partyflag !== 4 && player.partyid === 65535) {
+						if (player.partyflag !== 4 && (Config.PublicMode === 1 || player.partyflag !== 2) && player.partyid === 65535) {
 							clickParty(player, 2);
 							delay(100);
 						}
