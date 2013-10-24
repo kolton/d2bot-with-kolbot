@@ -82,7 +82,7 @@ var ClassAttack = {
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
 		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (this.skillRange[index] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
+			if (this.skillRange[index] < 4 && checkCollision(me, unit, 0x1) && !Attack.validSpot(unit.x, unit.y)) {
 				return 1;
 			}
 
@@ -189,7 +189,7 @@ var ClassAttack = {
 				}
 			}
 		} else if (Math.floor(getDistance(me, unit)) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
-			walk = Config.AttackSkill[atkSkill] !== 97 && (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+			walk = (Config.AttackSkill[atkSkill] !== 97 && (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) || me.getState(139) || me.getState(140);
 
 			// walk short distances instead of tele for melee attacks. teleport if failed to walk
 			if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, walk)) {

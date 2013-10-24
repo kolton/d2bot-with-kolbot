@@ -97,7 +97,7 @@ Unit.prototype.openMenu = function (addDelay) {
 
 	var i, j;
 
-	for (i = 0; i < 3; i += 1) {
+	for (i = 0; i < 5; i += 1) {
 		if (getDistance(me, this) > 3) {
 			Pather.moveToUnit(this);
 		}
@@ -106,16 +106,16 @@ Unit.prototype.openMenu = function (addDelay) {
 			Packet.flash(me.gid);
 		}
 
-		Misc.click(0, 0, this);
-		//this.interact();
+		//Misc.click(0, 0, this);
+		this.interact();
 		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 
 		for (j = 0; j < 40; j += 1) {
-			if (j % 10 === 0) {
+			if (j > 0 && j % 10 === 0) {
 				me.cancel();
 				delay(400);
-				Misc.click(0, 0, this);
-				//this.interact();
+				//Misc.click(0, 0, this);
+				this.interact();
 				//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 			}
 
@@ -219,6 +219,22 @@ Unit.prototype.buy = function (shiftBuy, gamble) {
 
 	return false;
 };
+
+// Item owner name
+Unit.prototype.__defineGetter__("parentName",
+	function () {
+		if (this.type !== 4) {
+			throw new Error("Unit.parentName: Must be used with item units.");
+		}
+
+		var parent = this.getParent();
+
+		if (parent) {
+			return parent.name;
+		}
+
+		return false;
+	});
 
 // You MUST use a delay after Unit.sell() if using custom scripts. delay(500) works best, dynamic delay is used when identifying/selling (500 - item id time)
 Unit.prototype.sell = function () {
@@ -595,6 +611,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 		}
 
 		break;
+	case 195: // itemskillonattack
 	case 198: // itemskillonhit
 	case 204: // itemchargedskill
 		if (subid === undefined) {

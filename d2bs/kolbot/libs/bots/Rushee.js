@@ -101,21 +101,23 @@ function Rushee() {
 			return false;
 		}
 
-		for (i = 0; i < 10; i += 1) {
+		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, npc) > 3) {
 				Pather.moveToUnit(npc);
 			}
 
 			npc.interact();
-			delay(2000 + me.ping);
+			delay(1000 + me.ping);
 			me.cancel();
 
-			if (Pather.usePortal(null) || Pather.usePortal(null, Config.Leader)) {
-				return true;
+			if (Pather.getPortal(null)) {
+				me.cancel();
+
+				break;
 			}
 		}
 
-		return false;
+		return Pather.usePortal(null) || Pather.usePortal(null, Config.Leader);
 	};
 
 	this.cubeStaff = function () {
@@ -289,13 +291,15 @@ function Rushee() {
 		return true;
 	};
 
-	// START
 	addEventListener("chatmsg",
 		function (who, msg) {
 			if (who === Config.Leader) {
 				actions.push(msg);
 			}
 		});
+
+	// START
+	Town.move("portalspot");
 
 	while (!leader) {
 		leader = this.findLeader(Config.Leader);
