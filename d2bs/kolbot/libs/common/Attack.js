@@ -314,7 +314,7 @@ var Attack = {
 			return true;
 		}
 
-		while (monsterList.length > 0) {
+		while (monsterList.length > 0 && attackCount < 300) {
 			if (boss) {
 				orgx = boss.x;
 				orgy = boss.y;
@@ -455,7 +455,7 @@ var Attack = {
 			sortFunc = this.sortMonsters;
 		}
 
-		while (monsterList.length > 0) {
+		while (monsterList.length > 0 && attackCount < 300) {
 			if (refresh && attackCount > 0 && attackCount % refresh === 0) {
 				monsterList = mainArg.call();
 			}
@@ -529,7 +529,7 @@ var Attack = {
 		return true;
 	},
 
-	securePosition: function (x, y, range, timer) {
+	securePosition: function (x, y, range, timer, skipBlocked) {
 		if (arguments.length < 4) {
 			throw new Error("securePosition needs 4 arguments");
 		}
@@ -547,6 +547,7 @@ var Attack = {
 			if (monster) {
 				do {
 					if (getDistance(monster, x, y) <= range && this.checkMonster(monster) &&
+							(!skipBlocked || !checkCollision(me, monster, 0x4)) &&
 							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54) || !checkCollision(me, monster, 0x1))) {
 						monList.push(copyUnit(monster));
 					}
@@ -775,7 +776,7 @@ var Attack = {
 		}
 
 		// Avoid non-walkable spots, objects
-		if (result === undefined || result & 0x1 || result & 0x400) {
+		if (result === undefined || (result & 0x1) || (result & 0x400)) {
 			return false;
 		}
 

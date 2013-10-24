@@ -29,8 +29,17 @@ var NodeAction = {
 			}
 		}
 
-		if (typeof Config.ClearPath === "number" && arg.clearPath === false) {
-			monList = Attack.getMob(-1, Config.ClearPath, 30);
+		if ((typeof Config.ClearPath === "number" || typeof Config.ClearPath === "object") && arg.clearPath === false) {
+			switch (typeof Config.ClearPath) {
+			case "number":
+				monList = Attack.getMob(-1, Config.ClearPath, 30);
+
+				break;
+			case "object":
+				monList = Attack.getMob(-1, Config.ClearPath.Spectype, Config.ClearPath.Range);
+
+				break;
+			}
 
 			if (monList) {
 				Attack.clearList(monList);
@@ -292,7 +301,8 @@ MainLoop:
 				return true;
 			}
 
-			Misc.click(0, 0, x, y);
+			//Misc.click(0, 0, x, y);
+			me.move(x, y);
 
 			attemptCount += 1;
 			nTimer = getTickCount();
@@ -320,7 +330,8 @@ ModeLoop:
 						};
 
 						if (Attack.validSpot(whereToClick.x, whereToClick.y)) {
-							Misc.click(0, 0, whereToClick.x, whereToClick.y);
+							//Misc.click(0, 0, whereToClick.x, whereToClick.y);
+							me.move(whereToClick.x, whereToClick.y);
 
 							break;
 						}
@@ -821,14 +832,16 @@ MainLoop:
 	},
 
 	usePortal: function (targetArea, owner, unit) {
-		if (me.inTown) {
-			me.cancel();
-		}
+		me.cancel();
 
 		var i, tick, portal, useTK,
 			preArea = me.area;
 
 		for (i = 0; i < 10; i += 1) {
+			if (me.dead) {
+				return false;
+			}
+
 			if (me.area !== preArea) {
 				return true;
 			}
@@ -1136,6 +1149,9 @@ MainLoop:
 
 					delay(1000);
 				}
+			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
+				this.moveToPreset(me.area, 5, 19);
+				this.useUnit(5, 19);
 			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 
@@ -1143,7 +1159,6 @@ MainLoop:
 					unit = getUnit(2, 357);
 
 					Misc.click(0, 0, unit);
-					//unit.interact();
 					delay(1000);
 					me.cancel();
 

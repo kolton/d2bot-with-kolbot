@@ -106,7 +106,7 @@ function main() {
 		}
 
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 25, 3000);
+		Attack.securePosition(me.x, me.y, 40, 3000, true);
 		say("1");
 
 		while (!this.playerIn()) {
@@ -143,7 +143,7 @@ function main() {
 			}
 
 			Pather.makePortal();
-			Attack.securePosition(me.x, me.y, 25, 3000);
+			Attack.securePosition(me.x, me.y, 30, 3000, true);
 			say("1");
 
 			while (!this.playerIn()) {
@@ -196,7 +196,7 @@ function main() {
 		}
 
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 25, 3000);
+		Attack.securePosition(me.x, me.y, 30, 3000, true);
 		say("1");
 
 		while (!this.playerIn()) {
@@ -306,7 +306,7 @@ function main() {
 		}
 
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 25, 3000);
+		Attack.securePosition(me.x, me.y, 30, 3000, true);
 		say("1");
 
 		while (!this.playerIn()) {
@@ -328,11 +328,12 @@ function main() {
 
 		Pather.teleport = false;
 
-		Pather.moveTo(22577, 15645);
+		Pather.moveTo(22579, 15706);
 
 		Pather.teleport = true;
 
-		Pather.moveTo(22577, 15609);
+		Pather.moveTo(22577, 15649, 10);
+		Pather.moveTo(22577, 15609, 10);
 		Pather.makePortal();
 		say("1");
 
@@ -387,7 +388,6 @@ function main() {
 		Precast.doPrecast(true);
 		Pather.moveToExit(102, true);
 		Pather.moveTo(17591, 8070);
-		Pather.makePortal();
 
 		var monsta,
 			monList = [];
@@ -408,6 +408,7 @@ function main() {
 		}
 
 		Pather.moveTo(17591, 8070);
+		Pather.makePortal();
 
 		monsta = getUnit(1, "hydra");
 

@@ -1219,7 +1219,7 @@ CursorLoop:
 			return true;
 		}
 
-		var i, tick,
+		var i, tick, dialog, lines,
 			npc = this.initNPC("Merc");
 
 		if (!npc) {
@@ -1228,12 +1228,24 @@ CursorLoop:
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			Misc.useMenu(0x1507);
+			dialog = getDialogLines();
 
-			tick = getTickCount();
+			for (lines = 0; lines < dialog.length; lines += 1) {
+				if (dialog[lines].text.match(":", "gi")) {
+					dialog[lines].handler();
+					delay(Math.max(750, me.ping * 2));
+				}
+
+				// "You do not have enough gold for that."
+				if (dialog[lines].text.match(getLocaleString(3362), "gi")) {
+					return false;
+				}
+			}
 
 			while (getTickCount() - tick < 2000) {
 				if (me.getMerc()) {
+					delay(Math.max(750, me.ping * 2));
+
 					break MainLoop;
 				}
 
@@ -1241,7 +1253,6 @@ MainLoop:
 			}
 		}
 
-		delay(Math.max(750, me.ping * 2));
 		Attack.checkInfinity();
 
 		return !!me.getMerc();
