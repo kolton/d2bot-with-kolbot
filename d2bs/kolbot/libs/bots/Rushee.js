@@ -1,7 +1,12 @@
+/**
+*	@filename	Rushee.js
+*	@author		kolton
+*	@desc		Rushee script that works with Rusher
+*/
+
 function Rushee() {
-	var quester, leader, target,
-		leaderName = Config.Leader,
-		action = "";
+	var act, leader, target,
+		actions = [];
 
 	this.findLeader = function (name) {
 		var party = getParty(name);
@@ -13,8 +18,45 @@ function Rushee() {
 		return false;
 	};
 
+	// Get leader's act from Party Unit
+	this.checkLeaderAct = function (unit) {
+		if (unit.area <= 39) {
+			return 1;
+		}
+
+		if (unit.area >= 40 && unit.area <= 74) {
+			return 2;
+		}
+
+		if (unit.area >= 75 && unit.area <= 102) {
+			return 3;
+		}
+
+		if (unit.area >= 103 && unit.area <= 108) {
+			return 4;
+		}
+
+		return 5;
+	};
+
+	this.checkQuest = function (id, state) {
+		sendPacket(1, 0x40);
+		delay(500);
+
+		return me.getQuest(id, state);
+	};
+
 	this.getQuestItem = function (classid, chestid) {
-		var chest, item;
+		var chest, item,
+			tick = getTickCount();
+
+		if (me.getItem(classid)) {
+			return true;
+		}
+
+		if (me.inTown) {
+			return false;
+		}
 
 		chest = getUnit(2, chestid);
 
@@ -27,10 +69,14 @@ function Rushee() {
 		item = getUnit(4, classid);
 
 		if (!item) {
+			if (getTickCount() - tick < 500) {
+				delay(500);
+			}
+
 			return false;
 		}
 
-		return Pickit.pickItem(item);
+		return Pickit.pickItem(item) && delay(1000);
 	};
 
 	this.checkQuestMonster = function (classid) {
@@ -55,16 +101,16 @@ function Rushee() {
 			return false;
 		}
 
-		for (i = 0; i < 5; i += 1) {
+		for (i = 0; i < 10; i += 1) {
 			if (getDistance(me, npc) > 3) {
 				Pather.moveToUnit(npc);
 			}
 
 			npc.interact();
-			delay(500);
+			delay(2000 + me.ping);
 			me.cancel();
 
-			if (Pather.usePortal(null)) {
+			if (Pather.usePortal(null) || Pather.usePortal(null, Config.Leader)) {
 				return true;
 			}
 		}
@@ -93,6 +139,7 @@ function Rushee() {
 
 	this.placeStaff = function () {
 		var staff,
+			tick = getTickCount(),
 			orifice = getUnit(2, 152);
 
 		if (!orifice) {
@@ -104,23 +151,30 @@ function Rushee() {
 		staff = me.getItem(91);
 
 		if (!staff) {
+			if (getTickCount() - tick < 500) {
+				delay(500);
+			}
+
 			return false;
 		}
 
 		staff.toCursor();
 		submitItem();
-		delay(250 + me.ping);
+		delay(750 + me.ping);
 
 		return true;
 	};
 
 	this.changeAct = function (act) {
-		var npc, check,
+		var npc,
 			preArea = me.area;
 
 		if (me.mode === 17) {
 			me.revive();
-			delay(2000);
+
+			while (!me.inTown) {
+				delay(500);
+			}
 		}
 
 		if (me.act === act) {
@@ -187,7 +241,7 @@ function Rushee() {
 					}
 
 					me.cancel();
-					Pather.usePortal(102, leaderName);
+					Pather.usePortal(102, Config.Leader);
 				}
 
 				Pather.moveTo(17591, 8070);
@@ -208,7 +262,8 @@ function Rushee() {
 				}
 
 				me.cancel();
-				Pather.usePortal(null);
+				Pather.useUnit(2, 566, 109);
+
 				break;
 			}
 
@@ -226,13 +281,6 @@ function Rushee() {
 				return false;
 			}
 
-			if (AutoRush.Target.length && me.diff === AutoRush.Target[0] && me.act === AutoRush.Target[1]) {
-				AutoRush.finishRush();
-				D2Bot.restart();
-
-				return true;
-			}
-
 			say("Act change done.");
 		} catch (e) {
 			return false;
@@ -241,266 +289,414 @@ function Rushee() {
 		return true;
 	};
 
-
+	// START
 	addEventListener("chatmsg",
 		function (who, msg) {
-			if (who === leaderName) {
-				action = msg;
+			if (who === Config.Leader) {
+				actions.push(msg);
 			}
-		}
-		);
+		});
 
 	while (!leader) {
-		leader = this.findLeader(leaderName);
-		
+		leader = this.findLeader(Config.Leader);
+
 		delay(500);
 	}
 
 	say("Leader found.");
-	
+
 	while (true) {
-		switch (action) {
-		case "1":
-			while (!leader.area) {
-				delay(500);
-			}
+		try {
+			if (actions.length > 0) {
+				switch (actions[0]) {
+				case "1":
+					print("command: 1");
 
-			if (!quester) {
-				break;
-			}
-
-			switch (leader.area) {
-			case 37: // Catacombs level 4
-				Pather.usePortal(37, leaderName);
-				this.checkQuestMonster(156);
-
-				if (me.mode === 17) {
-					me.revive();
-					
-					while (!me.inTown) {
+					while (!leader.area) {
 						delay(500);
 					}
-				} else {
-					Pather.usePortal(1, leaderName);
-				}
 
-				this.changeAct(2);
+					if (!Config.Rushee.Quester) {
+						actions.shift();
 
-				action = "";
-
-				break;
-			case 60: // Halls of the Dead level 3
-				Pather.usePortal(60, leaderName);
-				this.getQuestItem(549, 354);
-				Pather.usePortal(40, leaderName);
-
-				action = "";
-
-				break;
-			case 61: // Claw Viper Temple level 2
-				Pather.usePortal(61, leaderName);
-				this.getQuestItem(521, 149);
-				Pather.usePortal(40, leaderName);
-				Town.move("drognan");
-
-				target = getUnit(1, "drognan");
-
-				if (target) {
-					target.openMenu();
-					me.cancel();
-				}
-
-				Town.move("portalspot");
-				say("drognan done");
-
-				action = "";
-
-				break;
-			case 64: // Maggot Lair level 3
-				Pather.usePortal(64, leaderName);
-				this.getQuestItem(92, 356);
-				Pather.usePortal(40, leaderName);
-				this.cubeStaff();
-
-				action = "";
-
-				break;
-			case 74: // Arcane Sanctuary
-				Pather.usePortal(74, leaderName);
-				this.checkQuestMonster(250);
-
-				if (me.mode === 17) {
-					me.revive();
-					
-					while (!me.inTown) {
-						delay(500);
+						break;
 					}
-				} else {
-					Pather.usePortal(40, leaderName);
-				}
 
-				Town.move("atma");
+					act = this.checkLeaderAct(leader);
 
-				target = getUnit(1, "atma");
-
-				if (target) {
-					target.openMenu();
-					me.cancel();
-				}
-
-				Town.move("portalspot");
-
-				action = "";
-
-				break;
-			case 66: // Tal Rasha's Tombs
-			case 67:
-			case 68:
-			case 69:
-			case 70:
-			case 71:
-			case 72:
-				Pather.usePortal(null, leaderName);
-				this.placeStaff();
-				Pather.usePortal(40, leaderName);
-
-				action = "";
-
-				break;
-			case 73: // Duriel's Lair
-				Pather.usePortal(73, leaderName);
-				this.tyraelTalk();
-				this.changeAct(3);
-
-				action = "";
-
-				break;
-			case 83: // Travincal
-				Pather.usePortal(83, leaderName);
-				this.checkQuestMonster(getLocaleString(2863));
-				this.checkQuestMonster(getLocaleString(2862));
-				this.checkQuestMonster(getLocaleString(2860));
-
-				if (me.mode === 17) {
-					me.revive();
-					
-					while (!me.inTown) {
-						delay(500);
+					if (me.act !== act) {
+						Town.goToTown(act);
+						Town.move("portalspot");
 					}
-				} else {
-					Pather.usePortal(75, leaderName);
-				}
 
-				Town.move("cain");
+					switch (leader.area) {
+					case 37: // Catacombs level 4
+						if (!Pather.usePortal(37, Config.Leader)) {
+							break;
+						}
 
-				target = getUnit(1, "deckard cain");
+						target = Pather.getPortal(null, Config.Leader);
 
-				if (target) {
-					target.openMenu();
-					me.cancel();
-				}
+						if (target) {
+							Pather.walkTo(target.x, target.y);
+						}
 
-				Town.move("portalspot");
+						actions.shift();
 
-				action = "";
+						break;
+					case 60: // Halls of the Dead level 3
+						Pather.usePortal(60, Config.Leader);
+						this.getQuestItem(549, 354);
+						Pather.usePortal(40, Config.Leader);
 
-				break;
-			case 102: // Durance of Hate level 3
-				Pather.usePortal(102, leaderName);
-				this.checkQuestMonster(242);
+						actions.shift();
 
-				if (me.mode === 17) {
-					me.revive();
-					
-					while (!me.inTown) {
+						break;
+					case 61: // Claw Viper Temple level 2
+						Pather.usePortal(61, Config.Leader);
+						this.getQuestItem(521, 149);
+						Pather.usePortal(40, Config.Leader);
+						Town.move("drognan");
+
+						target = getUnit(1, "drognan");
+
+						if (target && target.openMenu()) {
+							actions.shift();
+							me.cancel();
+							say("drognan done");
+						}
+
+						Town.move("portalspot");
+
+						break;
+					case 64: // Maggot Lair level 3
+						Pather.usePortal(64, Config.Leader);
+						this.getQuestItem(92, 356);
 						delay(500);
-					}
-					
-					Town.move("portalspot");
-					Pather.usePortal(102, leaderName);
-				}
+						Pather.usePortal(40, Config.Leader);
+						this.cubeStaff();
 
-				this.changeAct(4);
+						actions.shift();
 
-				action = "";
+						break;
+					case 74: // Arcane Sanctuary
+						if (!Pather.usePortal(74, Config.Leader)) {
+							break;
+						}
 
-				break;
-			case 108: // Chaos Sanctuary
-				Pather.usePortal(108, leaderName);
+						actions.shift();
 
-				while (!getUnit(1, 243)) {
-					delay(500);
-				}
+						break;
+					case 66: // Tal Rasha's Tombs
+					case 67:
+					case 68:
+					case 69:
+					case 70:
+					case 71:
+					case 72:
+						Pather.usePortal(null, Config.Leader);
+						this.placeStaff();
+						Pather.usePortal(40, Config.Leader);
+						actions.shift();
 
-				this.checkQuestMonster(243);
-				
-				if (me.gametype === 0) {
-					//quitGame();
-					quit();
-				} else {
-					if (me.mode === 17) {
-						me.revive();
-						
-						while (!me.inTown) {
+						break;
+					case 73: // Duriel's Lair
+						Pather.usePortal(73, Config.Leader);
+						this.tyraelTalk();
+
+						actions.shift();
+
+						break;
+					case 83: // Travincal
+						if (me.inTown) {
+							if (!Pather.usePortal(83, Config.Leader)) {
+								me.cancel();
+
+								break;
+							}
+
+							target = Pather.getPortal(null, Config.Leader);
+
+							if (target) {
+								Pather.walkTo(target.x, target.y);
+							}
+						}
+
+						actions.shift();
+
+						break;
+					case 102: // Durance of Hate level 3
+						if (me.area === 75) {
+							Pather.usePortal(102, Config.Leader);
+						}
+
+						if (me.area === 102) {
+							//this.checkQuestMonster(242);
+							while (leader.area === me.area) {
+								delay(500);
+							}
+
+							if (me.mode === 17) {
+								me.revive();
+
+								while (!me.inTown) {
+									delay(500);
+								}
+
+								Town.move("portalspot");
+								Pather.usePortal(102, Config.Leader);
+							}
+
+							actions.shift();
+						}
+
+						break;
+					case 108: // Chaos Sanctuary
+						Pather.usePortal(108, Config.Leader);
+
+						while (!getUnit(1, 243)) {
 							delay(500);
 						}
+
+						Pather.moveTo(7763, 5267);
+						this.checkQuestMonster(243);
+
+						if (me.gametype === 0) {
+							D2Bot.restart();
+						} else {
+							if (me.mode === 17) {
+								me.revive();
+
+								while (!me.inTown) {
+									delay(500);
+								}
+							}
+
+							Pather.usePortal(103, Config.Leader);
+						}
+
+						actions.shift();
+
+						break;
+					default: // unsupported area
+						actions.shift();
+
+						break;
 					}
-					
-					Pather.usePortal(103, leaderName);
-					this.changeAct(5);
+
+					break;
+				case "2": // Go back to town and check quest
+					print("command: 2");
+
+					// If dying, wait until animation is over
+					while (me.mode === 0) {
+						delay(40);
+					}
+
+					// Revive if dead
+					if (me.mode === 17) {
+						me.revive();
+
+						// Wait until revive is complete
+						while (!me.inTown) {
+							delay(40);
+						}
+					}
+
+					switch (me.area) {
+					case 1:
+					case 37: // Catacombs level 4
+						// Go to town if not there, break if procedure fails
+						if (!me.inTown && !Pather.usePortal(1, Config.Leader)) {
+							break;
+						}
+
+						if (!this.checkQuest(6, 4)) {
+							D2Bot.printToConsole("Andariel quest failed", 9);
+							quit();
+						}
+
+						actions.shift();
+
+						break;
+					case 40:
+					case 74: // Arcane Sanctuary
+						if (!me.inTown && !Pather.usePortal(40, Config.Leader)) {
+							break;
+						}
+
+						Town.move("atma");
+
+						target = getUnit(1, 176); // Atma
+
+						if (target && target.openMenu()) {
+							me.cancel();
+						} else {
+							break;
+						}
+
+						if (!this.checkQuest(13, 0)) {
+							D2Bot.printToConsole("Summoner quest failed", 9);
+							quit();
+						}
+
+						Town.move("portalspot");
+						actions.shift();
+
+						break;
+					case 75:
+					case 83: // Travincal
+						if (!me.inTown && !Pather.usePortal(75, Config.Leader)) {
+							break;
+						}
+
+						Town.move("cain");
+
+						target = getUnit(1, NPC.Cain);
+
+						if (target && target.openMenu()) {
+							me.cancel();
+						} else {
+							break;
+						}
+
+						if (!this.checkQuest(21, 0)) {
+							D2Bot.printToConsole("Travincal quest failed", 9);
+							quit();
+						}
+
+						Town.move("portalspot");
+						actions.shift();
+
+						break;
+					}
+
+					break;
+				case "3": // Bumper
+					if (!Config.Rushee.Bumper) {
+						break;
+					}
+
+					while (!leader.area) {
+						delay(500);
+					}
+
+					act = this.checkLeaderAct(leader);
+
+					if (me.act !== act) {
+						Town.goToTown(act);
+						Town.move("portalspot");
+					}
+
+					switch (leader.area) {
+					case 120: // Arreat Summit
+						if (!Pather.usePortal(120, Config.Leader)) {
+							break;
+						}
+
+						// Wait until portal is gone
+						while (Pather.getPortal(109, Config.Leader)) {
+							delay(500);
+						}
+
+						// Wait until portal is up again
+						while (!Pather.getPortal(109, Config.Leader)) {
+							delay(500);
+						}
+
+						if (!Pather.usePortal(109, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
+					case 132: // Worldstone Chamber
+						if (!Pather.usePortal(132, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
+					}
+
+					break;
+				case "quit":
+					quit();
+
+					break;
+				case "exit":
+					D2Bot.restart();
+
+					break;
+				case "a2":
+					if (!this.changeAct(2)) {
+						break;
+					}
+
+					target = getUnit(1, "jerhyn");
+
+					if (target) {
+						target.openMenu();
+					}
+
+					me.cancel();
+
+					if (Config.Rushee.Quester) {
+						Town.move("portalspot");
+					} else {
+						Town.move("palace");
+					}
+
+					actions.shift();
+
+					break;
+				case "a3":
+					if (!this.changeAct(3)) {
+						break;
+					}
+
+					Town.move("portalspot");
+					actions.shift();
+
+					break;
+				case "a4":
+					if (!this.changeAct(4)) {
+						break;
+					}
+
+					Town.move("portalspot");
+					actions.shift();
+
+					break;
+				case "a5":
+					if (!this.changeAct(5)) {
+						break;
+					}
+
+					Town.move("portalspot");
+					actions.shift();
+
+					break;
+				default: // Invalid command
+					actions.shift();
+
+					break;
 				}
-
-				action = "";
-
-				break;
 			}
+		} catch (e) {
+			if (me.mode === 17) {
+				me.revive();
 
-			break;
-		case me.name + " quest":
-			say("I am quester.");
-
-			quester = true;
-			action = "";
-
-			break;
-		case "quit":
-			quit();
-			break;
-		case "exit":
-			quitGame();
-			break;
-		case "a2":
-			if (!quester && me.act !== 2) {
-				this.changeAct(2);
+				while (!me.inTown) {
+					delay(500);
+				}
 			}
+		}
 
-			action = "";
-
-			break;
-		case "a3":
-			if (!quester && me.act !== 3) {
-				this.changeAct(3);
-			}
-
-			action = "";
-
-			break;
-		case "a4":
-			if (!quester && me.act !== 4) {
-				this.changeAct(4);
-			}
-
-			action = "";
-
-			break;
-		case "a5":
-			if (!quester && me.act !== 5) {
-				this.changeAct(5);
-			}
-
-			action = "";
-
-			break;
+		if (getUIFlag(0x17)) {
+			me.cancel();
 		}
 
 		delay(500);

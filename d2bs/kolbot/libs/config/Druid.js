@@ -154,6 +154,10 @@ function LoadConfig() {
 		Config.OrgTorch.UseSalvation = true; // Use Salvation aura on Mephisto (if possible)
 		Config.OrgTorch.GetFade = false; // Get fade by standing in a fire. You MUST have Last Wish or Treachery on your character being worn.
 	Scripts.Rusher = false; // Rush bot alpha version (no questing yet, only rushing), for a list of commands, see Rusher.js
+		Config.Rusher.WaitPlayerCount = 0; // Wait until game has a certain number of players (0 - don't wait, 8 - wait for full game).
+	Scripts.Rushee = false; // Automatic rushee, works with Rusher
+		Config.Rushee.Quester = false; // Enter portals and get quest items.
+		Config.Rushee.Bumper = false; // Do Ancients and Baal. Minimum levels: 20 - norm, 40 - nightmare
 	Scripts.CrushTele = false; // classic rush teleporter. go to area of interest and press "-" numpad key
 	Scripts.Questing = false; // solves missing quests (skill/stat+shenk)
 	Scripts.Gamble = false; // Gambling system, other characters will mule gold into your game so you can gamble infinitely. See Gambling.js
@@ -271,7 +275,7 @@ function LoadConfig() {
 	Config.FieldID = false; // Identify items in the field instead of going to town.
 
 	// Repair settings
-	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune.
+	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
 	Config.RepairPercent = 40; // Durability percent of any equipped item that will trigger repairs.
 
 	// Gambling config

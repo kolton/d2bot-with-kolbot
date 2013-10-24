@@ -423,5 +423,12 @@ var Config = {
 	},
 	ClearAnyArea: {
 		AreaList: []
+	},
+	Rusher: {
+		WaitPlayerCount: 0
+	},
+	Rushee: {
+		Quester: false,
+		Bumper: false
 	}
 };

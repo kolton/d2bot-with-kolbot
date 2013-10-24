@@ -16,17 +16,72 @@ function Rusher() {
 	load("tools/rushthread.js");
 	delay(500);
 
-	var rushThread, command, master, commandSplit0,
-		commands = [];
+	var i, rushThread, command, master, commandSplit0,
+		commands = [],
+		sequence = ["andariel", "cube", "amulet", "staff", "summoner", "duriel", "travincal", "mephisto", "diablo", "ancients", "baal"];
 
 	rushThread = getScript("tools/rushthread.js");
 
 	this.reloadThread = function () {
-		rushThread.stop();
-		load("tools/rushthread.js");
+		rushThread = getScript("tools/rushthread.js");
+
+		if (rushThread) {
+			rushThread.stop();
+		}
+
 		delay(500);
+		load("tools/rushthread.js");
 
 		rushThread = getScript("tools/rushthread.js");
+	};
+
+	this.getPlayerCount = function () {
+		var count = 0,
+			party = getParty();
+
+		if (party) {
+			do {
+				count += 1;
+			} while (party.getNext());
+		}
+
+		return count;
+	};
+
+	this.getPartyAct = function () {
+		var party = getParty(),
+			minArea = 999;
+
+		do {
+			if (party.name !== me.name) {
+				while (!party.area) {
+					me.overhead("Waiting for party area info");
+					delay(500);
+				}
+
+				if (party.area < minArea) {
+					minArea = party.area;
+				}
+			}
+		} while (party.getNext());
+
+		if (minArea <= 39) {
+			return 1;
+		}
+
+		if (minArea >= 40 && minArea <= 74) {
+			return 2;
+		}
+
+		if (minArea >= 75 && minArea <= 102) {
+			return 3;
+		}
+
+		if (minArea >= 103 && minArea <= 108) {
+			return 4;
+		}
+
+		return 5;
 	};
 
 	this.chatEvent = function (nick, msg) {
@@ -62,10 +117,12 @@ function Rusher() {
 
 				break;
 			default:
-				if (nick === master) {
-					commands.push(msg);
-				} else {
-					say("I'm only accepting commands from my master.");
+				if (msg && msg.match(/^do \w|^clear \d/gi)) {
+					if (nick === master) {
+						commands.push(msg);
+					} else {
+						say("I'm only accepting commands from my master.");
+					}
 				}
 
 				break;
@@ -74,6 +131,37 @@ function Rusher() {
 	};
 
 	addEventListener("chatmsg", this.chatEvent);
+
+	while (this.getPlayerCount() < Math.min(8, Config.Rusher.WaitPlayerCount)) {
+		me.overhead("Waiting for players to join");
+		delay(500);
+	}
+
+	// Skip to a higher act if all party members are there
+	switch (this.getPartyAct()) {
+	case 2:
+		say("Party is in act 2, starting from act 2");
+		rushThread.send("skiptoact 2");
+
+		break;
+	case 3:
+		say("Party is in act 3, starting from act 3");
+		rushThread.send("skiptoact 3");
+
+		break;
+	case 4:
+		say("Party is in act 4, starting from act 4");
+		rushThread.send("skiptoact 4");
+
+		break;
+	case 5:
+		say("Party is in act 5, starting from act 5");
+		rushThread.send("skiptoact 5");
+
+		break;
+	}
+
+	delay(200);
 	rushThread.send("go");
 
 	while (true) {
@@ -100,12 +188,26 @@ function Rusher() {
 					break;
 				}
 
-				if (commandSplit0 === "do") {
-					this.reloadThread();
-					rushThread.send(command.split(" ")[1]);
-				} else if (commandSplit0 === "clear") {
-					this.reloadThread();
-					rushThread.send(command);
+				if (commandSplit0.toLowerCase() === "do") {
+					for (i = 0; i < sequence.length; i += 1) {
+						if (command.split(" ")[1] && sequence[i].match(command.split(" ")[1], "gi")) {
+							this.reloadThread();
+							rushThread.send(command.split(" ")[1]);
+
+							break;
+						}
+					}
+
+					if (i === sequence.length) {
+						say("Invalid sequence");
+					}
+				} else if (commandSplit0.toLowerCase() === "clear") {
+					if (!isNaN(parseInt(command.split(" ")[1], 10)) && parseInt(command.split(" ")[1], 10) > 0 && parseInt(command.split(" ")[1], 10) <= 132) {
+						this.reloadThread();
+						rushThread.send(command);
+					} else {
+						say("Invalid area");
+					}
 				}
 
 				break;
