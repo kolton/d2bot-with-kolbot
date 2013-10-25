@@ -275,7 +275,11 @@ MainLoop:
 			nFail = 0,
 			attemptCount = 0;
 
-		if (me.runwalk === 0) {
+		if (me.runwalk === 1 && me.stamina / me.staminamax * 100 <= 20) {
+			me.runwalk = 0;
+		}
+
+		if (me.runwalk === 0 && me.stamina / me.staminamax * 100 >= 50) {
 			me.runwalk = 1;
 		}
 

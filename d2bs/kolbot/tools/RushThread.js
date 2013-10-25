@@ -73,7 +73,7 @@ function main() {
 
 		return false;
 	};
-	
+
 	this.playersInAct = function (act) {
 		var area, party,
 			areas = [0, 1, 40, 75, 103, 109];
@@ -170,7 +170,13 @@ function main() {
 		}
 
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 25, 3000);
+
+		if (me.diff < 2) {
+			Attack.securePosition(me.x, me.y, 25, 3000);
+		} else {
+			Attack.securePosition(me.x, me.y, 25, 100, 0x1);
+		}
+
 		say("1");
 
 		while (!this.playerIn()) {
@@ -306,7 +312,13 @@ function main() {
 		}
 
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 30, 3000, true);
+
+		if (me.diff < 2) {
+			Attack.securePosition(me.x, me.y, 30, 3000, true);
+		} else {
+			Attack.securePosition(me.x, me.y, 30, 100, true);
+		}
+
 		say("1");
 
 		while (!this.playerIn()) {
@@ -684,6 +696,7 @@ function main() {
 
 		Attack.clear(50);
 		Pather.moveTo(10089, 12622);
+		me.cancel();
 		Pather.makePortal();
 
 		while (this.playerIn()) {
@@ -949,6 +962,7 @@ MainLoop:
 		}
 
 		Pather.makePortal();
+		delay(1000);
 		say("3");
 
 		while (!this.playerIn()) {
@@ -1087,7 +1101,7 @@ MainLoop:
 				if (izual && getDistance(monster, izual) > 35) {
 					try {
 						Attack.kill(monster);
-					} catch (e) {
+					} catch (e2) {
 
 					}
 				} else {
