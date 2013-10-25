@@ -244,6 +244,8 @@ function Rushee() {
 
 					me.cancel();
 					Pather.usePortal(102, Config.Leader);
+				} else {
+					delay(1500);
 				}
 
 				Pather.moveTo(17591, 8070);
@@ -299,7 +301,9 @@ function Rushee() {
 		});
 
 	// START
-	Town.move("portalspot");
+	if (me.inTown) {
+		Town.move("portalspot");
+	}
 
 	while (!leader) {
 		leader = this.findLeader(Config.Leader);

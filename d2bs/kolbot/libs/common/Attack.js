@@ -536,6 +536,10 @@ var Attack = {
 
 		var monster, monList, tick;
 
+		if (skipBlocked === true) {
+			skipBlocked = 0x4;
+		}
+
 		while (true) {
 			if (getDistance(me, x, y) > 5) {
 				Pather.moveTo(x, y);
@@ -546,8 +550,8 @@ var Attack = {
 
 			if (monster) {
 				do {
-					if (getDistance(monster, x, y) <= range && this.checkMonster(monster) &&
-							(!skipBlocked || !checkCollision(me, monster, 0x4)) &&
+					if (getDistance(monster, x, y) <= range && this.checkMonster(monster) && this.canAttack(monster) &&
+							(!skipBlocked || !checkCollision(me, monster, skipBlocked)) &&
 							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54) || !checkCollision(me, monster, 0x1))) {
 						monList.push(copyUnit(monster));
 					}
@@ -572,7 +576,7 @@ var Attack = {
 				}
 			}
 
-			delay(200);
+			delay(100);
 		}
 
 		return true;
@@ -1214,6 +1218,27 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		return this.getResist(unit, type) < maxres;
+	},
+
+	// Check if we have valid skills to attack a monster
+	canAttack: function (unit) {
+		if (unit.type === 1) {
+			if (unit.spectype & 0x7) { // Unique/Champion
+				if (Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[1])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[2]))) {
+					return true;
+				}
+			} else {
+				if (Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[3])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[4]))) {
+					return true;
+				}
+			}
+
+			if (Config.AttackSkill.length === 7) {
+				return Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[5])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[6]));
+			}
+		}
+
+		return false;
 	},
 
 	// Detect use of bows/crossbows
