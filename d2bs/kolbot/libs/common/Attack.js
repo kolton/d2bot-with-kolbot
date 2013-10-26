@@ -529,7 +529,7 @@ var Attack = {
 		return true;
 	},
 
-	securePosition: function (x, y, range, timer, skipBlocked) {
+	securePosition: function (x, y, range, timer, skipBlocked, special) {
 		if (arguments.length < 4) {
 			throw new Error("securePosition needs 4 arguments");
 		}
@@ -573,6 +573,18 @@ var Attack = {
 				// reset the timer when there's monsters in range
 				if (tick) {
 					tick = false;
+				}
+			}
+
+			if (special) {
+				switch (me.classid) {
+				case 3: // Paladin Redemption addon
+					if (me.getSkill(124, 1)) {
+						Skill.setSkill(124, 0);
+						delay(1000);
+					}
+
+					break;
 				}
 			}
 
