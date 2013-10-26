@@ -354,7 +354,7 @@ MainSwitch:
 		if (ingame) {
 			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
 				break;
 			}
 
@@ -413,7 +413,7 @@ MainSwitch:
 		if (ingame) {
 			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
 				break;
 			}
 
