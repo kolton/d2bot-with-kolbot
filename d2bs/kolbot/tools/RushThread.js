@@ -174,7 +174,7 @@ function main() {
 		if (me.diff < 2) {
 			Attack.securePosition(me.x, me.y, 25, 3000);
 		} else {
-			Attack.securePosition(me.x, me.y, 25, 100, 0x1);
+			Attack.securePosition(me.x, me.y, 25, 3000, true, true);
 		}
 
 		say("1");
@@ -316,7 +316,7 @@ function main() {
 		if (me.diff < 2) {
 			Attack.securePosition(me.x, me.y, 30, 3000, true);
 		} else {
-			Attack.securePosition(me.x, me.y, 30, 100, true);
+			Attack.securePosition(me.x, me.y, 25, 3000, true, true);
 		}
 
 		say("1");

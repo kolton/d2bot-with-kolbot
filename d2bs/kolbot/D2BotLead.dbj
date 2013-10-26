@@ -264,18 +264,23 @@ function main() {
 	}
 
 	if (gameInfo.error) {
-		D2Bot.retrieve();
+		//D2Bot.retrieve();
 		delay(200);
 
-		if (gameInfo.crashInfo) {
-			D2Bot.printToConsole("Crash Info: Script: " + gameInfo.crashInfo.currScript + " Area: " + gameInfo.crashInfo.area, 10);
-		}
+		/*if (!!DataFile.getStats().debugInfo) {
+			D2Bot.printToConsole("Crash at " + DataFile.getStats().debugInfo, 10);
+			DataFile.updateStats("debugInfo", false);
+		}*/
+
+		/*if (gameInfo.crashInfo) {
+			D2Bot.printToConsole("Crash Info: Script: " + gameInfo.crashInfo.currScript + " Area: " + gameInfo.crashInfo.area + (gameInfo.crashInfo.hasOwnProperty("lastAction") ? " " + gameInfo.crashInfo.lastAction : ""), 10);
+		}*/
 
 		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
 
-	D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+	//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -347,9 +352,9 @@ MainSwitch:
 		}
 
 		if (ingame) {
-			D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
 				break;
 			}
 
@@ -406,9 +411,9 @@ MainSwitch:
 		}
 
 		if (ingame) {
-			D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
 				break;
 			}
 
@@ -772,10 +777,10 @@ MainSwitch:
 	case 42: // Empty character screen
 		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
 			ControlAction.click(6, 33, 572, 128, 35);
-		}
 
-		if (gameInfo.rdBlocker) {
-			D2Bot.restart();
+			if (gameInfo.rdBlocker) {
+				D2Bot.restart();
+			}
 		}
 
 		break;

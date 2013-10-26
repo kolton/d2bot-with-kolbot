@@ -306,6 +306,10 @@ function main() {
 			}
 
 			break;
+		case 102:
+			Misc.spy(me.name);
+
+			break;
 		case 109: // Numpad -
 			Misc.spy(me.name);
 
@@ -406,10 +410,16 @@ function main() {
 				return;
 			}
 
-			if (obj && obj.hasOwnProperty("currScript")) {
-				debugInfo.currScript = obj.currScript;
+			if (obj) {
+				if (obj.hasOwnProperty("currScript")) {
+					debugInfo.currScript = obj.currScript;
+				}
 
-				D2Bot.store(JSON.stringify(debugInfo));
+				if (obj.hasOwnProperty("lastAction")) {
+					debugInfo.lastAction = obj.lastAction;
+				}
+
+				//D2Bot.store(JSON.stringify(debugInfo));
 			}
 
 			break;
@@ -538,11 +548,11 @@ function main() {
 			break;
 		}
 		
-		if (debugInfo.area !== me.area) {
+		/*if (debugInfo.area !== me.area) {
 			debugInfo.area = me.area;
 
 			D2Bot.store(JSON.stringify(debugInfo));
-		}
+		}*/
 
 		delay(20);
 	}

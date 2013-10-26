@@ -265,8 +265,14 @@ function Rushee() {
 					return false;
 				}
 
-				me.cancel();
-				Pather.useUnit(2, 566, 109);
+				delay(me.ping + 1);
+
+				if (getUnit(2, 566)) {
+					me.cancel();
+					Pather.useUnit(2, 566, 109);
+				} else {
+					Misc.useMenu(0x58D2);
+				}
 
 				break;
 			}
@@ -416,18 +422,10 @@ function Rushee() {
 
 						break;
 					case 83: // Travincal
-						if (me.inTown) {
-							if (!Pather.usePortal(83, Config.Leader)) {
-								me.cancel();
+						if (!Pather.usePortal(83, Config.Leader)) {
+							me.cancel();
 
-								break;
-							}
-
-							target = Pather.getPortal(null, Config.Leader);
-
-							if (target) {
-								Pather.walkTo(target.x, target.y);
-							}
+							break;
 						}
 
 						actions.shift();
@@ -494,6 +492,12 @@ function Rushee() {
 
 					break;
 				case "2": // Go back to town and check quest
+					if (!Config.Rushee.Quester) {
+						actions.shift();
+
+						break;
+					}
+
 					print("command: 2");
 
 					// If dying, wait until animation is over
@@ -582,6 +586,8 @@ function Rushee() {
 					break;
 				case "3": // Bumper
 					if (!Config.Rushee.Bumper) {
+						actions.shift();
+
 						break;
 					}
 
