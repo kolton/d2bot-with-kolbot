@@ -85,6 +85,15 @@ var Config = {
 				throw new Error("Config.init: Error in character config.");
 			}
 		}
+		
+		try { 
+			if (Config.AutoBuild.Enabled === true && !isIncluded("common/AutoBuild.js") && include("common/AutoBuild.js")) { 
+				AutoBuild.initialize();
+			}
+		} catch (e3) {
+			print("ÿc8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
+			print(e3.toSource());
+		}
 	},
 
 	// Time
@@ -430,5 +439,11 @@ var Config = {
 	Rushee: {
 		Quester: false,
 		Bumper: false
+	},
+	AutoBuild: {
+		Enabled: false,
+		Template: "",
+		Verbose: false,
+		DebugMode: false
 	}
 };

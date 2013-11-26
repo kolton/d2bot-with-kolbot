@@ -453,4 +453,16 @@ function LoadConfig() {
 	Config.ActiveSummon = false; // Raise dead between each attack. If false, it will raise after clearing a spot.
 	Config.ReviveUnstackable = true; // Revive monsters that can move freely after you teleport.
 	Config.IronGolemChicken = 30; // Exit game if Iron Golem's life is less or equal to designated percent.
+	
+	
+	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
+	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system
+	
+	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing 
+												//	template filename located in libs/config/Builds/
+
+	Config.AutoBuild.Verbose = true;			//	Allows script to print messages in console
+	Config.AutoBuild.DebugMode = true;			//	Debug mode prints a little more information to console and 
+												//	logs activity to /logs/AutoBuild.CharacterName._MM_DD_YYYY.log
+												//	It automatically enables Config.AutoBuild.Verbose
 }
