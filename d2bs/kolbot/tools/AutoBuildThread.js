@@ -76,14 +76,20 @@ function spendStatPoint (id) {
 function spendStatPoints () {
 	var stats = AutoBuildTemplate[me.charlvl].StatPoints;
 	var errorMessage = "\nInvalid stat point set in build template "+getTemplateFilename()+" at level "+me.charlvl;
-	var statIsValid = false;
 	var spentEveryPoint = true;
+	var unusedStatPoints = me.getStat(4);
+	var len = stats.length;
 	
-	// Only ever spend 5 points per level
-	// We silently ignore skills and stats set to -1
-	for (var i = 0; i < 5; i++) {
+	if (len > unusedStatPoints) {
+		len = unusedStatPoints;
+		AutoBuild.print("Warning: Number of stats specified in your build template at level "+me.charlvl+" exceeds the available unused stat points"+
+			"\nOnly the first "+len+" stats "+stats.slice(0, len).join(", ")+" will be added");
+	}
+	
+	// We silently ignore stats set to -1
+	for (var i = 0; i < len; i++) {
 		var id = stats[i];
-		statIsValid = (typeof id === "number") && (0 <= id && id <= 3);
+		var statIsValid = (typeof id === "number") && (0 <= id && id <= 3);
 		
 		if (id === -1) { continue; }
 		else if (statIsValid) {
@@ -94,7 +100,7 @@ function spendStatPoints () {
 					spentEveryPoint = false;
 					AutoBuild.print("Attempt to spend point "+(i+1)+" in "+STAT_ID_TO_NAME[id]+" may have failed!"); 
 				} else if (debug) { 
-					AutoBuild.print("Stat "+(i+1)+"/5) Increased "+STAT_ID_TO_NAME[id]+" from "+preStatValue+" to "+me.getStat(id)); 
+					AutoBuild.print("Stat +("+(i+1)+"/"+len+") Increased "+STAT_ID_TO_NAME[id]+" from "+preStatValue+" to "+me.getStat(id)); 
 				}
 			}
 		} else {
@@ -146,52 +152,70 @@ function getRequiredSkills (id) {
 };
 
 
-function spendSkillPoint () {
-	var id = AutoBuildTemplate[me.charlvl].SkillPoint;
-	var errorMessage = "\nInvalid skill point set in build template "+getTemplateFilename()+" for level "+me.charlvl;
-	
-	if (id === -1) { // We silently ignore skills and stats set to -1
-		return true;
-	} else if (!skillInValidRange(id)) {
-		throw new Error("Skill id "+id+" is not a skill for your character class"+errorMessage);
-	}
-	
-	var skillName = getSkillById(id)+" ("+id+")";
-	var requiredSkills = getRequiredSkills(id);
-	if (requiredSkills.length > 0) {
-		throw new Error("You need prerequisite skills "+requiredSkills.join(", ")+" before adding "+skillName + errorMessage);
-	}
-	
-	var requiredLevel = getBaseStat("skills", id, 176);
-	if (me.charlvl < requiredLevel) {
-		throw new Error("You need to be at least level "+requiredLevel+" before you get "+skillName + errorMessage);
-	}
-	
-	var pointSpent = false;
+function spendSkillPoint (id) {
 	var unusedSkillPoints = me.getStat(5);
-	// var preHardPoints = me.getSkill(id, 0);
-	
+	var skillName = getSkillById(id)+" ("+id+")";		// TODO: Use let ? 
 	if (SPEND_POINTS) {
 		useSkillPoint(id);
 		AutoBuild.print("useSkillPoint(): "+skillName);
 	} else {
 		AutoBuild.print("Fake useSkillPoint(): "+skillName);
 	}
+	delay(100);											// TODO: How long should we wait... if at all?
+	return (unusedSkillPoints - me.getStat(5) === 1);	// Check if we spent one point
+};
+
+
+function spendSkillPoints () {
+	var skills = AutoBuildTemplate[me.charlvl].SkillPoints;
+	var errInvalidSkill = "\nInvalid skill point set in build template "+getTemplateFilename()+" for level "+me.charlvl;
+	var spentEveryPoint = true;
+	var unusedSkillPoints = me.getStat(5);
+	var len = skills.length;
 	
-	delay(100);
-	// pointSpent = (me.getSkill(id, 0) - preHardPoints === 1); 	// Check if we spent one point
-	pointSpent = (unusedSkillPoints - me.getStat(5) === 1); 	// Check if we spent one point
+	if (len > unusedSkillPoints) {
+		len = unusedSkillPoints;
+		AutoBuild.print("Warning: Number of skills specified in your build template at level "+me.charlvl+" exceeds the available unused skill points"+
+			"\nOnly the first "+len+" skills "+skills.slice(0, len).join(", ")+" will be added");
+	}
 	
-	if (SPEND_POINTS) {
-		if (!pointSpent) { 
-			AutoBuild.print("Attempt to spend skill point in", skillName, "may have failed");
-		} else if (debug) { 
-			var actualSkillLevel = me.getSkill(id, 1);
-			AutoBuild.print("Increased "+skillName+" by one point (level: ", actualSkillLevel+")"); 
+	// We silently ignore skills set to -1
+	for (var i = 0; i < len; i++) {
+		var id = skills[i];								// TODO: Use let ? 
+		
+		if (id === -1) { continue; } 
+		else if (!skillInValidRange(id)) {
+			throw new Error("Skill id "+id+" is not a skill for your character class"+errInvalidSkill);
 		}
-	} 
+		
+		var skillName = getSkillById(id)+" ("+id+")";	// TODO: Use let ? 
+		var requiredSkills = getRequiredSkills(id);
+		if (requiredSkills.length > 0) {
+			throw new Error("You need prerequisite skills "+requiredSkills.join(", ")+" before adding "+skillName+errInvalidSkill);
+		}
+		
+		var requiredLevel = getBaseStat("skills", id, 176);
+		if (me.charlvl < requiredLevel) {
+			throw new Error("You need to be at least level "+requiredLevel+" before you get "+skillName+errInvalidSkill);
+		}
+		
+		var pointSpent = spendSkillPoint(id);
+		
+		if (SPEND_POINTS) {
+			if (!pointSpent) { 
+				spentEveryPoint = false;
+				AutoBuild.print("Attempt to spend skill point "+(i+1)+" in "+skillName+" may have failed!"); 
+			} else if (debug) { 
+				var actualSkillLevel = me.getSkill(id, 1);
+				AutoBuild.print("Increased "+skillName+" by one point (level: ", actualSkillLevel+")"); 
+				AutoBuild.print("Skill ("+(i+1)+"/"+len+") Increased "+skillName+" by one (level: ", actualSkillLevel+")"); 
+			}
+		}
+		
+		delay(100);	// TODO: How long should we wait... if at all?
+	}
 	
-	return pointSpent;
+	return spentEveryPoint;
 };
 
 
@@ -211,7 +235,7 @@ function main () {
 			
 			if (levels > 0 && canSpendPoints()) {
 				AutoBuild.print("Level up detected (", prevLevel, "-->", me.charlvl, ")");
-				spendSkillPoint();
+				spendSkillPoints();
 				spendStatPoints();
 				scriptBroadcast({event: "level up"});
 				AutoBuild.applyConfigUpdates(); // scriptBroadcast() won't trigger listener on this thread.
