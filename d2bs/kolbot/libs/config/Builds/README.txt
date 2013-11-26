@@ -176,11 +176,14 @@ README.txt - AutoBuild Script Installation and Configuration
 	It's comprised of 99 sub-objects which are indexed by character level (Number).
 	At every character level (except level 1) you may set skill and stat points which the bot will spend when it reaches that level. 
 	Lookup skill ids in the /d2bs/kolbot/sdk/ folder. Valid stat ids are 0 (Strength), 1 (Energy), 2 (Dexterity), or 3 (Vitality). 
-	You may set 1 skill point per level and 5 stat points per level. Anything set to -1 will be silently ignored, so use -1 if 
-	you don't want to spend points at a certain level.
+	You may set multiple skill and stat points per level. Anything set to -1 will be silently ignored, so you can use -1 if 
+	you don't want to spend points at a certain level. (Or just completely remove the value from the array)
 	
-	NOTE: The scripts DO NOT take into consideration any skill or stat points awarded from quests. 
-	You will need to spend those points manually.
+	NOTE: The scripts DO NOT limit the number of skills and stats spent upon each level up event. 
+	You are responsible for keeping track of the number of accrued points versus the number of points spent 
+	at each level in your build template. However, there are safety measures in place to prevent spending points your character doesn't have.
+	I suggest not trying to spend points based on whether a quest was completed or not, unless you really know what you are doing and write 
+	the additional logic required to make that determination.
 	
 	Every time you level up, the "Update" function within the corresponding character level is called.
 	This is where you make CHANGES to the "Config" object. You can make changes in the same format you usually do in your char config file.
