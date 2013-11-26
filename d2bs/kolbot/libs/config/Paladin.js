@@ -147,6 +147,7 @@ function LoadConfig() {
 
 	// *** special scripts ***
 	Scripts.WPGetter = false; // Get missing waypoints
+	Scripts.GetKeys = false;  // Hunt for T/H/D keys
 	Scripts.OrgTorch = false;
 		Config.OrgTorch.MakeTorch = true; // Convert organ sets to torches
 		Config.OrgTorch.WaitForKeys = true; // Enable Torch System to get keys from other profiles. See libs/TorchSystem.js for more info
