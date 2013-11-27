@@ -16,6 +16,9 @@
 */
 
 
+include("common/Cubing.js");
+include("common/Prototypes.js");
+include("common/Runewords.js");
 js_strict(true);
 
 
