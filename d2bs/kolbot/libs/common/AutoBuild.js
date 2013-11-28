@@ -55,7 +55,7 @@ var AutoBuild = new function AutoBuild () {
 	function getLogFilename () {
 		var d = new Date();
 		var dateString = d.getMonth()+"_"+d.getDate()+"_"+d.getFullYear();
-		return "logs/AutoBuild."+me.charname+"."+dateString+".log";
+		return "logs/AutoBuild."+me.realm+"."+me.charname+"."+dateString+".log";
 	};	
 	
 	
