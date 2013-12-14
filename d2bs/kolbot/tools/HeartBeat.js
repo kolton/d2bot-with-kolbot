@@ -19,12 +19,12 @@ function main() {
 			return false;
 		}
 
-		if (!me.ingame && getLocation() && getScript("default.dbj")) {
+		/*if (!me.ingame && getLocation() && getScript("default.dbj")) {
 			D2Bot.printToConsole("default.dbj was loaded out of game.");
 			D2Bot.restart();
 
 			return true;
-		}
+		}*/
 
 		var list = [],
 			threads = [],
