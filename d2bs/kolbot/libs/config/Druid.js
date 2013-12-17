@@ -442,4 +442,16 @@ function LoadConfig() {
 	Config.SummonAnimal = "Grizzly"; // 0 = disabled, 1 or "Spirit Wolf" = summon spirit wolf, 2 or "Dire Wolf" = summon dire wolf, 3 or "Grizzly" = summon grizzly
 	Config.SummonSpirit = "Oak Sage"; // 0 = disabled, 1 / "Oak Sage", 2 / "Heart of Wolverine", 3 / "Spirit of Barbs"
 	Config.SummonVine = "Poison Creeper"; // 0 = disabled, 1 / "Poison Creeper", 2 / "Carrion Vine", 3 / "Solar Creeper"
+	
+	
+	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
+	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system
+	
+	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing 
+												//	template filename located in libs/config/Builds/
+
+	Config.AutoBuild.Verbose = true;			//	Allows script to print messages in console
+	Config.AutoBuild.DebugMode = true;			//	Debug mode prints a little more information to console and 
+												//	logs activity to /logs/AutoBuild.CharacterName._MM_DD_YYYY.log
+												//	It automatically enables Config.AutoBuild.Verbose
 }
