@@ -648,10 +648,10 @@ function main() {
 		case 104: // Numpad 8
 			if (Hooks.vector.enabled) {
 				Hooks.vector.enabled = false;
-				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Enable Monsters";
+				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Enable Vectors";
 			} else {
 				Hooks.vector.enabled = true;
-				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Disable Monsters";
+				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Disable Vectors";
 			}
 
 			break;
