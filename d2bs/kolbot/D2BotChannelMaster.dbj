@@ -1,4 +1,8 @@
 /**
+* This was initially made by me for use with my Rusher channel. It makes it possible to sit in a channel without timing out, and allow others (or yourself) to load profiles at will.
+* This will pass the game information to both the person requesting the game, and the runners/helpers defined. Whatever game name/password you set in your 'master' profile, will be the game name used.
+* Currently, this is setup to stop the client after it leaves the game. It will not sit in channel. It will also only try to join the game once. If it fails, it will stop and the person will have to request again.
+*
 *	@Author 		Adhd
 *  	@LastUpdate 	12/17/13 14:38 Alaskan Time
 *	@Filename		D2BotChannelMaster.dbj
@@ -8,17 +12,17 @@
 var StarterConfig = { 
 
 	//This is the CHANNEL MASTER. It starts all profiles below.
-	ChannelMasterProfile : "master", // Master of the channel. starts other profiles
-	whisper: true, // Whisper the game name and pass to the user
-	currentGames: false, // Give the info of all Characters for that trigger word
-	gameMessage: "Please make the following game, and a rusher will join you: ", // Message to say when a trigger word is found. the game name and password will be added after this phrase.
+	ChannelMasterProfile : "master", // Master of the channel. starts other profiles. **SET game name and password in this profile.
+	whisper: true, // Whisper the game name and pass to the user instead of saying it in chat globally.
+	currentGames: false, // Give the info of all Characters for the trigger word requested in chat, If none are available.
+	gameMessage: "Please make the following game, and someone will join you: ", // Message to say when a trigger word is found. the game name and password will be added after this phrase.
 	unavailableMessage: "I am sorry, None of those rushers are available at the moment.", // Message to say when no characters are available for that trigger word
 	
 	
 	// ChannelConfig can override these options for individual profiles.
 	JoinChannel : "Op mr.crush", // Default channel. Can be an array of channels - ["channel 1", "channel 2"]
 	FirstJoinMessage : "", // Default join message. Can be an array of messages	
-	
+
 	//Global script settings
 	JoinGameDelay : 9, // Seconds to wait before joining a new game
 	ChatActionsDelay : 2, // Seconds to wait in lobby before entering a channel
@@ -30,7 +34,6 @@ var StarterConfig = {
 	ConnectingTimeout : 20, // Seconds to wait before cancelling the 'Connecting...' screen
 	PleaseWaitTimeout : 10, // Seconds to wait before cancelling the 'Please Wait...' screen
 	WaitInLineTimeout : 60, // Seconds to wait before cancelling the 'Waiting in Line...' screen
-	GameDoesNotExistTimeout : 30 // Seconds to wait before cancelling the 'Game does not exist.' screen
 	
 
 };
@@ -39,12 +42,27 @@ var ChannelConfig = {
 
 	/*	Format is as follows:
 	 *
-	 *	"Trigger word": {
+	 *	//Trigger word to look for
+	 *	"!startMyProfile": {
 	 *
 	 *		"Profile 1 to start": {
-	 *			joinChannel: "", //Can be an array - ["op chan", "op chan2"],
-	 *			FirstJoinMessage: "", Can be an array
-	 *         	otherProfiles: ["Barb", "Pally"] //Must be an array
+	 *			joinChannel: "", 					//Can be an array - ["op chan", "op chan2"],
+	 *			FirstJoinMessage: "", 			 	//Can be an array
+	 *         	otherProfiles: ["Barb", "Pally"] 	//Must be an array
+	 *   	},
+	 *		"Profile 2 to start": {
+	 *			joinChannel: "",
+	 *			FirstJoinMessage: "",
+	 *         	otherProfiles: ["helper Barb"]
+	 *   	}
+	 *	},
+	 
+	 *	"!startMyOtherProfile": {
+	 *
+	 *		"Profile 1 to start": {
+	 *			joinChannel: "",
+	 *			FirstJoinMessage: "",
+	 *         	otherProfiles: ["Barb", "Pally"]
 	 *   	},
 	 *		"Profile 2 to start": {
 	 *			joinChannel: "",
@@ -53,14 +71,12 @@ var ChannelConfig = {
 	 *   	}
 	 *	};
 	 */
-
-	 
 };
 
-// No touchy!
+// Do not edit below here.
+
 include("json2.js");
 include("OOG.js");
-include("automule.js");
 include("gambling.js");
 include("torchsystem.js");
 include("common/misc.js");
@@ -73,16 +89,13 @@ if (!FileTools.exists("/rushers")) {
 	dir.create("rushers");
 }
 
-var gameInfo, gameStart, inGame, chatActionsDone, pingQuit, date, handle, useChat, 
-firstLogin, connectFail, joinInfo, CharInfo, GameStuff, currentRusher,
+var gameInfo, gameStart, inGame, chatActionsDone, pingQuit, date, handle, 
+useChat, firstLogin, connectFail, CharInfo, GameStuff, currentRusher, lines,
 gameCount = DataFile.getStats().runs + 1,
 myConfig = getConfig(),
 lastGameStatus = "ready",
 oldIndex = 0,
-lines = "",
-leader = "",
 loginFail = 0,
-isUp = "no",
 chanInfo = {
 	joinChannel : "",
 	firstMsg : ""
@@ -126,14 +139,14 @@ function getConfig() {
 		
 			for (var profile in ChannelConfig[i]) {
 				if (profile == me.profile) {
-					print("Ã¿c9Using a custom Sorc profile");
+					print("ÿc9Using a custom Runner profile");
 					return ChannelConfig[i][profile];
 				}
 				
 				if (typeof ChannelConfig[i][profile].otherProfiles == "object") {
 					for (var y = 0; y < ChannelConfig[i][profile].otherProfiles.length; y += 1) {
 						if (ChannelConfig[i][profile].otherProfiles[y] === me.profile) {
-							print("Ã¿c7Using a custom Helper profile");
+							print("ÿc7Using a custom Helper profile");
 							return profile;
 						}
 					}
@@ -143,9 +156,9 @@ function getConfig() {
 	}
 
 	if (me.profile === StarterConfig.ChannelMasterProfile) {
-		print("Ã¿c8Utilizing the 'Master' profile");
+		print("ÿc8Utilizing the 'Master' profile");
 	} else {
-		print("Ã¿c1No custom profile found!");
+		print("ÿc1No custom profile found!");
 	}
 	return false;
 }
@@ -184,32 +197,10 @@ function ReceiveCopyData(mode, msg) {
 	}
 
 	switch (mode) {
-	case 1: // JoinInfo
-
-		joinInfo = JSON.parse(msg);
-
-		break;
 	case 2: // Game info
 		print("Received Game Info");
 
 		gameInfo = JSON.parse(msg);
-
-		break;
-	case 3: // Game request
-		// Don't let others join mule/torch/key/gold drop game
-		if (AutoMule.inGame || Gambling.inGame || TorchSystem.inGame) {
-			break;
-		}
-
-		if (gameInfo) {
-			obj = JSON.parse(msg);
-
-			if (me.gameReady) {
-				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
-			} else {
-				D2Bot.joinMe(obj.profile, gameInfo.gameName.toLowerCase(), gameCount, gameInfo.gamePass.toLowerCase(), isUp);
-			}
-		}
 
 		break;
 	case 4: // Heartbeat ping
@@ -265,35 +256,6 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
-function ScriptMsgEvent(msg) {
-	switch (msg) {
-	case "mule":
-		AutoMule.check = true;
-
-		break;
-	case "muleTorch":
-		AutoMule.torchCheck = true;
-
-		break;
-	case "torch":
-		TorchSystem.check = true;
-
-		break;
-	case "getMuleMode":
-		if (AutoMule.torchCheck) {
-			scriptBroadcast("1");
-		} else if (AutoMule.check) {
-			scriptBroadcast("0");
-		}
-
-		break;
-	case "pingquit":
-		pingQuit = true;
-
-		break;
-	}
-}
-
 function timer(tick) {
 	if (!tick) {
 		return "";
@@ -321,7 +283,7 @@ function main() {
 
 	debugLog(me.profile);
 	addEventListener('copydata', ReceiveCopyData);
-	addEventListener('scriptmsg', ScriptMsgEvent);
+
 	while (!handle) {
 		delay(100);
 	}
@@ -330,6 +292,7 @@ function main() {
 	delay(500);
 	D2Bot.init();
 	load("tools/heartbeat.js");
+	
 	while (!gameInfo) {
 		D2Bot.requestGameInfo();
 		delay(500);
@@ -345,10 +308,10 @@ function main() {
 		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
+	
 	while (true) {
 		while (me.ingame) {
 			if (me.gameReady) {
-				isUp = "yes";
 
 				if (!inGame) {
 					date = new Date();
@@ -369,18 +332,13 @@ function main() {
 			delay(1000);
 		}
 
-		isUp = "no";
-
 		locationAction(getLocation());
 		delay(1000);
 	}
 }
 
 function locationAction(location) {
-	var i,
-	control,
-	string,
-	text;
+	var i, control, string, text;
 
 	MainSwitch : switch (location) {
 	case 0:
@@ -471,7 +429,7 @@ function locationAction(location) {
 				
 				if (lines) {
 					for (; oldIndex < lines.length; oldIndex++) {
-						words = lines[oldIndex].toLowerCase().replace(/<|>|Ã¿c4|/g, "");
+						words = lines[oldIndex].toLowerCase().replace(/<|>|ÿc4|/g, "");
 						wordsArray = words.split(" ");
 						
 						for (i in ChannelConfig) {
@@ -625,7 +583,7 @@ function locationAction(location) {
 
 			D2Bot.updateRuns();
 
-			print("Ã¿c2joining game " + GameStuff.gameName);
+			print("ÿc2joining game " + GameStuff.gameName);
 
 			delay(StarterConfig.JoinGameDelay * 1000);
 
@@ -671,12 +629,12 @@ function locationAction(location) {
 			for (var y = 0; y < myConfig.otherProfiles.length; y += 1) {
 			
 				if (sendCopyData(null, myConfig.otherProfiles[y], 4, "pingrep")) {
-					print("Ã¿c4Helper stuck in game, stopping..");
+					print("ÿc4Helper stuck in game, stopping..");
 					D2Bot.stop(myConfig.otherProfiles[y]);
 				}
 
 				D2Bot.start(myConfig.otherProfiles[y]);
-				print("Ã¿c3starting " + myConfig.otherProfiles[y]);
+				print("ÿc3starting " + myConfig.otherProfiles[y]);
 				delay(500);
 			}
 		}
