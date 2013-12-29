@@ -48,7 +48,8 @@ var MuleLogger = {
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c/g, "\\xffc", "g").replace("\xFFC", "\\xffc", "g");
+			var partial = /(y|ÿ)(c)([0-9!"+<;.*])/g;
+			desc[i] = desc[i].replace(partial, "\\xffc$3").replace("\xFFC", "\\xffc", "g");
 		}
 
 		if (this.LogItemLevel && desc[desc.length - 1]) {
