@@ -171,7 +171,14 @@ MainLoop:
 
 				break MainLoop;
 			case "ready":
-				//delay(2000);
+				var control = getControl(6, 652, 469, 120, 20);
+
+				if (control) {
+					delay(200);
+					control.click();
+				}
+
+				delay(2000);
 
 				this.inGame = true;
 				me.blockMouse = true;

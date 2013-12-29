@@ -726,15 +726,12 @@ var Misc = {
 					desc[i] = stringColor + desc[i];
 				}
 			}
+
+			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2");
 		}
 
 		if (desc[desc.length - 1]) {
 			desc[desc.length - 1] = desc[desc.length - 1].trim() + " (" + unit.ilvl + ")";
-		}
-
-		for (i = 0; i < desc.length; i += 1) {
-			var partial = /(y|ÿ)(c)([0-9!"+<;.*])/g;
-			desc[i] = desc[i].replace(partial, "\\xffc$3");
 		}
 
 		desc = desc.reverse().join("\n");
