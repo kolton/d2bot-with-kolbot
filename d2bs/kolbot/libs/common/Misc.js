@@ -720,7 +720,7 @@ var Misc = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^ÿ/)) {
+				if (desc[i].match(/^(y|ÿ)c/)) {
 					stringColor = desc[i].substring(0, 3);
 				} else {
 					desc[i] = stringColor + desc[i];
@@ -730,6 +730,10 @@ var Misc = {
 
 		if (desc[desc.length - 1]) {
 			desc[desc.length - 1] = desc[desc.length - 1].trim() + " (" + unit.ilvl + ")";
+		}
+
+		for (i = 0; i < desc.length; i += 1) {
+			desc[i] = desc[i].replace(/(y|ÿ)c/g, "\\xffc");
 		}
 
 		desc = desc.reverse().join("\n");
@@ -822,7 +826,7 @@ var Misc = {
 				return false;
 			}
 
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		case "Kept":
@@ -832,7 +836,7 @@ var Misc = {
 		case "Shopped":
 		case "Gambled":
 		case "Dropped":
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		case "No room for":
@@ -840,7 +844,7 @@ var Misc = {
 
 			break;
 		default:
-			desc = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/gi, "").trim();
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		}
@@ -861,7 +865,7 @@ var Misc = {
 			lastArea = DataFile.getStats().lastArea;
 
 			if (lastArea) {
-				desc += ("\nÿc0Area: " + lastArea);
+				desc += ("\n\\xffc0Area: " + lastArea);
 			}
 		}
 
@@ -1021,7 +1025,7 @@ var Misc = {
 		}
 
 		if (keptLine) {
-			desc += ("\nÿc0Line: " + keptLine);
+			desc += ("\n\\xffc0Line: " + keptLine);
 		}
 
 		itemObj = {
