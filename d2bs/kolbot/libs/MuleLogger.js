@@ -41,14 +41,14 @@ var MuleLogger = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^ÿ/)) {
+				if (desc[i].match(/^(y|ÿ)c/)) {
 					stringColor = desc[i].substring(0, 3);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
 			}
 
-			desc[i] = desc[i].replace("ÿ", "\\xff", "g").replace("\xFF", "\\xff", "g");
+			desc[i] = desc[i].replace(/(y|ÿ)c/g, "\\xffc", "g").replace("\xFFC", "\\xffc", "g");
 		}
 
 		if (this.LogItemLevel && desc[desc.length - 1]) {
