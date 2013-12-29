@@ -733,7 +733,8 @@ var Misc = {
 		}
 
 		for (i = 0; i < desc.length; i += 1) {
-			desc[i] = desc[i].replace(/(y|ÿ)c/g, "\\xffc");
+			var partial = /(y|ÿ)(c)([0-9!"+<;.*])/g;
+			desc[i] = desc[i].replace(partial, "\\xffc$3");
 		}
 
 		desc = desc.reverse().join("\n");
