@@ -238,7 +238,7 @@ function main() {
 
 				if (!ingame) {
 					print("Updating Status");
-					//D2Bot.updateStatus("Game: " + me.gamename);
+					D2Bot.updateStatus("Game: " + me.gamename);
 
 					joinInfo.oldGame = me.gamename;
 					lastGameStatus = "ingame";
@@ -248,7 +248,6 @@ function main() {
 					DataFile.updateStats("runs", gameCount);
 				}
 
-				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
@@ -427,7 +426,7 @@ MainLoop:
 		D2Bot.updateStatus("Join Game");
 
 		if (joinInfo.gameName !== "") {
-			print("ÿc2Joining ÿc0" + joinInfo.gameName);
+			print("ï¿½c2Joining ï¿½c0" + joinInfo.gameName);
 
 			if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].AnnounceGame === "boolean" && typeof AdvancedConfig[me.profile].AnnounceMessage === "string") {
 				sayMsg(AdvancedConfig[me.profile].AnnounceMessage + " " + joinInfo.gameName);
