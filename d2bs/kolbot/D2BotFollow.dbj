@@ -214,7 +214,7 @@ function main() {
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				if (!ingame) {
 					print("Updating Status");
-					//D2Bot.updateStatus("Game: " + me.gamename);
+					D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
