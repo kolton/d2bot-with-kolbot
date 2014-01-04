@@ -291,7 +291,7 @@ function main() {
 					gameStart = getTickCount();
 
 					print("Updating Status");
-					//D2Bot.updateStatus("Game: " + me.gamename);
+					D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
@@ -300,7 +300,6 @@ function main() {
 					DataFile.updateStats("ingameTick");
 				}
 
-				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
@@ -478,7 +477,7 @@ MainSwitch:
 					if (ControlAction.joinChannel(chanInfo.joinChannel[i])) {
 						useChat = true;
 					} else {
-						print("ÿc1Unable to join channel, disabling chat messages.");
+						print("ï¿½c1Unable to join channel, disabling chat messages.");
 
 						useChat = false;
 					}
