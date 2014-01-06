@@ -111,6 +111,11 @@ var ClassAttack = {
 
 		// Check Immunities
 		if (!Attack.checkResist(unit, this.skillElement[index])) {
+			// already on last skill
+			if (index === Config.AttackSkill.length - 1) {
+				return 1;
+			}
+
 			if (Config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, this.skillElement[index + 1])) {
 				index = index + 1;
 			} else {
