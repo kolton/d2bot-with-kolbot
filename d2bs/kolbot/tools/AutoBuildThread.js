@@ -1,5 +1,5 @@
 /**
-*	@title	:	AutoBuild.js
+*	@title	:	AutoBuildThread.js
 *
 *	@author	:	alogwe
 *
@@ -9,22 +9,21 @@
 */
 
 js_strict(true);
-include("json2.js");
-include("common/Prototypes.js");
-include("common/Config.js"); 
+
+if (!isIncluded("common/Config.js")) { include("common/Config.js"); };
+if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
+if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
+if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
+
 Config.init(); // includes libs/common/AutoBuild.js
 
-// Config = JSON.parse(JSON.stringify(Config));	// TODO: Figure out if we need to do this?
-												// Cache variables to prevent a bug where D2BS loses the reference to 
-												// the Config object (kolton's note in ToolThread.js)
-
-var	debug		= !!Config.AutoBuild.DebugMode;
-var	prevLevel	= me.charlvl;												
-const SPEND_POINTS = true;							// For testing, it actually allows skill and stat point spending.
-const STAT_ID_TO_NAME =	[getLocaleString(4060),		// Strength 
-						 getLocaleString(4069),		// Energy
-						 getLocaleString(4062),		// Dexterity
-						 getLocaleString(4066)];	// Vitality 
+var	debug				= 	!!Config.AutoBuild.DebugMode;
+var	prevLevel			= 	me.charlvl;												
+const SPEND_POINTS 		= 	true;						// For testing, it actually allows skill and stat point spending.
+const STAT_ID_TO_NAME	=	[getLocaleString(4060),		// Strength 
+							getLocaleString(4069),		// Energy
+						 	getLocaleString(4062),		// Dexterity
+						 	getLocaleString(4066)];		// Vitality 
 						 
 						 
 // Will check if value exists in an Array
@@ -100,7 +99,7 @@ function spendStatPoints () {
 					spentEveryPoint = false;
 					AutoBuild.print("Attempt to spend point "+(i+1)+" in "+STAT_ID_TO_NAME[id]+" may have failed!"); 
 				} else if (debug) { 
-					AutoBuild.print("Stat +("+(i+1)+"/"+len+") Increased "+STAT_ID_TO_NAME[id]+" from "+preStatValue+" to "+me.getStat(id)); 
+					AutoBuild.print("Stat ("+(i+1)+"/"+len+") Increased "+STAT_ID_TO_NAME[id]+" from "+preStatValue+" to "+me.getStat(id)); 
 				}
 			}
 		} else {
@@ -207,7 +206,6 @@ function spendSkillPoints () {
 				AutoBuild.print("Attempt to spend skill point "+(i+1)+" in "+skillName+" may have failed!"); 
 			} else if (debug) { 
 				var actualSkillLevel = me.getSkill(id, 1);
-				AutoBuild.print("Increased "+skillName+" by one point (level: ", actualSkillLevel+")"); 
 				AutoBuild.print("Skill ("+(i+1)+"/"+len+") Increased "+skillName+" by one (level: ", actualSkillLevel+")"); 
 			}
 		}
@@ -252,7 +250,9 @@ function main () {
 			delay(1e3);
 		}
 	} catch (err) {
-		AutoBuild.print("Something broke! \nError:", err.toSource(), "\nEnding helper thread.");
+		print("Something broke!");
+		print("Error:"+ err.toSource());
+		print("Stack trace: \n"+ err.stack);
 		return false;
 	}
 	
