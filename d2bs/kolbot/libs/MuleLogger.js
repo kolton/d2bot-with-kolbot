@@ -24,6 +24,7 @@ var MuleLogger = {
 	LogGame: ["", ""], // ["gamename", "password"]
 	LogNames: true, // Put account/character name on the picture
 	LogItemLevel: true, // Add item level to the picture
+	LogEquipped: false, // include equipped items
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
 	IngameTime: 20, // Time to wait after leaving game
 
@@ -287,8 +288,13 @@ var MuleLogger = {
 		}
 
 		for (i = 0; i < items.length; i += 1) {
-			if (items[i].mode === 0) {
+			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
 				parsedItem = this.logItem(items[i]);
+
+				if (items[i].mode === 1) {
+					parsedItem.title += " (equipped)";
+				}
+
 				string = JSON.stringify(parsedItem);
 				finalString += (string + "\n");
 
