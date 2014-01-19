@@ -24,6 +24,8 @@ var MuleLogger = {
 	LogGame: ["", ""], // ["gamename", "password"]
 	LogNames: true, // Put account/character name on the picture
 	LogItemLevel: true, // Add item level to the picture
+	LogEquipped: false, // include equipped items
+	LogMerc: false, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
 	IngameTime: 20, // Time to wait after leaving game
 
@@ -268,6 +270,7 @@ var MuleLogger = {
 		var i, folder, string, parsedItem,
 			items = me.getItems(),
 			realm = me.realm || "Single Player",
+			merc,
 			finalString = "";
 
 		if (!FileTools.exists("mules/" + realm)) {
@@ -287,8 +290,13 @@ var MuleLogger = {
 		}
 
 		for (i = 0; i < items.length; i += 1) {
-			if (items[i].mode === 0) {
+			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
 				parsedItem = this.logItem(items[i]);
+
+				if (items[i].mode === 1) {
+					parsedItem.title += " (equipped)";
+				}
+
 				string = JSON.stringify(parsedItem);
 				finalString += (string + "\n");
 
@@ -298,6 +306,30 @@ var MuleLogger = {
 			}
 		}
 
+		if (this.LogMerc) {
+			for (i = 0; i < 3; i += 1) {
+				merc = me.getMerc();
+				if (merc) {
+					break;
+				}
+				delay(50);
+			}
+			
+			if (merc) {
+				items = merc.getItems();
+				for (i = 0; i < items.length; i += 1) {
+					parsedItem = this.logItem(items[i]);
+					parsedItem.title += " (merc)";
+				
+					string = JSON.stringify(parsedItem);
+					finalString += (string + "\n");
+
+					if (this.SaveScreenShot) {
+						D2Bot.saveItem(parsedItem);
+					}
+				}
+			}
+		}
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + ".txt", finalString);
 		print("Item logging done.");
 	}

@@ -13,8 +13,11 @@
 *
 *	@todo	:	Make this file "libs/config/Builds/README.txt"
 */
-
 js_strict(true);
+
+if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
+if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
+if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
 
 var AutoBuild = new function AutoBuild () {
 
@@ -63,27 +66,26 @@ var AutoBuild = new function AutoBuild () {
 		var classname = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"][me.classid];
 		var build = getBuildType();
 		var template = "config/Builds/"+classname+"."+build+".js";
-		return template;
+		return template.toLowerCase();
 	};	
 	
 	
 	function initialize () {
+		var currentScript = getCurrentScript();
 		var template = getTemplateFilename();
-		this.print("Including build template: "+template);
+		this.print("Including build template "+template+" into "+currentScript);
 		if (!include(template)) {
 			throw new Error("Failed to include template: "+template);
 		}
-		
-		var currentScript = getCurrentScript();
-		
+
 		// Only load() helper thread from default.dbj if it isn't loaded
-		if (currentScript === "default.dbj" && !getScript("tools/AutoBuildThread.js")) { 
+		if (currentScript === "default.dbj" && !getScript("tools\\autobuildthread.js")) { 
 			load("tools/autobuildthread.js"); 
 		}
 		
-		// All threads except autobuildhelper.js use this event listener 
+		// All threads except autobuildthread.js use this event listener 
 		// to update their thread-local Config object
-		if (currentScript !== "tools/autobuildthread.js") {
+		if (currentScript !== "tools\\autobuildthread.js") {
 			addEventListener("scriptmsg", levelUpHandler);	
 		}
 		
