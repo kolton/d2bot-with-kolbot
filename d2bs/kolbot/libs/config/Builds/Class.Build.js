@@ -14,13 +14,11 @@
 * 	Vitality	= 3
 *
 */
-
-
-include("common/Cubing.js");
-include("common/Prototypes.js");
-include("common/Runewords.js");
 js_strict(true);
 
+if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
+if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
+if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
 
 var AutoBuildTemplate = {
 

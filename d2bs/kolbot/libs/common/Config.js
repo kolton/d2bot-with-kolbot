@@ -23,7 +23,7 @@ var Config = {
 					if (CustomConfig.hasOwnProperty(n)) {
 						if (CustomConfig[n].indexOf(me.profile) > -1) {
 							if (notify) {
-								print("ÿc2Loading custom config: ÿc9" + n + ".js");
+								print("ï¿½c2Loading custom config: ï¿½c9" + n + ".js");
 							}
 
 							configFilename = n + ".js";
@@ -59,8 +59,8 @@ var Config = {
 
 		if (!FileTools.exists("libs/config/" + configFilename)) {
 			if (notify) {
-				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
-				print("ÿc1Loading default config.");
+				print("ï¿½c1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
+				print("ï¿½c1Loading default config.");
 			}
 
 			try {
@@ -68,19 +68,19 @@ var Config = {
 			} catch (e) {
 				throw new Error("Failed to load default config.");
 			}
-		}
-
-		try {
-			include("config/" + configFilename);
-		} catch (e1) {
-			throw new Error("Failed to load character config.");
+		} else {
+			try {
+				include("config/" + configFilename);
+			} catch (e1) {
+				throw new Error("Failed to load character config.");
+			}
 		}
 
 		try {
 			LoadConfig.call();
 		} catch (e2) {
 			if (notify) {
-				print("ÿc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
+				print("ï¿½c8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
 
 				throw new Error("Config.init: Error in character config.");
 			}
@@ -91,7 +91,7 @@ var Config = {
 				AutoBuild.initialize();
 			}
 		} catch (e3) {
-			print("ÿc8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
+			print("ï¿½c8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
 			print(e3.toSource());
 		}
 	},
