@@ -13,7 +13,7 @@ var Roll = {
 var Recipe = {
 	Gem: 0,
 	HitPower: {
-		Helm: 1,
+    	Helm: 1,
 		Boots: 2,
 		Gloves: 3,
 		Belt: 4,
@@ -85,10 +85,10 @@ var Recipe = {
 	Reroll: {
 		Magic: 49,
 		Rare: 50,
-		HighRare: 53
+		HighRare: 51
 	},
-	Rune: 51,
-	Token: 52
+	Rune: 52,
+	Token: 53
 };
 
 var Cubing = {
@@ -393,9 +393,9 @@ var Cubing = {
 				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, 601, 601, 601, 601, 601], Index: Recipe.Reroll.Rare});
 
 				break;
-			case Recipe.Reroll.HighRare: //Added the ability to use SOJ's in recipes. Maybe make a socketing case next.
-				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, "soj"], Index: Recipe.Reroll.HighRare});
-			
+			case Recipe.Reroll.HighRare: 
+				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, 522], Index: Recipe.Reroll.HighRare});
+
 				break;
 			case Recipe.Rune:
 				switch (Config.Recipes[i][1]) {
@@ -532,9 +532,9 @@ var Cubing = {
 IngredientLoop:
 			for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 				for (k = 0; k < items.length; k += 1) {
-					if (((this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(items[k].classid) > -1) || this.recipes[i].Ingredients[j] === "soj" ||
+					if (((this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(items[k].classid) > -1) ||
 						items[k].classid === this.recipes[i].Ingredients[j]) && this.validItem(items[k], this.recipes[i])) {
-	
+
 						// push the item's info into the valid ingredients array. this will be used to find items when checking recipes
 						this.validIngredients.push({classid: items[k].classid, gid: items[k].gid});
 
@@ -553,9 +553,7 @@ IngredientLoop:
 				}
 
 				// add the item to needed list - enable pickup
-				if (this.recipes[i].Ingredients[j] !== "soj") {
-					this.neededIngredients.push({classid: this.recipes[i].Ingredients[j], recipe: this.recipes[i]});
-				}
+				this.neededIngredients.push({classid: this.recipes[i].Ingredients[j], recipe: this.recipes[i]});
 
 				// skip flawless gems adding if we don't have the main item (Recipe.Gem and Recipe.Rune for el-ort are always enabled)
 				if (!this.recipes[i].Enabled) {
@@ -623,29 +621,14 @@ IngredientLoop:
 			}
 		}
 	},
-	
-	findSojs: function () {
-		var items = me.findItems("rin", 0);
-		
-		if (items.length > -1) {
-			for (var i = 0; i < items.length; i += 1) {
-				if(items[i].fname.match("Stone of Jordan")) {
-					if (!Storage.Inventory.IsLocked(items[i], Config.Inventory)) { //Find an Available SOJ. Check against locked storage (Stash is always unlocked in this case)
-						return items[i].gid;
-					}
-				}		
-			}
-		}
-		return false;
-	},
-	
+
 	update: function () {
 		this.clearSubRecipes();
 		this.buildLists();
 	},
 
 	checkRecipe: function (recipe) {
-		var i, j, newGid, item,
+		var i, j, item,
 			usedGids = [],
 			matchList = [];
 
@@ -653,22 +636,8 @@ IngredientLoop:
 			for (j = 0; j < this.validIngredients.length; j += 1) {
 				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 &&
 						(this.validIngredients[j].classid === recipe.Ingredients[i] || (recipe.Ingredients[i] === "pgem" &&
-						this.gemList.indexOf(this.validIngredients[j].classid) > -1) || recipe.Ingredients[i] === "soj"
-						)) {
-					
-					//SOJ incorporation thanks to Adhd
-					if (recipe.Ingredients[i] === "soj") {
-						newGid = this.findSojs();
-						
-						if (typeof newGid === "number") {
-							this.validIngredients[j].gid = newGid;
-							this.validIngredients[j].classid = 522;
-						} else {
-							//No soj available.. Just break out of the recipe.
-							break;
-						}
-					}
-					
+						this.gemList.indexOf(this.validIngredients[j].classid) > -1))
+						) {
 					item = me.getItem(this.validIngredients[j].classid, -1, this.validIngredients[j].gid);
 
 					if (item && this.validItem(item, recipe)) { // 26.11.2012. check if the item actually belongs to the given recipe
@@ -747,7 +716,6 @@ IngredientLoop:
 	},
 
 	validItem: function (unit, recipe) {
-
 		// Don't use items in locked inventory space
 		if (unit.mode === 0 && unit.location === 3 && Storage.Inventory.IsLocked(unit, Config.Inventory)) {
 			return false;
@@ -767,11 +735,6 @@ IngredientLoop:
 			return true;
 		}
 
-		//Unique Rings
-		if (unit.itemType === 10 && unit.quality === 7) {
-			return true;
-		}
-	
 		if (recipe.Index >= Recipe.HitPower.Helm && recipe.Index <= Recipe.Safety.Weapon) {
 			// Junk jewels (NOT matching a pickit entry)
 			if (unit.itemType === 58) {
@@ -845,9 +808,21 @@ IngredientLoop:
 			return false;
 		}
 
-		if (recipe.Index === Recipe.Reroll.Rare || 
-		recipe.Index === Recipe.Reroll.HighRare) {
+		if (recipe.Index === Recipe.Reroll.Rare) {
 			if (unit.quality === 6 && NTIP.CheckItem(unit) === 0) {
+				return true;
+			}
+
+			return false;
+		}
+
+		if (recipe.Index === Recipe.Reroll.HighRare) {
+			if (unit.quality === 6 && NTIP.CheckItem(unit) === 0) {
+				return true;
+			}
+
+			if (unit.itemType === 10 && unit.getStat(77) && 
+			!Storage.Inventory.IsLocked(unit, Config.Inventory)) {
 				return true;
 			}
 
