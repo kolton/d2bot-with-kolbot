@@ -505,6 +505,37 @@ MainLoop:
 					}
 				}
 			}
+			
+			if (needPots < 1) {
+				potion = me.getItem(-1, 2);
+				if (potion) {
+					do {
+						if (potion.itemType === unit.itemType) {
+							if (potion.classid < unit.classid) {
+								potion.interact();
+								needPots += 1;
+								break;
+							}
+						}
+					} while (potion.getNext());
+				}
+			}
+			
+			if (needPots < 1) {
+				potion = me.getItem(-1, 0);
+				if (potion) {
+					do {
+						if (potion.itemType === unit.itemType) {
+							if (potion.classid < unit.classid) {
+								potion.interact();
+								needPots += 1;
+								break;
+							}
+						}
+					} while (potion.getNext());
+				}
+			}
+			
 
 			if (needPots < 1) {
 				return false;
