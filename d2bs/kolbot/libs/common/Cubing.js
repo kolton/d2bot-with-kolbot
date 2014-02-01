@@ -13,7 +13,7 @@ var Roll = {
 var Recipe = {
 	Gem: 0,
 	HitPower: {
-    	Helm: 1,
+		Helm: 1,
 		Boots: 2,
 		Gloves: 3,
 		Belt: 4,
@@ -393,7 +393,7 @@ var Cubing = {
 				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, 601, 601, 601, 601, 601], Index: Recipe.Reroll.Rare});
 
 				break;
-			case Recipe.Reroll.HighRare: 
+			case Recipe.Reroll.HighRare:
 				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, 522], Index: Recipe.Reroll.HighRare});
 
 				break;
@@ -821,8 +821,7 @@ IngredientLoop:
 				return true;
 			}
 
-			if (unit.itemType === 10 && unit.getStat(77) && 
-			!Storage.Inventory.IsLocked(unit, Config.Inventory)) {
+			if (unit.itemType === 10 && unit.getStat(77) && !Storage.Inventory.IsLocked(unit, Config.Inventory)) {
 				return true;
 			}
 
