@@ -125,7 +125,7 @@ var AutoMule = {
 			return false;
 		}
 
-		var muleObj,
+		var i, control, muleObj,
 			stopCheck = false,
 			muleInfo = {status: ""},
 			failCount = 0;
@@ -171,7 +171,7 @@ MainLoop:
 
 				break MainLoop;
 			case "ready":
-				var control = getControl(6, 652, 469, 120, 20);
+				control = getControl(6, 652, 469, 120, 20);
 
 				if (control) {
 					delay(200);
@@ -183,13 +183,24 @@ MainLoop:
 				this.inGame = true;
 				me.blockMouse = true;
 
-				joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
+				try {
+					joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
+				} catch (joinError) {
+
+				}
 
 				me.blockMouse = false;
 
-				delay(5000);
+				// Untested change 11.Feb.14.
+				for (i = 0; i < 8; i += 1) {
+					delay(1000);
 
-				break MainLoop;
+					if (me.ingame && me.gameReady) {
+						break MainLoop;
+					}
+				}
+
+				break;
 			default:
 				failCount += 1;
 
