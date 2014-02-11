@@ -13,8 +13,9 @@ function Coldworm() {
 	
 	// Beetleburst, added by 13ack.Stab
 	if (Config.Coldworm.KillBeetleburst) {
-		if (!Pather.moveToPreset(me.area, 1, 747))
+		if (!Pather.moveToPreset(me.area, 1, 747)) {
 			throw new Error("Failed to move to Beetleburst");
+		}
 			
 		Attack.clear(15, 0, getLocaleString(2882));
 	}
