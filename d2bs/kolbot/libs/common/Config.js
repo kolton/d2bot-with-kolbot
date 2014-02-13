@@ -383,6 +383,7 @@ var Config = {
 		ShopNPC: "anya"
 	},
 	Coldworm: {
+		KillBeetleburst: false,
 		ClearMaggotLair: false
 	},
 	Summoner: {
