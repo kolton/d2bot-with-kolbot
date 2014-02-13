@@ -52,6 +52,7 @@ function LoadConfig() {
 	// *** act 2 ***
 	Scripts.Radament = false;
 	Scripts.Coldworm = false;
+		Config.Coldworm.KillBeetleburst = false;
 		Config.Coldworm.ClearMaggotLair = false; // Clear all 3 levels
 	Scripts.AncientTunnels = false;
 		Config.AncientTunnels.OpenChest = false; // Open special chest in Lost City
