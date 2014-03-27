@@ -166,13 +166,24 @@ Loop:
 			}
 
 			//Item already on the cursor.
-			if (me.itemoncursor && item.mode !== 4) {
-				return false;
-			}
+			//if (me.itemoncursor && item.mode !== 4) {
+			//	return false;
+			//}
 
 			//Pick to cursor if not already.
-			item.toCursor();
-
+			//item.toCursor();
+			
+			//Loop five times to try and pick up the item.
+			for (n = 0; n < 5; n += 1) {
+				if (me.itemoncursor) break;
+				item.toCursor();
+			}
+			
+			// return false if we could not pick up the item
+			if (!me.itemoncursor) {
+				return false;
+			}
+			
 			//Loop three times to try and place it.
 			for (n = 0; n < 5; n += 1) {
 				clickItem(0, nPos.y, nPos.x, this.location);
@@ -210,7 +221,7 @@ Loop:
 			string = "";
 
 			for (y = 0; y < this.width; y += 1) {
-				string += (this.buffer[x][y] > 0) ? "ÿc1x" : "ÿc0o";
+				string += (this.buffer[x][y] > 0) ? "Ã¿c1x" : "Ã¿c0o";
 			}
 
 			print(string);
