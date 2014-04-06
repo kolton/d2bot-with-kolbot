@@ -199,7 +199,7 @@ var D2Bot = {
 			args: []
 		};
 
-		//print("ÿc1Heart beat " + this.handle);
+		//print("ï¿½c1Heart beat " + this.handle);
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
@@ -531,7 +531,9 @@ MainLoop:
 			ControlAction.click(6, 555, 381, 16, 16);
 
 			break;
-		default:
+		default:	//Hardest difficulty available
+			ControlAction.click(6, 430, 381, 16, 16);
+			ControlAction.click(6, 555, 381, 16, 16);
 			ControlAction.click(6, 698, 381, 16, 16);
 
 			break;
