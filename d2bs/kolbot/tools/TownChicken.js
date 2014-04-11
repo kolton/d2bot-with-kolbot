@@ -37,13 +37,13 @@ function main() {
 			if (script) {
 				if (script.running) {
 					if (script.name === "default.dbj") {
-						print("ÿc1Pausing.");
+						print("ï¿½c1Pausing.");
 					}
 
 					script.pause();
 				} else {
 					if (script.name === "default.dbj") {
-						print("ÿc2Resuming.");
+						print("ï¿½c2Resuming.");
 					}
 
 					script.resume();
@@ -78,7 +78,7 @@ function main() {
 	while (true) {
 		if (!me.inTown && (townCheck ||
 			(Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) ||
-			(Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
+			(Config.TownMP > 0 && me.mp < Math.floor(me.mpmax * Config.TownMP / 100)))) {
 			this.togglePause();
 
 			while (!me.gameReady) {

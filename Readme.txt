@@ -1,4 +1,6 @@
-This is the MASTER (also known as TRUNK) branch.
+This is the CORE15 branch.
+It will contain most recent D2BS 1.5 core changes.
+The rest will be the same as in MASTER branch.
 
 The package contains 3 distinct components:
 D2BS - core
