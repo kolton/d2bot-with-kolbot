@@ -375,8 +375,11 @@ ModeLoop:
 			do {
 				if ((getDistance(door, x, y) < 4 && getDistance(me, door) < 9) || getDistance(me, door) < 4) {
 					for (i = 0; i < 3; i += 1) {
-						Misc.click(0, 0, door);
-						//door.interact();
+						if (Config.PacketShopping) {
+		+					Packet.interact(door);
+		+				}else{
+		+					Misc.click(0, 0, door);	
+		+				}
 
 						tick = getTickCount();
 
@@ -608,7 +611,11 @@ ModeLoop:
 			}
 
 			delay(200);
-			Misc.click(0, 0, unit);
+			if (Config.PacketShopping) {
++				Packet.interact(unit);
++			}else{
++				Misc.click(0, 0, unit);	
++			}
 
 			tick = getTickCount();
 
@@ -672,8 +679,11 @@ ModeLoop:
 
 				if (check) {
 					this.moveToUnit(wp);
-					Misc.click(0, 0, wp);
-
+					if (Config.PacketShopping) {
+	+					Packet.interact(wp);
+	+				}else{
+	+					Misc.click(0, 0, wp);	
+	+				}
 					tick = getTickCount();
 
 					while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
@@ -874,7 +884,7 @@ MainLoop:
 						}
 
 						if (i < 2) {
-							sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
+							Packet.interact(portal);
 						} else {
 							Misc.click(0, 0, portal);
 						}
@@ -1059,9 +1069,11 @@ MainLoop:
 
 				if (wp) {
 					for (j = 0; j < 10; j += 1) {
-						Misc.click(0, 0, wp);
-						//wp.interact();
-
+						if (Config.PacketShopping) {
+		+					Packet.interact(wp);
+		+				}else{
+		+					Misc.click(0, 0, wp);	
+		+				}
 						if (getUIFlag(0x14)) {
 							delay(500);
 							me.cancel();
@@ -1124,23 +1136,21 @@ MainLoop:
 				this.moveTo(5026, 5095);
 
 				unit = getUnit(2, 449); // Gate
-
 				if (unit) {
-					for (i = 0; i < 3; i += 1) {
-						Misc.click(0, 0, unit);
-						//unit.interact();
-
-						tick = getTickCount();
-
-						while (getTickCount() - tick < 3000) {
-							if (unit.mode === 2) {
-								delay(1000);
-
-								break;
+					for (i = 0; i < 10; i += 1) {		
+						if (unit.mode === 0) { //0 close, 1 busy, 2 open
+							if (Config.PacketShopping) {
+								Packet.interact(unit);
+							}else{
+								Misc.click(0, 0, unit);
 							}
 						}
+						if (unit.mode === 2) {
+							break;
+						}
+						delay(500);
 					}
-				}
+				}	
 
 				this.moveToExit(target.course[0], true);
 			} else if (me.area === 4 && target.course[0] === 38) { // Stony Field -> Tristram

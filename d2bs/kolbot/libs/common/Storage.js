@@ -175,7 +175,11 @@ Loop:
 
 			//Loop three times to try and place it.
 			for (n = 0; n < 5; n += 1) {
-				clickItem(0, nPos.y, nPos.x, this.location);
+				if (Config.PacketShopping) {
+					Packet.toBuffer(nPos.x, nPos.y, this.location);
+				}else{
+					clickItem(0, nPos.y, nPos.x, this.location);
+				}
 
 				nDelay = getTickCount();
 
