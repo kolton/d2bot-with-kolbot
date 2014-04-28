@@ -36,7 +36,7 @@ function main() {
 			if (script) {
 				if (script.running) {
 					if (script.name === "default.dbj") {
-						print("Ã¿c1Pausing.");
+						print("ÿc1Pausing.");
 					}
 					script.pause();
 				} 
@@ -57,7 +57,7 @@ function main() {
 			if (script) {
 				if (!script.running) {
 					if (script.name === "default.dbj") {
-						print("Ã¿c2Resuming.");
+						print("ÿc2Resuming.");
 					}
 
 					script.resume();
