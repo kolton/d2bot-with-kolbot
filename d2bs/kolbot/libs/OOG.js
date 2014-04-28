@@ -524,17 +524,21 @@ MainLoop:
 
 		switch (diff) {
 		case "Normal":
+		case 0:
 			ControlAction.click(6, 430, 381, 16, 16);
-
 			break;
 		case "Nightmare":
+		case 1:
 			ControlAction.click(6, 555, 381, 16, 16);
-
+			break;
+		case "Hell":
+		case 2:
+			ControlAction.click(6, 698, 381, 16, 16);
 			break;
 		default:
+			ControlAction.click(6, 430, 381, 16, 16);
+			ControlAction.click(6, 555, 381, 16, 16);
 			ControlAction.click(6, 698, 381, 16, 16);
-
-			break;
 		}
 
 		if (delay) {

@@ -426,7 +426,11 @@ var Misc = {
 
 		for (i = 0; i < 3; i += 1) {
 			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
-				Misc.click(0, 0, unit);
+				if (Config.PacketShopping) {
+					Packet.interact(unit);
+				}else{
+					Misc.click(0, 0, unit);
+				}
 			}
 
 			tick = getTickCount();
@@ -649,8 +653,11 @@ var Misc = {
 
 		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 3, 0)) {
-				Misc.click(0, 0, unit);
-				//unit.interact();
+				if (Config.PacketShopping) {
+					Packet.interact(unit);
+				}else{
+					Misc.click(0, 0, unit);
+				}	
 			}
 
 			tick = getTickCount();
@@ -720,14 +727,14 @@ var Misc = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|ÿ)c/)) {
+				if (desc[i].match(/^(y|ï¿½)c/)) {
 					stringColor = desc[i].substring(0, 3);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2");
+			desc[i] = desc[i].replace(/(y|ï¿½)c([0-9!"+<;.*])/g, "\\xffc$2");
 		}
 
 		if (desc[desc.length - 1]) {
@@ -824,7 +831,7 @@ var Misc = {
 				return false;
 			}
 
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ï¿½)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		case "Kept":
@@ -834,7 +841,7 @@ var Misc = {
 		case "Shopped":
 		case "Gambled":
 		case "Dropped":
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ï¿½)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		case "No room for":
@@ -842,7 +849,7 @@ var Misc = {
 
 			break;
 		default:
-			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ï¿½)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		}
@@ -854,7 +861,7 @@ var Misc = {
 	logItem: function (action, unit, keptLine) {
 		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim();
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ï¿½c[0-9!"+<;.*]/, "").trim();
 
 		desc = this.getItemDesc(unit);
 		color = unit.getColor();
@@ -1306,13 +1313,13 @@ MainLoop:
 
 		if (typeof error === "string") {
 			msg = error;
-			oogmsg = error.replace(/ÿc[0-9!"+<;.*]/gi, "");
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+			oogmsg = error.replace(/ï¿½c[0-9!"+<;.*]/gi, "");
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ï¿½c[0-9!"+<;.*]/gi, "") + "\n";
 		} else {
 			source = error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length);
-			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
+			msg = "ï¿½c1Error in ï¿½c0" + script + " ï¿½c1(" + source + " line ï¿½c1" + error.lineNumber + "): ï¿½c1" + error.message;
 			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ï¿½c[0-9!"+<;.*]/gi, "") + "\n";
 		}
 
 		if (this.errorConsolePrint) {
@@ -1540,6 +1547,95 @@ var Experience = {
 };
 
 var Packet = {
+	drop: function () {		
+		if (!me.itemoncursor) { 
+			throw new Error("Unit.drop: No item on cursor");
+		}
+		
+		var i, cursorItem = getUnit(100);
+		
+		sendPacket(1, 0x17, 4, cursorItem.gid); //drop
+
+		for (i = 0; i < 10; i += 1) {
+			if (!me.itemoncursor) {
+				return true;
+			}
+			delay(me.ping/2+50);
+		}
+
+		return false;
+	},
+
+	toCursor: function (unit) {
+		if (me.itemoncursor) { 
+			throw new Error("Unit.toCursor: Already an item on cursor");
+		}
+		
+		var i;
+
+		sendPacket(1, 0x19, 4, unit.gid); //unit to cursor
+
+		for (i = 0; i < 10; i += 1) {
+			if (me.itemoncursor) {
+				return true;
+			}
+			delay(me.ping/2+50);
+		}
+
+		return false;
+	},
+	
+	toBuffer: function (x, y, buffer) { //move cursorItem to specified buffer ; default buffer is inventory ; manage missing arg
+		if (!me.itemoncursor) { 
+			throw new Error("Unit.toBuffer: No item on cursor");
+		}
+		
+		var i, nPos, cube, cursorItem = getUnit(100);
+		
+		switch(buffer){ //0 inventory, 4 stash, 3 cube -> these are the d2location, not the d2bs ones...
+			case "stash":
+			case "Stash":
+			case 7:
+				buffer = 4; 
+				if(!x || !y){
+					nPos = Storage.Stash.FindSpot(cursorItem);
+					x = nPos.x;
+					y = nPos.y;
+				}
+				break;
+			case "cube":
+			case "Cube":
+			case 6: 
+				if (!getUIFlag(0x1A)) { //cube not open
+					cube = me.getItem(549);
+					sendPacket(1, 0x2a, 4, cursorItem.gid, 4, cube.gid); 
+					return true;
+				}
+				buffer = 3;
+				if(!x || !y){
+					nPos = Storage.Cube.FindSpot(cursorItem);
+					x = nPos.x;
+					y = nPos.y;
+				}
+				break;
+			default:
+				buffer = 0; 
+				if(!x || !y){
+					nPos = Storage.Inventory.FindSpot(cursorItem);
+					x = nPos.x;
+					y = nPos.y;
+				}
+		}
+		
+		sendPacket(1, 0x18, 4, cursorItem.gid, 4, y, 4, x, 4, buffer); 
+		return true;
+	},
+	
+	interact: function (unit) {
+			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);		
+	},
+	
+	
 	openMenu: function (unit) {
 		if (unit.type !== 1) {
 			throw new Error("openMenu: Must be used on NPCs.");

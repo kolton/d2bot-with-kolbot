@@ -754,13 +754,21 @@ WPLoop:
 						Pather.moveToUnit(unit);
 					}
 
-					unit.interact();
+					if (Config.PacketShopping) {
+						Packet.interact(unit);
+					}else{
+						unit.interact();
+					}
 
 					for (j = 0; j < 100; j += 1) {
 						if (j % 20 === 0) {
 							me.cancel();
 							delay(300);
-							unit.interact();
+							if (Config.PacketShopping) {
+								Packet.interact(unit);
+							}else{
+								unit.interact();
+							}
 						}
 
 						if (getUIFlag(0x14)) {

@@ -106,17 +106,21 @@ Unit.prototype.openMenu = function (addDelay) {
 			Packet.flash(me.gid);
 		}
 
-		//Misc.click(0, 0, this);
-		this.interact();
-		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
+		if (Config.PacketShopping) {
+			Packet.interact(this);
+		}else{
+			this.interact();	
+		}
 
 		for (j = 0; j < 40; j += 1) {
 			if (j > 0 && j % 10 === 0) {
 				me.cancel();
 				delay(400);
-				//Misc.click(0, 0, this);
-				this.interact();
-				//sendPacket(1, 0x13, 4, 1, 4, this.gid);
+				if (Config.PacketShopping) {
+					Packet.interact(this);
+				}else{
+					this.interact();	
+				}
 			}
 
 			if (getUIFlag(0x08)) {
@@ -273,6 +277,10 @@ Unit.prototype.sell = function () {
 };
 
 Unit.prototype.toCursor = function () {
+	if (Config.PacketShopping) {
+		return Packet.toCursor(this);
+	}
+	
 	if (this.type !== 4) {
 		throw new Error("Unit.toCursor: Must be used with items.");
 	}
@@ -312,7 +320,11 @@ Unit.prototype.drop = function () {
 	if (!this.toCursor()) {
 		return false;
 	}
-
+	
+	if (Config.PacketShopping) {
+		return Packet.drop();
+	}
+	
 	for (i = 0; i < 3; i += 1) {
 		clickMap(0, 0, me.x, me.y);
 		delay(40);
@@ -577,7 +589,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ï¿½c[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -650,7 +662,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ï¿½c[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -668,7 +680,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ï¿½c[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 

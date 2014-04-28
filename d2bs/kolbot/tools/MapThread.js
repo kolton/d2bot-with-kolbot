@@ -314,7 +314,7 @@ var Hooks = {
 		},
 
 		getPOI: function () {
-			var unit, name;
+			var unit, units, name;
 
 			switch (me.area) {
 			case 4: // Stony Field
@@ -347,6 +347,11 @@ var Hooks = {
 				name = "Fat Worm";
 
 				break;
+			case 54: // Palace Cellar 3
+			unit = getPresetUnit(me.area, 2, 298);
+			name = "Blue Portal";
+
+				break;
 			case 66: // Tal Rasha's Tombs
 			case 67:
 			case 68:
@@ -354,9 +359,33 @@ var Hooks = {
 			case 70:
 			case 71:
 			case 72:
-				unit = getPresetUnit(me.area, 2, 152);
-				name = "Orifice";
-
+				unit =  getPresetUnit(me.area, 2, 397);
+				name = "Chest";
+				if(!unit){
+					unit = getPresetUnit(me.area, 2, 152);
+					name = "Orifice";
+				}
+				break;
+			case 76: // Spider Forest
+				units = getPresetUnits(me.area, 5, 51);
+				unit = units[1];
+				name = "Eye's Cave";
+				break;
+			case 85: // Spider Cavern
+				unit = getPresetUnit(me.area, 2, 407);
+				name = "Eye";
+				break;
+			case 80: // Kurast Bazaar
+				unit = getPresetUnit(me.area, 5, 57);
+				name = "Heart's Sewer"
+				break;
+			case 93: // A3 Sewers Level 2
+				unit = getPresetUnit(me.area, 2, 405);
+				name = "Heart"
+				break;
+			case 91: // Flayer Dungeon Level 3
+				unit = getPresetUnit(me.area, 2, 406);
+				name = "Brain";
 				break;
 			case 78: // Flayer Jungle
 				unit = getPresetUnit(me.area, 2, 252);
@@ -393,11 +422,22 @@ var Hooks = {
 				name = "Hell Entrance";
 
 				break;
+			case 113: // Crystalized Passage
+				unit = getPresetUnit(me.area, 5, 75);
+				name = "Crystalized Passage";
+
+				break;
+			case 114: // Frozen River
+				unit = getPresetUnit(me.area, 2, 460);
+				name = "Anya";
+
+				break;
 			case 124: // Halls of Vaught
 				unit = getPresetUnit(me.area, 2, 462);
 				name = "Nihlathak";
 
 				break;
+			
 			}
 
 			if (unit) {
@@ -619,7 +659,7 @@ function main() {
 	include("common/attack.js");
 	include("common/pather.js");
 	load("tools/maphelper.js");
-	print("ÿc9Map Thread Loaded");
+	print("ï¿½c9Map Thread Loaded");
 
 	this.revealArea = function (area) {
 		if (!this.revealedAreas) {

@@ -93,7 +93,11 @@ function Diablo() {
 
 			warn = false;
 
-			seal.interact();
+			if (Config.PacketShopping) {
+				Packet.interact(seal);
+			}else{
+				seal.interact();
+			}
 			delay(classid === 394 ? 1000 : 500);
 
 			if (!seal.mode) {
