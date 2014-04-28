@@ -234,7 +234,7 @@ var Town = {
 				pot = this.getPotion(npc, Config.BeltColumn[i]);
 
 				if (pot) {
-					//print("ï¿½c2column ï¿½c0" + i + "ï¿½c2 needs ï¿½c0" + col[i] + " ï¿½c2potions");
+					//print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
 
 					// Shift+buy will trigger if there's no empty columns or if only the current column is empty
 					if (useShift) {
@@ -729,7 +729,7 @@ CursorLoop:
 			return false;
 		}
 
-		print("ï¿½c4MiniShopBotï¿½c0: Scanning " + npc.itemcount + " items.");
+		print("ÿc4MiniShopBotÿc0: Scanning " + npc.itemcount + " items.");
 
 		do {
 			if (this.ignoredItemTypes.indexOf(item.itemType) === -1) {
@@ -1048,8 +1048,8 @@ CursorLoop:
 						delay(me.ping * 2 + 500);
 
 						if (cubeItems[0].bodylocation === bodyLoc) {
-							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ï¿½c[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
-							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ï¿½c[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
+							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
+							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
 
 							return true;
 						}
@@ -1153,7 +1153,7 @@ CursorLoop:
 				repairAction.push("repair");
 			}
 		} else {
-			print("ï¿½c4Town: ï¿½c1Can't afford repairs.");
+			print("ÿc4Town: ÿc1Can't afford repairs.");
 		}
 
 		return repairAction;

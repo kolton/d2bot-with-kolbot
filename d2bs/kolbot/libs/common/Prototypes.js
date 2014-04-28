@@ -589,7 +589,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i].replace(/ï¿½c[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -662,7 +662,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return parseInt(temp[i].replace(/ï¿½c[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -680,7 +680,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return parseInt(temp[i].replace(/ï¿½c[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
