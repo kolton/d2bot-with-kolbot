@@ -1138,6 +1138,7 @@ MainLoop:
 
 								break;
 							}
+							delay(100);
 						}
 					}
 				}
