@@ -199,7 +199,7 @@ var D2Bot = {
 			args: []
 		};
 
-		//print("ÿc1Heart beat " + this.handle);
+		//print("ï¿½c1Heart beat " + this.handle);
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
@@ -741,6 +741,10 @@ MainLoop:
 				}
 
 				break;
+			case 10: //error creating account
+                		me.blockMouse = false;
+        			return false;
+        			break;
 			default:
 				break;
 			}
