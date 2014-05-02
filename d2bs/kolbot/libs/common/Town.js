@@ -1356,8 +1356,11 @@ MainLoop:
 				if (useTK) {
 					Skill.cast(43, 0, stash);
 				} else {
-					Misc.click(0, 0, stash);
-					//stash.interact();
+					if (Config.PacketShopping) {
+						Packet.interact(stash);
+					}else{
+						Misc.click(0, 0, stash);	
+					}
 				}
 
 				tick = getTickCount();
@@ -1414,7 +1417,11 @@ MainLoop:
 			gid = corpseList[0].gid;
 
 			Pather.moveToUnit(corpseList[0]);
-			Misc.click(0, 0, corpseList[0]);
+			if (Config.PacketShopping) {
+				Packet.interact(corpseList[0]);
+			}else{
+				Misc.click(0, 0, corpseList[0]);	
+			}
 			delay(500);
 
 			if (getTickCount() - timer > 3000) {

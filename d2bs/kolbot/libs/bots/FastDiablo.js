@@ -172,10 +172,9 @@ function FastDiablo() {
 				if (getDistance(me, seal) > 5) {
 					Pather.moveToUnit(seal, 4, 0);
 				}
-
-				//seal.interact();
-				sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
-
+				
+				Packet.interact(seal);
+				
 				tick = getTickCount();
 
 				while (getTickCount() - tick < 500) {

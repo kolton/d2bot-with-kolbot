@@ -426,7 +426,11 @@ var Misc = {
 
 		for (i = 0; i < 3; i += 1) {
 			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
-				Misc.click(0, 0, unit);
+				if (Config.PacketShopping) {
+					Packet.interact(unit);
+				}else{
+					Misc.click(0, 0, unit);
+				}
 			}
 
 			tick = getTickCount();
@@ -649,8 +653,11 @@ var Misc = {
 
 		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, unit) < 4 || Pather.moveToUnit(unit, 3, 0)) {
-				Misc.click(0, 0, unit);
-				//unit.interact();
+				if (Config.PacketShopping) {
+					Packet.interact(unit);
+				}else{
+					Misc.click(0, 0, unit);
+				}	
 			}
 
 			tick = getTickCount();
@@ -1540,6 +1547,95 @@ var Experience = {
 };
 
 var Packet = {
+	drop: function () {		
+		if (!me.itemoncursor) { 
+			throw new Error("Unit.drop: No item on cursor");
+		}
+		
+		var i, cursorItem = getUnit(100);
+		
+		sendPacket(1, 0x17, 4, cursorItem.gid); //drop
+
+		for (i = 0; i < 10; i += 1) {
+			if (!me.itemoncursor) {
+				return true;
+			}
+			delay(me.ping/2+50);
+		}
+
+		return false;
+	},
+
+	toCursor: function (unit) {
+		if (me.itemoncursor) { 
+			throw new Error("Unit.toCursor: Already an item on cursor");
+		}
+		
+		var i;
+
+		sendPacket(1, 0x19, 4, unit.gid); //unit to cursor
+
+		for (i = 0; i < 10; i += 1) {
+			if (me.itemoncursor) {
+				return true;
+			}
+			delay(me.ping/2+50);
+		}
+
+		return false;
+	},
+	
+	toBuffer: function (x, y, buffer) { //move cursorItem to specified buffer ; default buffer is inventory ; manage missing arg
+		if (!me.itemoncursor) { 
+			throw new Error("Unit.toBuffer: No item on cursor");
+		}
+		
+		var i, nPos, cube, cursorItem = getUnit(100);
+		
+		switch(buffer){ //0 inventory, 4 stash, 3 cube -> these are the d2location, not the d2bs ones...
+			case "stash":
+			case "Stash":
+			case 7:
+				buffer = 4; 
+				if(!x || !y){
+					nPos = Storage.Stash.FindSpot(cursorItem);
+					x = nPos.x;
+					y = nPos.y;
+				}
+				break;
+			case "cube":
+			case "Cube":
+			case 6: 
+				if (!getUIFlag(0x1A)) { //cube not open
+					cube = me.getItem(549);
+					sendPacket(1, 0x2a, 4, cursorItem.gid, 4, cube.gid); 
+					return true;
+				}
+				buffer = 3;
+				if(!x || !y){
+					nPos = Storage.Cube.FindSpot(cursorItem);
+					x = nPos.x;
+					y = nPos.y;
+				}
+				break;
+			default:
+				buffer = 0; 
+				if(!x || !y){
+					nPos = Storage.Inventory.FindSpot(cursorItem);
+					x = nPos.x;
+					y = nPos.y;
+				}
+		}
+		
+		sendPacket(1, 0x18, 4, cursorItem.gid, 4, y, 4, x, 4, buffer); 
+		return true;
+	},
+	
+	interact: function (unit) {
+			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);		
+	},
+	
+	
 	openMenu: function (unit) {
 		if (unit.type !== 1) {
 			throw new Error("openMenu: Must be used on NPCs.");

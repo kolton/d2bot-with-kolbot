@@ -27,21 +27,35 @@ include("common/Town.js");
 function main() {
 	var townCheck = false;
 
-	this.togglePause = function () {
+	this.pause = function () {
 		var i,	script,
 			scripts = ["default.dbj", "tools/antihostile.js", "tools/rushthread.js"];
 
 		for (i = 0; i < scripts.length; i += 1) {
 			script = getScript(scripts[i]);
-
 			if (script) {
 				if (script.running) {
 					if (script.name === "default.dbj") {
 						print("ÿc1Pausing.");
 					}
-
 					script.pause();
-				} else {
+				} 
+			}
+		}
+
+		return true;
+	};
+
+	this.resume = function () {
+		var i,	script,
+			scripts = ["default.dbj", "tools/antihostile.js", "tools/rushthread.js"];
+			
+
+		for (i = 0; i < scripts.length; i += 1) {
+			script = getScript(scripts[i]);
+
+			if (script) {
+				if (!script.running) {
 					if (script.name === "default.dbj") {
 						print("ÿc2Resuming.");
 					}
@@ -53,6 +67,7 @@ function main() {
 
 		return true;
 	};
+
 
 	addEventListener("scriptmsg",
 		function (msg) {
@@ -78,8 +93,8 @@ function main() {
 	while (true) {
 		if (!me.inTown && (townCheck ||
 			(Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) ||
-			(Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
-			this.togglePause();
+			(Config.TownMP > 0 && me.mp < Math.floor(me.mpmax * Config.TownMP / 100)))) {
+			this.pause();
 
 			while (!me.gameReady) {
 				delay(100);
@@ -94,7 +109,7 @@ function main() {
 
 				return;
 			} finally {
-				this.togglePause();
+				this.resume();
 
 				townCheck = false;
 			}

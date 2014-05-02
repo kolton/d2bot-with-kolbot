@@ -281,7 +281,11 @@ function main() {
 		journal = getUnit(2, 357);
 
 		for (i = 0; i < 5; i += 1) {
-			journal.interact();
+			if (Config.PacketShopping) {
+				Packet.interact(journal);
+			}else{
+				journal.interact();
+			}
 			delay(1000);
 			me.cancel();
 
@@ -543,7 +547,11 @@ function main() {
 
 			if (seal) {
 				for (i = 0; i < 3; i += 1) {
-					seal.interact();
+					if (Config.PacketShopping) {
+						Packet.interact(seal);
+					}else{
+						seal.interact();
+					}
 
 					tick = getTickCount();
 
@@ -684,7 +692,11 @@ function main() {
 		if (altar) {
 			while (altar.mode !== 2) {
 				Pather.moveToUnit(altar);
-				altar.interact();
+				if (Config.PacketShopping) {
+					Packet.interact(altar);
+				}else{
+					altar.interact();
+				}
 				delay(2000 + me.ping);
 				me.cancel();
 			}
