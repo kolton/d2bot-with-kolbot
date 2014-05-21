@@ -67,6 +67,7 @@ include("json2.js");
 include("OOG.js");
 include("automule.js");
 include("gambling.js");
+include("craftingsystem.js");
 include("torchsystem.js");
 include("common/misc.js");
 
@@ -114,7 +115,7 @@ function ReceiveCopyData(mode, msg) {
 		break;
 	case 3: // Game request
 		// Don't let others join mule/torch/key/gold drop game
-		if (AutoMule.inGame || Gambling.inGame || TorchSystem.inGame) {
+		if (AutoMule.inGame || Gambling.inGame || TorchSystem.inGame || CraftingSystem.inGame) {
 			break;
 		}
 
@@ -195,6 +196,10 @@ function ScriptMsgEvent(msg) {
 		TorchSystem.check = true;
 
 		break;
+	case "crafting":
+		CraftingSystem.check = true;
+
+		break;
 	case "getMuleMode":
 		if (AutoMule.torchCheck) {
 			scriptBroadcast("1");
@@ -267,10 +272,11 @@ function main() {
 		//D2Bot.retrieve();
 		delay(200);
 
-		/*if (!!DataFile.getStats().debugInfo) {
-			D2Bot.printToConsole("Crash at " + DataFile.getStats().debugInfo, 10);
-			DataFile.updateStats("debugInfo", false);
-		}*/
+		if (!!DataFile.getStats().debugInfo) {
+			gameInfo.crashInfo = DataFile.getStats().debugInfo;
+
+			D2Bot.printToConsole("Crash Info: Script: " + JSON.parse(gameInfo.crashInfo).currScript + " Area: " + JSON.parse(gameInfo.crashInfo).area, 10);
+		}
 
 		/*if (gameInfo.crashInfo) {
 			D2Bot.printToConsole("Crash Info: Script: " + gameInfo.crashInfo.currScript + " Area: " + gameInfo.crashInfo.area + (gameInfo.crashInfo.hasOwnProperty("lastAction") ? " " + gameInfo.crashInfo.lastAction : ""), 10);
@@ -281,6 +287,7 @@ function main() {
 	}
 
 	//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+	DataFile.updateStats("debugInfo", JSON.stringify({currScript: "none", area: "out of game"}));
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -291,7 +298,7 @@ function main() {
 					gameStart = getTickCount();
 
 					print("Updating Status");
-					D2Bot.updateStatus("Game: " + me.gamename);
+					//D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
@@ -300,6 +307,7 @@ function main() {
 					DataFile.updateStats("ingameTick");
 				}
 
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
@@ -353,7 +361,7 @@ MainSwitch:
 		if (ingame) {
 			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
 				break;
 			}
 
@@ -412,7 +420,7 @@ MainSwitch:
 		if (ingame) {
 			//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
 
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
 				break;
 			}
 
@@ -477,7 +485,7 @@ MainSwitch:
 					if (ControlAction.joinChannel(chanInfo.joinChannel[i])) {
 						useChat = true;
 					} else {
-						print("ï¿½c1Unable to join channel, disabling chat messages.");
+						print("ÿc1Unable to join channel, disabling chat messages.");
 
 						useChat = false;
 					}

@@ -14,6 +14,7 @@ function main() {
 	include("OOG.js");
 	include("json2.js");
 	include("automule.js");
+	include("craftingsystem.js");
 	include("common/Attack.js");
 	include("common/Config.js");
 	include("common/Cubing.js");
@@ -123,7 +124,7 @@ function main() {
 	this.stopDefault = function () {
 		var script = getScript("default.dbj");
 
-		if (script) {
+		if (script && script.running) {
 			script.stop();
 		}
 
@@ -318,7 +319,7 @@ function main() {
 			say("/fps");
 
 			break;
-		case 100: // numpad 4 - get nearest preset unit id
+		case 105: // numpad 9 - get nearest preset unit id
 			print(this.getNearestPreset());
 
 			break;
@@ -372,7 +373,7 @@ function main() {
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
 			if (Config.SoJWaitTime) {
 				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3], 7);
-				scriptBroadcast("soj");
+				Messaging.sendToScript("default.dbj", "soj");
 			}
 
 			break;
@@ -397,7 +398,7 @@ function main() {
 
 	this.scriptEvent = function (msg) {
 		var obj;
-		
+
 		switch (msg) {
 		case "quit":
 			quitFlag = true;
@@ -420,6 +421,7 @@ function main() {
 				}
 
 				//D2Bot.store(JSON.stringify(debugInfo));
+				DataFile.updateStats("debugInfo", JSON.stringify(debugInfo));
 			}
 
 			break;
@@ -547,12 +549,13 @@ function main() {
 
 			break;
 		}
-		
-		/*if (debugInfo.area !== me.area) {
-			debugInfo.area = me.area;
 
-			D2Bot.store(JSON.stringify(debugInfo));
-		}*/
+		if (debugInfo.area !== Pather.getAreaName(me.area)) {
+			debugInfo.area = Pather.getAreaName(me.area);
+
+			//D2Bot.store(JSON.stringify(debugInfo));
+			DataFile.updateStats("debugInfo", JSON.stringify(debugInfo));
+		}
 
 		delay(20);
 	}

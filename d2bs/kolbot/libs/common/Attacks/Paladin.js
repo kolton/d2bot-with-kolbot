@@ -5,113 +5,70 @@
 */
 
 var ClassAttack = {
-	skillRange: [],
-	skillHand: [],
-	skillElement: [],
-
-	init: function () {
-		var i;
-
-		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
-			Config.AttackSkill.push(Config.LowManaSkill[i]);
-		}
-
-		for (i = 0; i < Config.AttackSkill.length; i += 1) {
-			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
-			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
-
-			switch (Config.AttackSkill[i]) {
-			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
-				this.skillHand[i] = 2; // shift bypass
-
-				break;
-			case 96: // Sacrifice
-			case 97: // Smite
-			case 106: // Zeal
-			case 116: // Conversion
-				this.skillRange[i] = 4;
-				this.skillHand[i] = 2; // shift bypass
-
-				break;
-			case 112: // Blessed Hammer
-				this.skillRange[i] = 3;
-
-				break;
-			case 101: // Holy Bolt
-				this.skillRange[i] = 5;
-
-				break;
-			case 107: // Charge
-				this.skillRange[i] = 10;
-
-				break;
-			case 121: // Fist of the Heavens
-				this.skillRange[i] = 20;
-
-				break;
-			default: // Every other skill
-				this.skillRange[i] = 25;
-
-				break;
-			}
-		}
-	},
-
 	doAttack: function (unit, preattack) {
 		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (getDistance(me, unit) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
-					return 1;
+					return false;
 				}
 			}
 
-			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
-				return 2;
-			}
+			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return 3;
+			return true;
 		}
 
-		var index;
+		var index, attackSkill, aura;
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
-		if (Attack.checkResist(unit, this.skillElement[index])) {
-			if (this.skillRange[index] < 4 && checkCollision(me, unit, 0x1) && !Attack.validSpot(unit.x, unit.y)) {
-				return 1;
-			}
-
-			switch (this.doCast(unit, index)) {
-			case 0: // total fail
-				return 1;
-			case false: // fail to cast
-				return 2;
-			}
-
-			return 3;
+		if (Attack.getCustomAttack(unit)) {
+			attackSkill = Attack.getCustomAttack(unit)[0];
+			aura = Attack.getCustomAttack(unit)[1];
+		} else {
+			attackSkill = Config.AttackSkill[index];
+			aura = Config.AttackSkill[index + 1];
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
-			if (this.skillRange[5] < 4 && checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1)) {
-				return 1;
-			}
-
-			switch (this.doCast(unit, 5)) {
-			case 0: // total fail
-				return 1;
-			case false: // fail to cast
-				return 2;
-			}
-
-			return 3;
+		// Monster immune to primary skill
+		if (Config.AttackSkill[5] > -1 && !Attack.checkResist(unit, attackSkill) && Attack.checkResist(unit, Config.AttackSkill[5])) {
+			attackSkill = Config.AttackSkill[5];
+			aura = Config.AttackSkill[6];
 		}
 
-		return 1;
+		// Low mana skill
+		if (Config.LowManaSkill[0] > -1 && Skill.getManaCost(attackSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[0])) {
+			attackSkill = Config.LowManaSkill[0];
+			aura = Config.LowManaSkill[1];
+		}
+
+		switch (this.doCast(unit, attackSkill, aura)) {
+		case 0: // Fail
+			break;
+		case 1: // Success
+			return true;
+		case 2: // Try to telestomp
+			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+				while (Attack.checkMonster(unit)) {
+					if (getDistance(me, unit) > 3) {
+						Pather.moveToUnit(unit);
+					}
+
+					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+				}
+
+				return true;
+			}
+
+			break;
+		}
+
+		// Couldn't attack
+		return false;
 	},
 
 	afterAttack: function () {
@@ -123,85 +80,128 @@ var ClassAttack = {
 		}
 	},
 
-	doCast: function (unit, index) {
-		var i, walk,
-			atkSkill = index,
-			aura = index + 1;
+	doCast: function (unit, attackSkill, aura) {
+		var i, walk;
 
-		// Low mana skill
-		if (Config.AttackSkill[atkSkill] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[atkSkill]) > me.mp) {
-			atkSkill = Config.AttackSkill.length - 2;
+		if (attackSkill < 0) {
+			return false;
 		}
 
-		// Low mana aura
-		if (Config.AttackSkill[aura] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[aura]) > me.mp) {
-			aura = Config.AttackSkill.length - 1;
-		}
-
-		if (Config.AttackSkill[atkSkill] === 112) {
+		switch (attackSkill) {
+		case 112:
 			if (unit.classid === 691 && Config.AvoidDolls) {
 				this.dollAvoid(unit);
 
-				if (Config.AttackSkill[aura] > -1) {
-					Skill.setSkill(Config.AttackSkill[aura], 0);
+				if (aura > -1) {
+					Skill.setSkill(aura, 0);
 				}
 
-				return Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
+				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
+
+				return 1;
 			}
 
 			if (!this.getHammerPosition(unit)) {
-				print("can't get to " + unit.name);
+				print("Can't get to " + unit.name);
 
-				return (unit.spectype & 0x7) ? 2 : 0; // continue attacking a boss monster
+				return (unit.spectype & 0x7) ? 1 : 0; // continue attacking a boss monster
 			}
 
-			if (getDistance(me, unit) > 7) { // increase pvp aggressiveness
-				return false;
+			if (getDistance(me, unit) > 7 || unit.dead) {
+				return 1;
 			}
 
-			if (Config.AttackSkill[aura] > -1) {
-				Skill.setSkill(Config.AttackSkill[aura], 0);
+			if (aura > -1) {
+				Skill.setSkill(aura, 0);
 			}
 
 			for (i = 0; i < 3; i += 1) {
-				Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
+				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
 
 				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5 || unit.type === 0) {
 					break;
 				}
 			}
 
-			return true;
-		}
-
-		if (Config.AttackSkill[atkSkill] === 101) {
-			if (getDistance(me, unit) > this.skillRange[atkSkill] + 3 || CollMap.checkColl(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4)) {
+			return 1;
+		case 101:
+			if (getDistance(me, unit) > Skill.getRange(attackSkill) + 3 || CollMap.checkColl(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x4)) {
 					return 0;
 				}
 			}
 
 			CollMap.reset();
 
-			if (getDistance(me, unit) > this.skillRange[atkSkill] || CollMap.checkColl(me, unit, 0x2004, 2)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x2004, true)) {
+			if (getDistance(me, unit) > Skill.getRange(attackSkill) || CollMap.checkColl(me, unit, 0x2004, 2)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x2004, true)) {
 					return 0;
 				}
 			}
-		} else if (Math.floor(getDistance(me, unit)) > this.skillRange[atkSkill] || checkCollision(me, unit, 0x4)) {
-			walk = (Config.AttackSkill[atkSkill] !== 97 && (this.skillRange[atkSkill] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1))) || me.getState(139) || me.getState(140);
 
-			// walk short distances instead of tele for melee attacks. teleport if failed to walk
-			if (!Attack.getIntoPosition(unit, this.skillRange[atkSkill], 0x4, walk)) {
+			if (!unit.dead) {
+				if (aura > -1) {
+					Skill.setSkill(aura, 0);
+				}
+
+				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
+			}
+
+			return 1;
+		case 121: // FoH
+			if (!me.getState(121)) {
+				if (getDistance(me, unit) > Skill.getRange(attackSkill) || CollMap.checkColl(me, unit, 0x2004, 2)) {
+					if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x2004, true)) {
+						return 0;
+					}
+				}
+
+				if (!unit.dead) {
+					if (aura > -1) {
+						Skill.setSkill(aura, 0);
+					}
+
+					Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
+
+					return 1;
+				}
+			}
+
+			break;
+		default:
+			if (Skill.getRange(attackSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
 				return 0;
 			}
+
+			if (Math.floor(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x4)) {
+				walk = attackSkill !== 97 && Skill.getRange(attackSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
+
+				// walk short distances instead of tele for melee attacks. teleport if failed to walk
+				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x4, walk)) {
+					return 0;
+				}
+			}
+
+			if (!unit.dead) {
+				if (aura > -1) {
+					Skill.setSkill(aura, 0);
+				}
+
+				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
+			}
+
+			return 1;
 		}
 
-		if (Config.AttackSkill[aura] > -1) {
-			Skill.setSkill(Config.AttackSkill[aura], 0);
+		for (i = 0; i < 25; i += 1) {
+			if (!me.getState(121)) {
+				break;
+			}
+
+			delay(40);
 		}
 
-		return unit.mode === 0 || unit.mode === 12 || Skill.cast(Config.AttackSkill[atkSkill], this.skillHand[atkSkill], unit);
+		return 1;
 	},
 
 	dollAvoid: function (unit) {
@@ -237,10 +237,10 @@ var ClassAttack = {
 		case 1: // Monster
 			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targetx : unit.x;
 			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targety : unit.y;
-			positions = [[x + 2, y], [x, y + 3], [x - 2, y - 1]];
+			positions = [[x + 2, y + 1], [x, y + 3], [x - 2, y - 1]];
 
 			if (size === 3) {
-				positions.unshift([x + size - 1, y + size - 1]);
+				positions.unshift([x + 2, y + 2]);
 			}
 
 			break;

@@ -23,7 +23,7 @@ var Config = {
 					if (CustomConfig.hasOwnProperty(n)) {
 						if (CustomConfig[n].indexOf(me.profile) > -1) {
 							if (notify) {
-								print("ï¿½c2Loading custom config: ï¿½c9" + n + ".js");
+								print("ÿc2Loading custom config: ÿc9" + n + ".js");
 							}
 
 							configFilename = n + ".js";
@@ -57,22 +57,32 @@ var Config = {
 			}
 		}
 
-		if (!FileTools.exists("libs/config/" + configFilename)) {
+		if (FileTools.exists("libs/config/" + configFilename)) {
+			try {
+				if (!include("config/" + configFilename)) {
+					throw new Error();
+				}
+			} catch (e1) {
+				throw new Error("Failed to load character config.");
+			}
+		} else {
 			if (notify) {
-				print("ï¿½c1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
-				print("ï¿½c1Loading default config.");
+				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
+				print("ÿc1Loading default config.");
+			}
+
+			// Try to find default config
+			if (!FileTools.exists("libs/config/" + classes[me.classid] + ".js")) {
+				D2Bot.printToConsole("Not going well? Read the wiki: https://github.com/kolton/d2bot-with-kolbot/wiki");
+				throw new Error("ÿc1Default config not found. \nÿc9     Try reading the kolbot wiki.");
 			}
 
 			try {
-				include("config/" + classes[me.classid] + ".js");
+				if (!include("config/" + classes[me.classid] + ".js")) {
+					throw new Error();
+				}
 			} catch (e) {
-				throw new Error("Failed to load default config.");
-			}
-		} else {
-			try {
-				include("config/" + configFilename);
-			} catch (e1) {
-				throw new Error("Failed to load character config.");
+				throw new Error("ÿc1Failed to load default config.");
 			}
 		}
 
@@ -80,18 +90,18 @@ var Config = {
 			LoadConfig.call();
 		} catch (e2) {
 			if (notify) {
-				print("ï¿½c8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
+				print("ÿc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
 
 				throw new Error("Config.init: Error in character config.");
 			}
 		}
-		
-		try { 
-			if (Config.AutoBuild.Enabled === true && !isIncluded("common/AutoBuild.js") && include("common/AutoBuild.js")) { 
+
+		try {
+			if (Config.AutoBuild.Enabled === true && !isIncluded("common/AutoBuild.js") && include("common/AutoBuild.js")) {
 				AutoBuild.initialize();
 			}
 		} catch (e3) {
-			print("ï¿½c8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
+			print("ÿc8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
 			print(e3.toSource());
 		}
 	},
@@ -203,12 +213,17 @@ var Config = {
 	SoJWaitTime: 0,
 	KillDclone: false,
 
+	// Experimental
+	FastParty: false,
+	AutoEquip: false,
+
 	// Attack specific
 	Dodge: false,
 	DodgeRange: 15,
 	DodgeHP: 100,
 	AttackSkill: [],
 	LowManaSkill: [],
+	CustomAttack: {},
 	TeleStomp: false,
 	ClearType: false,
 	ClearPath: false,

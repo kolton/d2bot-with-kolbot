@@ -132,7 +132,7 @@ function main() {
 							otherParty = player.partyid;
 						}
 
-						if (player.partyflag === 2 && (!otherParty || player.partyid === otherParty) && (getTickCount() - partyTick >= 2000)) {
+						if (player.partyflag === 2 && (!otherParty || player.partyid === otherParty) && (getTickCount() - partyTick >= 2000 || Config.FastParty)) {
 							clickParty(player, 2);
 							delay(100);
 						}

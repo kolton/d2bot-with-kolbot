@@ -431,6 +431,14 @@ function LoadConfig() {
 	Config.LowManaSkill[0] = -1; // Timed low mana skill.
 	Config.LowManaSkill[1] = -1; // Untimed low mana skill.
 
+	/* Advanced Attack config. Allows custom skills to be used on custom monsters.
+	 *	Format: "Monster Name": [timed skill id, untimed skill id]
+	 *	Multiple entries are separated by commas
+	 */
+	Config.CustomAttack = {
+		"Monster Name": [-1, -1]
+	};
+
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
 	Config.TeleStomp = false; // Use merc to attack bosses if they're immune to attacks, but not to physical damage

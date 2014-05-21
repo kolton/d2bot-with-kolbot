@@ -5,88 +5,56 @@
 */
 
 var ClassAttack = {
-	skillRange: [],
-	skillHand: [],
-	skillElement: [],
-
-	init: function () {
-		var i;
-
-		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
-			Config.AttackSkill.push(Config.LowManaSkill[i]);
-		}
-
-		for (i = 0; i < Config.AttackSkill.length; i += 1) {
-			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
-			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
-
-			switch (Config.AttackSkill[i]) {
-			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
-				this.skillHand[i] = 2; // shift bypass
-
-				break;
-			case 126: // Bash
-			case 133: // Double Swing
-			case 139: // Stun
-			case 144: // Concentrate
-			case 147: // Frenzy
-			case 152: // Berserk
-			case 232: // Feral Rage
-				this.skillRange[i] = 3;
-				this.skillHand[i] = 2; // shift bypass
-
-				break;
-			case 130: // Howl
-				this.skillRange[i] = 10;
-
-				break;
-			case 146: // Battle Cry
-			case 154: // War Cry
-				this.skillRange[i] = 4;
-
-				break;
-			case 151: // Whirlwind
-				this.skillRange[i] = 10;
-				this.skillHand[i] = 0;
-
-				break;
-			case 132: // Leap
-				this.skillRange[i] = 10;
-
-				break;
-			default: // Every other skill
-				this.skillRange[i] = 20;
-
-				break;
-			}
-		}
-	},
-
 	doAttack: function (unit, preattack) {
 		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
-					return 1;
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(Config.AttackSkill[0])) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
+					return false;
 				}
 			}
 
-			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
-				return 2;
-			}
+			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return 3;
+			return true;
 		}
 
-		var index;
+		var index, attackSkill;
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
-		return this.doCast(unit, index);
+		if (Attack.getCustomAttack(unit)) {
+			attackSkill = Attack.getCustomAttack(unit)[0];
+		} else {
+			attackSkill = Config.AttackSkill[index];
+		}
+
+		if (Config.AttackSkill[index + 1] > -1 && !Attack.checkResist(unit, attackSkill) && Attack.checkResist(unit, Config.AttackSkill[index + 1])) {
+			attackSkill = Config.AttackSkill[index + 1];
+		}
+
+		if (Skill.getManaCost(attackSkill) > me.mp) { // Low mana skill
+			if (Config.LowManaSkill[0] > -1 && Attack.checkResist(unit, Config.LowManaSkill[0])) {
+				attackSkill = Config.LowManaSkill[0];
+			} else if (Config.LowManaSkill[1] > -1 && Attack.checkResist(unit, Config.LowManaSkill[1])) {
+				attackSkill = Config.LowManaSkill[1];
+			}
+		}
+
+		switch (this.doCast(unit, attackSkill)) {
+		case 0: // Fail
+			break;
+		case 1: // Success
+			return true;
+		case 2: // Telestomp with barbs is pointless
+			break;
+		}
+
+		// Couldn't attack
+		return false;
 	},
 
 	afterAttack: function (pickit) {
@@ -97,62 +65,45 @@ var ClassAttack = {
 		}
 	},
 
-	doCast: function (unit, index) {
+	doCast: function (unit, attackSkill) {
 		var walk;
 
-		if (unit.mode === 0 || unit.mode === 12) {
-			return 3;
+		if (attackSkill < 0) {
+			return 2;
 		}
 
-		// Low mana skill
-		if (Config.AttackSkill[index] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[index]) > me.mp) {
-			index = Config.AttackSkill.length - 1;
-		}
-
-		// Check Immunities
-		if (!Attack.checkResist(unit, this.skillElement[index])) {
-			// already on last skill
-			if (index === Config.AttackSkill.length - 1) {
-				return 1;
-			}
-
-			if (Config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, this.skillElement[index + 1])) {
-				index = index + 1;
-			} else {
-				return 1;
-			}
-		}
-
-		if (Config.AttackSkill[index] === 151) {
-			if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x1)) {
-				//Pather.moveToUnit(unit, 0, 0, false, true);
-
-				if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x1)) {
-					return 1;
+		switch (attackSkill) {
+		case 151:
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x1)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x1)) {
+					return 0;
 				}
 			}
 
-			if (!this.whirlwind(unit)) {
-				if (Config.AttackSkill[index + 1] > 0) {
-					index = index + 1;
-				} else {
-					return 2;
+			if (!unit.dead) {
+				this.whirlwind(unit);
+			}
+
+			return 1;
+		default:
+			if (Skill.getRange(attackSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
+				return 0;
+			}
+
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x4)) {
+				walk = Skill.getRange(attackSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
+
+				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x4, walk)) {
+					return 0;
 				}
-			} else {
-				return 3;
 			}
-		}
 
-		if (Math.round(getDistance(me, unit)) > this.skillRange[index] || checkCollision(me, unit, 0x4)) {
-			walk = (this.skillRange[index] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1));
-
-			// walk short distances instead of tele for melee attacks
-			if (!Attack.getIntoPosition(unit, this.skillRange[index], 0x4, walk)) {
-				return 1;
+			if (!unit.dead) {
+				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
 			}
-		}
 
-		return Skill.cast(Config.AttackSkill[index], this.skillHand[index], unit) ? 3 : 2;
+			return 1;
+		}
 	},
 
 	whirlwind: function (unit) {
@@ -173,7 +124,7 @@ var ClassAttack = {
 		for (i = 0; i < angles.length; i += 1) { // get a better spot
 			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 4 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 4 + unit.y)];
 
-			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1, 0)) {
+			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1, 1)) {
 				return Skill.cast(151, 0, coords[0], coords[1]);
 			}
 		}
@@ -193,8 +144,8 @@ var ClassAttack = {
 		if (monster) {
 			do {
 				if (getDistance(me, monster) <= range && Attack.checkMonster(monster) && !checkCollision(me, monster, 0x4) &&
-						(Attack.checkResist(monster, this.skillElement[(monster.spectype & 0x7) ? 1 : 3]) ||
-						(Config.AttackSkill[3] > -1 && Attack.checkResist(monster, this.skillElement[3])))) {
+						(Attack.checkResist(monster, Attack.getSkillElement(Config.AttackSkill[(monster.spectype & 0x7) ? 1 : 3])) ||
+						(Config.AttackSkill[3] > -1 && Attack.checkResist(monster, Attack.getSkillElement(Config.AttackSkill[3]))))) {
 					return true;
 				}
 			} while (monster.getNext());
@@ -244,7 +195,7 @@ MainLoop:
 				corpse = corpseList.shift();
 
 				if (this.checkCorpse(corpse)) {
-					if (getDistance(me, corpse) > 9 || checkCollision(me, corpse, 0x1)) {
+					if (getDistance(me, corpse) > 30 || checkCollision(me, corpse, 0x1)) {
 						Pather.moveToUnit(corpse);
 					}
 
@@ -254,7 +205,7 @@ MainLoop:
 
 CorpseLoop:
 					for (j = 0; j < 3; j += 1) {
-						Skill.cast(142, 0, corpse);
+						Skill.cast(142, 3, corpse);
 
 						tick = getTickCount();
 
