@@ -30,6 +30,7 @@ var Runeword = {
 	Wealth: [629, 627, 612], // Lem + Ko + Tir
 	White: [623, 625], // Dol + Io
 	Zephyr: [618, 614], // Ort + Eth
+
 	// 1.10
 	Beast: [639, 612, 631, 632, 626], // Ber + Tir + Um + Mal + Lum
 	Bramble: [617, 636, 638, 614], // Ral + Ohm + Sur + Eth
@@ -55,29 +56,32 @@ var Runeword = {
 	Splendor: [614, 626], // Eth + Lum
 	Stone: [622, 631, 630, 626], // Shael + Um + Pul + Lum
 	Wind: [638, 610], // Sur + El
-	Brand: [640, 637, 632, 634], // Jah + Lo + Mal + Gul
-	Death: [624, 610, 635, 618, 634], // Hel + El + Vex + Ort + Gul
-	Destruction: [635, 637, 639, 640, 627], // Vex + Lo + Ber + Jah + Ko
-	Dragon: [638, 637, 621], // Sur + Lo + Sol
-	Dream: [625, 640, 630], // Io + Jah + Pul
-	Edge: [612, 616, 620], // Tir + Tal + Amn
-	Faith: [636, 640, 629, 611], // Ohm + Jah + Lem + Eld
-	Fortitude: [610, 621, 623, 637], // El + Sol + Dol + Lo
-	Grief: [614, 612, 637, 632, 617], // Eth + Tir + Lo + Mal + Ral
-	Harmony: [612, 615, 621, 627], // Tir + Ith + Sol + Ko
-	Ice: [620, 622, 640, 637], // Amn + Shael + Jah + Lo
-	"Infinity": [639, 632, 639, 633], // Ber + Mal + Ber + Ist
-	Insight: [617, 612, 616, 621], // Ral + Tir + Tal + Sol
-	LastWish: [640, 632, 640, 638, 640, 639], // Jah + Mal + Jah + Sur + Jah + Ber
-	Lawbringer: [620, 629, 627], // Amn + Lem + Ko
-	Oath: [622, 630, 632, 626], // Shael + Pul + Mal + Lum
-	Obedience: [624, 627, 619, 614, 628], // Hel + Ko + Thul + Eth + Fal
-	Phoenix: [635, 635, 637, 640], // Vex + Vex + Lo + Jah
-	Pride: [641, 638, 625, 637], // Cham + Sur + Io + Lo
-	Rift: [624, 627, 629, 634], // Hel + Ko + Lem + Gul
-	Spirit: [616, 619, 618, 620], // Tal + Thul + Ort + Amn
-	VoiceofReason: [629, 627, 610, 611], // Lem + Ko + El + Eld
-	Wrath: [630, 626, 639, 632], // Pul + Lum + Ber + Mal
+
+	// Don't use ladder-only on NL
+	Brand: me.ladder ? [640, 637, 632, 634] : false, // Jah + Lo + Mal + Gul
+	Death: me.ladder ? [624, 610, 635, 618, 634] : false, // Hel + El + Vex + Ort + Gul
+	Destruction: me.ladder ? [635, 637, 639, 640, 627] : false, // Vex + Lo + Ber + Jah + Ko
+	Dragon: me.ladder ? [638, 637, 621] : false, // Sur + Lo + Sol
+	Dream: me.ladder ? [625, 640, 630] : false, // Io + Jah + Pul
+	Edge: me.ladder ? [612, 616, 620] : false, // Tir + Tal + Amn
+	Faith: me.ladder ? [636, 640, 629, 611] : false, // Ohm + Jah + Lem + Eld
+	Fortitude: me.ladder ? [610, 621, 623, 637] : false, // El + Sol + Dol + Lo
+	Grief: me.ladder ? [614, 612, 637, 632, 617] : false, // Eth + Tir + Lo + Mal + Ral
+	Harmony: me.ladder ? [612, 615, 621, 627] : false, // Tir + Ith + Sol + Ko
+	Ice: me.ladder ? [620, 622, 640, 637] : false, // Amn + Shael + Jah + Lo
+	"Infinity": me.ladder ? [639, 632, 639, 633] : false, // Ber + Mal + Ber + Ist
+	Insight: me.ladder ? [617, 612, 616, 621] : false, // Ral + Tir + Tal + Sol
+	LastWish: me.ladder ? [640, 632, 640, 638, 640, 639] : false, // Jah + Mal + Jah + Sur + Jah + Ber
+	Lawbringer: me.ladder ? [620, 629, 627] : false, // Amn + Lem + Ko
+	Oath: me.ladder ? [622, 630, 632, 626] : false, // Shael + Pul + Mal + Lum
+	Obedience: me.ladder ? [624, 627, 619, 614, 628] : false, // Hel + Ko + Thul + Eth + Fal
+	Phoenix: me.ladder ? [635, 635, 637, 640] : false, // Vex + Vex + Lo + Jah
+	Pride: me.ladder ? [641, 638, 625, 637] : false, // Cham + Sur + Io + Lo
+	Rift: me.ladder ? [624, 627, 629, 634] : false, // Hel + Ko + Lem + Gul
+	Spirit: me.ladder ? [616, 619, 618, 620] : false, // Tal + Thul + Ort + Amn
+	VoiceofReason: me.ladder ? [629, 627, 610, 611] : false, // Lem + Ko + El + Eld
+	Wrath: me.ladder ? [630, 626, 639, 632] : false, // Pul + Lum + Ber + Mal
+
 	// 1.11
 	Bone: [621, 631, 631], // Sol + Um + Um
 	Enlightenment: [630, 617, 621], // Pul + Ral + Sol
@@ -111,14 +115,16 @@ var Runewords = {
 
 		// change text to classid
 		for (i = 0; i < Config.Runewords.length; i += 1) {
-			if (isNaN(Config.Runewords[i][1])) {
-				if (NTIPAliasClassID.hasOwnProperty(Config.Runewords[i][1].replace(/\s+/g, "").toLowerCase())) {
-					Config.Runewords[i][1] = NTIPAliasClassID[Config.Runewords[i][1].replace(/\s+/g, "").toLowerCase()];
-				} else {
-					Misc.errorReport("ÿc1Invalid runewords entry:ÿc0 " + Config.Runewords[i][1]);
-					Config.Runewords.splice(i, 1);
+			if (Config.Runewords[i][0] !== false) {
+				if (isNaN(Config.Runewords[i][1])) {
+					if (NTIPAliasClassID.hasOwnProperty(Config.Runewords[i][1].replace(/\s+/g, "").toLowerCase())) {
+						Config.Runewords[i][1] = NTIPAliasClassID[Config.Runewords[i][1].replace(/\s+/g, "").toLowerCase()];
+					} else {
+						Misc.errorReport("ÿc1Invalid runewords entry:ÿc0 " + Config.Runewords[i][1]);
+						Config.Runewords.splice(i, 1);
 
-					i -= 1;
+						i -= 1;
+					}
 				}
 			}
 		}
@@ -127,6 +133,10 @@ var Runewords = {
 	},
 
 	validItem: function (item) {
+		if (CraftingSystem.validGids.indexOf(item.gid) > -1) {
+			return false;
+		}
+
 		return true;
 	},
 

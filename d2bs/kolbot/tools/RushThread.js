@@ -11,6 +11,7 @@ include("NTItemParser.dbl");
 include("OOG.js");
 include("Gambling.js");
 include("AutoMule.js");
+include("CraftingSystem.js");
 include("TorchSystem.js");
 include("common/Attack.js");
 include("common/Cubing.js");
@@ -1140,6 +1141,7 @@ MainLoop:
 	Pickit.init(false);
 	Attack.init();
 	Storage.Init();
+	CraftingSystem.buildLists();
 	Runewords.init();
 	Cubing.init();
 

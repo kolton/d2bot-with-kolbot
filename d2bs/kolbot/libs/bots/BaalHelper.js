@@ -226,9 +226,11 @@ WSKLoop:
 			throw new Error("Failed to move to WSK3.");
 		}
 
-		if (!Pather.moveToExit(131, true) || !Pather.moveTo(15113, 5040)) {
+		if (!Pather.moveToExit(131, true)) {
 			throw new Error("Failed to move to Throne of Destruction.");
 		}
+
+		Pather.moveTo(15113, 5040);
 	} else {
 		Pather.useWaypoint(109);
 		Town.move("portalspot");

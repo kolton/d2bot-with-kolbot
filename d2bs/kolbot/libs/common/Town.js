@@ -86,6 +86,7 @@ var Town = {
 
 		this.buyPotions();
 		this.identify();
+		Item.autoEquip();
 		this.shopItems();
 		this.buyKeys();
 		this.repair();
@@ -406,7 +407,7 @@ var Town = {
 		// Avoid unnecessary NPC visits
 		for (i = 0; i < list.length; i += 1) {
 			// Only unid items or sellable junk (low level) should trigger a NPC visit
-			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && [-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1) {
+			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1 || Config.AutoEquip)) {
 				break;
 			}
 		}
@@ -475,6 +476,10 @@ MainLoop:
 
 					result = Pickit.checkItem(item);
 
+					if (!Item.autoEquipCheck(item)) {
+						result.result = 0;
+					}
+
 					switch (result.result) {
 					case 1:
 						Misc.itemLogger("Kept", item);
@@ -489,6 +494,11 @@ MainLoop:
 
 						break;
 					case 3: // runeword (doesn't trigger normally)
+						break;
+					case 5: // Crafting System
+						Misc.itemLogger("Kept", item, "CraftSys-Town");
+						CraftingSystem.update(item);
+
 						break;
 					default:
 						Misc.itemLogger("Sold", item);
@@ -740,7 +750,7 @@ CursorLoop:
 		for (i = 0; i < items.length; i += 1) {
 			result = Pickit.checkItem(items[i]);
 
-			if (result.result === 1) {
+			if (result.result === 1 && Item.autoEquipCheck(items[i])) {
 				try {
 					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
 						Misc.itemLogger("Shopped", items[i]);
@@ -821,6 +831,10 @@ CursorLoop:
 						case 2:
 							list.push(newItem.gid);
 							Cubing.update();
+
+							break;
+						case 5: // Crafting System
+							CraftingSystem.update(newItem);
 
 							break;
 						default:
@@ -985,8 +999,7 @@ CursorLoop:
 			return false;
 		}
 
-		var i,
-			items = this.getItemsForRepair(Config.RepairPercent, false);
+		var items = this.getItemsForRepair(Config.RepairPercent, false);
 
 		items.sort(function (a, b) {
 			return a.getStat(72) * 100 / a.getStat(73) - b.getStat(72) * 100 / b.getStat(73);
@@ -1300,7 +1313,7 @@ MainLoop:
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
 				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
-					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]);
+					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]) || CraftingSystem.keepItem(items[i]);
 
 					if (result) {
 						Misc.itemLogger("Stashed", items[i]);
@@ -1654,7 +1667,8 @@ MainSwitch:
 					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) &&
 					(Pickit.checkItem(items[i]).result === 0 || Pickit.checkItem(items[i]).result === 4) &&
 					!Cubing.keepItem(items[i]) &&
-					!Runewords.keepItem(items[i])
+					!Runewords.keepItem(items[i]) &&
+					!CraftingSystem.keepItem(items[i])
 					) {
 				try {
 					if (loseItemAction === sellAction) {
@@ -1662,15 +1676,6 @@ MainSwitch:
 						items[i].sell();
 					} else {
 						Misc.itemLogger("Dropped", items[i], "clearInventory");
-
-						// TEMP
-						/*if (items[i].name.match("flawless", "i")) {
-							D2Bot.printToConsole("QQ", 9);
-							D2Bot.stop();
-
-							return true;
-						}*/
-
 						items[i].drop();
 					}
 				} catch (e) {
@@ -1678,6 +1683,8 @@ MainSwitch:
 				}
 			}
 		}
+
+		me.cancel();
 
 		return true;
 	},
@@ -1723,9 +1730,9 @@ MainSwitch:
 			this.act[1].spot.sewers = [5221, 5181];
 			this.act[1].spot.meshif = [5205, 5058];
 			this.act[1].spot[NPC.Drognan] = [5097, 5035];
-			this.act[1].spot.atma = [5140, 5055];
+			this.act[1].spot.atma = [5137, 5060];
 			this.act[1].spot.warriv = [5152, 5201];
-			this.act[1].spot.portalspot = [5168, 5055];
+			this.act[1].spot.portalspot = [5168, 5060];
 			this.act[1].spot.stash = [5124, 5082];
 			this.act[1].spot.waypoint = [5070, 5083];
 			this.act[1].initialized = true;
@@ -1782,18 +1789,10 @@ MainSwitch:
 			throw new Error("move: Not in town");
 		}
 
-		var i, townSpot, path,
-			rval = false,
-			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
+		var i, path;
 
 		if (!this.act[me.act - 1].initialized) {
 			this.initialize();
-		}
-
-		if (typeof (this.act[me.act - 1].spot[spot]) === "object") {
-			townSpot = this.act[me.act - 1].spot[spot];
-		} else {
-			return false;
 		}
 
 		// Act 5 wp->portalspot override - ActMap.cpp crash
@@ -1807,51 +1806,99 @@ MainSwitch:
 			return true;
 		}
 
+		for (i = 0; i < 3; i += 1) {
+			if (this.moveToSpot(spot)) {
+				return true;
+			}
+
+			Packet.flash(me.gid);
+		}
+
+		return false;
+	},
+
+	moveToSpot: function (spot) {
+		var i, path, townSpot,
+			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
+
+		if (typeof (this.act[me.act - 1].spot[spot]) === "object") {
+			townSpot = this.act[me.act - 1].spot[spot];
+		} else {
+			return false;
+		}
+
 		if (useTK) {
 			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 11);
 
 			if (path && path[1]) {
-				rval = Pather.moveTo(path[1].x, path[1].y);
-			}
-		} else {
-			print("Townmove: " + spot + " from " + me.x + ", " + me.y);
-			delay(100);
-
-			for (i = 0; i < 3; i += 1) {
-				rval = Pather.moveTo(townSpot[0], townSpot[1]);
-
-				// If unit has more than one location and it's not here, search
-				if (townSpot.length > 2 && !getUnit(1, spot)) {
-					for (i = 0; i < townSpot.length / 2; i += 1) {
-						rval = Pather.moveTo(townSpot[i * 2], townSpot[i * 2 + 1]);
-
-						if (!!getUnit(1, spot)) {
-							break;
-						}
-					}
-				}
-
-				if (rval) {
-					break;
-				}
-
-				Packet.flash(me.gid);
+				townSpot = [path[1].x, path[1].y];
 			}
 		}
 
-		return rval;
+		for (i = 0; i < townSpot.length; i += 2) {
+			//print("moveToSpot: " + spot + " from " + me.x + ", " + me.y);
+			Pather.moveTo(townSpot[i], townSpot[i + 1]);
+
+			switch (spot) {
+			case "stash":
+				if (!!getUnit(2, 267)) {
+					return true;
+				}
+
+				break;
+			case "cain":
+				if (!!getUnit(1, NPC.Cain)) {
+					return true;
+				}
+
+				break;
+			case "palace":
+				if (!!getUnit(1, "jerhyn")) {
+					return true;
+				}
+
+				break;
+			case "portalspot":
+			case "sewers":
+				if (getDistance(me, townSpot[i], townSpot[i + 1]) < 10) {
+					return true;
+				}
+
+				break;
+			case "waypoint":
+				if (!!getUnit(2, "waypoint")) {
+					return true;
+				}
+
+				break;
+			default:
+				if (!!getUnit(1, spot)) {
+					return true;
+				}
+
+				break;
+			}
+		}
+
+		return false;
 	},
 
 	goToTown: function (act) {
 		var towns = [1, 40, 75, 103, 109];
 
 		if (!me.inTown) {
-			if (!Pather.makePortal()) {
-				throw new Error("Town.goToTown: Failed to make TP");
-			}
+			try {
+				if (!Pather.makePortal()) {
+					throw new Error("Town.goToTown: Failed to make TP");
+				}
 
-			if (!Pather.usePortal(null, me.name)) {
-				throw new Error("Town.goToTown: Failed to take TP");
+				if (!Pather.usePortal(null, me.name)) {
+					throw new Error("Town.goToTown: Failed to take TP");
+				}
+			} catch (TPError) {
+				print(TPError);
+
+				throw new Error("Town.goToTown: Failed to go to town");
 			}
 		}
 

@@ -5,51 +5,6 @@
 */
 
 var ClassAttack = {
-	skillRange: [],
-	skillHand: [],
-	skillElement: [],
-
-	init: function () {
-		var i;
-
-		for (i = 0; i < Config.LowManaSkill.length; i += 1) {
-			Config.AttackSkill.push(Config.LowManaSkill[i]);
-		}
-
-		for (i = 0; i < Config.AttackSkill.length; i += 1) {
-			this.skillHand[i] = getBaseStat("skills", Config.AttackSkill[i], "leftskill");
-			this.skillElement[i] = Attack.getSkillElement(Config.AttackSkill[i]);
-
-			switch (Config.AttackSkill[i]) {
-			case 0: // Normal Attack
-				this.skillRange[i] = Attack.usingBow() ? 20 : 3;
-				this.skillHand[i] = 2; // shift bypass
-
-				break;
-			case 225: // Firestorm
-			case 229: // Molten Boulder
-			case 230: // Arctic Blast
-				this.skillRange[i] = 10;
-
-				break;
-			case 234: // Fissure
-			case 244: // Volcano
-				this.skillRange[i] = 15;
-
-				break;
-			case 240: // Twister
-			case 245: // Tornado
-				this.skillRange[i] = 5;
-
-				break;
-			default: // Every other skill
-				this.skillRange[i] = 20;
-
-				break;
-			}
-		}
-	},
-
 	doAttack: function (unit, preattack) {
 		if (Config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
@@ -63,57 +18,83 @@ var ClassAttack = {
 			Skill.cast(235, 0);
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, this.skillElement[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.floor(getDistance(me, unit)) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
-					return 1;
+		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
+					return false;
 				}
 			}
 
-			if (!Skill.cast(Config.AttackSkill[0], this.skillHand[0], unit)) {
-				return 2;
-			}
+			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return 3;
+			return true;
 		}
 
-		var index;
+		var index, checkSkill,
+			timedSkill = -1,
+			untimedSkill = -1;
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
-		if (Attack.checkResist(unit, this.skillElement[index])) {
-			switch (this.doCast(unit, index)) {
-			case 0: // total fail
-				return 1;
-			case false: // fail to cast
-				return 2;
-			}
-
-			return 3;
+		// Get timed skill
+		if (Attack.getCustomAttack(unit)) {
+			checkSkill = Attack.getCustomAttack(unit)[0];
+		} else {
+			checkSkill = Config.AttackSkill[index];
 		}
 
-		if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, this.skillElement[5])) {
-			switch (this.doCast(unit, 5)) {
-			case 0: // total fail
-				return 1;
-			case false: // fail to cast
-				return 2;
-			}
-
-			return 3;
+		if (Attack.checkResist(unit, checkSkill)) {
+			timedSkill = checkSkill;
+		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+			timedSkill = Config.AttackSkill[5];
 		}
 
-		if ((me.getState(144) && Attack.checkResist(unit, "cold")) || (Config.TeleStomp && me.getMerc() && Attack.checkResist(unit, "physical"))) {
-			if (getDistance(me, unit) > 4) {
-				Pather.moveToUnit(unit);
-			}
-
-			delay(300);
-
-			return 3;
+		// Get untimed skill
+		if (Attack.getCustomAttack(unit)) {
+			checkSkill = Attack.getCustomAttack(unit)[1];
+		} else {
+			checkSkill = Config.AttackSkill[index + 1];
 		}
 
-		return 1;
+		if (Attack.checkResist(unit, checkSkill)) {
+			untimedSkill = checkSkill;
+		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+			untimedSkill = Config.AttackSkill[6];
+		}
+
+		// Low mana timed skill
+		if (Config.LowManaSkill[0] > -1 && Skill.getManaCost(timedSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[0])) {
+			timedSkill = Config.LowManaSkill[0];
+		}
+
+		// Low mana untimed skill
+		if (Config.LowManaSkill[1] > -1 && Skill.getManaCost(untimedSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[1])) {
+			untimedSkill = Config.LowManaSkill[1];
+		}
+
+		switch (this.doCast(unit, timedSkill, untimedSkill)) {
+		case 0: // Fail
+			break;
+		case 1: // Success
+			return true;
+		case 2: // Try to telestomp
+			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+				while (Attack.checkMonster(unit)) {
+					if (getDistance(me, unit) > 3) {
+						Pather.moveToUnit(unit);
+					}
+
+					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+				}
+
+				return true;
+			}
+
+			break;
+		}
+
+		// Couldn't attack
+		return false;
 	},
 
 	afterAttack: function () {
@@ -121,57 +102,81 @@ var ClassAttack = {
 		Precast.doPrecast(false);
 	},
 
-	doCast: function (unit, index) {
-		var i, walk,
-			timed = index,
-			untimed = index + 1;
+	// Returns: 0 - fail, 1 - success, 2 - no valid attack skills
+	doCast: function (unit, timedSkill, untimedSkill) {
+		var i, walk;
 
-		// Low mana timed skill
-		if (Config.AttackSkill[timed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 2] > -1 && Skill.getManaCost(Config.AttackSkill[timed]) > me.mp) {
-			timed = Config.AttackSkill.length - 2;
+		// No valid skills can be found
+		if (timedSkill < 0 && untimedSkill < 0) {
+			return 2;
 		}
 
-		if (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[timed])) {
-			if (Math.floor(getDistance(me, unit)) > this.skillRange[timed] || checkCollision(me, unit, 0x4)) {
-				walk = (this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
+		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
+			switch (timedSkill) {
+			case 245: // Tornado
+				if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
+					if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4)) {
+						return 0;
+					}
+				}
 
-				if (!Attack.getIntoPosition(unit, this.skillRange[timed], 0x4, walk)) {
+				// Randomized x coord changes tornado path and prevents constant missing
+				if (!unit.dead) {
+					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit.x + rand(-2, 2), unit.y);
+				}
+
+				return 1;
+			default:
+				if (Skill.getRange(timedSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
+					return 0;
+				}
+
+				if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
+					// Allow short-distance walking for melee skills
+					walk = Skill.getRange(timedSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
+
+					if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4, walk)) {
+						return 0;
+					}
+				}
+
+				if (!unit.dead) {
+					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
+				}
+
+				return 1;
+			}
+		}
+
+		if (untimedSkill > -1) {
+			if (Skill.getRange(untimedSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
+				return 0;
+			}
+
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(untimedSkill) || checkCollision(me, unit, 0x4)) {
+				// Allow short-distance walking for melee skills
+				walk = Skill.getRange(untimedSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
+
+				if (!Attack.getIntoPosition(unit, Skill.getRange(untimedSkill), 0x4, walk)) {
 					return 0;
 				}
 			}
 
-			if (Config.AttackSkill[timed] === 245) {
-				return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit.x + rand(-2, 2), unit.y);
+			if (!unit.dead) {
+				Skill.cast(untimedSkill, Skill.getHand(untimedSkill), unit);
 			}
 
-			return Skill.cast(Config.AttackSkill[timed], this.skillHand[timed], unit);
-		}
-
-		// Low mana untimed skill
-		if (Config.AttackSkill[untimed] > -1 && Config.AttackSkill[Config.AttackSkill.length - 1] > -1 && Skill.getManaCost(Config.AttackSkill[untimed]) > me.mp) {
-			untimed = Config.AttackSkill.length - 1;
-		}
-
-		if (Config.AttackSkill[untimed] > -1) {
-			if (Math.floor(getDistance(me, unit)) > this.skillRange[untimed] || checkCollision(me, unit, 0x4)) {
-				walk = (this.skillRange[untimed] < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1)) || me.getState(139) || me.getState(140);
-
-				if (!Attack.getIntoPosition(unit, this.skillRange[untimed], 0x4, walk)) {
-					return 0;
-				}
-			}
-
-			return Skill.cast(Config.AttackSkill[untimed], this.skillHand[untimed], unit);
+			return 1;
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			delay(40);
-
 			if (!me.getState(121)) {
 				break;
 			}
+
+			delay(40);
 		}
 
-		return false;
+		return 1;
 	}
 };

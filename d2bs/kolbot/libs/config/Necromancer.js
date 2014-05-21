@@ -432,6 +432,14 @@ function LoadConfig() {
 	Config.LowManaSkill[0] = -1; // Timed low mana skill.
 	Config.LowManaSkill[1] = -1; // Untimed low mana skill.
 
+	/* Advanced Attack config. Allows custom skills to be used on custom monsters.
+	 *	Format: "Monster Name": [timed skill id, untimed skill id]
+	 *	Multiple entries are separated by commas
+	 */
+	Config.CustomAttack = {
+		"Monster Name": [-1, -1]
+	};
+
 	Config.Dodge = false; // Move away from monsters that get too close. Don't use with short-ranged attacks like Poison Dagger.
 	Config.DodgeRange = 15; // Distance to keep from monsters.
 	Config.DodgeHP = 100; // Dodge only if HP percent is less than or equal to Config.DodgeHP. 100 = always dodge.

@@ -83,14 +83,14 @@ var MuleLogger = {
 
 	// Log kept item stats in the manager.
 	logItem: function (unit) {
-		/*if (!isIncluded("common/misc.js")) {
+		if (!isIncluded("common/misc.js")) {
 			include("common/misc.js");
-		}*/
+		}
 
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]/, "").trim();
+			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]/, "").trim();
 
 		desc = this.getItemDesc(unit) + "$" + unit.gid;
 		color = unit.getColor();
@@ -248,17 +248,13 @@ var MuleLogger = {
 			}
 		}
 
-		if (this.LogNames) {
-			header = (me.account || "Single Player") + " / " + me.name;
-		}
-
 		return {
 			itemColor: color,
 			image: code,
 			title: name,
 			description: desc,
 			header: header,
-			sockets: Misc.getItemSockets(unit) // not yet implemented
+			sockets: Misc.getItemSockets(unit)
 		};
 	},
 
@@ -293,34 +289,49 @@ var MuleLogger = {
 			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
 				parsedItem = this.logItem(items[i]);
 
+				// Log names to saved image
+				if (this.LogNames) {
+					parsedItem.header = (me.account || "Single Player") + " / " + me.name;
+				}
+
+				if (this.SaveScreenShot) {
+					D2Bot.saveItem(parsedItem);
+				}
+
+				// Always put name on Char Viewer items
+				if (!parsedItem.header) {
+					parsedItem.header = (me.account || "Single Player") + " / " + me.name;
+				}
+
+				// Remove itemtype_ prefix from the name
+				parsedItem.title = parsedItem.title.substr(parsedItem.title.indexOf("_") + 1);
+
 				if (items[i].mode === 1) {
 					parsedItem.title += " (equipped)";
 				}
 
 				string = JSON.stringify(parsedItem);
 				finalString += (string + "\n");
-
-				if (this.SaveScreenShot) {
-					D2Bot.saveItem(parsedItem);
-				}
 			}
 		}
 
 		if (this.LogMerc) {
 			for (i = 0; i < 3; i += 1) {
 				merc = me.getMerc();
+
 				if (merc) {
 					break;
 				}
+
 				delay(50);
 			}
-			
+
 			if (merc) {
 				items = merc.getItems();
+
 				for (i = 0; i < items.length; i += 1) {
 					parsedItem = this.logItem(items[i]);
 					parsedItem.title += " (merc)";
-				
 					string = JSON.stringify(parsedItem);
 					finalString += (string + "\n");
 
@@ -330,6 +341,7 @@ var MuleLogger = {
 				}
 			}
 		}
+
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + ".txt", finalString);
 		print("Item logging done.");
 	}

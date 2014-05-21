@@ -5,6 +5,211 @@
 */
 
 var Skill = {
+	usePvpRange: false,
+
+	getRange: function (skillId) {
+		switch (skillId) {
+		case 0: // Normal Attack
+			return Attack.usingBow() ? 20 : 3;
+		case 10: // Jab
+		case 14: // Power Strike
+		case 19: // Impale
+		case 30: // Fend
+		case 34: // Lightning Strike
+		case 73: // Poison Dagger
+		case 96: // Sacrifice
+		case 97: // Smite
+		case 106: // Zeal
+		case 112: // Blessed Hammer
+		case 116: // Conversion
+		case 126: // Bash
+		case 133: // Double Swing
+		case 139: // Stun
+		case 144: // Concentrate
+		case 147: // Frenzy
+		case 152: // Berserk
+		case 232: // Feral Rage
+		case 233: // Maul
+		case 238: // Rabies
+		case 239: // Fire Claws
+		case 242: // Hunger
+		case 248: // Fury
+		case 255: // Dragon Talon
+		case 260: // Dragon Claw
+		case 270: // Dragon Tail
+			return 3;
+		case 146: // Battle Cry
+		case 154: // War Cry
+			return 4;
+		case 44: // Frost Nova
+		case 101: // Holy Bolt
+		case 240: // Twister
+		case 245: // Tornado
+		case 500: // Summoner
+			return 5;
+		case 38: // Charged Bolt
+			return 6;
+		case 48: // Nova
+			return 7;
+		case 92: // Poison Nova
+			return 8;
+		case 107: // Charge
+		case 130: // Howl
+		case 132: // Leap
+		case 151: // Whirlwind
+		case 225: // Firestorm
+		case 229: // Molten Boulder
+		case 230: // Arctic Blast
+		case 243: // Shock Wave
+			return 10;
+		case 64: // Frozen Orb
+		case 67: // Teeth
+		case 234: // Fissure
+		case 244: // Volcano
+		case 251: // Fire Blast
+		case 256: // Shock Web
+		case 257: // Blade Sentinel
+		case 266: // Blade Fury
+			return 15;
+		case 121: // Fist of the Heavens
+		case 253: // Psychic Hammer
+		case 275: // Dragon Flight
+			return 20;
+		// Variable range
+		case 42: // Static Field
+			if (me.gametype === 1) {
+				return Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
+			}
+
+			return 25;
+		case 49: // Lightning
+		case 84: // Bone Spear
+		case 93: // Bone Spirit
+			if (this.usePvpRange) {
+				return 40;
+			}
+
+			return 15;
+		case 24: // Charged Strike
+		case 47:
+		case 51:
+		case 53:
+		case 56:
+		case 59:
+		case 273: // Mind Blast
+			if (this.usePvpRange) {
+				return 40;
+			}
+
+			return 20;
+		}
+
+		// Every other skill
+		return 20;
+	},
+
+	getHand: function (skillId) {
+		switch (skillId) {
+		case 6:
+		case 7:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 18:
+		case 19:
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		case 26:
+		case 27:
+		case 29:
+		case 30:
+		case 31:
+		case 33:
+		case 34:
+		case 35:
+		case 36:
+		case 37:
+		case 38:
+		case 39:
+		case 41:
+		case 45:
+		case 47:
+		case 49:
+		case 53:
+		case 55:
+		case 61:
+		case 63:
+		case 64:
+		case 65:
+		case 67:
+		case 73:
+		case 79:
+		case 84:
+		case 89:
+		case 93:
+		case 101:
+		case 107:
+		case 111:
+		case 112:
+		case 121:
+		case 132:
+		case 140:
+		case 143:
+		case 151:
+		case 225:
+		case 229:
+		case 230:
+		case 240:
+		case 243:
+		case 245:
+		case 251:
+		case 254:
+		case 256:
+		case 257:
+		case 259:
+		case 263:
+		case 265:
+		case 266:
+		case 269:
+		case 274:
+		case 275:
+			return 1;
+		case 0: // Normal Attack
+		case 96: // Sacrifice
+		case 97: // Smite
+		case 106: // Zeal
+		case 116: // Conversion
+		case 126: // Bash
+		case 133: // Double Swing
+		case 139: // Stun
+		case 144: // Concentrate
+		case 147: // Frenzy
+		case 152: // Berserk
+		case 232: // Feral Rage
+		case 233: // Maul
+		case 238: // Rabies
+		case 239: // Fire Claws
+		case 242: // Hunger
+		case 248: // Fury
+		case 255: // Dragon Talon
+		case 260: // Dragon Claw
+		case 270: // Dragon Tail
+			return 2; // Shift bypass
+		}
+
+		// Every other skill
+		return 0;
+	},
+
 	charges: [],
 
 	// Cast a skill on self, Unit or coords
@@ -56,18 +261,18 @@ var Skill = {
 			switch (typeof x) {
 			case "number":
 				Packet.castSkill(hand, x, y);
-				delay(300);
+				delay(250);
 
 				break;
 			case "object":
 				Packet.unitCast(hand, x);
-				delay(300);
+				delay(250);
 
 				break;
 			}
 		} else {
 			switch (hand) {
-			case 0: // Right hand
+			case 0: // Right hand + No Shift
 				clickType = 3;
 				shift = 0;
 
@@ -80,6 +285,11 @@ var Skill = {
 			case 2: // Left hand + No Shift
 				clickType = 0;
 				shift = 0;
+
+				break;
+			case 3: // Right hand + Shift
+				clickType = 3;
+				shift = 1;
 
 				break;
 			}
@@ -129,21 +339,30 @@ MainLoop:
 
 	// Put a skill on desired slot
 	setSkill: function (skillId, hand) {
+		var charge;
+
 		if (!me.getSkill(skillId, 1)) {
 			return false;
 		}
 
-		if (this.isCharge(skillId)) {
-			return false;
-		}
-
-		if (hand === undefined) {
+		if (hand === undefined || hand === 3) {
 			hand = 0;
 		}
 
 		// Check if the skill is already set
 		if (me.getSkill(hand === 0 ? 2 : 3) === skillId) {
 			return true;
+		}
+
+		charge = this.getCharge(skillId);
+
+		if (!!charge) {
+			// charge.charges is a cached value from Attack.getCharges
+			/*if (charge.charges > 0 && me.setSkill(skillId, hand, charge.unit)) {
+				return true;
+			}*/
+
+			return false;
 		}
 
 		if (me.setSkill(skillId, hand)) {
@@ -154,12 +373,12 @@ MainLoop:
 	},
 
 	// Charged skill
-	isCharge: function (skillId) {
+	getCharge: function (skillId) {
 		var i;
 
 		for (i = 0; i < this.charges.length; i += 1) {
 			if (this.charges[i].skill === skillId && me.getSkill(skillId, 0) === this.charges[i].level && me.getSkill(skillId, 0) === me.getSkill(skillId, 1)) {
-				return true;
+				return this.charges[i];
 			}
 		}
 
@@ -211,24 +430,68 @@ MainLoop:
 	}
 };
 
-var Items = {
+var Item = {
+	canEquip: function (item) {
+		if (item.type !== 4) { // Not an item
+			return false;
+		}
+
+		if (!item.getFlag(0x10)) { // Unid item
+			return false;
+		}
+
+		if (item.getStat(92) > me.getStat(12) || item.dexreq > me.getStat(2) || item.strreq > me.getStat(0)) { // Higher requirements
+			return false;
+		}
+
+		return true;
+	},
+
 	// Equips an item and throws away the old equipped item
-	equip: function (unit) {
-		if (unit.type !== 4) {
-			throw new Error("Items.equp: Unit must be an item");
-		}
-
-		if (!unit.getFlag(0x10)) { // Unid item
+	equip: function (item, bodyLoc) {
+		if (!this.canEquip(item)) {
 			return false;
 		}
 
-		if (unit.getStat(92) > me.getStat(12)) { // Higher level req item
-			return false;
+		var i;
+
+		for (i = 0; i < 3; i += 1) {
+			if (item.toCursor()) {
+				clickItem(0, bodyLoc);
+				delay(me.ping * 2 + 500);
+
+				if (item.bodylocation === bodyLoc) {
+					if (getCursorType() === 3) {
+						Misc.click(0, 0, me);
+					}
+
+					return true;
+				}
+			}
 		}
 
-		var i, bodyLoc;
+		return false;
+	},
 
-		switch (unit.itemType) {
+	getEquippedItemTier: function (bodyLoc) {
+		var item = me.getItem();
+
+		if (item) {
+			do {
+				if (item.bodylocation === bodyLoc) {
+					return NTIP.GetTier(item);
+				}
+			} while (item.getNext());
+		}
+
+		// Don't have anything equipped in there
+		return -1;
+	},
+
+	getBodyLoc: function (item) {
+		var bodyLoc;
+
+		switch (item.itemType) {
 		case 2: // Shield
 		case 70: // Auric Shields
 			bodyLoc = [4, 5];
@@ -297,30 +560,84 @@ var Items = {
 
 			break;
 		default:
-			throw new Error("Items.equip: Bad item type");
+			return false;
 		}
 
-		if (typeof bodyLoc === "object") {
-			// Temporary
-			bodyLoc = bodyLoc[0];
+		if (typeof bodyLoc === "number") {
+			bodyLoc = [bodyLoc];
 		}
 
-		for (i = 0; i < 3; i += 1) {
-			if (unit.toCursor()) {
-				clickItem(0, bodyLoc);
-				delay(me.ping * 2 + 500);
+		return bodyLoc;
+	},
 
-				if (unit.bodylocation === bodyLoc) {
-					if (getCursorType() === 3) {
-						Misc.click(0, 0, me);
-					}
+	autoEquipCheck: function (item) {
+		if (!Config.AutoEquip) {
+			return true;
+		}
 
+		var i,
+			tier = NTIP.GetTier(item),
+			bodyLoc = this.getBodyLoc(item);
+
+		if (tier > 0 && bodyLoc) {
+			for (i = 0; i < bodyLoc.length; i += 1) {
+				// Low tier items shouldn't be kept if they can't be equipped
+				if (tier > this.getEquippedItemTier(bodyLoc[i]) && this.canEquip(item)) {
 					return true;
 				}
 			}
 		}
 
-		return false;
+		// Sell/ignore low tier items, keep high tier
+		if (tier > 0 && tier < 100) {
+			return false;
+		}
+
+		return true;
+	},
+
+	// returns true if the item should be kept+logged, false if not
+	autoEquip: function () {
+		if (!Config.AutoEquip) {
+			return true;
+		}
+
+		var i, j, tier, bodyLoc,
+			items = me.findItems(-1, 0, 3);
+
+		function sortEq(a, b) {
+			if (Item.canEquip(a)) {
+				return -1;
+			}
+
+			if (Item.canEquip(b)) {
+				return 1;
+			}
+
+			return 0;
+		}
+
+		while (items.length > 0) {
+			items.sort(sortEq);
+
+			tier = NTIP.GetTier(items[0]);
+			bodyLoc = this.getBodyLoc(items[0]);
+
+			if (tier > 0 && bodyLoc) {
+				for (j = 0; j < bodyLoc.length; j += 1) {
+					if (tier > this.getEquippedItemTier(bodyLoc[j])) {
+						print(items[0].name);
+						this.equip(items[0], bodyLoc[j]);
+
+						break;
+					}
+				}
+			}
+
+			items.shift();
+		}
+
+		return true;
 	}
 };
 
@@ -1551,15 +1868,21 @@ var Packet = {
 
 		var i, j;
 
-		for (i = 0; i < 3; i += 1) {
-			if (getDistance(me, unit) > 5) {
+		for (i = 0; i < 5; i += 1) {
+			if (getDistance(me, unit) > 3) {
 				Pather.moveToUnit(unit);
 			}
 
-			sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+			if (i > 0) {
+				Packet.flash(me.gid);
+			}
+
+			if (!getUIFlag(0x08)) {
+				sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+			}
 
 			for (j = 0; j < 40; j += 1) {
-				if (j % 8 === 0) {
+				if (j > 0 && j % 8 === 0 && !getUIFlag(0x08)) {
 					me.cancel();
 					delay(300);
 					sendPacket(1, 0x13, 4, 1, 4, unit.gid);
@@ -1751,5 +2074,89 @@ CursorLoop:
 		if (value > 0) {
 			getPacket(1, 0x1d, 1, stat, 1, value);
 		}
+	}
+};
+
+var Messaging = {
+	sendToScript: function (name, msg) {
+		var script = getScript(name);
+
+		if (script && script.running) {
+			script.send(msg);
+
+			return true;
+		}
+
+		return false;
+	},
+
+	sendToProfile: function (profileName, mode, message, getResponse) {
+		var response;
+
+		function copyDataEvent(mode, msg) {
+			var obj;
+
+			try {
+				obj = JSON.parse(msg);
+			} catch (e) {
+				return false;
+			}
+
+			response = Misc.copy(obj);
+
+			return true;
+		}
+
+		if (getResponse) {
+			addEventListener("copydata", copyDataEvent);
+		}
+
+		sendCopyData(null, profileName, mode, JSON.stringify({
+			message: message,
+			sender: me.profile
+		}));
+
+		if (getResponse) {
+			delay(200);
+			removeEventListener("copydata", copyDataEvent);
+
+			if (!!response) {
+				return response;
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+};
+
+var Events = {
+	// gamepacket
+	gamePacket: function (bytes) {
+		var temp;
+
+		switch (bytes[0]) {
+		// Block movement after using TP/WP/Exit
+		case 0x0D: // Player Stop
+			// This can mess up death screen so disable for characters that are allowed to die
+			if (Config.LifeChicken > 0) {
+				return true;
+			}
+
+			break;
+		// Block poison skills that might crash the client
+		case 0x4C: // Cast skill on target
+		case 0x4D: // Cast skill on coords
+			temp = Number("0x" + bytes[7].toString(16) + bytes[6].toString(16));
+
+			if (temp && [15, 25, 92].indexOf(temp) > -1) {
+				return true;
+			}
+
+			break;
+		}
+
+		return false;
 	}
 };

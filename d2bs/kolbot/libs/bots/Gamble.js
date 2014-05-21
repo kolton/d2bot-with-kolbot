@@ -35,6 +35,12 @@ function Gamble() {
 
 		while (needGold) {
 			while (true) {
+				if (Town.needGamble()) {
+					needGold = false;
+				}
+
+				Town.stash();
+
 				gold = getUnit(4, 523, 3);
 
 				if (!gold || !Pickit.canPick(gold)) {
@@ -42,12 +48,7 @@ function Gamble() {
 				}
 
 				Pickit.pickItem(gold);
-				Town.stash();
 				delay(500);
-
-				if (Town.needGamble()) {
-					needGold = false;
-				}
 			}
 
 			delay(500);

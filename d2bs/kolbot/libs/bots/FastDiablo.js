@@ -5,8 +5,6 @@
 */
 
 function FastDiablo() {
-	var i, tick, seal;
-
 	this.getLayout = function (seal, value) {
 		var sealPreset = getPresetUnit(108, 2, seal);
 
@@ -162,47 +160,59 @@ function FastDiablo() {
 	};
 
 
-	this.openSeal = function (id) {
-		Pather.moveToPreset(108, 2, id, 4);
+	this.openSeal = function (classid) {
+		var i, j, seal;
 
-		seal = getUnit(2, id);
+		for (i = 0; i < 5; i += 1) {
+			Pather.moveToPreset(108, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
 
-		if (seal) {
-			for (i = 0; i < 5; i += 1) {
-				if (getDistance(me, seal) > 5) {
-					Pather.moveToUnit(seal, 4, 0);
+			if (i > 1) {
+				Attack.clear(10);
+			}
+
+			for (j = 0; j < 3; j += 1) {
+				seal = getUnit(2, classid);
+
+				if (seal) {
+					break;
 				}
 
-				//seal.interact();
-				sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
+				delay(100);
+			}
 
-				tick = getTickCount();
+			if (!seal) {
+				throw new Error("Seal not found (id " + classid + ")");
+			}
 
-				while (getTickCount() - tick < 500) {
-					if (seal.mode) {
-						return true;
-					}
+			if (seal.mode) {
+				return true;
+			}
 
-					delay(10);
+			sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
+			delay(classid === 394 ? 1000 : 500);
+
+			if (!seal.mode) {
+				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
+					Pather.moveTo(seal.x + 15, seal.y);
+				} else {
+					Pather.moveTo(seal.x - 5, seal.y - 5);
 				}
 
-				if (i > 2) {
-					Attack.clear(5);
-				}
+				delay(500);
+			} else {
+				return true;
 			}
 		}
 
-		return false;
+		throw new Error("Failed to open seal (id " + classid + ")");
 	};
 
 	Town.doChores();
 	Pather.useWaypoint(107);
 	Precast.doPrecast(true);
 	this.initLayout();
-
-	if (!this.openSeal(395) || !this.openSeal(396)) {
-		throw new Error("Failed to open seals");
-	}
+	this.openSeal(395);
+	this.openSeal(396);
 
 	if (this.vizLayout === 1) {
 		Pather.moveTo(7691, 5292);
@@ -214,9 +224,7 @@ function FastDiablo() {
 		throw new Error("Failed to kill Vizier");
 	}
 
-	if (!this.openSeal(394)) {
-		throw new Error("Failed to open seals");
-	}
+	this.openSeal(394);
 
 	if (this.seisLayout === 1) {
 		Pather.moveTo(7771, 5196);
@@ -228,9 +236,8 @@ function FastDiablo() {
 		throw new Error("Failed to kill de Seis");
 	}
 
-	if (!this.openSeal(392) || !this.openSeal(393)) {
-		throw new Error("Failed to open seals");
-	}
+	this.openSeal(392);
+	this.openSeal(393);
 
 	if (this.infLayout === 1) {
 		delay(1);

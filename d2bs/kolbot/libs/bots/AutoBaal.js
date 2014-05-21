@@ -108,15 +108,7 @@ function AutoBaal() {
 
 				if (Attack.checkResist(monster, Attack.getSkillElement(Config.AttackSkill[index]))) {
 					if (Config.AttackSkill[index] > -1) {
-						if (!me.getState(121)) {
-							Skill.cast(Config.AttackSkill[index], ClassAttack.skillHand[index], monster);
-						} else if (Config.AttackSkill[index + 1] > -1) {
-							Skill.cast(Config.AttackSkill[index + 1], ClassAttack.skillHand[index + 1], monster);
-						} else {
-							while (me.getState(121)) {
-								delay(40);
-							}
-						}
+						ClassAttack.doCast(monster, Config.AttackSkill[index], Config.AttackSkill[index + 1]);
 					}
 				} else {
 					monList.shift();

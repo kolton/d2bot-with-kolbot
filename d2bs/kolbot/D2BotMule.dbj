@@ -714,6 +714,7 @@ MainSwitch:
 
 		if (makeNext) {
 			if (obj.fullChars.length === 8 || (muleMode === 1 && obj.torchChars.length === 8)) {
+				//D2Bot.printToConsole("ACCOUNT FULL");
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -724,6 +725,7 @@ MainSwitch:
 		}
 
 		if (!obj.character || obj.character.indexOf(muleObj.charPrefix) < 0) {
+			//D2Bot.printToConsole("CHAR NOT FOUND");
 			nextChar();
 
 			obj = MuleData.read();
@@ -739,6 +741,7 @@ MainSwitch:
 		};
 
 		if (muleMode === 1 && obj.torchChars.indexOf(info.charName) > -1) {
+			//D2Bot.printToConsole("CHAR ALREADY HAS TORCH");
 			nextChar();
 
 			break;
@@ -747,7 +750,10 @@ MainSwitch:
 		if (ControlAction.findCharacter(info)) {
 			ControlAction.loginCharacter(info);
 		} else {
+			//D2Bot.printToConsole("CHAR NOT FOUND 2");
+
 			if (ControlAction.getCharacters().length >= 8) { // premade account that's already full
+				//D2Bot.printToConsole("ACCOUNT FULL 2");
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -755,6 +761,7 @@ MainSwitch:
 			}
 
 			if (!ControlAction.makeCharacter(info)) {
+				//D2Bot.printToConsole("MAKE CHAR FAILED");
 				// TODO: check if acc is full and cancel location 15 and 29 if true
 				nextChar();
 

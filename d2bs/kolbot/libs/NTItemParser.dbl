@@ -35,17 +35,8 @@ NTIP.OpenFile = function (filepath, notify) {
 
 	var i, nipfile, line, lines, info, item,
 		tick = getTickCount(),
-		//hash = md5_file(filepath),
 		filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length),
 		entries = 0;
-
-	/*if (!FileTools.exists("pickit/minified/" + hash + "." + filename)) {
-		NTIP.Minify(filepath);
-	}
-
-	if (FileTools.exists("pickit/minified/" + hash + "." + filename)) {
-		filepath = "pickit/minified/" + hash + "." + filename;
-	}*/
 
 	try {
 		nipfile = File.open(filepath, 0);
@@ -60,28 +51,6 @@ NTIP.OpenFile = function (filepath, notify) {
 	}
 
 	lines = nipfile.readAllLines();
-	/*item = {
-		itemType: 0,
-		classid: 0,
-		itemclass: 0,
-		quality: 0,
-		ilvl: 0,
-		getFlag: function () {
-			return false;
-		},
-		getColor: function () {
-			return false;
-		},
-		getPrefix: function () {
-			return false;
-		},
-		getSuffix: function () {
-			return false;
-		},
-		getStatEx: function () {
-			return false;
-		}
-	};*/
 
 	nipfile.close();
 
@@ -93,28 +62,6 @@ NTIP.OpenFile = function (filepath, notify) {
 		};
 
 		line = NTIP.ParseLineInt(lines[i], info);
-
-		// frickaline try/catch method
-		// switching to this would mean adding a separate check for runeword entries
-		/*if (line) {
-			try {
-				if (line[0] && line[0].length) {
-					eval(line[0]);
-				}
-
-				if (line[1] && line[1].length) {
-					eval(line[1]);
-				}
-
-				if (line[2] && line[2].length) {
-					eval(line[2]);
-				}
-			} catch (lineError) {
-				Misc.errorReport("Bad Line: " + lines[i]);
-				
-				line = false;
-			}
-		}*/
 
 		if (line) {
 			entries += 1;
@@ -210,8 +157,46 @@ NTIP.Clear = function () {
 	stringArray = [];
 };
 
+NTIP.GetTier = function (item) {
+	var i,
+		tier = 0;
+
+	// Go through ALL lines that describe the item
+	for (i = 0; i < NTIP_CheckList.length; i += 1) {
+		if (NTIP_CheckList[i].length === 3 && NTIP_CheckList[i][2].hasOwnProperty("Tier") && !isNaN(NTIP_CheckList[i][2].Tier)) {
+			try {
+				if (NTIP_CheckList[i][0].length > 0) {
+					if (eval(NTIP_CheckList[i][0])) {
+						if (NTIP_CheckList[i][1].length > 0) {
+							if (eval(NTIP_CheckList[i][1])) {
+								if (NTIP_CheckList[i][2].Tier > tier) {
+									tier = NTIP_CheckList[i][2].Tier;
+								}
+							}
+						} else {
+							if (NTIP_CheckList[i][2].Tier > tier) {
+								tier = NTIP_CheckList[i][2].Tier;
+							}
+						}
+					}
+				} else if (NTIP_CheckList[i][1].length > 0) {
+					if (eval(NTIP_CheckList[i][1])) {
+						if (NTIP_CheckList[i][2].Tier > tier) {
+							tier = NTIP_CheckList[i][2].Tier;
+						}
+					}
+				}
+			} catch (e) {
+
+			}
+		}
+	}
+
+	return tier;
+};
+
 NTIP.CheckItem = function (item, entryList, verbose) {
-	var i, list, identified, num, tier, rval,
+	var i, list, identified, num, rval,
 		result = 0;
 
 	if (!entryList) {
@@ -228,10 +213,6 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 				if (eval(list[i][0])) {
 					if (list[i][1].length > 0) {
 						if (eval(list[i][1])) {
-							if (list[i][2] && list[i][2].Tier && !isNaN(list[i][2].Tier)) {
-								tier = list[i][2].Tier;
-							}
-
 							if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
 								num = NTIP.CheckQuantityOwned(list[i][0], list[i][1]);
 
@@ -255,10 +236,6 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 							result = -1;
 						}
 					} else {
-						if (list[i][2] && list[i][2].Tier && !isNaN(list[i][2].Tier)) {
-							tier = list[i][2].Tier;
-						}
-
 						if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
 							num = NTIP.CheckQuantityOwned(list[i][0], null);
 
@@ -282,10 +259,6 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 				}
 			} else if (list[i][1].length > 0) {
 				if (eval(list[i][1])) {
-					if (list[i][2] && list[i][2].Tier && !isNaN(list[i][2].Tier)) {
-						tier = list[i][2].Tier;
-					}
-
 					if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
 						num = NTIP.CheckQuantityOwned(null, list[i][1]);
 
@@ -334,7 +307,6 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 		}
 
 		rval.result = result;
-		rval.tier = tier;
 
 		return rval;
 	}
