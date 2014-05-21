@@ -389,13 +389,17 @@ MainLoop:
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) &&
 						[76, 77, 78].indexOf(item.itemType) === -1 && // don't drop potions
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) &&
-						!this.cubingIngredient(item) && !this.runewordIngredient(item)) {
+						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) {
 					items.push(copyUnit(item));
 				}
 			} while (item.getNext());
 		}
 
 		return items;
+	},
+
+	utilityIngredient: function (item) {
+		return CraftingSystem.validGids.indexOf(item.gid) > -1;
 	},
 
 	// check if an item is a cubing ingredient
@@ -504,6 +508,7 @@ MainLoop:
 		return false;
 	},
 
+	// TODO: use master info to avoid conflicts
 	getMuleFilename: function (mode) {
 		var i, mule, jsonObj, jsonStr, file;
 

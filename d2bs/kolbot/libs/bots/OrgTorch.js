@@ -28,7 +28,8 @@ function OrgTorch() {
 				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
 					if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
 						scriptBroadcast("muleTorch");
-						quit();
+						//quit();
+						Messaging.sendToScript("tools/toolsthread.js", "quit");
 						//delay(10000);
 					}
 

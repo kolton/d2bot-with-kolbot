@@ -48,6 +48,46 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
+	writeToFile: function (filename, msg) {
+		var obj = {
+			profile: me.profile,
+			func: "writeToFile",
+			args: [filename, msg]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	postToIRC: function (ircProfile, recepient, msg) {
+		var obj = {
+			profile: me.profile,
+			func: "postToIRC",
+			args: [ircProfile, recepient, msg]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	ircEvent: function (mode) {
+		var obj = {
+			profile: me.profile,
+			func: "ircEvent",
+			args: [mode ? "true" : "false"]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	notify: function (msg) {
+		var obj = {
+			profile: me.profile,
+			func: "notify",
+			args: [msg]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	saveItem: function (itemObj) {
 		var obj = {
 				profile: me.profile,
@@ -166,6 +206,26 @@ var D2Bot = {
 		var obj = {
 			profile: me.profile,
 			func: "start",
+			args: [profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	startSchedule: function (profile) {
+		var obj = {
+			profile: me.profile,
+			func: "startSchedule",
+			args: [profile]
+		};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	stopSchedule: function (profile) {
+		var obj = {
+			profile: me.profile,
+			func: "stopSchedule",
 			args: [profile]
 		};
 
@@ -329,7 +389,7 @@ var DataFile = {
 	getStats: function () {
 		var obj = this.getObj();
 
-		return {runs: obj.runs, experience: obj.experience, lastArea: obj.lastArea, gold: obj.gold, level: obj.level, name: obj.name, gameName: obj.gameName, ingameTick: obj.ingameTick, handle: obj.handle, nextGame: obj.nextGame};
+		return Misc.clone(obj);
 	},
 
 	updateStats: function (arg, value) {
@@ -352,10 +412,6 @@ var DataFile = {
 
 		for (i = 0; i < statArr.length; i += 1) {
 			switch (statArr[i]) {
-			case "runs":
-				obj.runs = value;
-
-				break;
 			case "experience":
 				obj.experience = me.getStat(13);
 				obj.level = me.getStat(12);
@@ -377,10 +433,6 @@ var DataFile = {
 				obj.name = me.name;
 
 				break;
-			case "gameName":
-				obj.gameName = value;
-
-				break;
 			case "ingameTick":
 				obj.ingameTick = getTickCount();
 
@@ -389,12 +441,8 @@ var DataFile = {
 				obj.deaths = (obj.deaths || 0) + 1;
 
 				break;
-			case "handle":
-				obj.handle = value;
-
-				break;
-			case "nextGame":
-				obj.nextGame = value;
+			default:
+				obj[statArr[i]] = value;
 
 				break;
 			}
@@ -855,6 +903,11 @@ MainLoop:
 				this.click(6, 33, 572, 128, 35);
 
 				break;
+			case 14: // disconnected?
+			case 30: // player not found?
+				me.blockMouse = false;
+
+				return false;
 			default:
 				break;
 			}

@@ -314,7 +314,7 @@ function DiabloHelper() {
 			} while (partybaal.getNext());
 		}
 
-		if (areaCheck && Pather.usePortal(108, null)) {
+		if (areaCheck && Pather.getPortal(108, null) && Pather.usePortal(108, null)) {
 			break;
 		}
 
@@ -341,7 +341,18 @@ function DiabloHelper() {
 	this.seisSeal();
 	Precast.doPrecast(true);
 	this.infectorSeal();
-	Pather.moveTo(7788, 5292);
+
+	switch (me.classid) {
+	case 1:
+		Pather.moveTo(7793, 5291);
+
+		break;
+	default:
+		Pather.moveTo(7788, 5292);
+
+		break;
+	}
+
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();

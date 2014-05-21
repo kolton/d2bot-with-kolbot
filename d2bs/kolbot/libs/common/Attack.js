@@ -16,8 +16,6 @@ var Attack = {
 			include("common/Attacks/" + this.classes[me.classid] + ".js");
 		}
 
-		ClassAttack.init();
-
 		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
 			showConsole();
 			print("ÿc1Bad attack config. Don't expect your bot to attack.");
@@ -27,6 +25,18 @@ var Attack = {
 			this.checkInfinity();
 			this.getCharges();
 		}
+	},
+
+	getCustomAttack: function (unit) {
+		var i;
+
+		for (i in Config.CustomAttack) {
+			if (Config.CustomAttack.hasOwnProperty(i) && unit.name.toLowerCase() === i.toLowerCase()) {
+				return Config.CustomAttack[i];
+			}
+		}
+
+		return false;
 	},
 
 	// Get items with charges
@@ -167,7 +177,11 @@ var Attack = {
 				Precast.weaponSwitch(Math.abs(Config.MFSwitch));
 			}
 
-			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
+			if (attackCount > 0 && attackCount % 15 === 0 && Skill.getRange(Config.AttackSkill[1]) < 4) {
+				Packet.flash(me.gid);
+			}
+
+			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
 				errorInfo = " (doAttack failed)";
 
 				break;
@@ -192,6 +206,39 @@ var Attack = {
 
 		if (target.hp > 0 && target.mode !== 0 && target.mode !== 12) {
 			throw new Error("Failed to kill " + target.name + errorInfo);
+		}
+
+		return true;
+	},
+
+	hurt: function (classId, percent) {
+		var i, target,
+			attackCount = 0;
+
+		for (i = 0; i < 5; i += 1) {
+			target = getUnit(1, classId);
+
+			if (target) {
+				break;
+			}
+
+			delay(200);
+		}
+
+		while (attackCount < 300 && Attack.checkMonster(target) && Attack.skipCheck(target)) {
+			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
+				break;
+			}
+
+			if (!copyUnit(target).x) {
+				return true;
+			}
+
+			attackCount += 1;
+
+			if (target.hp * 100 / 128 <= percent) {
+				break;
+			}
 		}
 
 		return true;
@@ -339,30 +386,41 @@ var Attack = {
 
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
-				switch (result) {
-				case 1:
-					monsterList.shift();
+				if (result) {
+					for (i = 0; i < gidAttack.length; i += 1) {
+						if (gidAttack[i].gid === target.gid) {
+							break;
+						}
+					}
 
-					break;
-				case 2:
-				case 3:
-					if (!(target.spectype & 0x7) && me.area !== 131) {
-						for (i = 0; i < gidAttack.length; i += 1) {
-							if (gidAttack[i].gid === target.gid) {
-								break;
-							}
+					if (i === gidAttack.length) {
+						gidAttack.push({gid: target.gid, attacks: 0});
+					}
+
+					gidAttack[i].attacks += 1;
+
+					// Desync/bad position handler
+					switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
+					case 112:
+						// Tele in random direction with Blessed Hammer
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
+							Pather.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4);
 						}
 
-						if (i === gidAttack.length) {
-							gidAttack.push({gid: target.gid, attacks: 0});
+						break;
+					default:
+						// Flash with melee skills
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+							Packet.flash(me.gid);
 						}
 
-						gidAttack[i].attacks += 1;
+						break;
+					}
 
-						if (gidAttack[i].attacks > 15) {
-							print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
-							monsterList.shift();
-						}
+					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
+					if (me.area !== 131 && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
+						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
+						monsterList.shift();
 					}
 
 					attackCount += 1;
@@ -370,10 +428,8 @@ var Attack = {
 					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
 						Pickit.fastPick();
 					}
-
-					break;
-				default:
-					return false;
+				} else {
+					monsterList.shift();
 				}
 			} else {
 				monsterList.shift();
@@ -478,30 +534,41 @@ var Attack = {
 
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
-				switch (result) {
-				case 1:
-					monsterList.shift();
+				if (result) {
+					for (i = 0; i < gidAttack.length; i += 1) {
+						if (gidAttack[i].gid === target.gid) {
+							break;
+						}
+					}
 
-					break;
-				case 2:
-				case 3:
-					if (!(target.spectype & 0x7) && me.area !== 131) {
-						for (i = 0; i < gidAttack.length; i += 1) {
-							if (gidAttack[i].gid === target.gid) {
-								break;
-							}
+					if (i === gidAttack.length) {
+						gidAttack.push({gid: target.gid, attacks: 0});
+					}
+
+					gidAttack[i].attacks += 1;
+
+					// Desync/bad position handler
+					switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
+					case 112:
+						// Tele in random direction with Blessed Hammer
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
+							Pather.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4);
 						}
 
-						if (i === gidAttack.length) {
-							gidAttack.push({gid: target.gid, attacks: 0});
+						break;
+					default:
+						// Flash with melee skills
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+							Packet.flash(me.gid);
 						}
 
-						gidAttack[i].attacks += 1;
+						break;
+					}
 
-						if (gidAttack[i].attacks > 15) {
-							print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
-							monsterList.shift();
-						}
+					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
+					if (me.area !== 131 && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
+						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
+						monsterList.shift();
 					}
 
 					attackCount += 1;
@@ -509,10 +576,8 @@ var Attack = {
 					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
 						Pickit.fastPick();
 					}
-
-					break;
-				default:
-					return false;
+				} else {
+					monsterList.shift();
 				}
 			} else {
 				monsterList.shift();
@@ -530,9 +595,9 @@ var Attack = {
 	},
 
 	securePosition: function (x, y, range, timer, skipBlocked, special) {
-		if (arguments.length < 4) {
+		/*if (arguments.length < 4) {
 			throw new Error("securePosition needs 4 arguments");
-		}
+		}*/
 
 		var monster, monList, tick;
 
@@ -724,11 +789,11 @@ var Attack = {
 
 		// Barb optimization
 		if (me.classid === 4) {
-			if (!Attack.checkResist(unitA, ClassAttack.skillElement[(unitA.spectype & 0x7) ? 1 : 3])) {
+			if (!Attack.checkResist(unitA, Attack.getSkillElement(Config.AttackSkill[(unitA.spectype & 0x7) ? 1 : 3]))) {
 				return 1;
 			}
 
-			if (!Attack.checkResist(unitB, ClassAttack.skillElement[(unitB.spectype & 0x7) ? 1 : 3])) {
+			if (!Attack.checkResist(unitB, Attack.getSkillElement(Config.AttackSkill[(unitB.spectype & 0x7) ? 1 : 3]))) {
 				return -1;
 			}
 		}
@@ -1212,24 +1277,29 @@ AuraLoop: // Skip monsters with auras
 	},
 
 	// Check if a monster is immune to specified attack type
-	checkResist: function (unit, type, maxres) {
+	checkResist: function (unit, damageType, maxres) {
 		if (unit.type === 0) { // player
 			return true;
+		}
+
+		// When skillId is passed
+		if (typeof damageType === "number") {
+			damageType = this.getSkillElement(damageType);
 		}
 
 		if (typeof maxres !== "number") {
 			maxres = 100;
 		}
 
-		if (this.infinity && ["fire", "lightning", "cold"].indexOf(type) > -1) {
+		if (this.infinity && ["fire", "lightning", "cold"].indexOf(damageType) > -1) {
 			if (!unit.getState(28)) {
-				return this.getResist(unit, type) < 117;
+				return this.getResist(unit, damageType) < 117;
 			}
 
-			return this.getResist(unit, type) < maxres;
+			return this.getResist(unit, damageType) < maxres;
 		}
 
-		return this.getResist(unit, type) < maxres;
+		return this.getResist(unit, damageType) < maxres;
 	},
 
 	// Check if we have valid skills to attack a monster
@@ -1290,7 +1360,7 @@ AuraLoop: // Skip monsters with auras
 					Pather.walkTo(unit.x, unit.y, 3);
 				}
 
-				return true;
+				return !checkCollision(me, unit, coll);
 			}
 
 			return Pather.moveTo(unit.x, unit.y, 0);

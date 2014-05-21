@@ -424,15 +424,16 @@ var Hooks = {
 		hooks: [],
 		action: null,
 		currArea: 0,
+		enabled: true,
 		prevAreas: [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
 					36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46,
-					46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102,
+					46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 81, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102,
 					103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129,
 					130, 131, 109, 109, 109, 109],
+
 		event: function (keycode) {
 			Hooks.tele.action = keycode;
 		},
-		enabled: true,
 
 		check: function () {
 			if (!this.enabled) {
@@ -465,6 +466,11 @@ var Hooks = {
 				case 99: // Numpad 3
 					hook = this.getHook("POI");
 					obj.type = "unit";
+
+					break;
+				case 100: // Numpad 4
+					hook = this.getHook("Side Area");
+					obj.type = "area";
 
 					break;
 				}
@@ -501,6 +507,65 @@ var Hooks = {
 
 			if (me.area === 46) {
 				nextAreas[46] = getRoom().correcttomb;
+			}
+
+			switch (me.area) {
+			case 2: // Blood Moor
+				this.hooks.push({
+					name: "Side Area",
+					destination: 8,
+					hook: new Text("Num 4: " + Pather.getAreaName(8), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 43: // Far Oasis
+				this.hooks.push({
+					name: "Side Area",
+					destination: 62,
+					hook: new Text("Num 4: " + Pather.getAreaName(62), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 76:
+				this.hooks.push({
+					name: "Side Area",
+					destination: 85,
+					hook: new Text("Num 4: " + Pather.getAreaName(85), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 78:
+				this.hooks.push({
+					name: "Side Area",
+					destination: 88,
+					hook: new Text("Num 4: " + Pather.getAreaName(88), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 80:
+				this.hooks.push({
+					name: "Side Area",
+					destination: 94,
+					hook: new Text("Num 4: " + Pather.getAreaName(94), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 81:
+				this.hooks.push({
+					name: "Side Area",
+					destination: 92,
+					hook: new Text("Num 4: " + Pather.getAreaName(92), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 113:
+				this.hooks.push({
+					name: "Side Area",
+					destination: 114,
+					hook: new Text("Num 4: " + Pather.getAreaName(114), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
 			}
 
 			poi = Hooks.vector.getPOI();
@@ -648,10 +713,10 @@ function main() {
 		case 104: // Numpad 8
 			if (Hooks.vector.enabled) {
 				Hooks.vector.enabled = false;
-				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Enable Vectors";
+				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Enable Monsters";
 			} else {
 				Hooks.vector.enabled = true;
-				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Disable Vectors";
+				Hooks.text.getHook("vectorStatus").hook.text = "Num 8: Disable Monsters";
 			}
 
 			break;

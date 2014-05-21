@@ -45,11 +45,14 @@ Unit.prototype.__defineGetter__("idle",
 // Death check
 Unit.prototype.__defineGetter__("dead",
 	function () {
-		if (this.type > 0) {
-			throw new Error("Unit.dead: Must be used with player units.");
+		switch (this.type) {
+		case 0: // Player
+			return this.mode === 0 || this.mode === 17;
+		case 1: // Monster
+			return this.mode === 0 || this.mode === 12;
+		default:
+			throw new Error("Unit.dead: Wrong unit type");
 		}
-
-		return (this.mode === 0 || this.mode === 17);
 	});
 
 // Check if unit is in town
@@ -106,17 +109,16 @@ Unit.prototype.openMenu = function (addDelay) {
 			Packet.flash(me.gid);
 		}
 
-		//Misc.click(0, 0, this);
-		this.interact();
-		//sendPacket(1, 0x13, 4, 1, 4, this.gid);
+		if (!getUIFlag(0x08)) {
+			delay(100);
+			this.interact();
+		}
 
 		for (j = 0; j < 40; j += 1) {
-			if (j > 0 && j % 10 === 0) {
+			if (j > 0 && j % 10 === 0 && !getUIFlag(0x08)) {
 				me.cancel();
 				delay(400);
-				//Misc.click(0, 0, this);
 				this.interact();
-				//sendPacket(1, 0x13, 4, 1, 4, this.gid);
 			}
 
 			if (getUIFlag(0x08)) {

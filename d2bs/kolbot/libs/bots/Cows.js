@@ -219,6 +219,7 @@ function Cows() {
 		break;
 	}
 
+	Town.goToTown(1);
 	Town.doChores();
 
 	leg = this.getLeg();

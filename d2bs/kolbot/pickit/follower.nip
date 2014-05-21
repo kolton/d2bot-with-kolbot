@@ -1,5 +1,3 @@
-// just a simple gold/pot pickit
-
 [name] == gold
 [type] == healingpotion
 [type] == manapotion
@@ -8,3 +6,58 @@
 [quality] >= magic # [strength] > 100
 
 [type] == 39
+
+// classic
+
+// gloves
+[type] == gloves # [maxhp] > 10 || [maxmana] > 10 # [tier] == 1
+[type] == gloves # [maxhp] > 10 && [maxmana] > 10 # [tier] == 2
+[name] == heavygloves && [quality] == unique # [maxhp] > 0 # [tier] == 3
+[name] == lightgauntlets && [quality] == unique # [fcr] > 0 # [tier] == 101
+[name] == lightgauntlets && [quality] == set # [coldresist] > 0 # [tier] == 101
+
+// belt
+[name] == lightbelt || [name] == sash # # [tier] == 1
+[name] == lightbelt # [maxhp] > 0 # [tier] == 2
+[name] == belt # [maxhp] > 0 # [tier] == 3
+[name] == heavybelt && [quality] == set # [mindamage] > 0 # [tier] == 101
+
+// boots
+[type] == boots # [fireresist]+[lightresist]+[coldresist] >= 10 # [tier] == 1
+[type] == boots # [fireresist]+[lightresist]+[coldresist] >= 40 # [tier] == 3
+[name] == greaves && [quality] == unique # [fireresist] > 0 # [tier] == 101
+
+// helm
+[type] == helm # [maxhp] > 0 # [tier] == 1
+[type] == helm && [quality] == rare # [maxhp] >= 30 && [fireresist]+[lightresist]+[coldresist] >= 40 # [tier] == 101
+[name] == crown && [quality] == set # [fireresist] > 0 # [tier] == 101
+
+// amulet
+[type] == amulet # [maxhp] > 0 # [tier] == 1
+[type] == amulet # [maxhp] > 0 && [maxmana] > 0 # [tier] == 2
+[type] == amulet && [quality] == unique # [itemallskills] == 1 # [tier] == 3
+[type] == amulet && [quality] == rare # [maxhp]+[maxmana] >= 50 && [fireresist]+[lightresist]+[coldresist] >= 40 # [tier] == 4
+[type] == amulet && [quality] == set # [poisonresist] > 0 # [tier] == 101
+
+// ring
+[type] == ring # [maxhp] > 0 # [tier] == 1
+[type] == ring # [maxhp] > 0 && [maxmana] > 0 # [tier] == 2
+[type] == ring && [quality] == unique # [maxmana] > 0 # [tier] == 3
+[type] == ring && [quality] == rare # [maxhp]+[maxmana] >= 40 && [fireresist]+[lightresist]+[coldresist] >= 30 # [tier] == 4
+[type] == ring && [quality] == unique # [itemallskills] == 1 # [tier] == 101 // soj
+
+// armor
+[type] == armor # [maxhp] > 0 # [tier] == 1
+[type] == armor # [maxhp] >= 20 && [fireresist]+[lightresist]+[coldresist] >= 20 # [tier] == 2
+[name] == studdedleather && [quality] == unique # [dexterity] > 0 # [tier] == 101
+
+// weapon
+[type] == wand # [fcr] > 0 # [tier] == 1
+[type] == wand # [fcr] == 20 && [maxmana] >= 20 # [tier] == 2
+[name] == blade && [quality] == unique # [fcr] > 0 # [tier] == 101
+
+// shield
+[type] == shield # [fireresist]+[lightresist]+[coldresist] >= 10 # [tier] == 1
+[type] == shield # [fireresist]+[lightresist]+[coldresist] >= 20 # [tier] == 2
+[type] == shield # [fireresist]+[lightresist]+[coldresist] >= 40 # [tier] == 3
+[name] == gothicshield # [fireresist] > 0 # [tier] == 101

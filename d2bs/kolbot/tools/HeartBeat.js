@@ -11,69 +11,44 @@ function main() {
 	D2Bot.init();
 	print("Heartbeat loaded");
 
-	var tick = getTickCount(),
-		startTick = getTickCount();
-
-	function scriptCheck() {
-		if (getTickCount() - startTick < 2000) {
-			return false;
-		}
-
-		/*if (!me.ingame && getLocation() && getScript("default.dbj")) {
-			D2Bot.printToConsole("default.dbj was loaded out of game.");
-			D2Bot.restart();
-
-			return true;
-		}*/
-
-		var list = [],
-			threads = [],
-			script = getScript();
+	function togglePause() {
+		var script = getScript();
 
 		if (script) {
 			do {
-				if (list.indexOf(script.name) === -1) {
-					list.push(script.name);
-					threads.push(script.threadid);
-				} else if (script.threadid !== threads[list.indexOf(script.name)]) {
-					D2Bot.printToConsole("Script loaded twice " + script.name);
-					D2Bot.restart();
-
-					return true;
+				if (script.name.indexOf(".dbj") > -1) {
+					if (script.running) {
+						print("ÿc1Pausing ÿc0" + script.name);
+						script.pause();
+					} else {
+						print("ÿc2Resuming ÿc0" + script.name);
+						script.resume();
+					}
 				}
 			} while (script.getNext());
 		}
 
-		return false;
+		return true;
 	}
 
-	function CopyDataEvent(mode, msg) {
-		switch (mode) {
-		case 4:
-			if (msg === "pingrep") {
-				tick = getTickCount();
+	// Event functions
+	function KeyEvent(key) {
+		switch (key) {
+		case 19:
+			if (me.ingame) {
+				break;
 			}
+
+			togglePause();
 
 			break;
 		}
 	}
 
-	addEventListener("copydata", CopyDataEvent);
+	addEventListener("keyup", KeyEvent);
 
 	while (true) {
 		D2Bot.heartBeat();
 		delay(1000);
-
-		/*sendCopyData(null, me.windowtitle, 4, "pingreq");
-		delay(500);
-
-		if (getTickCount() - tick >= 20000) {
-			D2Bot.printToConsole("Starter not responding.");
-			D2Bot.restart();
-		}*/
-
-		if (scriptCheck()) {
-			break;
-		}
 	}
 }
