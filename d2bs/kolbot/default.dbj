@@ -103,11 +103,6 @@ function main() {
 	if (CraftingSystem.inGameCheck()) {
 		return true;
 	}
-	
-	// OrganSystem handler
-	if (OrganSystem.inGameCheck()) {
-		return true;
-	}
 
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
