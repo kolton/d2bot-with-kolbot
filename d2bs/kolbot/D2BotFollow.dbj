@@ -54,6 +54,7 @@ include("json2.js");
 include("OOG.js");
 include("automule.js");
 include("gambling.js");
+include("craftingsystem.js");
 include("torchsystem.js");
 include("common/misc.js");
 
@@ -108,6 +109,10 @@ function ScriptMsgEvent(msg) {
 		TorchSystem.check = true;
 
 		break;
+	case "crafting":
+		CraftingSystem.check = true;
+
+		break;
 	case "getMuleMode":
 		if (AutoMule.torchCheck) {
 			scriptBroadcast("1");
@@ -144,7 +149,7 @@ function ReceiveCopyData(mode, msg) {
 		break;
 	case 3: // Game request
 		// Don't let others join mule/torch/key/gold drop game
-		if (AutoMule.inGame || Gambling.inGame || TorchSystem.inGame) {
+		if (AutoMule.inGame || Gambling.inGame || TorchSystem.inGame || CraftingSystem.inGame) {
 			break;
 		}
 
@@ -188,6 +193,7 @@ function timer(tick) {
 }
 
 function main() {
+	debugLog(me.profile);
 	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
 
@@ -213,8 +219,8 @@ function main() {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				if (!ingame) {
-					print("Updating Status");
-					D2Bot.updateStatus("Game: " + me.gamename);
+					print("ÿc4Updating Status");
+					//D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
@@ -223,6 +229,7 @@ function main() {
 					DataFile.updateStats("runs", gameCount);
 				}
 
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
@@ -273,7 +280,7 @@ MainSwitch:
 		}
 
 		if (ingame) {
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
 				break;
 			}
 
@@ -311,7 +318,7 @@ MainSwitch:
 		D2Bot.updateStatus("Lobby Chat");
 
 		if (ingame) {
-			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck()) {
+			if (AutoMule.outOfGameCheck() || TorchSystem.outOfGameCheck() || Gambling.outOfGameCheck() || CraftingSystem.outOfGameCheck()) {
 				break;
 			}
 

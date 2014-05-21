@@ -10,6 +10,7 @@ include("json2.js");
 include("NTItemParser.dbl");
 include("OOG.js");
 include("Gambling.js");
+include("CraftingSystem.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/Config.js");
@@ -63,8 +64,7 @@ function main() {
 					townCheck = true;
 				}
 			}
-		}
-		);
+		});
 
 	// Init config and attacks
 	D2Bot.init();
@@ -72,13 +72,14 @@ function main() {
 	Pickit.init();
 	Attack.init();
 	Storage.Init();
+	CraftingSystem.buildLists();
 	Runewords.init();
 	Cubing.init();
 
 	while (true) {
 		if (!me.inTown && (townCheck ||
 			(Config.TownHP > 0 && me.hp < Math.floor(me.hpmax * Config.TownHP / 100)) ||
-			(Config.TownMP > 0 && me.hp < Math.floor(me.hpmax * Config.TownMP / 100)))) {
+			(Config.TownMP > 0 && me.mp < Math.floor(me.mpmax * Config.TownMP / 100)))) {
 			this.togglePause();
 
 			while (!me.gameReady) {
@@ -90,7 +91,8 @@ function main() {
 				Town.visitTown();
 			} catch (e) {
 				Misc.errorReport(e, "TownChicken.js");
-				scriptBroadcast("quit");
+				//scriptBroadcast("quit");
+				Messaging.sendToScript("tools/toolsthread.js", "quit");
 
 				return;
 			} finally {

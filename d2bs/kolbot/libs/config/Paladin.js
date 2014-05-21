@@ -432,6 +432,14 @@ function LoadConfig() {
 	Config.LowManaSkill[0] = -1; // Low mana skill.
 	Config.LowManaSkill[1] = -1; // Low mana aura.
 
+	/* Advanced Attack config. Allows custom skills to be used on custom monsters.
+	 *	Format: "Monster Name": [attack skill id, aura skill id]
+	 *	Multiple entries are separated by commas
+	 */
+	Config.CustomAttack = {
+		"Monster Name": [-1, -1]
+	};
+
 	Config.BossPriority = false; // Set to true to attack Unique/SuperUnique monsters first when clearing
 	Config.ClearType = 0xF; // Monster spectype to kill in level clear scripts (ie. Mausoleum). 0xF = skip normal, 0x7 = champions/bosses, 0 = all
 

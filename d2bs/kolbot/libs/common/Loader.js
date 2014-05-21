@@ -92,51 +92,53 @@ var Loader = {
 			throw new Error("You don't have any valid scripts in bots folder.");
 		}
 
-ScriptLoop:
 		for (i in Scripts) {
-			if (Scripts.hasOwnProperty(i) && this.scriptList.indexOf(i) > -1) {
-				if (!!Scripts[i]) {
-					if (!include("bots/" + i + ".js")) {
-						Misc.errorReport("Failed to include script: " + i);
-					}
+			if (Scripts.hasOwnProperty(i)) {
+				if (this.scriptList.indexOf(i) > -1) {
+					if (!!Scripts[i]) {
+						if (!include("bots/" + i + ".js")) {
+							Misc.errorReport("Failed to include script: " + i);
+						}
 
-					if (isIncluded("bots/" + i + ".js")) {
-						try {
-							reconfiguration = typeof Scripts[i] === 'object';
+						if (isIncluded("bots/" + i + ".js")) {
+							try {
+								reconfiguration = typeof Scripts[i] === 'object';
 
-							if (typeof (global[i]) === "function") {
-								if (i !== "Test" && i !== "Follower") {
-									townCheck = Town.goToTown();
+								if (typeof (global[i]) === "function") {
+									if (i !== "Test" && i !== "Follower") {
+										townCheck = Town.goToTown();
+									} else {
+										townCheck = true;
+									}
+
+									if (townCheck) {
+										print("ÿc2Starting script: ÿc9" + i);
+										//scriptBroadcast(JSON.stringify({currScript: i}));
+										Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: i}));
+
+										if (reconfiguration) {
+											print("ÿc2Copying Config properties from " + i + " object.");
+											this.copy(Scripts[i], Config);
+										}
+
+										global[i]();
+
+										if (reconfiguration) {
+											print("ÿc2Reverting back unmodified config properties.");
+											this.copy(unmodifiedConfig, Config);
+										}
+									}
 								} else {
-									townCheck = true;
+									throw new Error("Invalid script function name");
 								}
-
-								if (townCheck) {
-									print("ÿc2Starting script: ÿc9" + i);
-									//scriptBroadcast(JSON.stringify({currScript: i}));
-
-									if (reconfiguration) {
-										print("ÿc2Copying Config properties from " + i + " object.");
-										this.copy(Scripts[i], Config);
-									}
-
-									global[i]();
-
-									if (reconfiguration) {
-										print("ÿc2Reverting back unmodified config properties.");
-										this.copy(unmodifiedConfig, Config);
-									}
-								}
-							} else {
-								throw new Error("Invalid script function name");
+							} catch (error) {
+								Misc.errorReport(error, i);
 							}
-						} catch (error) {
-							Misc.errorReport(error, i);
 						}
 					}
+				} else {
+					Misc.errorReport("ÿc1Script " + i + " doesn't exist.");
 				}
-			} else {
-				Misc.errorReport("ÿc1Script " + i + " doesn't exist.");
 			}
 		}
 	}

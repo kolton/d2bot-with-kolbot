@@ -10,6 +10,7 @@ include("json2.js");
 include("NTItemParser.dbl");
 include("OOG.js");
 include("Gambling.js");
+include("CraftingSystem.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/Config.js");
@@ -176,33 +177,14 @@ function main() {
 		load("tools/FlashThread.js");
 	}
 
+	// Use PVP range for attacks
+	Skill.usePvpRange = true;
+
 	// Attack sequence adjustments - this only affects the AntiHostile thread
 	switch (me.classid) {
-	case 0: // Amazon - increase skill range
-		if ([24].indexOf(Config.AttackSkill[1]) > -1) {
-			ClassAttack.skillRange[1] = 40;
-			ClassAttack.skillRange[2] = 40;
-		}
-
-		break;
-	case 1: // Sorceress - increase skill range
-		if ([47, 49, 51, 53, 56, 59].indexOf(Config.AttackSkill[1]) > -1) {
-			ClassAttack.skillRange[1] = 40;
-			ClassAttack.skillRange[2] = 40;
-		}
-
-		break;
-	case 2: // Necromancer - increase skill range
-		if ([84, 93].indexOf(Config.AttackSkill[1]) > -1) {
-			ClassAttack.skillRange[1] = 40;
-			ClassAttack.skillRange[2] = 40;
-		}
-
-		break;
 	case 6: // Assassin - use Mind Blast with trapsins
 		if (me.getSkill(273, 1) && [251, 256].indexOf(Config.AttackSkill[1]) > -1) {
 			Config.AttackSkill[1] = 273; // Mind Blast
-			ClassAttack.skillRange[1] = 40;
 			ClassAttack.trapRange = 40;
 		}
 
@@ -270,10 +252,10 @@ function main() {
 
 					while (!this.findPlayer() && hostiles.length > 0) {
 						if (!me.getState(121)) {
-							Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
+							Skill.cast(Config.AttackSkill[1], Skill.getHand(Config.AttackSkill[1]), 15099, 5237);
 						} else {
 							if (Config.AttackSkill[2] > -1) {
-								Skill.cast(Config.AttackSkill[2], ClassAttack.skillHand[2], 15099, 5237);
+								Skill.cast(Config.AttackSkill[2], Skill.getHand(Config.AttackSkill[2]), 15099, 5237);
 							} else {
 								while (me.getState(121)) {
 									delay(40);
@@ -295,7 +277,7 @@ function main() {
 
 					while (!this.findPlayer() && hostiles.length > 0) {
 						// Tornado path is a function of target x. Slight randomization will make sure it can't always miss
-						Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099 + rand(-2, 2), 5237);
+						Skill.cast(Config.AttackSkill[1], Skill.getHand(Config.AttackSkill[1]), 15099 + rand(-2, 2), 5237);
 					}
 
 					break;
@@ -313,7 +295,7 @@ function main() {
 							}
 						}
 
-						Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], 15099, 5237);
+						Skill.cast(Config.AttackSkill[1], Skill.getHand(Config.AttackSkill[1]), 15099, 5237);
 
 						while (me.getState(121)) {
 							delay(40);
@@ -383,7 +365,7 @@ function main() {
 						if (missile) {
 							do {
 								if (getPlayerFlag(me.gid, missile.owner, 8) && (getDistance(me, missile) < 15 || (missile.targetx && getDistance(me, missile.targetx, missile.targety) < 15))) {
-									this.moveAway(missile, ClassAttack.skillRange[1]);
+									this.moveAway(missile, Skill.getRange(Config.AttackSkill[1]));
 
 									break;
 								}
@@ -391,8 +373,8 @@ function main() {
 						}
 
 						// Move away if the player is too close or if he tries to move too close (telestomp)
-						if (ClassAttack.skillRange[1] > 20 && (getDistance(me, player) < 30 || (player.targetx && getDistance(me, player.targetx, player.targety) < 15))) {
-							this.moveAway(player, ClassAttack.skillRange[1]);
+						if (Skill.getRange(Config.AttackSkill[1]) > 20 && (getDistance(me, player) < 30 || (player.targetx && getDistance(me, player.targetx, player.targety) < 15))) {
+							this.moveAway(player, Skill.getRange(Config.AttackSkill[1]));
 						}
 
 						break;

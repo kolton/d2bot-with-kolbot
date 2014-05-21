@@ -66,6 +66,51 @@ var NodeAction = {
 	}
 };
 
+var PathDebug = {
+	hooks: [],
+	enableHooks: false,
+
+	drawPath: function (path) {
+		if (!this.enableHooks) {
+			return;
+		}
+
+		this.removeHooks();
+
+		var i;
+
+		if (path.length < 2) {
+			return;
+		}
+
+		for (i = 0; i < path.length - 1; i += 1) {
+			this.hooks.push(new Line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y, 0x84, true));
+		}
+	},
+
+	removeHooks: function () {
+		var i;
+
+		for (i = 0; i < this.hooks.length; i += 1) {
+			this.hooks[i].remove();
+		}
+
+		this.hooks = [];
+	},
+
+	coordsInPath: function (path, x, y) {
+		var i;
+
+		for (i = 0; i < path.length; i += 1) {
+			if (getDistance(x, y, path[i].x, path[i].y) < 5) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+};
+
 var Pather = {
 	teleport: true,
 	walkDistance: 10,
@@ -74,11 +119,15 @@ var Pather = {
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 	recursion: true,
 
+	/*
+		Pather.moveTo(x, y, retry, clearPath, pop);
+		x - the x coord to move to
+		y - the y coord to move to
+		retry - number of attempts before aborting
+		clearPath - kill monsters while moving
+		pop - remove last node
+	*/
 	moveTo: function (x, y, retry, clearPath, pop) {
-		while (!me.gameReady) {
-			delay(100);
-		}
-
 		if (me.dead) { // Abort if dead
 			return false;
 		}
@@ -132,18 +181,10 @@ var Pather = {
 			return this.walkTo(x, y);
 		}
 
-		while (!me.area) {
-			delay(40);
-		}
-
 		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
-		if (!path) {
+		if (!path || !path.length) {
 			throw new Error("moveTo: Failed to generate path.");
-		}
-
-		while (!me.gameReady) {
-			delay(40);
 		}
 
 		path.reverse();
@@ -151,6 +192,8 @@ var Pather = {
 		if (pop) {
 			path.pop();
 		}
+
+		PathDebug.drawPath(path);
 
 		if (this.useTeleport && Config.TeleSwitch) {
 			Misc.teleSwitch();
@@ -183,7 +226,23 @@ var Pather = {
 					}
 				}
 
-				if (!(this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y))) {
+				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y)) {
+					if (!me.inTown && path.length > 1) { // Don't use NodeAction or TownCheck on last node
+						if (this.recursion) {
+							this.recursion = false;
+
+							NodeAction.go({clearPath: clearPath});
+
+							if (getDistance(me, node.x, node.y) > 4) {
+								this.moveTo(node.x, node.y);
+							}
+
+							this.recursion = true;
+						}
+
+						Misc.townCheck();
+					}
+				} else {
 					if (fail > 0 && !this.useTeleport && !me.inTown) {
 						Attack.clear(5);
 
@@ -193,36 +252,26 @@ var Pather = {
 					}
 
 					// Reduce node distance in new path
-					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? rand(20, 30) : 10);
+					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? rand(25, 35) : rand(10, 15));
 					fail += 1;
 
-					if (!path) {
+					if (!path || !path.length) {
 						throw new Error("moveTo: Failed to generate path.");
 					}
 
 					path.reverse();
 
-					print("move retry " + fail);
-				}
+					PathDebug.drawPath(path);
 
-				if (fail > 0 && fail >= retry) {
-					break;
-				}
-
-				if (!me.inTown && path.length > 1) { // Don't use NodeAction or TownCheck on last node
-					if (this.recursion) {
-						this.recursion = false;
-
-						NodeAction.go({clearPath: clearPath});
-
-						if (getDistance(me, node.x, node.y) > 4) {
-							this.moveTo(node.x, node.y);
-						}
-
-						this.recursion = true;
+					if (pop) {
+						path.pop();
 					}
 
-					Misc.townCheck();
+					print("move retry " + fail);
+
+					if (fail > 0 && fail >= retry) {
+						break;
+					}
 				}
 			}
 
@@ -233,9 +282,16 @@ var Pather = {
 			Precast.weaponSwitch(Misc.oldSwitch);
 		}
 
+		PathDebug.removeHooks();
+
 		return getDistance(me, node.x, node.y) < 5;
 	},
 
+	/*
+		Pather.teleportTo(x, y);
+		x - the x coord to teleport to
+		y - the y coord to teleport to
+	*/
 	teleportTo: function (x, y) {
 		var i, tick;
 
@@ -262,6 +318,11 @@ MainLoop:
 		return false;
 	},
 
+	/*
+		Pather.walkTo(x, y);
+		x - the x coord to walk to
+		y - the y coord to walk to
+	*/
 	walkTo: function (x, y, minDist) {
 		while (!me.gameReady) {
 			delay(100);
@@ -275,25 +336,31 @@ MainLoop:
 			nFail = 0,
 			attemptCount = 0;
 
-		if (me.runwalk === 1 && me.stamina / me.staminamax * 100 <= 20) {
-			me.runwalk = 0;
+		// Stamina handler and Charge
+		if (!me.inTown && !me.dead) {
+			if (me.runwalk === 1 && me.stamina / me.staminamax * 100 <= 20) {
+				me.runwalk = 0;
+			}
+
+			if (me.runwalk === 0 && me.stamina / me.staminamax * 100 >= 50) {
+				me.runwalk = 1;
+			}
+
+			if (me.classid === 3 && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
+				if (Config.Vigor) {
+					Skill.setSkill(115, 0);
+				}
+
+				Misc.click(0, 1, x, y);
+
+				while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
+					delay(40);
+				}
+			}
 		}
 
-		if (me.runwalk === 0 && me.stamina / me.staminamax * 100 >= 50) {
+		if (me.inTown && me.runwalk === 0) {
 			me.runwalk = 1;
-		}
-
-		// Charge!
-		if (me.classid === 3 && !me.dead && !me.inTown && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
-			if (Config.Vigor) {
-				Skill.setSkill(115, 0);
-			}
-
-			Misc.click(0, 1, x, y);
-
-			while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
-				delay(40);
-			}
 		}
 
 		while (getDistance(me.x, me.y, x, y) > minDist && !me.dead) {
@@ -362,6 +429,11 @@ ModeLoop:
 		return !me.dead && getDistance(me.x, me.y, x, y) <= minDist;
 	},
 
+	/*
+		Pather.openDoors(x, y);
+		x - the x coord of the node close to the door
+		y - the y coord of the node close to the door
+	*/
 	openDoors: function (x, y) {
 		if (me.inTown) {
 			return false;
@@ -394,16 +466,20 @@ ModeLoop:
 			} while (door.getNext());
 		}
 
-		// TODO: Monsta doors (Barricaded)
+		// DO: Monsta doors (Barricaded)
 
 		return false;
 	},
 
 	/*
-		This function moves to an existing unit or object with x, y properties. It can also accept a preset unit.
-		If you want to go to a preset unit based on its area, type and id, use Pather.moveToPreset().
+		Pather.moveToUnit(unit, offX, offY, clearPath, pop);
+		unit - a valid Unit or PresetUnit object
+		offX - offset from unit's x coord
+		offY - offset from unit's x coord
+		clearPath - kill monsters while moving
+		pop - remove last node
 	*/
-	moveToUnit: function (unit, offX, offY, clearPath, pop) { // Maybe use range instead of XY offset
+	moveToUnit: function (unit, offX, offY, clearPath, pop) {
 		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown
 							&& ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
@@ -440,7 +516,14 @@ ModeLoop:
 	},
 
 	/*
-		This function finds the preset unit based on its area, unitType and unitId and then moves to it.
+		Pather.moveToPreset(area, unitType, unitId, offX, offY, clearPath, pop);
+		area - area of the preset unit
+		unitType - type of the preset unit
+		unitId - preset unit id
+		offX - offset from unit's x coord
+		offY - offset from unit's x coord
+		clearPath - kill monsters while moving
+		pop - remove last node
 	*/
 	moveToPreset: function (area, unitType, unitId, offX, offY, clearPath, pop) {
 		if (area === undefined || unitType === undefined || unitId === undefined) {
@@ -472,7 +555,12 @@ ModeLoop:
 		return this.moveTo(presetUnit.roomx * 5 + presetUnit.x + offX, presetUnit.roomy * 5 + presetUnit.y + offY, 3, clearPath, pop);
 	},
 
-	// moveToExit can take a single area or an array of areas as the first argument
+	/*
+		Pather.moveToExit(targetArea, use, clearPath);
+		targetArea - area id or array of area ids to move to
+		use - enter target area or last area in the array
+		clearPath - kill monsters while moving
+	*/
 	moveToExit: function (targetArea, use, clearPath) {
 		var i, j, area, exits, targetRoom, dest,
 			areas = [];
@@ -545,6 +633,10 @@ ModeLoop:
 		return true;
 	},
 
+	/*
+		Pather.getNearestRoom(area);
+		area - the id of area to search for the room nearest to the player character
+	*/
 	getNearestRoom: function (area) {
 		var i, x, y, dist, room,
 			minDist = 10000;
@@ -584,6 +676,12 @@ ModeLoop:
 		return [x, y];
 	},
 
+	/*
+		Pather.useUnit(type, id, targetArea);
+		type - type of the unit to use
+		id - id of the unit to use
+		targetArea - area id of where the unit leads to
+	*/
 	useUnit: function (type, id, targetArea) {
 		var i, tick, unit,
 			preArea = me.area;
@@ -607,14 +705,14 @@ ModeLoop:
 				this.moveToUnit(unit);
 			}
 
-			delay(200);
-			Misc.click(0, 0, unit);
+			delay(300);
+			sendPacket(1, 0x13, 4, type, 4, unit.gid);
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 3000) {
-				if ((targetArea === null && me.area !== preArea) || me.area === targetArea) {
-					delay(200);
+				if ((!targetArea && me.area !== preArea) || me.area === targetArea) {
+					delay(100);
 
 					return true;
 				}
@@ -625,10 +723,14 @@ ModeLoop:
 			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
 		}
 
-		return false;
+		return targetArea ? me.area === targetArea : me.area !== preArea;
 	},
 
-	// If there is no check, it will try to take the waypoint directly, without opening the waypoint screen
+	/*
+		Pather.moveTo(targetArea, check);
+		targetArea - id of the area to enter
+		check - force the waypoint menu
+	*/
 	useWaypoint: function useWaypoint(targetArea, check) {
 		switch (targetArea) {
 		case undefined:
@@ -650,13 +752,11 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp, timer;
-
-		timer = getTickCount();
+		var i, tick, wp;
 
 		for (i = 0; i < 12; i += 1) {
-			if (me.area === targetArea) {
-				return true;
+			if (me.area === targetArea || me.dead) {
+				break;
 			}
 
 			if (me.inTown) {
@@ -671,7 +771,10 @@ ModeLoop:
 				}
 
 				if (check) {
-					this.moveToUnit(wp);
+					if (getDistance(me, wp) > 5) {
+						this.moveToUnit(wp);
+					}
+
 					Misc.click(0, 0, wp);
 
 					tick = getTickCount();
@@ -718,17 +821,14 @@ ModeLoop:
 					}
 				}
 
+				delay(200);
 				wp.interact(targetArea);
 
 				tick = getTickCount();
 
 				while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
-					while (!me.gameReady || !me.area) {
-						delay(100);
-					}
-
 					if (me.area === targetArea) {
-						delay(200);
+						delay(100);
 
 						return true;
 					}
@@ -736,7 +836,10 @@ ModeLoop:
 					delay(10);
 				}
 
-				if (me.inTown) {
+				me.cancel(); // In case lag causes the wp menu to stay open
+				Packet.flash(me.gid);
+
+				/*if (me.inTown) {
 					Misc.click(0, 0, me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4); // In case of client/server desync
 
 					if (i > 2) {
@@ -746,15 +849,11 @@ ModeLoop:
 					Town.move("waypoint");
 				} else {
 					this.moveToUnit(wp);
-				}
+				}*/
 
 				if (i > 1) { // Activate check if we fail direct interact twice
-					Packet.flash(me.gid);
-
 					check = true;
 				}
-
-				me.cancel(); // In case lag causes the wp menu to stay open
 			} else {
 				Packet.flash(me.gid);
 			}
@@ -762,9 +861,17 @@ ModeLoop:
 			delay(me.ping + 1);
 		}
 
+		if (me.area === targetArea) {
+			return true;
+		}
+
 		throw new Error("useWaypoint: Failed to use waypoint");
 	},
 
+	/*
+		Pather.makePortal(use);
+		use - use the portal that was made
+	*/
 	makePortal: function (use) {
 		if (me.inTown) {
 			return true;
@@ -835,6 +942,12 @@ MainLoop:
 		return false;
 	},
 
+	/*
+		Pather.usePortal(targetArea, owner, unit);
+		targetArea - id of the area the portal leads to
+		owner - name of the portal's owner
+		unit - use existing portal unit
+	*/
 	usePortal: function (targetArea, owner, unit) {
 		me.cancel();
 
@@ -843,11 +956,7 @@ MainLoop:
 
 		for (i = 0; i < 10; i += 1) {
 			if (me.dead) {
-				return false;
-			}
-
-			if (me.area !== preArea) {
-				return true;
+				break;
 			}
 
 			if (i > 0 && owner && me.inTown) {
@@ -898,12 +1007,8 @@ MainLoop:
 				tick = getTickCount();
 
 				while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
-					while (!me.area || !me.gameReady) {
-						delay(100);
-					}
-
 					if (me.area !== preArea) {
-						delay(200);
+						delay(100);
 
 						return true;
 					}
@@ -923,9 +1028,14 @@ MainLoop:
 			delay(me.ping + 1);
 		}
 
-		return false;
+		return targetArea ? me.area === targetArea : me.area !== preArea;
 	},
 
+	/*
+		Pather.getPortal(targetArea, owner, unit);
+		targetArea - id of the area the portal leads to
+		owner - name of the portal's owner
+	*/
 	getPortal: function (targetArea, owner) {
 		var portal = getUnit(2, "portal");
 
@@ -959,6 +1069,14 @@ MainLoop:
 		return false;
 	},
 
+	/*
+		Pather.moveTo(x, y, range, step, coll);
+		x - the starting x coord
+		y - the starting y coord
+		range - maximum allowed range from the starting coords
+		step - distance between each checked dot on the grid
+		coll - collision flag to avoid
+	*/
 	getNearestWalkable: function (x, y, range, step, coll) {
 		if (!step) {
 			step = 1;
@@ -973,7 +1091,7 @@ MainLoop:
 			result = false;
 
 		// Check if the original spot is valid
-		if (this.checkSpot(x, y, coll)) {
+		if (this.checkSpot(x, y, coll, false)) {
 			result = [x, y];
 		}
 
@@ -1000,6 +1118,13 @@ MainLoop:
 		return result;
 	},
 
+	/*
+		Pather.moveTo(x, y, coll, cacheOnly);
+		x - the x coord to check
+		y - the y coord to check
+		coll - collision flag to search for
+		cacheOnly - use only cached room data
+	*/
 	checkSpot: function (x, y, coll, cacheOnly) {
 		var dx, dy, value;
 
@@ -1022,6 +1147,10 @@ MainLoop:
 		return true;
 	},
 
+	/*
+		Pather.accessToAct(act);
+		act - the act number to check for access
+	*/
 	accessToAct: function (act) {
 		switch (act) {
 		// Act 1 is always accessible
@@ -1041,6 +1170,10 @@ MainLoop:
 		}
 	},
 
+	/*
+		Pather.getWP(area);
+		area - the id of area to get the waypoint in
+	*/
 	getWP: function (area) {
 		var i, j, wp, preset,
 			wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
@@ -1078,6 +1211,10 @@ MainLoop:
 		return false;
 	},
 
+	/*
+		Pather.journeyTo(area);
+		area - the id of area to move to
+	*/
 	journeyTo: function (area) {
 		var i, special, unit, tick, target;
 
@@ -1138,6 +1275,8 @@ MainLoop:
 
 								break;
 							}
+
+							delay(10);
 						}
 					}
 				}
@@ -1155,7 +1294,7 @@ MainLoop:
 				}
 			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
 				this.moveToPreset(me.area, 5, 19);
-				this.useUnit(5, 19);
+				this.useUnit(5, 19, 47);
 			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 
@@ -1197,6 +1336,11 @@ MainLoop:
 
 	plotCourse_openedWpMenu: false,
 
+	/*
+		Pather.plotCourse(dest, src);
+		dest - destination area id
+		src - starting area id
+	*/
 	plotCourse: function (dest, src) {
 		var node, prevArea,
 			useWP = false,
@@ -1273,6 +1417,11 @@ MainLoop:
 		return {course: arr, useWP: useWP};
 	},
 
+	/*
+		Pather.areasConnected(src, dest);
+		dest - destination area id
+		src - starting area id
+	*/
 	areasConnected: function (src, dest) {
 		if (src === 46 && dest === 74) {
 			return false;
@@ -1281,6 +1430,10 @@ MainLoop:
 		return true;
 	},
 
+	/*
+		Pather.getAreaName(area);
+		area - id of the area to get the name for
+	*/
 	getAreaName: function (area) {
 		var areas = [
 			"None",

@@ -19,17 +19,9 @@ function Andariel() {
 		}
 
 		for (i = 0; i < 300; i += 1) {
-			if (!me.getState(121)) {
-				Skill.cast(Config.AttackSkill[1], ClassAttack.skillHand[1], target);
-			} else {
-				if (Config.AttackSkill[2] > -1) {
-					Skill.cast(Config.AttackSkill[2], ClassAttack.skillHand[2], target);
-				} else {
-					delay(300);
-				}
-			}
+			ClassAttack.doCast(target, Config.AttackSkill[1], Config.AttackSkill[2]);
 
-			if (target.mode === 0 || target.mode === 12) {
+			if (target.dead) {
 				return true;
 			}
 
@@ -38,7 +30,7 @@ function Andariel() {
 			}
 		}
 
-		return target.mode === 0 || target.mode === 12;
+		return target.dead;
 	};
 
 	Town.doChores();

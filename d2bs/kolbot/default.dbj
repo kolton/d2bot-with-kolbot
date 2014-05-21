@@ -6,6 +6,7 @@ include("NTItemParser.dbl");
 include("OOG.js");
 include("AutoMule.js");
 include("Gambling.js");
+include("CraftingSystem.js");
 include("TorchSystem.js");
 include("MuleLogger.js");
 include("common/Attack.js");
@@ -79,6 +80,7 @@ function main() {
 	Pickit.init(true);
 	Attack.init();
 	Storage.Init();
+	CraftingSystem.buildLists();
 	Runewords.init();
 	Cubing.init();
 
@@ -97,6 +99,16 @@ function main() {
 		return true;
 	}
 
+	// Crafting System handler
+	if (CraftingSystem.inGameCheck()) {
+		return true;
+	}
+	
+	// OrganSystem handler
+	if (OrganSystem.inGameCheck()) {
+		return true;
+	}
+
 	me.maxgametime = Config.MaxGameTime * 1000;
 	stats = DataFile.getStats();
 
@@ -112,6 +124,8 @@ function main() {
 
 	// Load events and threads
 	addEventListener("scriptmsg", this.scriptEvent);
+	//addEventListener("gamepacket", Events.gamePacket);
+
 	load("tools/ToolsThread.js");
 
 	if (Config.TownCheck || Config.TownHP || Config.TownMP) {
@@ -165,6 +179,7 @@ function main() {
 	if (sojPause) {
 		try {
 			Town.goToTown();
+			Town.doChores();
 
 			me.maxgametime = 0;
 
@@ -198,12 +213,15 @@ function main() {
 		scriptBroadcast("mule");
 	}
 
+	if (CraftingSystem.checkFullSets()) {
+		scriptBroadcast("crafting");
+	}
+
 	if (TorchSystem.keyCheck()) {
 		scriptBroadcast("torch");
 	}
 
-	scriptBroadcast("quit");
-	//delay(5000); // Don't end default before other scripts - possible JS_IsRunning crash fix
+	Messaging.sendToScript("tools/toolsthread.js", "quit");
 
 	return true;
 }

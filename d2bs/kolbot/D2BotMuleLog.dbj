@@ -167,12 +167,13 @@ MainSwitch:
 
 			print("updating runs");
 			D2Bot.updateRuns();
+			delay(1000);
 
 			gameCount += 1;
 			lastGameStatus = "ready";
 			ingame = false;
 
-			ControlAction.click(6, 693, 490, 80, 20);
+			ControlAction.click(6, 693, 490, 80, 20); // Quit from Lobby
 
 			break;
 		}
@@ -375,9 +376,7 @@ MainSwitch:
 			if (obj.currChar) {
 				for (i = 0; i < charList.length; i += 1) {
 					if (charList[i] === obj.currChar) {
-						charList.splice(0, i);
-
-						i -= 1;
+						charList.splice(0, i + 1); // Remove the previous currChar as well
 
 						break;
 					}
@@ -385,13 +384,15 @@ MainSwitch:
 			}
 		}
 
-		currChar = charList.shift();
-		obj.currChar = currChar;
-
 		// last char in acc = trigger next acc
 		if (!charList.length) {
 			nextAcc = true;
+
+			break;
 		}
+
+		currChar = charList.shift();
+		obj.currChar = currChar;
 
 		print("ÿc4Mule Loggerÿc2: Login character: " + currChar);
 		FileTools.writeText("logs/MuleLog.json", JSON.stringify(obj));

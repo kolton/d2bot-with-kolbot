@@ -33,7 +33,7 @@ var TorchSystem = {
 
 		// Edit here!
 
-		"Farmer 1": { // Farmer profile name
+		"PROFILE NAME": { // Farmer profile name
 			// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
 			KeyFinderProfiles: [""],
 
@@ -165,6 +165,10 @@ var TorchSystem = {
 							}
 						}
 					}
+				}
+
+				if (me.getStat(14) >= 100000) {
+					gold(100000);
 				}
 
 				delay(5000);

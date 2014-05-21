@@ -341,16 +341,20 @@ var Cubing = {
 				this.recipes.push({Ingredients: [Config.Recipes[i][1], 617, 621, 576], Index: Recipe.Unique.Weapon.ToExceptional, Ethereal: Config.Recipes[i][2]});
 
 				break;
-			case Recipe.Unique.Weapon.ToElite:
-				this.recipes.push({Ingredients: [Config.Recipes[i][1], 626, 630, 576], Index: Recipe.Unique.Weapon.ToElite, Ethereal: Config.Recipes[i][2]});
+			case Recipe.Unique.Weapon.ToElite: // Ladder only
+				if (me.ladder) {
+					this.recipes.push({Ingredients: [Config.Recipes[i][1], 626, 630, 576], Index: Recipe.Unique.Weapon.ToElite, Ethereal: Config.Recipes[i][2]});
+				}
 
 				break;
 			case Recipe.Unique.Armor.ToExceptional:
 				this.recipes.push({Ingredients: [Config.Recipes[i][1], 616, 622, 586], Index: Recipe.Unique.Armor.ToExceptional, Ethereal: Config.Recipes[i][2]});
 
 				break;
-			case Recipe.Unique.Armor.ToElite:
-				this.recipes.push({Ingredients: [Config.Recipes[i][1], 629, 627, 586], Index: Recipe.Unique.Armor.ToElite, Ethereal: Config.Recipes[i][2]});
+			case Recipe.Unique.Armor.ToElite: // Ladder only
+				if (me.ladder) {
+					this.recipes.push({Ingredients: [Config.Recipes[i][1], 629, 627, 586], Index: Recipe.Unique.Armor.ToElite, Ethereal: Config.Recipes[i][2]});
+				}
 
 				break;
 			case Recipe.Rare.Weapon.ToExceptional:
@@ -411,96 +415,134 @@ var Cubing = {
 					this.recipes.push({Ingredients: [Config.Recipes[i][1], Config.Recipes[i][1], Config.Recipes[i][1]], Index: Recipe.Rune, AlwaysEnabled: true});
 
 					break;
-				case 619: // thul
+				case 619: // thul->amn
 					this.recipes.push({Ingredients: [619, 619, 619, 562], Index: Recipe.Rune});
 
 					break;
-				case 620: // amn
+				case 620: // amn->sol
 					this.recipes.push({Ingredients: [620, 620, 620, 557], Index: Recipe.Rune});
 
 					break;
-				case 621: // sol
+				case 621: // sol->shael
 					this.recipes.push({Ingredients: [621, 621, 621, 567], Index: Recipe.Rune});
 
 					break;
-				case 622: // shael
+				case 622: // shael->dol
 					this.recipes.push({Ingredients: [622, 622, 622, 577], Index: Recipe.Rune});
 
 					break;
-				case 623: // dol
-					this.recipes.push({Ingredients: [623, 623, 623, 572], Index: Recipe.Rune});
+				case 623: // dol->hel
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [623, 623, 623, 572], Index: Recipe.Rune});
+					}
 
 					break;
-				case 624: // hel
-					this.recipes.push({Ingredients: [624, 624, 624, 582], Index: Recipe.Rune});
+				case 624: // hel->io
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [624, 624, 624, 582], Index: Recipe.Rune});
+					}
 
 					break;
-				case 625: // io
-					this.recipes.push({Ingredients: [625, 625, 625, 563], Index: Recipe.Rune});
+				case 625: // io->lum
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [625, 625, 625, 563], Index: Recipe.Rune});
+					}
 
 					break;
-				case 626: // lum
-					this.recipes.push({Ingredients: [626, 626, 626, 558], Index: Recipe.Rune});
+				case 626: // lum->ko
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [626, 626, 626, 558], Index: Recipe.Rune});
+					}
 
 					break;
-				case 627: // ko
-					this.recipes.push({Ingredients: [627, 627, 627, 568], Index: Recipe.Rune});
+				case 627: // ko->fal
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [627, 627, 627, 568], Index: Recipe.Rune});
+					}
 
 					break;
-				case 628: // fal
-					this.recipes.push({Ingredients: [628, 628, 628, 578], Index: Recipe.Rune});
+				case 628: // fal->lem
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [628, 628, 628, 578], Index: Recipe.Rune});
+					}
 
 					break;
-				case 629: // lem
-					this.recipes.push({Ingredients: [629, 629, 629, 573], Index: Recipe.Rune});
+				case 629: // lem->pul
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [629, 629, 629, 573], Index: Recipe.Rune});
+					}
 
 					break;
-				case 630: // pul
-					this.recipes.push({Ingredients: [630, 630, 583], Index: Recipe.Rune});
+				case 630: // pul->um
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [630, 630, 583], Index: Recipe.Rune});
+					}
 
 					break;
-				case 631: // um
-					this.recipes.push({Ingredients: [631, 631, 564], Index: Recipe.Rune});
+				case 631: // um->mal
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [631, 631, 564], Index: Recipe.Rune});
+					}
 
 					break;
-				case 632: // mal
-					this.recipes.push({Ingredients: [632, 632, 559], Index: Recipe.Rune});
+				case 632: // mal->ist
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [632, 632, 559], Index: Recipe.Rune});
+					}
 
 					break;
-				case 633: // ist
-					this.recipes.push({Ingredients: [633, 633, 569], Index: Recipe.Rune});
+				case 633: // ist->gul
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [633, 633, 569], Index: Recipe.Rune});
+					}
 
 					break;
-				case 634: // gul
-					this.recipes.push({Ingredients: [634, 634, 579], Index: Recipe.Rune});
+				case 634: // gul->vex
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [634, 634, 579], Index: Recipe.Rune});
+					}
 
 					break;
-				case 635: // vex
-					this.recipes.push({Ingredients: [635, 635, 574], Index: Recipe.Rune});
+				case 635: // vex->ohm
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [635, 635, 574], Index: Recipe.Rune});
+					}
 
 					break;
-				case 636: // ohm
-					this.recipes.push({Ingredients: [636, 636, 584], Index: Recipe.Rune});
+				case 636: // ohm->lo
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [636, 636, 584], Index: Recipe.Rune});
+					}
 
 					break;
-				case 637: // lo
-					this.recipes.push({Ingredients: [637, 637, 565], Index: Recipe.Rune});
+				case 637: // lo->sur
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [637, 637, 565], Index: Recipe.Rune});
+					}
 
 					break;
-				case 638: // sur
-					this.recipes.push({Ingredients: [638, 638, 560], Index: Recipe.Rune});
+				case 638: // sur->ber
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [638, 638, 560], Index: Recipe.Rune});
+					}
 
 					break;
-				case 639: // ber
-					this.recipes.push({Ingredients: [639, 639, 570], Index: Recipe.Rune});
+				case 639: // ber->jah
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [639, 639, 570], Index: Recipe.Rune});
+					}
 
 					break;
-				case 640: // jah
-					this.recipes.push({Ingredients: [640, 640, 580], Index: Recipe.Rune});
+				case 640: // jah->cham
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [640, 640, 580], Index: Recipe.Rune});
+					}
 
 					break;
-				case 641: // cham
-					this.recipes.push({Ingredients: [641, 641, 575], Index: Recipe.Rune});
+				case 641: // cham->zod
+					if (me.ladder) {
+						this.recipes.push({Ingredients: [641, 641, 575], Index: Recipe.Rune});
+					}
 
 					break;
 				}
@@ -520,6 +562,8 @@ var Cubing = {
 
 	buildLists: function () {
 		var i, j, k, items;
+
+		CraftingSystem.checkSubrecipes();
 
 		this.validIngredients = [];
 		this.neededIngredients = [];
@@ -722,7 +766,7 @@ IngredientLoop:
 		}
 
 		// Excluded items
-		if (Runewords.validGids.indexOf(unit.gid) > -1) {
+		if (Runewords.validGids.indexOf(unit.gid) > -1 || CraftingSystem.validGids.indexOf(unit.gid) > -1) {
 			return false;
 		}
 
@@ -894,6 +938,10 @@ IngredientLoop:
 						case 1:
 							Misc.itemLogger("Cubing Kept", items[j]);
 							Misc.logItem("Cubing Kept", items[j], result.line);
+
+							break;
+						case 5: // Crafting System
+							CraftingSystem.update(items[j]);
 
 							break;
 						}

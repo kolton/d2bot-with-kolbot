@@ -541,7 +541,7 @@ function Follower() {
 							Config.AttackSkill[4] = skill;
 
 							Skill.setSkill(skill, 0);
-							Attack.init();
+							//Attack.init();
 						} else {
 							say("I don't have that aura.");
 						}
@@ -562,7 +562,7 @@ function Follower() {
 							Config.AttackSkill[1] = skill;
 							Config.AttackSkill[3] = skill;
 
-							Attack.init();
+							//Attack.init();
 						} else {
 							say("I don't have that skill.");
 						}
