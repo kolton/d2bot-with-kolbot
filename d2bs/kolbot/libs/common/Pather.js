@@ -36,7 +36,10 @@ var NodeAction = {
 
 				break;
 			case "object":
-				monList = Attack.getMob(-1, Config.ClearPath.Spectype, Config.ClearPath.Range);
+				if (!Config.ClearPath.hasOwnProperty("Areas") || Config.ClearPath.Areas.length === 0 || Config.ClearPath.Areas.indexOf(me.area) > -1) {
+					//monList = Attack.getMob(-1, Config.ClearPath.Spectype, Config.ClearPath.Range);
+					Attack.clear(Config.ClearPath.Range, Config.ClearPath.Spectype);
+				}
 
 				break;
 			}
@@ -233,7 +236,8 @@ var Pather = {
 
 							NodeAction.go({clearPath: clearPath});
 
-							if (getDistance(me, node.x, node.y) > 4) {
+							// Getting back to old node is bad when walking
+							if (this.useTeleport && getDistance(me, node.x, node.y) > 4) {
 								this.moveTo(node.x, node.y);
 							}
 
@@ -372,8 +376,8 @@ MainLoop:
 				return true;
 			}
 
-			//Misc.click(0, 0, x, y);
-			me.move(x, y);
+			Misc.click(0, 0, x, y);
+			//me.move(x, y);
 
 			attemptCount += 1;
 			nTimer = getTickCount();
@@ -401,8 +405,8 @@ ModeLoop:
 						};
 
 						if (Attack.validSpot(whereToClick.x, whereToClick.y)) {
-							//Misc.click(0, 0, whereToClick.x, whereToClick.y);
-							me.move(whereToClick.x, whereToClick.y);
+							Misc.click(0, 0, whereToClick.x, whereToClick.y);
+							//me.move(whereToClick.x, whereToClick.y);
 
 							break;
 						}
@@ -1173,8 +1177,9 @@ MainLoop:
 	/*
 		Pather.getWP(area);
 		area - the id of area to get the waypoint in
+		clearPath - clear path
 	*/
-	getWP: function (area) {
+	getWP: function (area, clearPath) {
 		var i, j, wp, preset,
 			wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
 
@@ -1186,7 +1191,7 @@ MainLoop:
 			preset = getPresetUnit(area, 2, wpIDs[i]);
 
 			if (preset) {
-				this.moveToUnit(preset);
+				this.moveToUnit(preset, 0, 0, clearPath);
 
 				wp = getUnit(2, "waypoint");
 
