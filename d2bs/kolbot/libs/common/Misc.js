@@ -494,7 +494,7 @@ var Item = {
 		switch (item.itemType) {
 		case 2: // Shield
 		case 70: // Auric Shields
-			bodyLoc = [4, 5];
+			bodyLoc = 5;
 
 			break;
 		case 3: // Armor
@@ -503,7 +503,7 @@ var Item = {
 			break;
 		case 5: // Arrows
 		case 6: // Bolts
-			bodyLoc = [4, 5];
+			bodyLoc = 5;
 
 			break;
 		case 10: // Ring
@@ -556,7 +556,7 @@ var Item = {
 		case 86: // 
 		case 87: // 
 		case 88: // 
-			bodyLoc = [4, 5];
+			bodyLoc = 4;
 
 			break;
 		default:
