@@ -78,6 +78,8 @@ var Town = {
 		}
 
 		this.heal();
+		this.identify();
+		this.shopItems();
 		this.fillTome(518);
 
 		if (Config.FieldID) {
@@ -85,9 +87,7 @@ var Town = {
 		}
 
 		this.buyPotions();
-		this.identify();
 		Item.autoEquip();
-		this.shopItems();
 		this.buyKeys();
 		this.repair();
 		this.gamble();
