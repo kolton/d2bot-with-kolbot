@@ -30,6 +30,11 @@ var Attack = {
 	getCustomAttack: function (unit) {
 		var i;
 
+		// Check if unit got invalidated
+		if (!unit || !unit.name || !copyUnit(unit).x) {
+			return false;
+		}
+
 		for (i in Config.CustomAttack) {
 			if (Config.CustomAttack.hasOwnProperty(i) && unit.name.toLowerCase() === i.toLowerCase()) {
 				return Config.CustomAttack[i];
@@ -226,7 +231,7 @@ var Attack = {
 		}
 
 		while (attackCount < 300 && Attack.checkMonster(target) && Attack.skipCheck(target)) {
-			if (ClassAttack.doAttack(target, attackCount % 15 === 0) < 2) {
+			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
 				break;
 			}
 
@@ -324,7 +329,7 @@ var Attack = {
 
 		if (bossId) {
 			for (i = 0; !boss && i < 5; i += 1) {
-				boss = getUnit(1, bossId);
+				boss = bossId > 999 ? getUnit(1, -1, -1, bossId) : getUnit(1, bossId);
 
 				delay(200);
 			}
@@ -1360,10 +1365,12 @@ AuraLoop: // Skip monsters with auras
 					Pather.walkTo(unit.x, unit.y, 3);
 				}
 
-				return !checkCollision(me, unit, coll);
+				return true;
 			}
 
-			return Pather.moveTo(unit.x, unit.y, 0);
+			Pather.moveTo(unit.x, unit.y, 0);
+
+			return true;
 		}
 
 		var n, i, cx, cy, t,
