@@ -198,7 +198,13 @@ var Town = {
 	},
 
 	buyPotions: function () {
-		var i, j, npc, useShift, col, beltSize, pot;
+		var i, j, npc, useShift, col, beltSize, pot,
+			needPots = false,
+			needBuffer = true,
+			buffer = {
+				hp: 0,
+				mp: 0
+			};
 
 		if (!this.beltSize) {
 			this.beltSize = Storage.BeltSize();
@@ -207,15 +213,49 @@ var Town = {
 		beltSize = this.beltSize;
 		col = this.checkColumns(beltSize);
 
+		// HP/MP Buffer
+		if (Config.HPBuffer > 0 || Config.MPBuffer > 0) {
+			pot = me.getItem(-1, 0);
+
+			if (pot) {
+				do {
+					if (pot.location === 3) {
+						switch (pot.itemType) {
+						case 76:
+							buffer.hp += 1;
+
+							break;
+						case 77:
+							buffer.mp += 1;
+
+							break;
+						}
+					}
+				} while (pot.getNext());
+			}
+		}
+
 		// Check if we need to buy potions based on Config.MinColumn
 		for (i = 0; i < 4; i += 1) {
 			if (["hp", "mp"].indexOf(Config.BeltColumn[i]) > -1 && col[i] > (beltSize - Math.min(Config.MinColumn[i], beltSize))) {
-				break;
+				needPots = true;
+			}
+		}
+
+		// Check if we need any potions for buffers
+		if (buffer.mp < Config.MPBuffer || buffer.hp < Config.HPBuffer) {
+			for (i = 0; i < 4; i += 1) {
+				// We can't buy potions because they would go into belt instead
+				if (col[i] >= beltSize && (!needPots || Config.BeltColumn[i] === "rv")) {
+					needBuffer = false;
+
+					break;
+				}
 			}
 		}
 
 		// No columns to fill
-		if (i === 4) {
+		if (!needPots && !needBuffer) {
 			return true;
 		}
 
@@ -249,6 +289,26 @@ var Town = {
 			}
 
 			col = this.checkColumns(beltSize); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
+		}
+
+		if (buffer.hp < Config.HPBuffer) {
+			for (i = 0; i < Config.HPBuffer - buffer.hp; i += 1) {
+				pot = this.getPotion(npc, "hp");
+
+				if (Storage.Inventory.CanFit(pot)) {
+					pot.buy(false);
+				}
+			}
+		}
+
+		if (buffer.mp < Config.MPBuffer) {
+			for (i = 0; i < Config.MPBuffer - buffer.mp; i += 1) {
+				pot = this.getPotion(npc, "mp");
+
+				if (Storage.Inventory.CanFit(pot)) {
+					pot.buy(false);
+				}
+			}
 		}
 
 		return true;
@@ -356,6 +416,9 @@ var Town = {
 					tome.buy();
 				} catch (e1) {
 					print(e1);
+
+					// Couldn't buy the tome, don't spam the scrolls
+					return false;
 				}
 			}
 		}
@@ -435,6 +498,11 @@ MainLoop:
 			if (!item.getFlag(0x10) && item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
 				result = Pickit.checkItem(item);
 
+				// Force ID for unid items matching autoEquip criteria
+				if (result.result === 1 && Config.AutoEquip && !item.getFlag(0x10) && Item.autoEquipCheck(item)) {
+					result.result = -1;
+				}
+
 				switch (result.result) {
 				// Items for gold, will sell magics, etc. w/o id, but at low levels
 				// magics are often not worth iding.
@@ -482,6 +550,11 @@ MainLoop:
 
 					switch (result.result) {
 					case 1:
+						// Couldn't id autoEquip item. Don't log it.
+						if (result.result === 1 && Config.AutoEquip && !item.getFlag(0x10) && Item.autoEquipCheck(item)) {
+							break;
+						}
+
 						Misc.itemLogger("Kept", item);
 						Misc.logItem("Kept", item, result.line);
 
@@ -1315,6 +1388,11 @@ MainLoop:
 				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
 					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]) || CraftingSystem.keepItem(items[i]);
 
+					// Don't stash unid autoequip items
+					if (Config.AutoEquip && Pickit.checkItem(items[i]).result === 1 && !items[i].getFlag(0x10) && Item.autoEquipCheck(items[i])) {
+						result = false;
+					}
+
 					if (result) {
 						Misc.itemLogger("Stashed", items[i]);
 						Storage.Stash.MoveTo(items[i]);
@@ -1559,9 +1637,7 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, loseItemAction, col,
-			dropAction = 0,
-			sellAction = 1,
+		var i, col,
 			item = me.getItem(-1, 0),
 			items = [];
 
@@ -1651,40 +1727,40 @@ MainSwitch:
 		// Any leftover items from a failed ID (crashed game, disconnect etc.)
 		items = Storage.Inventory.Compare(Config.Inventory);
 
-		// If low on gold
-		if (me.getStat(14) + me.getStat(15) < Config.LowGold) {
-			this.initNPC("Shop");
-
-			loseItemAction = sellAction;
-		} else {
-			loseItemAction = dropAction;
-		}
-
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if ([18, 41, 78].indexOf(items[i].itemType) === -1 &&
-					items[i].classid !== 549 &&
-					(items[i].code !== 529 || !!me.findItem(518, 0, 3)) &&
-					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) &&
-					(Pickit.checkItem(items[i]).result === 0 || Pickit.checkItem(items[i]).result === 4) &&
-					!Cubing.keepItem(items[i]) &&
-					!Runewords.keepItem(items[i]) &&
-					!CraftingSystem.keepItem(items[i])
+			if ([18, 41, 78].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or rejuvs
+					items[i].classid !== 549 && // Don't throw cube
+					(items[i].code !== 529 || !!me.findItem(518, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
+					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
+					!Cubing.keepItem(items[i]) && // Don't throw cubing ingredients
+					!Runewords.keepItem(items[i]) && // Don't throw runeword ingredients
+					!CraftingSystem.keepItem(items[i]) // Don't throw crafting system ingredients
 					) {
-				try {
-					if (loseItemAction === sellAction) {
+				switch (Pickit.checkItem(items[i]).result) {
+				case 0: // Drop item
+					if (getUIFlag(0xC)) { // Might as well sell the item if already in shop
 						Misc.itemLogger("Sold", items[i]);
 						items[i].sell();
 					} else {
 						Misc.itemLogger("Dropped", items[i], "clearInventory");
 						items[i].drop();
 					}
-				} catch (e) {
-					print(e);
+
+					break;
+				case 4: // Sell item
+					try {
+						print("LowGold sell " + items[i].name);
+						this.initNPC("Shop");
+						Misc.itemLogger("Sold", items[i]);
+						items[i].sell();
+					} catch (e) {
+						print(e);
+					}
+
+					break;
 				}
 			}
 		}
-
-		me.cancel();
 
 		return true;
 	},
