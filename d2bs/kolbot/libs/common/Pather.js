@@ -135,7 +135,7 @@ var Pather = {
 			return false;
 		}
 
-		var i, path, adjustedNode,
+		var i, path, adjustedNode, cleared,
 			node = {x: x, y: y},
 			fail = 0;
 
@@ -186,7 +186,7 @@ var Pather = {
 
 		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
-		if (!path || !path.length) {
+		if (!path) {
 			throw new Error("moveTo: Failed to generate path.");
 		}
 
@@ -229,7 +229,7 @@ var Pather = {
 					}
 				}
 
-				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y)) {
+				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, fail > 0 ? 1 : 4)) {
 					if (!me.inTown && path.length > 1) { // Don't use NodeAction or TownCheck on last node
 						if (this.recursion) {
 							this.recursion = false;
@@ -248,7 +248,12 @@ var Pather = {
 					}
 				} else {
 					if (fail > 0 && !this.useTeleport && !me.inTown) {
-						Attack.clear(5);
+						// Don't go berserk on longer paths
+						if (!cleared) {
+							Attack.clear(5);
+
+							cleared = true;
+						}
 
 						if (fail > 1 && me.getSkill(143, 1)) {
 							Skill.cast(143, 0, node.x, node.y);
@@ -259,7 +264,7 @@ var Pather = {
 					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? rand(25, 35) : rand(10, 15));
 					fail += 1;
 
-					if (!path || !path.length) {
+					if (!path) {
 						throw new Error("moveTo: Failed to generate path.");
 					}
 
@@ -326,6 +331,7 @@ MainLoop:
 		Pather.walkTo(x, y);
 		x - the x coord to walk to
 		y - the y coord to walk to
+		minDist - minimal distance from x/y before returning true
 	*/
 	walkTo: function (x, y, minDist) {
 		while (!me.gameReady) {
@@ -706,11 +712,11 @@ ModeLoop:
 
 		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, unit) > 5) {
-				this.moveToUnit(unit);
+				this.moveToUnit(unit, 2, 2);
 			}
 
 			delay(300);
-			sendPacket(1, 0x13, 4, type, 4, unit.gid);
+			Misc.click(0, 0, unit);
 
 			tick = getTickCount();
 
