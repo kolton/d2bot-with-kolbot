@@ -421,6 +421,10 @@ MainLoop:
 
 	// Get mana cost of the skill (mBot)
 	getManaCost: function (skillId) {
+		if (skillId < 6) {
+			return 0;
+		}
+
 		var skillLvl = me.getSkill(skillId, 1),
 			effectiveShift = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
 			lvlmana = getBaseStat(3, skillId, "lvlmana") === 65535 ? -1 : getBaseStat(3, skillId, "lvlmana"), // Correction for skills that need less mana with levels (kolton)
@@ -582,7 +586,7 @@ var Item = {
 		if (tier > 0 && bodyLoc) {
 			for (i = 0; i < bodyLoc.length; i += 1) {
 				// Low tier items shouldn't be kept if they can't be equipped
-				if (tier > this.getEquippedItemTier(bodyLoc[i]) && this.canEquip(item)) {
+				if (tier > this.getEquippedItemTier(bodyLoc[i]) && (this.canEquip(item) || !item.getFlag(0x10))) {
 					return true;
 				}
 			}
@@ -617,6 +621,8 @@ var Item = {
 			return 0;
 		}
 
+		me.cancel();
+
 		while (items.length > 0) {
 			items.sort(sortEq);
 
@@ -627,7 +633,10 @@ var Item = {
 				for (j = 0; j < bodyLoc.length; j += 1) {
 					if (tier > this.getEquippedItemTier(bodyLoc[j])) {
 						print(items[0].name);
-						this.equip(items[0], bodyLoc[j]);
+						
+						if (this.equip(items[0], bodyLoc[j])) {
+							Misc.logItem("Equipped", items[0]);
+						}
 
 						break;
 					}

@@ -11,8 +11,8 @@ var ClassAttack = {
 		}
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (getDistance(me, unit) > this.skillRange[0] || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, this.skillRange[0], 0x4)) {
+			if (getDistance(me, unit) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
 				}
 			}
