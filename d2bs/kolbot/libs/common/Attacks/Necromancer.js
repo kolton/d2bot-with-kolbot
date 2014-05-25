@@ -7,6 +7,7 @@
 var ClassAttack = {
 	novaTick: 0,
 	cursesSet: false,
+	curseState: [],
 
 	initCurses: function () {
 		var i;
