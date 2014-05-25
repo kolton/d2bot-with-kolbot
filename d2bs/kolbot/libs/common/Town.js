@@ -1635,7 +1635,7 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, col,
+		var i, col, result,
 			item = me.getItem(-1, 0),
 			items = [];
 
@@ -1726,16 +1726,21 @@ MainSwitch:
 		items = Storage.Inventory.Compare(Config.Inventory);
 
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if (!Item.autoEquip(items[i]) ||
-					([18, 41, 78].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or rejuvs
+			if ([18, 41, 78].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or rejuvs
 					items[i].classid !== 549 && // Don't throw cube
 					(items[i].code !== 529 || !!me.findItem(518, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
 					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
 					!Cubing.keepItem(items[i]) && // Don't throw cubing ingredients
 					!Runewords.keepItem(items[i]) && // Don't throw runeword ingredients
 					!CraftingSystem.keepItem(items[i]) // Don't throw crafting system ingredients
-					)) {
-				switch (Pickit.checkItem(items[i]).result) {
+					) {
+				result = Pickit.checkItem(items[i]).result;
+
+				if (!Item.autoEquipCheck(items[i])) {
+					result = 0;
+				}
+
+				switch (result) {
 				case 0: // Drop item
 					if (getUIFlag(0xC) || (Config.PacketShopping && getInteractedNPC() && getInteractedNPC().itemcount > 0)) { // Might as well sell the item if already in shop
 						print("clearInventory sell " + items[i].name);
