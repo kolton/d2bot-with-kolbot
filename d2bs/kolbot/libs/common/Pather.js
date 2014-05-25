@@ -230,14 +230,13 @@ var Pather = {
 				}
 
 				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, fail > 0 ? 1 : 4)) {
-					if (!me.inTown && path.length > 1) { // Don't use NodeAction or TownCheck on last node
+					if (!me.inTown) {
 						if (this.recursion) {
 							this.recursion = false;
 
 							NodeAction.go({clearPath: clearPath});
 
-							// Getting back to old node is bad when walking
-							if (this.useTeleport && getDistance(me, node.x, node.y) > 4) {
+							if (getDistance(me, node.x, node.y) > 5) {
 								this.moveTo(node.x, node.y);
 							}
 
