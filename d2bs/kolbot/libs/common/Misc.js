@@ -633,8 +633,9 @@ var Item = {
 				for (j = 0; j < bodyLoc.length; j += 1) {
 					if (tier > this.getEquippedItemTier(bodyLoc[j])) {
 						print(items[0].name);
-						
+
 						if (this.equip(items[0], bodyLoc[j])) {
+							delay(250);
 							Misc.logItem("Equipped", items[0]);
 						}
 
