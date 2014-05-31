@@ -252,9 +252,11 @@ function DiabloHelper() {
 				} else {
 					Skill.cast(Config.AttackSkill[1], 0, coords[0], coords[1]);
 				}
+
+				return true;
 			}
 
-			return true;
+			break;
 		case 3:
 			break;
 		case 6:
@@ -263,10 +265,12 @@ function DiabloHelper() {
 
 				if (trapCheck) {
 					ClassAttack.placeTraps({x: coords[0], y: coords[1]}, 5);
+
+					return true;
 				}
 			}
 
-			return true;
+			break;
 		}
 
 		return false;
