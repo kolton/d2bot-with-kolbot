@@ -161,7 +161,7 @@ function Wakka() {
 	};
 
 	this.followPath = function (dest) {
-		var path = getPath(me.area, me.x, me.y, dest[0], dest[1], 0, 15);
+		var path = getPath(me.area, me.x, me.y, dest[0], dest[1], 0, 10);
 
 		if (!path) {
 			throw new Error("Failed go get path");
@@ -216,7 +216,7 @@ function Wakka() {
 				}
 			}
 
-			if (Pather.walkTo(path[0].x, path[0].y)) {
+			if (Pather.walkTo(path[0].x, path[0].y, 2)) {
 				path.shift();
 			}
 

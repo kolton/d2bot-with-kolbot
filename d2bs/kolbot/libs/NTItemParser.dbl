@@ -413,6 +413,12 @@ NTIP.ParseLineInt = function (input, info) {
 
 			p_result[0] += p_section[i].substring(p_start, p_end);
 
+			if (p_section[i].substring(p_start, p_end) === "=") {
+				Misc.errorReport("Unexpected = at line " + info.line + " in " + info.file);
+
+				return false;
+			}
+
 			for (p_start = p_end; p_end < p_section[i].length; p_end += 1) {
 				if (NTIP.IsSyntaxInt(p_section[i][p_end])) {
 					break;
@@ -529,7 +535,7 @@ NTIP.ParseLineInt = function (input, info) {
 		p_result[1] = "";
 	}
 
-	if (p_result[2] && p_result[2].replace(/^\s+|\s+$/, "").length > 0) {
+	if (p_result[2] && p_result[2].length > 0) {
 		p_section = p_result[2].split("[");
 		p_result[2] = {};
 
@@ -537,31 +543,25 @@ NTIP.ParseLineInt = function (input, info) {
 			p_end = p_section[i].indexOf("]");
 			p_keyword = p_section[i].substring(0, p_end);
 
-			switch (p_keyword.toLowerCase().replace(/^\s+|\s+$/, "")) {
+			switch (p_keyword.toLowerCase()) {
 			case "maxquantity":
-				p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").indexOf("//");
+				value = Number(p_section[i].split("==")[1].match(/\d+/g));
 
-				if (p_end === -1) {
-					p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").length;
+				if (!isNaN(value)) {
+					p_result[2].MaxQuantity = value;
 				}
-
-				value = Number(p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").substring(0, p_end));
-				p_result[2].MaxQuantity = value;
 
 				break;
 			case "tier":
-				p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").indexOf("//");
+				value = Number(p_section[i].split("==")[1].match(/\d+/g));
 
-				if (p_end === -1) {
-					p_end = p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").length;
+				if (!isNaN(value)) {
+					p_result[2].Tier = value;
 				}
-
-				value = Number(p_section[i].split("==")[1].replace(/^\s+|\s+$/, "").substring(0, p_end));
-				p_result[2].Tier = value;
 
 				break;
 			default:
-				Misc.errorReport("Unknown 3rd part keyword: " + p_keyword.toLowerCase().replace(/^\s+|\s+$/, ""));
+				Misc.errorReport("Unknown 3rd part keyword: " + p_keyword.toLowerCase());
 
 				return false;
 			}

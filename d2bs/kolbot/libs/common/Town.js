@@ -406,10 +406,10 @@ var Town = {
 
 		delay(500);
 
-		if (!me.findItem(518, 0, 3)) {
+		if (code === 518 && !me.findItem(518, 0, 3)) {
 			tome = npc.getItem(518);
 
-			if (tome) {
+			if (tome && Storage.Inventory.CanFit(tome)) {
 				try {
 					tome.buy();
 				} catch (e1) {
@@ -418,6 +418,8 @@ var Town = {
 					// Couldn't buy the tome, don't spam the scrolls
 					return false;
 				}
+			} else {
+				return false;
 			}
 		}
 
@@ -528,7 +530,10 @@ MainLoop:
 							}
 
 							delay(500);
-							scroll.buy();
+
+							if (Storage.Inventory.CanFit(scroll)) {
+								scroll.buy();
+							}
 						}
 
 						scroll = me.findItem(530, 0, 3);
@@ -800,7 +805,7 @@ CursorLoop:
 			items = [],
 			npc = getInteractedNPC();
 
-		if (!npc || !getUIFlag(0x0C) || !npc.itemcount) {
+		if (!npc || !npc.itemcount) {
 			return false;
 		}
 
@@ -1367,6 +1372,16 @@ MainLoop:
 		return true;
 	},
 
+	canStash: function (item) {
+		var ignoredClassids = [91, 174]; // Some quest items that have to be in inventory or equipped
+
+		if (this.ignoredItemTypes.indexOf(item.itemType) > -1 || ignoredClassids.indexOf(item.classid) > -1 || !Storage.Stash.CanFit(item)) {
+			return false;
+		}
+
+		return true;
+	},
+
 	stash: function (stashGold) {
 		if (stashGold === undefined) {
 			stashGold = true;
@@ -1378,17 +1393,21 @@ MainLoop:
 
 		me.cancel();
 
-		var i, result,
+		var i, result, tier,
 			items = Storage.Inventory.Compare(Config.Inventory);
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
-				if (this.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
+				if (this.canStash(items[i])) {
 					result = (Pickit.checkItem(items[i]).result > 0 && Pickit.checkItem(items[i]).result < 4) || Cubing.keepItem(items[i]) || Runewords.keepItem(items[i]) || CraftingSystem.keepItem(items[i]);
 
-					// Don't stash unid autoequip items
-					if (Config.AutoEquip && Pickit.checkItem(items[i]).result === 1 && !items[i].getFlag(0x10) && Item.autoEquipCheck(items[i])) {
-						result = false;
+					// Don't stash low tier autoequip items.
+					if (Config.AutoEquip && Pickit.checkItem(items[i]).result === 1) {
+						tier = NTIP.GetTier(items[i]);
+
+						if (tier > 0 && tier < 100) {
+							result = false;
+						}
 					}
 
 					if (result) {
