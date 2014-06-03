@@ -266,10 +266,6 @@ var ClassAttack = {
 	},
 
 	reposition: function (x, y) {
-		while (!me.idle) {
-			delay(40);
-		}
-
 		if (getDistance(me, x, y) > 0) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
 				if (getDistance(me, x, y) > 40) {
@@ -285,10 +281,6 @@ var ClassAttack = {
 
 				me.move(x, y);
 			}
-		}
-
-		while (!me.idle) {
-			delay(40);
 		}
 
 		return true;

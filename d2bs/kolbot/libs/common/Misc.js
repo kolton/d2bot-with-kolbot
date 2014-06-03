@@ -105,6 +105,10 @@ var Skill = {
 		}
 
 		// Every other skill
+		if (this.usePvpRange) {
+			return 40;
+		}
+
 		return 20;
 	},
 
@@ -228,8 +232,9 @@ var Skill = {
 
 		// No mana to cast
 		if (this.getManaCost(skillId) > me.mp) {
-			if (Config.AttackSkill.indexOf(skillId) > -1 || skillId === 42) {
-				delay(200);
+			// Maybe delay on ALL skills that we don't have enough mana for?
+			if (Config.AttackSkill.concat([42, 54]).concat(Config.LowManaSkill).indexOf(skillId) > -1) {
+				delay(300);
 			}
 
 			return false;
@@ -457,6 +462,11 @@ var Item = {
 			return false;
 		}
 
+		// Already equipped in the right slot
+		if (item.bodylocation === bodyLoc) {
+			return true;
+		}
+
 		var i;
 
 		for (i = 0; i < 3; i += 1) {
@@ -477,19 +487,25 @@ var Item = {
 		return false;
 	},
 
-	getEquippedItemTier: function (bodyLoc) {
+	getEquippedItem: function (bodyLoc) {
 		var item = me.getItem();
 
 		if (item) {
 			do {
 				if (item.bodylocation === bodyLoc) {
-					return NTIP.GetTier(item);
+					return {
+						classid: item.classid,
+						tier: NTIP.GetTier(item)
+					};
 				}
 			} while (item.getNext());
 		}
 
 		// Don't have anything equipped in there
-		return -1;
+		return {
+			classid: -1,
+			tier: -1
+		};
 	},
 
 	getBodyLoc: function (item) {
@@ -586,7 +602,7 @@ var Item = {
 		if (tier > 0 && bodyLoc) {
 			for (i = 0; i < bodyLoc.length; i += 1) {
 				// Low tier items shouldn't be kept if they can't be equipped
-				if (tier > this.getEquippedItemTier(bodyLoc[i]) && (this.canEquip(item) || !item.getFlag(0x10))) {
+				if (tier > this.getEquippedItem(bodyLoc[i]).tier && (this.canEquip(item) || !item.getFlag(0x10))) {
 					return true;
 				}
 			}
@@ -608,6 +624,10 @@ var Item = {
 
 		var i, j, tier, bodyLoc,
 			items = me.findItems(-1, 0, 3);
+
+		if (!items) {
+			return false;
+		}
 
 		function sortEq(a, b) {
 			if (Item.canEquip(a)) {
@@ -631,7 +651,7 @@ var Item = {
 
 			if (tier > 0 && bodyLoc) {
 				for (j = 0; j < bodyLoc.length; j += 1) {
-					if (tier > this.getEquippedItemTier(bodyLoc[j])) {
+					if (tier > this.getEquippedItem(bodyLoc[j]).tier && this.getEquippedItem(bodyLoc[j]).classid !== 174) { // khalim's will adjustment
 						print(items[0].name);
 
 						if (this.equip(items[0], bodyLoc[j])) {
@@ -863,7 +883,7 @@ var Misc = {
 
 			unit = unitList.shift();
 
-			if (unit && this.openChest(unit)) {
+			if (unit && (Pather.useTeleport || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
 				Pickit.pickItems();
 			}
 		}
@@ -879,7 +899,7 @@ var Misc = {
 		}
 
 		if (!range) {
-			range = 25;
+			range = Pather.useTeleport ? 25 : 15;
 		}
 
 		var i, j, shrine,
@@ -950,7 +970,7 @@ var Misc = {
 					// Get the shrine if we have no active state or to refresh current state or if the shrine has no state
 					// Don't override shrine state with a lesser priority shrine
 					if (index === -1 || i <= index || this.shrineStates[i] === 0) {
-						if (shrineList[j].objtype === Config.ScanShrines[i]) {
+						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport || !checkCollision(me, shrineList[j], 0x4))) {
 							this.getShrine(shrineList[j]);
 
 							// Gem shrine - pick gem

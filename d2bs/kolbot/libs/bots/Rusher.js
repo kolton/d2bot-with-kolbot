@@ -33,6 +33,8 @@ function Rusher() {
 		load("tools/rushthread.js");
 
 		rushThread = getScript("tools/rushthread.js");
+
+		delay(500);
 	};
 
 	this.getPlayerCount = function () {

@@ -426,6 +426,10 @@ var DataFile = {
 
 				break;
 			case "gold":
+				if (!me.gameReady) {
+					break;
+				}
+
 				obj.gold = me.getStat(14) + me.getStat(15);
 
 				break;
@@ -567,6 +571,8 @@ MainLoop:
 	},
 
 	createGame: function (name, pass, diff, delay) {
+		var control;
+
 		ControlAction.setText(1, 432, 162, 158, 20, name);
 		ControlAction.setText(1, 432, 217, 158, 20, pass);
 
@@ -579,8 +585,28 @@ MainLoop:
 			ControlAction.click(6, 555, 381, 16, 16);
 
 			break;
+		case "Highest":
+			control = getControl(6, 698, 381, 16, 16);
+
+			if (control.disabled !== 4) {
+				ControlAction.click(6, 698, 381, 16, 16); // Click Hell
+
+				break;
+			}
+
+			control = getControl(6, 555, 381, 16, 16);
+
+			if (control.disabled !== 4) {
+				ControlAction.click(6, 555, 381, 16, 16); // Click Nightmare
+
+				break;
+			}
+
+			ControlAction.click(6, 430, 381, 16, 16); // Click Normal
+
+			break;
 		default:
-			ControlAction.click(6, 698, 381, 16, 16);
+			ControlAction.click(6, 698, 381, 16, 16); // Click Hell
 
 			break;
 		}
