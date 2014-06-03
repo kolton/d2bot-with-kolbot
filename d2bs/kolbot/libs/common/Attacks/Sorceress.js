@@ -31,7 +31,15 @@ var ClassAttack = {
 			untimedSkill = -1;
 
 		// Static
-		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.indexOf(unit.name) > -1 && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
+		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.some(
+				function (name) {
+					if (unit.name.toLowerCase() === name.toLowerCase()) {
+						return true;
+					}
+
+					return false;
+				}
+			) && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
 			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 
 			while (Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.checkMonster(unit)) {

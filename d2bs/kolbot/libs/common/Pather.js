@@ -315,6 +315,12 @@ MainLoop:
 			tick = getTickCount();
 
 			while (getTickCount() - tick < Math.max(500, me.ping * 2 + 200)) {
+				if (me.mode === 4) {
+					i -= 1;
+
+					break;
+				}
+
 				if (getDistance(me.x, me.y, x, y) < 5) {
 					return true;
 				}
@@ -571,7 +577,7 @@ ModeLoop:
 		clearPath - kill monsters while moving
 	*/
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, area, exits, targetRoom, dest,
+		var i, j, area, exits, targetRoom, dest, currExit,
 			areas = [];
 
 		if (targetArea instanceof Array) {
@@ -583,7 +589,7 @@ ModeLoop:
 		for (i = 0; i < areas.length; i += 1) {
 			area = getArea();
 
-			if (typeof area !== "object") {
+			if (!area) {
 				throw new Error("moveToExit: error in getArea()");
 			}
 
@@ -594,8 +600,16 @@ ModeLoop:
 			}
 
 			for (j = 0; j < exits.length; j += 1) {
-				if (exits[j].target === areas[i]) {
-					dest = this.getNearestWalkable(exits[j].x, exits[j].y, 5, 1);
+				currExit = {
+					x: exits[j].x,
+					y: exits[j].y,
+					type: exits[j].type,
+					target: exits[j].target,
+					tileid: exits[j].tileid
+				};
+
+				if (currExit.target === areas[i]) {
+					dest = this.getNearestWalkable(currExit.x, currExit.y, 5, 1);
 
 					if (!dest) {
 						return false;
@@ -609,7 +623,7 @@ ModeLoop:
 						In that case we must use the exit before the last area.
 					*/
 					if (use || i < areas.length - 1) {
-						switch (exits[j].type) {
+						switch (currExit.type) {
 						case 1: // walk through
 							targetRoom = this.getNearestRoom(areas[i]);
 
@@ -622,7 +636,7 @@ ModeLoop:
 
 							break;
 						case 2: // stairs
-							if (!this.useUnit(5, exits[j].tileid, areas[i])) {
+							if (!this.useUnit(5, currExit.tileid, areas[i])) {
 								return false;
 							}
 
@@ -711,11 +725,11 @@ ModeLoop:
 
 		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, unit) > 5) {
-				this.moveToUnit(unit, 2, 2);
+				this.moveToUnit(unit);
 			}
 
 			delay(300);
-			Misc.click(0, 0, unit);
+			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
 
 			tick = getTickCount();
 
@@ -1086,7 +1100,7 @@ MainLoop:
 		step - distance between each checked dot on the grid
 		coll - collision flag to avoid
 	*/
-	getNearestWalkable: function (x, y, range, step, coll) {
+	getNearestWalkable: function (x, y, range, step, coll, size) {
 		if (!step) {
 			step = 1;
 		}
@@ -1100,7 +1114,7 @@ MainLoop:
 			result = false;
 
 		// Check if the original spot is valid
-		if (this.checkSpot(x, y, coll, false)) {
+		if (this.checkSpot(x, y, coll, false, size)) {
 			result = [x, y];
 		}
 
@@ -1110,7 +1124,7 @@ MainLoop:
 				for (j = -distance; j <= distance; j += 1) {
 					// Check outer layer only (skip previously checked)
 					if (Math.abs(i) >= Math.abs(distance) || Math.abs(j) >= Math.abs(distance)) {
-						if (this.checkSpot(x + i, y + j, coll)) {
+						if (this.checkSpot(x + i, y + j, coll, false, size)) {
 							result = [x + i, y + j];
 
 							break MainLoop;
@@ -1134,15 +1148,19 @@ MainLoop:
 		coll - collision flag to search for
 		cacheOnly - use only cached room data
 	*/
-	checkSpot: function (x, y, coll, cacheOnly) {
+	checkSpot: function (x, y, coll, cacheOnly, size) {
 		var dx, dy, value;
 
 		if (coll === undefined) {
 			coll = 0x1;
 		}
 
-		for (dx = -1; dx <= 1; dx += 1) {
-			for (dy = -1; dy <= 1; dy += 1) {
+		if (!size) {
+			size = 1;
+		}
+
+		for (dx = -size; dx <= size; dx += 1) {
+			for (dy = -size; dy <= size; dy += 1) {
 				if (Math.abs(dx) !== Math.abs(dy)) {
 					value = CollMap.getColl(x + dx, y + dy, cacheOnly);
 
