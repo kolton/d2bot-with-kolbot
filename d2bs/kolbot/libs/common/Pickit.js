@@ -114,7 +114,8 @@ var Pickit = {
 			pickList.sort(this.sortItems);
 
 			// Check if the item unit is still valid and if it's on ground or being dropped
-			if (copyUnit(pickList[0]).x !== undefined && (pickList[0].mode === 3 || pickList[0].mode === 5)) {
+			if (copyUnit(pickList[0]).x !== undefined && (pickList[0].mode === 3 || pickList[0].mode === 5) &&
+					(Pather.useTeleport || !checkCollision(me, pickList[0], 0x1))) { // Don't pick items behind walls/obstacles when walking
 				// Check if the item should be picked
 				status = this.checkItem(pickList[0]);
 
@@ -190,7 +191,7 @@ var Pickit = {
 				case 0:
 					break;
 				default: // Check if a kept item can be stashed
-					if (Town.ignoredItemTypes.indexOf(items[i].itemType) === -1 && Storage.Stash.CanFit(items[i])) {
+					if (Town.canStash(items[i])) {
 						return true;
 					}
 
@@ -249,7 +250,15 @@ MainLoop:
 
 			if (stats.useTk) {
 				Skill.cast(43, 0, item);
-			} else if ((getDistance(me, item) < (Config.FastPick === 2 && i < 1 ? 6 : 4) && !checkCollision(me, item, 0x1)) || Pather.moveToUnit(item)) {
+			} else {
+				if (checkCollision(me, item, 0x1) || getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4)) {
+					if (Pather.useTeleport) {
+						Pather.moveToUnit(item);
+					} else if (!Pather.moveTo(item.x, item.y, 0)) {
+						continue MainLoop;
+					}
+				}
+
 				if (Config.FastPick < 2) {
 					Misc.click(0, 0, item);
 				} else {
@@ -289,7 +298,8 @@ MainLoop:
 				delay(20);
 			}
 
-			//print("pick retry");
+			// TK failed, disable it
+			stats.useTk = false;
 		}
 
 		stats.picked = me.itemcount > itemCount || !!me.getItem(-1, -1, gid);
@@ -381,6 +391,24 @@ MainLoop:
 
 	canPick: function (unit) {
 		var tome, charm, i, potion, needPots, buffers, pottype, myKey, key;
+
+		switch (unit.classid) {
+		case 92: // Staff of Kings
+		case 173: // Khalim's Flail
+		case 521: // Viper Amulet
+		case 546: // Jade Figurine
+		case 549: // Cube
+		case 551: // Mephisto's Soulstone
+		case 552: // Book of Skill
+		case 553: // Khalim's Eye
+		case 554: // Khalim's Heart
+		case 555: // Khalim's Brain
+			if (me.getItem(unit.classid)) {
+				return false;
+			}
+
+			break;
+		}
 
 		switch (unit.itemType) {
 		case 4: // Gold

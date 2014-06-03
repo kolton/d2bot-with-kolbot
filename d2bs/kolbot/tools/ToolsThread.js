@@ -16,6 +16,7 @@ function main() {
 	include("automule.js");
 	include("craftingsystem.js");
 	include("common/Attack.js");
+	include("common/CollMap.js");
 	include("common/Config.js");
 	include("common/Cubing.js");
 	include("common/Pather.js");
@@ -78,6 +79,11 @@ function main() {
 		if (!items) {
 			return false;
 		}
+
+		// Get highest id = highest potion first
+		items.sort(function (a, b) {
+			return b.classid - a.classid;
+		});
 
 		for (i = 0; i < items.length; i += 1) {
 			if (type < 3 && items[i].mode === 0 && items[i].location === 3 && items[i].itemType === pottype) {
@@ -196,7 +202,7 @@ function main() {
 				try {
 					clickItem(2, potion);
 				} catch (e) {
-					this.drinkPotion(type); // Recursive check - we better drink the damn potion
+					print("Couldn't give the potion to merc.");
 				}
 			}
 
@@ -269,16 +275,6 @@ function main() {
 		return false;
 	};
 
-	this.revealArea = function (area) {
-		var room = getRoom(area);
-
-		do {
-			if (room instanceof Room && room.area === area) {
-				room.reveal();
-			}
-		} while (room.getNext());
-	};
-
 	// Event functions
 	this.keyEvent = function (key) {
 		switch (key) {
@@ -288,13 +284,13 @@ function main() {
 			break;
 		case 123: // F12 key
 			me.overhead("Revealing " + Pather.getAreaName(me.area));
-			this.revealArea(me.area);
+			revealLevel(true);
 
 			break;
 		case 107: // Numpad +
 			showConsole();
-			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39)
-				+ " ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
+			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39) +
+				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
 
 			break;
 		case 101: // numpad 5
@@ -347,7 +343,8 @@ function main() {
 		case 0x00: // "%Name1(%Name2) dropped due to time out."
 		case 0x01: // "%Name1(%Name2) dropped due to errors."
 		case 0x03: // "%Name1(%Name2) left our world. Diablo's minions weaken."
-			if (Config.QuitList.indexOf(name1) > -1) {
+			if ((typeof Config.QuitList === "string" && Config.QuitList.toLowerCase() === "any") ||
+					(Config.QuitList instanceof Array && Config.QuitList.indexOf(name1) > -1)) {
 				print(name1 + (mode === 0 ? " timed out" : " left"));
 
 				quitFlag = true;
@@ -559,4 +556,6 @@ function main() {
 
 		delay(20);
 	}
+
+	return true;
 }

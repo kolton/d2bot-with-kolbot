@@ -452,9 +452,13 @@ var Attack = {
 	},
 
 	// Filter monsters based on classId, spectype and range
-	getMob: function (classid, spectype, range) {
+	getMob: function (classid, spectype, range, center) {
 		var monsterList = [],
 			monster = getUnit(1);
+
+		if (!center) {
+			center = me;
+		}
 
 		switch (typeof classid) {
 		case "number":
@@ -463,7 +467,7 @@ var Attack = {
 
 			if (monster) {
 				do {
-					if (getDistance(me, monster) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+					if (getDistance(center.x, center.y, monster.x, monster.y) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
 						monsterList.push(copyUnit(monster));
 					}
 				} while (monster.getNext());
@@ -475,7 +479,7 @@ var Attack = {
 
 			if (monster) {
 				do {
-					if (classid.indexOf(monster.classid) > -1 && getDistance(me, monster) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+					if (classid.indexOf(monster.classid) > -1 && getDistance(center.x, center.y, monster.x, monster.y) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
 						monsterList.push(copyUnit(monster));
 					}
 				} while (monster.getNext());
@@ -968,7 +972,7 @@ var Attack = {
 		if (typeof index === "number") {
 			//print("Dodge build time: " + (getTickCount() - tick));
 
-			return Pather.moveTo(grid[index].x, grid[index].y, 3);
+			return Pather.moveTo(grid[index].x, grid[index].y, 0);
 		}
 
 		return false;
@@ -1403,7 +1407,7 @@ AuraLoop: // Skip monsters with auras
 
 				for (i = 0; i < coords.length; i += 1) {
 					// Valid position found
-					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, n > 0 ? 0 : 1)) {
+					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, Math.max(0, 2 - n))) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						if (walk) {

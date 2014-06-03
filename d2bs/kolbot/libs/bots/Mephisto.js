@@ -147,7 +147,12 @@ function Mephisto() {
 	if (me.classid === 1) {
 		if (Config.Mephisto.MoatTrick) {
 			this.moat();
+
+			Skill.usePvpRange = true;
+
 			Attack.kill(242); // Mephisto
+
+			Skill.usePvpRange = false;
 		} else {
 			//this.killMephisto();
 			Attack.kill(242); // Mephisto
