@@ -212,6 +212,7 @@ var Config = {
 	StopOnDClone: false,
 	SoJWaitTime: 0,
 	KillDclone: false,
+	DCloneQuit: false,
 
 	// Experimental
 	FastParty: false,

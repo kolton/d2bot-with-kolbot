@@ -39,7 +39,12 @@ Unit.prototype.__defineGetter__("idle",
 			throw new Error("Unit.idle: Must be used with player units.");
 		}
 
-		return (this.mode === 1 || this.mode === 5);
+		return (this.mode === 1 || this.mode === 5 || this.mode === 17); // Dead is pretty idle too
+	});
+
+Unit.prototype.__defineGetter__("gold",
+	function () {
+		return this.getStat(14) + this.getStat(15);
 	});
 
 // Death check

@@ -405,6 +405,7 @@ function LoadConfig() {
 	Config.StopOnDClone = true; // Go to town and idle as soon as Diablo walks the Earth
 	Config.SoJWaitTime = 5; // Time in minutes to wait for another SoJ sale before leaving game. 0 = disabled
 	Config.KillDclone = false; // Go to Palace Cellar 3 and try to kill Diablo Clone. Pointless if you already have Annihilus.
+	Config.DCloneQuit = false; // 1 = quit when Diablo walks, 2 = quit on soj sales, 0 = disabled
 
 	// Monster skip config
 	// Skip immune monsters. Possible options: "fire", "cold", "lightning", "poison", "physical", "magic".
@@ -438,7 +439,7 @@ function LoadConfig() {
 	 *	Multiple entries are separated by commas
 	 */
 	Config.CustomAttack = {
-		"Monster Name": [-1, -1]
+		//"Monster Name": [-1, -1]
 	};
 
 	Config.Dodge = false; // Move away from monsters that get too close. Don't use with short-ranged attacks like Poison Dagger.

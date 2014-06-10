@@ -169,8 +169,8 @@ var Pather = {
 			pop = false;
 		}
 
-		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown
-							&& ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
+							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -495,8 +495,8 @@ ModeLoop:
 		pop - remove last node
 	*/
 	moveToUnit: function (unit, offX, offY, clearPath, pop) {
-		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown
-							&& ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
+							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
 		if (offX === undefined) {
 			offX = 0;
