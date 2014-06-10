@@ -165,13 +165,14 @@ var Attack = {
 		}
 
 		while (attackCount < 300 && this.checkMonster(target) && this.skipCheck(target)) {
-			// Get the target again if the bot went to town and back
-			if (Misc.townCheck()) {
-				target = getUnit(1, -1, -1, gid);
-			}
+			Misc.townCheck();
 
 			if (!target || !copyUnit(target).x) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
-				break;
+				target = getUnit(1, -1, -1, gid);
+
+				if (!target) {
+					break;
+				}
 			}
 
 			if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
@@ -897,7 +898,7 @@ var Attack = {
 		return true;
 	},
 
-	buildDodgeList: function () {
+	buildMonsterList: function () {
 		var monster,
 			monList = [];
 
@@ -928,7 +929,7 @@ var Attack = {
 				y: Math.round(Math.sin(Math.atan2(me.y - unit.y, me.x - unit.x)) * Config.DodgeRange + unit.y)
 			};
 
-		monList = this.buildDodgeList();
+		monList = this.buildMonsterList();
 
 		monList.sort(Sort.units);
 
@@ -980,6 +981,7 @@ var Attack = {
 
 	getMonsterCount: function (x, y, range, list) {
 		var i,
+			fire,
 			count = 0,
 			ignored = [243];
 
@@ -987,6 +989,16 @@ var Attack = {
 			if (ignored.indexOf(list[i].classid) === -1 && this.checkMonster(list[i]) && getDistance(x, y, list[i].x, list[i].y) <= range) {
 				count += 1;
 			}
+		}
+
+		fire = getUnit(2, "fire");
+
+		if (fire) {
+			do {
+				if (getDistance(x, y, fire.x, fire.y) <= range) {
+					count += 100;
+				}
+			} while (fire.getNext());
 		}
 
 		return count;
@@ -1286,18 +1298,21 @@ AuraLoop: // Skip monsters with auras
 	},
 
 	// Check if a monster is immune to specified attack type
-	checkResist: function (unit, damageType, maxres) {
-		if (unit.type === 0) { // player
+	checkResist: function (unit, val, maxres) {
+		// Ignore player resistances
+		if (unit.type === 0) {
 			return true;
 		}
 
-		// When skillId is passed
-		if (typeof damageType === "number") {
-			damageType = this.getSkillElement(damageType);
+		var damageType = typeof val === "number" ? this.getSkillElement(val) : val;
+
+		if (maxres === undefined) {
+			maxres = 100;
 		}
 
-		if (typeof maxres !== "number") {
-			maxres = 100;
+		// Static handler
+		if (val === 42 && this.getResist(unit, damageType) < 100) {
+			return (unit.hp * 100 / 128) > Config.CastStatic;
 		}
 
 		if (this.infinity && ["fire", "lightning", "cold"].indexOf(damageType) > -1) {

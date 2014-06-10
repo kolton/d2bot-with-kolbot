@@ -32,9 +32,24 @@ var ClassAttack = {
 
 		// Static
 		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.some(
-				function (name) {
-					if (unit.name.toLowerCase() === name.toLowerCase()) {
-						return true;
+				function (id) {
+					if (unit) {
+						switch (typeof id) {
+						case "number":
+							if (unit.classid && unit.classid === id) {
+								return true;
+							}
+
+							break;
+						case "string":
+							if (unit.name && unit.name.toLowerCase() === id.toLowerCase()) {
+								return true;
+							}
+
+							break;
+						default:
+							throw new Error("Bad Config.StaticList settings.");
+						}
 					}
 
 					return false;
@@ -132,39 +147,24 @@ var ClassAttack = {
 		}
 
 		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
-			switch (timedSkill) {
-			case 59: // Blizzard
-				if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
-					if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4)) {
-						return 0;
-					}
-				}
+			if (Skill.getRange(timedSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
+				return 0;
+			}
 
-				if (!unit.dead) {
-					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit.x + rand(-2, 2), unit.y + rand(-2, 2));
-				}
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
+				// Allow short-distance walking for melee skills
+				walk = Skill.getRange(timedSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
 
-				return 1;
-			default:
-				if (Skill.getRange(timedSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4, walk)) {
 					return 0;
 				}
-
-				if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
-					// Allow short-distance walking for melee skills
-					walk = Skill.getRange(timedSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
-
-					if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4, walk)) {
-						return 0;
-					}
-				}
-
-				if (!unit.dead) {
-					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
-				}
-
-				return 1;
 			}
+
+			if (!unit.dead && !checkCollision(me, unit, 0x4)) {
+				Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
+			}
+
+			return 1;
 		}
 
 		if (untimedSkill > -1) {

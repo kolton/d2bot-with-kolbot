@@ -81,7 +81,7 @@ var Skill = {
 				return Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 			}
 
-			return 25;
+			return 20;
 		case 49: // Lightning
 		case 84: // Bone Spear
 		case 93: // Bone Spirit
@@ -331,6 +331,10 @@ MainLoop:
 
 		if (this.isTimed(skillId)) { // account for lag, state 121 doesn't kick in immediately
 			for (i = 0; i < 10; i += 1) {
+				if ([4, 9].indexOf(me.mode) > -1) {
+					break;
+				}
+
 				if (me.getState(121)) {
 					break;
 				}
@@ -424,16 +428,26 @@ MainLoop:
 		return [32, 40, 43, 50, 52, 58, 60, 68, 75, 85, 94, 117, 221, 222, 226, 227, 235, 236, 237, 246, 247, 258, 267, 268, 277, 278, 279].indexOf(skillId) > -1;
 	},
 
+	manaCostList: {},
+
 	// Get mana cost of the skill (mBot)
 	getManaCost: function (skillId) {
 		if (skillId < 6) {
 			return 0;
 		}
 
+		if (this.manaCostList.hasOwnProperty(skillId)) {
+			return this.manaCostList[skillId];
+		}
+
 		var skillLvl = me.getSkill(skillId, 1),
 			effectiveShift = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
 			lvlmana = getBaseStat(3, skillId, "lvlmana") === 65535 ? -1 : getBaseStat(3, skillId, "lvlmana"), // Correction for skills that need less mana with levels (kolton)
 			ret = Math.max((getBaseStat(3, skillId, "mana") + lvlmana * (skillLvl - 1)) * (effectiveShift[getBaseStat(3, skillId, "manashift")] / 256), getBaseStat(3, skillId, "minmana"));
+
+		if (!this.manaCostList.hasOwnProperty(skillId)) {
+			this.manaCostList[skillId] = ret;
+		}
 
 		return ret;
 	}
@@ -463,11 +477,17 @@ var Item = {
 		}
 
 		// Already equipped in the right slot
-		if (item.bodylocation === bodyLoc) {
+		if (item.mode === 1 && item.bodylocation === bodyLoc) {
 			return true;
 		}
 
 		var i;
+
+		if (item.location === 7) {
+			if (!Town.openStash()) {
+				return false;
+			}
+		}
 
 		for (i = 0; i < 3; i += 1) {
 			if (item.toCursor()) {
@@ -623,7 +643,7 @@ var Item = {
 		}
 
 		var i, j, tier, bodyLoc,
-			items = me.findItems(-1, 0, 3);
+			items = me.findItems(-1, 0);
 
 		if (!items) {
 			return false;
@@ -643,6 +663,15 @@ var Item = {
 
 		me.cancel();
 
+		// Remove items without tier
+		for (i = 0; i < items.length; i += 1) {
+			if (NTIP.GetTier(items[i]) === 0) {
+				items.splice(i, 1);
+
+				i -= 1;
+			}
+		}
+
 		while (items.length > 0) {
 			items.sort(sortEq);
 
@@ -651,7 +680,7 @@ var Item = {
 
 			if (tier > 0 && bodyLoc) {
 				for (j = 0; j < bodyLoc.length; j += 1) {
-					if (tier > this.getEquippedItem(bodyLoc[j]).tier && this.getEquippedItem(bodyLoc[j]).classid !== 174) { // khalim's will adjustment
+					if ([3, 7].indexOf(items[0].location) > -1 && tier > this.getEquippedItem(bodyLoc[j]).tier && this.getEquippedItem(bodyLoc[j]).classid !== 174) { // khalim's will adjustment
 						print(items[0].name);
 
 						if (this.equip(items[0], bodyLoc[j])) {
@@ -772,8 +801,9 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (Pather.moveTo(unit.x + 1, unit.y, 0)) {
-				Misc.click(0, 0, unit);
+			if (Pather.moveTo(unit.x, unit.y + 2, 0)) {
+				//Misc.click(0, 0, unit);
+				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
 			}
 
 			tick = getTickCount();
