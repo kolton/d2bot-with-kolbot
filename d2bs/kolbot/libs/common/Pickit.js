@@ -251,7 +251,7 @@ MainLoop:
 			if (stats.useTk) {
 				Skill.cast(43, 0, item);
 			} else {
-				if (checkCollision(me, item, 0x1) || getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4)) {
+				if (getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
 					if (Pather.useTeleport) {
 						Pather.moveToUnit(item);
 					} else if (!Pather.moveTo(item.x, item.y, 0)) {

@@ -368,6 +368,14 @@ function main() {
 
 			break;
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
+			if (Config.DCloneQuit === 2) {
+				D2Bot.printToConsole("SoJ sold in game. Leaving.");
+				
+				quitFlag = true;
+
+				break;
+			}
+
 			if (Config.SoJWaitTime) {
 				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3], 7);
 				Messaging.sendToScript("default.dbj", "soj");
@@ -375,6 +383,14 @@ function main() {
 
 			break;
 		case 0x12: // "Diablo Walks the Earth"
+			if (Config.DCloneQuit > 0) {
+				D2Bot.printToConsole("Diablo walked in game. Leaving.");
+
+				quitFlag = true;
+
+				break;
+			}
+
 			if (Config.StopOnDClone) {
 				D2Bot.printToConsole("Diablo Walks the Earth", 7);
 				this.togglePause();

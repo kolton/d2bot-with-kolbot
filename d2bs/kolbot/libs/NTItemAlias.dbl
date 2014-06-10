@@ -1,4 +1,4 @@
-var NTIPAliasType  =  {};
+var NTIPAliasType = {};
 NTIPAliasType["shield"] = 2;
 NTIPAliasType["armor"] = 3;
 NTIPAliasType["gold"] = 4;
@@ -101,7 +101,7 @@ NTIPAliasType["sapphire"] = 100;
 NTIPAliasType["topaz"] = 101;
 NTIPAliasType["skull"] = 102;
 
-var NTIPAliasClassID  =  {};
+var NTIPAliasClassID = {};
 NTIPAliasClassID["hax"] = 0;    NTIPAliasClassID["handaxe"] = 0;
 NTIPAliasClassID["axe"] = 1;
 NTIPAliasClassID["2ax"] = 2;    NTIPAliasClassID["doubleaxe"] = 2;
@@ -762,12 +762,12 @@ NTIPAliasClassID["bet"] = 656;  NTIPAliasClassID["burningessenceofterror"] = 656
 NTIPAliasClassID["fed"] = 657;  NTIPAliasClassID["festeringessenceofdestruction"] = 657;
 NTIPAliasClassID["std"] = 658;  NTIPAliasClassID["standardofheroes"] = 658;
 
-var NTIPAliasClass  =  {};
+var NTIPAliasClass = {};
 NTIPAliasClass["normal"] = 0;
 NTIPAliasClass["exceptional"] = 1;
 NTIPAliasClass["elite"] = 2;
 
-var NTIPAliasQuality  =  {};
+var NTIPAliasQuality = {};
 NTIPAliasQuality["lowquality"] = 1;
 NTIPAliasQuality["normal"] = 2;
 NTIPAliasQuality["superior"] = 3;
@@ -777,31 +777,31 @@ NTIPAliasQuality["rare"] = 6;
 NTIPAliasQuality["unique"] = 7;
 NTIPAliasQuality["crafted"] = 8;
 
-var NTIPAliasFlag  =  {};
+var NTIPAliasFlag = {};
 NTIPAliasFlag["identified"] = 0x10;
 NTIPAliasFlag["eth"] = 0x400000; NTIPAliasFlag["ethereal"] = 0x400000;
 NTIPAliasFlag["runeword"] = 0x4000000;
 
 // rare item colors
-var NTIPAliasColor  =  {};
-NTIPAliasColor["black"]  =  3;
-NTIPAliasColor["white"]  =  20;
-NTIPAliasColor["orange"]  =  19;
-NTIPAliasColor["lightyellow"]  =  13;
-NTIPAliasColor["lightred"]  =  7;
-NTIPAliasColor["lightgold"]  =  15;
-NTIPAliasColor["lightblue"]  =  4;
-NTIPAliasColor["lightpurple"]  =  17;
-NTIPAliasColor["crystalblue"]  =  6;
-NTIPAliasColor["crystalred"]  =  9;
-NTIPAliasColor["crystalgreen"]  =  12;
-NTIPAliasColor["darkyellow"]  =  14;
-NTIPAliasColor["darkred"]  =  8;
-NTIPAliasColor["darkgold"]  =  16;
-NTIPAliasColor["darkgreen"]  =  11;
-NTIPAliasColor["darkblue"]  =  5;
+var NTIPAliasColor = {};
+NTIPAliasColor["black"] = 3;
+NTIPAliasColor["white"] = 20;
+NTIPAliasColor["orange"] = 19;
+NTIPAliasColor["lightyellow"] = 13;
+NTIPAliasColor["lightred"] = 7;
+NTIPAliasColor["lightgold"] = 15;
+NTIPAliasColor["lightblue"] = 4;
+NTIPAliasColor["lightpurple"] = 17;
+NTIPAliasColor["crystalblue"] = 6;
+NTIPAliasColor["crystalred"] = 9;
+NTIPAliasColor["crystalgreen"] = 12;
+NTIPAliasColor["darkyellow"] = 14;
+NTIPAliasColor["darkred"] = 8;
+NTIPAliasColor["darkgold"] = 16;
+NTIPAliasColor["darkgreen"] = 11;
+NTIPAliasColor["darkblue"] = 5;
 
-var NTIPAliasStat  =  {};
+var NTIPAliasStat = {};
 NTIPAliasStat["strength"] = 0;
 NTIPAliasStat["energy"] = 1;
 NTIPAliasStat["dexterity"] = 2;
