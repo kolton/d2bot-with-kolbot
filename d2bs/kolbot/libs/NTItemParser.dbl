@@ -286,7 +286,7 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 			showConsole();
 
 			if (!entryList) {
-				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ")");
+				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ") Error message: " + pickError.message + " Trigger item: " + item.fname.split("\n").reverse().join(" "));
 
 				NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
 			} else {
