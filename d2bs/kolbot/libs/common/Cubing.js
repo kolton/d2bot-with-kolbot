@@ -1002,6 +1002,10 @@ IngredientLoop:
 			return false;
 		}
 
+		if (getUIFlag(0x1A)) {
+			return true;
+		}
+
 		for (i = 0; i < 3; i += 1) {
 			cube.interact();
 
@@ -1036,6 +1040,8 @@ IngredientLoop:
 		while (items.length) {
 			if (Storage.Inventory.CanFit(items[0])) {
 				Storage.Inventory.MoveTo(items[0]);
+			} else if (Storage.Stash.CanFit(items[0])) {
+				Storage.Stash.MoveTo(items[0]);
 			} else {
 				return false;
 			}
