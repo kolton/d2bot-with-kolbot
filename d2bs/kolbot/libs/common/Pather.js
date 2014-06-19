@@ -1397,8 +1397,8 @@ MainLoop:
 					if ((me.inTown || // check wp in town
 							((src !== previousAreas[dest] && dest !== previousAreas[src]) && // check wp if areas aren't linked
 								previousAreas[src] !== previousAreas[dest])) && // check wp if areas aren't linked with a common area
-									Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))
-										) {
+								Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))
+							) {
 						if (node.from !== src) {
 							useWP = true;
 						}
