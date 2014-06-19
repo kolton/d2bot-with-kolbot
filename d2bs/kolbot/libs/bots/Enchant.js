@@ -372,8 +372,8 @@ MainLoop:
 			}
 		}
 
-		Town.goToTown(1);
 		Town.doChores();
+		Town.goToTown(1);
 		Town.move("portalspot");
 
 		wpNicks[nick].requests += 1;
@@ -452,8 +452,8 @@ MainLoop:
 
 	addEventListener("chatmsg", ChatEvent);
 	addEventListener("gameevent", GreetEvent);
-	Town.goToTown(1);
 	Town.doChores();
+	Town.goToTown(1);
 	Town.move("portalspot");
 
 	while (true) {
@@ -479,7 +479,7 @@ MainLoop:
 				say("Commands:");
 				say((Config.Enchant.Triggers[0] ? "Enhant: " + Config.Enchant.Triggers[0] : "") +
 						(Config.Enchant.Triggers[1] ? " | Open cow level: " + Config.Enchant.Triggers[1] : "") +
-							(Config.Enchant.Triggers[2] ? " | Give waypoints: " + Config.Enchant.Triggers[2] : ""));
+						(Config.Enchant.Triggers[2] ? " | Give waypoints: " + Config.Enchant.Triggers[2] : ""));
 
 				if (Config.Enchant.AutoChant) {
 					say("Auto enchant is ON");

@@ -1088,7 +1088,13 @@ var Misc = {
 		var i, desc,
 			stringColor = "";
 
-		desc = unit.description.split("\n");
+		desc = unit.description;
+
+		if (!desc) {
+			return "";
+		}
+
+		desc = desc.split("\n");
 
 		// Lines are normally in reverse. Add color tags if needed and reverse order.
 		for (i = 0; i < desc.length; i += 1) {
@@ -2095,6 +2101,54 @@ CursorLoop:
 				if (unit.getFlag(0x10)) {
 					delay(50);
 
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
+	itemToCursor: function (item) {
+		var i, tick;
+
+		for (i = 0; i < 15; i += 1) {
+			sendPacket(1, 0x19, 4, item.gid);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < Math.max(500, me.ping * 2 + 200)) {
+				if (me.itemoncursor) {
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
+	dropItem: function (item) {
+		var i, tick;
+
+		if (me.itemoncursor) {
+			sendPacket(1, 0x17, 4, getUnit(100).gid);
+		}
+
+		if (!this.itemToCursor(item)) {
+			return false;
+		}
+
+		for (i = 0; i < 15; i += 1) {
+			sendPacket(1, 0x17, 4, item.gid);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < Math.max(500, me.ping * 2 + 200)) {
+				if (!me.itemoncursor) {
 					return true;
 				}
 

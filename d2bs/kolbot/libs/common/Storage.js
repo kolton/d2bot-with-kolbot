@@ -179,7 +179,7 @@ Loop:
 
 				nDelay = getTickCount();
 
-				while ((getTickCount() - nDelay) < 500) {
+				while ((getTickCount() - nDelay) < Math.max(1000, me.ping * 3 + 500)) {
 					if (!me.itemoncursor) {
 						print("Successfully placed " + item.name + " at X: " + nPos.x + " Y: " + nPos.y);
 						delay(200);
