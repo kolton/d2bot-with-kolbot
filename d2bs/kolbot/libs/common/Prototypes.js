@@ -287,10 +287,14 @@ Unit.prototype.toCursor = function () {
 	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
-		if (this.mode === 1) {
-			clickItem(0, this.bodylocation); // fix for equipped items (cubing viper staff for example)
-		} else {
-			clickItem(0, this);
+		try {
+			if (this.mode === 1) {
+				clickItem(0, this.bodylocation); // fix for equipped items (cubing viper staff for example)
+			} else {
+				clickItem(0, this);
+			}
+		} catch (e) {
+			return false;
 		}
 
 		tick = getTickCount();

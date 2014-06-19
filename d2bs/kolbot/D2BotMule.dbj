@@ -358,6 +358,7 @@ include("automule.js");
 include("mulelogger.js");
 include("torchsystem.js");
 include("NTItemParser.dbl");
+include("common/attack.js");
 include("common/storage.js");
 include("common/pickit.js");
 include("common/town.js");

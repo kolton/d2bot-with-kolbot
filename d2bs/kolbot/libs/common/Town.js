@@ -252,6 +252,11 @@ var Town = {
 			}
 		}
 
+		// We have enough potions in inventory
+		if (buffer.mp >= Config.MPBuffer && buffer.hp >= Config.HPBuffer) {
+			needBuffer = false;
+		}
+
 		// No columns to fill
 		if (!needPots && !needBuffer) {
 			return true;
@@ -1920,6 +1925,10 @@ MainSwitch:
 	moveToSpot: function (spot) {
 		var i, path, townSpot,
 			useTK = me.classid === 1 && ((me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint");
+
+		if (!this.act[me.act - 1].hasOwnProperty("spot") || !this.act[me.act - 1].spot.hasOwnProperty(spot)) {
+			return false;
+		}
 
 		if (typeof (this.act[me.act - 1].spot[spot]) === "object") {
 			townSpot = this.act[me.act - 1].spot[spot];
