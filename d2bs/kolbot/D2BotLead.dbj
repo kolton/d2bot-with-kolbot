@@ -485,7 +485,7 @@ MainSwitch:
 					if (ControlAction.joinChannel(chanInfo.joinChannel[i])) {
 						useChat = true;
 					} else {
-						print("ÿc1Unable to join channel, disabling chat messages.");
+						print("ï¿½c1Unable to join channel, disabling chat messages.");
 
 						useChat = false;
 					}
@@ -626,6 +626,20 @@ MainSwitch:
 
 				D2Bot.updateStatus("Invalid Account");
 				D2Bot.printToConsole("Invalid Account");
+
+				break;
+			case getLocaleString(5202):  //classic key for different product
+			case getLocaleString(10915):  //lod key for different product
+				D2Bot.updateStatus("CDKey for different Product");
+				D2Bot.printToConsole("CDKey for different Product: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
 
 				break;
 			case getLocaleString(5199):
