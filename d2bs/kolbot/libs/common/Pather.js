@@ -794,11 +794,9 @@ ModeLoop:
 				}
 
 				if (check) {
-					if (getDistance(me, wp) > 5) {
-						this.moveToUnit(wp);
+					if (!this.useUnit(2, wp.classid, me.area)) {
+						continue;
 					}
-
-					Misc.click(0, 0, wp);
 
 					tick = getTickCount();
 
