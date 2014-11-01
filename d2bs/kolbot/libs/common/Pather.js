@@ -794,7 +794,26 @@ ModeLoop:
 				}
 
 				if (check) {
-					if (!this.useUnit(2, wp.classid, me.area)) {
+					if (getDistance(me, wp) > 5) {
+						this.moveToUnit(wp);
+					}
+
+					Misc.click(0, 0, wp);
+					delay(me.ping * 2);
+					tick = getTickCount();
+
+					while (!getUIFlag(0x14) && getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
+						print("useWaypoint: Waiting for waypoint menu");
+
+						if (getDistance(me, wp) > 5) {
+							this.moveToUnit(wp);
+						}
+
+						Misc.click(0, 0, wp);
+						delay(me.ping * 2);
+					}
+
+					if (!getUIFlag(0x14)) {
 						continue;
 					}
 
