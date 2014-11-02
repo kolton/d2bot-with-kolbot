@@ -842,6 +842,10 @@ ModeLoop:
 
 						delay(10);
 					}
+
+					if (!getUIFlag(0x14)) {
+						continue;
+					}
 				}
 
 				delay(200);
