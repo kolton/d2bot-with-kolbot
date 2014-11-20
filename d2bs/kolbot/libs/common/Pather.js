@@ -843,6 +843,13 @@ ModeLoop:
 
 						delay(10);
 					}
+
+					if (!getUIFlag(0x14)) {
+						print("waypoint retry " + (i + 1));
+						Packet.flash(me.gid);
+
+						continue;
+					}
 				}
 
 				if (!check || getUIFlag(0x14)) {
