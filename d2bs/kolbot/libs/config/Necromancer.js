@@ -181,8 +181,8 @@ function LoadConfig() {
 		Config.ShopBot.ShopNPC = "Anya";
 		// Put item classid numbers or names to scan (remember to put quotes around names). Leave blank to scan ALL items. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [];
-		// Delay between shopping cycles in milliseconds, might help with crashes.
-		Config.ShopBot.CycleDelay = 0;
+		Config.ShopBot.CycleDelay = 0; // Delay between shopping cycles in milliseconds, might help with crashes.
+		Config.ShopBot.QuitOnMatch = false; // Leave game as soon as an item is shopped.
 	Scripts.ChestMania = false; // Open chests in configured areas
 		Config.ChestMania.Act1 = [13, 14, 15, 16, 18, 19]; // List of act 1 areas to open chests in
 		Config.ChestMania.Act2 = [55, 59, 65, 66, 67, 68, 69, 70, 71, 72]; // List of act 2 areas to open chests in
