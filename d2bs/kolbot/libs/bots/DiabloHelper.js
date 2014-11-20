@@ -344,13 +344,17 @@ AreaInfoLoop:
 			throw new Error("Failed to move to Chaos Sanctuary");
 		}
 
+		if (!Config.DiabloHelper.Entrance) {
+			Pather.moveTo(7774, 5305);
+		}
+
 CSLoop:
 		for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
 			party = getParty();
 
 			if (party) {
 				do {
-					if ((!Config.Leader || party.name === Config.Leader) && party.area === 108) {
+					if (party.name !== me.name && party.area === 108 && (!Config.Leader || party.name === Config.Leader)) {
 						break CSLoop;
 					}
 				} while (party.getNext());
