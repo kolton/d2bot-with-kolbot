@@ -454,6 +454,10 @@ MainLoop:
 };
 
 var Item = {
+	hasTier: function (item) {
+		return Config.AutoEquip && NTIP.GetTier(item) > 0;
+	},
+
 	canEquip: function (item) {
 		if (item.type !== 4) { // Not an item
 			return false;
@@ -481,7 +485,7 @@ var Item = {
 			return true;
 		}
 
-		var i;
+		var i, cursorItem;
 
 		if (item.location === 7) {
 			if (!Town.openStash()) {
@@ -496,7 +500,15 @@ var Item = {
 
 				if (item.bodylocation === bodyLoc) {
 					if (getCursorType() === 3) {
-						Misc.click(0, 0, me);
+						//Misc.click(0, 0, me);
+
+						cursorItem = getUnit(100);
+
+						if (cursorItem && Pickit.checkItem(cursorItem).result > 0 && (NTIP.GetTier(cursorItem) < 1 || NTIP.GetTier(cursorItem) > 99)) {
+							if (Storage.Inventory.CanFit(cursorItem)) {
+								Storage.Inventory.MoveTo(cursorItem);
+							}
+						}
 					}
 
 					return true;
@@ -642,7 +654,7 @@ var Item = {
 			return true;
 		}
 
-		var i, j, tier, bodyLoc,
+		var i, j, tier, bodyLoc, tome,
 			items = me.findItems(-1, 0);
 
 		if (!items) {
@@ -681,10 +693,22 @@ var Item = {
 			if (tier > 0 && bodyLoc) {
 				for (j = 0; j < bodyLoc.length; j += 1) {
 					if ([3, 7].indexOf(items[0].location) > -1 && tier > this.getEquippedItem(bodyLoc[j]).tier && this.getEquippedItem(bodyLoc[j]).classid !== 174) { // khalim's will adjustment
+						if (!items[0].getFlag(0x10)) { // unid
+							tome = me.findItem(519, 0, 3);
+
+							if (tome && tome.getStat(70) > 0) {
+								if (items[0].location === 7) {
+									Town.openStash();
+								}
+
+								Town.identifyItem(items[0], tome);
+							}
+						}
+
 						print(items[0].name);
 
 						if (this.equip(items[0], bodyLoc[j])) {
-							delay(250);
+							delay(500);
 							Misc.logItem("Equipped", items[0]);
 						}
 
@@ -781,6 +805,20 @@ var Misc = {
 		return false;
 	},
 
+	// Get total number of players in game
+	getPlayerCount: function () {
+		var count = 0,
+			party = getParty();
+
+		if (party) {
+			do {
+				count += 1;
+			} while (party.getNext());
+		}
+
+		return count;
+	},
+
 	// Open a chest Unit
 	openChest: function (unit) {
 		// Skip invalid and Countess chests
@@ -801,7 +839,7 @@ var Misc = {
 		var i, tick;
 
 		for (i = 0; i < 3; i += 1) {
-			if (Pather.moveTo(unit.x, unit.y + 2, 0)) {
+			if (Pather.moveTo(unit.x + 1, unit.y + 2, 3) && getDistance(me, unit.x + 1, unit.y + 2) < 5) {
 				//Misc.click(0, 0, unit);
 				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
 			}
@@ -838,7 +876,7 @@ var Misc = {
 		}
 
 		coords = [];
-		presetUnits = getPresetUnits(area);
+		presetUnits = getPresetUnits(area, 2);
 
 		if (!chestIds) {
 			chestIds = [
@@ -865,7 +903,7 @@ var Misc = {
 
 		while (coords.length) {
 			coords.sort(Sort.units);
-			Pather.moveToUnit(coords[0], 2, 0);
+			Pather.moveToUnit(coords[0], 1, 2);
 			this.openChests(20);
 
 			for (i = 0; i < coords.length; i += 1) {
@@ -1519,44 +1557,46 @@ var Misc = {
 
 		if (Config.TownCheck && !me.inTown) {
 			try {
-				for (i = 0; i < 4; i += 1) {
-					if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
-						potion = me.getItem(-1, 2); // belt item
+				if (me.gold > 1000) {
+					for (i = 0; i < 4; i += 1) {
+						if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
+							potion = me.getItem(-1, 2); // belt item
 
-						if (potion) {
-							do {
-								if (potion.code.indexOf("hp") > -1) {
-									needhp = false;
+							if (potion) {
+								do {
+									if (potion.code.indexOf("hp") > -1) {
+										needhp = false;
 
-									break;
-								}
-							} while (potion.getNext());
+										break;
+									}
+								} while (potion.getNext());
+							}
+
+							if (needhp) {
+								print("We need healing potions");
+
+								check = true;
+							}
 						}
 
-						if (needhp) {
-							print("We need healing potions");
+						if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
+							potion = me.getItem(-1, 2); // belt item
 
-							check = true;
-						}
-					}
+							if (potion) {
+								do {
+									if (potion.code.indexOf("mp") > -1) {
+										needmp = false;
 
-					if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
-						potion = me.getItem(-1, 2); // belt item
+										break;
+									}
+								} while (potion.getNext());
+							}
 
-						if (potion) {
-							do {
-								if (potion.code.indexOf("mp") > -1) {
-									needmp = false;
+							if (needmp) {
+								print("We need mana potions");
 
-									break;
-								}
-							} while (potion.getNext());
-						}
-
-						if (needmp) {
-							print("We need mana potions");
-
-							check = true;
+								check = true;
+							}
 						}
 					}
 				}
@@ -1590,7 +1630,7 @@ var Misc = {
 		}
 
 		var item,
-			unit = getUnit(0, name);
+			unit = getUnit(-1, name);
 
 		if (!unit) {
 			print("player not found");
@@ -1602,7 +1642,7 @@ var Misc = {
 
 		if (item) {
 			do {
-				this.logItem(name, item);
+				this.logItem(unit.name, item);
 			} while (item.getNext());
 		}
 
@@ -2114,8 +2154,20 @@ CursorLoop:
 	itemToCursor: function (item) {
 		var i, tick;
 
+		if (me.itemoncursor) { // Something already on cursor
+			if (getUnit(100).gid === item.gid) { // Return true if the item is already on cursor
+				return true;
+			}
+
+			this.dropItem(getUnit(100)); // If another item is on cursor, drop it
+		}
+
 		for (i = 0; i < 15; i += 1) {
-			sendPacket(1, 0x19, 4, item.gid);
+			if (item.mode === 1) { // equipped
+				sendPacket(1, 0x1c, 2, item.bodylocation);
+			} else {
+				sendPacket(1, 0x19, 4, item.gid);
+			}
 
 			tick = getTickCount();
 
@@ -2133,10 +2185,6 @@ CursorLoop:
 
 	dropItem: function (item) {
 		var i, tick;
-
-		if (me.itemoncursor) {
-			sendPacket(1, 0x17, 4, getUnit(100).gid);
-		}
 
 		if (!this.itemToCursor(item)) {
 			return false;
@@ -2225,10 +2273,12 @@ var Messaging = {
 			addEventListener("copydata", copyDataEvent);
 		}
 
-		sendCopyData(null, profileName, mode, JSON.stringify({
-			message: message,
-			sender: me.profile
-		}));
+		if (!sendCopyData(null, profileName, mode, JSON.stringify({
+				message: message,
+				sender: me.profile
+			}))) {
+			return false;
+		}
 
 		if (getResponse) {
 			delay(200);
@@ -2264,6 +2314,7 @@ var Events = {
 		case 0x4D: // Cast skill on coords
 			temp = Number("0x" + bytes[7].toString(16) + bytes[6].toString(16));
 
+			// Match Poison Javelin, Plague Javelin or Poison Nova
 			if (temp && [15, 25, 92].indexOf(temp) > -1) {
 				return true;
 			}

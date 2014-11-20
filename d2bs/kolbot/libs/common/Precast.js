@@ -14,6 +14,12 @@ var Precast = new function () {
 			return true;
 		}
 
+		if (slot === -1) {
+			this.BOSwitch();
+
+			slot = this.haveCTA;
+		}
+
 		var i, tick;
 
 		if (slot === undefined) {

@@ -9,6 +9,7 @@ function main() {
 		debugInfo = {area: 0, currScript: "no entry"},
 		pingTimer = [],
 		quitFlag = false,
+		cloneWalked = false,
 		timerLastDrink = [];
 
 	include("OOG.js");
@@ -74,9 +75,9 @@ function main() {
 
 	this.getPotion = function (pottype, type) {
 		var i,
-			items = me.getItems();
+			items = me.findItems(-1, 2);
 
-		if (!items) {
+		if (!items || items.length === 0) {
 			return false;
 		}
 
@@ -109,13 +110,16 @@ function main() {
 
 			if (script) {
 				if (script.running) {
-					if (script.name === "default.dbj") {
+					if (i === 0) { // default.dbj
 						print("ÿc1Pausing.");
 					}
 
-					script.pause();
+					// don't pause townchicken during clone walk
+					if (scripts[i] !== "tools/townchicken.js" || !cloneWalked) {
+						script.pause();
+					}
 				} else {
-					if (script.name === "default.dbj") {
+					if (i === 0) { // default.dbj
 						print("ÿc2Resuming.");
 					}
 
@@ -138,6 +142,7 @@ function main() {
 	};
 
 	this.exit = function () {
+		beep();
 		this.stopDefault();
 		quit();
 	};
@@ -260,19 +265,36 @@ function main() {
 	};
 
 	this.getIronGolem = function () {
-		var golem = getUnit(1, "iron golem");
+		var owner,
+			golem = getUnit(1, 291);
 
-		if (!golem) {
-			return false;
+		if (golem) {
+			do {
+				owner = golem.getParent();
+
+				if (owner && owner.name === me.name) {
+					return copyUnit(golem);
+				}
+			} while (golem.getNext());
 		}
 
-		do {
-			if (golem.getParent().name === me.name) {
-				return golem;
-			}
-		} while (golem.getNext());
-
 		return false;
+	};
+
+	this.getNearestPreset = function () {
+		var i, unit, dist, id;
+
+		unit = getPresetUnits(me.area);
+		dist = 99;
+
+		for (i = 0; i < unit.length; i += 1) {
+			if (getDistance(me, unit[i].roomx * 5 + unit[i].x, unit[i].roomy * 5 + unit[i].y) < dist) {
+				dist = getDistance(me, unit[i].roomx * 5 + unit[i].x, unit[i].roomy * 5 + unit[i].y);
+				id = unit[i].type + " " + unit[i].id;
+			}
+		}
+
+		return id || "";
 	};
 
 	// Event functions
@@ -295,9 +317,13 @@ function main() {
 			break;
 		case 101: // numpad 5
 			if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo")) {
-				print("ÿc2Mule triggered");
-				scriptBroadcast("mule");
-				this.exit();
+				if (AutoMule.getMuleItems().length > 0) {
+					print("ÿc2Mule triggered");
+					scriptBroadcast("mule");
+					this.exit();
+				} else {
+					me.overhead("No items to mule.");
+				}
 			} else {
 				me.overhead("Profile not enabled for muling.");
 			}
@@ -320,22 +346,6 @@ function main() {
 
 			break;
 		}
-	};
-
-	this.getNearestPreset = function () {
-		var i, unit, dist, id;
-
-		unit = getPresetUnits(me.area);
-		dist = 99;
-
-		for (i = 0; i < unit.length; i += 1) {
-			if (getDistance(me, unit[i].roomx * 5 + unit[i].x, unit[i].roomy * 5 + unit[i].y) < dist) {
-				dist = getDistance(me, unit[i].roomx * 5 + unit[i].x, unit[i].roomy * 5 + unit[i].y);
-				id = unit[i].type + " " + unit[i].id;
-			}
-		}
-
-		return id || "";
 	};
 
 	this.gameEvent = function (mode, param1, param2, name1, name2) {
@@ -370,7 +380,7 @@ function main() {
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
 			if (Config.DCloneQuit === 2) {
 				D2Bot.printToConsole("SoJ sold in game. Leaving.");
-				
+
 				quitFlag = true;
 
 				break;
@@ -393,6 +403,9 @@ function main() {
 
 			if (Config.StopOnDClone) {
 				D2Bot.printToConsole("Diablo Walks the Earth", 7);
+
+				cloneWalked = true;
+
 				this.togglePause();
 				Town.goToTown();
 				showConsole();
@@ -448,6 +461,7 @@ function main() {
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
 	addEventListener("scriptmsg", this.scriptEvent);
+	addEventListener("gamepacket", Events.gamePacket);
 
 	// Load Fastmod
 	Packet.changeStat(105, Config.FCR);

@@ -331,6 +331,7 @@ var Storage = new function () {
 		this.Stash.Reset();
 		this.Belt.Reset();
 		this.Cube.Reset();
+		this.TradeScreen.Reset();
 
 		var item = me.getItem();
 
@@ -342,6 +343,10 @@ var Storage = new function () {
 			switch (item.location) {
 			case 3:
 				this.Inventory.Mark(item);
+
+				break;
+			case 5:
+				this.TradeScreen.Mark(item);
 
 				break;
 			case 2:

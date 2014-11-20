@@ -1,0 +1,57 @@
+// weapon
+//[type] == wand && [quality] <= rare # [fcr] > 0 && [maxmana] > 0 # [tier] == 1
+//[type] == wand && [quality] <= rare # [fcr] == 20 && [maxmana] >= 20 # [tier] == 2
+//[name] == blade && [quality] == unique # [fcr] > 0 # [tier] == 3
+//[name] == burntwand && [quality] == unique # [fcr] > 0 # [tier] == 4
+//[name] == swirlingcrystal && [quality] == set # # [tier] == 5
+[name] == swirlingcrystal && [quality] == set # [skillcoldmastery] == 2 # [tier] == 99
+[flag] == runeword # [plusskillbattleorders] > 0 # [tier] == 99
+
+// armor
+[type] == armor && [quality] <= rare # [maxhp] > 0 # [tier] == 1
+[name] == studdedleather && [quality] == unique # # [tier] == 2
+[name] == russetarmor && [quality] == unique && [flag] != ethereal # # [tier] == 3
+//[name] == hellforgeplate && [quality] == set # # [tier] == 4
+[name] == serpentskinarmor && [quality] == unique && [flag] != ethereal # [fireresist] < 35 # [tier] == 5
+[name] == lacqueredplate && [quality] == set # # [tier] == 101
+
+// boots
+[type] == boots && [quality] <= rare # [lightresist] > 0 # [tier] == 1
+[name] == battleboots && [quality] == set # # [tier] == 3
+[name] == heavyboots && [quality] == set # # [tier] == 4
+[name] == battleboots && [quality] == unique # [itemmagicbonus] < 40 # [tier] == 5
+[name] == battleboots && [quality] == unique # [itemmagicbonus] >= 40 # [tier] == 101
+
+// gloves
+[type] == gloves && [quality] <= rare # [maxhp] > 0 # [tier] == 1
+[name] == lightgauntlets && [quality] == unique # # [tier] == 2
+[name] == gauntlets && [quality] == unique # # [tier] == 3
+
+// amulet
+[type] == amulet && [quality] <= rare # [maxhp] > 0 && [maxmana] > 0 # [tier] == 1
+[type] == amulet && [quality] == unique # [itemallskills] == 1 # [tier] == 2
+[type] == amulet && [quality] == set # [sorceressskills] == 2 # [tier] == 101
+
+// ring
+[type] == ring && [quality] <= rare # [maxhp] > 0 # [tier] == 1
+[type] == ring && [quality] <= rare # [maxhp] > 0 && [fcr] == 10 # [tier] == 2
+[type] == ring && [quality] <= rare # [maxhp] > 0 && [maxmana] > 0 && [fcr] == 10 # [tier] == 3
+[type] == ring && [quality] == unique # [itemallskills] == 1 # [tier] == 100
+
+// belt
+[type] == belt && [quality] <= rare # [maxhp] > 0 # [tier] == 1
+[type] == belt && [quality] <= rare # [maxhp] > 0 && [fireresist]+[lightresist]+[coldresist] >= 30 # [tier] == 2
+[name] == meshbelt && [quality] == set # # [tier] == 3
+[name] == meshbelt && [quality] == set # [itemmagicbonus] == 15 # [tier] == 4
+
+// helm
+[type] == helm && [quality] == rare # [maxhp] > 0 # [tier] == 1
+[type] == helm && [quality] == rare # [maxhp] > 0 && [fireresist]+[lightresist]+[coldresist] >= 30 # [tier] == 2
+[name] == warhat && [quality] == unique # # [tier] == 3
+[name] == deathmask && [quality] == set # # [tier] == 4
+
+// shield
+[type] == shield && [quality] <= rare # [fireresist]+[lightresist]+[coldresist] >= 30 # [tier] == 1
+[type] == shield && [quality] <= rare # [fireresist]+[lightresist]+[coldresist] >= 50 # [tier] == 2
+[name] == grimshield && [quality] == unique # # [tier] == 3
+[name] == roundshield && [quality] == unique # # [tier] == 4

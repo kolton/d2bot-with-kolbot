@@ -56,14 +56,14 @@ var NodeAction = {
 
 	// Open chests while pathing
 	popChests: function () {
-		if (Config.OpenChests > 0) {
-			Misc.openChests(15);
+		if (!!Config.OpenChests) {
+			Misc.openChests(20);
 		}
 	},
 
 	// Scan shrines while pathing
 	getShrines: function () {
-		if (Config.ScanShrines && Config.ScanShrines.length) {
+		if (!!Config.ScanShrines && Config.ScanShrines.length > 0) {
 			Misc.scanShrines();
 		}
 	}
@@ -118,7 +118,7 @@ var Pather = {
 	teleport: true,
 	walkDistance: 10,
 	teleDistance: 40,
-	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17],
+	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17, 0x19, 0x1A],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 	recursion: true,
 
@@ -229,7 +229,7 @@ var Pather = {
 					}
 				}
 
-				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, fail > 0 ? 1 : 4)) {
+				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, fail > 0 ? 2 : 4)) {
 					if (!me.inTown) {
 						if (this.recursion) {
 							this.recursion = false;
@@ -268,7 +268,6 @@ var Pather = {
 					}
 
 					path.reverse();
-
 					PathDebug.drawPath(path);
 
 					if (pop) {
@@ -300,8 +299,12 @@ var Pather = {
 		x - the x coord to teleport to
 		y - the y coord to teleport to
 	*/
-	teleportTo: function (x, y) {
+	teleportTo: function (x, y, maxRange) {
 		var i, tick;
+
+		if (maxRange === undefined) {
+			maxRange = 5
+		}
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
@@ -315,13 +318,7 @@ MainLoop:
 			tick = getTickCount();
 
 			while (getTickCount() - tick < Math.max(500, me.ping * 2 + 200)) {
-				if (me.mode === 4) {
-					i -= 1;
-
-					break;
-				}
-
-				if (getDistance(me.x, me.y, x, y) < 5) {
+				if (getDistance(me.x, me.y, x, y) < maxRange) {
 					return true;
 				}
 
@@ -615,7 +612,7 @@ ModeLoop:
 						return false;
 					}
 
-					if (!Pather.moveTo(dest[0], dest[1], 3, clearPath)) {
+					if (!this.moveTo(dest[0], dest[1], 3, clearPath)) {
 						return false;
 					}
 
@@ -777,6 +774,10 @@ ModeLoop:
 
 		var i, tick, wp;
 
+		while (!me.idle) {
+			delay(40);
+		}
+
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
 				break;
@@ -851,35 +852,26 @@ ModeLoop:
 					}
 				}
 
-				delay(200);
-				wp.interact(targetArea);
+				if (!check || getUIFlag(0x14)) {
+					delay(200);
+					wp.interact(targetArea);
 
-				tick = getTickCount();
+					tick = getTickCount();
 
-				while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
-					if (me.area === targetArea) {
-						delay(100);
+					while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
+						if (me.area === targetArea) {
+							delay(100);
 
-						return true;
+							return true;
+						}
+
+						delay(10);
 					}
 
-					delay(10);
+					me.cancel(); // In case lag causes the wp menu to stay open
 				}
 
-				me.cancel(); // In case lag causes the wp menu to stay open
 				Packet.flash(me.gid);
-
-				/*if (me.inTown) {
-					Misc.click(0, 0, me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4); // In case of client/server desync
-
-					if (i > 2) {
-						Town.move("stash");
-					}
-
-					Town.move("waypoint");
-				} else {
-					this.moveToUnit(wp);
-				}*/
 
 				if (i > 1) { // Activate check if we fail direct interact twice
 					check = true;
@@ -1026,7 +1018,7 @@ MainLoop:
 					tick = getTickCount();
 
 					while (getTickCount() - tick < 2000) {
-						if (portal.mode === 2) {
+						if (portal.mode === 2 || me.area === 74) {
 							break;
 						}
 
