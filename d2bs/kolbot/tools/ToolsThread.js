@@ -142,7 +142,6 @@ function main() {
 	};
 
 	this.exit = function () {
-		beep();
 		this.stopDefault();
 		quit();
 	};
