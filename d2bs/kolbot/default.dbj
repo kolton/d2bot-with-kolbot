@@ -55,7 +55,7 @@ function main() {
 		return true;
 	}
 
-	var i, sojPause, stats,
+	var i, sojPause, stats, anni,
 		sojCounter = 0,
 		startTime = getTickCount();
 
@@ -72,6 +72,22 @@ function main() {
 			sojCounter = 0;
 
 			break;
+		}
+	};
+
+	this.copyDataEvent = function (mode, msg) {
+		if (mode === 0 && msg === "mule") { // "Mule Profile" option from D2Bot#
+			if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo")) {
+				if (AutoMule.getMuleItems().length > 0) {
+					D2Bot.printToConsole("Mule triggered");
+					scriptBroadcast("mule");
+					scriptBroadcast("quit");
+				} else {
+					D2Bot.printToConsole("No items to mule.");
+				}
+			} else {
+				D2Bot.printToConsole("Profile not enabled for muling.");
+			}
 		}
 	};
 
@@ -119,6 +135,7 @@ function main() {
 
 	// Load events and threads
 	addEventListener("scriptmsg", this.scriptEvent);
+	addEventListener("copydata", this.copyDataEvent);
 	//addEventListener("gamepacket", Events.gamePacket);
 
 	load("tools/ToolsThread.js");
@@ -145,8 +162,10 @@ function main() {
 		Town.getCorpse();
 		Town.clearBelt();
 		Town.clearInventory();
-		Pickit.pickItems();
+		//Pickit.pickItems();
 	}
+
+	//me.automap = true;
 
 	// Next game = drop keys
 	if (TorchSystem.keyCheck()) {
@@ -208,6 +227,13 @@ function main() {
 		scriptBroadcast("mule");
 	}
 
+	// Anni handler. Mule Anni if it's in unlocked space and profile is set to mule torch/anni.
+	anni = me.findItem(603, 0, -1, 7);
+
+	if (anni && !Storage.Inventory.IsLocked(anni, Config.Inventory) && AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
+		scriptBroadcast("muleAnni");
+	}
+
 	if (CraftingSystem.checkFullSets()) {
 		scriptBroadcast("crafting");
 	}
@@ -216,7 +242,7 @@ function main() {
 		scriptBroadcast("torch");
 	}
 
-	Messaging.sendToScript("tools/toolsthread.js", "quit");
+	scriptBroadcast("quit");
 
 	return true;
 }

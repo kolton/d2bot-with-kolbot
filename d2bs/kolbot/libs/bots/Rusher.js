@@ -112,7 +112,7 @@ function Rusher() {
 			case "quit":
 				if (nick === master) {
 					say("bye ~");
-					quit();
+					scriptBroadcast("quit");
 				} else {
 					say("I'm only accepting commands from my master.");
 				}

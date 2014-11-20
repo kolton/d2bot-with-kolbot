@@ -29,7 +29,7 @@ function OrgTorch() {
 					if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
 						scriptBroadcast("muleTorch");
 						//quit();
-						Messaging.sendToScript("tools/toolsthread.js", "quit");
+						scriptBroadcast("quit");
 						//delay(10000);
 					}
 

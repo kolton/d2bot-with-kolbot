@@ -284,6 +284,10 @@ Unit.prototype.toCursor = function () {
 		throw new Error("Unit.toCursor: Must be used with items.");
 	}
 
+	if (me.itemoncursor && this.mode === 4) {
+		return true;
+	}
+
 	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
@@ -345,7 +349,7 @@ Unit.prototype.drop = function () {
 	return false;
 };
 
-me.findItem = function (id, mode, loc) {
+me.findItem = function (id, mode, loc, quality) {
 	if (id === undefined) {
 		id = -1;
 	}
@@ -355,28 +359,24 @@ me.findItem = function (id, mode, loc) {
 	}
 
 	if (loc === undefined) {
-		loc = false;
+		loc = -1;
+	}
+
+	if (quality === undefined) {
+		quality = -1;
 	}
 
 	var item = me.getItem(id, mode);
 
-	if (!item) {
-		return false;
-	}
-
-	if (loc) {
-		while (item.location !== loc) {
-			if (!item.getNext()) {
-				break;
+	if (item) {
+		do {
+			if ((loc === -1 || item.location === loc) && (quality === -1 || item.quality === quality)) {
+				return item;
 			}
-		}
-
-		if (item.location !== loc) {
-			return false;
-		}
+		} while (item.getNext());
 	}
 
-	return item;
+	return false;
 };
 
 me.findItems = function (id, mode, loc) {
@@ -593,6 +593,12 @@ Unit.prototype.getStatEx = function (id, subid) {
 			}
 
 			return 0;
+		}
+
+		break;
+	case 57:
+		if (subid === 1) {
+			return Math.round(this.getStat(57) * this.getStat(59) / 256); 
 		}
 
 		break;
@@ -817,6 +823,7 @@ Unit.prototype.getColor = function () {
 			"Rainbow": Color.lightpurple,
 			"Scintillating": Color.lightpurple,
 			"Prismatic": Color.lightpurple,
+			"Chromatic": Color.lightpurple,
 			"Hierophant's": Color.crystalgreen,
 			"Berserker's": Color.crystalgreen,
 			"Necromancer's": Color.crystalgreen,

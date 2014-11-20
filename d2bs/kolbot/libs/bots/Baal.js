@@ -197,14 +197,8 @@ function Baal() {
 	};
 
 	Town.doChores();
-
-	if (Config.RandomPrecast) {
-		Pather.useWaypoint("random");
-		Precast.doPrecast(true);
-	} else {
-		Pather.useWaypoint(129);
-		Precast.doPrecast(true);
-	}
+	Pather.useWaypoint(Config.RandomPrecast ? "random" : 129);
+	Precast.doPrecast(true);
 
 	if (me.area !== 129) {
 		Pather.useWaypoint(129);

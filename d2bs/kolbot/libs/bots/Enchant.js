@@ -5,9 +5,9 @@
 */
 
 function Enchant() {
-	var command, hostile, nick,
+	var command, hostile, nick, spot, tick, s, m,
+		startTime = getTickCount(),
 		shitList = [],
-		wpNicks = {},
 		greet = [];
 
 	this.enchant = function (nick) {
@@ -17,22 +17,48 @@ function Enchant() {
 			return false;
 		}
 
-		var unit = getUnit(0, nick);
+		var partyUnit,
+			unit = getUnit(0, nick);
 
-		if (!unit || getDistance(me, unit) > 40) {
+		if (getDistance(me, unit) > 35) {
 			say("Get closer.");
 
 			return false;
 		}
 
+		if (!unit) {
+			partyUnit = getParty(nick);
+
+			// wait until party area is readable?
+
+			if ([40, 75, 103, 109].indexOf(partyUnit.area) > -1) {
+				say("Wait for me at waypoint.");
+				Town.goToTown([1, 40, 75, 103, 109].indexOf(partyUnit.area) + 1); // index+1 for town 2,3,4,5
+
+				unit = getUnit(0, nick);
+			} else {
+				say("You need to be in one of the towns.");
+
+				return false;
+			}
+		}
+
 		if (unit) {
 			do {
 				if (!unit.dead) { // player is alive
+					if (getDistance(me, unit) >= 35) {
+						say("You went too far away.");
+
+						return false;
+					}
+
 					Skill.setSkill(52, 0);
 					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
 					delay(500);
 				}
 			} while (unit.getNext());
+		} else {
+			say("Couldn't find you, champ.");
 		}
 
 		unit = getUnit(1);
@@ -98,7 +124,7 @@ function Enchant() {
 				do {
 					if (leg.name.indexOf("ÿc1") > -1) {
 						wrongLeg = true;
-					} else { // For idiots trying to give leg from another difficulty
+					} else if (getDistance(me, leg) <= 15) {
 						gid = leg.gid;
 
 						Pickit.pickItem(leg);
@@ -108,7 +134,7 @@ function Enchant() {
 				} while (leg.getNext());
 			}
 
-			say("Bring the leg " + (wrongLeg ? "from this difficulty" : "") + " to me.");
+			say("Bring the leg " + (wrongLeg ? "from this difficulty" : "") + " close to me.");
 
 			return false;
 		}
@@ -243,6 +269,8 @@ function Enchant() {
 		leg = this.getLeg();
 
 		if (!leg) {
+			say("Failed to get the leg :(");
+
 			return false;
 		}
 
@@ -273,12 +301,16 @@ function Enchant() {
 	};
 
 	this.getWpNick = function (nick) {
-		if (wpNicks.hasOwnProperty(nick)) {
-			if (wpNicks[nick].requests > 4) {
+		if (!this.wpNicks) {
+			this.wpNicks = {};
+		}
+
+		if (this.wpNicks.hasOwnProperty(nick)) {
+			if (this.wpNicks[nick].requests > 4) {
 				return "maxrequests";
 			}
 
-			if (getTickCount() - wpNicks[nick].timer < 60000) {
+			if (getTickCount() - this.wpNicks[nick].timer < 60000) {
 				return "mintime";
 			}
 
@@ -289,7 +321,7 @@ function Enchant() {
 	};
 
 	this.addWpNick = function (nick) {
-		wpNicks[nick] = {timer: getTickCount(), requests: 0};
+		this.wpNicks[nick] = {timer: getTickCount(), requests: 0};
 	};
 
 	this.giveWps = function (nick) {
@@ -376,8 +408,8 @@ MainLoop:
 		Town.goToTown(1);
 		Town.move("portalspot");
 
-		wpNicks[nick].requests += 1;
-		wpNicks[nick].timer = getTickCount();
+		this.wpNicks[nick].requests += 1;
+		this.wpNicks[nick].timer = getTickCount();
 
 		return true;
 	};
@@ -431,6 +463,56 @@ MainLoop:
 		return rval;
 	};
 
+	this.floodCheck = function (command) {
+		var cmd = command[0],
+			nick = command[1];
+
+		if ([	"help", "timeleft",
+				Config.Enchant.Triggers[0].toLowerCase(),
+				Config.Enchant.Triggers[1].toLowerCase(),
+				Config.Enchant.Triggers[2].toLowerCase()
+				].indexOf(cmd.toLowerCase()) === -1) {
+			return false;
+		}
+
+		if (!this.cmdNicks) {
+			this.cmdNicks = {};
+		}
+
+		if (!this.cmdNicks.hasOwnProperty(nick)) {
+			this.cmdNicks[nick] = {
+				firstCmd: getTickCount(),
+				commands: 0,
+				ignored: false
+			};
+		}
+
+		if (this.cmdNicks[nick].ignored) {
+			if (getTickCount() - this.cmdNicks[nick].ignored < 60000) {
+				return true; // ignore flooder
+			}
+
+			// unignore flooder
+			this.cmdNicks[nick].ignored = false;
+			this.cmdNicks[nick].commands = 0;
+		}
+
+		this.cmdNicks[nick].commands += 1;
+
+		if (getTickCount() - this.cmdNicks[nick].firstCmd < 10000) {
+			if (this.cmdNicks[nick].commands > 5) {
+				this.cmdNicks[nick].ignored = getTickCount();
+
+				say(nick + ", you are being ignored for 60 seconds because of flooding.");
+			}
+		} else {
+			this.cmdNicks[nick].firstCmd = getTickCount();
+			this.cmdNicks[nick].commands = 0;
+		}
+
+		return false;
+	};
+
 	function ChatEvent(nick, msg) {
 		command = [msg, nick];
 	}
@@ -446,6 +528,7 @@ MainLoop:
 		}
 	}
 
+	// START
 	if (Config.ShitList) {
 		shitList = ShitList.read();
 	}
@@ -456,6 +539,11 @@ MainLoop:
 	Town.goToTown(1);
 	Town.move("portalspot");
 
+	spot = {
+		x: me.x,
+		y: me.y
+	};
+
 	while (true) {
 		while (greet.length > 0) {
 			nick  = greet.shift();
@@ -465,7 +553,11 @@ MainLoop:
 			}
 		}
 
-		if (command) {
+		if (spot && getDistance(me, spot) > 10) {
+			Pather.moveTo(spot.x, spot.y);
+		}
+
+		if (command && !this.floodCheck(command)) {
 			switch (command[0].toLowerCase()) {
 			case "help":
 				this.checkHostiles();
@@ -477,13 +569,22 @@ MainLoop:
 				}
 
 				say("Commands:");
-				say((Config.Enchant.Triggers[0] ? "Enhant: " + Config.Enchant.Triggers[0] : "") +
+				say("Remaining time: timeleft" +
+						(Config.Enchant.Triggers[0] ? " | Enhant: " + Config.Enchant.Triggers[0] : "") +
 						(Config.Enchant.Triggers[1] ? " | Open cow level: " + Config.Enchant.Triggers[1] : "") +
 						(Config.Enchant.Triggers[2] ? " | Give waypoints: " + Config.Enchant.Triggers[2] : ""));
 
 				if (Config.Enchant.AutoChant) {
 					say("Auto enchant is ON");
 				}
+
+				break;
+			case "timeleft":
+				tick = Config.Enchant.GameLength * 6e4 - getTickCount() + startTime;
+				m = Math.floor(tick / 60000);
+				s = Math.floor((tick / 1000) % 60);
+
+				say("Time left: " + (m ? m + " minute" + (m > 1 ? "s" : "") + ", " : "") + s + " second" + (s > 1 ? "s." : "."));
 
 				break;
 			case Config.Enchant.Triggers[0].toLowerCase(): // chant
@@ -534,11 +635,15 @@ MainLoop:
 
 		command = "";
 
+		if (me.act > 1) {
+			Town.goToTown(1);
+		}
+
 		if (Config.Enchant.AutoChant) {
 			this.autoChant();
 		}
 
-		if (getTickCount() - me.gamestarttime >= Config.Enchant.GameLength * 6e4) {
+		if (getTickCount() - startTime >= Config.Enchant.GameLength * 6e4) {
 			say("Use kolbot or die!");
 			delay(1000);
 
