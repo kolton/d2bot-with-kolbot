@@ -399,7 +399,8 @@ var Config = {
 	ShopBot: {
 		ScanIDs: [],
 		ShopNPC: "anya",
-		CycleDelay: 0
+		CycleDelay: 0,
+		QuitOnMatch: false
 	},
 	Coldworm: {
 		KillBeetleburst: false,

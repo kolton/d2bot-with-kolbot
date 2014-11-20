@@ -10,15 +10,6 @@ function ShopBot() {
 		totalCycles = 0,
 		leadTimeout = 20; // NPC move timeout in seconds
 
-	function moveBlocker(bytes) {
-		switch (bytes[0]) {
-		case 0x0D: // Player Stop
-			return true;
-		}
-
-		return false;
-	}
-
 	this.pickEntries = [];
 	this.npcs = {};
 	this.paths = {};
@@ -103,7 +94,7 @@ function ShopBot() {
 					delay(100);
 				}
 
-				if (getDistance(me, npc) < i === path.length - 2 ? 8 : 5) {
+				if (getDistance(me, npc) < (i === path.length - 2 ? 8 : 5)) {
 					break;
 				}
 
@@ -348,7 +339,7 @@ function ShopBot() {
 				this.paths[name] = [];
 
 				for (i = 0; i < path.length; i += 1) {
-					temp = Pather.getNearestWalkable(path[i].x, path[i].y, 5, 1, 0x1|0x400, 4);
+					temp = Pather.getNearestWalkable(path[i].x, path[i].y, 5, 1, 0x1 | 0x400, 4);
 
 					if (temp) {
 						this.paths[name] = this.paths[name].concat(temp);
@@ -594,11 +585,11 @@ function ShopBot() {
 				return false;
 			}
 
-			if (this.openMenu(npc)) {
-				if (Config.ShopBot.CycleDelay) {
-					delay(Config.ShopBot.CycleDelay);
-				}
+			if (Config.ShopBot.CycleDelay) {
+				delay(Config.ShopBot.CycleDelay);
+			}
 
+			if (this.openMenu(npc)) {
 				this.shopItems(npc, menuId);
 			}
 		}
