@@ -196,7 +196,8 @@ NTIP.GetTier = function (item) {
 };
 
 NTIP.CheckItem = function (item, entryList, verbose) {
-	var i, list, identified, num, rval,
+	var i, list, identified, num,
+		rval = {},
 		result = 0;
 
 	if (!entryList) {
@@ -234,6 +235,10 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 							}
 						} else if (!identified && result === 0) {
 							result = -1;
+
+							if (verbose) {
+								rval.line = stringArray[i].file + " #" + stringArray[i].line;
+							}
 						}
 					} else {
 						if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
@@ -280,6 +285,10 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 					}
 				} else if (!identified && result === 0) {
 					result = -1;
+
+					if (verbose) {
+						rval.line = stringArray[i].file + " #" + stringArray[i].line;
+					}
 				}
 			}
 		} catch (pickError) {
@@ -298,12 +307,17 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 	}
 
 	if (verbose) {
-		rval = {};
-
-		if (result > 0) {
+		switch (result) {
+		case -1:
+			break;
+		case 1:
 			rval.line = stringArray[i].file + " #" + stringArray[i].line;
-		} else {
+
+			break;
+		default:
 			rval.line = null;
+
+			break;
 		}
 
 		rval.result = result;

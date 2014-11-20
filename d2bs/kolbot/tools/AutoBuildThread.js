@@ -160,7 +160,7 @@ function spendSkillPoint (id) {
 	} else {
 		AutoBuild.print("Fake useSkillPoint(): "+skillName);
 	}
-	delay(100);											// TODO: How long should we wait... if at all?
+	delay(200);											// TODO: How long should we wait... if at all?
 	return (unusedSkillPoints - me.getStat(5) === 1);	// Check if we spent one point
 };
 
@@ -210,7 +210,7 @@ function spendSkillPoints () {
 			}
 		}
 		
-		delay(100);	// TODO: How long should we wait... if at all?
+		delay(200);	// TODO: How long should we wait... if at all?
 	}
 	
 	return spentEveryPoint;

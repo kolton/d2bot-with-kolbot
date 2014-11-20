@@ -30,24 +30,27 @@ function main() {
 
 	this.togglePause = function () {
 		var i,	script,
-			scripts = ["default.dbj", "tools/antihostile.js", "tools/rushthread.js"];
+			scripts = ["default.dbj", "tools/antihostile.js", "tools/rushthread.js", "tools/CloneKilla.js"];
 
 		for (i = 0; i < scripts.length; i += 1) {
 			script = getScript(scripts[i]);
 
 			if (script) {
 				if (script.running) {
-					if (script.name === "default.dbj") {
+					if (i === 0) { // default.dbj
 						print("ÿc1Pausing.");
 					}
 
 					script.pause();
 				} else {
-					if (script.name === "default.dbj") {
-						print("ÿc2Resuming.");
+					if (i === 0) { // default.dbj
+						if (!getScript("tools/clonekilla.js")) { // resume only if clonekilla isn't running
+							print("ÿc2Resuming.");
+							script.resume();
+						}
+					} else {
+						script.resume();
 					}
-
-					script.resume();
 				}
 			}
 		}
@@ -91,8 +94,7 @@ function main() {
 				Town.visitTown();
 			} catch (e) {
 				Misc.errorReport(e, "TownChicken.js");
-				//scriptBroadcast("quit");
-				Messaging.sendToScript("tools/toolsthread.js", "quit");
+				scriptBroadcast("quit");
 
 				return;
 			} finally {

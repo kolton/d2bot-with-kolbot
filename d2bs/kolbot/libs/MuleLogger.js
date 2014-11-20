@@ -30,9 +30,13 @@ var MuleLogger = {
 	IngameTime: 20, // Time to wait after leaving game
 
 	// don't edit
-	getItemDesc: function (unit) {
+	getItemDesc: function (unit, logIlvl) {
 		var i, desc,
 			stringColor = "";
+
+		if (logIlvl === undefined) {
+			logIlvl = this.LogItemLevel;
+		}
 
 		desc = unit.description.split("\n");
 
@@ -53,7 +57,7 @@ var MuleLogger = {
 			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2").replace("\xFF", "\\xff", "g");
 		}
 
-		if (this.LogItemLevel && desc[desc.length - 1]) {
+		if (logIlvl && desc[desc.length - 1]) {
 			desc[desc.length - 1] = desc[desc.length - 1].trim() + " (" + unit.ilvl + ")";
 		}
 
@@ -82,9 +86,13 @@ var MuleLogger = {
 	},
 
 	// Log kept item stats in the manager.
-	logItem: function (unit) {
+	logItem: function (unit, logIlvl) {
 		if (!isIncluded("common/misc.js")) {
 			include("common/misc.js");
+		}
+
+		if (logIlvl === undefined) {
+			logIlvl = this.LogItemLevel;
 		}
 
 		var i, code, desc, sock,
@@ -92,7 +100,7 @@ var MuleLogger = {
 			color = -1,
 			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]/, "").trim();
 
-		desc = this.getItemDesc(unit) + "$" + unit.gid;
+		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid;
 		color = unit.getColor();
 
 		switch (unit.quality) {
@@ -258,9 +266,21 @@ var MuleLogger = {
 		};
 	},
 
-	logChar: function () {
+	logChar: function (logIlvl, logName, saveImg) {
 		while (!me.gameReady) {
-			delay(500);
+			delay(100);
+		}
+
+		if (logIlvl === undefined) {
+			logIlvl = this.LogItemLevel;
+		}
+
+		if (logName === undefined) {
+			logName = this.LogNames;
+		}
+
+		if (saveImg === undefined) {
+			saveImg = this.SaveScreenShot;
 		}
 
 		var i, folder, string, parsedItem,
@@ -287,14 +307,14 @@ var MuleLogger = {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
-				parsedItem = this.logItem(items[i]);
+				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image
-				if (this.LogNames) {
+				if (logName) {
 					parsedItem.header = (me.account || "Single Player") + " / " + me.name;
 				}
 
-				if (this.SaveScreenShot) {
+				if (saveImg) {
 					D2Bot.saveItem(parsedItem);
 				}
 

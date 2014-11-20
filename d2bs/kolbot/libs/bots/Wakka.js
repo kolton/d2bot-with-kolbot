@@ -8,7 +8,8 @@ var stopLvl = 99;
 
 function Wakka() {
 	var i, safeTP, portal, vizClear, seisClear, infClear, tick, diablo,
-		minDist = 40,
+		timeout = 1, // minutes
+		minDist = 50,
 		maxDist = 80,
 		leaderUnit = null,
 		leaderPartyUnit = null,
@@ -44,6 +45,10 @@ function Wakka() {
 			}
 
 			delay(500);
+
+			if (getTickCount() - me.gamestarttime >= timeout * 6e4) {
+				throw new Error("No leader found");
+			}
 		} while (!leader); // repeat until leader is found (or until game is empty)
 
 		return false;
@@ -216,7 +221,7 @@ function Wakka() {
 				}
 			}
 
-			if (Pather.walkTo(path[0].x, path[0].y, 2)) {
+			if (Pather.moveTo(path[0].x, path[0].y)) {
 				path.shift();
 			}
 
@@ -228,7 +233,6 @@ function Wakka() {
 
 	// start
 	Town.goToTown(4);
-	Town.doChores();
 	Town.move("portalspot");
 
 	if (Config.Leader) {
@@ -247,7 +251,10 @@ function Wakka() {
 		}
 	}
 
-	if (leader || autoLeaderDetect(108)) {
+	autoLeaderDetect(108);
+	Town.doChores();
+
+	if (leader) {
 		while (Misc.inMyParty(leader)) {
 			if (me.getStat(12) >= stopLvl) {
 				D2Bot.stop();
@@ -255,14 +262,16 @@ function Wakka() {
 
 			switch (me.area) {
 			case 103:
-				portal = Pather.getPortal(108, leader);
+				//portal = Pather.getPortal(108, leader);
+				portal = Pather.getPortal(108, null);
 
 				if (portal) {
 					if (!safeTP) {
 						delay(5000);
 					}
 
-					Pather.usePortal(108, leader);
+					//Pather.usePortal(108, leader);
+					Pather.usePortal(108, null);
 				}
 
 				break;
@@ -270,7 +279,8 @@ function Wakka() {
 				if (!safeTP) {
 					if (this.checkMonsters(25, false)) {
 						me.overhead("hot tp");
-						Pather.usePortal(103, leader);
+						//Pather.usePortal(103, leader);
+						Pather.usePortal(103, null);
 						this.getCorpse();
 
 						break;

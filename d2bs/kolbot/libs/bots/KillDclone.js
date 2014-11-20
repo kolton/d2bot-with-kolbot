@@ -16,8 +16,8 @@ function KillDclone() {
 	Attack.kill(333);
 	Pickit.pickItems();
 
-	if (!!AutoMule.getMule(1)) {
-		scriptBroadcast("muleTorch");
+	if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
+		scriptBroadcast("muleAnni");
 	}
 
 	return true;

@@ -369,7 +369,9 @@ var Config = {
 	},
 	DiabloHelper: {
 		Wait: 120,
-		Entrance: false
+		Entrance: false,
+		SkipIfBaal: false,
+		SkipTP: false
 	},
 	BattleOrders: {
 		Mode: 0,
@@ -396,7 +398,8 @@ var Config = {
 	},
 	ShopBot: {
 		ScanIDs: [],
-		ShopNPC: "anya"
+		ShopNPC: "anya",
+		CycleDelay: 0
 	},
 	Coldworm: {
 		KillBeetleburst: false,

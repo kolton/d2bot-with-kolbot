@@ -83,7 +83,7 @@ function Rushee() {
 		var monster = getUnit(1, classid);
 
 		if (monster) {
-			while (monster.mode !== 12) {
+			while (monster.mode !== 12 && monster.mode !== 0) {
 				delay(500);
 			}
 
@@ -140,7 +140,7 @@ function Rushee() {
 	};
 
 	this.placeStaff = function () {
-		var staff,
+		var staff, item,
 			tick = getTickCount(),
 			orifice = getUnit(2, 152);
 
@@ -163,6 +163,13 @@ function Rushee() {
 		staff.toCursor();
 		submitItem();
 		delay(750 + me.ping);
+		
+		item = me.findItem(-1, 0, 3);
+
+		if (item) {
+			item.toCursor();
+			Storage.Inventory.MoveTo(item);
+		}
 
 		return true;
 	};
@@ -432,29 +439,13 @@ function Rushee() {
 
 						break;
 					case 102: // Durance of Hate level 3
-						if (me.area === 75) {
-							Pather.usePortal(102, Config.Leader);
+						if (!Pather.usePortal(102, Config.Leader)) {
+							me.cancel();
+
+							break;
 						}
 
-						if (me.area === 102) {
-							//this.checkQuestMonster(242);
-							while (leader.area === me.area) {
-								delay(500);
-							}
-
-							if (me.mode === 17) {
-								me.revive();
-
-								while (!me.inTown) {
-									delay(500);
-								}
-
-								Town.move("portalspot");
-								Pather.usePortal(102, Config.Leader);
-							}
-
-							actions.shift();
-						}
+						actions.shift();
 
 						break;
 					case 108: // Chaos Sanctuary
@@ -465,22 +456,6 @@ function Rushee() {
 						}
 
 						Pather.moveTo(7763, 5267);
-						this.checkQuestMonster(243);
-
-						if (me.gametype === 0) {
-							D2Bot.restart();
-						} else {
-							if (me.mode === 17) {
-								me.revive();
-
-								while (!me.inTown) {
-									delay(500);
-								}
-							}
-
-							Pather.usePortal(103, Config.Leader);
-						}
-
 						actions.shift();
 
 						break;
@@ -498,7 +473,7 @@ function Rushee() {
 						break;
 					}
 
-					print("command: 2");
+					//print("command: 2");
 
 					// If dying, wait until animation is over
 					while (me.mode === 0) {
@@ -581,6 +556,29 @@ function Rushee() {
 						actions.shift();
 
 						break;
+					case 102:
+						if (!Pather.usePortal(75, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
+					case 103:
+					case 108: // Chaos Sanctuary
+						if (me.gametype === 0) {
+							D2Bot.restart();
+
+							break;
+						}
+
+						if (!me.inTown && !Pather.usePortal(103, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
 					}
 
 					break;
@@ -641,6 +639,7 @@ function Rushee() {
 
 					break;
 				case "exit":
+				case "bye ~":
 					D2Bot.restart();
 
 					break;
@@ -649,13 +648,13 @@ function Rushee() {
 						break;
 					}
 
-					target = getUnit(1, "jerhyn");
+					/*target = getUnit(1, "jerhyn");
 
 					if (target) {
 						target.openMenu();
 					}
 
-					me.cancel();
+					me.cancel();*/
 
 					if (Config.Rushee.Quester) {
 						Town.move("portalspot");

@@ -317,7 +317,7 @@ function main() {
 		if (me.diff < 2) {
 			Attack.securePosition(me.x, me.y, 30, 3000, true);
 		} else {
-			Attack.securePosition(me.x, me.y, 25, 3000, true, true);
+			Attack.securePosition(me.x, me.y, 40, 3000, true, true);
 		}
 
 		say("1");
@@ -372,77 +372,80 @@ function main() {
 
 		var coords = [me.x, me.y];
 
-		Pather.moveTo(coords[0] - 24, coords[1]);
-		Pather.moveTo(coords[0] - 24, coords[1] - 135);
-		Pather.moveTo(coords[0] + 81, coords[1] - 135);
+		Pather.moveTo(coords[0] + 23, coords[1] - 102);
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 25, 3000);
+		Attack.securePosition(me.x, me.y, 40, 3000);
 		say("1");
 
 		while (!this.playerIn()) {
-			Pather.moveTo(coords[0] + 81, coords[1] - 135);
 			delay(250);
 		}
 
-		Pather.moveTo(coords[0] + 97, coords[1] - 68);
-		Attack.kill(getLocaleString(2863));
+		Pather.moveTo(coords[0] + 30, coords[1] - 134);
+		Pather.moveTo(coords[0] + 86, coords[1] - 130);
+		Pather.moveTo(coords[0] + 71, coords[1] - 94);
+		Attack.securePosition(me.x, me.y, 40, 3000);
+
+		/*Attack.kill(getLocaleString(2863));
 		Attack.kill(getLocaleString(2862));
-		Attack.kill(getLocaleString(2860));
+		Attack.kill(getLocaleString(2860));*/
+
 		say("2");
-		Pather.moveTo(coords[0] + 81, coords[1] - 135);
+		Pather.moveTo(coords[0] + 23, coords[1] - 102);
 		Pather.usePortal(null, me.name);
 
 		return true;
 	};
 
 	this.mephisto = function () {
+		var hydra;
+
 		Town.doChores();
 		Pather.useWaypoint(101, true);
 		Precast.doPrecast(true);
 		Pather.moveToExit(102, true);
-		Pather.moveTo(17591, 8070);
-
-		var monsta,
-			monList = [];
-
-		monsta = getUnit(1);
-
-		if (monsta) {
-			do {
-				if (Attack.checkMonster(monsta) && getDistance(monsta, 17627, 8070) <= 30) {
-					monList.push(copyUnit(monsta));
-				}
-			} while (monsta.getNext());
-		}
-
-		if (monList.length) {
-			Pather.moveTo(17627, 8070);
-			Attack.clearList(monList);
-		}
-
-		Pather.moveTo(17591, 8070);
+		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
-
-		monsta = getUnit(1, "hydra");
-
-		if (monsta) {
-			do {
-				while (monsta.mode !== 0 && monsta.mode !== 12 && monsta.hp > 0) {
-					delay(500);
-				}
-			} while (monsta.getNext());
-		}
-
 		say("1");
 
 		while (!this.playerIn()) {
-			Pather.moveTo(17591, 8070);
 			delay(250);
 		}
 
-		Attack.kill(242);
-		say("a4");
 		Pather.moveTo(17591, 8070);
+		Attack.kill(242);
+		Pickit.pickItems();
+		Pather.moveTo(17692, 8023);
+		Pather.makePortal();
+		say("2");
+
+		while (this.playerIn()) {
+			delay(250);
+		}
+
+		Pather.moveTo(17591, 8070);
+		Attack.securePosition(me.x, me.y, 40, 3000);
+
+		hydra = getUnit(1, "hydra");
+
+		if (hydra) {
+			do {
+				while (hydra.mode !== 0 && hydra.mode !== 12 && hydra.hp > 0) {
+					delay(500);
+				}
+			} while (hydra.getNext());
+		}
+
+		Pather.makePortal();
+		Pather.moveTo(17581, 8070);
+		say("1");
+
+		while (!this.playerIn()) {
+			delay(250);
+		}
+
+		say("a4");
+		//Pather.moveTo(17591, 8070);
 		delay(2000);
 		Pather.usePortal(null);
 
@@ -625,6 +628,7 @@ function main() {
 		}
 
 		Attack.kill(243);
+		say("2");
 
 		if (me.gametype > 0) {
 			say("a5");
@@ -868,12 +872,16 @@ function main() {
 			return true;
 		};
 
-		Town.doChores();
-		Pather.useWaypoint(129, true);
-		Precast.doPrecast(true);
+		if (me.inTown) {
+			Town.doChores();
+			Pather.useWaypoint(129, true);
+			Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([130, 131], true)) {
-			throw new Error("Failed to move to Throne of Destruction.");
+			if (!Pather.moveToExit([130, 131], true)) {
+				throw new Error("Failed to move to Throne of Destruction.");
+			}
+		} else {
+			say("1");
 		}
 
 		Pather.moveTo(15113, 5040);
@@ -945,6 +953,7 @@ MainLoop:
 			delay(10);
 		}
 
+		this.clearThrone();
 		Pather.moveTo(15092, 5011);
 		Precast.doPrecast(true);
 
@@ -962,7 +971,9 @@ MainLoop:
 			throw new Error("Couldn't find portal.");
 		}
 
+		Pather.moveTo(15213, 5908);
 		Pather.makePortal();
+		Pather.moveTo(15170, 5950);
 		delay(1000);
 		say("3");
 
@@ -1126,6 +1137,8 @@ MainLoop:
 		return true;
 	};
 
+	print("Loading RushThread");
+
 	var i, command,
 		current = 0,
 		sequence = ["andariel", "cube", "amulet", "staff", "summoner", "duriel", "travincal", "mephisto", "diablo", "ancients", "baal"];
@@ -1151,9 +1164,10 @@ MainLoop:
 			case "go":
 				if (current >= sequence.length) {
 					say("bye ~");
-					quit();
+					delay(2000);
+					scriptBroadcast("quit");
 
-					break;
+					return true;
 				}
 
 				say("Starting " + sequence[current]);

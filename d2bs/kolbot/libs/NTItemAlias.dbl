@@ -864,6 +864,7 @@ NTIPAliasStat["magicmaxdam"] = 53;
 NTIPAliasStat["coldmindam"] = 54;
 NTIPAliasStat["coldmaxdam"] = 55;
 NTIPAliasStat["coldlength"] = 56;
+NTIPAliasStat["poisondamage"] = [57, 1];
 NTIPAliasStat["poisonmindam"] = 57;
 NTIPAliasStat["poisonmaxdam"] = 58;
 NTIPAliasStat["poisonlength"] = 59;
@@ -917,6 +918,7 @@ NTIPAliasStat["itemfastermovevelocity"] = 96;	NTIPAliasStat["frw"] = 96;
 // oskill
 NTIPAliasStat["itemnonclassskill"] = 97;
 // Amazon
+NTIPAliasStat["plusskillcriticalstrike"] = [97,9];
 NTIPAliasStat["plusskillguidedarrow"] = [97,22];
 // Sorceress
 NTIPAliasStat["plusskillteleport"] = [97,54];
