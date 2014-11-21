@@ -75,7 +75,7 @@ function main() {
 
 	this.getPotion = function (pottype, type) {
 		var i,
-			items = me.findItems(-1, 2);
+			items = me.getItems();
 
 		if (!items || items.length === 0) {
 			return false;
@@ -385,7 +385,7 @@ function main() {
 				break;
 			}
 
-			if (Config.SoJWaitTime) {
+			if (Config.SoJWaitTime && me.gametype === 1) { // only do this in expansion
 				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3], 7);
 				Messaging.sendToScript("default.dbj", "soj");
 			}
@@ -400,7 +400,7 @@ function main() {
 				break;
 			}
 
-			if (Config.StopOnDClone) {
+			if (Config.StopOnDClone && me.gametype === 1) { // only do this in expansion
 				D2Bot.printToConsole("Diablo Walks the Earth", 7);
 
 				cloneWalked = true;
