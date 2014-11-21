@@ -69,7 +69,7 @@ function main() {
 			}
 		});
 
-	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode > 1 ? "Accept" : "Invite"));
+	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode === 2 ? "Accept" : "Invite"));
 
 	if (Config.ShitList) {
 		shitList = ShitList.read();

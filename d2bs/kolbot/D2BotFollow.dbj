@@ -449,7 +449,7 @@ JoinLoop2:
 
 					lastGame.push(joinInfo.gameName);
 
-					if (lastGame.length > 5 || leader.length === 1) { // reset old game list after 5 games or when following only one leader
+					if (lastGame.length > leader.length) { // Might need a fixed number. Right now it stores 1 game per leader.
 						lastGame.shift();
 					}
 
