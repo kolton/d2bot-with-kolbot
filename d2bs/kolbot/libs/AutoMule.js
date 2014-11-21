@@ -368,8 +368,6 @@ MainLoop:
 		}
 
 		delay(2000);
-		OrganSystem.organHandler();
-
 		quit();
 		//delay(10000);
 
