@@ -34,7 +34,7 @@ var NPC = {
 };
 
 var Town = {
-	useTk: true,
+	telekinesis: true,
 	sellTimer: getTickCount(), // shop speedup test
 	beltSize: false,
 
@@ -244,6 +244,10 @@ var Town = {
 	},
 
 	buyPotions: function () {
+		if (me.gold < 1000) { // Ain't got money fo' dat shyt
+			return false;
+		}
+
 		var i, j, npc, useShift, col, beltSize, pot,
 			needPots = false,
 			needBuffer = true,
@@ -446,6 +450,10 @@ var Town = {
 	},
 
 	fillTome: function (code) {
+		if (me.gold < 450) {
+			return false;
+		}
+
 		if (this.checkScrolls(code) >= 13) {
 			return true;
 		}
@@ -666,7 +674,7 @@ MainLoop:
 		}
 
 		// Check if we may use Cain - minimum gold
-		if (me.getStat(14) + me.getStat(15) < Config.CainID.MinGold) {
+		if (me.gold < Config.CainID.MinGold) {
 			//print("Can't use Cain - not enough gold.");
 
 			return false;
@@ -930,7 +938,7 @@ CursorLoop:
 			list.push(items.shift().gid);
 		}
 
-		while (me.getStat(14) + me.getStat(15) >= Config.GambleGoldStop) {
+		while (me.gold >= Config.GambleGoldStop) {
 			if (!getInteractedNPC()) {
 				npc.startTrade("Gamble");
 			}
@@ -1000,7 +1008,7 @@ CursorLoop:
 	},
 
 	needGamble: function () {
-		return Config.Gamble && me.getStat(14) + me.getStat(15) >= Config.GambleGoldStart;
+		return Config.Gamble && me.gold >= Config.GambleGoldStart;
 	},
 
 	getGambledItem: function (list) {
@@ -1284,7 +1292,7 @@ CursorLoop:
 	needRepair: function () {
 		var quiver, bowCheck, quantity,
 			repairAction = [],
-			canAfford = me.getStat(14) + me.getStat(15) >= me.getRepairCost();
+			canAfford = me.gold >= me.getRepairCost();
 
 		// Arrow/Bolt check
 		bowCheck = Attack.usingBow();
@@ -1443,7 +1451,7 @@ MainLoop:
 	needMerc: function () {
 		var i, merc;
 
-		if (me.gametype === 0 || !Config.UseMerc || me.getStat(14) + me.getStat(15) < me.mercrevivecost) { // gametype 0 = classic
+		if (me.gametype === 0 || !Config.UseMerc || me.gold < me.mercrevivecost) { // gametype 0 = classic
 			return false;
 		}
 
@@ -1546,7 +1554,7 @@ MainLoop:
 		}
 
 		var i, tick, stash,
-			useTK = me.classid === 1 && me.getSkill(43, 1);
+			telekinesis = me.classid === 1 && me.getSkill(43, 1);
 
 		for (i = 0; i < 5; i += 1) {
 			this.move("stash");
@@ -1554,7 +1562,7 @@ MainLoop:
 			stash = getUnit(2, 267);
 
 			if (stash) {
-				if (useTK) {
+				if (telekinesis) {
 					Skill.cast(43, 0, stash);
 				} else {
 					Misc.click(0, 0, stash);
@@ -1583,7 +1591,7 @@ MainLoop:
 					this.move("stash");
 				}
 
-				useTK = false;
+				telekinesis = false;
 			}
 		}
 
@@ -2025,7 +2033,7 @@ MainSwitch:
 
 	moveToSpot: function (spot) {
 		var i, path, townSpot,
-			useTK = me.classid === 1 && ((this.useTk && (me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1)) || spot === "waypoint");
+			longRange = (me.classid === 1 && this.telekinesis && me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint";
 
 		if (!this.act[me.act - 1].hasOwnProperty("spot") || !this.act[me.act - 1].spot.hasOwnProperty(spot)) {
 			return false;
@@ -2037,8 +2045,8 @@ MainSwitch:
 			return false;
 		}
 
-		if (useTK) {
-			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 11);
+		if (longRange) {
+			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 10);
 
 			if (path && path[1]) {
 				townSpot = [path[1].x, path[1].y];

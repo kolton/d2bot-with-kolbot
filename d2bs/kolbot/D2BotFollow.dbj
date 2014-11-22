@@ -408,11 +408,8 @@ JoinLoop2:
 					ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
 					ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
 
-					if (lastGameStatus === "pending" || (gameInfo.error === "@error" && DataFile.getStats().gameName === joinInfo.gameName)) {
-						if (gameInfo.error === "@error") {
-							gameInfo.error = "";
-						}
-
+					if (lastGameStatus === "pending" || (gameInfo.error && DataFile.getStats().gameName === joinInfo.gameName)) {
+						D2Bot.printToConsole("Failed to join game");
 						ControlAction.timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000, joinCheck, leader[j]);
 						D2Bot.updateRuns();
 						D2Bot.requestGame(leader[j]);
@@ -493,6 +490,8 @@ JoinLoop2:
 		} catch (e) {
 			print(e + " " + getLocation());
 		}
+
+		ControlAction.timeoutDelay("Lobby Delay", 5000);
 
 		break;
 	case 10: // Login Error
@@ -763,6 +762,7 @@ JoinLoop2:
 	case 38: // Game is full
 		D2Bot.printToConsole("Game is full");
 		ControlAction.click(6, 652, 469, 120, 20);
+		lastGame.push(joinInfo.gameName);
 
 		lastGameStatus = "ready";
 

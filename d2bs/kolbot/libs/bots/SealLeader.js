@@ -1,10 +1,4 @@
-/**
-*	@filename	FastDiablo.js
-*	@author		kolton
-*	@desc		kill seal bosses and Diablo
-*/
-
-function FastDiablo() {
+function SealLeader() {
 	this.getLayout = function (seal, value) {
 		var sealPreset = getPresetUnit(108, 2, seal);
 
@@ -29,21 +23,13 @@ function FastDiablo() {
 		var i, boss,
 			glow = getUnit(2, 131);
 
-		for (i = 0; i < 24; i += 1) {
+		for (i = 0; i < 16; i += 1) {
 			boss = getUnit(1, name);
 
 			if (boss) {
 				this.chaosPreattack(name, 8);
 
-				try {
-					Attack.kill(name);
-				} catch (e) {
-					Attack.clear(10, 0, name);
-				}
-
-				Pickit.pickItems();
-
-				return true;
+				return Attack.clear(40, 0, name);
 			}
 
 			delay(250);
@@ -206,10 +192,21 @@ function FastDiablo() {
 		throw new Error("Failed to open seal (id " + classid + ")");
 	};
 
+	// START
 	Town.doChores();
 	Pather.useWaypoint(107);
 	Precast.doPrecast(true);
 	this.initLayout();
+
+	if (this.vizLayout === 1) {
+		Pather.moveTo(7708, 5269);
+	} else {
+		Pather.moveTo(7647, 5267);
+	}
+
+	Attack.securePosition(me.x, me.y, 35, 3000, true);
+	Pather.makePortal();
+	say("in");
 	this.openSeal(395);
 	this.openSeal(396);
 
@@ -219,10 +216,22 @@ function FastDiablo() {
 		Pather.moveTo(7695, 5316);
 	}
 
+	// Kill Viz
 	if (!this.getBoss(getLocaleString(2851))) {
 		throw new Error("Failed to kill Vizier");
 	}
 
+	say("out");
+
+	if (this.seisLayout === 1) {
+		Pather.moveTo(7767, 5147);
+	} else {
+		Pather.moveTo(7820, 5147);
+	}
+
+	Attack.securePosition(me.x, me.y, 35, 3000, true);
+	Pather.makePortal();
+	say("in");
 	this.openSeal(394);
 
 	if (this.seisLayout === 1) {
@@ -235,20 +244,33 @@ function FastDiablo() {
 		throw new Error("Failed to kill de Seis");
 	}
 
-	this.openSeal(392);
-	this.openSeal(393);
+	say("out");
 
 	if (this.infLayout === 1) {
-		delay(1);
+		Pather.moveTo(7860, 5314);
 	} else {
-		Pather.moveTo(7928, 5295); // temp
+		Pather.moveTo(7909, 5317);
+	}
+
+	Attack.securePosition(me.x, me.y, 35, 3000, true);
+	Pather.makePortal();
+	say("in");
+	this.openSeal(392);
+
+	if (this.infLayout === 2) {
+		Pather.moveTo(7928, 5295);
 	}
 
 	if (!this.getBoss(getLocaleString(2853))) {
 		throw new Error("Failed to kill Infector");
 	}
 
+	this.openSeal(393);
+	say("out");
+	Pather.moveTo(7763, 5267);
+	Pather.makePortal();
 	Pather.moveTo(7788, 5292);
+	say("in");
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();

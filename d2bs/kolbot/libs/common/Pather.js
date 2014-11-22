@@ -344,7 +344,7 @@ MainLoop:
 			minDist = me.inTown ? 2 : 4;
 		}
 
-		var i, angle, angles, nTimer, whereToClick,
+		var i, angle, angles, nTimer, whereToClick, tick,
 			nFail = 0,
 			attemptCount = 0;
 
@@ -407,6 +407,7 @@ ModeLoop:
 					angles = [Math.PI / 2, -Math.PI / 2];
 
 					for (i = 0; i < angles.length; i += 1) {
+						// TODO: might need rework into getnearestwalkable
 						whereToClick = {
 							x: Math.round(Math.cos(angle + angles[i]) * 5 + me.x),
 							y: Math.round(Math.sin(angle + angles[i]) * 5 + me.y)
@@ -414,7 +415,12 @@ ModeLoop:
 
 						if (Attack.validSpot(whereToClick.x, whereToClick.y)) {
 							Misc.click(0, 0, whereToClick.x, whereToClick.y);
-							//me.move(whereToClick.x, whereToClick.y);
+
+							tick = getTickCount();
+
+							while (getDistance(me, whereToClick) > 2 && getTickCount() - tick < 1000) {
+								delay(40);
+							}
 
 							break;
 						}

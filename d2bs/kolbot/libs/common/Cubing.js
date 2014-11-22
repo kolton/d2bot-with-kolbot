@@ -146,6 +146,11 @@ var Cubing = {
 	},
 
 	getCube: function () {
+		// Don't activate from townchicken
+		if (getScript(true).name === "tools\\townchicken.js") {
+			return false;
+		}
+
 		var i, cube, chest;
 
 		Pather.useWaypoint(57, true);
