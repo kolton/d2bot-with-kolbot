@@ -455,7 +455,13 @@ var Config = {
 		AreaList: []
 	},
 	Rusher: {
-		WaitPlayerCount: 0
+		WaitPlayerCount: 0,
+		Radament: false,
+		LamEsen: false,
+		Izual: false,
+		Shenk: false,
+		Anya: false,
+		LastRun: ""
 	},
 	Rushee: {
 		Quester: false,
