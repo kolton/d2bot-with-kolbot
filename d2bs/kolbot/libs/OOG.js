@@ -697,6 +697,8 @@ MainLoop:
 MainLoop:
 		while (true) {
 			switch (getLocation()) {
+			case 0:
+				break;
 			case 8: // main menu
 				if (info.realm) {
 					ControlAction.clickRealm(realms[info.realm]);
@@ -953,12 +955,21 @@ MainLoop:
 			info.charClass = "barbarian";
 		}
 
-		var clickCoords = [];
+		var control,
+			clickCoords = [];
 
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
 			case 12: // character select
 			case 42: // empty character select
+				control = getControl(6, 33, 528, 168, 60);
+
+				if (control && control.disabled === 4) { // Create Character greyed out
+					me.blockMouse = false;
+
+					return false;
+				}
+
 				this.click(6, 33, 528, 168, 60);
 
 				break;

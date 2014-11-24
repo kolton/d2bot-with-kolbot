@@ -20,13 +20,20 @@ var AutoMule = {
 			stopProfile: "",
 
 			// Trigger muling at the end of a game if used space in stash and inventory is equal to or more than given percent.
-			// Both conditions need to be met in order to trigger muling.
 			usedStashTrigger: 80,
 			usedInventoryTrigger: 80
 		}
 	},
 
-	TorchMules: {
+	/** Torch/Anni mules
+		- Torch is muled in OrgTorch script after finishing uber Tristram successfully or when starting OrgTorch script with a Torch already on the character.
+		- Anni is muled after successfully killing Diablo in Palace Cellar level 3 using Config.KillDclone option or KillDClone script.
+			If a profile is listed in Torch/Anni mule's enabledProfiles list, it will also do a check to mule Anni at the end of each game.
+			Anni that is in locked inventory slot will not be muled.
+
+		* Each mule will hold either a Torch or an Anni, but not both. As soon as the current mule has either one, a new one will be created.
+	*/
+	TorchAnniMules: {
 		"Mule1":  {
 			muleProfile: "",  // The name of mule profile in d2bot#. It will be started and stopped when needed.
 			accountPrefix: "",  // Account prefix. Numbers added automatically when making accounts.
@@ -51,7 +58,7 @@ var AutoMule = {
 
 	inGame: false,
 	check: false,
-	torchCheck: false,
+	torchAnniCheck: false,
 
 	// *** Master functions ***
 	getInfo: function () {
@@ -71,15 +78,15 @@ var AutoMule = {
 			}
 		}
 
-		for (i in this.TorchMules) {
-			if (this.TorchMules.hasOwnProperty(i)) {
-				for (j = 0; j < this.TorchMules[i].enabledProfiles.length; j += 1) {
-					if (this.TorchMules[i].enabledProfiles[j].toLowerCase() === me.profile.toLowerCase()) {
+		for (i in this.TorchAnniMules) {
+			if (this.TorchAnniMules.hasOwnProperty(i)) {
+				for (j = 0; j < this.TorchAnniMules[i].enabledProfiles.length; j += 1) {
+					if (this.TorchAnniMules[i].enabledProfiles[j].toLowerCase() === me.profile.toLowerCase()) {
 						if (!info) {
 							info = {};
 						}
 
-						info.torchMuleInfo = this.TorchMules[i];
+						info.torchMuleInfo = this.TorchAnniMules[i];
 					}
 				}
 			}
@@ -112,7 +119,7 @@ var AutoMule = {
 				return info.muleInfo;
 			}
 
-			if (this.torchCheck && info.hasOwnProperty("torchMuleInfo")) {
+			if (this.torchAnniCheck && info.hasOwnProperty("torchMuleInfo")) {
 				return info.torchMuleInfo;
 			}
 		}
@@ -121,7 +128,7 @@ var AutoMule = {
 	},
 
 	outOfGameCheck: function () {
-		if (!this.check && !this.torchCheck) {
+		if (!this.check && !this.torchAnniCheck) {
 			return false;
 		}
 
@@ -143,12 +150,12 @@ var AutoMule = {
 		}
 
 		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting" + (this.torchCheck ? " torch " : " ")  + "mule profile: " + muleObj.muleProfile, 7);
+		D2Bot.printToConsole("Starting " + (this.torchAnniCheck === 2 ? "anni" : this.torchAnniCheck === 1 ? "torch" : "")  + " mule profile: " + muleObj.muleProfile, 7);
 
 MainLoop:
 		while (true) {
 			// If nothing received our copy data start the mule profile
-			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: this.torchCheck ? 1 : 0}))) {
+			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: this.torchAnniCheck || 0}))) {
 				D2Bot.start(muleObj.muleProfile);
 			}
 
@@ -222,7 +229,7 @@ MainLoop:
 
 		this.inGame = false;
 		this.check = false;
-		this.torchCheck = false;
+		this.torchAnniCheck = false;
 
 		// No response - stop mule profile
 		if (failCount >= 60) {
@@ -277,8 +284,12 @@ MainLoop:
 
 		function MuleModeEvent(msg) {
 			switch (msg) {
+			case "2":
+				AutoMule.torchAnniCheck = 2;
+
+				break;
 			case "1":
-				AutoMule.torchCheck = true;
+				AutoMule.torchAnniCheck = 1;
 
 				break;
 			case "0":
@@ -293,7 +304,7 @@ MainLoop:
 		scriptBroadcast("getMuleMode");
 		delay(500);
 
-		if (!this.check && !this.torchCheck) {
+		if (!this.check && !this.torchAnniCheck) {
 			print("Error - Unable to determine mule mode");
 			quit();
 
@@ -312,14 +323,16 @@ MainLoop:
 
 		sendCopyData(null, muleObj.muleProfile, 11, "begin");
 
-		if (this.torchCheck) {
-			print("ÿc4AutoMuleÿc0: In torch mule game.");
-			D2Bot.printToConsole("AutoMule: Transfering torch.", 7);
+		if (this.torchAnniCheck === 2) {
+			print("ÿc4AutoMuleÿc0: In anni mule game.");
 			D2Bot.updateStatus("AutoMule: In game.");
-			this.dropTorch();
+			this.dropCharm(true);
+		} else if (this.torchAnniCheck === 1) {
+			print("ÿc4AutoMuleÿc0: In torch mule game.");
+			D2Bot.updateStatus("AutoMule: In game.");
+			this.dropCharm(false);
 		} else {
 			print("ÿc4AutoMuleÿc0: In mule game.");
-			D2Bot.printToConsole("AutoMule: Transfering items.", 7);
 			D2Bot.updateStatus("AutoMule: In game.");
 			this.dropStuff();
 		}
@@ -354,6 +367,7 @@ MainLoop:
 			scriptBroadcast("exit");
 		}
 
+		delay(2000);
 		quit();
 		//delay(10000);
 
@@ -368,6 +382,12 @@ MainLoop:
 		var i,
 			items = this.getMuleItems();
 
+		if (!items || items.length === 0) {
+			return false;
+		}
+
+		D2Bot.printToConsole("AutoMule: Transfering items.", 7);
+
 		for (i = 0; i < items.length; i += 1) {
 			items[i].drop();
 		}
@@ -380,16 +400,27 @@ MainLoop:
 
 	// get a list of items to mule
 	getMuleItems: function () {
-		var items = [],
-			item = me.getItem(-1, 0);
+		var item, items, info;
+
+		info = this.getInfo();
+
+		if (!info || !info.hasOwnProperty("muleInfo")) {
+			return false;
+		}
+
+		item = me.getItem(-1, 0);
+		items = [];
 
 		if (item) {
 			do {
-				if (Town.ignoredItemTypes.indexOf(item.itemType) === -1 && Pickit.checkItem(item).result > 0 && item.classid !== 549 &&
-						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) &&
-						[76, 77, 78].indexOf(item.itemType) === -1 && // don't drop potions
-						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) &&
-						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) {
+				if (Town.ignoredItemTypes.indexOf(item.itemType) === -1 &&
+						(Pickit.checkItem(item).result > 0 || (item.location === 7 && info.muleInfo.hasOwnProperty("muleOrphans") && info.muleInfo.muleOrphans)) &&
+						item.classid !== 549 && // Don't drop Horadric Cube
+						(item.classid !== 603 || item.quality !== 7) && // Don't drop Annihilus
+						(item.classid !== 604 || item.quality !== 7) && // Don't drop Hellfire Torch
+						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
+						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
+						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) { // Don't drop Runeword/Cubing/CraftingSystem ingredients
 					items.push(copyUnit(item));
 				}
 			} while (item.getNext());
@@ -442,33 +473,49 @@ MainLoop:
 		return false;
 	},
 
-	dropTorch: function () {
+	dropCharm: function (dropAnni) {
 		if (!Town.openStash()) {
 			return false;
 		}
 
-		var item = me.getItem(getScript("AnniStarter.dbj") ? "cm1" : "cm2");
+		var item;
 
-		if (item) {
-			do {
-				if (item.quality === 7) {
-					item.drop();
-					delay(1000);
-					me.cancel();
+		if (dropAnni) {
+			item = me.findItem(603, 0, -1, 7);
 
-					return true;
-				}
-			} while (item.getNext());
+			if (item && !Storage.Inventory.IsLocked(item, Config.Inventory)) {
+				D2Bot.printToConsole("AutoMule: Transfering Anni.", 7);
+				item.drop();
+				delay(1000);
+				me.cancel();
+
+				return true;
+			}
+
+			return false;
 		}
 
-		return false;
+		item = me.findItem(604, 0, -1, 7);
+
+		if (item) {
+			D2Bot.printToConsole("AutoMule: Transfering Torch.", 7);
+			item.drop();
+			delay(1000);
+			me.cancel();
+
+			return true;
+		}
+
+		me.cancel();
+
+		return true;
 	},
 
 	// *** Mule functions ***
 	getMaster: function (info) {
 		var i, j, k, muleObj;
 
-		muleObj = info.mode === 1 ? this.TorchMules : this.Mules;
+		muleObj = info.mode === 1 ? this.TorchAnniMules : this.Mules;
 
 		for (i in muleObj) {
 			if (muleObj.hasOwnProperty(i)) {
@@ -494,7 +541,7 @@ MainLoop:
 		var i, mule;
 
 		mode = mode || 0;
-		mule = mode === 1 ? this.TorchMules : this.Mules;
+		mule = mode > 0 ? this.TorchAnniMules : this.Mules;
 
 		for (i in mule) {
 			if (mule.hasOwnProperty(i)) {
@@ -508,18 +555,17 @@ MainLoop:
 		return false;
 	},
 
-	// TODO: use master info to avoid conflicts
-	getMuleFilename: function (mode) {
+	getMuleFilename: function (mode, master) {
 		var i, mule, jsonObj, jsonStr, file;
 
 		mode = mode || 0;
-		mule = mode === 1 ? this.TorchMules : this.Mules;
+		mule = mode > 0 ? this.TorchAnniMules : this.Mules;
 
 		// Iterate through mule object
 		for (i in mule) {
 			if (mule.hasOwnProperty(i)) {
 				// Mule profile matches config
-				if (mule[i].muleProfile && mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase()) {
+				if (mule[i].muleProfile && mule[i].muleProfile.toLowerCase() === me.profile.toLowerCase() && mule[i].enabledProfiles.indexOf(master) > -1) {
 					file = mode === 0 ? "logs/AutoMule." + i + ".json" : "logs/TorchMule." + i + ".json";
 
 					// If file exists check for valid info

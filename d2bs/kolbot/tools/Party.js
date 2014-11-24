@@ -11,6 +11,7 @@ function main() {
 	include("common/Cubing.js");
 	include("common/Runewords.js");
 	include("common/Misc.js");
+	include("common/Prototypes.js");
 	Config.init();
 
 	var i, myPartyId, player, otherParty, shitList, currScript, scriptList,
@@ -68,7 +69,7 @@ function main() {
 			}
 		});
 
-	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode > 1 ? "Accept" : "Invite"));
+	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode === 2 ? "Accept" : "Invite"));
 
 	if (Config.ShitList) {
 		shitList = ShitList.read();

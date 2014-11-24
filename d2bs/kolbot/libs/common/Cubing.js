@@ -88,7 +88,11 @@ var Recipe = {
 		HighRare: 51
 	},
 	Rune: 52,
-	Token: 53
+	Token: 53,
+	LowToNorm: {
+		Armor: 54,
+		Weapon: 55
+	}
 };
 
 var Cubing = {
@@ -142,6 +146,11 @@ var Cubing = {
 	},
 
 	getCube: function () {
+		// Don't activate from townchicken
+		if (getScript(true).name === "tools\\townchicken.js") {
+			return false;
+		}
+
 		var i, cube, chest;
 
 		Pather.useWaypoint(57, true);
@@ -398,7 +407,15 @@ var Cubing = {
 
 				break;
 			case Recipe.Reroll.HighRare:
-				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, 522], Index: Recipe.Reroll.HighRare});
+				this.recipes.push({Ingredients: [Config.Recipes[i][1], 601, 522], Index: Recipe.Reroll.HighRare, Enabled: false});
+
+				break;
+			case Recipe.LowToNorm.Weapon:
+				this.recipes.push({Ingredients: [Config.Recipes[i][1], 611, "cgem"], Index: Recipe.LowToNorm.Weapon});
+
+				break;
+			case Recipe.LowToNorm.Armor:
+				this.recipes.push({Ingredients: [Config.Recipes[i][1], 610, "cgem"], Index: Recipe.LowToNorm.Armor});
 
 				break;
 			case Recipe.Rune:
@@ -577,6 +594,7 @@ IngredientLoop:
 			for (j = 0; j < this.recipes[i].Ingredients.length; j += 1) {
 				for (k = 0; k < items.length; k += 1) {
 					if (((this.recipes[i].Ingredients[j] === "pgem" && this.gemList.indexOf(items[k].classid) > -1) ||
+						(this.recipes[i].Ingredients[j] === "cgem" && [557, 562, 567, 572, 577, 582, 597].indexOf(items[k].classid) > -1) ||
 						items[k].classid === this.recipes[i].Ingredients[j]) && this.validItem(items[k], this.recipes[i])) {
 
 						// push the item's info into the valid ingredients array. this will be used to find items when checking recipes
@@ -678,10 +696,11 @@ IngredientLoop:
 
 		for (i = 0; i < recipe.Ingredients.length; i += 1) {
 			for (j = 0; j < this.validIngredients.length; j += 1) {
-				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 &&
-						(this.validIngredients[j].classid === recipe.Ingredients[i] || (recipe.Ingredients[i] === "pgem" &&
-						this.gemList.indexOf(this.validIngredients[j].classid) > -1))
-						) {
+				if (usedGids.indexOf(this.validIngredients[j].gid) === -1 && (
+						this.validIngredients[j].classid === recipe.Ingredients[i] ||
+						(recipe.Ingredients[i] === "pgem" && this.gemList.indexOf(this.validIngredients[j].classid) > -1) ||
+						(recipe.Ingredients[i] === "cgem" && [557, 562, 567, 572, 577, 582, 597].indexOf(this.validIngredients[j].classid) > -1)
+					)) {
 					item = me.getItem(this.validIngredients[j].classid, -1, this.validIngredients[j].gid);
 
 					if (item && this.validItem(item, recipe)) { // 26.11.2012. check if the item actually belongs to the given recipe
@@ -861,11 +880,21 @@ IngredientLoop:
 		}
 
 		if (recipe.Index === Recipe.Reroll.HighRare) {
-			if (unit.quality === 6 && NTIP.CheckItem(unit) === 0) {
+			if (recipe.Ingredients[0] === unit.classid && unit.quality === 6 && NTIP.CheckItem(unit) === 0) {
+				recipe.Enabled = true;
+
 				return true;
 			}
 
-			if (unit.itemType === 10 && unit.getStat(77) && !Storage.Inventory.IsLocked(unit, Config.Inventory)) {
+			if (recipe.Enabled && recipe.Ingredients[2] === unit.classid && unit.itemType === 10 && unit.getStat(77) && !Storage.Inventory.IsLocked(unit, Config.Inventory)) {
+				return true;
+			}
+
+			return false;
+		}
+
+		if (recipe.Index === Recipe.LowToNorm.Armor || recipe.Index === Recipe.LowToNorm.Weapon) {
+			if (unit.quality === 1 && NTIP.CheckItem(unit) === 0) {
 				return true;
 			}
 
@@ -970,7 +999,7 @@ IngredientLoop:
 		var item;
 
 		if (me.itemoncursor) {
-			item = getUnit(4, -1, 4);
+			item = getUnit(100);
 
 			if (item) {
 				if (Storage.Inventory.CanFit(item) && Storage.Inventory.MoveTo(item)) {

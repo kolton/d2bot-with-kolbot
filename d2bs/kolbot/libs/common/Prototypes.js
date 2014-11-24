@@ -284,6 +284,10 @@ Unit.prototype.toCursor = function () {
 		throw new Error("Unit.toCursor: Must be used with items.");
 	}
 
+	if (me.itemoncursor && this.mode === 4) {
+		return true;
+	}
+
 	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
@@ -345,7 +349,7 @@ Unit.prototype.drop = function () {
 	return false;
 };
 
-me.findItem = function (id, mode, loc) {
+me.findItem = function (id, mode, loc, quality) {
 	if (id === undefined) {
 		id = -1;
 	}
@@ -355,28 +359,24 @@ me.findItem = function (id, mode, loc) {
 	}
 
 	if (loc === undefined) {
-		loc = false;
+		loc = -1;
+	}
+
+	if (quality === undefined) {
+		quality = -1;
 	}
 
 	var item = me.getItem(id, mode);
 
-	if (!item) {
-		return false;
-	}
-
-	if (loc) {
-		while (item.location !== loc) {
-			if (!item.getNext()) {
-				break;
+	if (item) {
+		do {
+			if ((loc === -1 || item.location === loc) && (quality === -1 || item.quality === quality)) {
+				return item;
 			}
-		}
-
-		if (item.location !== loc) {
-			return false;
-		}
+		} while (item.getNext());
 	}
 
-	return item;
+	return false;
 };
 
 me.findItems = function (id, mode, loc) {
@@ -531,13 +531,86 @@ Unit.prototype.getStatEx = function (id, subid) {
 	var i, temp, rval, regex;
 
 	switch (id) {
+	case 20: // toblock
+		switch (this.classid) {
+		case 328: // buckler
+			return this.getStat(20);
+		case 413: // preserved
+		case 483: // mummified
+		case 503: // minion
+			return this.getStat(20) - 3;
+		case 329: // small
+		case 414: // zombie
+		case 484: // fetish
+		case 504: // hellspawn
+			return this.getStat(20) - 5;
+		case 331: // kite
+		case 415: // unraveller
+		case 485: // sexton
+		case 505: // overseer
+			return this.getStat(20) - 8;
+		case 351: // spiked
+		case 374: // deefender
+		case 416: // gargoyle
+		case 486: // cantor
+		case 506: // succubus
+		case 408: // targe
+		case 478: // akaran t
+			return this.getStat(20) - 10;
+		case 330: // large
+		case 375: // round
+		case 417: // demon
+		case 487: // hierophant
+		case 507: // bloodlord
+			return this.getStat(20) - 12;
+		case 376: // scutum
+			return this.getStat(20) - 14;
+		case 409: // rondache
+		case 479: // akaran r
+			return this.getStat(20) - 15;
+		case 333: // goth
+		case 379: // ancient
+			return this.getStat(20) - 16;
+		case 397: // barbed
+			return this.getStat(20) - 17;
+		case 377: // dragon
+			return this.getStat(20) - 18;
+		case 502: // vortex
+			return this.getStat(20) - 19;
+		case 350: // bone
+		case 396: // grim
+		case 445: // luna
+		case 467: // blade barr
+		case 466: // troll
+		case 410: // heraldic
+		case 480: // protector
+			return this.getStat(20) - 20;
+		case 444: // heater
+		case 447: // monarch
+		case 411: // aerin
+		case 481: // gilded
+		case 501: // zakarum
+			return this.getStat(20) - 22;
+		case 332: // tower
+		case 378: // pavise
+		case 446: // hyperion
+		case 448: // aegis
+		case 449: // ward
+			return this.getStat(20) - 24;
+		case 412: // crown
+		case 482: // royal
+		case 500: // kurast
+			return this.getStat(20) - 25;
+		case 499: // sacred r
+			return this.getStat(20) - 28;
+		case 498: // sacred t
+			return this.getStat(20) - 30;
+		}
+
+		break;
 	case 21: // plusmindamage
 	case 22: // plusmaxdamage
 		if (subid === 1) {
-			if (this.mode !== 0) {
-				break;
-			}
-
 			temp = this.getStat(-1);
 			rval = 0;
 
@@ -593,6 +666,12 @@ Unit.prototype.getStatEx = function (id, subid) {
 			}
 
 			return 0;
+		}
+
+		break;
+	case 57:
+		if (subid === 1) {
+			return Math.round(this.getStat(57) * this.getStat(59) / 256);
 		}
 
 		break;
@@ -817,6 +896,7 @@ Unit.prototype.getColor = function () {
 			"Rainbow": Color.lightpurple,
 			"Scintillating": Color.lightpurple,
 			"Prismatic": Color.lightpurple,
+			"Chromatic": Color.lightpurple,
 			"Hierophant's": Color.crystalgreen,
 			"Berserker's": Color.crystalgreen,
 			"Necromancer's": Color.crystalgreen,

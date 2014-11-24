@@ -7,6 +7,7 @@
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
 		if (Config.MercWatch && Town.needMerc()) {
+			print("mercwatch");
 			Town.visitTown();
 		}
 
@@ -22,7 +23,9 @@ var ClassAttack = {
 			return true;
 		}
 
-		var index, attackSkill, aura;
+		var index,
+			attackSkill = -1,
+			aura = -1;
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
@@ -35,9 +38,16 @@ var ClassAttack = {
 		}
 
 		// Monster immune to primary skill
-		if (Config.AttackSkill[5] > -1 && !Attack.checkResist(unit, attackSkill) && Attack.checkResist(unit, Config.AttackSkill[5])) {
-			attackSkill = Config.AttackSkill[5];
-			aura = Config.AttackSkill[6];
+		if (!Attack.checkResist(unit, attackSkill)) {
+			// Reset skills
+			attackSkill = -1;
+			aura = -1;
+
+			// Set to secondary if not immune
+			if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5])) {
+				attackSkill = Config.AttackSkill[5];
+				aura = Config.AttackSkill[6];
+			}
 		}
 
 		// Low mana skill
@@ -108,6 +118,8 @@ var ClassAttack = {
 			}
 
 			if (getDistance(me, unit) > 7 || unit.dead) {
+				//print(getDistance(me, unit));
+
 				return 1;
 			}
 
@@ -237,7 +249,7 @@ var ClassAttack = {
 		case 1: // Monster
 			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targetx : unit.x;
 			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targety : unit.y;
-			positions = [[x + 2, y + 1], [x, y + 3], [x - 2, y - 1]];
+			positions = [[x + 2, y + 1], [x, y + 3], [x + 2, y - 1], [x - 2, y + 2], [x - 5, y]];
 
 			if (size === 3) {
 				positions.unshift([x + 2, y + 2]);
@@ -254,9 +266,7 @@ var ClassAttack = {
 
 		for (i = 0; i < positions.length; i += 1) {
 			if (Attack.validSpot(positions[i][0], positions[i][1])) {
-				this.reposition(positions[i][0], positions[i][1]);
-
-				if (!checkCollision(me, unit, 0x1)) {
+				if (this.reposition(positions[i][0], positions[i][1])) { // && !checkCollision(me, unit, 0x1)) {
 					return true;
 				}
 			}
@@ -266,13 +276,14 @@ var ClassAttack = {
 	},
 
 	reposition: function (x, y) {
+		var i;
+
 		if (getDistance(me, x, y) > 0) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
 				if (getDistance(me, x, y) > 40) {
 					Pather.moveTo(x, y);
 				} else {
-					//Pather.teleportTo(x, y);
-					Skill.cast(54, 0, x, y);
+					Pather.teleportTo(x, y, 3);
 				}
 			} else {
 				if (Config.Vigor) {

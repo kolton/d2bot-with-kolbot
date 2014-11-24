@@ -4,6 +4,8 @@
 *	@desc		make and reroll runewords
 */
 
+// TODO: Config.Runewords[i][0] can be false, but array methods can be used on it
+
 var Runeword = {
 	// 1.09
 	AncientsPledge: [617, 618, 616], // Ral + Ort + Tal

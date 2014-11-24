@@ -39,6 +39,20 @@ function Rushee() {
 		return 5;
 	};
 
+	this.revive = function () {
+		while (me.mode === 0) {
+			delay(40);
+		}
+
+		if (me.mode === 17) {
+			me.revive();
+
+			while (!me.inTown) {
+				delay(40);
+			}
+		}
+	};
+
 	this.checkQuest = function (id, state) {
 		sendPacket(1, 0x40);
 		delay(500);
@@ -83,7 +97,7 @@ function Rushee() {
 		var monster = getUnit(1, classid);
 
 		if (monster) {
-			while (monster.mode !== 12) {
+			while (monster.mode !== 12 && monster.mode !== 0) {
 				delay(500);
 			}
 
@@ -131,6 +145,7 @@ function Rushee() {
 		Storage.Cube.MoveTo(amulet);
 		Storage.Cube.MoveTo(staff);
 		Cubing.openCube();
+		print("making staff");
 		transmute();
 		delay(750 + me.ping);
 		Cubing.emptyCube();
@@ -140,7 +155,7 @@ function Rushee() {
 	};
 
 	this.placeStaff = function () {
-		var staff,
+		var staff, item,
 			tick = getTickCount(),
 			orifice = getUnit(2, 152);
 
@@ -163,6 +178,13 @@ function Rushee() {
 		staff.toCursor();
 		submitItem();
 		delay(750 + me.ping);
+
+		// unbug cursor
+		item = me.findItem(-1, 0, 3);
+
+		if (item && item.toCursor()) {
+			Storage.Inventory.MoveTo(item);
+		}
 
 		return true;
 	};
@@ -323,9 +345,41 @@ function Rushee() {
 		try {
 			if (actions.length > 0) {
 				switch (actions[0]) {
-				case "1":
-					print("command: 1");
+				case "all in":
+					switch (leader.area) {
+					case 49: // Pick Book of Skill, use Book of Skill
+						Town.move("portalspot");
+						Pather.usePortal(49, Config.Leader);
+						delay(500);
 
+						while (true) {
+							target = getUnit(4, 552);
+
+							if (!target) {
+								break;
+							}
+
+							Pickit.pickItem(target);
+							delay(250);
+
+							if (me.getItem(552)) {
+								print("Using book of skill");
+								clickItem(1, me.getItem(552));
+
+								break;
+							}
+						}
+
+						Pather.usePortal(40, Config.Leader);
+						actions.shift();
+
+						break;
+					}
+
+					actions.shift();
+
+					break;
+				case "1":
 					while (!leader.area) {
 						delay(500);
 					}
@@ -356,6 +410,14 @@ function Rushee() {
 						}
 
 						actions.shift();
+
+						break;
+					case 49:
+						Town.move("portalspot");
+
+						if (Pather.usePortal(49, Config.Leader)) {
+							actions.shift();
+						}
 
 						break;
 					case 60: // Halls of the Dead level 3
@@ -431,28 +493,47 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 102: // Durance of Hate level 3
-						if (me.area === 75) {
-							Pather.usePortal(102, Config.Leader);
+					case 94: // Ruined Temple
+						if (!Pather.usePortal(94, Config.Leader)) {
+							me.cancel();
+
+							break;
 						}
 
-						if (me.area === 102) {
-							//this.checkQuestMonster(242);
-							while (leader.area === me.area) {
-								delay(500);
-							}
+						target = getUnit(2, 193);
 
-							if (me.mode === 17) {
-								me.revive();
+						Misc.openChest(target);
+						delay(300);
 
-								while (!me.inTown) {
-									delay(500);
-								}
+						target = getUnit(4, 548);
 
-								Town.move("portalspot");
-								Pather.usePortal(102, Config.Leader);
-							}
+						Pickit.pickItem(target);
+						Pather.usePortal(75, Config.Leader);
+						Town.move("alkor");
 
+						target = getUnit(1, "alkor");
+
+						if (target && target.openMenu()) {
+							me.cancel();
+						}
+
+						Town.move("portalspot");
+						actions.shift();
+
+						break;
+					case 102: // Durance of Hate level 3
+						if (!Pather.usePortal(102, Config.Leader)) {
+							me.cancel();
+
+							break;
+						}
+
+						actions.shift();
+
+						break;
+					case 104: // sometimes the portal can be in city of the damned...
+					case 105:
+						if (Pather.usePortal(null, Config.Leader)) {
 							actions.shift();
 						}
 
@@ -465,20 +546,33 @@ function Rushee() {
 						}
 
 						Pather.moveTo(7763, 5267);
-						this.checkQuestMonster(243);
+						actions.shift();
 
-						if (me.gametype === 0) {
-							D2Bot.restart();
-						} else {
-							if (me.mode === 17) {
-								me.revive();
+						break;
+					case 110: // Bloody Foothils
+						Pather.usePortal(110, Config.Leader);
+						actions.shift();
 
-								while (!me.inTown) {
-									delay(500);
-								}
-							}
+						break;
+					case 114: // Frozen River
+						Town.move("malah");
 
-							Pather.usePortal(103, Config.Leader);
+						target = getUnit(1, "malah");
+
+						if (target && target.openMenu()) {
+							me.cancel();
+						}
+
+						Pather.usePortal(114, Config.Leader);
+						delay(500);
+
+						target = getUnit(2, 558);
+
+						if (target) {
+							Pather.moveToUnit(target);
+							sendPacket(1, 0x13, 4, 0x2, 4, target.gid);
+							delay(1000);
+							me.cancel();
 						}
 
 						actions.shift();
@@ -493,31 +587,61 @@ function Rushee() {
 					break;
 				case "2": // Go back to town and check quest
 					if (!Config.Rushee.Quester) {
+						switch (leader.area) {
+						// Non-questers can piggyback off quester out messages
+						case 110: // Shenk
+							if (me.act === 5) {
+								Town.move("larzuk");
+
+								target = getUnit(1, "larzuk");
+
+								if (target && target.openMenu()) {
+									me.cancel();
+								}
+							}
+
+							break;
+						case 114: // Anya
+							if (me.act === 5) {
+								Town.move("malah");
+
+								target = getUnit(1, "malah");
+
+								if (target && target.openMenu()) {
+									me.cancel();
+								}
+
+								if (me.getItem(646)) {
+									print("Using scroll of resistance");
+									clickItem(1, me.getItem(646));
+								}
+							}
+
+							break;
+						case 104:
+						case 105:
+							if (me.act === 4 && this.checkQuest(25, 1)) {
+								Town.move(NPC.Tyrael);
+
+								target = getUnit(1, "tyrael");
+
+								if (target && target.openMenu()) {
+									me.cancel();
+								}
+							}
+
+							break;
+						}
+
 						actions.shift();
 
 						break;
 					}
 
-					print("command: 2");
-
-					// If dying, wait until animation is over
-					while (me.mode === 0) {
-						delay(40);
-					}
-
-					// Revive if dead
-					if (me.mode === 17) {
-						me.revive();
-
-						// Wait until revive is complete
-						while (!me.inTown) {
-							delay(40);
-						}
-					}
-
 					switch (me.area) {
-					case 1:
 					case 37: // Catacombs level 4
+						this.revive();
+
 						// Go to town if not there, break if procedure fails
 						if (!me.inTown && !Pather.usePortal(1, Config.Leader)) {
 							break;
@@ -531,8 +655,19 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 40:
+					case 49: // Sewers 3
+						this.revive();
+
+						if (!me.inTown && !Pather.usePortal(40, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
 					case 74: // Arcane Sanctuary
+						this.revive();
+
 						if (!me.inTown && !Pather.usePortal(40, Config.Leader)) {
 							break;
 						}
@@ -556,8 +691,9 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 75:
 					case 83: // Travincal
+						this.revive();
+
 						if (!me.inTown && !Pather.usePortal(75, Config.Leader)) {
 							break;
 						}
@@ -575,6 +711,98 @@ function Rushee() {
 						if (!this.checkQuest(21, 0)) {
 							D2Bot.printToConsole("Travincal quest failed", 9);
 							quit();
+						}
+
+						Town.move("portalspot");
+						actions.shift();
+
+						break;
+					case 102: // Durance 2
+						this.revive();
+
+						if (!Pather.usePortal(75, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
+					case 104:
+					case 105:
+						this.revive();
+
+						if (!me.inTown && !Pather.usePortal(103, Config.Leader)) {
+							break;
+						}
+
+						if (this.checkQuest(25, 1)) {
+							Town.move(NPC.Tyrael);
+
+							target = getUnit(1, "tyrael");
+
+							if (target && target.openMenu()) {
+								me.cancel();
+							}
+
+							Town.move("portalspot");
+						}
+
+						actions.shift();
+
+						break;
+					case 108: // Chaos Sanctuary
+						this.revive();
+
+						if (me.gametype === 0) {
+							D2Bot.restart();
+
+							break;
+						}
+
+						if (!me.inTown && !Pather.usePortal(103, Config.Leader)) {
+							break;
+						}
+
+						actions.shift();
+
+						break;
+					case 110: // Bloody Foothils
+						this.revive();
+
+						if (!me.inTown && !Pather.usePortal(109, Config.Leader)) {
+							break;
+						}
+
+						Town.move("larzuk");
+
+						target = getUnit(1, "larzuk");
+
+						if (target && target.openMenu()) {
+							me.cancel();
+						}
+
+						Town.move("portalspot");
+						actions.shift();
+
+						break;
+					case 114: // Frozen River
+						this.revive();
+
+						if (!me.inTown && !Pather.usePortal(109, Config.Leader)) {
+							break;
+						}
+
+						Town.move("malah");
+
+						target = getUnit(1, "malah");
+
+						if (target && target.openMenu()) {
+							me.cancel();
+						}
+
+						if (me.getItem(646)) {
+							print("Using Scroll of Resistance");
+							clickItem(1, me.getItem(646));
 						}
 
 						Town.move("portalspot");
@@ -641,6 +869,7 @@ function Rushee() {
 
 					break;
 				case "exit":
+				case "bye ~":
 					D2Bot.restart();
 
 					break;
