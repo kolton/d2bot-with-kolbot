@@ -15,7 +15,7 @@ function Rakanishu() {
 
 	Attack.clear(15, 0, getLocaleString(2872)); // Rakanishu
 
-	if (Config.Rakanishu.KillGriswold && me.getQuest(4, 3)) {
+	if (Config.Rakanishu.KillGriswold && me.getQuest(4, 4)) {
 		if (!Pather.usePortal(38)) {
 			throw new Error("Failed to move to Tristram");
 		}
