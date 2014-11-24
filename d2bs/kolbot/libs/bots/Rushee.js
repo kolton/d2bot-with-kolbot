@@ -620,11 +620,7 @@ function Rushee() {
 							break;
 						case 104:
 						case 105:
-							if (me.act === 4) {
-								while (!this.checkQuest(25, 1)) { // 'talk to izual'
-									delay(2000);
-								}
-
+							if (me.act === 4 && this.checkQuest(25, 1)) {
 								Town.move(NPC.Tyrael);
 
 								target = getUnit(1, "tyrael");
