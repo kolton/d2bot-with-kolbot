@@ -1,17 +1,2 @@
-For any classids I missed, check NTITemAlias.dbl file!!
-Only items of high interest will be mentioned here.
-
-Item			-	classid
-
-Anya (hell):
-Gauntlets			-	338
-Light Plate (lld)	-	327
-Mage Plate (lld)	-	373
-Archon Plate		-	443
-Ancient Armor		-	326
-Barbed Shield (lld)	-	397
-Ward				-	449
-Greater Talons		-	187
-Scissors Quhab		-	188
-Runic Talons		-	194
-Scissors Suwayyah	-	195
+Names can now be used instead of classids. If you want to use classids, check NTItemAlias.dbl
+To see which NPC sells which items, check this link: http://members.iinet.net.au/~dcarson/shopcalc.html

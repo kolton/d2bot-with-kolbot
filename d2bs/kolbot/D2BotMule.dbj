@@ -9,7 +9,7 @@ var StarterConfig = {
 };
 
 
-var master, gameInfo, connectFail, makeAcc,
+var master, gameInfo, connectFail, makeAcc, joinInfo,
 	muleMode, muleFilename, muleObj, handle,
 	makeNext = false,
 	status = "loading",
@@ -77,26 +77,26 @@ function pickItems() {
 		rval = "fail",
 		list = [];
 
-	while (!me.ingame && !me.gameReady) {
-		delay(500);
+	while (!me.name) { // shit can happen sometimes...
+		delay(100);
 	}
 
-	delay(1000);
+	//delay(1000);
 
-	for (i = 0; i < 10; i += 1) {
-		items = me.getItems();
+	for (i = 0; i < 100; i += 1) {
+		items = me.findItems(-1, 0, 3);
 
 		if (items) {
 			break;
 		}
 
-		delay(1000);
+		delay(100);
 	}
 
 	if (items) {
 		for (i = 0; i < items.length; i += 1) {
 			if (items[i].mode === 0 && items[i].location === 3 && Town.ignoredItemTypes.indexOf(items[i].itemType) > -1  // drop trash (id/tp scroll primarily)
-					&& (muleMode !== 1 || items[i].classid !== 530)) { // don't drop ID scroll with torch mules
+					&& (muleMode === 0 || items[i].classid !== 530)) { // don't drop ID scroll with torch/anni mules
 				try {
 					items[i].drop();
 				} catch (dropError) {
@@ -108,11 +108,11 @@ function pickItems() {
 
 	while (me.gameReady) {
 		if (masterStatus.status === "done") {
-			item = getUnit(4, -1, 3); // item, on ground
+			item = getUnit(4);
 
 			if (item) {
 				do {
-					if (Town.ignoredItemTypes.indexOf(item.itemType) === -1) { // don't pick up trash
+					if (getDistance(me, item) < 20 && [3, 5].indexOf(item.mode) > -1 && Town.ignoredItemTypes.indexOf(item.itemType) === -1) { // don't pick up trash
 						list.push(copyUnit(item));
 					}
 				} while (item.getNext());
@@ -130,8 +130,15 @@ function pickItems() {
 				canFit = Storage.Inventory.CanFit(item);
 
 				// Torch handling
-				if (muleMode === 1 && item.classid === 604 && item.quality === 7 && !Pickit.canPick(item)) {
+				if (muleMode > 0 && item.classid === 604 && item.quality === 7 && !Pickit.canPick(item)) {
 					D2Bot.printToConsole("Mule already has a Torch.", 7);
+
+					rval = "next";
+				}
+
+				// Anni handling
+				if (muleMode > 0 && item.classid === 603 && item.quality === 7 && !Pickit.canPick(item)) {
+					D2Bot.printToConsole("Mule already has an Anni.", 7);
 
 					rval = "next";
 				}
@@ -157,7 +164,7 @@ function pickItems() {
 			//D2Bot.shoutGlobal("report", 0);
 		}
 
-		delay(1000);
+		delay(500);
 	}
 
 	return rval;
@@ -176,7 +183,11 @@ function ReceiveCopyData(mode, msg) {
 
 	// mode check instead of msg check because of crashes
 	switch (mode) {
-	case 1: // join
+	case 1: // JoinInfo
+		//print("Got Join Info");
+
+		joinInfo = JSON.parse(msg);
+
 		break;
 	case 2: // game info
 		print("Recieved Game Info");
@@ -281,6 +292,20 @@ function locationTimeout(time, location) {
 	return (getLocation() !== location);
 }
 
+function ingameTimeout(time) {
+	var tick = getTickCount();
+
+	while (getTickCount() - tick < time) {
+		if (me.ingame && me.gameReady) {
+			return true;
+		}
+
+		delay(100);
+	}
+
+	return me.ingame && me.gameReady;
+}
+
 function timeoutDelay(text, time) {
 	var endTime = getTickCount() + time;
 
@@ -309,33 +334,12 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
-function checkTorch() {
+function checkAnniTorch() {
 	while (!me.gameReady) {
 		delay(500);
 	}
 
-	var item = me.getItem("cm2");
-
-	if (item) {
-		do {
-			if (item.quality === 7) {
-				return true;
-			}
-		} while (item.getNext());
-	}
-
-	// Hacky anni add-on
-	item = me.getItem("cm1");
-
-	if (item) {
-		do {
-			if (item.quality === 7) {
-				return true;
-			}
-		} while (item.getNext());
-	}
-
-	return false;
+	return me.findItem(603, 0, -1, 7) || me.findItem(604, 0, -1, 7);
 }
 
 function foreverAlone() {
@@ -384,17 +388,23 @@ function main() {
 		delay(500);
 	}
 
+	D2Bot.updateRuns(); // we need the mule to swap keys somehow after all
+	delay(1000);
+
 	// Wait for master before login = give room to determine muling mode (normal or torch)
 	while (!master) {
-		delay(1000);
+		delay(100);
 	}
 
 	print("Master found: " + master);
 
 	muleObj = AutoMule.getMuleObject(muleMode, master);
-	muleFilename = AutoMule.getMuleFilename(muleMode);
+	muleFilename = AutoMule.getMuleFilename(muleMode, master);
 
-	var obj, statusTimeout;
+	print("Mule filename: " + muleFilename);
+
+	var obj, tick,
+		inGame = false;
 
 	try {
 		// ugly solution to uglier problem - pickItem area update
@@ -415,23 +425,35 @@ function main() {
 	} catch (e) {
 		print("Caught exception creating data files.");
 		print(e);
-		D2Bot.printToConsole("Exception: " + e);
+		D2Bot.printToConsole("DataFileException: " + e.message + " (" + e.fileName.substring(e.fileName.lastIndexOf("\\") + 1, e.fileName.length) + " #" + e.lineNumber + ")");
 	}
 
 	while (true) {
 		try {
 			if (me.ingame && me.gameReady) {
-				if (status === "loading") {
-					status = "ready";
+				if (!inGame) {
+					if (status !== "begin") {
+						status = "ready";
+					}
 
-					D2Bot.updateStatus("In " + (muleMode ? "torch" : "") + " mule game.");
-					D2Bot.printToConsole("In " + (muleMode ? "torch" : "") + " mule game.", 7);
+					D2Bot.updateStatus("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.");
+					D2Bot.printToConsole("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.", 7);
 					Storage.Init();
+
+					inGame = true;
 				}
 
-				for (statusTimeout = 0; statusTimeout < 60000 && status !== "begin"; statusTimeout += 500) {
-					delay(500);
+				tick = getTickCount();
+
+				while (getTickCount() - tick < 60000) {
+					if (status === "begin") {
+						break;
+					}
+
+					delay(100);
 				}
+
+				print("Delay: " + (getTickCount() - tick));
 
 				if (status !== "begin") {
 					D2Bot.printToConsole("Nobody joined - stopping.", 9);
@@ -447,26 +469,26 @@ function main() {
 
 					obj = MuleData.read();
 
-					if (checkTorch()) {
+					if (checkAnniTorch()) {
 						obj.torchChars.push(me.name);
 					}
 
 					MuleData.write(obj);
 					D2Bot.printToConsole("Done muling.", 7);
 					sendCopyData(null, master, 10, JSON.stringify({status: "quit"}));
-					delay(500);
+					//delay(500);
 					D2Bot.stop();
 
 					break;
 				// can't fit more items, get to next character or account
 				case "next":
 					MuleLogger.logChar();
-					delay(500);
+					//delay(500);
 
 					makeNext = true;
 					obj = MuleData.read();
 
-					if (checkTorch()) {
+					if (checkAnniTorch()) {
 						obj.torchChars.push(me.name);
 					}
 
@@ -483,13 +505,17 @@ function main() {
 				}
 			}
 
-			locationAction(getLocation());
-			delay(1000);
+			if (!me.ingame) {
+				delay(1000);
+				locationAction(getLocation());
+			}
 		} catch (e2) {
 			print("Caught an exception in the main loop.");
 			print(e2);
-			D2Bot.printToConsole("Exception: " + e2);
+			D2Bot.printToConsole("MainLoopException: " + e2.message + " (" + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + " #" + e2.lineNumber + ")");
 		}
+
+		delay(100);
 	}
 }
 
@@ -508,7 +534,19 @@ MainSwitch:
 			break;
 		}
 
-		ControlAction.click(6, 652, 469, 120, 20); // Join
+		if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+			break;
+		}
+
+		if (!locationTimeout(5000, location)) { // in case join button gets bugged
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+				break;
+			}
+
+			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+				break;
+			}
+		}
 
 		break;
 	case 4: // Create Game
@@ -522,7 +560,7 @@ MainSwitch:
 
 		delay(2000);
 		createGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
-		locationTimeout(5000, location);
+		ingameTimeout(5000);
 
 		break;
 	case 2: // Waiting In Line
@@ -533,9 +571,17 @@ MainSwitch:
 		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
-		delay(2000);
-		joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
-		locationTimeout(5000, location);
+		D2Bot.requestGame(master);
+		delay(100);
+
+		if (joinInfo && joinInfo.gameName !== "" && joinInfo.inGame) {
+			joinGame(joinInfo.gameName, joinInfo.gamePass);
+		} else {
+			joinGame(muleObj.muleGameName[0], muleObj.muleGameName[1]);
+		}
+
+		ingameTimeout(5000);
+		print("Ingame timeout done.");
 
 		break;
 	case 6: // Ladder
@@ -592,13 +638,35 @@ MainSwitch:
 			case getLocaleString(5207):
 				D2Bot.updateStatus("Invalid Password");
 				D2Bot.printToConsole("Invalid Password");
+
 				break;
-			case getLocaleString(5199):
-				D2Bot.updateStatus("Disabled CDKey");
-				D2Bot.printToConsole("Disabled CDKey");
+			case getLocaleString(5208):
+				ControlAction.click(6, 335, 412, 128, 35);
+
+				makeAcc = true;
+
+				break MainSwitch;
+			case getLocaleString(5202): // cd key intended for another product
+			case getLocaleString(10915): // lod key intended for another product
+				D2Bot.updateStatus("Invalid CDKey");
+				D2Bot.printToConsole("Invalid CDKey: " + gameInfo.mpq, 6);
 				D2Bot.CDKeyDisabled();
 
 				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(5199):
+				D2Bot.updateStatus("Disabled CDKey");
+				D2Bot.printToConsole("Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
 					D2Bot.stop();
@@ -611,15 +679,17 @@ MainSwitch:
 				ControlAction.click(6, 335, 412, 128, 35);
 
 				break MainSwitch;
-			case getLocaleString(5208):
-				ControlAction.click(6, 335, 412, 128, 35);
-
-				makeAcc = true;
-
-				break MainSwitch;
 			default:
 				D2Bot.updateStatus("Login Error");
 				D2Bot.printToConsole("Login Error - " + string);
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
 				break;
 			}
 		}
@@ -682,7 +752,34 @@ MainSwitch:
 	case 15: // new character (selected)
 	case 29: // new character (list)
 	case 42: // empty char screen
+		string = "";
+		text = ControlAction.getText(4, 45, 318, 531, 140);
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+
+			if (string === getLocaleString(11161)) { // CDKey disabled from realm play
+				D2Bot.updateStatus("Realm Disabled CDKey");
+				D2Bot.printToConsole("Realm Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+			}
+		}
+
 		// Single Player screen fix
+		// TODO: see if this is still needed. d2bs doesn't load scripts twice anymore
 		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
 			ControlAction.click(6, 33, 572, 128, 35);
 
@@ -714,8 +811,7 @@ MainSwitch:
 		obj = MuleData.read();
 
 		if (makeNext) {
-			if (obj.fullChars.length === 8 || (muleMode === 1 && obj.torchChars.length === 8)) {
-				//D2Bot.printToConsole("ACCOUNT FULL");
+			if (obj.fullChars.length === 8 || (muleMode > 0 && obj.torchChars.length === 8)) {
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -726,7 +822,6 @@ MainSwitch:
 		}
 
 		if (!obj.character || obj.character.indexOf(muleObj.charPrefix) < 0) {
-			//D2Bot.printToConsole("CHAR NOT FOUND");
 			nextChar();
 
 			obj = MuleData.read();
@@ -741,8 +836,7 @@ MainSwitch:
 			charClass: "amazon"
 		};
 
-		if (muleMode === 1 && obj.torchChars.indexOf(info.charName) > -1) {
-			//D2Bot.printToConsole("CHAR ALREADY HAS TORCH");
+		if (muleMode > 0 && obj.torchChars.indexOf(info.charName) > -1) {
 			nextChar();
 
 			break;
@@ -751,10 +845,7 @@ MainSwitch:
 		if (ControlAction.findCharacter(info)) {
 			ControlAction.loginCharacter(info);
 		} else {
-			//D2Bot.printToConsole("CHAR NOT FOUND 2");
-
 			if (ControlAction.getCharacters().length >= 8) { // premade account that's already full
-				//D2Bot.printToConsole("ACCOUNT FULL 2");
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -762,7 +853,6 @@ MainSwitch:
 			}
 
 			if (!ControlAction.makeCharacter(info)) {
-				//D2Bot.printToConsole("MAKE CHAR FAILED");
 				// TODO: check if acc is full and cancel location 15 and 29 if true
 				nextChar();
 
@@ -785,15 +875,15 @@ MainSwitch:
 
 		break;
 	case 19: // Login - Cdkey In Use
-		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+		D2Bot.printToConsole(gameInfo.mpq + " is in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
 		D2Bot.CDKeyInUse();
 
 		if (gameInfo.switchKeys) {
-			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+			ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 			D2Bot.restart(true);
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
-			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+			ControlAction.timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
 		}
 
 		break;
@@ -821,26 +911,26 @@ MainSwitch:
 
 		switch (string) {
 		case getLocaleString(10914):
-			D2Bot.printToConsole("LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+			D2Bot.printToConsole(gameInfo.mpq + " LoD key in use by " + ControlAction.getText(4, 158, 310, 485, 40), 6);
 			D2Bot.CDKeyInUse();
 
 			if (gameInfo.switchKeys) {
-				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
 				ControlAction.click(6, 335, 450, 128, 35);
-				timeoutDelay("LoD key in use", StarterConfig.CDKeyInUseDelay * 6e4);
+				ControlAction.timeoutDelay("LoD key in use", StarterConfig.CDKeyInUseDelay * 6e4);
 			}
 
 			break;
 		default:
 			if (gameInfo.switchKeys) {
 				D2Bot.printToConsole("Invalid CD-Key");
-				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+				ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 				D2Bot.restart(true);
 			} else {
 				ControlAction.click(6, 335, 450, 128, 35);
-				timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
+				ControlAction.timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
 			}
 
 			break;

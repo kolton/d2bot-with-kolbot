@@ -369,7 +369,9 @@ var Config = {
 	},
 	DiabloHelper: {
 		Wait: 120,
-		Entrance: false
+		Entrance: false,
+		SkipIfBaal: false,
+		SkipTP: false
 	},
 	BattleOrders: {
 		Mode: 0,
@@ -396,7 +398,9 @@ var Config = {
 	},
 	ShopBot: {
 		ScanIDs: [],
-		ShopNPC: "anya"
+		ShopNPC: "anya",
+		CycleDelay: 0,
+		QuitOnMatch: false
 	},
 	Coldworm: {
 		KillBeetleburst: false,
@@ -451,7 +455,13 @@ var Config = {
 		AreaList: []
 	},
 	Rusher: {
-		WaitPlayerCount: 0
+		WaitPlayerCount: 0,
+		Radament: false,
+		LamEsen: false,
+		Izual: false,
+		Shenk: false,
+		Anya: false,
+		LastRun: ""
 	},
 	Rushee: {
 		Quester: false,

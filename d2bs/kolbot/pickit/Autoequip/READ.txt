@@ -1,0 +1,6 @@
+This is an example autoequip pickit.
+The feature is experimental and there will be ZERO support for it.
+To use it, ADD these lines to your character config.
+
+Config.AutoEquip = true;
+Config.PickitFiles.push("autoequip/sorceress.xpac.nip");

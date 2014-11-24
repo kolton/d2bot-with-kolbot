@@ -98,6 +98,7 @@ function main() {
 	};
 
 	this.andariel = function () {
+		say("starting andariel");
 		Town.doChores();
 		Pather.useWaypoint(35, true);
 		Precast.doPrecast(true);
@@ -136,6 +137,7 @@ function main() {
 
 	this.cube = function () {
 		if (me.diff === 0) {
+			say("starting cube");
 			Pather.useWaypoint(57, true);
 			Precast.doPrecast(true);
 
@@ -162,6 +164,7 @@ function main() {
 	};
 
 	this.amulet = function () {
+		say("starting amulet");
 		Town.doChores();
 		Pather.useWaypoint(44, true);
 		Precast.doPrecast(true);
@@ -194,6 +197,7 @@ function main() {
 	};
 
 	this.staff = function () {
+		say("starting staff");
 		Town.doChores();
 		Pather.useWaypoint(43, true);
 		Precast.doPrecast(true);
@@ -226,6 +230,7 @@ function main() {
 		// right down 25830 5447 (25866, 5431)
 		// left down 25447 5822 (25431, 5861)
 
+		say("starting summoner");
 		Town.doChores();
 		Pather.useWaypoint(74, true);
 		Precast.doPrecast(true);
@@ -301,6 +306,8 @@ function main() {
 	};
 
 	this.duriel = function () {
+		say("starting duriel");
+
 		if (me.inTown) {
 			Town.doChores();
 			Pather.useWaypoint(46, true);
@@ -317,7 +324,7 @@ function main() {
 		if (me.diff < 2) {
 			Attack.securePosition(me.x, me.y, 30, 3000, true);
 		} else {
-			Attack.securePosition(me.x, me.y, 25, 3000, true, true);
+			Attack.securePosition(me.x, me.y, 40, 3000, true, true);
 		}
 
 		say("1");
@@ -366,83 +373,89 @@ function main() {
 	};
 
 	this.travincal = function () {
+		say("starting travincal");
 		Town.doChores();
 		Pather.useWaypoint(83, true);
 		Precast.doPrecast(true);
 
 		var coords = [me.x, me.y];
 
-		Pather.moveTo(coords[0] - 24, coords[1]);
-		Pather.moveTo(coords[0] - 24, coords[1] - 135);
-		Pather.moveTo(coords[0] + 81, coords[1] - 135);
+		Pather.moveTo(coords[0] + 23, coords[1] - 102);
 		Pather.makePortal();
-		Attack.securePosition(me.x, me.y, 25, 3000);
+		Attack.securePosition(me.x, me.y, 40, 3000);
 		say("1");
 
 		while (!this.playerIn()) {
-			Pather.moveTo(coords[0] + 81, coords[1] - 135);
 			delay(250);
 		}
 
-		Pather.moveTo(coords[0] + 97, coords[1] - 68);
-		Attack.kill(getLocaleString(2863));
+		Pather.moveTo(coords[0] + 30, coords[1] - 134);
+		Pather.moveTo(coords[0] + 86, coords[1] - 130);
+		Pather.moveTo(coords[0] + 71, coords[1] - 94);
+		Attack.securePosition(me.x, me.y, 40, 3000);
+
+		/*Attack.kill(getLocaleString(2863));
 		Attack.kill(getLocaleString(2862));
-		Attack.kill(getLocaleString(2860));
+		Attack.kill(getLocaleString(2860));*/
+
 		say("2");
-		Pather.moveTo(coords[0] + 81, coords[1] - 135);
+		Pather.moveTo(coords[0] + 23, coords[1] - 102);
 		Pather.usePortal(null, me.name);
 
 		return true;
 	};
 
 	this.mephisto = function () {
+		say("starting mephisto");
+
+		var hydra;
+
 		Town.doChores();
 		Pather.useWaypoint(101, true);
 		Precast.doPrecast(true);
 		Pather.moveToExit(102, true);
-		Pather.moveTo(17591, 8070);
-
-		var monsta,
-			monList = [];
-
-		monsta = getUnit(1);
-
-		if (monsta) {
-			do {
-				if (Attack.checkMonster(monsta) && getDistance(monsta, 17627, 8070) <= 30) {
-					monList.push(copyUnit(monsta));
-				}
-			} while (monsta.getNext());
-		}
-
-		if (monList.length) {
-			Pather.moveTo(17627, 8070);
-			Attack.clearList(monList);
-		}
-
-		Pather.moveTo(17591, 8070);
+		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
-
-		monsta = getUnit(1, "hydra");
-
-		if (monsta) {
-			do {
-				while (monsta.mode !== 0 && monsta.mode !== 12 && monsta.hp > 0) {
-					delay(500);
-				}
-			} while (monsta.getNext());
-		}
-
 		say("1");
 
 		while (!this.playerIn()) {
-			Pather.moveTo(17591, 8070);
 			delay(250);
 		}
 
-		Attack.kill(242);
-		say("a4");
 		Pather.moveTo(17591, 8070);
+		Attack.kill(242);
+		Pickit.pickItems();
+		Pather.moveTo(17692, 8023);
+		Pather.makePortal();
+		say("2");
+
+		while (this.playerIn()) {
+			delay(250);
+		}
+
+		Pather.moveTo(17591, 8070);
+		Attack.securePosition(me.x, me.y, 40, 3000);
+
+		hydra = getUnit(1, "hydra");
+
+		if (hydra) {
+			do {
+				while (hydra.mode !== 0 && hydra.mode !== 12 && hydra.hp > 0) {
+					delay(500);
+				}
+			} while (hydra.getNext());
+		}
+
+		Pather.makePortal();
+		Pather.moveTo(17581, 8070);
+		say("1");
+
+		while (!this.playerIn()) {
+			delay(250);
+		}
+
+		say("a4");
+		//Pather.moveTo(17591, 8070);
 		delay(2000);
 		Pather.usePortal(null);
 
@@ -450,6 +463,8 @@ function main() {
 	};
 
 	this.diablo = function () {
+		say("starting diablo");
+
 		this.getLayout = function (seal, value) {
 			var sealPreset = getPresetUnit(108, 2, seal);
 
@@ -625,6 +640,7 @@ function main() {
 		}
 
 		Attack.kill(243);
+		say("2");
 
 		if (me.gametype > 0) {
 			say("a5");
@@ -659,6 +675,8 @@ function main() {
 
 			return false;
 		}
+
+		say("starting ancients");
 
 		var altar;
 
@@ -712,21 +730,7 @@ function main() {
 	};
 
 	this.baal = function () {
-		if (me.diff === 2) {
-			say("Hell rush complete~");
-			delay(500);
-			quit();
-
-			return false;
-		}
-
-		if (!this.bumperCheck()) {
-			say("No eligible bumpers detected. Rush complete~");
-			delay(500);
-			quit();
-
-			return false;
-		}
+		say("starting baal");
 
 		var tick, portal;
 
@@ -868,12 +872,14 @@ function main() {
 			return true;
 		};
 
-		Town.doChores();
-		Pather.useWaypoint(129, true);
-		Precast.doPrecast(true);
+		if (me.inTown) {
+			Town.doChores();
+			Pather.useWaypoint(129, true);
+			Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([130, 131], true)) {
-			throw new Error("Failed to move to Throne of Destruction.");
+			if (!Pather.moveToExit([130, 131], true)) {
+				throw new Error("Failed to move to Throne of Destruction.");
+			}
 		}
 
 		Pather.moveTo(15113, 5040);
@@ -945,6 +951,7 @@ MainLoop:
 			delay(10);
 		}
 
+		this.clearThrone();
 		Pather.moveTo(15092, 5011);
 		Precast.doPrecast(true);
 
@@ -962,7 +969,9 @@ MainLoop:
 			throw new Error("Couldn't find portal.");
 		}
 
+		Pather.moveTo(15213, 5908);
 		Pather.makePortal();
+		Pather.moveTo(15170, 5950);
 		delay(1000);
 		say("3");
 
@@ -984,12 +993,19 @@ MainLoop:
 	};
 
 	// Quests
-	this.izual = function () {
-		var izualCoords, myPosition, merc, izualPreset, timer, izual, monster,
-			moveAway = function (unit, range) {
+	this.radament = function () {
+		if (!Config.Rusher.Radament) {
+			return false;
+		}
+
+		say("starting radament");
+
+		var i, radaCoords, rada, radaPreset, returnSpot,
+			moveIntoPos = function (unit, range) {
 				var i, coordx, coordy,
+					coords = [],
 					angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
-					angles = [0, 45, -45, 90, -90, 135, -135, 180];
+					angles = [0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 105, -105, 120, -120, 135, -135, 150, -150, 180];
 
 				for (i = 0; i < angles.length; i += 1) {
 					coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * range + unit.x);
@@ -997,24 +1013,166 @@ MainLoop:
 
 					try {
 						if (!(getCollision(unit.area, coordx, coordy) & 0x1)) {
-							return Pather.moveTo(coordx, coordy);
+							coords.push({
+								x: coordx,
+								y: coordy
+							});
 						}
 					} catch (e) {
 
 					}
 				}
 
-				return false;
-			},
-			nearbyMonsterCheck = function (range) {
-				var monster = getUnit(1);
+				if (coords.length > 0) {
+					coords.sort(Sort.units);
 
-				if (monster) {
-					do {
-						if (Attack.checkMonster(monster) && getDistance(me, monster) < range) {
-							return monster;
+					return Pather.moveToUnit(coords[0]);
+				}
+
+				return false;
+			};
+
+		Pather.useWaypoint(48, true);
+		Precast.doPrecast(false);
+		Pather.moveToExit(49, true);
+
+		radaPreset = getPresetUnit(49, 2, 355);
+		radaCoords = {
+			area: 49,
+			x: radaPreset.roomx * 5 + radaPreset.x,
+			y: radaPreset.roomy * 5 + radaPreset.y
+		};
+
+		moveIntoPos(radaCoords, 50);
+
+		for (i = 0; i < 3; i += 1) {
+			rada = getUnit(1, 229);
+
+			if (rada) {
+				break;
+			}
+
+			delay(500);
+		}
+
+		if (rada) {
+			moveIntoPos(rada, 60);
+		} else {
+			print("radament unit not found");
+		}
+
+		Attack.securePosition(me.x, me.y, 35, 3000);
+		Pather.makePortal();
+		say("1");
+
+		while (!this.playerIn()) {
+			delay(200);
+		}
+
+		Attack.kill(229); // Radament
+
+		returnSpot = {
+			x: me.x,
+			y: me.y
+		};
+
+		say("2");
+		Pickit.pickItems();
+		Attack.securePosition(me.x, me.y, 30, 3000);
+
+		while (this.playerIn()) {
+			delay(200);
+		}
+
+		Pather.moveToUnit(returnSpot);
+		Pather.makePortal();
+		say("all in");
+
+		while (!this.playerIn()) {
+			delay(200);
+		}
+
+		while (getUnit(4, 552)) {
+			delay(1000);
+		}
+
+		while (this.playerIn()) {
+			delay(200);
+		}
+
+		Pather.usePortal(null, null);
+
+		return true;
+	};
+
+	this.lamesen = function () {
+		if (!Config.Rusher.LamEsen) {
+			return false;
+		}
+
+		say("starting lamesen");
+
+		if (!Town.goToTown() || !Pather.useWaypoint(80, true)) {
+			throw new Error("Lam Essen quest failed");
+		}
+
+		Precast.doPrecast(false);
+
+		if (!Pather.moveToExit(94, true) || !Pather.moveToPreset(me.area, 2, 193)) {
+			throw new Error("Lam Essen quest failed");
+		}
+
+		Attack.securePosition(me.x, me.y, 30, 2000);
+		Pather.makePortal();
+		say("1");
+
+		while (!this.playerIn()) {
+			delay(200);
+		}
+
+		while (this.playerIn()) {
+			delay(200);
+		}
+
+		Pather.usePortal(null, null);
+
+		return true;
+	};
+
+	this.izual = function () {
+		if (!Config.Rusher.Izual) {
+			return false;
+		}
+
+		say("starting izual");
+
+		var i, izualCoords, izual, izualPreset, returnSpot,
+			moveIntoPos = function (unit, range) {
+				var i, coordx, coordy,
+					coords = [],
+					angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI),
+					angles = [0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 105, -105, 120, -120, 135, -135, 150, -150, 180];
+
+				for (i = 0; i < angles.length; i += 1) {
+					coordx = Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * range + unit.x);
+					coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * range + unit.y);
+
+					try {
+						if (!(getCollision(unit.area, coordx, coordy) & 0x1)) {
+							coords.push({
+								x: coordx,
+								y: coordy
+							});
 						}
-					} while (monster.getNext());
+					} catch (e) {
+
+					}
+				}
+
+				if (coords.length > 0) {
+					coords.sort(Sort.units);
+
+					return Pather.moveToUnit(coords[0]);
 				}
 
 				return false;
@@ -1022,6 +1180,7 @@ MainLoop:
 
 		Pather.useWaypoint(106, true);
 		Precast.doPrecast(false);
+		Pather.moveToExit(105, true);
 
 		izualPreset = getPresetUnit(105, 1, 256);
 		izualCoords = {
@@ -1030,105 +1189,143 @@ MainLoop:
 			y: izualPreset.roomy * 5 + izualPreset.y
 		};
 
-		moveAway(izualCoords, 55);
+		moveIntoPos(izualCoords, 50);
 
-		izual = getUnit(1, 256);
+		for (i = 0; i < 3; i += 1) {
+			izual = getUnit(1, 256);
 
-		if (izual) {
-			moveAway(izual, 55);
+			if (izual) {
+				break;
+			}
+
+			delay(500);
 		}
 
-		merc = me.getMerc();
-		myPosition = {
+		if (izual) {
+			moveIntoPos(izual, 60);
+		} else {
+			print("izual unit not found");
+		}
+
+		returnSpot = {
 			x: me.x,
 			y: me.y
 		};
 
-		while (true) {
-			monster = nearbyMonsterCheck(35);
+		Attack.securePosition(me.x, me.y, 30, 3000);
+		Pather.makePortal();
+		say("1");
 
-			if (!monster) {
-				if (!timer) {
-					me.overhead("Safe Timer Start");
-
-					timer = getTickCount();
-				}
-
-				if (timer && getTickCount() - timer >= 5000) {
-					break;
-				}
-			} else {
-				timer = 0;
-			}
-
-			izual = getUnit(1, 256);
-
-			if (izual && getDistance(me, izual) < 40) {
-				moveAway(izual, 55);
-
-				myPosition = {
-					x: me.x,
-					y: me.y
-				};
-			}
-
-			if (izual && getDistance(monster, izual) > 35) {
-				try {
-					Attack.kill(monster);
-				} catch (e) {
-
-				}
-			} else {
-				if (!izual || getDistance(me, izual) > 35) {
-					Attack.clear(15);
-				}
-			}
-
-			if (getDistance(me, myPosition) > 5 || (merc && getDistance(me, merc) > 10)) {
-				Pather.teleportTo(myPosition.x, myPosition.y);
-			}
-
+		while (!this.playerIn()) {
 			delay(200);
+		}
+
+		Attack.kill(256); // Izual
+		Pickit.pickItems();
+		say("2");
+		Pather.moveToUnit(returnSpot);
+
+		while (this.playerIn()) {
+			delay(200);
+		}
+
+		Pather.usePortal(null, null);
+
+		return true;
+	};
+
+	this.shenk = function () {
+		if (!Config.Rusher.Shenk) {
+			return false;
+		}
+
+		say("starting shenk");
+
+		Pather.useWaypoint(111, true);
+		Precast.doPrecast(false);
+		Pather.moveTo(3846, 5120);
+		Attack.securePosition(me.x, me.y, 30, 3000);
+		Pather.makePortal();
+		say("1");
+
+		while (!this.playerIn()) {
+			delay(200);
+		}
+
+		Attack.kill(getLocaleString(22435)); // Shenk
+		Pickit.pickItems();
+		Pather.moveTo(3846, 5120);
+		say("2");
+
+		while (this.playerIn()) {
+			delay(200);
+		}
+
+		Pather.usePortal(null, null);
+
+		return true;
+	};
+
+	this.anya = function () {
+		if (!Config.Rusher.Anya) {
+			return false;
+		}
+
+		say("starting anya");
+
+		var anya;
+
+		if (!Town.goToTown() || !Pather.useWaypoint(113, true)) {
+			throw new Error("Anya quest failed");
+		}
+
+		Precast.doPrecast(false);
+
+		if (!Pather.moveToExit(114, true) || !Pather.moveToPreset(me.area, 2, 460)) {
+			throw new Error("Anya quest failed");
+		}
+
+		Attack.securePosition(me.x, me.y, 30, 2000);
+
+		anya = getUnit(2, 558);
+
+		if (anya) {
+			Pather.moveToUnit(anya);
+			sendPacket(1, 0x13, 4, 0x2, 4, anya.gid); // Rusher should be able to interact so quester can get the potion without entering
+			delay(1000 + me.ping);
+			me.cancel();
 		}
 
 		Pather.makePortal();
 		say("1");
 
 		while (!this.playerIn()) {
-			monster = nearbyMonsterCheck(35);
-			izual = getUnit(1, 256);
-
-			if (monster) {
-				if (izual && getDistance(monster, izual) > 35) {
-					try {
-						Attack.kill(monster);
-					} catch (e2) {
-
-					}
-				} else {
-					if (!izual || getDistance(me, izual) > 35) {
-						Attack.clear(15);
-					}
-				}
-			}
-
-			if (getDistance(me, myPosition) > 5 || (merc && getDistance(me, merc) > 10)) {
-				Pather.teleportTo(myPosition.x, myPosition.y);
-			}
-
 			delay(200);
 		}
 
-		Pather.moveToUnit(izualCoords); // Temporary line until hdin attack fix is up
-		Attack.kill(256); // Izual
+		while (getUnit(2, 558)) {
+			delay(1000);
+		}
+
+		say("2"); // Mainly for non-questers to know when to get the scroll of resistance
+
+		while (this.playerIn()) {
+			delay(200);
+		}
+
 		Pather.usePortal(null, null);
 
 		return true;
 	};
 
+	print("Loading RushThread");
+
 	var i, command,
 		current = 0,
-		sequence = ["andariel", "cube", "amulet", "staff", "summoner", "duriel", "travincal", "mephisto", "diablo", "ancients", "baal"];
+		sequence = [
+			"andariel", "radament", "cube", "amulet", "staff", "summoner", "duriel", "lamesen",
+			"travincal", "mephisto", "izual", "diablo", "shenk", "anya", "ancients", "baal"
+		];
 
 	this.scriptEvent = function (msg) {
 		command = msg;
@@ -1149,14 +1346,18 @@ MainLoop:
 		if (command) {
 			switch (command) {
 			case "go":
-				if (current >= sequence.length) {
+				// End run if entire sequence is done or if Config.Rusher.LastRun is done
+				if (current >= sequence.length || (Config.Rusher.LastRun && current > sequence.indexOf(Config.Rusher.LastRun))) {
 					say("bye ~");
-					quit();
 
-					break;
+					while (Misc.getPlayerCount() > 1) {
+						delay(1000);
+					}
+
+					scriptBroadcast("quit");
+
+					return true;
 				}
-
-				say("Starting " + sequence[current]);
 
 				try {
 					this[sequence[current]]();

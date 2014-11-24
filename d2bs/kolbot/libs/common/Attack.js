@@ -363,11 +363,7 @@ var Attack = {
 			} while (target.getNext());
 		}
 
-		if (!start) {
-			return true;
-		}
-
-		while (monsterList.length > 0 && attackCount < 300) {
+		while (start && monsterList.length > 0 && attackCount < 300) {
 			if (boss) {
 				orgx = boss.x;
 				orgy = boss.y;
@@ -400,23 +396,27 @@ var Attack = {
 					}
 
 					if (i === gidAttack.length) {
-						gidAttack.push({gid: target.gid, attacks: 0});
+						gidAttack.push({gid: target.gid, attacks: 0, name: target.name});
 					}
 
 					gidAttack[i].attacks += 1;
+					attackCount += 1;
 
 					// Desync/bad position handler
 					switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
 					case 112:
+						//print(gidAttack[i].name + " " + gidAttack[i].attacks);
+
 						// Tele in random direction with Blessed Hammer
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
-							Pather.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4);
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 8 : 3) === 0) {
+							//print("random move m8");
+							Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
 						}
 
 						break;
 					default:
 						// Flash with melee skills
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
 							Packet.flash(me.gid);
 						}
 
@@ -428,8 +428,6 @@ var Attack = {
 						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 						monsterList.shift();
 					}
-
-					attackCount += 1;
 
 					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
 						Pickit.fastPick();
@@ -443,7 +441,7 @@ var Attack = {
 		}
 
 		ClassAttack.afterAttack(pickit);
-		this.openChests(range);
+		this.openChests(range, orgx, orgy);
 
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
@@ -456,6 +454,10 @@ var Attack = {
 	getMob: function (classid, spectype, range, center) {
 		var monsterList = [],
 			monster = getUnit(1);
+
+		if (range === undefined) {
+			range = 25;
+		}
 
 		if (!center) {
 			center = me;
@@ -776,7 +778,7 @@ var Attack = {
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
 			if (result) {
-				Pather.moveTo(result[0], result[1], 3);
+				Pather.moveTo(result[0], result[1], 3, spectype);
 				//this.countUniques();
 
 				if (!this.clear(40, spectype)) {
@@ -875,23 +877,35 @@ var Attack = {
 	},
 
 	// Open chests when clearing
-	openChests: function (range) {
+	openChests: function (range, x, y) {
 		if (!Config.OpenChests) {
 			return false;
 		}
 
+		if (x === undefined || y === undefined) {
+			x = me.x;
+			y = me.y;
+		}
+
 		var i, unit,
-			ids = ["chest", "weaponrack", "armorstand"];
+			list = [],
+			ids = ["chest", "chest3", "weaponrack", "armorstand"];
 
-		for (i = 0; i < ids.length; i += 1) {
-			unit = getUnit(2, ids[i]);
+		unit = getUnit(2);
 
-			if (unit) {
-				do {
-					if ((getDistance(me, unit) <= range) && Misc.openChest(unit)) {
-						Pickit.pickItems();
-					}
-				} while (unit.getNext());
+		if (unit) {
+			do {
+				if (unit.name && getDistance(unit, x, y) <= range && ids.indexOf(unit.name.toLowerCase()) > -1) {
+					list.push(copyUnit(unit));
+				}
+			} while (unit.getNext());
+		}
+
+		while (list.length) {
+			list.sort(Sort.units);
+
+			if (Misc.openChest(list.shift())) {
+				Pickit.pickItems();
 			}
 		}
 
@@ -933,7 +947,7 @@ var Attack = {
 
 		monList.sort(Sort.units);
 
-		if (this.getMonsterCount(me.x, me.y, range, monList) === 0) {
+		if (this.getMonsterCount(me.x, me.y, 15, monList) === 0) {
 			return true;
 		}
 
@@ -948,7 +962,8 @@ var Attack = {
 		}
 
 		function sortGrid(a, b) {
-			return getDistance(a.x, a.y, idealPos.x, idealPos.y) - getDistance(b.x, b.y, idealPos.x, idealPos.y);
+			//return getDistance(a.x, a.y, idealPos.x, idealPos.y) - getDistance(b.x, b.y, idealPos.x, idealPos.y);
+			return getDistance(b.x, b.y, unit.x, unit.y) - getDistance(a.x, a.y, unit.x, unit.y);
 		}
 
 		grid.sort(sortGrid);
@@ -995,7 +1010,7 @@ var Attack = {
 
 		if (fire) {
 			do {
-				if (getDistance(x, y, fire.x, fire.y) <= range) {
+				if (getDistance(x, y, fire.x, fire.y) <= 4) {
 					count += 100;
 				}
 			} while (fire.getNext());
@@ -1165,6 +1180,8 @@ EnchantLoop: // Skip enchanted monsters
 			}
 
 			if (j === tempArray.length) {
+				//print("Skip Enchanted: " + unit.name);
+
 				return false;
 			}
 		}
@@ -1422,7 +1439,7 @@ AuraLoop: // Skip monsters with auras
 
 				for (i = 0; i < coords.length; i += 1) {
 					// Valid position found
-					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, Math.max(0, 2 - n))) {
+					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, 1)) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						if (walk) {

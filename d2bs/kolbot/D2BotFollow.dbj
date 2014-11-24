@@ -45,6 +45,7 @@ var AdvancedConfig = {
 	*/
 
 	// Put your lines under this one. Multiple entries are separated by commas. No comma after the last one.
+
 };
 
 
@@ -59,12 +60,11 @@ include("torchsystem.js");
 include("common/misc.js");
 
 var i, j, gameInfo, joinInfo, gameStart, ingame, handle,
-	connectFail, firstLogin, chatActionsDone, lastGameTick,
+	firstLogin, chatActionsDone, lastGameTick, connectFail,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
 	leader = "",
-	lastGame = [],
-	loginFail = 0;
+	lastGame = [];
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
@@ -210,10 +210,26 @@ function main() {
 		delay(500);
 	}
 
-	if (gameInfo.error === "@error") {
+	if (gameInfo.error) {
+		//D2Bot.retrieve();
+		delay(200);
+
+		if (!!DataFile.getStats().debugInfo) {
+			gameInfo.crashInfo = DataFile.getStats().debugInfo;
+
+			D2Bot.printToConsole("Crash Info: Script: " + JSON.parse(gameInfo.crashInfo).currScript + " Area: " + JSON.parse(gameInfo.crashInfo).area, 10);
+		}
+
+		/*if (gameInfo.crashInfo) {
+			D2Bot.printToConsole("Crash Info: Script: " + gameInfo.crashInfo.currScript + " Area: " + gameInfo.crashInfo.area + (gameInfo.crashInfo.hasOwnProperty("lastAction") ? " " + gameInfo.crashInfo.lastAction : ""), 10);
+		}*/
+
 		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
+
+	//D2Bot.store(JSON.stringify({currScript: "none", area: "out of game"}));
+	DataFile.updateStats("debugInfo", JSON.stringify({currScript: "none", area: "out of game"}));
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -270,8 +286,6 @@ MainSwitch:
 		break;
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
-
-		loginFail = 0;
 
 		if (StarterConfig.JoinChannel !== "") {
 			ControlAction.click(6, 27, 480, 120, 20);
@@ -385,6 +399,8 @@ MainSwitch:
 JoinLoop2:
 		for (i = 0; i < 5; i += 1) {
 			for (j = 0; j < leader.length; j += 1) {
+				joinInfo = false;
+
 				D2Bot.requestGame(leader[j]);
 				delay(100);
 
@@ -392,11 +408,8 @@ JoinLoop2:
 					ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
 					ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
 
-					if (lastGameStatus === "pending" || (gameInfo.error === "@error" && DataFile.getStats().gameName === joinInfo.gameName)) {
-						if (gameInfo.error === "@error") {
-							gameInfo.error = "";
-						}
-
+					if (lastGameStatus === "pending" || (gameInfo.error && DataFile.getStats().gameName === joinInfo.gameName)) {
+						D2Bot.printToConsole("Failed to join game");
 						ControlAction.timeoutDelay("Join Delay", StarterConfig.JoinRetryDelay * 1000, joinCheck, leader[j]);
 						D2Bot.updateRuns();
 						D2Bot.requestGame(leader[j]);
@@ -433,7 +446,7 @@ JoinLoop2:
 
 					lastGame.push(joinInfo.gameName);
 
-					if (lastGame.length > 5) {
+					if (lastGame.length > leader.length) { // Might need a fixed number. Right now it stores 1 game per leader.
 						lastGame.shift();
 					}
 
@@ -478,6 +491,8 @@ JoinLoop2:
 			print(e + " " + getLocation());
 		}
 
+		ControlAction.timeoutDelay("Lobby Delay", 5000);
+
 		break;
 	case 10: // Login Error
 		string = "";
@@ -499,17 +514,22 @@ JoinLoop2:
 
 				break;
 			case getLocaleString(5208):
-				loginFail += 1;
-
-				if (loginFail < 2) {
-					ControlAction.timeoutDelay("Login retry", 3000);
-					ControlAction.click(6, 335, 412, 128, 35);
-
-					break MainSwitch;
-				}
-
 				D2Bot.updateStatus("Invalid Account");
 				D2Bot.printToConsole("Invalid Account");
+
+				break;
+			case getLocaleString(5202): // cd key intended for another product
+			case getLocaleString(10915): // lod key intended for another product
+				D2Bot.updateStatus("Invalid CDKey");
+				D2Bot.printToConsole("Invalid CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
 
 				break;
 			case getLocaleString(5199):
@@ -535,6 +555,13 @@ JoinLoop2:
 				D2Bot.updateStatus("Login Error");
 				D2Bot.printToConsole("Login Error - " + string);
 
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
 				break;
 			}
 		}
@@ -553,13 +580,13 @@ JoinLoop2:
 			ControlAction.timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 6e4);
 
 			connectFail = false;
+		} else {
+			connectFail = true;
 		}
 
 		if (!ControlAction.click(6, 335, 450, 128, 35)) {
 			break;
 		}
-
-		connectFail = true;
 
 		break;
 	case 13: // Realm Down - Character Select screen
@@ -666,12 +693,38 @@ JoinLoop2:
 		break;
 	case 23: // Character Select - Connecting
 	case 42: // Empty character screen
-		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
-			ControlAction.click(6, 33, 572, 128, 35);
+		string = "";
+		text = ControlAction.getText(4, 45, 318, 531, 140);
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+
+			if (string === getLocaleString(11161)) { // CDKey disabled from realm play
+				D2Bot.updateStatus("Realm Disabled CDKey");
+				D2Bot.printToConsole("Realm Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+			}
 		}
 
-		if (gameInfo.rdBlocker) {
-			D2Bot.restart();
+		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
+			ControlAction.click(6, 33, 572, 128, 35);
+
+			if (gameInfo.rdBlocker) {
+				D2Bot.restart();
+			}
 		}
 
 		break;
@@ -709,6 +762,7 @@ JoinLoop2:
 	case 38: // Game is full
 		D2Bot.printToConsole("Game is full");
 		ControlAction.click(6, 652, 469, 120, 20);
+		lastGame.push(joinInfo.gameName);
 
 		lastGameStatus = "ready";
 

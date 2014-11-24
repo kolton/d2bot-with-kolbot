@@ -95,7 +95,7 @@ var CollMap = new function () {
 	};
 
 	this.coordsInRoom = function (x, y, room) {
-		if (x >= room.x * 5 && x < room.x * 5 + room.xsize && y >= room.y * 5 && y < room.y * 5 + room.ysize) {
+		if (room && x >= room.x * 5 && x < room.x * 5 + room.xsize && y >= room.y * 5 && y < room.y * 5 + room.ysize) {
 			return true;
 		}
 

@@ -79,7 +79,6 @@ var gameInfo, gameStart, ingame, chatActionsDone, pingQuit,
 	handle, useChat, firstLogin, connectFail,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
-	loginFail = 0,
 	isUp = "no",
 	chanInfo = {
 		joinChannel: "",
@@ -189,7 +188,11 @@ function ScriptMsgEvent(msg) {
 
 		break;
 	case "muleTorch":
-		AutoMule.torchCheck = true;
+		AutoMule.torchAnniCheck = 1;
+
+		break;
+	case "muleAnni":
+		AutoMule.torchAnniCheck = 2;
 
 		break;
 	case "torch":
@@ -201,7 +204,9 @@ function ScriptMsgEvent(msg) {
 
 		break;
 	case "getMuleMode":
-		if (AutoMule.torchCheck) {
+		if (AutoMule.torchAnniCheck === 2) {
+			scriptBroadcast("2");
+		} else if (AutoMule.torchAnniCheck === 1) {
 			scriptBroadcast("1");
 		} else if (AutoMule.check) {
 			scriptBroadcast("0");
@@ -333,8 +338,6 @@ MainSwitch:
 		if (lastGameStatus === "pending") {
 			gameCount += 1;
 		}
-
-		loginFail = 0;
 
 		if (StarterConfig.PingQuitDelay && pingQuit) {
 			ControlAction.timeoutDelay("Ping Delay", StarterConfig.PingQuitDelay * 1e3);
@@ -548,6 +551,8 @@ MainSwitch:
 
 		// FTJ handler
 		if (lastGameStatus === "pending") {
+			isUp = "no";
+
 			D2Bot.printToConsole("Failed to create game");
 			ControlAction.timeoutDelay("FTJ delay", StarterConfig.FTJDelay * 1e3);
 			D2Bot.updateRuns();
@@ -615,17 +620,22 @@ MainSwitch:
 
 				break;
 			case getLocaleString(5208):
-				loginFail += 1;
-
-				if (loginFail < 2) {
-					ControlAction.timeoutDelay("Login retry", 3000);
-					ControlAction.click(6, 335, 412, 128, 35);
-
-					break MainSwitch;
-				}
-
 				D2Bot.updateStatus("Invalid Account");
 				D2Bot.printToConsole("Invalid Account");
+
+				break;
+			case getLocaleString(5202): // cd key intended for another product
+			case getLocaleString(10915): // lod key intended for another product
+				D2Bot.updateStatus("Invalid CDKey");
+				D2Bot.printToConsole("Invalid CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
 
 				break;
 			case getLocaleString(5199):
@@ -650,6 +660,13 @@ MainSwitch:
 			default:
 				D2Bot.updateStatus("Login Error");
 				D2Bot.printToConsole("Login Error - " + string);
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
 
 				break;
 			}
@@ -782,6 +799,32 @@ MainSwitch:
 		break;
 	case 23: // Character Select - Connecting
 	case 42: // Empty character screen
+		string = "";
+		text = ControlAction.getText(4, 45, 318, 531, 140);
+
+		if (text) {
+			for (i = 0; i < text.length; i += 1) {
+				string += text[i];
+
+				if (i !== text.length - 1) {
+					string += " ";
+				}
+			}
+
+			if (string === getLocaleString(11161)) { // CDKey disabled from realm play
+				D2Bot.updateStatus("Realm Disabled CDKey");
+				D2Bot.printToConsole("Realm Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+			}
+		}
+
 		if (!locationTimeout(StarterConfig.ConnectingTimeout * 1e3, location)) {
 			ControlAction.click(6, 33, 572, 128, 35);
 

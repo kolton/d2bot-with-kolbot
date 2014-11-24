@@ -42,7 +42,7 @@ function DiabloHelper() {
 		var sealPreset = getPresetUnit(108, 2, seal);
 
 		if (!seal) {
-			throw new Error("Seal preset not found. Can't continue.");
+			throw new Error("Seal preset not found. Can't continue");
 		}
 
 		if (sealPreset.roomy * 5 + sealPreset.y === value || sealPreset.roomx * 5 + sealPreset.x === value) {
@@ -294,39 +294,94 @@ function DiabloHelper() {
 	this.starToInfA = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5295, 7919, 5290];
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
 
-	var i, partybaal, areaCheck;
+	var i, party;
 
 	// start
 	Town.doChores();
-	Pather.useWaypoint(107);
-	Precast.doPrecast(true);
-	Pather.useWaypoint(103);
-	Town.move("portalspot");
 
-	for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
-		partybaal = getParty();
+	if (Config.DiabloHelper.SkipIfBaal) {
+AreaInfoLoop:
+		while (true) {
+			me.overhead("Getting party area info");
 
-		if (partybaal) {
+			if (Misc.getPlayerCount() <= 1) {
+				throw new Error("Empty game"); // Alone in game
+			}
+
+			party = getParty();
+
+			if (party) {
+				do {
+					if (party.name !== me.name && party.area) {
+						break AreaInfoLoop; // Can read player area
+					}
+				} while (party.getNext());
+			}
+
+			delay(1000);
+		}
+
+		party = getParty();
+
+		if (party) {
 			do {
-				if (!areaCheck && partybaal.name !== me.name && partybaal.area) {
-					areaCheck = true;
+				if (party.area === 131 || party.area === 132) { // Player is in Throne of Destruction or Worldstone Chamber
+					return false; // End script
 				}
-
-				if (partybaal.area === 131) {
-					return false;
-				}
-			} while (partybaal.getNext());
+			} while (party.getNext());
 		}
-
-		if (areaCheck && Pather.getPortal(108, null) && Pather.usePortal(108, null)) {
-			break;
-		}
-
-		delay(1000);
 	}
 
-	if (i === Config.DiabloHelper.Wait) {
-		throw new Error("No portals to Chaos");
+	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
+	Precast.doPrecast(true);
+
+	if (Config.DiabloHelper.SkipTP) {
+		if (me.area !== 107) {
+			Pather.useWaypoint(107);
+		}
+
+		if (!Pather.moveTo(7790, 5544)) {
+			throw new Error("Failed to move to Chaos Sanctuary");
+		}
+
+		if (!Config.DiabloHelper.Entrance) {
+			Pather.moveTo(7774, 5305);
+		}
+
+CSLoop:
+		for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
+			party = getParty();
+
+			if (party) {
+				do {
+					if (party.name !== me.name && party.area === 108 && (!Config.Leader || party.name === Config.Leader)) {
+						break CSLoop;
+					}
+				} while (party.getNext());
+			}
+
+			Attack.clear(30, 0, false, this.sort);
+			delay(1000);
+		}
+
+		if (i === Config.DiabloHelper.Wait) {
+			throw new Error("Player wait timed out (" + (Config.Leader ? "Leader not" : "No players") + " found in Chaos)");
+		}
+	} else {
+		Pather.useWaypoint(103);
+		Town.move("portalspot");
+
+		for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
+			if (Pather.getPortal(108, Config.Leader || null) && Pather.usePortal(108, Config.Leader || null)) {
+				break;
+			}
+
+			delay(1000);
+		}
+
+		if (i === Config.DiabloHelper.Wait) {
+			throw new Error("Player wait timed out (" + (Config.Leader ? "No leader" : "No player") + " portals found)");
+		}
 	}
 
 	this.initLayout();

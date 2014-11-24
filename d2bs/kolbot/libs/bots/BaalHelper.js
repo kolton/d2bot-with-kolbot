@@ -150,7 +150,7 @@ function BaalHelper() { // experi-mental
 		include("bots/Nihlathak.js");
 
 		try {
-			Nihlathak();
+			Nihlathak.call();
 		} catch (e) {
 			print(e);
 		}
@@ -161,7 +161,7 @@ function BaalHelper() { // experi-mental
 
 		try {
 			Town.goToTown();
-			FastDiablo();
+			FastDiablo.call();
 		} catch (e2) {
 			print(e2);
 		}
@@ -171,14 +171,8 @@ function BaalHelper() { // experi-mental
 
 	Town.goToTown(5);
 	Town.doChores();
-
-	if (Config.RandomPrecast) {
-		Pather.useWaypoint("random");
-		Precast.doPrecast(true);
-	} else {
-		Pather.useWaypoint(129);
-		Precast.doPrecast(true);
-	}
+	Pather.useWaypoint(Config.RandomPrecast ? "random" : 129);
+	Precast.doPrecast(true);
 
 	if (Config.BaalHelper.SkipTP) {
 		if (me.area !== 129) {
@@ -195,7 +189,7 @@ WSKLoop:
 
 			if (party) {
 				do {
-					if (party.area === 131) {
+					if ((!Config.Leader || party.name === Config.Leader) && party.area === 131) {
 						break WSKLoop;
 					}
 				} while (party.getNext());
@@ -205,7 +199,7 @@ WSKLoop:
 		}
 
 		if (i === Config.BaalHelper.Wait) {
-			throw new Error("No players in Throne.");
+			throw new Error("Player wait timed out (" + (Config.Leader ? "Leader not" : "No players") + " found in Throne)");
 		}
 
 		for (i = 0; i < 3; i += 1) {
@@ -230,13 +224,15 @@ WSKLoop:
 			throw new Error("Failed to move to Throne of Destruction.");
 		}
 
-		Pather.moveTo(15113, 5040);
+		if (!Pather.moveTo(15113, 5040)) {
+			D2Bot.printToConsole("path fail");
+		}
 	} else {
 		Pather.useWaypoint(109);
 		Town.move("portalspot");
 
 		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
-			if (Pather.usePortal(131, Config.Leader || null)) {
+			if (Pather.getPortal(131, Config.Leader || null) && Pather.usePortal(131, Config.Leader || null)) {
 				break;
 			}
 
@@ -244,7 +240,7 @@ WSKLoop:
 		}
 
 		if (i === Config.BaalHelper.Wait) {
-			throw new Error("No portals to Throne.");
+			throw new Error("Player wait timed out (" + (Config.Leader ? "No leader" : "No player") + " portals found)");
 		}
 	}
 

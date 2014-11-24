@@ -1,7 +1,7 @@
 /**
 *	@filename	Rusher.js
 *	@author		kolton
-*	@desc		Rusher script. ALPHA VERSION
+*	@desc		Rusher script.
 *				Chat commands:
 *				master - assigns player as master and listens to his commands
 *				release - resets master
@@ -18,8 +18,10 @@ function Rusher() {
 
 	var i, rushThread, command, master, commandSplit0,
 		commands = [],
-		sequence = ["andariel", "cube", "amulet", "staff", "summoner", "duriel", "travincal", "mephisto", "diablo", "ancients", "baal"];
-
+		sequence = [
+			"andariel", "radament", "cube", "amulet", "staff", "summoner", "duriel", "lamesen",
+			"travincal", "mephisto", "izual", "diablo", "shenk", "anya", "ancients", "baal"
+		];
 	rushThread = getScript("tools/rushthread.js");
 
 	this.reloadThread = function () {
@@ -112,7 +114,7 @@ function Rusher() {
 			case "quit":
 				if (nick === master) {
 					say("bye ~");
-					quit();
+					scriptBroadcast("quit");
 				} else {
 					say("I'm only accepting commands from my master.");
 				}

@@ -14,6 +14,12 @@ var Precast = new function () {
 			return true;
 		}
 
+		if (slot === -1) {
+			this.BOSwitch();
+
+			slot = this.haveCTA;
+		}
+
 		var i, tick;
 
 		if (slot === undefined) {
@@ -29,9 +35,9 @@ var Precast = new function () {
 
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 4000) {
+			while (getTickCount() - tick < 2000 + me.ping) {
 				if (me.weaponswitch === slot) {
-					delay(me.ping + 1);
+					//delay(me.ping + 1);
 
 					return true;
 				}

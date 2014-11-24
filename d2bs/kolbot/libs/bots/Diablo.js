@@ -320,8 +320,12 @@ function Diablo() {
 
 	// start
 	Town.doChores();
-	Pather.useWaypoint(107);
+	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
 	Precast.doPrecast(true);
+
+	if (me.area !== 107) {
+		Pather.useWaypoint(107);
+	}
 
 	if (!Pather.moveTo(7790, 5544)) {
 		throw new Error("Failed to move to Chaos Sanctuary");
