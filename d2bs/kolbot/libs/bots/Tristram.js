@@ -5,7 +5,7 @@
 */
 
 function Tristram() {
-	if (!me.getQuest(4, 3)) {
+	if (!me.getQuest(4, 4)) {
 		throw new Error("You don't have the Cain quest");
 	}
 
