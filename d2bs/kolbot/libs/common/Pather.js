@@ -800,7 +800,7 @@ ModeLoop:
 					this.moveToUnit(wp);
 				}
 
-				if (check) {
+				if (check || Config.WaypointMenu) {
 					if (getDistance(me, wp) > 5) {
 						this.moveToUnit(wp);
 					}
@@ -848,6 +848,14 @@ ModeLoop:
 						}
 
 						delay(10);
+					}
+
+					if (!getUIFlag(0x14)) {
+						print("waypoint retry " + (i + 1));
+						this.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
+						Packet.flash(me.gid);
+
+						continue;
 					}
 				}
 
