@@ -10,6 +10,7 @@ function main() {
 		pingTimer = [],
 		quitFlag = false,
 		cloneWalked = false,
+		canQuit = true,
 		timerLastDrink = [];
 
 	include("OOG.js");
@@ -21,6 +22,7 @@ function main() {
 	include("common/Config.js");
 	include("common/Cubing.js");
 	include("common/Pather.js");
+	include("common/Pickit.js");
 	include("common/Prototypes.js");
 	include("common/Runewords.js");
 	include("common/Town.js");
@@ -425,6 +427,10 @@ function main() {
 		var obj;
 
 		switch (msg) {
+		case "toggleQuitlist":
+			canQuit = !canQuit;
+
+			break;
 		case "quit":
 			quitFlag = true;
 
@@ -563,7 +569,7 @@ function main() {
 			quitFlag = true;
 		}
 
-		if (quitFlag) {
+		if (quitFlag && canQuit) {
 			print("ÿc8Run duration ÿc2" + ((getTickCount() - me.gamestarttime) / 1000));
 
 			if (Config.LogExperience) {
