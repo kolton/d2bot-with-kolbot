@@ -416,6 +416,7 @@ function main() {
 		Pather.moveToExit(102, true);
 		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
+		delay(2000);
 		say("1");
 
 		while (!this.playerIn()) {
