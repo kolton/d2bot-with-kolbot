@@ -7,8 +7,9 @@
 function Tristram() {
 	var tree, scroll, akara, stones, gibbet;
 
-	if (!me.getQuest(4, 4)) {
-		if (!me.getQuest(4, 3)) {
+	if (!me.getQuest(4, 4) && !me.getItem(525)) {
+		if (!me.getItem(524)) {
+			// print("We need Scroll of Inifuss");
 			Town.doChores();
 			Pather.useWaypoint(5);
 			Precast.doPrecast(true);
@@ -28,14 +29,13 @@ function Tristram() {
 			Town.goToTown();
 		}
 
-		if (!me.getItem(525)) {
-			Town.move("akara");
+		// print("We need Key to the Cairn Stones");
+		Town.move("akara");
 
-			akara = getUnit(1, "akara");
+		akara = getUnit(1, "akara");
 
-			akara.openMenu();
-			me.cancel();
-		}
+		akara.openMenu();
+		me.cancel();
 	}
 
 	Town.doChores();
@@ -64,6 +64,8 @@ function Tristram() {
 	while (!Pather.usePortal(38)) {
 		Attack.securePosition(me.x, me.y, 10, 1000);
 	}
+
+	Pather.moveTo(me.x, me.y + 6);
 
 	if (Config.Tristram.PortalLeech) {
 		Pather.makePortal();
