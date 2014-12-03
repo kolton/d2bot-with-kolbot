@@ -293,6 +293,7 @@ function ShopBot() {
 
 		switch (name) {
 		case "akara":
+		case "charsi":
 			if (me.inTown) {
 				if (!Town.goToTown(1)) {
 					break;
@@ -303,18 +304,18 @@ function ShopBot() {
 				}
 			}
 
-			npc = this.npcs[name] || getUnit(1, NPC.Akara);
+			npc = this.npcs[name] || getUnit(1, name);
 
 			if (!npc) {
-				Town.move("akara");
+				Town.move(name);
 
-				npc = getUnit(1, NPC.Akara);
+				npc = getUnit(1, name);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Akara);
+				npc = getUnit(1, name);
 			}
 
 			if (!npc) {
@@ -333,7 +334,7 @@ function ShopBot() {
 				wp = getUnit(2, "waypoint");
 				wp = {x: wp.x, y: wp.y};
 
-				Town.move("akara");
+				Town.move(name);
 
 				path = getPath(me.area, npc.x, npc.y, wp.x + 2, wp.y + 2, 0, 8);
 				this.paths[name] = [];

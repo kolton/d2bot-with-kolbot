@@ -232,6 +232,7 @@ function main () {
 			var levels = gainedLevels();
 			
 			if (levels > 0 && canSpendPoints()) {
+				scriptBroadcast("toggleQuitlist");
 				AutoBuild.print("Level up detected (", prevLevel, "-->", me.charlvl, ")");
 				spendSkillPoints();
 				spendStatPoints();
@@ -245,6 +246,8 @@ function main () {
 				// prevLevel doesn't get set to me.charlvl because 
 				// we may have gained multiple levels at once
 				prevLevel += 1;
+
+				scriptBroadcast("toggleQuitlist");
 			}
 			
 			delay(1e3);

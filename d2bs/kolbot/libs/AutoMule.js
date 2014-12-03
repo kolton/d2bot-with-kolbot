@@ -21,7 +21,10 @@ var AutoMule = {
 
 			// Trigger muling at the end of a game if used space in stash and inventory is equal to or more than given percent.
 			usedStashTrigger: 80,
-			usedInventoryTrigger: 80
+			usedInventoryTrigger: 80,
+
+			// Mule items that have been stashed at some point but are no longer in pickit.
+			muleOrphans: true
 		}
 	},
 
@@ -347,6 +350,9 @@ MainLoop:
 
 			if (getTickCount() - tick > timeout) {
 				D2Bot.printToConsole("Mule didn't rejoin. Picking up items.", 9);
+
+				Misc.useItemLog = false; // Don't log items picked back up in town.
+
 				Pickit.pickItems();
 
 				break;
