@@ -114,7 +114,7 @@ var ClassAttack = {
 			if (!this.getHammerPosition(unit)) {
 				print("Can't get to " + unit.name);
 
-				return (unit.spectype & 0x7) ? 1 : 0; // continue attacking a boss monster
+				return 0;
 			}
 
 			if (getDistance(me, unit) > 7 || unit.dead) {
@@ -230,7 +230,7 @@ var ClassAttack = {
 	},
 
 	getHammerPosition: function (unit) {
-		var i, x, y, positions,
+		var i, x, y, positions, check,
 			baseId = getBaseStat("monstats", unit.classid, "baseid"),
 			size = getBaseStat("monstats2", baseId, "sizex");
 
@@ -265,8 +265,13 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < positions.length; i += 1) {
-			if (Attack.validSpot(positions[i][0], positions[i][1])) {
-				if (this.reposition(positions[i][0], positions[i][1])) { // && !checkCollision(me, unit, 0x1)) {
+			check = {
+				x: positions[i][0],
+				y: positions[i][1]
+			};
+			
+			if (Attack.validSpot(check.x, check.y) && !CollMap.checkColl(unit, check, 0x4, 0)) {
+				if (this.reposition(positions[i][0], positions[i][1])) {
 					return true;
 				}
 			}

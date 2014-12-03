@@ -507,8 +507,10 @@ var Town = {
 		if (!tome) {
 			switch (id) {
 			case 519:
+			case "ibk":
 				return 20; // Ignore missing ID tome
 			case 518:
+			case "tbk":
 				return 0; // Force TP tome check
 			}
 		}
@@ -754,8 +756,9 @@ MainLoop:
 			item = list.shift();
 			result = Pickit.checkItem(item);
 
-			if (!Item.autoEquipCheck(item)) {
-				result = 0;
+			// Force ID for unid items matching autoEquip criteria
+			if (result.result === 1 && !item.getFlag(0x10) && Item.hasTier(item)) {
+				result.result = -1;
 			}
 
 			if (result.result === -1) { // unid item that should be identified
@@ -763,6 +766,10 @@ MainLoop:
 				delay(me.ping + 1);
 
 				result = Pickit.checkItem(item);
+
+				if (!Item.autoEquipCheck(item)) {
+					result.result = 0;
+				}
 
 				switch (result.result) {
 				case 0:
@@ -1870,7 +1877,7 @@ MainSwitch:
 
 				switch (result) {
 				case 0: // Drop item
-					if ((getUIFlag(0x0C) || getUIFlag(0x08)) && items[i].getItemCost(1) <= 1) { // Quest items and such
+					if ((getUIFlag(0x0C) || getUIFlag(0x08)) && (items[i].getItemCost(1) <= 1 || items[i].itemType === 39)) { // Quest items and such
 						me.cancel();
 						delay(200);
 					}

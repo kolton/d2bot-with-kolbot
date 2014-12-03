@@ -61,7 +61,7 @@ var Pickit = {
 
 		// If total gold is less than 10k pick up anything worth 10 gold per
 		// square to sell in town.
-		if (rval.result === 0 && Town.ignoredItemTypes.indexOf(unit.itemType) === -1 && me.getStat(14) + me.getStat(15) < Config.LowGold) {
+		if (rval.result === 0 && Town.ignoredItemTypes.indexOf(unit.itemType) === -1 && me.gold < Config.LowGold && unit.itemType !== 39) {
 			// Gold doesn't take up room, just pick it up
 			if (unit.classid === 523) {
 				return {

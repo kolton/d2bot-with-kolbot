@@ -271,6 +271,11 @@ MainSwitch:
 		break;
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
+
+		if (!firstLogin) {
+			firstLogin = true;
+		}
+
 		ControlAction.click(6, 27, 480, 120, 20);
 
 		break;
@@ -472,10 +477,6 @@ MainLoop:
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
 
-		if (!firstLogin) {
-			firstLogin = true;
-		}
-
 		D2Bot.updateStatus("Logging In");
 
 		try {
@@ -526,6 +527,19 @@ MainLoop:
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(10913):
+				D2Bot.updateStatus("Disabled LoD CDKey");
+				D2Bot.printToConsole("Disabled LoD CDKey: " + gameInfo.mpq, 6);
 				D2Bot.CDKeyDisabled();
 
 				if (gameInfo.switchKeys) {

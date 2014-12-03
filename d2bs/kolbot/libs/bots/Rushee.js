@@ -384,7 +384,10 @@ function Rushee() {
 						delay(500);
 					}
 
+					//print(leader.area);
+
 					if (!Config.Rushee.Quester) {
+						//print("not a quester");
 						actions.shift();
 
 						break;
@@ -809,6 +812,11 @@ function Rushee() {
 						actions.shift();
 
 						break;
+					default:
+						Town.move("portalspot");
+						actions.shift();
+
+						break;
 					}
 
 					break;
@@ -919,6 +927,14 @@ function Rushee() {
 					}
 
 					Town.move("portalspot");
+					actions.shift();
+
+					break;
+				case me.name + " quest":
+					say("I am quester.");
+
+					Config.Rushee.Quester = true;
+
 					actions.shift();
 
 					break;

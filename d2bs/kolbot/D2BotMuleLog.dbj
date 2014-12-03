@@ -329,6 +329,19 @@ MainSwitch:
 				}
 
 				break;
+			case getLocaleString(10913):
+				D2Bot.updateStatus("Disabled LoD CDKey");
+				D2Bot.printToConsole("Disabled LoD CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
 			case getLocaleString(5347):
 				D2Bot.updateStatus("Disconnected");
 				D2Bot.printToConsole("Disconnected");
