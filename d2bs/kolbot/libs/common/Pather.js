@@ -303,7 +303,7 @@ var Pather = {
 		var i, tick;
 
 		if (maxRange === undefined) {
-			maxRange = 5
+			maxRange = 5;
 		}
 
 MainLoop:
@@ -530,7 +530,7 @@ ModeLoop:
 			this.moveTo(unit.x + offX, unit.y + offY, 0, clearPath, true);
 		}
 
-		return this.moveTo(unit.x + offX, unit.y + offY, this.useTeleport ? 3 : 0, clearPath, pop);
+		return this.moveTo(unit.x + offX, unit.y + offY, this.useTeleport && unit.type && unit.type === 1 ? 3 : 0, clearPath, pop);
 	},
 
 	/*
@@ -760,7 +760,7 @@ ModeLoop:
 	useWaypoint: function useWaypoint(targetArea, check) {
 		switch (targetArea) {
 		case undefined:
-			throw new Error("useWaypoint: Invalid targetArea parameter");
+			throw new Error("useWaypoint: Invalid targetArea parameter: " + targetArea);
 		case null:
 		case "random":
 			check = true;
@@ -780,9 +780,9 @@ ModeLoop:
 
 		var i, tick, wp;
 
-		while (!me.idle) {
+		/*while (!me.idle) {
 			delay(40);
-		}
+		}*/
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -796,7 +796,7 @@ ModeLoop:
 			wp = getUnit(2, "waypoint");
 
 			if (wp && wp.area === me.area) {
-				if (!me.inTown && getDistance(me, wp) > 5) {
+				if (!me.inTown && getDistance(me, wp) > 7) {
 					this.moveToUnit(wp);
 				}
 
