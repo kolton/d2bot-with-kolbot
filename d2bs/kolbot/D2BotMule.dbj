@@ -77,7 +77,11 @@ function pickItems() {
 		rval = "fail",
 		list = [];
 
-	while (!me.name) { // shit can happen sometimes...
+	while (!me.name || !me.gameReady) {
+		if (!me.ingame) {
+			return rval;
+		}
+
 		delay(100);
 	}
 
@@ -300,6 +304,10 @@ function ingameTimeout(time) {
 			return true;
 		}
 
+		if (getLocation() === 28) { // game doesn't exist, might need more locs
+			break;
+		}
+
 		delay(100);
 	}
 
@@ -453,7 +461,7 @@ function main() {
 					delay(100);
 				}
 
-				print("Delay: " + (getTickCount() - tick));
+				//print("Delay: " + (getTickCount() - tick));
 
 				if (status !== "begin") {
 					D2Bot.printToConsole("Nobody joined - stopping.", 9);
@@ -479,7 +487,7 @@ function main() {
 					//delay(500);
 					D2Bot.stop();
 
-					break;
+					return;
 				// can't fit more items, get to next character or account
 				case "next":
 					MuleLogger.logChar();
@@ -497,6 +505,11 @@ function main() {
 					nextChar();
 					D2Bot.printToConsole("Mule full, getting next character.", 7);
 					quit();
+
+					// TODO: see whether a for loop is better
+					while (me.ingame) {
+						delay(100);
+					}
 
 					break;
 				case "fail":
@@ -524,10 +537,10 @@ function locationAction(location) {
 
 MainSwitch:
 	switch (location) {
-	case 0:
-		break;
 	case 1:
 	case 3:
+		D2Bot.updateStatus("Lobby");
+
 		if (makeNext) {
 			ControlAction.click(6, 693, 490, 80, 20);
 
@@ -663,6 +676,19 @@ MainSwitch:
 			case getLocaleString(5199):
 				D2Bot.updateStatus("Disabled CDKey");
 				D2Bot.printToConsole("Disabled CDKey: " + gameInfo.mpq, 6);
+				D2Bot.CDKeyDisabled();
+
+				if (gameInfo.switchKeys) {
+					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
+					D2Bot.restart(true);
+				} else {
+					D2Bot.stop();
+				}
+
+				break;
+			case getLocaleString(10913):
+				D2Bot.updateStatus("Disabled LoD CDKey");
+				D2Bot.printToConsole("Disabled LoD CDKey: " + gameInfo.mpq, 6);
 				D2Bot.CDKeyDisabled();
 
 				if (gameInfo.switchKeys) {

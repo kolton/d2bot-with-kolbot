@@ -654,7 +654,7 @@ var Item = {
 			return true;
 		}
 
-		var i, j, tier, bodyLoc, tome,
+		var i, j, tier, bodyLoc, tome, gid,
 			items = me.findItems(-1, 0);
 
 		if (!items) {
@@ -705,11 +705,12 @@ var Item = {
 							}
 						}
 
+						gid = items[0].gid;
+
 						print(items[0].name);
 
 						if (this.equip(items[0], bodyLoc[j])) {
-							delay(500);
-							Misc.logItem("Equipped", items[0]);
+							Misc.logItem("Equipped", me.getItem(-1, -1, gid));
 						}
 
 						break;
@@ -1227,8 +1228,10 @@ var Misc = {
 		return tempArray;
 	},
 
+	useItemLog: true, // Might be a bit dirty
+
 	itemLogger: function (action, unit, text) {
-		if (!Config.ItemInfo) {
+		if (!Config.ItemInfo || !this.useItemLog) {
 			return false;
 		}
 
@@ -1273,6 +1276,10 @@ var Misc = {
 
 	// Log kept item stats in the manager.
 	logItem: function (action, unit, keptLine) {
+		if (!this.useItemLog) {
+			return false;
+		}
+
 		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim();
@@ -2253,30 +2260,39 @@ var Messaging = {
 	},
 
 	sendToProfile: function (profileName, mode, message, getResponse) {
-		var response;
+		var i, response;
 
-		function copyDataEvent(mode, msg) {
-			var obj;
+		function copyDataEvent(mode2, msg) {
+			if (mode2 === mode) {
+				var obj;
 
-			try {
-				obj = JSON.parse(msg);
-			} catch (e) {
-				return false;
+				try {
+					obj = JSON.parse(msg);
+				} catch (e) {
+					return false;
+				}
+
+				if (obj.hasOwnProperty("sender") && obj.sender === profileName) {
+					response = Misc.copy(obj);
+				}
+
+				return true;
 			}
 
-			response = Misc.copy(obj);
-
-			return true;
+			return false;
 		}
 
 		if (getResponse) {
 			addEventListener("copydata", copyDataEvent);
 		}
 
-		if (!sendCopyData(null, profileName, mode, JSON.stringify({
-				message: message,
-				sender: me.profile
-			}))) {
+		if (!sendCopyData(null, profileName, mode, JSON.stringify({message: message, sender: me.profile}))) {
+			//print("sendToProfile: failed to get response from " + profileName);
+
+			if (getResponse) {
+				removeEventListener("copydata", copyDataEvent);
+			}
+
 			return false;
 		}
 

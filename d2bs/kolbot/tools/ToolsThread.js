@@ -4,6 +4,30 @@
 *	@desc		several tools to help the player - potion use, chicken, Diablo clone stop, map reveal, quit with player
 */
 
+js_strict(true);
+
+include("json2.js");
+include("NTItemParser.dbl");
+include("OOG.js");
+include("AutoMule.js");
+include("Gambling.js");
+include("CraftingSystem.js");
+include("TorchSystem.js");
+include("MuleLogger.js");
+include("common/Attack.js");
+include("common/Cubing.js");
+include("common/CollMap.js");
+include("common/Config.js");
+include("common/Loader.js");
+include("common/Misc.js");
+include("common/Pickit.js");
+include("common/Pather.js");
+include("common/Precast.js");
+include("common/Prototypes.js");
+include("common/Runewords.js");
+include("common/Storage.js");
+include("common/Town.js");
+
 function main() {
 	var i, mercHP, ironGolem, tick, merc,
 		debugInfo = {area: 0, currScript: "no entry"},
@@ -13,23 +37,14 @@ function main() {
 		canQuit = true,
 		timerLastDrink = [];
 
-	include("OOG.js");
-	include("json2.js");
-	include("automule.js");
-	include("craftingsystem.js");
-	include("common/Attack.js");
-	include("common/CollMap.js");
-	include("common/Config.js");
-	include("common/Cubing.js");
-	include("common/Pather.js");
-	include("common/Pickit.js");
-	include("common/Prototypes.js");
-	include("common/Runewords.js");
-	include("common/Town.js");
-	include("common/Misc.js");
 	print("ÿc3Start ToolsThread script");
 	D2Bot.init();
-	Config.init();
+	Config.init(false);
+	Pickit.init(false);
+	Storage.Init();
+	CraftingSystem.buildLists();
+	Runewords.init();
+	Cubing.init();
 
 	for (i = 0; i < 5; i += 1) {
 		timerLastDrink[i] = 0;
@@ -466,7 +481,7 @@ function main() {
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
 	addEventListener("scriptmsg", this.scriptEvent);
-	addEventListener("gamepacket", Events.gamePacket);
+	//addEventListener("gamepacket", Events.gamePacket);
 
 	// Load Fastmod
 	Packet.changeStat(105, Config.FCR);

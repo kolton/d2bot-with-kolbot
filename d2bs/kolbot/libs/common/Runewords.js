@@ -106,13 +106,22 @@ var Runewords = {
 			return;
 		}
 
-		var i;
+		var i, info, parsedLine;
 
 		this.pickitEntries = [];
 
 		// initiate pickit entries
 		for (i = 0; i < Config.KeepRunewords.length; i += 1) {
-			this.pickitEntries.push(NTIP.ParseLineInt(Config.KeepRunewords[i]));
+			info = {
+				file: "Character Config",
+				line: Config.KeepRunewords[i]
+			};
+
+			parsedLine = NTIP.ParseLineInt(Config.KeepRunewords[i], info);
+
+			if (parsedLine) {
+				this.pickitEntries.push(NTIP.ParseLineInt(Config.KeepRunewords[i], info));
+			}
 		}
 
 		// change text to classid
