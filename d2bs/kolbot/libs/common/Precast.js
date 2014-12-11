@@ -59,6 +59,8 @@ var Precast = new function () {
 		}
 
 		if (this.BOSwitch()) {
+			//Add a condition here that checks if the character already has a Higher level BO (from another party member)
+			//If a higher level BO has not been casted, then proceed with this cast
 			Skill.cast(155, 0); // Battle Command
 			Skill.cast(149, 0); // Battle Orders
 
@@ -99,7 +101,7 @@ var Precast = new function () {
 			break;
 		}
 
-		print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap);
+		print("Ã¿c4PrecastÃ¿c0: Current " + sumCurr + ", Swap " + sumSwap);
 
 		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
 	};
