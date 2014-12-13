@@ -1,6 +1,6 @@
 /**
 *	@filename	Precast.js
-*	@author		D3STROY3R, kolton, dzik
+*	@author		D3STROY3R, kolton
 *	@desc		handle player prebuff sequence
 */
 
@@ -8,6 +8,7 @@ var Precast = new function () {
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;
+	this.BOGain = 0;
 
 	this.weaponSwitch = function (slot) {
 		if (me.gametype === 0) {
@@ -51,6 +52,12 @@ var Precast = new function () {
 
 	this.precastCTA = function (force) {
 		if (!force && me.getState(32)) {
+			return true;
+		}
+		
+		this.BOGain = 0.32 + me.getSkill(149, 1) * 0.03; // 3% per level
+		
+		if (Config.MaxHpBuffer * (1 + (me.getSkill(149, 1) > 0 ? this.BOGain : 0)) < me.maxhp) { // if our bo is lower, stop.
 			return true;
 		}
 
