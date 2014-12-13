@@ -148,6 +148,8 @@ function main() {
 
 	load("tools/ToolsThread.js");
 
+	Config.MaxHpBuffer = me.hpmax;
+
 	if (Config.TownCheck || Config.TownHP || Config.TownMP) {
 		load("tools/TownChicken.js");
 	}
@@ -161,7 +163,7 @@ function main() {
 	}
 
 	if (Config.FastPick) {
-		print("ÿc2Fast pickit active.");
+		print("Ã¿c2Fast pickit active.");
 		addEventListener("itemaction", this.itemEvent);
 	}
 
