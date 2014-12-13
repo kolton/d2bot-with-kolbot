@@ -1,6 +1,6 @@
 /**
 *	@filename	Precast.js
-*	@author		D3STROY3R, kolton
+*	@author		D3STROY3R, kolton, dzik
 *	@desc		handle player prebuff sequence
 */
 
@@ -79,27 +79,45 @@ var Precast = new function () {
 			sumSwap = 0;
 
 		switch (skillId) {
-		case 117: // Holy Shield
-			sumCurr = 0;
-			sumSwap = 0;
-			item = me.getItem();
+			case 52: // Enchant
+				sumCurr = 0;
+				sumSwap = 0;
+				item = me.getItem();
 
-			if (item) {
-				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
+				if (item) {
+					do {
+						if (item.bodylocation === 4 || item.bodylocation === 5) {
+							sumCurr += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
+						}
 
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-				} while (item.getNext());
-			}
+						if (item.bodylocation === 11 || item.bodylocation === 12) {
+							sumSwap += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
+						}
+					} while (item.getNext());
+				}
 
-			break;
+				break;
+			case 117: // Holy Shield
+				sumCurr = 0;
+				sumSwap = 0;
+				item = me.getItem();
+
+				if (item) {
+					do {
+						if (item.bodylocation === 4 || item.bodylocation === 5) {
+							sumCurr += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+						}
+
+						if (item.bodylocation === 11 || item.bodylocation === 12) {
+							sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+						}
+					} while (item.getNext());
+				}
+
+				break;
 		}
 
-		print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap);
+		print("Ë™c4PrecastË™c0: Current " + sumCurr + ", Swap " + sumSwap);
 
 		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
 	};
@@ -419,6 +437,15 @@ MainLoop:
 	this.enchant = function () {
 		var unit,
 			chanted = [];
+			
+		var swapped,
+			slot = this.getBetterSlot(52);
+
+		if (slot !== me.weaponswitch) {
+			swapped = true;
+		}
+
+		this.weaponSwitch(slot);
 
 		// Player
 		unit = getUnit(0);
@@ -443,6 +470,10 @@ MainLoop:
 			} while (unit.getNext());
 		}
 
+		if (swapped) {
+			this.weaponSwitch(Math.abs(slot - 1));
+		}
+		
 		return true;
 	};
 };
