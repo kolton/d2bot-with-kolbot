@@ -345,8 +345,8 @@ function main() {
 			}
 
 			break;
-		case 102:
-			Misc.spy(me.name);
+		case 102: // Numpad 6
+			MuleLogger.logChar();
 
 			break;
 		case 109: // Numpad -

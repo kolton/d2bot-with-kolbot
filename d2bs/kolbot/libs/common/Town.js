@@ -36,7 +36,6 @@ var NPC = {
 var Town = {
 	telekinesis: true,
 	sellTimer: getTickCount(), // shop speedup test
-	beltSize: false,
 
 	tasks: [
 		{Heal: NPC.Akara, Shop: NPC.Akara, Gamble: NPC.Gheed, Repair: NPC.Charsi, Merc: NPC.Kashya, Key: NPC.Akara, CainID: NPC.Cain},
@@ -256,11 +255,7 @@ var Town = {
 				mp: 0
 			};
 
-		if (!this.beltSize) {
-			this.beltSize = Storage.BeltSize();
-		}
-
-		beltSize = this.beltSize;
+		beltSize = Storage.BeltSize();
 		col = this.checkColumns(beltSize);
 
 		// HP/MP Buffer
@@ -941,7 +936,7 @@ CursorLoop:
 
 		items = me.findItems(-1, 0, 3);
 
-		while (items.length > 0) {
+		while (items && items.length > 0) {
 			list.push(items.shift().gid);
 		}
 
@@ -1606,18 +1601,31 @@ MainLoop:
 	},
 
 	getCorpse: function () {
-		var corpse, gid,
+		var i, corpse, gid,
 			corpseList = [],
 			timer = getTickCount();
 
-		corpse = getUnit(0, me.name, 17);
+		// No equipped items - high chance of dying in last game, force retries
+		if (!me.getItem(-1, 1)) {
+			for (i = 0; i < 5; i += 1) {
+				corpse = getUnit(0, me.name, 17);
+
+				if (corpse) {
+					break;
+				}
+
+				delay(500);
+			}
+		} else {
+			corpse = getUnit(0, me.name, 17);
+		}
 
 		if (!corpse) {
 			return true;
 		}
 
 		do {
-			if (getDistance(me.x, me.y, corpse.x, corpse.y) <= 20) {
+			if (corpse.dead && corpse.name === me.name && (getDistance(me.x, me.y, corpse.x, corpse.y) <= 20 || me.inTown)) {
 				corpseList.push(copyUnit(corpse));
 			}
 		} while (corpse.getNext());
@@ -1768,13 +1776,14 @@ MainLoop:
 	},
 
 	clearInventory: function () {
-		var i, col, result,
-			item = me.getItem(-1, 0),
+		var i, col, result, item, beltSize,
 			items = [];
 
 		this.checkQuestItems(); // only golden bird quest for now
 
-		// Handle potions
+		// Return potions to belt
+		item = me.getItem(-1, 0);
+
 		if (item) {
 			do {
 				if (item.location === 3 && [76, 77, 78].indexOf(item.itemType) > -1) {
@@ -1782,11 +1791,8 @@ MainLoop:
 				}
 			} while (item.getNext());
 
-			if (!this.beltSize) {
-				this.beltSize = Storage.BeltSize();
-			}
-
-			col = this.checkColumns(this.beltSize);
+			beltSize = Storage.BeltSize();
+			col = this.checkColumns(beltSize);
 
 			// Sort from HP to RV
 			items.sort(function (a, b) {
@@ -1796,64 +1802,53 @@ MainLoop:
 			while (items.length) {
 				item = items.shift();
 
-MainSwitch:
-				// Redundant but will do for now
-				switch (item.itemType) {
-				case 76:
-					for (i = 0; i < 4; i += 1) {
-						if (Config.BeltColumn[i] === "hp" && col[i] > 0) {
-							clickItem(2, item.x, item.y, item.location); // Return potion to belt
-							delay(me.ping + 200);
-
-							col = this.checkColumns(this.beltSize);
-
-							break MainSwitch;
+				for (i = 0; i < 4; i += 1) {
+					if (item.code.indexOf(Config.BeltColumn[i]) > -1 && col[i] > 0) {
+						if (col[i] === beltSize) { // Pick up the potion and put it in belt if the column is empty
+							if (item.toCursor()) {
+								clickItem(0, i, 0, 2);
+							}
+						} else {
+							clickItem(2, item.x, item.y, item.location); // Shift-click potion
 						}
-					}
 
-					if (!Config.HPBuffer) {
-						item.interact();
 						delay(me.ping + 200);
+
+						col = this.checkColumns(beltSize);
 					}
-
-					break;
-				case 77:
-					for (i = 0; i < 4; i += 1) {
-						if (Config.BeltColumn[i] === "mp" && col[i] > 0) {
-							clickItem(2, item.x, item.y, item.location);
-							delay(me.ping + 200);
-
-							col = this.checkColumns(this.beltSize);
-
-							break MainSwitch;
-						}
-					}
-
-					if (!Config.MPBuffer) {
-						item.interact();
-						delay(me.ping + 200);
-					}
-
-					break;
-				case 78:
-					for (i = 0; i < 4; i += 1) {
-						if (Config.BeltColumn[i] === "rv" && col[i] > 0) {
-							clickItem(2, item.x, item.y, item.location);
-							delay(me.ping + 200);
-
-							col = this.checkColumns(this.beltSize);
-
-							break MainSwitch;
-						}
-					}
-
-					if (!Config.RejuvBuffer) {
-						item.interact();
-						delay(me.ping + 200);
-					}
-
-					break;
 				}
+			}
+		}
+
+		// Cleanup remaining potions
+		item = me.getItem(-1, 0);
+
+		if (item) {
+			items = [
+				[], // array for hp
+				[] // array for mp
+			];
+
+			do {
+				if (item.itemType === 76) {
+					items[0].push(copyUnit(item));
+				}
+
+				if (item.itemType === 77) {
+					items[1].push(copyUnit(item));
+				}
+			} while (item.getNext());
+
+			// Cleanup healing potions
+			while (items[0].length > Config.HPBuffer) {
+				items[0].shift().interact();
+				delay(200 + me.ping);
+			}
+
+			// Cleanup mana potions
+			while (items[1].length > Config.MPBuffer) {
+				items[1].shift().interact();
+				delay(200 + me.ping);
 			}
 		}
 
@@ -1861,8 +1856,27 @@ MainSwitch:
 		items = Storage.Inventory.Compare(Config.Inventory);
 
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if ([18, 41, 78].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or rejuvs
-					items[i].classid !== 549 && // Don't throw cube
+			if ([18, 41, 76, 77, 78].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or potions
+					// Keep some quest items
+					items[i].classid !== 524 && // Scroll of Inifuss
+					items[i].classid !== 525 && // Key to Cairn Stones
+					items[i].classid !== 549 && // Horadric Cube
+					items[i].classid !== 92 && // Staff of Kings
+					items[i].classid !== 521 && // Viper Amulet
+					items[i].classid !== 91 && // Horadric Staff
+					items[i].classid !== 552 && // Book of Skill
+					items[i].classid !== 545 && // Potion of Life
+					items[i].classid !== 546 && // A Jade Figurine
+					items[i].classid !== 547 && // The Golden Bird
+					items[i].classid !== 548 && // Lam Esen's Tome
+					items[i].classid !== 553 && // Khalim's Eye
+					items[i].classid !== 554 && // Khalim's Heart 
+					items[i].classid !== 555 && // Khalim's Brain
+					items[i].classid !== 173 && // Khalim's Flail
+					items[i].classid !== 174 && // Khalim's Will
+					items[i].classid !== 644 && // Malah's Potion
+					items[i].classid !== 646 && // Scroll of Resistance
+					//
 					(items[i].code !== 529 || !!me.findItem(518, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
 					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
 					!Cubing.keepItem(items[i]) && // Don't throw cubing ingredients

@@ -114,7 +114,9 @@ function ScriptMsgEvent(msg) {
 
 		break;
 	case "getMuleMode":
-		if (AutoMule.torchCheck) {
+		if (AutoMule.torchAnniCheck === 2) {
+			scriptBroadcast("2");
+		} else if (AutoMule.torchAnniCheck === 1) {
 			scriptBroadcast("1");
 		} else if (AutoMule.check) {
 			scriptBroadcast("0");
