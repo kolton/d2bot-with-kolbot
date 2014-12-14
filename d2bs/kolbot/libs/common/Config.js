@@ -160,6 +160,7 @@ var Config = {
 	MPBuffer: 0,
 	RejuvBuffer: 0,
 	PickRange: 40,
+	MakeRoom: true,
 	FastPick: false,
 	OpenChests: false,
 	PickitFiles: [],
@@ -236,6 +237,7 @@ var Config = {
 	SummonValkyrie: false,
 
 	// Sorceress specific
+	UseTelekinesis: false,
 	CastStatic: false,
 	StaticList: [],
 

@@ -100,7 +100,7 @@ var ClassAttack = {
 
 		needRepair = Town.needRepair();
 
-		if (needRepair && needRepair.length) { // Repair check, mainly to restock arrows
+		if (needRepair && needRepair.length > 0) { // Repair check, mainly to restock arrows
 			Town.visitTown();
 		}
 

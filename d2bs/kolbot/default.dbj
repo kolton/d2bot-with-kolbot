@@ -129,14 +129,6 @@ function main() {
 		D2Bot.printToConsole("Experience decreased by " + (stats.experience - me.getStat(13)), 9);
 		DataFile.updateStats("deaths");
 		D2Bot.updateDeaths();
-
-		for (i = 0; i < 5; i += 1) {
-			if (getUnit(0, me.name, 17)) {
-				break;
-			}
-
-			delay(500);
-		}
 	}
 
 	DataFile.updateStats(["experience", "name"]);
@@ -144,7 +136,7 @@ function main() {
 	// Load events and threads
 	addEventListener("scriptmsg", this.scriptEvent);
 	addEventListener("copydata", this.copyDataEvent);
-	//addEventListener("gamepacket", Events.gamePacket);
+	addEventListener("gamepacket", Events.gamePacket);
 
 	load("tools/ToolsThread.js");
 

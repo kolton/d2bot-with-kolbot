@@ -48,6 +48,16 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
+	uploadItem: function (itemObj) {
+		var obj = {
+				profile: me.profile,
+				func: "uploadItem",
+				args: [JSON.stringify(itemObj)]
+			};
+
+		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	writeToFile: function (filename, msg) {
 		var obj = {
 			profile: me.profile,
@@ -188,15 +198,19 @@ var D2Bot = {
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
-	stop: function (profile) {
+	stop: function (profile, release) {
 		if (!profile) {
 			profile = me.profile;
+		}
+
+		if (release === undefined) {
+			release = false;
 		}
 
 		var obj = {
 			profile: me.profile,
 			func: "stop",
-			args: [profile]
+			args: [profile, release]
 		};
 
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
