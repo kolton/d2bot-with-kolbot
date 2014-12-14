@@ -58,7 +58,16 @@ var ClassAttack = {
 	},
 
 	afterAttack: function (pickit) {
+		var needRepair;
+
+		Misc.unShift();
 		Precast.doPrecast(false);
+
+		needRepair = Town.needRepair();
+
+		if (needRepair && needRepair.length > 0) { // Repair check
+			Town.visitTown();
+		}
 
 		if (pickit) {
 			this.findItem(me.area === 83 ? 60 : 20);
