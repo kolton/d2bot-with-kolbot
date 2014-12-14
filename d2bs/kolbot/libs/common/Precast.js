@@ -72,7 +72,7 @@ var Precast = new function () {
 
 		return false;
 	};
-	
+
 	this.getBetterSlot = function (skillId) {
 		var item,
 			sumCurr = 0,
@@ -92,6 +92,24 @@ var Precast = new function () {
 
 					if (item.bodylocation === 11 || item.bodylocation === 12) {
 						sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+					}
+				} while (item.getNext());
+			}
+
+			break;
+		case 52: // Enchant
+			sumCurr = 0;
+			sumSwap = 0;
+			item = me.getItem();
+
+			if (item) {
+				do {
+					if (item.bodylocation === 4 || item.bodylocation === 5) {
+						sumCurr += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
+					}
+
+					if (item.bodylocation === 11 || item.bodylocation === 12) {
+						sumSwap += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
 					}
 				} while (item.getNext());
 			}
@@ -417,8 +435,15 @@ MainLoop:
 	};
 
 	this.enchant = function () {
-		var unit,
+		var unit, swapped,
+			slot = this.getBetterSlot(52),
 			chanted = [];
+
+		if (slot !== me.weaponswitch) {
+			swapped = true;
+		}
+
+		this.weaponSwitch(slot);
 
 		// Player
 		unit = getUnit(0);
@@ -441,6 +466,10 @@ MainLoop:
 					Skill.cast(52, 0, unit);
 				}
 			} while (unit.getNext());
+		}
+
+		if (swapped) {
+			this.weaponSwitch(Math.abs(slot - 1));
 		}
 
 		return true;

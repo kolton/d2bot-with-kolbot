@@ -112,6 +112,48 @@ function Diablo() {
 		return false;
 	};
 
+	this.chaosPreattack = function (name, amount) {
+		var i, n, target, positions;
+
+		switch (me.classid) {
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			target = getUnit(1, name);
+
+			if (!target) {
+				return;
+			}
+
+			positions = [[6, 11], [0, 8], [8, -1], [-9, 2], [0, -11], [8, -8]];
+
+			for (i = 0; i < positions.length; i += 1) {
+				if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
+					Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
+					Skill.setSkill(Config.AttackSkill[2], 0);
+
+					for (n = 0; n < amount; n += 1) {
+						Skill.cast(Config.AttackSkill[1], 1);
+					}
+
+					break;
+				}
+			}
+
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
+		}
+	};
+
 	this.getBoss = function (name) {
 		var i, boss,
 			glow = getUnit(2, 131);
@@ -120,6 +162,8 @@ function Diablo() {
 			boss = getUnit(1, name);
 
 			if (boss) {
+				this.chaosPreattack(name, 8);
+
 				return Attack.clear(40, 0, name, this.sort);
 			}
 
@@ -264,21 +308,20 @@ function Diablo() {
 	};
 
 	this.followPath = function (path) {
-		var i,
-			cleared = [];
+		var i;
 
 		for (i = 0; i < path.length; i += 2) {
-			if (cleared.length) {
-				this.clearStrays(cleared);
+			if (this.cleared.length) {
+				this.clearStrays();
 			}
 
-			Pather.moveTo(path[i], path[i + 1]);
+			Pather.moveTo(path[i], path[i + 1], 3, getDistance(me, path[i], path[i + 1]) > 50);
 			Attack.clear(30, 0, false, this.sort);
 
 			// Push cleared positions so they can be checked for strays
-			cleared.push([path[i], path[i + 1]]);
+			this.cleared.push([path[i], path[i + 1]]);
 
-			// After 5 nodes go back 3 nodes to check for monsters
+			// After 5 nodes go back 2 nodes to check for monsters
 			if (i === 10 && path.length > 16) {
 				path = path.slice(6);
 				i = 0;
@@ -286,28 +329,69 @@ function Diablo() {
 		}
 	};
 
-	this.clearStrays = function (cleared) {
-		var i,
-			unit = getUnit(1);
+	this.clearStrays = function () {
+		/*if (!Config.PublicMode) {
+			return false;
+		}*/
 
-		if (unit) {
+		var i,
+			oldPos = {x: me.x, y: me.y},
+			monster = getUnit(1);
+
+		if (monster) {
 			do {
-				if (Attack.checkMonster(unit)) {
-					for (i = 0; i < cleared.length; i += 1) {
-						if (getDistance(unit, cleared[i][0], cleared[i][1]) < 30 && Attack.validSpot(unit.x, unit.y)) {
-							//me.overhead("we got a stray");
-							Pather.moveToUnit(unit);
-							Attack.clear(20, 0, false, this.sort);
+				if (Attack.checkMonster(monster)) {
+					for (i = 0; i < this.cleared.length; i += 1) {
+						if (getDistance(monster, this.cleared[i][0], this.cleared[i][1]) < 30 && Attack.validSpot(monster.x, monster.y)) {
+							me.overhead("we got a stray");
+							Pather.moveToUnit(monster);
+							Attack.clear(15, 0, false, this.sort);
 
 							break;
 						}
 					}
 				}
-			} while (unit.getNext());
+			} while (monster.getNext());
+		}
+
+		if (getDistance(me, oldPos.x, oldPos.y) > 5) {
+			Pather.moveTo(oldPos.x, oldPos.y);
 		}
 
 		return true;
 	};
+
+	this.defendPlayers = function () {
+		var i, player,
+			oldPos = {x: me.x, y: me.y},
+			monster = getUnit(1);
+
+		if (monster) {
+			do {
+				if (Attack.checkMonster(monster)) {
+					player = getUnit(0);
+
+					if (player) {
+						do {
+							if (player.name !== me.name && getDistance(monster, player) < 30) {
+								me.overhead("defending players");
+								Pather.moveToUnit(monster);
+								Attack.clear(15, 0, false, this.sort);
+							}
+						} while (player.getNext());
+					}
+				}
+			} while (monster.getNext());
+		}
+
+		if (getDistance(me, oldPos.x, oldPos.y) > 5) {
+			Pather.moveTo(oldPos.x, oldPos.y);
+		}
+
+		return true;
+	};
+
+	this.cleared = [];
 
 	// path coordinates
 	this.entranceToStar = [7794, 5517, 7791, 5491, 7768, 5459, 7775, 5424, 7817, 5458, 7777, 5408, 7769, 5379, 7777, 5357, 7809, 5359, 7805, 5330, 7780, 5317, 7791, 5293];
@@ -363,7 +447,18 @@ function Diablo() {
 	this.seisSeal();
 	Precast.doPrecast(true);
 	this.infectorSeal();
-	Pather.moveTo(7788, 5292);
+
+	switch (me.classid) {
+	case 1:
+		Pather.moveTo(7792, 5294);
+
+		break;
+	default:
+		Pather.moveTo(7788, 5292);
+
+		break;
+	}
+
 
 	if (Config.PublicMode) {
 		say(Config.Diablo.DiabloMsg);

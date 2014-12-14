@@ -112,13 +112,18 @@ var ClassAttack = {
 			}
 
 			if (!this.getHammerPosition(unit)) {
-				print("Can't get to " + unit.name);
+				//print("Can't get to " + unit.name);
+
+				// Fallback to secondary skill if it exists
+				if (Config.AttackSkill[5] > -1 && Config.AttackSkill[5] !== 112 && Attack.checkResist(unit, Config.AttackSkill[5])) {
+					return this.doCast(unit, Config.AttackSkill[5], Config.AttackSkill[6]);
+				}
 
 				return 0;
 			}
 
-			if (getDistance(me, unit) > 7 || unit.dead) {
-				//print(getDistance(me, unit));
+			if (getDistance(me, unit) > 9 || unit.dead) {
+				print(getDistance(me, unit));
 
 				return 1;
 			}
@@ -130,7 +135,7 @@ var ClassAttack = {
 			for (i = 0; i < 3; i += 1) {
 				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
 
-				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 5 || unit.type === 0) {
+				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 9 || unit.type === 0) {
 					break;
 				}
 			}
@@ -269,7 +274,7 @@ var ClassAttack = {
 				x: positions[i][0],
 				y: positions[i][1]
 			};
-			
+
 			if (Attack.validSpot(check.x, check.y) && !CollMap.checkColl(unit, check, 0x4, 0)) {
 				if (this.reposition(positions[i][0], positions[i][1])) {
 					return true;
