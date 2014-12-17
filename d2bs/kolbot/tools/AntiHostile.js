@@ -90,24 +90,6 @@ function main() {
 		}
 	};
 
-	// Initiate flashing sequence
-	this.startFlash = function (gid) {
-		var script = getScript("tools/FlashThread.js");
-
-		if (script) {
-			script.send("flash " + gid);
-		}
-	};
-
-	// Abort flashing sequence
-	this.stopFlash = function () {
-		var script = getScript("tools/FlashThread.js");
-
-		if (script) {
-			script.send("unflash");
-		}
-	};
-
 	// Find hostile player Units
 	this.findPlayer = function () {
 		var i, player;
@@ -171,11 +153,6 @@ function main() {
 	Config.init();
 	Attack.init();
 	Storage.Init();
-
-	// Load flash thread
-	if (Config.HostileAction > 1) {
-		load("tools/FlashThread.js");
-	}
 
 	// Use PVP range for attacks
 	Skill.usePvpRange = true;
@@ -343,7 +320,6 @@ function main() {
 				}
 
 				this.pause();
-				this.startFlash(player.gid); // might need to be expanded
 
 				Config.UseMerc = false; // Don't go revive the merc mid-fight
 				attackCount = 0;
@@ -398,7 +374,6 @@ function main() {
 
 				Pather.moveTo(prevPos.x, prevPos.y);
 				this.resume();
-				this.stopFlash();
 			}
 		}
 
