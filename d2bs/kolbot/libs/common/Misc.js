@@ -42,7 +42,6 @@ var Skill = {
 		case 154: // War Cry
 			return 4;
 		case 44: // Frost Nova
-		case 151: // Whirlwind
 		case 240: // Twister
 		case 245: // Tornado
 		case 500: // Summoner
@@ -50,6 +49,7 @@ var Skill = {
 		case 38: // Charged Bolt
 			return 6;
 		case 48: // Nova
+		case 151: // Whirlwind
 			return 7;
 		case 92: // Poison Nova
 			return 8;

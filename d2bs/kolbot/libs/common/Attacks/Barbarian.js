@@ -83,8 +83,8 @@ var ClassAttack = {
 
 		switch (attackSkill) {
 		case 151:
-			if (Math.round(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x1)) {
-				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x1)) {
+			if (Math.ceil(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x1)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x1, 2)) {
 					return 0;
 				}
 			}
@@ -134,7 +134,7 @@ var ClassAttack = {
 			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 4 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 4 + unit.y)];
 
 			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1, 1)) {
-				return Skill.cast(151, 0, coords[0], coords[1]);
+				return Skill.cast(151, Skill.getHand(151), coords[0], coords[1]);
 			}
 		}
 
@@ -142,7 +142,7 @@ var ClassAttack = {
 			return false;
 		}
 
-		return Skill.cast(151, 0, me.x, me.y);
+		return Skill.cast(151, Skill.getHand(151), me.x, me.y);
 	},
 
 	checkCloseMonsters: function (range) {
