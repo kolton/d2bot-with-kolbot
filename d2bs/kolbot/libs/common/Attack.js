@@ -1393,20 +1393,22 @@ AuraLoop: // Skip monsters with auras
 			return false;
 		}
 
-		if (distance < 5 && (!unit.hasOwnProperty("mode") || (unit.mode !== 0 && unit.mode !== 12))) {
+		if (walk === true) {
+			walk = 1;
+		}
+
+		if (distance < 4 && (!unit.hasOwnProperty("mode") || (unit.mode !== 0 && unit.mode !== 12))) {
 			//me.overhead("Short range");
 
 			if (walk) {
 				if (getDistance(me, unit) > 8 || checkCollision(me, unit, coll)) {
 					Pather.walkTo(unit.x, unit.y, 3);
 				}
-
-				return true;
+			} else {
+				Pather.moveTo(unit.x, unit.y, 0);
 			}
 
-			Pather.moveTo(unit.x, unit.y, 0);
-
-			return true;
+			return !CollMap.checkColl(me, unit, coll);
 		}
 
 		var n, i, cx, cy, t,
@@ -1442,10 +1444,23 @@ AuraLoop: // Skip monsters with auras
 					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, 1)) {
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
-						if (walk) {
+						switch (walk) {
+						case 1:
 							Pather.walkTo(coords[i].x, coords[i].y, 2);
-						} else {
+
+							break;
+						case 2:
+							if (getDistance(me, coords[i]) < 6 && !CollMap.checkColl(me, coords[i], 0x5)) {
+								Pather.walkTo(coords[i].x, coords[i].y, 2);
+							} else {
+								Pather.moveTo(coords[i].x, coords[i].y, 1);
+							}
+
+							break;
+						default:
 							Pather.moveTo(coords[i].x, coords[i].y, 1);
+
+							break;
 						}
 
 						return true;

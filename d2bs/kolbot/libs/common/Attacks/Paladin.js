@@ -123,7 +123,7 @@ var ClassAttack = {
 			}
 
 			if (getDistance(me, unit) > 9 || unit.dead) {
-				print(getDistance(me, unit));
+				//print(getDistance(me, unit));
 
 				return 1;
 			}

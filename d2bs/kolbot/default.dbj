@@ -136,8 +136,6 @@ function main() {
 	// Load events and threads
 	addEventListener("scriptmsg", this.scriptEvent);
 	addEventListener("copydata", this.copyDataEvent);
-	addEventListener("gamepacket", Events.gamePacket);
-
 	load("tools/ToolsThread.js");
 
 	if (Config.TownCheck || Config.TownHP || Config.TownMP) {

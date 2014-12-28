@@ -7,6 +7,20 @@
 function Diablo() {
 	// Sort function
 	this.sort = function (a, b) {
+		if (Config.BossPriority) {
+			if ((a.spectype & 0x5) && (b.spectype & 0x5)) {
+				return getDistance(me, a) - getDistance(me, b);
+			}
+
+			if (a.spectype & 0x5) {
+				return -1;
+			}
+
+			if (b.spectype & 0x5) {
+				return 1;
+			}
+		}
+
 		// Entrance to Star / De Seis
 		if (me.y > 5325 || me.y < 5260) {
 			if (a.y > b.y) {
@@ -362,7 +376,7 @@ function Diablo() {
 	};
 
 	this.defendPlayers = function () {
-		var i, player,
+		var player,
 			oldPos = {x: me.x, y: me.y},
 			monster = getUnit(1);
 
