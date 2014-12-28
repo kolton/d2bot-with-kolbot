@@ -42,7 +42,6 @@ var Skill = {
 		case 154: // War Cry
 			return 4;
 		case 44: // Frost Nova
-		case 101: // Holy Bolt
 		case 240: // Twister
 		case 245: // Tornado
 		case 500: // Summoner
@@ -50,13 +49,14 @@ var Skill = {
 		case 38: // Charged Bolt
 			return 6;
 		case 48: // Nova
+		case 151: // Whirlwind
 			return 7;
 		case 92: // Poison Nova
 			return 8;
+		case 101: // Holy Bolt
 		case 107: // Charge
 		case 130: // Howl
 		case 132: // Leap
-		case 151: // Whirlwind
 		case 225: // Firestorm
 		case 229: // Molten Boulder
 		case 230: // Arctic Blast
@@ -404,7 +404,7 @@ MainLoop:
 		}
 
 		// Can be cast by both
-		if ([1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
+		if ([0, 1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
 			return true;
 		}
 

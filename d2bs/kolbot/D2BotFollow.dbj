@@ -493,8 +493,6 @@ JoinLoop2:
 			print(e + " " + getLocation());
 		}
 
-		ControlAction.timeoutDelay("Lobby Delay", 5000);
-
 		break;
 	case 10: // Login Error
 		string = "";
