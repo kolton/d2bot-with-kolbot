@@ -7,6 +7,20 @@
 function DiabloHelper() {
 	// Sort function
 	this.sort = function (a, b) {
+		if (Config.BossPriority) {
+			if ((a.spectype & 0x5) && (b.spectype & 0x5)) {
+				return getDistance(me, a) - getDistance(me, b);
+			}
+
+			if (a.spectype & 0x5) {
+				return -1;
+			}
+
+			if (b.spectype & 0x5) {
+				return 1;
+			}
+		}
+
 		// Entrance to Star / De Seis
 		if (me.y > 5325 || me.y < 5260) {
 			if (a.y > b.y) {
@@ -280,10 +294,57 @@ function DiabloHelper() {
 		var i;
 
 		for (i = 0; i < path.length; i += 2) {
-			Pather.moveTo(path[i], path[i + 1]);
+			if (this.cleared.length) {
+				this.clearStrays();
+			}
+
+			Pather.moveTo(path[i], path[i + 1], 3, getDistance(me, path[i], path[i + 1]) > 50);
 			Attack.clear(30, 0, false, this.sort);
+
+			// Push cleared positions so they can be checked for strays
+			this.cleared.push([path[i], path[i + 1]]);
+
+			// After 5 nodes go back 2 nodes to check for monsters
+			if (i === 10 && path.length > 16) {
+				path = path.slice(6);
+				i = 0;
+			}
 		}
 	};
+
+	this.clearStrays = function () {
+		/*if (!Config.PublicMode) {
+			return false;
+		}*/
+
+		var i,
+			oldPos = {x: me.x, y: me.y},
+			monster = getUnit(1);
+
+		if (monster) {
+			do {
+				if (Attack.checkMonster(monster)) {
+					for (i = 0; i < this.cleared.length; i += 1) {
+						if (getDistance(monster, this.cleared[i][0], this.cleared[i][1]) < 30 && Attack.validSpot(monster.x, monster.y)) {
+							me.overhead("we got a stray");
+							Pather.moveToUnit(monster);
+							Attack.clear(15, 0, false, this.sort);
+
+							break;
+						}
+					}
+				}
+			} while (monster.getNext());
+		}
+
+		if (getDistance(me, oldPos.x, oldPos.y) > 5) {
+			Pather.moveTo(oldPos.x, oldPos.y);
+		}
+
+		return true;
+	};
+
+	this.cleared = [];
 
 	// path coordinates
 	this.entranceToStar = [7794, 5517, 7791, 5491, 7768, 5459, 7775, 5424, 7817, 5458, 7777, 5408, 7769, 5379, 7777, 5357, 7809, 5359, 7805, 5330, 7780, 5317, 7774, 5305];
