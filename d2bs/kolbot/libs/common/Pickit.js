@@ -176,6 +176,10 @@ var Pickit = {
 
 	// Check if we can even free up the inventory
 	canMakeRoom: function () {
+		if (!Config.MakeRoom) {
+			return false;
+		}
+
 		var i,
 			items = Storage.Inventory.Compare(Config.Inventory);
 
@@ -212,7 +216,7 @@ var Pickit = {
 			this.name = unit.name;
 			this.color = Pickit.itemColor(unit);
 			this.gold = unit.getStat(14);
-			this.useTk = me.classid === 1 && me.getSkill(43, 1) && (this.type === 4 || this.type === 22 || (this.type > 75 && this.type < 82)) &&
+			this.useTk = Config.UseTelekinesis && me.classid === 1 && me.getSkill(43, 1) && (this.type === 4 || this.type === 22 || (this.type > 75 && this.type < 82)) &&
 						getDistance(me, unit) > 5 && getDistance(me, unit) < 20 && !checkCollision(me, unit, 0x4);
 			this.picked = false;
 		}
@@ -301,6 +305,8 @@ MainLoop:
 
 			// TK failed, disable it
 			stats.useTk = false;
+
+			//print("pick retry");
 		}
 
 		stats.picked = me.itemcount > itemCount || !!me.getItem(-1, -1, gid);

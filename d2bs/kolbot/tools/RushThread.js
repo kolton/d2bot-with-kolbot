@@ -1364,6 +1364,7 @@ MainLoop:
 					this[sequence[current]]();
 				} catch (sequenceError) {
 					say(sequenceError.message);
+					say("2");
 					Town.goToTown();
 				}
 
