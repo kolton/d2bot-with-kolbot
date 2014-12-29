@@ -345,8 +345,8 @@ function main() {
 			}
 
 			break;
-		case 102:
-			Misc.spy(me.name);
+		case 102: // Numpad 6
+			MuleLogger.logChar();
 
 			break;
 		case 109: // Numpad -
@@ -481,7 +481,7 @@ function main() {
 	addEventListener("keyup", this.keyEvent);
 	addEventListener("gameevent", this.gameEvent);
 	addEventListener("scriptmsg", this.scriptEvent);
-	//addEventListener("gamepacket", Events.gamePacket);
+	addEventListener("gamepacket", Events.gamePacket);
 
 	// Load Fastmod
 	Packet.changeStat(105, Config.FCR);

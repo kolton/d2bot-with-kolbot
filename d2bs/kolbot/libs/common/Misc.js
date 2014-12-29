@@ -42,7 +42,6 @@ var Skill = {
 		case 154: // War Cry
 			return 4;
 		case 44: // Frost Nova
-		case 101: // Holy Bolt
 		case 240: // Twister
 		case 245: // Tornado
 		case 500: // Summoner
@@ -50,13 +49,14 @@ var Skill = {
 		case 38: // Charged Bolt
 			return 6;
 		case 48: // Nova
+		case 151: // Whirlwind
 			return 7;
 		case 92: // Poison Nova
 			return 8;
+		case 101: // Holy Bolt
 		case 107: // Charge
 		case 130: // Howl
 		case 132: // Leap
-		case 151: // Whirlwind
 		case 225: // Firestorm
 		case 229: // Molten Boulder
 		case 230: // Arctic Blast
@@ -348,7 +348,10 @@ MainLoop:
 
 	// Put a skill on desired slot
 	setSkill: function (skillId, hand) {
-		var charge;
+		// Check if the skill is already set
+		if (me.getSkill(hand === 0 ? 2 : 3) === skillId) {
+			return true;
+		}
 
 		if (!me.getSkill(skillId, 1)) {
 			return false;
@@ -358,12 +361,7 @@ MainLoop:
 			hand = 0;
 		}
 
-		// Check if the skill is already set
-		if (me.getSkill(hand === 0 ? 2 : 3) === skillId) {
-			return true;
-		}
-
-		charge = this.getCharge(skillId);
+		var charge = this.getCharge(skillId);
 
 		if (!!charge) {
 			// charge.charges is a cached value from Attack.getCharges
@@ -406,7 +404,7 @@ MainLoop:
 		}
 
 		// Can be cast by both
-		if ([1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
+		if ([0, 1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
 			return true;
 		}
 
@@ -2023,7 +2021,7 @@ var Packet = {
 			return true;
 		}
 
-		var i, tick,
+		var i,
 			gamble = mode === "Gamble";
 
 		if (this.openMenu(unit)) {
@@ -2228,11 +2226,29 @@ CursorLoop:
 		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
 	},
 
-	teleWalk: function (wX, wY) {
-		sendPacket(1, 0x5f, 2, wX, 2, wY);
-		delay(200);
-		sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
-		delay(200);
+	teleWalk: function (x, y) {
+		var i, tick, end;
+
+		if (!this.telewalkTick) {
+			this.telewalkTick = 0;
+		}
+
+		if (getDistance(me, x, y) > 10 && getTickCount() - this.telewalkTick > 3000 && Attack.validSpot(x, y)) {
+			for (i = 0; i < 5; i += 1) {
+				sendPacket(1, 0x5f, 2, x + rand(-1, 1), 2, y + rand(-1, 1));
+				delay(me.ping + 1);
+				sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
+				delay(me.ping + 1);
+
+				if (getDistance(me, x, y) < 5) {
+					return true;
+				}
+			}
+
+			this.telewalkTick = getTickCount();
+		}
+
+		return false;
 	},
 
 	flash: function (gid) {
@@ -2260,7 +2276,7 @@ var Messaging = {
 	},
 
 	sendToProfile: function (profileName, mode, message, getResponse) {
-		var i, response;
+		var response;
 
 		function copyDataEvent(mode2, msg) {
 			if (mode2 === mode) {
