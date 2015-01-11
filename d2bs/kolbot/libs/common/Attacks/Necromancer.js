@@ -483,15 +483,17 @@ MainLoop:
 		return false;
 	},
 	
-	checkMonstersNearCorpse: function (range, corpse) {
-		var monster = getUnit(1);
-
-		if (monster) {
+	checkCorpseNearMonster: function (monster,range) {
+		var corpse = getUnit(1, -1, 12);
+		if (range === undefined) { // Assume CorpseExplosion if no range specified
+			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3);
+		}
+		if (corpse) {
 			do {
-				if (Attack.checkMonster(monster) && getDistance(corpse, monster) <= range) {
+				if (getDistance(corpse, monster) <= range) {
 					return true;
 				}
-			} while (monster.getNext());
+			} while (corpse.getNext());
 		}
 		return false;
 	},
