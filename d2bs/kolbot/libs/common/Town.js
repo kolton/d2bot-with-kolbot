@@ -325,7 +325,7 @@ var Town = {
 				pot = this.getPotion(npc, Config.BeltColumn[i]);
 
 				if (pot) {
-					//print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
+					//print("Ã¿c2column Ã¿c0" + i + "Ã¿c2 needs Ã¿c0" + col[i] + " Ã¿c2potions");
 
 					// Shift+buy will trigger if there's no empty columns or if only the current column is empty
 					if (useShift) {
@@ -769,6 +769,12 @@ MainLoop:
 				switch (result.result) {
 				case 0:
 					Misc.itemLogger("Dropped", item, "fieldID");
+					if (Config.DroppedItemsAnnounce && Config.DroppedAnnounceQuality.indexOf(item.quality)  > -1) {
+						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/Ã¿c[0-9!"+<;.*]/, "").trim());
+						if (Config.DroppedItemsLogOOG && Config.DroppedItemsLogOOGQuality.indexOf(item.quality) > -1) {
+							Misc.logItem("Field Dropped", item, result.line);
+						}
+					}
 					item.drop();
 
 					break;
@@ -886,7 +892,7 @@ CursorLoop:
 			return false;
 		}
 
-		print("ÿc4MiniShopBotÿc0: Scanning " + npc.itemcount + " items.");
+		print("Ã¿c4MiniShopBotÃ¿c0: Scanning " + npc.itemcount + " items.");
 
 		do {
 			if (this.ignoredItemTypes.indexOf(item.itemType) === -1) {
@@ -1212,8 +1218,8 @@ CursorLoop:
 						delay(me.ping * 2 + 500);
 
 						if (cubeItems[0].bodylocation === bodyLoc) {
-							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
-							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
+							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/Ã¿c[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
+							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/Ã¿c[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
 
 							return true;
 						}
@@ -1328,7 +1334,7 @@ CursorLoop:
 				repairAction.push("repair");
 			}
 		} else {
-			print("ÿc4Town: ÿc1Can't afford repairs.");
+			print("Ã¿c4Town: Ã¿c1Can't afford repairs.");
 		}
 
 		return repairAction;
