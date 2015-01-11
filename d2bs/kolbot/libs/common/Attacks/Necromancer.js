@@ -433,7 +433,7 @@ MainLoop:
 					if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
 						me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
 						if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
-							delay(200);
+							delay(me.ping + 1);
 						}
 					}
 				} while (corpse.getNext() && this.checkMonstersNearCorpse(range,corpse));
