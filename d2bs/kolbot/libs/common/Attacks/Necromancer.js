@@ -430,7 +430,7 @@ MainLoop:
 			if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
 				// We don't need corpses as we are not a Summoner Necro, Spam CE to our hearts content.
 				do {
-					if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
+					if (this.checkCorpse(corpse)) {
 						me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
 						if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
 							delay(me.ping + 1);
