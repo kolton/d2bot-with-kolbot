@@ -427,30 +427,57 @@ MainLoop:
 			corpse = getUnit(1, -1, 12);
 
 		if (corpse) {
-			do {
-				if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
-					corpseList.push(copyUnit(corpse));
+			if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
+				// We don't need corpses as we are not a Summoner Necro, Spam CE to our hearts content.
+				do {
+					if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
+						me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
+						if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
+							delay(200);
+						}
+					}
+				} while (corpse.getNext() && this.checkMonstersNearCorpse(range,corpse));
+			} else {
+				// We are Summoner Necro, we should conserve corpses
+				do {
+					if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
+						corpseList.push(copyUnit(corpse));
 
-					if (corpseList.length >= 2) { // Explode 2 corpses per cycle, so we can leave some for summoning
-						break;
+						if (corpseList.length >= 2) { // Explode 2 corpses per cycle, so we can leave some for summoning
+							break;
+						}
+					}
+				} while (corpse.getNext());
+
+				while (corpseList.length > 0) {
+					corpse = corpseList.shift();
+
+					me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
+
+					if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
+						delay(200);
 					}
 				}
-			} while (corpse.getNext());
-		}
-
-		while (corpseList.length > 0) {
-			corpse = corpseList.shift();
-
-			me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
-
-			if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
-				delay(200);
 			}
 		}
-
+		
 		return true;
 	},
+	
+	checkMonstersNearCorpse: function (range, corpse) {
+		var monster = getUnit(1);
 
+		if (monster) {
+			do {
+				if (getDistance(corpse, monster) <= range) {
+					return true;
+				}
+			} while (monster.getNext());
+		}
+		
+		return false;
+	},
+	
 	checkCorpse: function (unit, revive) {
 		if (unit.mode !== 12) {
 			return false;
