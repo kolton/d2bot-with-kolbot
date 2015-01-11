@@ -249,6 +249,11 @@ var ClassAttack = {
 					}
 				}
 
+				// Make use of every corpse since were not a summoner necro
+				if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
+					if (this.checkCorpseNearMonster(unit)) this.explodeCorpses(unit);
+				}
+				
 				if (!unit.dead) {
 					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
 				}
@@ -475,6 +480,19 @@ MainLoop:
 			} while (monster.getNext());
 		}
 		
+		return false;
+	},
+	
+	checkMonstersNearCorpse: function (range, corpse) {
+		var monster = getUnit(1);
+
+		if (monster) {
+			do {
+				if (Attack.checkMonster(monster) && getDistance(corpse, monster) <= range) {
+					return true;
+				}
+			} while (monster.getNext());
+		}
 		return false;
 	},
 	
