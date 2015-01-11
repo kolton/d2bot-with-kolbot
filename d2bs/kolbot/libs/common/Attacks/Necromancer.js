@@ -469,7 +469,7 @@ MainLoop:
 
 		if (monster) {
 			do {
-				if (getDistance(corpse, monster) <= range) {
+				if (Attack.checkMonster(monster) && getDistance(corpse, monster) <= range) {
 					return true;
 				}
 			} while (monster.getNext());
