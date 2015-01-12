@@ -209,6 +209,13 @@ var ClassAttack = {
 			return 2;
 		}
 
+		// Check for bodies to exploit for CorpseExplosion before committing to an attack for non-summoner type necros
+		if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
+			if (this.checkCorpseNearMonster(unit)) {
+				this.explodeCorpses(unit);
+			}
+		}	
+		
 		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
 			switch (timedSkill) {
 			case 92: // Poison Nova
@@ -249,13 +256,6 @@ var ClassAttack = {
 					}
 				}
 				
-				// Make use of every corpse since were not a summoner necro
-				if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
-					if (this.checkCorpseNearMonster(unit)) {
-						this.explodeCorpses(unit);
-					}
-				}
-				
 				if (!unit.dead) {
 					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
 				}
@@ -283,8 +283,8 @@ var ClassAttack = {
 			}
 
 			return 1;
-		}
-
+		}	
+		
 		for (i = 0; i < 25; i += 1) {
 			if (!me.getState(121)) {
 				break;
