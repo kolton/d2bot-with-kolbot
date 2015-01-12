@@ -248,16 +248,18 @@ var ClassAttack = {
 						return 0;
 					}
 				}
-
+				
 				// Make use of every corpse since were not a summoner necro
 				if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
-					if (this.checkCorpseNearMonster(unit)) this.explodeCorpses(unit);
+					if (this.checkCorpseNearMonster(unit)) {
+						this.explodeCorpses(unit);
+					}
 				}
 				
 				if (!unit.dead) {
 					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
 				}
-
+				
 				break;
 			}
 		}
@@ -430,20 +432,20 @@ MainLoop:
 		var corpseList = [],
 			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3),
 			corpse = getUnit(1, -1, 12);
-
+			
 		if (corpse) {
 			if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
-				// We don't need corpses as we are not a Summoner Necro, Spam CE to our hearts content.
+				// We don't need corpses as we are not a Summoner Necro, Spam CE till monster dies or we run out of bodies.
 				do {
-					if (this.checkCorpse(corpse)) {
-						me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
+					if (!unit.dead && this.checkCorpse(corpse) && getDistance(corpse, unit) <= range) {
+						me.overhead("Exploding: " + corpse.classid + " " + corpse.name + " id:" + corpse.gid); // Added corpse ID so I can see when it blows another monster with the same ClassID and Name
 						if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
 							delay(me.ping + 1);
 						}
 					}
-				} while (corpse.getNext() && this.checkMonstersNearCorpse(range,corpse));
+				} while (corpse.getNext());
 			} else {
-				// We are Summoner Necro, we should conserve corpses
+				// We are a Summoner Necro, we should conserve corpses, only blow 2 at a time so we can check for needed re-summons.
 				do {
 					if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
 						corpseList.push(copyUnit(corpse));
@@ -464,23 +466,10 @@ MainLoop:
 					}
 				}
 			}
+			
 		}
 		
 		return true;
-	},
-	
-	checkMonstersNearCorpse: function (range, corpse) {
-		var monster = getUnit(1);
-
-		if (monster) {
-			do {
-				if (Attack.checkMonster(monster) && getDistance(corpse, monster) <= range) {
-					return true;
-				}
-			} while (monster.getNext());
-		}
-		
-		return false;
 	},
 	
 	checkCorpseNearMonster: function (monster,range) {
