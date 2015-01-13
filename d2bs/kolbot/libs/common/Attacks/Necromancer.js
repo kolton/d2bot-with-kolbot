@@ -209,6 +209,13 @@ var ClassAttack = {
 			return 2;
 		}
 
+		// Check for bodies to exploit for CorpseExplosion before committing to an attack for non-summoner type necros
+		if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
+			if (this.checkCorpseNearMonster(unit)) {
+				this.explodeCorpses(unit);
+			}
+		}	
+		
 		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
 			switch (timedSkill) {
 			case 92: // Poison Nova
@@ -248,11 +255,11 @@ var ClassAttack = {
 						return 0;
 					}
 				}
-
+				
 				if (!unit.dead) {
 					Skill.cast(timedSkill, Skill.getHand(timedSkill), unit);
 				}
-
+				
 				break;
 			}
 		}
@@ -276,8 +283,8 @@ var ClassAttack = {
 			}
 
 			return 1;
-		}
-
+		}	
+		
 		for (i = 0; i < 25; i += 1) {
 			if (!me.getState(121)) {
 				break;
@@ -422,35 +429,71 @@ MainLoop:
 			return false;
 		}
 
-		var corpseList = [],
+		var corpseList = [], i,
 			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3),
 			corpse = getUnit(1, -1, 12);
-
+			
 		if (corpse) {
 			do {
 				if (getDistance(unit, corpse) <= range && this.checkCorpse(corpse)) {
 					corpseList.push(copyUnit(corpse));
-
-					if (corpseList.length >= 2) { // Explode 2 corpses per cycle, so we can leave some for summoning
+				}
+			} while (corpse.getNext());
+				
+			//Shuffle the corpseList so if running multiple necrobots they explode separate corpses not the same ones
+			if (corpseList.length > 1) {
+				corpseList = corpseList.shuffle();
+			}
+		
+			if (Config.Skeletons+Config.SkeletonMages+Config.Revives === 0) {
+				// We don't need corpses as we are not a Summoner Necro, Spam CE till monster dies or we run out of bodies.
+				do {
+					corpse = corpseList.shift();
+					if (corpse) {
+						if (!unit.dead && this.checkCorpse(corpse) && getDistance(corpse, unit) <= range) {
+							me.overhead("Exploding: " + corpse.classid + " " + corpse.name + " id:" + corpse.gid); // Added corpse ID so I can see when it blows another monster with the same ClassID and Name
+							if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
+								delay(me.ping + 1);
+							}
+						}
+					}
+				} while (corpseList.length > 0);
+			} else {
+				// We are a Summoner Necro, we should conserve corpses, only blow 2 at a time so we can check for needed re-summons.
+				for (i = 0; i <= 1; i++) {
+					if (corpseList.length > 0) {
+						corpse = corpseList.shift();
+						if (corpse) {
+							me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
+							if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
+								delay(200);
+							}
+						}
+					} else {
 						break;
 					}
 				}
-			} while (corpse.getNext());
-		}
-
-		while (corpseList.length > 0) {
-			corpse = corpseList.shift();
-
-			me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
-
-			if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
-				delay(200);
 			}
 		}
-
+		
 		return true;
 	},
-
+	
+	checkCorpseNearMonster: function (monster,range) {
+		var corpse = getUnit(1, -1, 12);
+		if (range === undefined) { // Assume CorpseExplosion if no range specified
+			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3);
+		}
+		if (corpse) {
+			do {
+				if (getDistance(corpse, monster) <= range) {
+					return true;
+				}
+			} while (corpse.getNext());
+		}
+		return false;
+	},
+	
 	checkCorpse: function (unit, revive) {
 		if (unit.mode !== 12) {
 			return false;
