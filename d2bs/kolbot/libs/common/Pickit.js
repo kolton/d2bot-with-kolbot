@@ -321,9 +321,15 @@ MainLoop:
 				if (this.ignoreLog.indexOf(stats.type) === -1) {
 					Misc.itemLogger("Kept", item);
 
-					if (["pk1", "pk2", "pk3"].indexOf(item.code) === -1 || TorchSystem.LogKeys) {
-						Misc.logItem("Kept", item, keptLine);
+					if (["pk1", "pk2", "pk3"].indexOf(item.code) > -1 && !TorchSystem.LogKeys) {
+						break;
 					}
+					
+					if (["dhn", "bey", "mbr"].indexOf(item.code) > -1 && !TorchSystem.LogOrgans) {
+						break;	
+					}
+					
+					Misc.logItem("Kept", item, keptLine);
 				}
 
 				break;
