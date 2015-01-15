@@ -137,10 +137,12 @@ var Config = {
 	LowGold: 0,
 	StashGold: 0,
 	FieldID: false,
-	DroppedItemsAnnounce: false,
-	DroppedAnnounceQuality: [],
-	DroppedItemsLogOOG: false,
-	DroppedItemsLogOOGQuality: [],
+	DroppedItemsAnnounce: {
+		Enable: false,
+		Quality: [],
+		LogToOOG: false,
+		OOGQuality: []
+	},
 	CainID: {
 		Enable: false,
 		MinGold: 0,
