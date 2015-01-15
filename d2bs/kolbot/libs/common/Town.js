@@ -769,9 +769,9 @@ MainLoop:
 				switch (result.result) {
 				case 0:
 					Misc.itemLogger("Dropped", item, "fieldID");
-					if (Config.DroppedItemsAnnounce && Config.DroppedAnnounceQuality.indexOf(item.quality)  > -1) {
+					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality)  > -1) {
 						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim());
-						if (Config.DroppedItemsLogOOG && Config.DroppedItemsLogOOGQuality.indexOf(item.quality) > -1) {
+						if (Config.DroppedItemsAnnounce.LogToOOG && Config.DroppedItemsAnnounce.OOGQuality.indexOf(item.quality) > -1) {
 							Misc.logItem("Field Dropped", item, result.line);
 						}
 					}
