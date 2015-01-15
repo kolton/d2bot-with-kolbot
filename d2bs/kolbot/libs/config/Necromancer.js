@@ -291,6 +291,10 @@ function LoadConfig() {
 	Config.CainID.MinGold = 2500000; // Minimum gold (stash + character) to have in order to use Cain.
 	Config.CainID.MinUnids = 3; // Minimum number of unid items in order to use Cain.
 	Config.FieldID = false; // Identify items in the field instead of going to town.
+	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
+	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce
+	Config.DroppedItemsAnnounce.LogToOOG = false; // Show Field Dropped items in OOG Item Viewer Log
+	Config.DroppedItemsAnnounce.OOGQuality = []; // Quality of item to show in OOG Item Viewer Log
 
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
