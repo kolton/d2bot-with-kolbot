@@ -288,7 +288,7 @@ var ClassAttack = {
 	reposition: function (x, y) {
 		var i;
 
-		if (getDistance(me, x, y) > 0) {
+		if (Math.round(getDistance(me, x, y) > 0)) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
 				if (getDistance(me, x, y) > 40) {
 					Pather.moveTo(x, y);
@@ -296,11 +296,8 @@ var ClassAttack = {
 					Pather.teleportTo(x, y, 3);
 				}
 			} else {
-				if (Config.Vigor) {
-					Skill.setSkill(115, 0);
-				}
-
-				me.move(x, y);
+				Misc.click(0, 0, x, y);
+				delay(200);
 			}
 		}
 

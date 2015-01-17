@@ -27,17 +27,13 @@ include("common/Town.js");
 
 function main() {
 	// Variables and functions
-	var player, findTrigger, attackCount, prevPos, check, missile,
+	var player, attackCount, prevPos, check, missile,
 		charClass = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 		hostiles = [];
 
 	// AntiHostile gets game event info from ToolsThread
 	this.scriptEvent = function (msg) {
 		switch (msg.split(" ")[0]) {
-		case "findHostiles": // Scan for hostile players
-			findTrigger = true;
-
-			break;
 		case "remove": // Remove a hostile player that left the game
 			if (hostiles.indexOf(msg.split(" ")[1]) > -1) {
 				hostiles.splice(hostiles.indexOf(msg.split(" ")[1]), 1);
@@ -189,17 +185,12 @@ function main() {
 
 	addEventListener("scriptmsg", this.scriptEvent);
 	print("ÿc2Anti-Hostile thread loaded.");
-	this.findHostiles();
 
 	// Main Loop
 	while (true) {
 		if (me.gameReady) {
 			// Scan for hostiles
-			if (findTrigger) {
-				this.findHostiles();
-
-				findTrigger = false;
-			}
+			this.findHostiles();
 
 			if (hostiles.length > 0 && (Config.HostileAction === 0 || (Config.HostileAction === 1 && me.inTown))) {
 				if (Config.TownOnHostile) {

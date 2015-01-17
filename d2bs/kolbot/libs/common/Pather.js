@@ -32,20 +32,15 @@ var NodeAction = {
 		if ((typeof Config.ClearPath === "number" || typeof Config.ClearPath === "object") && arg.clearPath === false) {
 			switch (typeof Config.ClearPath) {
 			case "number":
-				monList = Attack.getMob(-1, Config.ClearPath, 30);
+				Attack.clear(30, Config.ClearPath);
 
 				break;
 			case "object":
 				if (!Config.ClearPath.hasOwnProperty("Areas") || Config.ClearPath.Areas.length === 0 || Config.ClearPath.Areas.indexOf(me.area) > -1) {
-					//monList = Attack.getMob(-1, Config.ClearPath.Spectype, Config.ClearPath.Range);
 					Attack.clear(Config.ClearPath.Range, Config.ClearPath.Spectype);
 				}
 
 				break;
-			}
-
-			if (monList) {
-				Attack.clearList(monList);
 			}
 		}
 
@@ -229,7 +224,7 @@ var Pather = {
 					}
 				}
 
-				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, fail > 0 ? 2 : 4)) {
+				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, (fail > 0 || me.inTown) ? 2 : 4)) {
 					if (!me.inTown) {
 						if (this.recursion) {
 							this.recursion = false;
@@ -322,7 +317,7 @@ MainLoop:
 					return true;
 				}
 
-				delay(40);
+				delay(10);
 			}
 		}
 
@@ -358,7 +353,7 @@ MainLoop:
 				me.runwalk = 1;
 			}
 
-			if (me.classid === 3 && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
+			if (Config.Charge && me.classid === 3 && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
 				if (Config.Vigor) {
 					Skill.setSkill(115, 0);
 				}
@@ -385,7 +380,6 @@ MainLoop:
 			}
 
 			Misc.click(0, 0, x, y);
-			//me.move(x, y);
 
 			attemptCount += 1;
 			nTimer = getTickCount();
@@ -429,19 +423,17 @@ ModeLoop:
 					break ModeLoop;
 				}
 
-				delay(40);
+				delay(10);
 			}
 
 			// Wait until we're done walking - idle or dead
 			while (getDistance(me.x, me.y, x, y) > minDist && me.mode !== 1 && me.mode !== 5 && !me.dead) {
-				delay(40);
+				delay(10);
 			}
 
 			if (attemptCount >= 3) {
 				return false;
 			}
-
-			delay(5);
 		}
 
 		return !me.dead && getDistance(me.x, me.y, x, y) <= minDist;
@@ -780,10 +772,6 @@ ModeLoop:
 
 		var i, tick, wp;
 
-		/*while (!me.idle) {
-			delay(40);
-		}*/
-
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
 				break;
@@ -887,7 +875,7 @@ ModeLoop:
 				Packet.flash(me.gid);
 			}
 
-			delay(me.ping + 1);
+			delay(200 + me.ping);
 		}
 
 		if (me.area === targetArea) {
@@ -906,44 +894,41 @@ ModeLoop:
 			return true;
 		}
 
-		var i, portal, oldPortal, oldGid, tick,
-			tpTome = me.findItem("tbk", 0, 3);
-
-		if (!tpTome) {
-			throw new Error("makePortal: No TP tomes.");
-		}
-
-		if (!tpTome.getStat(70)) {
-			throw new Error("makePortal: No scrolls.");
-		}
-
-		/* Check for old portal
-			- Because this function is fast, if there's player's portal already nearby, it's possible it will try to use that one without this check.
-		*/
-		oldPortal = getUnit(2, "portal");
-
-		if (oldPortal) {
-			do {
-				if (oldPortal.getParent() === me.name) {
-					oldGid = oldPortal.gid;
-
-					break;
-				}
-			} while (oldPortal.getNext());
-		}
+		var i, portal, oldPortal, oldGid, tick, tpTome;
 
 		for (i = 0; i < 5; i += 1) {
 			if (me.dead) {
 				break;
 			}
 
-			Packet.flash(me.gid);
+			tpTome = me.findItem("tbk", 0, 3);
+
+			if (!tpTome) {
+				throw new Error("makePortal: No TP tomes.");
+			}
+
+			if (!tpTome.getStat(70)) {
+				throw new Error("makePortal: No scrolls.");
+			}
+
+			oldPortal = getUnit(2, "portal");
+
+			if (oldPortal) {
+				do {
+					if (oldPortal.getParent() === me.name) {
+						oldGid = oldPortal.gid;
+
+						break;
+					}
+				} while (oldPortal.getNext());
+			}
+
 			tpTome.interact();
 
 			tick = getTickCount();
 
 MainLoop:
-			while (getTickCount() - tick < 2000) {
+			while (getTickCount() - tick < Math.max(500 + i * 100, me.ping * 2 + 100)) {
 				portal = getUnit(2, "portal");
 
 				if (portal) {
@@ -956,16 +941,17 @@ MainLoop:
 
 								break MainLoop; // don't spam usePortal
 							} else {
-								return portal;
+								return copyUnit(portal);
 							}
 						}
 					} while (portal.getNext());
 				}
 
-				delay(50);
+				delay(10);
 			}
 
-			delay(250);
+			Packet.flash(me.gid);
+			delay(200 + me.ping);
 		}
 
 		return false;
@@ -978,6 +964,10 @@ MainLoop:
 		unit - use existing portal unit
 	*/
 	usePortal: function (targetArea, owner, unit) {
+		if (targetArea && me.area === targetArea) {
+			return true;
+		}
+
 		me.cancel();
 
 		var i, tick, portal, useTK,
@@ -1007,7 +997,7 @@ MainLoop:
 
 						Skill.cast(43, 0, portal);
 					} else {
-						if (getDistance(me, portal) > (i > 3 ? 3 : 6)) {
+						if (getDistance(me, portal) > 5) {
 							this.moveToUnit(portal);
 						}
 
@@ -1019,7 +1009,7 @@ MainLoop:
 					}
 				}
 
-				if (portal.mode !== 2 && portal.classid === 298) { // Arcane Sanctuary
+				if (portal.classid === 298 && portal.mode !== 2) { // Portal to/from Arcane
 					Misc.click(0, 0, portal);
 
 					tick = getTickCount();
@@ -1054,7 +1044,7 @@ MainLoop:
 				Packet.flash(me.gid);
 			}
 
-			delay(me.ping + 1);
+			delay(200 + me.ping);
 		}
 
 		return targetArea ? me.area === targetArea : me.area !== preArea;

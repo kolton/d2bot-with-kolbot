@@ -115,7 +115,7 @@ var ClassAttack = {
 		case 1: // Success
 			return true;
 		case 2: // Try to telestomp
-			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc() && Attack.validSpot(unit.x, unit.y)) {
 				while (Attack.checkMonster(unit)) {
 					if (getDistance(me, unit) > 3) {
 						Pather.moveToUnit(unit);

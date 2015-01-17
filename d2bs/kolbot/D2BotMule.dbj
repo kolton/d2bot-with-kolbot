@@ -396,6 +396,13 @@ function main() {
 		delay(500);
 	}
 
+	if (gameInfo.rdBlocker) {
+		D2Bot.printToConsole("You must disable RD Blocker for Mule Logger to work properly. Stopping.");
+		D2Bot.stop(me.profile, true);
+
+		return;
+	}
+
 	D2Bot.updateRuns(); // we need the mule to swap keys somehow after all
 	delay(1000);
 
@@ -465,7 +472,7 @@ function main() {
 
 				if (status !== "begin") {
 					D2Bot.printToConsole("Nobody joined - stopping.", 9);
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 				}
 
 				me.overhead("begin");
@@ -485,7 +492,7 @@ function main() {
 					D2Bot.printToConsole("Done muling.", 7);
 					sendCopyData(null, master, 10, JSON.stringify({status: "quit"}));
 					//delay(500);
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 
 					return;
 				// can't fit more items, get to next character or account
@@ -669,7 +676,7 @@ MainSwitch:
 					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 				}
 
 				break;
@@ -682,7 +689,7 @@ MainSwitch:
 					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 				}
 
 				break;
@@ -695,7 +702,7 @@ MainSwitch:
 					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 				}
 
 				break;
@@ -713,7 +720,7 @@ MainSwitch:
 					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 				}
 
 				break;
@@ -799,7 +806,7 @@ MainSwitch:
 					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
-					D2Bot.stop();
+					D2Bot.stop(me.profile, true);
 				}
 			}
 		}

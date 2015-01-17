@@ -305,6 +305,12 @@ var MuleLogger = {
 			return;
 		}
 
+		function itemSort(a, b) {
+			return b.itemType - a.itemType;
+		}
+
+		items.sort(itemSort);
+
 		for (i = 0; i < items.length; i += 1) {
 			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
 				parsedItem = this.logItem(items[i], logIlvl);

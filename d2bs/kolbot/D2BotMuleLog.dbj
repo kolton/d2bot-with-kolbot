@@ -118,12 +118,27 @@ function main() {
 		delay(500);
 	}
 
+	if (gameInfo.rdBlocker) {
+		D2Bot.printToConsole("You must disable RD Blocker for Mule Logger to work properly. Stopping.");
+		D2Bot.stop();
+
+		return;
+	}
+
 	parseInfo();
 
-	if (gameInfo.error === "@error") {
-		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
+	if (gameInfo.error) {
+		if (!!DataFile.getStats().debugInfo) {
+			gameInfo.crashInfo = DataFile.getStats().debugInfo;
+
+			D2Bot.printToConsole("Crash Info: Script: " + JSON.parse(gameInfo.crashInfo).currScript + " Area: " + JSON.parse(gameInfo.crashInfo).area, 10);
+		}
+
+		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
+
+	DataFile.updateStats("debugInfo", JSON.stringify({currScript: "none", area: "out of game"}));
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
