@@ -125,6 +125,7 @@ function LoadConfig() {
 
 	Config.Leader = ""; // Leader's ingame character name. Leave blank to try auto-detection (works in AutoBaal, Wakka, MFHelper)
 	Config.QuitList = [""]; // List of character names to quit with. Example: Config.QuitList = ["MySorc", "MyDin"];
+	Config.QuitListMode = 0; // 0 = use character names; 1 = use profile names (all profiles must run on the same computer).
 
 	Scripts.TristramLeech = false; // Enters Tristram, attempts to stay close to the leader and will try and help kill.
 	Scripts.TravincalLeech = false; // Enters portal at back of Travincal.
@@ -167,7 +168,7 @@ function LoadConfig() {
 		Config.Rusher.Shenk = false; // Do Shenk quest.
 		Config.Rusher.Anya = false; // Do Anya quest.
 		Config.Rusher.LastRun = ""; // End rush after this run. List of runs: http://pastebin.com/Uez3nZ6g
-	Scripts.Rushee = false; // Automatic rushee, works with Rusher
+	Scripts.Rushee = false; // Automatic rushee, works with Rusher. Set Rusher's character name as Config.Leader
 		Config.Rushee.Quester = false; // Enter portals and get quest items.
 		Config.Rushee.Bumper = false; // Do Ancients and Baal. Minimum levels: 20 - norm, 40 - nightmare
 	Scripts.CrushTele = false; // classic rush teleporter. go to area of interest and press "-" numpad key
@@ -192,13 +193,13 @@ function LoadConfig() {
 		Config.ShopBot.ScanIDs = [];
 		Config.ShopBot.CycleDelay = 0; // Delay between shopping cycles in milliseconds, might help with crashes.
 		Config.ShopBot.QuitOnMatch = false; // Leave game as soon as an item is shopped.
-	Scripts.ChestMania = false; // Open chests in configured areas
+	Scripts.ChestMania = false; // Open chests in configured areas. See sdk/areas.txt
 		Config.ChestMania.Act1 = [13, 14, 15, 16, 18, 19]; // List of act 1 areas to open chests in
 		Config.ChestMania.Act2 = [55, 59, 65, 66, 67, 68, 69, 70, 71, 72]; // List of act 2 areas to open chests in
 		Config.ChestMania.Act3 = [79, 80, 81, 92, 93, 84, 85, 90]; // List of act 3 areas to open chests in
 		Config.ChestMania.Act4 = []; // List of act 4 areas to open chests in
 		Config.ChestMania.Act5 = [115, 116, 119, 125, 126, 127]; // List of act 5 areas to open chests in
-	Scripts.ClearAnyArea = false; // Clear any area
+	Scripts.ClearAnyArea = false; // Clear any area. Uses Config.ClearType to determine which type of monsters to kill.
 		Config.ClearAnyArea.AreaList = []; // List of area ids to clear. See sdk/areas.txt
 
 	// *** Guest scripts ***
@@ -284,13 +285,15 @@ function LoadConfig() {
 
 	// Additional item info log settings. All info goes to \logs\ItemLog.txt
 	Config.ItemInfo = false; // Log stashed, skipped (due to no space) or sold items.
-	Config.ItemInfoQuality = []; // The quality of sold items to log.
+	Config.ItemInfoQuality = []; // The quality of sold items to log. See NTItemAlias.dbl for values. Example: Config.ItemInfoQuality = [6, 7, 8];
 
 	// Item identification settings
 	Config.CainID.Enable = false; // Identify items at Cain
 	Config.CainID.MinGold = 2500000; // Minimum gold (stash + character) to have in order to use Cain.
 	Config.CainID.MinUnids = 3; // Minimum number of unid items in order to use Cain.
 	Config.FieldID = false; // Identify items in the field instead of going to town.
+	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
+	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
@@ -301,73 +304,73 @@ function LoadConfig() {
 	Config.GambleGoldStart = 1000000;
 	Config.GambleGoldStop = 500000;
 
-	// Check libs/NTItemAlias.dbl file for other item classids
-	Config.GambleItems.push(520); // Amulet
-	Config.GambleItems.push(522); // Ring
-	Config.GambleItems.push(418); // Circlet
-	Config.GambleItems.push(419); // Coronet
+	// List of item names or classids for gambling. Check libs/NTItemAlias.dbl file for other item classids.
+	Config.GambleItems.push("Amulet");
+	Config.GambleItems.push("Ring");
+	Config.GambleItems.push("Circlet");
+	Config.GambleItems.push("Coronet");
 
-	/* Cubing config. All recipe names are available in Templates/Cubing.txt
-	 * The format is Config.Recipes.push([recipe_name, item_id, etherealness]). Etherealness is optional and only applies to some recipes.
+	/* Cubing config. All recipe names are available in Templates/Cubing.txt. For item names/classids check NTItemAlias.dbl
+	 * The format is Config.Recipes.push([recipe_name, item_name_or_classid, etherealness]). Etherealness is optional and only applies to some recipes.
 	 */
 	Config.Cubing = false; // Set to true to enable cubing.
 
 	// Ingredients for the following recipes will be auto-picked, for classids check libs/NTItemAlias.dbl
 
-	//Config.Recipes.push([Recipe.Gem, 560]); // perfect amethyst
-	//Config.Recipes.push([Recipe.Gem, 565]); // perfect topaz
-	//Config.Recipes.push([Recipe.Gem, 570]); // perfect sapphire
-	//Config.Recipes.push([Recipe.Gem, 575]); // perfect emerald
-	//Config.Recipes.push([Recipe.Gem, 580]); // perfect ruby
-	//Config.Recipes.push([Recipe.Gem, 585]); // perfect diamond
-	//Config.Recipes.push([Recipe.Gem, 600]); // perfect skull
+	//Config.Recipes.push([Recipe.Gem, "Flawless Amethyst"]); // Make Perfect Amethyst
+	//Config.Recipes.push([Recipe.Gem, "Flawless Topaz"]); // Make Perfect Topaz
+	//Config.Recipes.push([Recipe.Gem, "Flawless Sapphire"]); // Make Perfect Sapphire
+	//Config.Recipes.push([Recipe.Gem, "Flawless Emerald"]); // Make Perfect Emerald
+	//Config.Recipes.push([Recipe.Gem, "Flawless Ruby"]); // Make Perfect Ruby
+	//Config.Recipes.push([Recipe.Gem, "Flawless Diamond"]); // Make Perfect Diamond
+	//Config.Recipes.push([Recipe.Gem, "Flawless Skull"]); // Make Perfect Skull
 
-	//Config.Recipes.push([Recipe.Token]); // token of absolution
-	
-	//Config.Recipes.push([Recipe.Rune, 630]); // pul -> um
-	//Config.Recipes.push([Recipe.Rune, 631]); // um -> mal
-	//Config.Recipes.push([Recipe.Rune, 632]); // mal -> ist
-	//Config.Recipes.push([Recipe.Rune, 633]); // ist -> gul
-	//Config.Recipes.push([Recipe.Rune, 634]); // gul -> vex
+	//Config.Recipes.push([Recipe.Token]); // Make Token of Absolution
+
+	//Config.Recipes.push([Recipe.Rune, "Pul Rune"]); // Upgrade Pul to Um
+	//Config.Recipes.push([Recipe.Rune, "Um Rune"]); // Upgrade Um to Mal
+	//Config.Recipes.push([Recipe.Rune, "Mal Rune"]); // Upgrade Mal to Ist
+	//Config.Recipes.push([Recipe.Rune, "Ist Rune"]); // Upgrade Ist to Gul
+	//Config.Recipes.push([Recipe.Rune, "Gul Rune"]); // Upgrade Gul to Vex
 
 	//Config.Recipes.push([Recipe.Caster.Amulet]); // Craft Caster Amulet
 	//Config.Recipes.push([Recipe.Blood.Ring]); // Craft Blood Ring
-	//Config.Recipes.push([Recipe.Blood.Helm, 424]); // Craft Blood Armet
-	//Config.Recipes.push([Recipe.HitPower.Gloves, 452]); // Craft Hit Power Vambraces
+	//Config.Recipes.push([Recipe.Blood.Helm, "Armet"]); // Craft Blood Armet
+	//Config.Recipes.push([Recipe.HitPower.Gloves, "Vambraces"]); // Craft Hit Power Vambraces
 
 	// The gems not used by other recipes will be used for magic item rerolling.
 
-	//Config.Recipes.push([Recipe.Reroll.Magic, 421]); // Reroll magic Diadem
-	//Config.Recipes.push([Recipe.Reroll.Magic, 605]); // Reroll magic Grand Charm (ilvl 91+)
+	//Config.Recipes.push([Recipe.Reroll.Magic, "Diadem"]); // Reroll magic Diadem
+	//Config.Recipes.push([Recipe.Reroll.Magic, "Grand Charm"]); // Reroll magic Grand Charm (ilvl 91+)
 
-	//Config.Recipes.push([Recipe.Reroll.Rare, 421]); // Reroll rare Diadem
+	//Config.Recipes.push([Recipe.Reroll.Rare, "Diadem"]); // Reroll rare Diadem
 
 	/* Base item for the following recipes must be in pickit. The rest of the ingredients will be auto-picked.
 	 * Use Roll.Eth, Roll.NonEth or Roll.All to determine what kind of base item to roll - ethereal, non-ethereal or all.
 	 */
-	//Config.Recipes.push([Recipe.Socket.Weapon, 255, Roll.Eth]); // Socket ethereal Thresher
-	//Config.Recipes.push([Recipe.Socket.Weapon, 256, Roll.Eth]); // Socket ethereal Cryptic Axe
-	//Config.Recipes.push([Recipe.Socket.Armor, 442, Roll.Eth]); // Socket ethereal Sacred Armor
-	//Config.Recipes.push([Recipe.Socket.Armor, 443, Roll.Eth]); // Socket ethereal Archon Plate
+	//Config.Recipes.push([Recipe.Socket.Weapon, "Thresher", Roll.Eth]); // Socket ethereal Thresher
+	//Config.Recipes.push([Recipe.Socket.Weapon, "Cryptic Axe", Roll.Eth]); // Socket ethereal Cryptic Axe
+	//Config.Recipes.push([Recipe.Socket.Armor, "Sacred Armor", Roll.Eth]); // Socket ethereal Sacred Armor
+	//Config.Recipes.push([Recipe.Socket.Armor, "Archon Plate", Roll.Eth]); // Socket ethereal Archon Plate
 
-	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 335, Roll.NonEth]); // Upgrade Bloodfist to Exceptional
-	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, 337, Roll.NonEth]); // Upgrade Magefist to Exceptional
-	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 381, Roll.NonEth]); // Upgrade Bloodfist or Grave Palm to Elite
-	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 383, Roll.NonEth]); // Upgrade Magefist or Lavagout to Elite
-	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, 389, Roll.NonEth]); // Upgrade Gore Rider to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, "Heavy Gloves", Roll.NonEth]); // Upgrade Bloodfist to Exceptional
+	//Config.Recipes.push([Recipe.Unique.Armor.ToExceptional, "Light Gauntlets", Roll.NonEth]); // Upgrade Magefist to Exceptional
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, "Sharkskin Gloves", Roll.NonEth]); // Upgrade Bloodfist or Grave Palm to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, "Battle Gauntlets", Roll.NonEth]); // Upgrade Magefist or Lavagout to Elite
+	//Config.Recipes.push([Recipe.Unique.Armor.ToElite, "War Boots", Roll.NonEth]); // Upgrade Gore Rider to Elite
 
 	/* Runeword config. All recipes are available in Templates/Runewords.txt
 	 * Keep lines follow pickit format and any given runeword is tested vs ALL lines so you don't need to repeat them
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
 
-	//Config.Runewords.push([Runeword.Insight, 255]); // Thresher
-	//Config.Runewords.push([Runeword.Insight, 256]); // Cryptic Axe
+	//Config.Runewords.push([Runeword.Insight, "Thresher"]); // Make Insight Thresher
+	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe"]); // Make Insight Cryptic Axe
 
 	//Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
 
-	//Config.Runewords.push([Runeword.Spirit, 447]); // Monarch
-	//Config.Runewords.push([Runeword.Spirit, 498]); // Sacred Targe
+	//Config.Runewords.push([Runeword.Spirit, "Monarch"]); // Make Spirit Monarch
+	//Config.Runewords.push([Runeword.Spirit, "Sacred Targe"]); // Make Spirit Sacred Targe
 
 	//Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
@@ -381,8 +384,10 @@ function LoadConfig() {
 	Config.DeathMessages = []; // Example: ["Watch out for that $killer, $name!"]
 	Config.Congratulations = []; // Example: ["Congrats on level $level, $name!"]
 	Config.ShitList = false; // Blacklist hostile players so they don't get invited to party.
+	Config.UnpartyShitlisted = false; // Leave party if someone invited a blacklisted player.
 
 	// General config
+	Config.AutoMap = false; // Set to true to open automap at the beginning of the game.
 	Config.LastMessage = ""; // Message or array of messages to say at the end of the run. Use $nextgame to say next game - "Next game: $nextgame" (works with lead entry point)
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will TP to town and stay in game if the run is completed before.
 	Config.MaxGameTime = 0; // Maximum game time in seconds. Quit game when limit is reached.

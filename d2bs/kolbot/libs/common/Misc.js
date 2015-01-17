@@ -804,6 +804,22 @@ var Misc = {
 		return false;
 	},
 
+	// Get number of players within getUnit distance
+	getNearbyPlayerCount: function () {
+		var count = 0,
+			player = getUnit(0);
+
+		if (player) {
+			do {
+				if (!player.dead) {
+					count += 1;
+				}
+			} while (player.getNext());
+		}
+
+		return count;
+	},
+
 	// Get total number of players in game
 	getPlayerCount: function () {
 		var count = 0,
@@ -1725,7 +1741,8 @@ MainLoop:
 
 	// Report script errors to logs/ScriptErrorLog.txt
 	errorReport: function (error, script) {
-		var h, m, s, date, msg, oogmsg, filemsg, source;
+		var i, h, m, s, date, msg, oogmsg, filemsg, source, stack,
+			stackLog = "";
 
 		date = new Date();
 		h = date.getHours();
@@ -1741,6 +1758,32 @@ MainLoop:
 			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
 			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
 			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+
+			if (error.hasOwnProperty("stack")) {
+				stack = error.stack;
+
+				if (stack) {
+					stack = stack.split("\n");
+
+					if (stack && typeof stack === "object") {
+						stack.reverse();
+					}
+
+					for (i = 0; i < stack.length; i += 1) {
+						if (stack[i]) {
+							stackLog += stack[i].substr(0, stack[i].indexOf("@") + 1) + stack[i].substr(stack[i].lastIndexOf("\\") + 1, stack[i].length - 1);
+
+							if (i < stack.length - 1) {
+								stackLog += ", ";
+							}
+						}
+					}
+				}
+			}
+
+			if (stackLog) {
+				filemsg += "Stack: " + stackLog + "\n";
+			}
 		}
 
 		if (this.errorConsolePrint) {
@@ -1980,7 +2023,7 @@ var Packet = {
 		var i, j;
 
 		for (i = 0; i < 5; i += 1) {
-			if (getDistance(me, unit) > 3) {
+			if (getDistance(me, unit) > 5) {
 				Pather.moveToUnit(unit);
 			}
 
@@ -2226,8 +2269,12 @@ CursorLoop:
 		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
 	},
 
-	teleWalk: function (x, y) {
-		var i, tick, end;
+	teleWalk: function (x, y, maxDist) {
+		var i;
+
+		if (maxDist === undefined) {
+			maxDist = 5;
+		}
 
 		if (!this.telewalkTick) {
 			this.telewalkTick = 0;
@@ -2240,7 +2287,9 @@ CursorLoop:
 				sendPacket(1, 0x4b, 4, me.type, 4, me.gid);
 				delay(me.ping + 1);
 
-				if (getDistance(me, x, y) < 5) {
+				if (getDistance(me, x, y) < maxDist) {
+					delay(200);
+
 					return true;
 				}
 			}

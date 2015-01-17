@@ -5,7 +5,7 @@
 */
 
 function MFHelper() {
-	var i, player, playerAct, split,
+	var i, player, playerAct, split, area,
 		oldCommand = "",
 		command = "";
 
@@ -156,6 +156,7 @@ function MFHelper() {
 		player = this.findPlayer(Config.Leader);
 	}
 
+	// START
 MainLoop:
 	while (true) {
 		if (player) {
@@ -182,16 +183,17 @@ MainLoop:
 					print("ÿc4MFHelperÿc0: Kill");
 
 					split = command.split("kill ")[1];
+					area = player.area;
 
 					for (i = 0; i < 5; i += 1) {
-						if (Pather.getPortal(player.area, player.name)) {
+						if (Pather.usePortal(player.area, player.name)) {
 							break;
 						}
 
 						delay(1000);
 					}
 
-					if (Pather.usePortal(player.area, player.name)) {
+					if (me.area === area) {
 						Precast.doPrecast(false);
 
 						try {
@@ -216,15 +218,17 @@ MainLoop:
 				} else if (command.indexOf("clearlevel") > -1) {
 					print("ÿc4MFHelperÿc0: Clear Level");
 
+					area = player.area;
+
 					for (i = 0; i < 5; i += 1) {
-						if (Pather.getPortal(player.area, player.name)) {
+						if (Pather.usePortal(player.area, player.name)) {
 							break;
 						}
 
 						delay(1000);
 					}
 
-					if (Pather.usePortal(player.area, player.name)) {
+					if (me.area === area) {
 						Precast.doPrecast(false);
 						Attack.clearLevel(Config.ClearType);
 						Precast.doPrecast(true);
@@ -239,8 +243,17 @@ MainLoop:
 					print("ÿc4MFHelperÿc0: Clear");
 
 					split = command.split("clear ")[1];
+					area = player.area;
 
-					if (Pather.usePortal(player.area, player.name)) {
+					for (i = 0; i < 5; i += 1) {
+						if (Pather.usePortal(player.area, player.name)) {
+							break;
+						}
+
+						delay(1000);
+					}
+
+					if (me.area === area) {
 						Precast.doPrecast(false);
 
 						try {
@@ -267,14 +280,14 @@ MainLoop:
 					print("ÿc4MFHelperÿc0: Clear Cows");
 
 					for (i = 0; i < 5; i += 1) {
-						if (Town.goToTown(1) && Pather.getPortal(39)) {
+						if (Town.goToTown(1) && Pather.usePortal(39)) {
 							break;
 						}
 
 						delay(1000);
 					}
 
-					if (Pather.usePortal(39)) {
+					if (me.area === 39) {
 						Precast.doPrecast(false);
 						this.clearCowLevel();
 						delay(1000);
@@ -288,15 +301,17 @@ MainLoop:
 				} else if (command.indexOf("council") > -1) {
 					print("ÿc4MFHelperÿc0: Kill Council");
 
+					area = player.area;
+
 					for (i = 0; i < 5; i += 1) {
-						if (Pather.getPortal(player.area, player.name)) {
+						if (Pather.usePortal(player.area, player.name)) {
 							break;
 						}
 
 						delay(1000);
 					}
 
-					if (Pather.usePortal(player.area, player.name)) {
+					if (me.area === area) {
 						Precast.doPrecast(false);
 						Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
 

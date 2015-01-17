@@ -163,7 +163,7 @@ function main() {
 		//Pickit.pickItems();
 	}
 
-	//me.automap = true;
+	me.automap = Config.AutoMap;
 
 	// Next game = drop keys
 	if (TorchSystem.keyCheck()) {

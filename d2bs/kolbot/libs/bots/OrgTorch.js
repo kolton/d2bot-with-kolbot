@@ -411,6 +411,7 @@ function OrgTorch() {
 	if (tkeys >= 3 && hkeys >= 3 && dkeys >= 3) {
 		this.getFade();
 		print("Making organs.");
+		D2Bot.printToConsole("OrgTorch: Making organs.", 7);
 
 		for (i = 0; i < 3; i += 1) {
 			// Abort if we have a complete set of organs
@@ -443,6 +444,7 @@ function OrgTorch() {
 	if (brains && eyes && horns) {
 		this.getFade();
 		print("Making torch");
+		D2Bot.printToConsole("OrgTorch: Making torch.", 7);
 
 		portal = this.openPortal(1);
 

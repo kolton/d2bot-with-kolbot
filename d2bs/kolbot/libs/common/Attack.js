@@ -408,7 +408,7 @@ var Attack = {
 						//print(gidAttack[i].name + " " + gidAttack[i].attacks);
 
 						// Tele in random direction with Blessed Hammer
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 8 : 3) === 0) {
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
 							//print("random move m8");
 							Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
 						}
@@ -1442,7 +1442,7 @@ AuraLoop: // Skip monsters with auras
 				for (i = 0; i < coords.length; i += 1) {
 					// Valid position found
 					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, 1)) {
-						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t)); // + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
+						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						switch (walk) {
 						case 1:
@@ -1470,7 +1470,7 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		if (name) {
-			print("Couldn't get to " + name);
+			print("ÿc4Attackÿc0: No valid positions for: " + name);
 		}
 
 		return false;
