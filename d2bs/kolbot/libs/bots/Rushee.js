@@ -228,7 +228,8 @@ function Rushee() {
 					break;
 				}
 
-				Town.move("palace");
+				Pather.usePortal(50, Config.Leader);
+				Pather.moveToExit(40, true);
 
 				npc = getUnit(1, "jerhyn");
 
@@ -239,6 +240,8 @@ function Rushee() {
 				}
 
 				me.cancel();
+				Pather.moveToExit(50, true);
+				Pather.usePortal(40, Config.Leader);
 				Town.move("meshif");
 
 				npc = getUnit(1, "meshif");
@@ -543,6 +546,10 @@ function Rushee() {
 						break;
 					case 108: // Chaos Sanctuary
 						Pather.usePortal(108, Config.Leader);
+						Pather.moveTo(7762, 5268);
+						Packet.flash(me.gid);
+						delay(500);
+						Pather.walkTo(7763, 5267, 2);
 
 						while (!getUnit(1, 243)) {
 							delay(500);
@@ -893,13 +900,7 @@ function Rushee() {
 					}
 
 					me.cancel();
-
-					if (Config.Rushee.Quester) {
-						Town.move("portalspot");
-					} else {
-						Town.move("palace");
-					}
-
+					Town.move("portalspot");
 					actions.shift();
 
 					break;

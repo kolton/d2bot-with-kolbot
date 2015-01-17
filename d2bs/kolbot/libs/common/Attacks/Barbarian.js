@@ -22,7 +22,8 @@ var ClassAttack = {
 			return true;
 		}
 
-		var index, attackSkill;
+		var index,
+			attackSkill = -1;
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
@@ -32,16 +33,17 @@ var ClassAttack = {
 			attackSkill = Config.AttackSkill[index];
 		}
 
-		if (Config.AttackSkill[index + 1] > -1 && !Attack.checkResist(unit, attackSkill) && Attack.checkResist(unit, Config.AttackSkill[index + 1])) {
-			attackSkill = Config.AttackSkill[index + 1];
+		if (!Attack.checkResist(unit, attackSkill)) {
+			attackSkill = -1;
+
+			if (Config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, Config.AttackSkill[index + 1])) {
+				attackSkill = Config.AttackSkill[index + 1];
+			}
 		}
 
-		if (Skill.getManaCost(attackSkill) > me.mp) { // Low mana skill
-			if (Config.LowManaSkill[0] > -1 && Attack.checkResist(unit, Config.LowManaSkill[0])) {
-				attackSkill = Config.LowManaSkill[0];
-			} else if (Config.LowManaSkill[1] > -1 && Attack.checkResist(unit, Config.LowManaSkill[1])) {
-				attackSkill = Config.LowManaSkill[1];
-			}
+		// Low mana skill
+		if (Skill.getManaCost(attackSkill) > me.mp && Config.LowManaSkill[0] > -1 && Attack.checkResist(unit, Config.LowManaSkill[0])) {
+			attackSkill = Config.LowManaSkill[0];
 		}
 
 		switch (this.doCast(unit, attackSkill)) {
@@ -127,7 +129,7 @@ var ClassAttack = {
 			angles.unshift(120);
 		}
 
-		me.runwalk = me.gametype;
+		//me.runwalk = 0;
 		angle = Math.round(Math.atan2(me.y - unit.y, me.x - unit.x) * 180 / Math.PI);
 
 		for (i = 0; i < angles.length; i += 1) { // get a better spot

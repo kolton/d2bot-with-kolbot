@@ -131,12 +131,19 @@ var Config = {
 	TownMP: 0,
 
 	// General
+	AutoMap: false,
 	LastMessage: "",
 	UseMerc: false,
 	MercWatch: false,
 	LowGold: 0,
 	StashGold: 0,
 	FieldID: false,
+	DroppedItemsAnnounce: {
+		Enable: false,
+		Quality: [],
+		LogToOOG: false,
+		OOGQuality: []
+	},
 	CainID: {
 		Enable: false,
 		MinGold: 0,
@@ -154,8 +161,10 @@ var Config = {
 	DeathMessages: [],
 	Congratulations: [],
 	ShitList: false,
+	UnpartyShitlisted: false,
 	Leader: "",
 	QuitList: [],
+	QuitListMode: 0,
 	HPBuffer: 0,
 	MPBuffer: 0,
 	RejuvBuffer: 0,
@@ -254,6 +263,7 @@ var Config = {
 
 	// Paladin speficic
 	Redemption: [0, 0],
+	Charge: false,
 	Vigor: false,
 	AvoidDolls: false,
 

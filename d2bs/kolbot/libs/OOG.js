@@ -477,15 +477,21 @@ var ControlAction = {
 	mutedKey: false,
 
 	timeoutDelay: function (text, time, stopfunc, arg) {
-		var endTime = getTickCount() + time;
+		var currTime = 0,
+			endTime = getTickCount() + time;
 
 		while (getTickCount() < endTime) {
 			if (typeof stopfunc === "function" && stopfunc(arg)) {
 				break;
 			}
 
-			D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
-			delay(500);
+			if (currTime !== Math.floor((endTime - getTickCount()) / 1000)) {
+				currTime = Math.floor((endTime - getTickCount()) / 1000);
+
+				D2Bot.updateStatus(text + " (" + Math.max(currTime, 0)  + "s)");
+			}
+
+			delay(10);
 		}
 	},
 
@@ -508,14 +514,26 @@ var ControlAction = {
 			return false;
 		}
 
-		var control = getControl(type, x, y, xsize, ysize);
+		var currText,
+			control = getControl(type, x, y, xsize, ysize);
 
 		if (!control) {
 			return false;
 		}
 
-		//delay(textdelay);
-		delay(200);
+		currText = control.text;
+
+		if (currText && currText === text) {
+			return true;
+		}
+
+		currText = control.getText();
+
+		if (currText && ((typeof currText === "string" && currText === text) || (typeof currText === "object" && currText.indexOf(text) > -1))) {
+			return true;
+		}
+
+		//delay(200);
 		control.setText(text);
 
 		return true;
@@ -747,7 +765,7 @@ MainLoop:
 				// make sure we're not on connecting screen
 				locTick = getTickCount();
 
-				while (getTickCount() - locTick < 2000 && getLocation() === 42) {
+				while (getTickCount() - locTick < 3000 && getLocation() === 42) {
 					delay(25);
 				}
 
@@ -772,7 +790,7 @@ MainLoop:
 			delay(100);
 		}
 
-		//delay(1000);
+		delay(1000);
 
 		me.blockMouse = false;
 
