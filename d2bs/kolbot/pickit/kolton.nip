@@ -128,7 +128,7 @@
 //([name] == demonhead || [name] == bonevisage) && [quality] == normal && [flag] == ethereal # [sockets] == 0 
 
 //          ==unique==
-//[name] == sallet && [quality] == unique && [flag] == ethereal # [enhanceddefense] >= 210 / /rockstopper
+//[name] == sallet && [quality] == unique && [flag] == ethereal # [enhanceddefense] >= 210 // rockstopper
 [name] == grandcrown && [quality] == unique && [flag] != ethereal # [itemgoldbonus] >= 100 && [enhanceddefense] >= 200 && [lifeleech] >= 12 //crown of thieves
 [name] == grandcrown && [quality] == unique && [flag] == ethereal # [itemgoldbonus] >= 100 // crown of thieves eth
 [name] == grimhelm && [quality] == unique && [flag] == ethereal # [lifeleech] == 8 && [manaleech] == 8 && [magicdamagereduction] == 15 && [damageresist] >= 20 // vampgaze eth
