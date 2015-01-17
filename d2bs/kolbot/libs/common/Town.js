@@ -310,7 +310,7 @@ var Town = {
 		}
 
 		if (me.diff === 0 && Pather.accessToAct(4) && me.act < 4) {
-			Town.goToTown(4);
+			this.goToTown(4);
 		}
 
 		npc = this.initNPC("Shop", "buyPotions");
@@ -769,6 +769,15 @@ MainLoop:
 				switch (result.result) {
 				case 0:
 					Misc.itemLogger("Dropped", item, "fieldID");
+
+					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality)  > -1) {
+						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim());
+
+						if (Config.DroppedItemsAnnounce.LogToOOG && Config.DroppedItemsAnnounce.OOGQuality.indexOf(item.quality) > -1) {
+							Misc.logItem("Field Dropped", item, result.line);
+						}
+					}
+
 					item.drop();
 
 					break;
@@ -915,13 +924,34 @@ CursorLoop:
 		return true;
 	},
 
+	gambleIds: [],
+
 	gamble: function () {
-		if (!this.needGamble() || !Config.GambleItems.length) {
+		if (!this.needGamble() || Config.GambleItems.length === 0) {
 			return true;
 		}
 
 		var i, item, items, npc, newItem, result,
 			list = [];
+
+		if (this.gambleIds.length === 0) {
+			// change text to classid
+			for (i = 0; i < Config.GambleItems.length; i += 1) {
+				if (isNaN(Config.GambleItems[i])) {
+					if (NTIPAliasClassID.hasOwnProperty(Config.GambleItems[i].replace(/\s+/g, "").toLowerCase())) {
+						this.gambleIds.push(NTIPAliasClassID[Config.GambleItems[i].replace(/\s+/g, "").toLowerCase()]);
+					} else {
+						Misc.errorReport("ÿc1Invalid gamble entry:ÿc0 " + Config.GambleItems[i]);
+					}
+				} else {
+					this.gambleIds.push(Config.GambleItems[i]);
+				}
+			}
+		}
+
+		if (this.gambleIds.length === 0) {
+			return true;
+		}
 
 		// Fuck Alkor
 		if (me.act === 3) {
@@ -950,7 +980,7 @@ CursorLoop:
 
 			if (item) {
 				do {
-					if (Config.GambleItems.indexOf(item.classid) > -1) {
+					if (this.gambleIds.indexOf(item.classid) > -1) {
 						items.push(copyUnit(item));
 					}
 				} while (item.getNext());
@@ -2021,7 +2051,7 @@ MainLoop:
 
 	move: function (spot) {
 		if (!me.inTown) {
-			throw new Error("move: Not in town");
+			this.goToTown();
 		}
 
 		var i, path;
@@ -2067,7 +2097,7 @@ MainLoop:
 		}
 
 		if (longRange) {
-			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 10);
+			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 9);
 
 			if (path && path[1]) {
 				townSpot = [path[1].x, path[1].y];
@@ -2078,7 +2108,7 @@ MainLoop:
 			//print("moveToSpot: " + spot + " from " + me.x + ", " + me.y);
 
 			if (getDistance(me, townSpot[i], townSpot[i + 1]) > 2) {
-				Pather.moveTo(townSpot[i], townSpot[i + 1]);
+				Pather.moveTo(townSpot[i], townSpot[i + 1], 3, false, true);
 			}
 
 			switch (spot) {

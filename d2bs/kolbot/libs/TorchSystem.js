@@ -6,6 +6,7 @@
 
 var TorchSystem = {
 	LogKeys: false,
+	LogOrgans: true,
 
 	FarmerProfiles: {
 // ############################ S E T U P ##########################################

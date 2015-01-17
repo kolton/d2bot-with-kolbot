@@ -90,6 +90,27 @@ function main() {
 		return false;
 	};
 
+	this.initQuitList = function () {
+		var i, string, obj,
+			temp = [];
+
+		for (i = 0; i < Config.QuitList.length; i += 1) {
+			if (FileTools.exists("data/" + Config.QuitList[i] + ".json")) {
+				string = Misc.fileAction("data/" + Config.QuitList[i] + ".json", 0);
+
+				if (string) {
+					obj = JSON.parse(string);
+
+					if (obj && obj.hasOwnProperty("name")) {
+						temp.push(obj.name);
+					}
+				}
+			}
+		}
+
+		Config.QuitList = temp.slice(0);
+	};
+
 	this.getPotion = function (pottype, type) {
 		var i,
 			items = me.getItems();
@@ -120,7 +141,7 @@ function main() {
 
 	this.togglePause = function () {
 		var i,	script,
-			scripts = ["default.dbj", "tools/townchicken.js", "tools/antihostile.js", "tools/party.js", "tools/flashthread.js", "tools/rushthread.js"];
+			scripts = ["default.dbj", "tools/townchicken.js", "tools/antihostile.js", "tools/party.js", "tools/rushthread.js"];
 
 		for (i = 0; i < scripts.length; i += 1) {
 			script = getScript(scripts[i]);
@@ -177,7 +198,7 @@ function main() {
 			break;
 		case 2:
 		case 4:
-			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 500)) { // small delay for juvs just to prevent using more at once
+			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 300)) { // small delay for juvs just to prevent using more at once
 				return false;
 			}
 
@@ -267,12 +288,17 @@ function main() {
 	};
 
 	this.checkVipers = function () {
-		var monster = getUnit(1, 597);
+		var owner,
+			monster = getUnit(1, 597);
 
 		if (monster) {
 			do {
-				if (monster.getState(96) && monster.getParent().name !== me.name) {
-					return true;
+				if (monster.getState(96)) {
+					owner = monster.getParent();
+
+					if (owner && owner.name !== me.name) {
+						return true;
+					}
 				}
 			} while (monster.getNext());
 		}
@@ -488,6 +514,10 @@ function main() {
 	Packet.changeStat(99, Config.FHR);
 	Packet.changeStat(102, Config.FBR);
 	Packet.changeStat(93, Config.IAS);
+
+	if (Config.QuitListMode > 0) {
+		this.initQuitList();
+	}
 
 	// Start
 	while (true) {

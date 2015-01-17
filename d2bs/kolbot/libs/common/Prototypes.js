@@ -82,7 +82,7 @@ Unit.prototype.__defineGetter__("attacking",
 			throw new Error("Unit.attacking: Must be used with player units.");
 		}
 
-		return [7, 8, 10, 11, 12, 13, 14, 15, 16, 18].indexOf(me.mode) > -1;
+		return [7, 8, 10, 11, 12, 13, 14, 15, 16, 18].indexOf(this.mode) > -1;
 	});
 
 // Open NPC menu
@@ -106,12 +106,13 @@ Unit.prototype.openMenu = function (addDelay) {
 	var i, j;
 
 	for (i = 0; i < 5; i += 1) {
-		if (getDistance(me, this) > 3) {
+		if (getDistance(me, this) > 4) {
 			Pather.moveToUnit(this);
 		}
 
 		if (i > 0) {
 			Packet.flash(me.gid);
+			// delay?
 		}
 
 		if (!getUIFlag(0x08)) {
@@ -639,7 +640,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 		break;
 	case 31: // plusdefense
 		if (subid === 0) {
-			if (this.mode !== 0) {
+			if ([0, 1].indexOf(this.mode) < 0) {
 				break;
 			}
 
@@ -728,7 +729,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 	if (this.getFlag(0x04000000)) { // Runeword
 		switch (id) {
 		case 16: // enhanceddefense
-			if (this.mode !== 0) {
+			if ([0, 1].indexOf(this.mode) < 0) {
 				break;
 			}
 
@@ -746,7 +747,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			return 0;
 		case 18: // enhanceddamage
-			if (this.mode !== 0) {
+			if ([0, 1].indexOf(this.mode) < 0) {
 				break;
 			}
 

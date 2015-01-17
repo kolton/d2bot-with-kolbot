@@ -320,13 +320,7 @@ function main() {
 		}
 
 		Pather.makePortal();
-
-		if (me.diff < 2) {
-			Attack.securePosition(me.x, me.y, 30, 3000, true);
-		} else {
-			Attack.securePosition(me.x, me.y, 40, 3000, true, true);
-		}
-
+		Attack.securePosition(me.x, me.y, 30, 3000, true, me.diff === 2);
 		say("1");
 
 		while (!this.playerIn()) {
@@ -361,9 +355,16 @@ function main() {
 			delay(100);
 		}
 
-		Pather.usePortal(null, me.name);
+		if (!Pather.usePortal(null, me.name)) {
+			Town.goToTown();
+		}
+
+		Pather.useWaypoint(52);
+		Pather.moveToExit([51, 50], true);
+		Pather.moveTo(10022, 5047);
 		say("a3");
-		Pather.useWaypoint(75, true);
+		Town.goToTown(3);
+		Town.doChores();
 
 		while (!this.playersInAct(3)) {
 			delay(250);
@@ -457,6 +458,11 @@ function main() {
 
 		say("a4");
 		//Pather.moveTo(17591, 8070);
+
+		while (!this.playersInAct(4)) {
+			delay(250);
+		}
+
 		delay(2000);
 		Pather.usePortal(null);
 
@@ -1349,6 +1355,7 @@ MainLoop:
 			case "go":
 				// End run if entire sequence is done or if Config.Rusher.LastRun is done
 				if (current >= sequence.length || (Config.Rusher.LastRun && current > sequence.indexOf(Config.Rusher.LastRun))) {
+					delay(3000);
 					say("bye ~");
 
 					while (Misc.getPlayerCount() > 1) {

@@ -71,7 +71,7 @@ function main() {
 
 	print("ÿc2Party thread loaded. Mode: " + (Config.PublicMode === 2 ? "Accept" : "Invite"));
 
-	if (Config.ShitList) {
+	if (Config.ShitList || Config.UnpartyShitlisted) {
 		shitList = ShitList.read();
 
 		print(shitList.length + " entries in shit list.");
@@ -139,6 +139,23 @@ function main() {
 						}
 
 						break;
+					}
+
+					if (Config.UnpartyShitlisted) {
+						// Add new hostile players to temp shitlist, leader should have Config.ShitList set to true to update the permanent list.
+						if (getPlayerFlag(me.gid, player.gid, 8) && shitList.indexOf(player.name) === -1) {
+							shitList.push(player.name);
+						}
+
+						if (shitList.indexOf(player.name) > -1 && myPartyId !== 65535 && player.partyid === myPartyId) {
+							// Only the one sending invites should say this.
+							if ([1, 3].indexOf(Config.PublicMode) > -1) {
+								say(player.name + " is shitlisted. Do not invite them.");
+							}
+
+							clickParty(player, 3);
+							delay(100);
+						}
 					}
 				}
 			}

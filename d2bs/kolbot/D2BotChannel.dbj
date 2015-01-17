@@ -228,10 +228,18 @@ function main() {
 		delay(500);
 	}
 
-	if (gameInfo.error === "@error") {
-		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
+	if (gameInfo.error) {
+		if (!!DataFile.getStats().debugInfo) {
+			gameInfo.crashInfo = DataFile.getStats().debugInfo;
+
+			D2Bot.printToConsole("Crash Info: Script: " + JSON.parse(gameInfo.crashInfo).currScript + " Area: " + JSON.parse(gameInfo.crashInfo).area, 10);
+		}
+
+		ControlAction.timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		D2Bot.updateRuns();
 	}
+
+	DataFile.updateStats("debugInfo", JSON.stringify({currScript: "none", area: "out of game"}));
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
@@ -365,6 +373,28 @@ MainSwitch:
 
 		switch (lastGameStatus) {
 		case "pending": // Most likely FTJ (can't detect it directly)
+			string = "";
+			text = ControlAction.getText(4, 438, 300, 326, 150);
+
+			if (text) {
+				for (i = 0; i < text.length; i += 1) {
+					string += text[i];
+
+					if (i !== text.length - 1) {
+						string += " ";
+					}
+				}
+
+				// Didn't meet level restriction
+				if (string === getLocaleString(5162)) {
+					print(string);
+
+					retry = 3;
+
+					break;
+				}
+			}
+
 			retry += 1;
 
 			D2Bot.updateRuns();
@@ -414,7 +444,7 @@ MainLoop:
 				joinInfo.gameName = joinInfo.gameName[joinInfo.gameName.length - 1].toString().replace(/^\W*/, ""); // use last match and trim it
 				joinInfo.gamePass = StarterConfig.Passwords[n] || "";
 
-				if (joinInfo.gameName !== joinInfo.oldGame && badGames.indexOf(joinInfo.gameName) === -1) {
+				if (joinInfo.gameName && joinInfo.gameName !== joinInfo.oldGame && badGames.indexOf(joinInfo.gameName) === -1) {
 					ControlAction.click(6, 652, 469, 120, 20);
 
 					break MainLoop;
