@@ -93,8 +93,8 @@
 	{skipped code}
 	
 	// Class specific config
-	Config.Curse[0] = 92; // Boss curse. Use skill number or set to 0 to disable.
-	Config.Curse[1] = 92; // Other monsters curse. Use skill number or set to 0 to disable.
+	Config.Curse[0] = 91; // Boss curse. Use skill number or set to 0 to disable.
+	Config.Curse[1] = 91; // Other monsters curse. Use skill number or set to 0 to disable.
 
 	Config.ExplodeCorpses = 74; // Explode corpses. Use skill number or 0 to disable. 74 = Corpse Explosion, 83 = Poison Explosion
 	
@@ -158,9 +158,9 @@
 
 	Config.AttackSkill[0] = -1; // Preattack skill. Not implemented yet.
 	Config.AttackSkill[1] = 97; // Primary skill to bosses.
-	Config.AttackSkill[2] = 113; // Primary aura to bosses
-	Config.AttackSkill[3] = 97; // Primary skill to others.
-	Config.AttackSkill[4] = 106; // Primary aura to others.
+	Config.AttackSkill[2] = 122; // Primary aura to bosses
+	Config.AttackSkill[3] = 106; // Primary skill to others.
+	Config.AttackSkill[4] = 122; // Primary aura to others.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary aura.
 
