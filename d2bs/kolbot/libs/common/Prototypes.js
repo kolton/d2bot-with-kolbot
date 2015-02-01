@@ -56,7 +56,7 @@ Unit.prototype.__defineGetter__("dead",
 		case 1: // Monster
 			return this.mode === 0 || this.mode === 12;
 		default:
-			throw new Error("Unit.dead: Wrong unit type");
+			return false;
 		}
 	});
 
