@@ -156,7 +156,10 @@ function Enchant() {
 		}
 
 		if (!portal) {
-			throw new Error("Tristram portal not found");
+			say("Failed to enter Tristram :(");
+			Town.goToTown();
+
+			return false;
 		}
 
 		Pather.moveTo(25048, 5177);
@@ -180,15 +183,37 @@ function Enchant() {
 		}
 
 		Town.goToTown();
+		say("Failed to get the leg :(");
 
 		return false;
 	};
 
 	this.getTome = function () {
-		var tome,
-			myTome = me.findItem("tbk", 0, 3),
-			akara = Town.initNPC("Shop");
+		var tome, akara, myTome;
 
+		myTome = me.findItem("tbk", 0, 3);
+		tome = me.getItem("tbk");
+
+		// In case of 2 tomes or tome stuck in cube
+		if (tome) {
+			do {
+				if (!myTome || tome.gid !== myTome.gid) {
+					return copyUnit(tome);
+				}
+			} while (tome.getNext());
+		}
+
+		Town.move("akara");
+
+		akara = getUnit(1, NPC.Akara);
+
+		if (!akara || akara.area !== me.area || getDistance(me, akara) > 20) {
+			say("Akara not found.");
+
+			return false;
+		}
+
+		myTome = me.findItem("tbk", 0, 3);
 		tome = me.getItem("tbk");
 
 		if (tome) {
@@ -199,8 +224,12 @@ function Enchant() {
 			} while (tome.getNext());
 		}
 
+		akara = Town.initNPC("Shop");
+
 		if (!akara) {
-			throw new Error("Failed to buy tome");
+			say("Failed to buy tome :(");
+
+			return false;
 		}
 
 		tome = akara.getItem("tbk");
@@ -269,8 +298,6 @@ function Enchant() {
 		leg = this.getLeg();
 
 		if (!leg) {
-			say("Failed to get the leg :(");
-
 			return false;
 		}
 
