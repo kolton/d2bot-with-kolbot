@@ -186,7 +186,7 @@ var Town = {
 			}
 		}
 
-		if (!npc || (!getUIFlag(0x08) && !npc.openMenu())) {
+		if (!npc || npc.area !== me.area || (!getUIFlag(0x08) && !npc.openMenu())) {
 			return false;
 		}
 
@@ -2097,7 +2097,7 @@ MainLoop:
 		}
 
 		if (longRange) {
-			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 9);
+			path = getPath(me.area, townSpot[0], townSpot[1], me.x, me.y, 1, 8);
 
 			if (path && path[1]) {
 				townSpot = [path[1].x, path[1].y];
