@@ -121,7 +121,7 @@ function Rusher() {
 
 				break;
 			default:
-				if (msg && msg.match(/^do \w|^clear \d/gi)) {
+				if (msg && msg.match(/^do \w|^clear \d|^pause$|^resume$/gi)) {
 					if (nick === master) {
 						commands.push(msg);
 					} else {
@@ -175,12 +175,16 @@ function Rusher() {
 			switch (command) {
 			case "pause":
 				if (rushThread.running) {
+					say("Pausing");
+
 					rushThread.pause();
 				}
 
 				break;
 			case "resume":
 				if (!rushThread.running) {
+					say("Resuming");
+
 					rushThread.resume();
 				}
 
