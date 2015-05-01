@@ -277,7 +277,7 @@ function main() {
 		//D2Bot.retrieve();
 		delay(200);
 
-		if (!!DataFile.getStats().debugInfo) {
+		if (!DataFile.getStats().debugInfo) {
 			gameInfo.crashInfo = DataFile.getStats().debugInfo;
 
 			D2Bot.printToConsole("Crash Info: Script: " + JSON.parse(gameInfo.crashInfo).currScript + " Area: " + JSON.parse(gameInfo.crashInfo).area, 10);
@@ -492,7 +492,7 @@ MainSwitch:
 					if (ControlAction.joinChannel(chanInfo.joinChannel[i])) {
 						useChat = true;
 					} else {
-						print("ÿc1Unable to join channel, disabling chat messages.");
+						print("Ã¿c1Unable to join channel, disabling chat messages.");
 
 						useChat = false;
 					}
