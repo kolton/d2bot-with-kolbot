@@ -194,7 +194,7 @@ var Pather = {
 		PathDebug.drawPath(path);
 
 		if (this.useTeleport && Config.TeleSwitch) {
-			Misc.teleSwitch();
+			Misc.teleSwitch(1);
 		}
 
 		while (path.length > 0) {
@@ -281,7 +281,7 @@ var Pather = {
 		}
 
 		if (this.useTeleport && Config.TeleSwitch) {
-			Precast.weaponSwitch(Misc.oldSwitch);
+			Precast.weaponSwitch(0);
 		}
 
 		PathDebug.removeHooks();
