@@ -157,6 +157,26 @@ var D2Bot = {
 
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
+	
+	getProfile: function () {
+		var obj = {
+			profile: me.profile,
+			func: "getProfile",
+			args: []
+		};
+
+        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	setProfile: function(account, password, character, difficulty, realm, infotag) {
+		var obj = {
+			profile: me.profile,
+			func: "setProfile",
+			args: [account, password, character, difficulty, realm, infotag]
+		};
+
+        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
 
 	restart: function (keySwap) {
 		var obj = {
@@ -273,7 +293,7 @@ var D2Bot = {
 			args: []
 		};
 
-		//print("ÿc1Heart beat " + this.handle);
+		//print("Ã¿c1Heart beat " + this.handle);
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
