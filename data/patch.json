@@ -1,0 +1,10 @@
+//
+// Format: name, game version, module #, offset, byte array as character string
+// Module list: D2CLIENT=0, D2COMMON=1, D2GFX=2, D2LANG=3, D2WIN=4, D2NET=5, D2GAME=6,
+//              D2LAUNCH=7, FOG=8, BNCLIENT=9, STORM=10, D2CMP=11, D2MULTI=12, D2MCPCLIENT=13
+// For 1.14d: GAME=14
+//
+{"Name":"hidewin0","Version":"1.13d","Module":2,"Offset":47483,"Data":"ahA="}
+{"Name":"hidewin1","Version":"1.13d","Module":2,"Offset":47362,"Data":"agY="}
+{"Name":"hidewin0","Version":"1.14d","Module":14,"Offset":1005781,"Data":"ahA="}
+{"Name":"hidewin1","Version":"1.14d","Module":14,"Offset":1005658,"Data":"agY="}
