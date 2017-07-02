@@ -273,6 +273,7 @@ function SealLeader() {
 	say("in");
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
+	say("Diablo done.");
 	Pickit.pickItems();
 
 	return true;
