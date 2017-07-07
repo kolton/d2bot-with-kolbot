@@ -35,13 +35,6 @@ var TorchSystem = {
 
 		// Edit here!
 
-		//"CrenoxTorch1": { // Farmer profile name
-		//	// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
-		//	KeyFinderProfiles: ["crx3", "crx11"],
-        //
-		//	// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
-		//	FarmGame: ""
-		//}
 
 // #################################################################################
 	},
@@ -95,7 +88,7 @@ var TorchSystem = {
 
 		for (i = 0; i < farmers.length; i += 1) {
 			if (farmers[i].FarmGame.length > 0 && me.gamename.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
-				print("ÿc4Torch Systemÿc0: In Farm game.");
+				print("Ã¿c4Torch SystemÃ¿c0: In Farm game.");
 				D2Bot.printToConsole("Torch System: In Farm game.", 7);
 				Town.goToTown(1);
 
@@ -150,7 +143,7 @@ var TorchSystem = {
 
 		for (i = 0; i < farmers.length; i += 1) {
 			if (farmers[i].FarmGame.length > 0 && me.gamename.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
-				print("ÿc4Torch Systemÿc0: In Farm game.");
+				print("Ã¿c4Torch SystemÃ¿c0: In Farm game.");
 				D2Bot.printToConsole("Torch System: Transfering keys.", 7);
 				D2Bot.updateStatus("Torch System: In game.");
 				Town.goToTown(1);
