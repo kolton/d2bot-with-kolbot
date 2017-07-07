@@ -34,14 +34,14 @@ var TorchSystem = {
 		*/
 
 		// Edit here!
-
- //              "PROFILE NAME": { // Farmer profile name
- //			// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
- //			KeyFinderProfiles: [""],
- //
- //			// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
- //			FarmGame: ""
- //		}
+		
+ 		"PROFILE NAME": { // Farmer profile name
+ 			// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
+ 			KeyFinderProfiles: [""],
+ 
+ 			// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
+ 			FarmGame: ""
+ 		}
 
 // #################################################################################
 	},
