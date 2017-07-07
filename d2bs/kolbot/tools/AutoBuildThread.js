@@ -14,6 +14,7 @@ if (!isIncluded("common/Config.js")) { include("common/Config.js"); };
 if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
 if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
 if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 Config.init(); // includes libs/common/AutoBuild.js
 
@@ -32,13 +33,13 @@ Array.prototype.contains = function (val) { return this.indexOf(val) > -1; };
 
 function skillInValidRange (id) {
 	switch (me.classid) {
-		case 0:	return	6 <= id && id <= 35;	// Amazon
-		case 1: return 36 <= id && id <= 65;	// Sorceress
-		case 2:	return 66 <= id && id <= 95;	// Necromancer
-		case 3:	return 96 <= id && id <= 125;	// Paladin
-		case 4:	return 126 <= id && id <= 155;	// Barbarian
-		case 5:	return 221 <= id && id <= 250;	// Druid
-		case 6:	return 251 <= id && id <= 280;	// Assassin
+        case ClassID.Amazon: return Skills.Amazon.Magic_Arrow <= id && id <= Skills.Amazon.Lightning_Fury;	// Amazon
+        case ClassID.Sorceress: return Skills.Sorceress.Fire_Bolt <= id && id <= Skills.Sorceress.Cold_Mastery;	// Sorceress
+        case ClassID.Necromancer: return Skills.Necromancer.Amplify_Damage <= id && id <= Skills.Necromancer.Revive;	// Necromancer
+        case ClassID.Paladin: return Skills.Paladin.Sacrifice <= id && id <= Skills.Paladin.Salvation;	// Paladin
+        case ClassID.Barbarian: return Skills.Barbarian.Bash <= id && id <= Skills.Barbarian.Battle_Command;	// Barbarian
+        case ClassID.Druid: return Skills.Druid.Raven <= id && id <= Skills.Druid.Hurricane;	// Druid
+        case ClassID.Assassin: return Skills.Assassin.Fire_Trauma <= id && id <= Skills.Assassin.Royal_Strike;	// Assassin
 		default:
 	}
 	return false;
@@ -49,9 +50,9 @@ function gainedLevels () { return me.charlvl - prevLevel; };
 
 
 function canSpendPoints () {
-	var unusedStatPoints = me.getStat(4);
+    var unusedStatPoints = me.getStat(Stats.statpts);
 	var haveUnusedStatpoints = unusedStatPoints >= 5;	// We spend 5 stat points per level up
-	var unusedSkillPoints = me.getStat(5);
+    var unusedSkillPoints = me.getStat(Stats.newskills);
 	var haveUnusedSkillpoints = unusedSkillPoints >= 1;	// We spend 1 skill point per level up
 	if (debug) { AutoBuild.print("Stat points:", unusedStatPoints, "     Skill points:", unusedSkillPoints); }
 	return haveUnusedStatpoints && haveUnusedSkillpoints; 
@@ -59,7 +60,7 @@ function canSpendPoints () {
 
 
 function spendStatPoint (id) {
-	var unusedStatPoints = me.getStat(4);
+    var unusedStatPoints = me.getStat(Stats.statpts);
 	if (SPEND_POINTS) {
 		useStatPoint(id);
 		AutoBuild.print("useStatPoint("+id+"): "+STAT_ID_TO_NAME[id]);
@@ -67,7 +68,7 @@ function spendStatPoint (id) {
 		AutoBuild.print("Fake useStatPoint("+id+"): "+STAT_ID_TO_NAME[id]);
 	}
 	delay(100);											// TODO: How long should we wait... if at all?
-	return (unusedStatPoints - me.getStat(4) === 1);	// Check if we spent one point
+    return (unusedStatPoints - me.getStat(Stats.statpts) === 1);	// Check if we spent one point
 };
 
 
@@ -76,7 +77,7 @@ function spendStatPoints () {
 	var stats = AutoBuildTemplate[me.charlvl].StatPoints;
 	var errorMessage = "\nInvalid stat point set in build template "+getTemplateFilename()+" at level "+me.charlvl;
 	var spentEveryPoint = true;
-	var unusedStatPoints = me.getStat(4);
+    var unusedStatPoints = me.getStat(Stats.statpts);
 	var len = stats.length;
 	
 	if (len > unusedStatPoints) {
@@ -88,7 +89,7 @@ function spendStatPoints () {
 	// We silently ignore stats set to -1
 	for (var i = 0; i < len; i++) {
 		var id = stats[i];
-		var statIsValid = (typeof id === "number") && (0 <= id && id <= 3);
+        var statIsValid = (typeof id === "number") && (Stats.strength <= id && id <= Stats.vitality);
 		
 		if (id === -1) { continue; }
 		else if (statIsValid) {
@@ -134,7 +135,7 @@ function getRequiredSkills (id) {
 		
 		for (var i = 0; i < results.length; i++) {
 			var skill = results[i];
-			var skillInValidRange = (0 < skill && skill <= 280) && (![217, 218, 219, 220].contains(skill));
+            var skillInValidRange = (0 < skill && skill <= 280) && (![Skills.common.Scroll_of_Identify, Skills.common.Book_of_Identify, Skills.common.Scroll_of_Townportal, Skills.common.Book_of_Townportal].contains(skill));
 			var hardPointsInSkill = me.getSkill(skill, 0);
 			
 			if (skillInValidRange && !hardPointsInSkill) {
@@ -152,7 +153,7 @@ function getRequiredSkills (id) {
 
 
 function spendSkillPoint (id) {
-	var unusedSkillPoints = me.getStat(5);
+    var unusedSkillPoints = me.getStat(Stats.newskills);
 	var skillName = getSkillById(id)+" ("+id+")";		// TODO: Use let ? 
 	if (SPEND_POINTS) {
 		useSkillPoint(id);
@@ -161,7 +162,7 @@ function spendSkillPoint (id) {
 		AutoBuild.print("Fake useSkillPoint(): "+skillName);
 	}
 	delay(200);											// TODO: How long should we wait... if at all?
-	return (unusedSkillPoints - me.getStat(5) === 1);	// Check if we spent one point
+    return (unusedSkillPoints - me.getStat(Stats.newskills) === 1);	// Check if we spent one point
 };
 
 
@@ -169,7 +170,7 @@ function spendSkillPoints () {
 	var skills = AutoBuildTemplate[me.charlvl].SkillPoints;
 	var errInvalidSkill = "\nInvalid skill point set in build template "+getTemplateFilename()+" for level "+me.charlvl;
 	var spentEveryPoint = true;
-	var unusedSkillPoints = me.getStat(5);
+    var unusedSkillPoints = me.getStat(Stats.newskills);
 	var len = skills.length;
 	
 	if (len > unusedSkillPoints) {

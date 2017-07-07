@@ -3,13 +3,14 @@
 *	@author		kolton, njomnjomnjom
 *	@desc		kill Mephisto
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Mephisto() {
 	this.killMephisto = function () {
 		var i, angle, angles,
 			pos = {},
 			attackCount = 0,
-			meph = getUnit(1, 242);
+            meph = getUnit(UnitType.NPC, UnitClassID.mephisto);
 
 		if (!meph) {
 			throw new Error("Mephisto not found!");
@@ -22,7 +23,7 @@ function Mephisto() {
 
 		while (attackCount < 300 && Attack.checkMonster(meph)) {
 			//if (getUnit(3, 276)) {
-			if (meph.mode === 5) {
+            if (meph.mode === NPCModes.attack2) {
 			//if (attackCount % 2 === 0) {
 				angle = Math.round(Math.atan2(me.y - meph.y, me.x - meph.x) * 180 / Math.PI);
 				angles = me.y > meph.y ? [-30, -60, -90] : [30, 60, 90];
@@ -49,7 +50,7 @@ function Mephisto() {
 			attackCount += 1;
 		}
 
-		return (meph.mode === 0 || meph.mode === 12);
+        return (meph.mode === NPCModes.death || meph.mode === NPCModes.dead);
 	};
 
 	this.moat = function () {
@@ -60,7 +61,7 @@ function Mephisto() {
 		delay(350);
 		Pather.moveTo(17563, 8072);
 
-		mephisto = getUnit(1, 242);
+        mephisto = getUnit(UnitType.NPC, UnitClassID.mephisto);
 
 		if (!mephisto) {
 			throw new Error("Mephisto not found.");
@@ -124,17 +125,17 @@ function Mephisto() {
 				say("council " + i);
 			}
 
-			Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
+            Attack.clearList(Attack.getMob([UnitClassID.councilmember1, UnitClassID.councilmember2, UnitClassID.councilmember3], 0, 40));
 		}
 
 		return true;
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(101);
+    Pather.useWaypoint(Areas.Act3.Durance_Of_Hate_Level_2);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(102, true)) {
+    if (!Pather.moveToExit(Areas.Act3.Durance_Of_Hate_Level_3, true)) {
 		throw new Error("Failed to move to Durance Level 3");
 	}
 
@@ -144,21 +145,21 @@ function Mephisto() {
 
 	Pather.moveTo(17566, 8069);
 
-	if (me.classid === 1) {
+    if (me.classid === ClassID.Sorceress) {
 		if (Config.Mephisto.MoatTrick) {
 			this.moat();
 
 			Skill.usePvpRange = true;
 
-			Attack.kill(242); // Mephisto
+            Attack.kill(UnitClassID.mephisto); // Mephisto
 
 			Skill.usePvpRange = false;
 		} else {
 			//this.killMephisto();
-			Attack.kill(242); // Mephisto
+            Attack.kill(UnitClassID.mephisto); // Mephisto
 		}
 	} else {
-		Attack.kill(242); // Mephisto
+        Attack.kill(UnitClassID.mephisto); // Mephisto
 	}
 
 	Pickit.pickItems();

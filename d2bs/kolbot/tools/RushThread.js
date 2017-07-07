@@ -26,6 +26,7 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var gidList = [];
 
@@ -77,7 +78,7 @@ function main() {
 
 	this.playersInAct = function (act) {
 		var area, party,
-			areas = [0, 1, 40, 75, 103, 109];
+            areas = [Areas.None, Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath];
 
 		if (!act) {
 			act = me.act;
@@ -100,10 +101,10 @@ function main() {
 	this.andariel = function () {
 		say("starting andariel");
 		Town.doChores();
-		Pather.useWaypoint(35, true);
+        Pather.useWaypoint(Areas.Act1.Catacombs_Level_2, true);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([36, 37], true) || !Pather.moveTo(22582, 9612)) {
+        if (!Pather.moveToExit([Areas.Act1.Catacombs_Level_3, Areas.Act1.Catacombs_Level_4], true) || !Pather.moveTo(22582, 9612)) {
 			throw new Error("andy failed");
 		}
 
@@ -116,7 +117,7 @@ function main() {
 			delay(250);
 		}
 
-		Attack.kill(156);
+        Attack.kill(UnitClassID.andariel);
 		say("2");
 		Pather.moveTo(22582, 9612);
 
@@ -126,7 +127,7 @@ function main() {
 
 		Pather.usePortal(null, me.name);
 		say("a2");
-		Pather.useWaypoint(40, true);
+        Pather.useWaypoint(Areas.Act2.Lut_Gholein, true);
 
 		while (!this.playersInAct(2)) {
 			delay(250);
@@ -138,10 +139,10 @@ function main() {
 	this.cube = function () {
 		if (me.diff === 0) {
 			say("starting cube");
-			Pather.useWaypoint(57, true);
+            Pather.useWaypoint(Areas.Act2.Halls_Of_The_Dead_Level_2, true);
 			Precast.doPrecast(true);
 
-			if (!Pather.moveToExit(60, true) || !Pather.moveToPreset(me.area, 2, 354)) {
+            if (!Pather.moveToExit(Areas.Act2.Halls_Of_The_Dead_Level_3, true) || !Pather.moveToPreset(me.area, UnitType.Object, UnitClassID.trap_melee)) {
 				throw new Error("cube failed");
 			}
 
@@ -166,10 +167,10 @@ function main() {
 	this.amulet = function () {
 		say("starting amulet");
 		Town.doChores();
-		Pather.useWaypoint(44, true);
+        Pather.useWaypoint(Areas.Act2.Lost_City, true);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([45, 58, 61], true) || !Pather.moveTo(15044, 14045)) {
+        if (!Pather.moveToExit([Areas.Act2.Valley_Of_Snakes, Areas.Act2.Claw_Viper_Temple_Level_1, Areas.Act2.Claw_Viper_Temple_Level_2], true) || !Pather.moveTo(15044, 14045)) {
 			throw new Error("amulet failed");
 		}
 
@@ -199,10 +200,10 @@ function main() {
 	this.staff = function () {
 		say("starting staff");
 		Town.doChores();
-		Pather.useWaypoint(43, true);
+        Pather.useWaypoint(Areas.Act2.Far_Oasis, true);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([62, 63, 64], true) || !Pather.moveToPreset(me.area, 2, 356)) {
+        if (!Pather.moveToExit([Areas.Act2.Maggot_Lair_Level_1, Areas.Act2.Maggot_Lair_Level_2, Areas.Act2.Maggot_Lair_Level_3], true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Staff_Of_Kings_Chest)) {
 			throw new Error("staff failed");
 		}
 
@@ -232,11 +233,11 @@ function main() {
 
 		say("starting summoner");
 		Town.doChores();
-		Pather.useWaypoint(74, true);
+        Pather.useWaypoint(Areas.Act2.Arcane_Sanctuary, true);
 		Precast.doPrecast(true);
 
 		var i, journal,
-			preset = getPresetUnit(me.area, 2, 357),
+            preset = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Horazons_Journal),
 			spot = {};
 
 		switch (preset.roomx * 5 + preset.x) {
@@ -273,7 +274,7 @@ function main() {
 			delay(250);
 		}
 
-		Pather.moveToPreset(me.area, 2, 357);
+        Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Horazons_Journal);
 		Attack.kill(250);
 		say("2");
 
@@ -282,16 +283,16 @@ function main() {
 		}
 
 		Pickit.pickItems();
-		Pather.moveToPreset(me.area, 2, 357);
+        Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Horazons_Journal);
 
-		journal = getUnit(2, 357);
+        journal = getUnit(UnitType.Object, UniqueObjectIds.Horazons_Journal);
 
 		for (i = 0; i < 5; i += 1) {
 			journal.interact();
 			delay(1000);
 			me.cancel();
 
-			if (Pather.getPortal(46)) {
+            if (Pather.getPortal(Areas.Act2.Canyon_Of_The_Magi)) {
 				break;
 			}
 		}
@@ -300,7 +301,7 @@ function main() {
 			throw new Error("summoner failed");
 		}
 
-		Pather.usePortal(46);
+        Pather.usePortal(Areas.Act2.Canyon_Of_The_Magi);
 
 		return true;
 	};
@@ -310,12 +311,12 @@ function main() {
 
 		if (me.inTown) {
 			Town.doChores();
-			Pather.useWaypoint(46, true);
+            Pather.useWaypoint(Areas.Act2.Canyon_Of_The_Magi, true);
 		}
 
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit(getRoom().correcttomb, true) || !Pather.moveToPreset(me.area, 2, 152)) {
+        if (!Pather.moveToExit(getRoom().correcttomb, true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Holder_For_Horadric_Staff)) {
 			throw new Error("duriel failed");
 		}
 
@@ -332,12 +333,12 @@ function main() {
 			delay(100);
 		}
 
-		while (!getUnit(2, 100)) {
+        while (!getUnit(UnitType.Object, UniqueObjectIds.Portal_To_Duriel)) {
 			delay(500);
 		}
 
-		Pather.useUnit(2, 100, 73);
-		Attack.kill(211);
+        Pather.useUnit(UnitType.Object, UniqueObjectIds.Portal_To_Duriel, Areas.Act2.Duriels_Lair);
+        Attack.kill(UnitClassID.duriel);
 		Pickit.pickItems();
 
 		Pather.teleport = false;
@@ -359,8 +360,8 @@ function main() {
 			Town.goToTown();
 		}
 
-		Pather.useWaypoint(52);
-		Pather.moveToExit([51, 50], true);
+        Pather.useWaypoint(Areas.Act2.Palace_Cellar_Level_1);
+        Pather.moveToExit([Areas.Act2.Harem_Level_2, Areas.Act2.Harem_Level_1], true);
 		Pather.moveTo(10022, 5047);
 		say("a3");
 		Town.goToTown(3);
@@ -376,7 +377,7 @@ function main() {
 	this.travincal = function () {
 		say("starting travincal");
 		Town.doChores();
-		Pather.useWaypoint(83, true);
+        Pather.useWaypoint(Areas.Act3.Travincal, true);
 		Precast.doPrecast(true);
 
 		var coords = [me.x, me.y];
@@ -412,9 +413,9 @@ function main() {
 		var hydra;
 
 		Town.doChores();
-		Pather.useWaypoint(101, true);
+        Pather.useWaypoint(Areas.Act3.Durance_Of_Hate_Level_2, true);
 		Precast.doPrecast(true);
-		Pather.moveToExit(102, true);
+        Pather.moveToExit(Areas.Act3.Durance_Of_Hate_Level_3, true);
 		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
 		delay(2000);
@@ -425,7 +426,7 @@ function main() {
 		}
 
 		Pather.moveTo(17591, 8070);
-		Attack.kill(242);
+        Attack.kill(UnitClassID.mephisto);
 		Pickit.pickItems();
 		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
@@ -438,11 +439,11 @@ function main() {
 		Pather.moveTo(17591, 8070);
 		Attack.securePosition(me.x, me.y, 40, 3000);
 
-		hydra = getUnit(1, "hydra");
+        hydra = getUnit(UnitType.NPC, "hydra");
 
 		if (hydra) {
 			do {
-				while (hydra.mode !== 0 && hydra.mode !== 12 && hydra.hp > 0) {
+                while (hydra.mode !== NPCModes.death && hydra.mode !== NPCModes.dead && hydra.hp > 0) {
 					delay(500);
 				}
 			} while (hydra.getNext());
@@ -473,7 +474,7 @@ function main() {
 		say("starting diablo");
 
 		this.getLayout = function (seal, value) {
-			var sealPreset = getPresetUnit(108, 2, seal);
+            var sealPreset = getPresetUnit(Areas.Act4.Chaos_Sanctuary, States.POISON, seal);
 
 			if (!seal) {
 				throw new Error("Seal preset not found. Can't continue.");
@@ -487,17 +488,17 @@ function main() {
 		};
 
 		this.initLayout = function () {
-			this.vizLayout = this.getLayout(396, 5275);
-			this.seisLayout = this.getLayout(394, 7773);
-			this.infLayout = this.getLayout(392, 7893);
+            this.vizLayout = this.getLayout(UniqueObjectIds.Diablo_Seal5, 5275);
+            this.seisLayout = this.getLayout(UniqueObjectIds.Diablo_Seal3, 7773);
+            this.infLayout = this.getLayout(UniqueObjectIds.Diablo_Seal1, 7893);
 		};
 
 		this.getBoss = function (name) {
 			var i, boss,
-				glow = getUnit(2, 131);
+                glow = getUnit(UnitType.Object, UniqueObjectIds.Vile_Dog_Afterglow);
 
 			for (i = 0; i < (name === getLocaleString(2853) ? 14 : 12); i += 1) {
-				boss = getUnit(1, name);
+                boss = getUnit(UnitType.NPC, name);
 
 				if (boss) {
 					if (name === getLocaleString(2852)) {
@@ -520,13 +521,13 @@ function main() {
 			var i, n, target, positions;
 
 			switch (me.classid) {
-			case 0:
+                case UnitClassID.skeleton1:
 				break;
-			case 1:
+                case UnitClassID.skeleton2:
 				break;
-			case 2:
+                case UnitClassID.skeleton3:
 				break;
-			case 3:
+                case UnitClassID.skeleton4:
 				target = getUnit(1, name);
 
 				if (!target) {
@@ -549,20 +550,20 @@ function main() {
 				}
 
 				break;
-			case 4:
+                case UnitClassID.skeleton5:
 				break;
-			case 5:
+                case UnitClassID.zombie1:
 				break;
-			case 6:
+                case UnitClassID.zombie2:
 				break;
 			}
 		};
 
 		this.openSeal = function (id) {
-			Pather.moveToPreset(108, 2, id, 4);
+            Pather.moveToPreset(Areas.Act4.Chaos_Sanctuary, UnitType.Object, id, 4);
 
 			var i, tick,
-				seal = getUnit(2, id);
+                seal = getUnit(UnitType.Object, id);
 
 			if (seal) {
 				for (i = 0; i < 3; i += 1) {
@@ -584,12 +585,12 @@ function main() {
 		};
 
 		Town.doChores();
-		Pather.useWaypoint(107, true);
+        Pather.useWaypoint(Areas.Act4.River_Of_Flame, true);
 		Precast.doPrecast(true);
 		Pather.moveTo(7790, 5544);
 		this.initLayout();
 
-		if (!this.openSeal(395) || !this.openSeal(396)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal4) || !this.openSeal(UniqueObjectIds.Diablo_Seal5)) {
 			throw new Error("Failed to open seals");
 		}
 
@@ -603,7 +604,7 @@ function main() {
 			throw new Error("Failed to kill Vizier");
 		}
 
-		if (!this.openSeal(394)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal3)) {
 			throw new Error("Failed to open seals");
 		}
 
@@ -617,7 +618,7 @@ function main() {
 			throw new Error("Failed to kill de Seis");
 		}
 
-		if (!this.openSeal(392) || !this.openSeal(393)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal1) || !this.openSeal(UniqueObjectIds.Diablo_Seal2)) {
 			throw new Error("Failed to open seals");
 		}
 
@@ -642,11 +643,11 @@ function main() {
 
 		Pather.moveTo(7763, 5267);
 
-		while (!getUnit(1, 243)) {
+        while (!getUnit(UnitType.NPC, UnitClassID.diablo)) {
 			delay(500);
 		}
 
-		Attack.kill(243);
+        Attack.kill(UnitClassID.diablo);
 		say("2");
 
 		if (me.gametype > 0) {
@@ -688,10 +689,10 @@ function main() {
 		var altar;
 
 		Town.doChores();
-		Pather.useWaypoint(118, true);
+        Pather.useWaypoint(Areas.Act5.Ancients_Way, true);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit(120, true)) {
+        if (!Pather.moveToExit(Areas.Act5.Arreat_Summit, true)) {
 			throw new Error("Failed to go to Ancients way.");
 		}
 
@@ -705,10 +706,10 @@ function main() {
 
 		Pather.moveTo(10048, 12628);
 
-		altar = getUnit(2, 546);
+        altar = getUnit(UnitType.Object, UniqueObjectIds.AncientsAltar);
 
 		if (altar) {
-			while (altar.mode !== 2) {
+            while (altar.mode !== ObjectModes.Opened) {
 				Pather.moveToUnit(altar);
 				altar.interact();
 				delay(2000 + me.ping);
@@ -716,7 +717,7 @@ function main() {
 			}
 		}
 
-		while (!getUnit(1, 542)) {
+        while (!getUnit(UnitType.NPC, UnitClassID.ancientbarb3)) {
 			delay(250);
 		}
 
@@ -745,9 +746,9 @@ function main() {
 			var check;
 
 			switch (me.classid) {
-			case 1:
-				if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
-					if (me.getState(121)) {
+                case ClassID.Sorceress:
+                    if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+                        if (me.getState(States.SKILLDELAY)) {
 						delay(500);
 					} else {
 						Skill.cast(Config.AttackSkill[1], 0, 15093, 5024);
@@ -755,8 +756,8 @@ function main() {
 				}
 
 				return true;
-			case 3: // Paladin
-				if (Config.AttackSkill[3] !== 112) {
+                case ClassID.Paladin: // Paladin
+                    if (Config.AttackSkill[3] !== Skills.Paladin.Blessed_Hammer) {
 					return false;
 				}
 
@@ -771,15 +772,15 @@ function main() {
 				Skill.cast(Config.AttackSkill[3], 1);
 
 				return true;
-			case 5: // Druid
-				if (Config.AttackSkill[3] === 245) {
+                case ClassID.Druid: // Druid
+                    if (Config.AttackSkill[3] === Skills.Druid.Tornado) {
 					Skill.cast(Config.AttackSkill[3], 0, 15093, 5029);
 
 					return true;
 				}
 
 				break;
-			case 6:
+                case ClassID.Assassin:
 				if (Config.UseTraps) {
 					check = ClassAttack.checkTraps({x: 15093, y: 5029});
 
@@ -797,23 +798,23 @@ function main() {
 		};
 
 		this.checkThrone = function () {
-			var monster = getUnit(1);
+            var monster = getUnit(UnitType.NPC);
 
 			if (monster) {
 				do {
 					if (Attack.checkMonster(monster) && monster.y < 5080) {
 						switch (monster.classid) {
-						case 23:
-						case 62:
+                            case UnitClassID.fallen5:
+                            case UnitClassID.fallenshaman5:
 							return 1;
-						case 105:
-						case 381:
+                            case UnitClassID.unraveler5:
+                            case UnitClassID.skmage_cold3:
 							return 2;
-						case 557:
+                            case UnitClassID.baalhighpriest:
 							return 3;
-						case 558:
+                            case UnitClassID.venomlord:
 							return 4;
-						case 571:
+                            case UnitClassID.baalminion1:
 							return 5;
 						default:
 							Attack.getIntoPosition(monster, 10, 0x4);
@@ -834,7 +835,7 @@ function main() {
 				pos = [15097, 5054, 15085, 5053, 15085, 5040, 15098, 5040, 15099, 5022, 15086, 5024];
 
 			if (Config.AvoidDolls) {
-				monster = getUnit(1, 691);
+                monster = getUnit(UnitType.NPC, UnitClassID.bonefetish7);
 
 				if (monster) {
 					do {
@@ -856,14 +857,14 @@ function main() {
 		};
 
 		this.checkHydra = function () {
-			var monster = getUnit(1, "hydra");
+            var monster = getUnit(UnitType.NPC, "hydra");
 
 			if (monster) {
 				do {
-					if (monster.mode !== 12 && monster.getStat(172) !== 2) {
+                    if (monster.mode !== NPCModes.dead && monster.getStat(Stats.alignment) !== 2) {
 						Pather.moveTo(15118, 5002);
 
-						while (monster.mode !== 12) {
+                        while (monster.mode !== NPCModes.dead) {
 							delay(500);
 
 							if (!copyUnit(monster).x) {
@@ -881,10 +882,10 @@ function main() {
 
 		if (me.inTown) {
 			Town.doChores();
-			Pather.useWaypoint(129, true);
+            Pather.useWaypoint(Areas.Act5.The_Worldstone_Keep_Level_2, true);
 			Precast.doPrecast(true);
 
-			if (!Pather.moveToExit([130, 131], true)) {
+            if (!Pather.moveToExit([Areas.Act5.The_Worldstone_Keep_Level_3, Areas.Act5.Throne_Of_Destruction], true)) {
 				throw new Error("Failed to move to Throne of Destruction.");
 			}
 		}
@@ -894,15 +895,15 @@ function main() {
 		this.clearThrone();
 
 		tick = getTickCount();
-		Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
+        Pather.moveTo(15093, me.classid === ClassID.Paladin ? 5029 : 5039);
 
 MainLoop:
 		while (true) {
-			if (getDistance(me, 15093, me.classid === 3 ? 5029 : 5039) > 3) {
-				Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
+            if (getDistance(me, 15093, me.classid === ClassID.Paladin ? 5029 : 5039) > 3) {
+                Pather.moveTo(15093, me.classid === ClassID.Paladin ? 5029 : 5039);
 			}
 
-			if (!getUnit(1, 543)) {
+            if (!getUnit(UnitType.NPC, UnitClassID.baalthrone)) {
 				break MainLoop;
 			}
 
@@ -940,8 +941,8 @@ MainLoop:
 				break MainLoop;
 			default:
 				if (getTickCount() - tick < 7e3) {
-					if (me.getState(2)) {
-						Skill.setSkill(109, 0);
+                    if (me.getState(States.POISON)) {
+                        Skill.setSkill(Skills.Paladin.Cleansing, 0);
 					}
 
 					break;
@@ -962,13 +963,13 @@ MainLoop:
 		Pather.moveTo(15092, 5011);
 		Precast.doPrecast(true);
 
-		while (getUnit(1, 543)) {
+        while (getUnit(UnitType.NPC, UnitClassID.baalthrone)) {
 			delay(500);
 		}
 
 		delay(1000);
 
-		portal = getUnit(2, 563);
+        portal = getUnit(UnitType.Object, UniqueObjectIds.Worldstone_Chamber);
 
 		if (portal) {
 			Pather.usePortal(null, null, portal);
@@ -987,7 +988,7 @@ MainLoop:
 		}
 
 		Pather.moveTo(15134, 5923);
-		Attack.kill(544); // Baal
+        Attack.kill(UnitClassID.baalcrab); // Baal
 		Pickit.pickItems();
 
 		return true;
@@ -1039,13 +1040,13 @@ MainLoop:
 				return false;
 			};
 
-		Pather.useWaypoint(48, true);
+        Pather.useWaypoint(Areas.Act2.A2_Sewers_Level_2, true);
 		Precast.doPrecast(false);
-		Pather.moveToExit(49, true);
+        Pather.moveToExit(Areas.Act2.A2_Sewers_Level_3, true);
 
-		radaPreset = getPresetUnit(49, 2, 355);
+        radaPreset = getPresetUnit(Areas.Act2.A2_Sewers_Level_3, UnitType.Object, UniqueObjectIds.Horadric_Scroll_Chest);
 		radaCoords = {
-			area: 49,
+            area: Areas.Act2.A2_Sewers_Level_3,
 			x: radaPreset.roomx * 5 + radaPreset.x,
 			y: radaPreset.roomy * 5 + radaPreset.y
 		};
@@ -1053,7 +1054,7 @@ MainLoop:
 		moveIntoPos(radaCoords, 50);
 
 		for (i = 0; i < 3; i += 1) {
-			rada = getUnit(1, 229);
+            rada = getUnit(UnitType.NPC, UnitClassID.radament);
 
 			if (rada) {
 				break;
@@ -1076,7 +1077,7 @@ MainLoop:
 			delay(200);
 		}
 
-		Attack.kill(229); // Radament
+        Attack.kill(UnitClassID.radament); // Radament
 
 		returnSpot = {
 			x: me.x,
@@ -1099,7 +1100,7 @@ MainLoop:
 			delay(200);
 		}
 
-		while (getUnit(4, 552)) {
+        while (getUnit(UnitType.Item, ItemClassIds.Book_Of_Skill)) {
 			delay(1000);
 		}
 
@@ -1119,13 +1120,13 @@ MainLoop:
 
 		say("starting lamesen");
 
-		if (!Town.goToTown() || !Pather.useWaypoint(80, true)) {
+        if (!Town.goToTown() || !Pather.useWaypoint(Areas.Act3.Kurast_Bazaar, true)) {
 			throw new Error("Lam Essen quest failed");
 		}
 
 		Precast.doPrecast(false);
 
-		if (!Pather.moveToExit(94, true) || !Pather.moveToPreset(me.area, 2, 193)) {
+        if (!Pather.moveToExit(Areas.Act3.Ruined_Temple, true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Lam_Esens_Tome)) {
 			throw new Error("Lam Essen quest failed");
 		}
 
@@ -1185,13 +1186,13 @@ MainLoop:
 				return false;
 			};
 
-		Pather.useWaypoint(106, true);
+        Pather.useWaypoint(Areas.Act4.City_Of_The_Damned, true);
 		Precast.doPrecast(false);
-		Pather.moveToExit(105, true);
+        Pather.moveToExit(Areas.Act4.Plains_Of_Despair, true);
 
-		izualPreset = getPresetUnit(105, 1, 256);
+        izualPreset = getPresetUnit(Areas.Act4.Plains_Of_Despair, UnitType.NPC, UnitClassID.izual);
 		izualCoords = {
-			area: 105,
+            area: Areas.Act4.Plains_Of_Despair,
 			x: izualPreset.roomx * 5 + izualPreset.x,
 			y: izualPreset.roomy * 5 + izualPreset.y
 		};
@@ -1199,7 +1200,7 @@ MainLoop:
 		moveIntoPos(izualCoords, 50);
 
 		for (i = 0; i < 3; i += 1) {
-			izual = getUnit(1, 256);
+            izual = getUnit(UnitType.NPC, UnitClassID.izual);
 
 			if (izual) {
 				break;
@@ -1227,7 +1228,7 @@ MainLoop:
 			delay(200);
 		}
 
-		Attack.kill(256); // Izual
+        Attack.kill(UnitClassID.izual); // Izual
 		Pickit.pickItems();
 		say("2");
 		Pather.moveToUnit(returnSpot);
@@ -1248,7 +1249,7 @@ MainLoop:
 
 		say("starting shenk");
 
-		Pather.useWaypoint(111, true);
+        Pather.useWaypoint(Areas.Act5.Frigid_Highlands, true);
 		Precast.doPrecast(false);
 		Pather.moveTo(3846, 5120);
 		Attack.securePosition(me.x, me.y, 30, 3000);
@@ -1282,19 +1283,19 @@ MainLoop:
 
 		var anya;
 
-		if (!Town.goToTown() || !Pather.useWaypoint(113, true)) {
+        if (!Town.goToTown() || !Pather.useWaypoint(Areas.Act5.Crystalized_Passage, true)) {
 			throw new Error("Anya quest failed");
 		}
 
 		Precast.doPrecast(false);
 
-		if (!Pather.moveToExit(114, true) || !Pather.moveToPreset(me.area, 2, 460)) {
+        if (!Pather.moveToExit(Areas.Act5.Frozen_River, true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Drehya_Outside_Town)) {
 			throw new Error("Anya quest failed");
 		}
 
 		Attack.securePosition(me.x, me.y, 30, 2000);
 
-		anya = getUnit(2, 558);
+        anya = getUnit(UnitType.Object, UniqueObjectIds.Frozen_Anya);
 
 		if (anya) {
 			Pather.moveToUnit(anya);
@@ -1310,7 +1311,7 @@ MainLoop:
 			delay(200);
 		}
 
-		while (getUnit(2, 558)) {
+        while (getUnit(UnitType.Object, UniqueObjectIds.Frozen_Anya)) {
 			delay(1000);
 		}
 

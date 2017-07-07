@@ -1,13 +1,15 @@
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 function GetKeys() {
 	Town.doChores();
 
 	if (!me.findItems("pk1") || me.findItems("pk1").length < 3) {
 		try {
 			print("ÿc2Countess");
-			Pather.useWaypoint(6);
+            Pather.useWaypoint(Areas.Act1.Black_Marsh);
 			Precast.doPrecast(true);
-			Pather.journeyTo(25);
-			Pather.moveToPreset(me.area, 2, 580);
+            Pather.journeyTo(Areas.Act1.Tower_Cellar_Level_5);
+            Pather.moveToPreset(me.area, UnitType.Object, 580);
 			Attack.kill(getLocaleString(2875));
 			Pickit.pickItems();
 		} catch (countessError) {
@@ -20,10 +22,10 @@ function GetKeys() {
 			print("ÿc2Summoner");
 			Town.goToTown();
 			Town.doChores();
-			Pather.useWaypoint(74);
+            Pather.useWaypoint(Areas.Act2.Arcane_Sanctuary);
 			Precast.doPrecast(true);
-			Pather.moveToPreset(me.area, 2, 357, -3, -3);
-			Attack.kill(250);
+            Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Horazons_Journal, -3, -3);
+            Attack.kill(UnitClassID.summoner);
 			Pickit.pickItems();
 		} catch (summonerError) {
 			print("ÿc1Summoner failed");
@@ -35,11 +37,11 @@ function GetKeys() {
 			print("ÿc2Nihlathak");
 			Town.goToTown();
 			Town.doChores();
-			Pather.useWaypoint(123);
+            Pather.useWaypoint(Areas.Act5.Halls_Of_Pain);
 			Precast.doPrecast(true);
-			Pather.moveToExit(124, true);
-			Pather.moveToPreset(me.area, 2, 462);
-			Attack.kill(526);
+            Pather.moveToExit(Areas.Act5.Halls_Of_Vaught, true);
+            Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Nihlathak_Outside_Town);
+            Attack.kill(UnitClassID.nihlathakboss);
 			Pickit.pickItems();
 		} catch (nihlathakError) {
 			print("ÿc1Nihlathak failed");

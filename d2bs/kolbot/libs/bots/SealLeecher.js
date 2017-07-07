@@ -1,3 +1,5 @@
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 function SealLeecher() {
 	var monster,
 		commands = [];
@@ -30,7 +32,7 @@ function SealLeecher() {
 			switch (commands[0]) {
 			case "in":
 				if (me.inTown) {
-					Pather.usePortal(108, Config.Leader);
+                    Pather.usePortal(Areas.Act4.Chaos_Sanctuary, Config.Leader);
 					delay(250);
 				}
 
@@ -43,7 +45,7 @@ function SealLeecher() {
 				break;
 			case "out":
 				if (!me.inTown) {
-					Pather.usePortal(103, Config.Leader);
+                    Pather.usePortal(Areas.Act4.The_Pandemonium_Fortress, Config.Leader);
 				}
 
 				commands.shift();
@@ -56,7 +58,7 @@ function SealLeecher() {
 			delay(40);
 		}
 
-		if (me.mode === 17) {
+        if (me.mode === PlayerModes.Dead) {
 			me.revive();
 
 			while (!me.inTown) {
@@ -65,13 +67,13 @@ function SealLeecher() {
 		}
 
 		if (!me.inTown) {
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 
 			if (monster) {
 				do {
 					if (Attack.checkMonster(monster) && getDistance(me, monster) < 20) {
 						me.overhead("HOT");
-						Pather.usePortal(103, Config.Leader);
+                        Pather.usePortal(Areas.Act4.The_Pandemonium_Fortress, Config.Leader);
 					}
 				} while (monster.getNext());
 			}

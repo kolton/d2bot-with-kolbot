@@ -24,6 +24,7 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function main() {
 	var townCheck = false;
@@ -61,7 +62,7 @@ function main() {
 	addEventListener("scriptmsg",
 		function (msg) {
 			if (msg === "townCheck") {
-				if (me.area === 136) {
+                if (me.area === Areas.UberLevels.Tristram) {
 					print("Can't tp from uber trist.");
 				} else {
 					townCheck = true;

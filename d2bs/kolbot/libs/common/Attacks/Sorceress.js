@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Sorceress attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
@@ -11,11 +12,11 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
-		if (!me.getState(30) && me.getSkill(58, 1)) {
-			Skill.cast(58, 0);
+        if (!me.getState(States.ENERGYSHIELD) && me.getSkill(Skills.Sorceress.Energy_Shield, 1)) {
+            Skill.cast(Skills.Sorceress.Energy_Shield, 0);
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+        if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
@@ -32,7 +33,7 @@ var ClassAttack = {
 			untimedSkill = -1;
 
 		// Static
-		if (Config.CastStatic < 100 && me.getSkill(42, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.some(
+        if (Config.CastStatic < 100 && me.getSkill(Skills.Sorceress.Static_Field, 1) && Attack.checkResist(unit, "lightning") && Config.StaticList.some(
 				function (id) {
 					if (unit) {
 						switch (typeof id) {
@@ -56,7 +57,7 @@ var ClassAttack = {
 					return false;
 				}
 			) && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
-			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
+            staticRange = Math.floor((me.getSkill(Skills.Sorceress.Static_Field, 1) + 4) * 2 / 3);
 
 			while (!me.dead && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.checkMonster(unit)) {
 				if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
@@ -65,7 +66,7 @@ var ClassAttack = {
 					}
 				}
 
-				if (!Skill.cast(42, 0)) {
+                if (!Skill.cast(Skills.Sorceress.Static_Field, 0)) {
 					break;
 				}
 			}
@@ -80,9 +81,9 @@ var ClassAttack = {
 			checkSkill = Config.AttackSkill[index];
 		}
 
-		if (Attack.checkResist(unit, checkSkill) && ([56, 59].indexOf(checkSkill) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        if (Attack.checkResist(unit, checkSkill) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(checkSkill) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedSkill = Config.AttackSkill[5];
 		}
 
@@ -93,9 +94,9 @@ var ClassAttack = {
 			checkSkill = Config.AttackSkill[index + 1];
 		}
 
-		if (Attack.checkResist(unit, checkSkill) && ([56, 59].indexOf(checkSkill) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        if (Attack.checkResist(unit, checkSkill) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(checkSkill) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			untimedSkill = Config.AttackSkill[6];
 		}
 
@@ -147,7 +148,7 @@ var ClassAttack = {
 			return 2;
 		}
 
-		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
+        if (timedSkill > -1 && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(timedSkill))) {
 			if (Skill.getRange(timedSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
 				return 0;
 			}
@@ -190,7 +191,7 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			if (!me.getState(121)) {
+            if (!me.getState(States.SKILLDELAY)) {
 				break;
 			}
 

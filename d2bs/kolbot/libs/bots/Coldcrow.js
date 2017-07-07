@@ -3,17 +3,18 @@
 *	@author		njomnjomnjom
 *	@desc		kill Coldcrow
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Coldcrow() {
 	Town.doChores();
-	Pather.useWaypoint(3);
+    Pather.useWaypoint(Areas.Act1.Cold_Plains);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(9, true, false)) {
+    if (!Pather.moveToExit(Areas.Act1.Cave_Level_1, true, false)) {
 		throw new Error("Failed to move to Cave");
 	}
 	
-	if (!Pather.moveToPreset(me.area, 1, 736, 0, 0, false)) {
+    if (!Pather.moveToPreset(me.area, UnitType.NPC, SuperUniques.Coldcrow, 0, 0, false)) {
 		throw new Error("Failed to move to Coldcrow");
 	}
 	

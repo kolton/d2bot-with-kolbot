@@ -3,13 +3,14 @@
 *	@author		kolton
 *	@desc		kill Eyeback the Unleashed
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Eyeback() {
 	Town.doChores();
-	Pather.useWaypoint(112);
+    Pather.useWaypoint(Areas.Act5.Arreat_Plateau);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(111, 1, 784)) {
+    if (!Pather.moveToPreset(Areas.Act5.Frigid_Highlands, UnitType.NPC, SuperUniques.Eyeback_Unleashed)) {
 		throw new Error("Failed to move to Eyeback the Unleashed");
 	}
 

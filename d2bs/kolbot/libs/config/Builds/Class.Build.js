@@ -19,6 +19,7 @@ js_strict(true);
 if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
 if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
 if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var AutoBuildTemplate = {
 

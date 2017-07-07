@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		keep gambling while other players supply you with gold
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Gamble() {
 	var gold,
@@ -41,7 +42,7 @@ function Gamble() {
 
 				Town.stash();
 
-				gold = getUnit(4, 523, 3);
+                gold = getUnit(UnitType.Item, ItemClassIds.Gold, 3);
 
 				if (!gold || !Pickit.canPick(gold)) {
 					break;

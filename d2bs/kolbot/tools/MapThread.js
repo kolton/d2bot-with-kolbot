@@ -1,3 +1,5 @@
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 var Hooks = {
 	monsters: {
 		hooks: [],
@@ -218,7 +220,7 @@ var Hooks = {
 		},
 
 		flush: function () {
-			if (getUIFlag(0x0D)) {
+            if (getUIFlag(UIFlags.alt_show_items)) {
 				return;
 			}
 
@@ -250,7 +252,7 @@ var Hooks = {
 
 				if (exits) {
 					for (i = 0; i < exits.length; i += 1) {
-						this.add(exits[i].x, exits[i].y, me.area === 46 && exits[i].target === getRoom().correcttomb ? 0x69 : 0x99);
+                        this.add(exits[i].x, exits[i].y, me.area === Areas.Act2.Canyon_Of_The_Magi && exits[i].target === getRoom().correcttomb ? 0x69 : 0x99);
 					}
 				}
 
@@ -300,7 +302,7 @@ var Hooks = {
 				wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
 
 			for (i = 0; i < wpIDs.length; i += 1) {
-				preset = getPresetUnit(me.area, 2, wpIDs[i]);
+                preset = getPresetUnit(me.area, UnitType.Object, wpIDs[i]);
 
 				if (preset) {
 					return {
@@ -317,53 +319,53 @@ var Hooks = {
 			var unit, name;
 
 			switch (me.area) {
-			case 4: // Stony Field
-				unit = getPresetUnit(me.area, 1, 737);
+                case Areas.Act1.Stony_Field: // Stony Field
+                    unit = getPresetUnit(me.area, UnitType.NPC, SuperUniques.Rakanishu);
 				name = "Cairn Stones";
 
 				break;
-			case 5: // Dark Wood
-				unit = getPresetUnit(me.area, 2, 30);
+                case Areas.Act1.Dark_Wood: // Dark Wood
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Inifuss_Tree);
 				name = "Tree";
 
 				break;
-			case 49: // Sewers 3
-				unit = getPresetUnit(me.area, 2, 355);
+                case Areas.Act2.A2_Sewers_Level_3: // Sewers 3
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Horadric_Scroll_Chest);
 				name = "Radament";
 
 				break;
-			case 60: // Halls of the Dead 3
-				unit = getPresetUnit(me.area, 2, 354);
+                case Areas.Act2.Halls_Of_The_Dead_Level_3: // Halls of the Dead 3
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Horadric_Cube_Chest);
 				name = "Cube";
 
 				break;
-			case 74: // Arcane Sanctuary
-				unit = getPresetUnit(me.area, 2, 357);
+                case Areas.Act2.Arcane_Sanctuary: // Arcane Sanctuary
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Horazons_Journal);
 				name = "Summoner";
 
 				break;
-			case 64: // Maggot Lair 3
-				unit = getPresetUnit(me.area, 1, 749);
+                case Areas.Act2.Maggot_Lair_Level_3: // Maggot Lair 3
+                    unit = getPresetUnit(me.area, UnitType.NPC, SuperUniques.Coldworm_the_Burrower);
 				name = "Fat Worm";
 
 				break;
-			case 66: // Tal Rasha's Tombs
-			case 67:
-			case 68:
-			case 69:
-			case 70:
-			case 71:
-			case 72:
-				unit = getPresetUnit(me.area, 2, 152);
+                case Areas.Act2.Tal_Rashas_Tomb_1: // Tal Rasha's Tombs
+			case Areas.Act2.Tal_Rashas_Tomb_2:
+			case Areas.Act2.Tal_Rashas_Tomb_3:
+			case Areas.Act2.Tal_Rashas_Tomb_4:
+			case Areas.Act2.Tal_Rashas_Tomb_5:
+			case Areas.Act2.Tal_Rashas_Tomb_6:
+            case Areas.Act2.Tal_Rashas_Tomb_7:
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Holder_For_Horadric_Staff);
 				name = "Orifice";
 
 				break;
-			case 78: // Flayer Jungle
-				unit = getPresetUnit(me.area, 2, 252);
+            case Areas.Act3.Flayer_Jungle: // Flayer Jungle
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Gidbinn_Decoy);
 				name = "Gidbinn";
 
 				break;
-			case 102: // Durance of Hate 3
+            case Areas.Act3.Durance_Of_Hate_Level_3: // Durance of Hate 3
 				unit = {
 					x: 17588,
 					y: 8069
@@ -371,30 +373,30 @@ var Hooks = {
 				name = "Mephisto";
 
 				break;
-			case 105: // Plains of Despair
-				unit = getPresetUnit(me.area, 1, 256);
+            case Areas.Act4.Plains_Of_Despair: // Plains of Despair
+                    unit = getPresetUnit(me.area, UnitType.NPC, UnitClassID.izual);
 				name = "Izual";
 
 				break;
-			case 107: // River of Flame
-				unit = getPresetUnit(me.area, 2, 376);
+            case Areas.Act4.River_Of_Flame: // River of Flame
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Forge_Hell);
 				name = "Hephasto";
 
 				break;
-			case 108: // Chaos Sanctuary
-				unit = getPresetUnit(me.area, 2, 255);
+            case Areas.Act4.Chaos_Sanctuary: // Chaos Sanctuary
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Diablo_Start_Point);
 				name = "Star";
 
 				break;
-			case 111: // Frigid Highlands
-			case 112: // Arreat Plateau
-			case 117: // Frozen Tundra
-				unit = getPresetUnit(me.area, 2, 60);
+            case Areas.Act5.Frigid_Highlands: // Frigid Highlands
+            case Areas.Act5.Arreat_Plateau: // Arreat Plateau
+            case Areas.Act5.Frozen_Tundra: // Frozen Tundra
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Permanent_Town_Portal);
 				name = "Hell Entrance";
 
 				break;
-			case 124: // Halls of Vaught
-				unit = getPresetUnit(me.area, 2, 462);
+            case Areas.Act5.Halls_Of_Vaught: // Halls of Vaught
+                    unit = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Nihlathak_Outside_Town);
 				name = "Nihlathak";
 
 				break;
@@ -423,13 +425,30 @@ var Hooks = {
 	tele: {
 		hooks: [],
 		action: null,
-		currArea: 0,
+        currArea: Areas.None,
 		enabled: true,
-		prevAreas: [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-					36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46,
-					46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 81, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 102,
-					103, 104, 105, 106, 107, 103, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129,
-					130, 131, 109, 109, 109, 109],
+        prevAreas: [Areas.None, Areas.None, Areas.Act1.Rogue_Encampment, Areas.Act1.Blood_Moor, Areas.Act1.Cold_Plains, Areas.Act1.Underground_Passage_Level_1, Areas.Act1.Dark_Wood,
+            Areas.Act1.Black_Marsh, Areas.Act1.Blood_Moor, Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field, Areas.Act1.Black_Marsh, Areas.Act1.Tamoe_Highland, Areas.Act1.Cave_Level_1,
+            Areas.Act1.Underground_Passage_Level_1, Areas.Act1.Hole_Level_1, Areas.Act1.Pit_Level_1, Areas.Act1.Cold_Plains, Areas.Act1.Burial_Grounds, Areas.Act1.Burial_Grounds,
+            Areas.Act1.Black_Marsh, Areas.Act1.Forgotten_Tower, Areas.Act1.Tower_Cellar_Level_1, Areas.Act1.Tower_Cellar_Level_2, Areas.Act1.Tower_Cellar_Level_3, Areas.Act1.Tower_Cellar_Level_4,
+            Areas.Act1.Tamoe_Highland, Areas.Act1.Monastery_Gate, Areas.Act1.Outer_Cloister, Areas.Act1.Barracks, Areas.Act1.Jail_Level_1, Areas.Act1.Jail_Level_2, Areas.Act1.Jail_Level_3,
+            Areas.Act1.Inner_Cloister, Areas.Act1.Cathedral, Areas.Act1.Catacombs_Level_1, Areas.Act1.Catacombs_Level_2, Areas.Act1.Catacombs_Level_3, Areas.Act1.Stony_Field,
+            Areas.Act1.Rogue_Encampment, Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act2.Rocky_Waste, Areas.Act2.Dry_Hills, Areas.Act2.Far_Oasis, Areas.Act2.Lost_City,
+            Areas.Act2.Arcane_Sanctuary, Areas.Act2.Lut_Gholein, Areas.Act2.A2_Sewers_Level_1, Areas.Act2.A2_Sewers_Level_2, Areas.Act2.Lut_Gholein, Areas.Act2.Harem_Level_1,
+            Areas.Act2.Harem_Level_2, Areas.Act2.Palace_Cellar_Level_1, Areas.Act2.Palace_Cellar_Level_2, Areas.Act2.Rocky_Waste, Areas.Act2.Dry_Hills, Areas.Act2.Halls_Of_The_Dead_Level_1,
+            Areas.Act2.Valley_Of_Snakes, Areas.Act2.Stony_Tomb_Level_1, Areas.Act2.Halls_Of_The_Dead_Level_2, Areas.Act2.Claw_Viper_Temple_Level_1, Areas.Act2.Far_Oasis,
+            Areas.Act2.Maggot_Lair_Level_1, Areas.Act2.Maggot_Lair_Level_2, Areas.Act2.Lost_City, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi,
+            Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act1.Rogue_Encampment,
+            Areas.Act2.Palace_Cellar_Level_3, Areas.Act1.Rogue_Encampment, Areas.Act3.Kurast_Docktown, Areas.Act3.Spider_Forest, Areas.Act3.Spider_Forest, Areas.Act3.Flayer_Jungle,
+            Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Kurast_Causeway, Areas.Act3.Spider_Forest, Areas.Act3.Spider_Forest, Areas.Act3.Flayer_Jungle,
+            Areas.Act3.Swampy_Pit_Level_1, Areas.Act3.Flayer_Jungle, Areas.Act3.Flayer_Dungeon_Level_1, Areas.Act3.Swampy_Pit_Level_2, Areas.Act3.Flayer_Dungeon_Level_2, Areas.Act3.Upper_Kurast,
+            Areas.Act3.A3_Sewers_Level_1, Areas.Act3.Kurast_Bazaar, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Upper_Kurast, Areas.Act3.Kurast_Causeway,
+            Areas.Act3.Kurast_Causeway, Areas.Act3.Travincal, Areas.Act3.Durance_Of_Hate_Level_1, Areas.Act3.Durance_Of_Hate_Level_2, Areas.Act3.Durance_Of_Hate_Level_3, Areas.Act4.The_Pandemonium_Fortress,
+            Areas.Act4.Outer_Steppes, Areas.Act4.Plains_Of_Despair, Areas.Act4.City_Of_The_Damned, Areas.Act4.River_Of_Flame, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath,
+            Areas.Act5.Bloody_Foothills, Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Crystalized_Passage, Areas.Act5.Crystalized_Passage, Areas.Act5.Glacial_Trail,
+            Areas.Act5.Glacial_Trail, Areas.Act5.Frozen_Tundra, Areas.Act5.Ancients_Way, Areas.Act5.Ancients_Way, Areas.Act5.Harrogath, Areas.Act5.Nihlathaks_Temple, Areas.Act5.Halls_Of_Anguish,
+            Areas.Act5.Halls_Of_Pain, Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Frozen_Tundra, Areas.Act5.Arreat_Summit, Areas.Act5.The_Worldstone_Keep_Level_1,
+            Areas.Act5.The_Worldstone_Keep_Level_2, Areas.Act5.The_Worldstone_Keep_Level_3, Areas.Act5.Throne_Of_Destruction, Areas.Act5.Harrogath, Areas.Act5.Harrogath, Areas.Act5.Harrogath, Areas.Act5.Harrogath],
 
 		event: function (keycode) {
 			Hooks.tele.action = keycode;
@@ -498,71 +517,71 @@ var Hooks = {
 				nextAreas = [];
 
 			// Specific area override
-			nextAreas[7] = 26;
-			nextAreas[76] = 78;
-			nextAreas[77] = 78;
-			nextAreas[113] = 115;
-			nextAreas[115] = 117;
-			nextAreas[118] = 120;
+            nextAreas[7] = Areas.Act1.Monastery_Gate;
+            nextAreas[76] = Areas.Act3.Flayer_Jungle;
+            nextAreas[77] = Areas.Act3.Flayer_Jungle;
+            nextAreas[113] = Areas.Act5.Glacial_Trail;
+            nextAreas[115] = Areas.Act5.Frozen_Tundra;
+            nextAreas[118] = Areas.Act5.Arreat_Summit;
 
-			if (me.area === 46) {
+            if (me.area === Areas.Act2.Canyon_Of_The_Magi) {
 				nextAreas[46] = getRoom().correcttomb;
 			}
 
 			switch (me.area) {
-			case 2: // Blood Moor
+                case Areas.Act1.Blood_Moor: // Blood Moor
 				this.hooks.push({
 					name: "Side Area",
-					destination: 8,
-					hook: new Text("Num 4: " + Pather.getAreaName(8), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act1.Den_Of_Evil,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act1.Den_Of_Evil), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
-			case 43: // Far Oasis
+                case Areas.Act2.Far_Oasis: // Far Oasis
 				this.hooks.push({
 					name: "Side Area",
-					destination: 62,
-					hook: new Text("Num 4: " + Pather.getAreaName(62), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act2.Maggot_Lair_Level_1,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act2.Maggot_Lair_Level_1), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
-			case 76:
+                case Areas.Act3.Spider_Forest:
 				this.hooks.push({
 					name: "Side Area",
-					destination: 85,
-					hook: new Text("Num 4: " + Pather.getAreaName(85), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act3.Spider_Cavern,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act3.Spider_Cavern), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
-			case 78:
+                case Areas.Act3.Flayer_Jungle:
 				this.hooks.push({
 					name: "Side Area",
-					destination: 88,
-					hook: new Text("Num 4: " + Pather.getAreaName(88), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act3.Flayer_Dungeon_Level_1,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act3.Flayer_Dungeon_Level_1), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
-			case 80:
+                case Areas.Act3.Kurast_Bazaar:
 				this.hooks.push({
 					name: "Side Area",
-					destination: 94,
-					hook: new Text("Num 4: " + Pather.getAreaName(94), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act3.Ruined_Temple,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act3.Ruined_Temple), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
-			case 81:
+                case Areas.Act3.Upper_Kurast:
 				this.hooks.push({
 					name: "Side Area",
-					destination: 92,
-					hook: new Text("Num 4: " + Pather.getAreaName(92), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act3.A3_Sewers_Level_1,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act3.A3_Sewers_Level_1), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
-			case 113:
+                case Areas.Act5.Crystalized_Passage:
 				this.hooks.push({
 					name: "Side Area",
-					destination: 114,
-					hook: new Text("Num 4: " + Pather.getAreaName(114), 150, 525 - (this.hooks.length * 10))
+                    destination: Areas.Act5.Frozen_River,
+                    hook: new Text("Num 4: " + Pather.getAreaName(Areas.Act5.Frozen_River), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
@@ -735,7 +754,7 @@ function main() {
 
 		this.revealArea(me.area);
 
-		if (getUIFlag(0x0A)) {
+        if (getUIFlag(UIFlags.Automap_is_on)) {
 			Hooks.update();
 		} else {
 			Hooks.flush();

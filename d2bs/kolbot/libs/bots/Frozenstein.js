@@ -3,13 +3,14 @@
 *	@author		kolton
 *	@desc		kill Frozensteinand optionally clear Frozen River
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Frozenstein() {
 	Town.doChores();
-	Pather.useWaypoint(113);
+    Pather.useWaypoint(Areas.Act5.Crystalized_Passage);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(114, true) || !Pather.moveToPreset(me.area, 2, 460, -5, -5)) {
+    if (!Pather.moveToExit(Areas.Act5.Frozen_River, true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Drehya_Outside_Town, -5, -5)) {
 		throw new Error("Failed to move to Frozenstein");
 	}
 

@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		who you gonna call?
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function GhostBusters() {
 	this.clearGhosts = function () {
@@ -34,7 +35,9 @@ function GhostBusters() {
 
 				if (monster) {
 					do {
-						if ([38, 39, 40, 41, 42, 631, 632, 633].indexOf(monster.classid) > -1 && getDistance(me, monster) <= 30 && Attack.checkMonster(monster)) {
+                        if ([UnitClassID.wraith1, UnitClassID.wraith2, UnitClassID.wraith3, UnitClassID.wraith4, UnitClassID.wraith5, UnitClassID.wraith6,
+                            UnitClassID.wraith7, UnitClassID.wraith8].indexOf(monster.classid) > -1 && getDistance(me, monster) <= 30 && Attack.checkMonster(monster)) {
+
 							monList.push(copyUnit(monster));
 						}
 					} while (monster.getNext());
@@ -52,10 +55,10 @@ function GhostBusters() {
 	this.cellar = function () { // black marsh wp
 		var i;
 
-		Pather.useWaypoint(6);
+        Pather.useWaypoint(Areas.Act1.Black_Marsh);
 		Precast.doPrecast(true);
 
-		for (i = 20; i <= 25; i += 1) {
+        for (i = Areas.Act1.Forgotten_Tower; i <= Areas.Act1.Tower_Cellar_Level_5; i += 1) {
 			Pather.moveToExit(i, true);
 			this.clearGhosts();
 		}
@@ -66,10 +69,10 @@ function GhostBusters() {
 	this.jail = function () { // gonna use inner cloister wp and travel backwards
 		var i;
 
-		Pather.useWaypoint(32);
+        Pather.useWaypoint(Areas.Act1.Inner_Cloister);
 		Precast.doPrecast(true);
 
-		for (i = 31; i >= 29; i -= 1) {
+        for (i = Areas.Act1.Jail_Level_3; i >= Areas.Act1.Jail_Level_1; i -= 1) {
 			Pather.moveToExit(i, true);
 			this.clearGhosts();
 		}
@@ -78,9 +81,9 @@ function GhostBusters() {
 	};
 
 	this.cathedral = function () { // inner cloister wp
-		Pather.useWaypoint(32);
+        Pather.useWaypoint(Areas.Act1.Inner_Cloister);
 		Precast.doPrecast(true);
-		Pather.moveToExit(33, true);
+        Pather.moveToExit(Areas.Act1.Cathedral, true);
 		this.clearGhosts();
 
 		return true;
@@ -89,22 +92,22 @@ function GhostBusters() {
 	this.tombs = function () { // canyon wp
 		var i;
 
-		Pather.useWaypoint(46);
+        Pather.useWaypoint(Areas.Act2.Canyon_Of_The_Magi);
 		Precast.doPrecast(true);
 
-		for (i = 66; i <= 72; i += 1) {
+        for (i = Areas.Act2.Tal_Rashas_Tomb_1; i <= Areas.Act2.Tal_Rashas_Tomb_7; i += 1) {
 			Pather.moveToExit(i, true);
 			this.clearGhosts();
-			Pather.moveToExit(46, true);
+            Pather.moveToExit(Areas.Act2.Canyon_Of_The_Magi, true);
 		}
 
 		return true;
 	};
 
 	this.flayerDungeon = function () { // flayer jungle wp
-		var areas = [88, 89, 91];
+        var areas = [Areas.Act3.Flayer_Dungeon_Level_1, Areas.Act3.Flayer_Dungeon_Level_2, Areas.Act3.Flayer_Dungeon_Level_3];
 
-		Pather.useWaypoint(78);
+        Pather.useWaypoint(Areas.Act3.Flayer_Jungle);
 		Precast.doPrecast(true);
 
 		while (areas.length) {
@@ -116,29 +119,29 @@ function GhostBusters() {
 	};
 
 	this.crystalinePassage = function () { // crystaline passage wp
-		Pather.useWaypoint(113);
+        Pather.useWaypoint(Areas.Act5.Crystalized_Passage);
 		Precast.doPrecast(true);
 		this.clearGhosts();
-		Pather.moveToExit(114, true); // frozen river
+        Pather.moveToExit(Areas.Act5.Frozen_River, true); // frozen river
 		this.clearGhosts();
 
 		return true;
 	};
 
 	this.glacialTrail = function () { // glacial trail wp
-		Pather.useWaypoint(115);
+        Pather.useWaypoint(Areas.Act5.Glacial_Trail);
 		Precast.doPrecast(true);
 		this.clearGhosts();
-		Pather.moveToExit(116, true); // drifter
+        Pather.moveToExit(Areas.Act5.Drifter_Cavern, true); // drifter
 		this.clearGhosts();
 
 		return true;
 	};
 
 	this.icyCellar = function () { // glacial trail wp
-		Pather.useWaypoint(118);
+        Pather.useWaypoint(Areas.Act5.Ancients_Way);
 		Precast.doPrecast(true);
-		Pather.moveToExit(119, true); // drifter
+        Pather.moveToExit(Areas.Act5.Icy_Cellar, true); // drifter
 		this.clearGhosts();
 
 		return true;

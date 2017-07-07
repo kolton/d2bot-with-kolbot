@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		help another player kill bosses or clear areas
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function MFHelper() {
 	var i, player, playerAct, split, area,
@@ -45,23 +46,23 @@ function MFHelper() {
 	};
 
 	this.getPlayerAct = function (player) {
-		if (player.area > 0 && player.area <= 39) {
+        if (player.area > Areas.None && player.area <= Areas.Act1.Moo_Moo_Farm) {
 			return 1;
 		}
 
-		if (player.area >= 40 && player.area <= 74) {
+        if (player.area >= Areas.Act2.Lut_Gholein && player.area <= Areas.Act2.Arcane_Sanctuary) {
 			return 2;
 		}
 
-		if (player.area >= 75 && player.area <= 102) {
+        if (player.area >= Areas.Act3.Kurast_Docktown && player.area <= Areas.Act3.Durance_Of_Hate_Level_3) {
 			return 3;
 		}
 
-		if (player.area >= 103 && player.area <= 108) {
+        if (player.area >= Areas.Act4.The_Pandemonium_Fortress && player.area <= Areas.Act4.Chaos_Sanctuary) {
 			return 4;
 		}
 
-		if (player.area >= 109) {
+        if (player.area >= Areas.Act5.Harrogath) {
 			return 5;
 		}
 
@@ -73,7 +74,7 @@ function MFHelper() {
 			finalRooms = [],
 			indexes = [];
 
-		kingPreset = getPresetUnit(me.area, 1, 773);
+        kingPreset = getPresetUnit(me.area, UnitType.NPC, SuperUniques.The_Cow_King);
 		badRooms = getRoom(kingPreset.roomx * 5 + kingPreset.x, kingPreset.roomy * 5 + kingPreset.y).getNearby();
 
 		for (i = 0; i < badRooms.length; i += 1) {
@@ -172,7 +173,7 @@ MainLoop:
 			}
 
 			// Finish if leader is in chaos or throne
-			if ([108, 131].indexOf(player.area) > -1) {
+            if ([Areas.Act4.Chaos_Sanctuary, Areas.Act5.Throne_Of_Destruction].indexOf(player.area) > -1) {
 				break;
 			}
 
@@ -280,14 +281,14 @@ MainLoop:
 					print("ÿc4MFHelperÿc0: Clear Cows");
 
 					for (i = 0; i < 5; i += 1) {
-						if (Town.goToTown(1) && Pather.usePortal(39)) {
+                        if (Town.goToTown(1) && Pather.usePortal(Areas.Act1.Moo_Moo_Farm)) {
 							break;
 						}
 
 						delay(1000);
 					}
 
-					if (me.area === 39) {
+                    if (me.area === Areas.Act1.Moo_Moo_Farm) {
 						Precast.doPrecast(false);
 						this.clearCowLevel();
 						delay(1000);
@@ -313,7 +314,7 @@ MainLoop:
 
 					if (me.area === area) {
 						Precast.doPrecast(false);
-						Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
+                        Attack.clearList(Attack.getMob([UnitClassID.councilmember1, UnitClassID.councilmember2, UnitClassID.councilmember3], 0, 40));
 
 						if (!Pather.usePortal(null, player.name)) {
 							Town.goToTown();

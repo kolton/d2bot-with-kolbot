@@ -24,6 +24,7 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function main() {
 	// Variables and functions
@@ -91,11 +92,11 @@ function main() {
 		var i, player;
 
 		for (i = 0; i < hostiles.length; i += 1) {
-			player = getUnit(0, hostiles[i]);
+            player = getUnit(UnitType.Player, hostiles[i]);
 
 			if (player) {
 				do {
-					if (player.mode !== 0 && player.mode !== 17 && getPlayerFlag(me.gid, player.gid, 8) && !player.inTown && !me.inTown) {
+                    if (player.mode !== PlayerModes.Death && player.mode !== PlayerModes.Dead && getPlayerFlag(me.gid, player.gid, 8) && !player.inTown && !me.inTown) {
 						return player;
 					}
 				} while (player.getNext());
@@ -111,7 +112,7 @@ function main() {
 			range = 999;
 		}
 
-		var missile = getUnit(3, id);
+        var missile = getUnit(UnitType.Missile, id);
 
 		if (!missile) {
 			return false;
@@ -130,12 +131,12 @@ function main() {
 		var unit,
 			name = player.name;
 
-		unit = getUnit(1);
+        unit = getUnit(UnitType.NPC);
 
 		if (unit) {
 			do {
 				// Revives and spirit wolves
-				if (unit.getParent() && unit.getParent().name === name && (unit.getState(96) || unit.classid === 420)) {
+                if (unit.getParent() && unit.getParent().name === name && (unit.getState(States.REVIVE) || unit.classid === UnitClassID.spiritwolf)) {
 					return true;
 				}
 			} while (unit.getNext());
@@ -154,15 +155,15 @@ function main() {
 	Skill.usePvpRange = true;
 
 	// Attack sequence adjustments - this only affects the AntiHostile thread
-	switch (me.classid) {
-	case 6: // Assassin - use Mind Blast with trapsins
-		if (me.getSkill(273, 1) && [251, 256].indexOf(Config.AttackSkill[1]) > -1) {
-			Config.AttackSkill[1] = 273; // Mind Blast
-			ClassAttack.trapRange = 40;
-		}
+    switch (me.classid) {
+        case ClassID.Assassin: // Assassin - use Mind Blast with trapsins
+            if (me.getSkill(Skills.Assassin.Mind_Blast, 1) && [Skills.Assassin.Fire_Trauma, Skills.Assassin.Shock_Field].indexOf(Config.AttackSkill[1]) > -1) {
+                Config.AttackSkill[1] = Skills.Assassin.Mind_Blast; // Mind Blast
+                ClassAttack.trapRange = 40;
+            }
 
-		break;
-	}
+            break;
+    }
 
 	// A simple but fast player dodge function
 	this.moveAway = function (unit, range) {
@@ -211,21 +212,21 @@ function main() {
 			}
 
 			// Mode 3 - Spam entrance (still experimental)
-			if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === 131) {
+            if (Config.HostileAction === 3 && hostiles.length > 0 && me.area === Areas.Act5.Throne_Of_Destruction) {
 				switch (me.classid) {
-				case 1: // Sorceress
+				case ClassID.Sorceress: // Sorceress
 					prevPos = {x: me.x, y: me.y};
 					this.pause();
-					Pather.moveTo(15103, 5247);
+                    Pather.moveTo(15103, 5247); Skills.Druid.Tornado
 
 					while (!this.findPlayer() && hostiles.length > 0) {
-						if (!me.getState(121)) {
+                        if (!me.getState(States.SKILLDELAY)) {
 							Skill.cast(Config.AttackSkill[1], Skill.getHand(Config.AttackSkill[1]), 15099, 5237);
 						} else {
 							if (Config.AttackSkill[2] > -1) {
 								Skill.cast(Config.AttackSkill[2], Skill.getHand(Config.AttackSkill[2]), 15099, 5237);
 							} else {
-								while (me.getState(121)) {
+                                while (me.getState(States.SKILLDELAY)) {
 									delay(40);
 								}
 							}
@@ -233,7 +234,7 @@ function main() {
 					}
 
 					break;
-				case 5: // Druid
+                case ClassID.Druid: // Druid
 					// Don't bother if it's not a tornado druid
 					if (Config.AttackSkill[1] !== 245) {
 						break;
@@ -249,23 +250,23 @@ function main() {
 					}
 
 					break;
-				case 6: // Assassin
+                case ClassID.Assassin: // Assassin
 					prevPos = {x: me.x, y: me.y};
 					this.pause();
 					Pather.moveTo(15103, 5247);
 
 					while (!this.findPlayer() && hostiles.length > 0) {
 						if (Config.UseTraps) {
-							check = ClassAttack.checkTraps({x: 15099, y: 5242, classid: 544});
+                            check = ClassAttack.checkTraps({ x: 15099, y: 5242, classid: UnitClassID.baalcrab});
 
 							if (check) {
-								ClassAttack.placeTraps({x: 15099, y: 5242, classid: 544}, 5);
+                                ClassAttack.placeTraps({ x: 15099, y: 5242, classid: UnitClassID.baalcrab}, 5);
 							}
 						}
 
 						Skill.cast(Config.AttackSkill[1], Skill.getHand(Config.AttackSkill[1]), 15099, 5237);
 
-						while (me.getState(121)) {
+                        while (me.getState(States.SKILLDELAY)) {
 							delay(40);
 						}
 					}
@@ -316,7 +317,7 @@ function main() {
 				attackCount = 0;
 
 				while (attackCount < 100) {
-					if (!copyUnit(player).x || player.inTown || me.mode === 17) { // Invalidated Unit (out of getUnit range) or player in town
+                    if (!copyUnit(player).x || player.inTown || me.mode === PlayerModes.Dead) { // Invalidated Unit (out of getUnit range) or player in town
 						break;
 					}
 
@@ -324,10 +325,10 @@ function main() {
 
 					// Specific attack additions
 					switch (me.classid) {
-					case 1: // Sorceress
-					case 2: // Necromancer
+                        case ClassID.Sorceress: // Sorceress
+                        case ClassID.Necromancer: // Necromancer
 						// Dodge missiles - experimental
-						missile = getUnit(3);
+                            missile = getUnit(UnitType.Missile);
 
 						if (missile) {
 							do {
@@ -345,11 +346,11 @@ function main() {
 						}
 
 						break;
-					case 3: // Paladin
+                        case ClassID.Paladin: // Paladin
 						// Smite summoners
-						if (Config.AttackSkill[1] === 112 && me.getSkill(97, 1)) {
-							if ([2, 5].indexOf(player.classid) > -1 && getDistance(me, player) < 4 && this.checkSummons(player)) {
-								Skill.cast(97, 1, player);
+                            if (Config.AttackSkill[1] === Skills.Paladin.Blessed_Hammer && me.getSkill(Skills.Paladin.Smite, 1)) {
+                                if ([ClassID.Necromancer, ClassID.Druid].indexOf(player.classid) > -1 && getDistance(me, player) < 4 && this.checkSummons(player)) {
+                                    Skill.cast(Skills.Paladin.Smite, 1, player);
 							}
 						}
 
@@ -358,7 +359,7 @@ function main() {
 
 					attackCount += 1;
 
-					if (player.mode === 0 || player.mode === 17) {
+                    if (player.mode === PlayerModes.Death || player.mode === PlayerModes.Dead) {
 						break;
 					}
 				}

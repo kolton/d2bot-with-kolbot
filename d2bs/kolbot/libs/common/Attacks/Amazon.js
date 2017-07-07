@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Amazon attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	bowCheck: false,
@@ -13,7 +14,7 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+        if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
@@ -29,7 +30,7 @@ var ClassAttack = {
 			timedSkill = -1,
 			untimedSkill = -1;
 
-		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
+        index = ((unit.spectype & 0x7) || unit.type === UnitType.Player) ? 1 : 3;
 
 		// Get timed skill
 		if (Attack.getCustomAttack(unit)) {
@@ -40,7 +41,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedSkill = Config.AttackSkill[5];
 		}
 
@@ -53,7 +54,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			untimedSkill = Config.AttackSkill[6];
 		}
 
@@ -134,9 +135,9 @@ var ClassAttack = {
 			}
 		}
 
-		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
+        if (timedSkill > -1 && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(timedSkill))) {
 			switch (timedSkill) {
-			case 35:
+                case Skills.Amazon.Lightning_Fury:
 				if (!this.lightFuryTick || getTickCount() - this.lightFuryTick > Config.LightningFuryDelay * 1000) {
 					if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
 						if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4)) {
@@ -196,7 +197,7 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			if (!me.getState(121)) {
+            if (!me.getState(States.SKILLDELAY)) {
 				break;
 			}
 

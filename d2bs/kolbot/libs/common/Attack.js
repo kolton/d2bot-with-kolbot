@@ -3,13 +3,14 @@
 *	@author		kolton
 *	@desc		handle player attacks
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var Attack = {
 	classes: ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 	infinity: false,
 
 	// Initialize attacks
-	init: function () {
+    init: function () {
 		if (Config.Wereform) {
 			include("common/Attacks/wereform.js");
 		} else {
@@ -21,7 +22,7 @@ var Attack = {
 			print("ÿc1Bad attack config. Don't expect your bot to attack.");
 		}
 
-		if (me.gametype === 1) {
+        if (me.gametype === GameType.Expansion) {
 			this.checkInfinity();
 			this.getCharges();
 		}
@@ -51,7 +52,7 @@ var Attack = {
 		}
 
 		var i, stats,
-			item = me.getItem(-1, 1);
+            item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc);
 
 		if (item) {
 			do {
@@ -118,7 +119,7 @@ var Attack = {
 		}
 
 		// Check player infinity
-		item = me.getItem(-1, 1);
+        item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc);
 
 		if (item) {
 			do {
@@ -168,7 +169,7 @@ var Attack = {
 			Misc.townCheck();
 
 			if (!target || !copyUnit(target).x) { // Check if unit got invalidated, happens if necro raises a skeleton from the boss's corpse.
-				target = getUnit(1, -1, -1, gid);
+                target = getUnit(UnitType.NPC, -1, -1, gid);
 
 				if (!target) {
 					break;
@@ -210,7 +211,7 @@ var Attack = {
 			return true;
 		}
 
-		if (target.hp > 0 && target.mode !== 0 && target.mode !== 12) {
+        if (target.hp > 0 && target.mode !== NPCModes.death && target.mode !== NPCModes.dead) {
 			throw new Error("Failed to kill " + target.name + errorInfo);
 		}
 
@@ -222,7 +223,7 @@ var Attack = {
 			attackCount = 0;
 
 		for (i = 0; i < 5; i += 1) {
-			target = getUnit(1, classId);
+            target = getUnit(UnitType.NPC, classId);
 
 			if (target) {
 				break;
@@ -251,7 +252,11 @@ var Attack = {
 	},
 
 	getScarinessLevel: function (unit) {
-		var scariness = 0, ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
+        var scariness = 0, ids = [UnitClassID.fallenshaman1, UnitClassID.fallenshaman2, UnitClassID.fallenshaman3, UnitClassID.fallenshaman4, UnitClassID.fallenshaman5,
+            UnitClassID.unraveler1, UnitClassID.unraveler2, UnitClassID.unraveler3, UnitClassID.unraveler4, UnitClassID.unraveler5, UnitClassID.fetishshaman1, UnitClassID.fetishshaman2,
+            UnitClassID.fetishshaman3, UnitClassID.fetishshaman4, UnitClassID.fetishshaman5, UnitClassID.vilemother1, UnitClassID.vilemother2, UnitClassID.vilemother3,
+            UnitClassID.fallenshaman6, UnitClassID.fallenshaman7, UnitClassID.fallenshaman8, UnitClassID.fetishshaman6, UnitClassID.fetishshaman7, UnitClassID.fetishshaman8,
+            UnitClassID.unraveler6, UnitClassID.unraveler7, UnitClassID.unraveler8, UnitClassID.unraveler9, UnitClassID.vilemother4, UnitClassID.vilemother5];
 
 		// Only handling monsters for now
 		if (unit.type !== 1) {
@@ -330,7 +335,7 @@ var Attack = {
 
 		if (bossId) {
 			for (i = 0; !boss && i < 5; i += 1) {
-				boss = bossId > 999 ? getUnit(1, -1, -1, bossId) : getUnit(1, bossId);
+                boss = bossId > 999 ? getUnit(UnitType.NPC, -1, -1, bossId) : getUnit(UnitType.NPC, bossId);
 
 				delay(200);
 			}
@@ -347,14 +352,14 @@ var Attack = {
 		}
 
 		monsterList = [];
-		target = getUnit(1);
+        target = getUnit(UnitType.NPC);
 
 		if (target) {
 			do {
 				if ((!spectype || (target.spectype & spectype)) && this.checkMonster(target) && this.skipCheck(target)) {
 					// Speed optimization - don't go through monster list until there's at least one within clear range
 					if (!start && getDistance(target, orgx, orgy) <= range &&
-							(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+                        (me.getSkill(Skills.Sorceress.Teleport, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
 						start = true;
 					}
 
@@ -404,7 +409,7 @@ var Attack = {
 
 					// Desync/bad position handler
 					switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
-					case 112:
+                        case Skills.Paladin.Blessed_Hammer:
 						//print(gidAttack[i].name + " " + gidAttack[i].attacks);
 
 						// Tele in random direction with Blessed Hammer
@@ -424,12 +429,12 @@ var Attack = {
 					}
 
 					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
-					if (me.area !== 131 && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
+					if (me.area !== Areas.Act5.Throne_Of_Destruction && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
 						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 						monsterList.shift();
 					}
 
-					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
+                    if (target.mode === NPCModes.death || target.mode === NPCModes.dead || Config.FastPick === 2) {
 						Pickit.fastPick();
 					}
 				} else {
@@ -453,7 +458,7 @@ var Attack = {
 	// Filter monsters based on classId, spectype and range
 	getMob: function (classid, spectype, range, center) {
 		var monsterList = [],
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 
 		if (range === undefined) {
 			range = 25;
@@ -466,7 +471,7 @@ var Attack = {
 		switch (typeof classid) {
 		case "number":
 		case "string":
-			monster = getUnit(1, classid);
+                monster = getUnit(UnitType.NPC, classid);
 
 			if (monster) {
 				do {
@@ -478,7 +483,7 @@ var Attack = {
 
 			break;
 		case "object":
-			monster = getUnit(1);
+                monster = getUnit(UnitType.NPC);
 
 			if (monster) {
 				do {
@@ -577,15 +582,15 @@ var Attack = {
 						break;
 					}
 
-					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
-					if (me.area !== 131 && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
+                    // Skip non-unique monsters after 15 attacks, except in Throne of Destruction
+                    if (me.area !== Areas.Act5.Throne_Of_Destruction && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
 						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 						monsterList.shift();
 					}
 
 					attackCount += 1;
 
-					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
+                    if (target.mode === NPCModes.death || target.mode === NPCModes.dead || Config.FastPick === 2) {
 						Pickit.fastPick();
 					}
 				} else {
@@ -622,14 +627,14 @@ var Attack = {
 				Pather.moveTo(x, y);
 			}
 
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 			monList = [];
 
 			if (monster) {
 				do {
 					if (getDistance(monster, x, y) <= range && this.checkMonster(monster) && this.canAttack(monster) &&
 							(!skipBlocked || !checkCollision(me, monster, skipBlocked)) &&
-							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54) || !checkCollision(me, monster, 0x1))) {
+                        ((me.classid === ClassID.Sorceress && me.getSkill(Skills.Sorceress.Teleport, 1)) || me.getStat(Stats.item_nonclassskill, Skills.Sorceress.Teleport) || !checkCollision(me, monster, 0x1))) {
 						monList.push(copyUnit(monster));
 					}
 				} while (monster.getNext());
@@ -655,9 +660,9 @@ var Attack = {
 
 			if (special) {
 				switch (me.classid) {
-				case 3: // Paladin Redemption addon
-					if (me.getSkill(124, 1)) {
-						Skill.setSkill(124, 0);
+				case ClassID.Paladin: // Paladin Redemption addon
+					if (me.getSkill(Skills.Paladin.Redemption, 1)) {
+						Skill.setSkill(Skills.Paladin.Redemption, 0);
 						delay(1000);
 					}
 
@@ -800,7 +805,7 @@ var Attack = {
 		}
 
 		// Barb optimization
-		if (me.classid === 4) {
+		if (me.classid === ClassID.Barbarian) {
 			if (!Attack.checkResist(unitA, Attack.getSkillElement(Config.AttackSkill[(unitA.spectype & 0x7) ? 1 : 3]))) {
 				return 1;
 			}
@@ -810,19 +815,27 @@ var Attack = {
 			}
 		}
 
-		var ids = [58, 59, 60, 61, 62, 101, 102, 103, 104, 105, 278, 279, 280, 281, 282, 298, 299, 300, 645, 646, 647, 662, 663, 664, 667, 668, 669, 670, 675, 676];
+        var ids = [UnitClassID.fallenshaman1, UnitClassID.fallenshaman2, UnitClassID.fallenshaman3, UnitClassID.fallenshaman4, UnitClassID.fallenshaman5,
+            UnitClassID.unraveler1, UnitClassID.unraveler2, UnitClassID.unraveler3, UnitClassID.unraveler4, UnitClassID.unraveler5,
+            UnitClassID.fetishshaman1, UnitClassID.fetishshaman2, UnitClassID.fetishshaman3, UnitClassID.fetishshaman4, UnitClassID.fetishshaman5,
+            UnitClassID.vilemother1, UnitClassID.vilemother2, UnitClassID.vilemother3,
+            UnitClassID.fallenshaman6, UnitClassID.fallenshaman7, UnitClassID.fallenshaman8,
+            UnitClassID.fetishshaman6, UnitClassID.fetishshaman7, UnitClassID.fetishshaman8,
+            UnitClassID.unraveler6, UnitClassID.unraveler7, UnitClassID.unraveler8, UnitClassID.unraveler9,
+            UnitClassID.vilemother4, UnitClassID.vilemother5];
+        
 
-		if (me.area !== 61 && ids.indexOf(unitA.classid) > -1 && ids.indexOf(unitB.classid) > -1) {
+        if (me.area !== Areas.Act2.Claw_Viper_Temple_Level_2 && ids.indexOf(unitA.classid) > -1 && ids.indexOf(unitB.classid) > -1) {
 			// Kill "scary" uniques first (like Bishibosh)
-			if ((unitA.spectype & 0x04) && (unitB.spectype & 0x04)) {
+            if ((unitA.spectype & SpecType.Boss) && (unitB.spectype & SpecType.Boss)) {
 				return getDistance(me, unitA) - getDistance(me, unitB);
 			}
 
-			if (unitA.spectype & 0x04) {
+            if (unitA.spectype & SpecType.Boss) {
 				return -1;
 			}
 
-			if (unitB.spectype & 0x04) {
+            if (unitB.spectype & SpecType.Boss) {
 				return 1;
 			}
 
@@ -891,7 +904,7 @@ var Attack = {
 			list = [],
 			ids = ["chest", "chest3", "weaponrack", "armorstand"];
 
-		unit = getUnit(2);
+        unit = getUnit(UnitType.Object);
 
 		if (unit) {
 			do {
@@ -998,7 +1011,7 @@ var Attack = {
 		var i,
 			fire,
 			count = 0,
-			ignored = [243];
+            ignored = [UnitClassID.diablo];
 
 		for (i = 0; i < list.length; i += 1) {
 			if (ignored.indexOf(list[i].classid) === -1 && this.checkMonster(list[i]) && getDistance(x, y, list[i].x, list[i].y) <= range) {
@@ -1006,7 +1019,7 @@ var Attack = {
 			}
 		}
 
-		fire = getUnit(2, "fire");
+        fire = getUnit(UnitType.Object, "fire");
 
 		if (fire) {
 			do {
@@ -1050,15 +1063,15 @@ var Attack = {
 			return false;
 		}
 
-		if (unit.type === 0 && unit.mode !== 17) { // Player
+        if (unit.type === UnitType.Player && unit.mode !== PlayerModes.Dead) { // Player
 			return true;
 		}
 
-		if (unit.hp === 0 || unit.mode === 0 || unit.mode === 12) { // Dead monster
+        if (unit.hp === 0 || unit.mode === NPCModes.death || unit.mode === NPCModes.dead) { // Dead monster
 			return false;
 		}
 
-		if (unit.getStat(172) === 2) {	// Friendly monster/NPC
+		if (unit.getStat(Stats.alignment) === 2) {	// Friendly monster/NPC
 			return false;
 		}
 
@@ -1067,49 +1080,48 @@ var Attack = {
 		}
 
 		switch (unit.classid) {
-		case 179: // An evil force - cow (lol)
-			return false;
-		case 543: // Baal in Throne
-			if (me.area === 131) {
-				return false;
-			}
+            case UnitClassID.cow: // An evil force - cow (lol)
+			    return false;
+            case UnitClassID.baalthrone: // Baal in Throne
+			    if (me.area === Areas.Act5.Throne_Of_Destruction) {
+			    	return false;
+			    }
+                break;
 
-			break;
-		case 110: // Vultures
-		case 111:
-		case 112:
-		case 113:
-		case 114:
-		case 608:
-			if (unit.mode === 8) { // Flying
-				return false;
-			}
+            case UnitClassID.vulture1: // Vultures
+            case UnitClassID.vulture2:
+            case UnitClassID.vulture3:
+            case UnitClassID.vulture4:
+            case UnitClassID.mosquito1:
+            case UnitClassID.vulture5:
+			    if (unit.mode === NPCModes.skill1) { // Flying
+			    	return false;
+			    }
+                break;
 
-			break;
-		case 68: // Sand Maggots
-		case 69:
-		case 70:
-		case 71:
-		case 72:
-		case 679:
-		case 258: // Water Watchers
-		case 259:
-		case 260:
-		case 261:
-		case 262:
-		case 263:
-			if (unit.mode === 14) { // Submerged/Burrowed
-				return false;
-			}
-
-			break;
+            case UnitClassID.sandmaggot1: // Sand Maggots
+            case UnitClassID.sandmaggot2:
+            case UnitClassID.sandmaggot3:
+            case UnitClassID.sandmaggot4:
+            case UnitClassID.sandmaggot5:
+            case UnitClassID.sandmaggot6:
+            case UnitClassID.tentacle1: // Water Watchers
+            case UnitClassID.tentacle2:
+            case UnitClassID.tentacle3:
+            case UnitClassID.tentaclehead1:
+            case UnitClassID.tentaclehead2:
+            case UnitClassID.tentaclehead3:
+			    if (unit.mode === NPCModes.sequence) { // Submerged/Burrowed
+			    	return false;
+			    }
+			    break;
 		}
 
 		return true;
 	},
 
 	skipCheck: function (unit) {
-		if (me.area === 131) {
+		if (me.area === Areas.Act5.Throne_Of_Destruction) {
 			return true;
 		}
 
@@ -1207,43 +1219,43 @@ AuraLoop: // Skip monsters with auras
 
 			switch (Config.SkipAura[i].toLowerCase()) {
 			case "fanaticism":
-				if (unit.getState(49)) {
+                    if (unit.getState(States.FANATICISM)) {
 					rval = false;
 				}
 
 				break;
 			case "might":
-				if (unit.getState(33)) {
+                    if (unit.getState(States.MIGHT)) {
 					rval = false;
 				}
 
 				break;
 			case "holy fire":
-				if (unit.getState(35)) {
+                    if (unit.getState(States.HOLYFIRE)) {
 					rval = false;
 				}
 
 				break;
 			case "blessed aim":
-				if (unit.getState(40)) {
+                    if (unit.getState(States.BLESSEDAIM)) {
 					rval = false;
 				}
 
 				break;
 			case "conviction":
-				if (unit.getState(28)) {
+                    if (unit.getState(States.CONVICTION)) {
 					rval = false;
 				}
 
 				break;
 			case "holy freeze":
-				if (unit.getState(43)) {
+                    if (unit.getState(States.HOLYWIND)) {
 					rval = false;
 				}
 
 				break;
 			case "holy shock":
-				if (unit.getState(46)) {
+                    if (unit.getState(States.HOLYSHOCK)) {
 					rval = false;
 				}
 
@@ -1263,13 +1275,13 @@ AuraLoop: // Skip monsters with auras
 		this.elements = ["physical", "fire", "lightning", "magic", "cold", "poison", "none"];
 
 		switch (skillId) {
-		case 74: // Corpse Explosion
-		case 144: // Concentrate
-		case 147: // Frenzy
-		case 273: // Minge Blast
+		case Skills.Necromancer.Corpse_Explosion: // Corpse Explosion
+		case Skills.Barbarian.Concentrate: // Concentrate
+		case Skills.Barbarian.Frenzy: // Frenzy
+		case Skills.Assassin.Mind_Blast: // Minge Blast
 		case 500: // Summoner
 			return "physical";
-		case 101: // Holy Bolt
+		case Skills.Paladin.Holy_Bolt: // Holy Bolt
 			return "holybolt"; // no need to use this.elements array because it returns before going over the array
 		}
 
@@ -1284,23 +1296,23 @@ AuraLoop: // Skip monsters with auras
 
 	// Get a monster's resistance to specified element
 	getResist: function (unit, type) {
-		if (unit.type === 0) { // player
+        if (unit.type === UnitType.Player) { // player
 			return 0;
 		}
 
 		switch (type) {
 		case "physical":
-			return unit.getStat(36);
+                return unit.getStat(Stats.damageresist);
 		case "fire":
-			return unit.getStat(39);
+                return unit.getStat(Stats.fireresist);
 		case "lightning":
-			return unit.getStat(41);
+                return unit.getStat(Stats.lightresist);
 		case "magic":
-			return unit.getStat(37);
+                return unit.getStat(Stats.magicresist);
 		case "cold":
-			return unit.getStat(43);
+                return unit.getStat(Stats.coldresist);
 		case "poison":
-			return unit.getStat(45);
+                return unit.getStat(Stats.poisonresist);
 		case "none":
 			return 0;
 		case "holybolt": // check if a monster is undead
@@ -1317,7 +1329,7 @@ AuraLoop: // Skip monsters with auras
 	// Check if a monster is immune to specified attack type
 	checkResist: function (unit, val, maxres) {
 		// Ignore player resistances
-		if (unit.type === 0) {
+        if (unit.type === UnitType.Player) {
 			return true;
 		}
 
@@ -1333,7 +1345,7 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		if (this.infinity && ["fire", "lightning", "cold"].indexOf(damageType) > -1) {
-			if (!unit.getState(28)) {
+            if (!unit.getState(States.CONVICTION)) {
 				return this.getResist(unit, damageType) < 117;
 			}
 
@@ -1345,7 +1357,7 @@ AuraLoop: // Skip monsters with auras
 
 	// Check if we have valid skills to attack a monster
 	canAttack: function (unit) {
-		if (unit.type === 1) {
+        if (unit.type === UnitType.NPC) {
 			if (unit.spectype & 0x7) { // Unique/Champion
 				if (Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[1])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[2]))) {
 					return true;
@@ -1368,17 +1380,17 @@ AuraLoop: // Skip monsters with auras
 	usingBow: function () {
 		var item;
 
-		item = me.getItem(-1, 1);
+		item = me.getItem(-1, ItemLocation.Equipped);
 
 		if (item) {
 			do {
-				if (item.bodylocation === 4 || item.bodylocation === 5) {
-					switch (item.itemType) {
-					case 27: // Bows
-					case 85: // Amazon Bows
-						return "bow";
-					case 35: // Crossbows
-						return "crossbow";
+                if (item.bodylocation === ItemBodyLocation.RIGHT_ARM || item.bodylocation === ItemBodyLocation.LEFT_ARM) {
+                    switch (item.itemType) {
+                        case NTItemTypes.bow: // Bows
+                        case NTItemTypes.amazonbow: // Amazon Bows
+						    return "bow";
+                        case NTItemTypes.crossbow: // Crossbows
+						    return "crossbow";
 					}
 				}
 			} while (item.getNext());
@@ -1397,7 +1409,7 @@ AuraLoop: // Skip monsters with auras
 			walk = 1;
 		}
 
-		if (distance < 4 && (!unit.hasOwnProperty("mode") || (unit.mode !== 0 && unit.mode !== 12))) {
+		if (distance < 4 && (!unit.hasOwnProperty("mode") || (unit.mode !== NPCModes.death && unit.mode !== NPCModes.dead))) {
 			//me.overhead("Short range");
 
 			if (walk) {

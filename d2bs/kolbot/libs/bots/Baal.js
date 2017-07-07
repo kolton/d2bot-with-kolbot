@@ -3,6 +3,7 @@
  *	@author		kolton, modified by YGM
  *	@desc		clear Throne of Destruction and kill Baal
  */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Baal() {
 	var portal, tick;
@@ -11,15 +12,15 @@ function Baal() {
 		var check;
 
 		switch (me.classid) {
-		case 1: // Sorceress
+            case ClassID.Sorceress: // Sorceress
 			switch (Config.AttackSkill[3]) {
-			case 49:
-			case 53:
-			case 56:
-			case 59:
-			case 64:
-				if (me.getState(121)) {
-					while (me.getState(121)) {
+                case Skills.Sorceress.Lightning:
+                case Skills.Sorceress.Chain_Lightning:
+                case Skills.Sorceress.Meteor:
+                case Skills.Sorceress.Blizzard:
+                case Skills.Sorceress.Frozen_Orb:
+                    if (me.getState(States.SKILLDELAY)) {
+                        while (me.getState(States.SKILLDELAY)) {
 						delay(100);
 					}
 				} else {
@@ -30,8 +31,8 @@ function Baal() {
 			}
 
 			break;
-		case 3: // Paladin
-			if (Config.AttackSkill[3] === 112) {
+            case ClassID.Paladin: // Paladin
+                if (Config.AttackSkill[3] === Skills.Paladin.Blessed_Hammer) {
 				if (Config.AttackSkill[4] > 0) {
 					Skill.setSkill(Config.AttackSkill[4], 0);
 				}
@@ -40,13 +41,13 @@ function Baal() {
 			}
 
 			break;
-		case 5: // Druid
-			if (Config.AttackSkill[3] === 245) {
+            case ClassID.Druid: // Druid
+                if (Config.AttackSkill[3] === Skills.Druid.Tornado) {
 				return Skill.cast(Config.AttackSkill[3], 0, 15094 + rand(-1, 1), 5028);
 			}
 
 			break;
-		case 6: // Assassin
+            case ClassID.Assassin: // Assassin
 			if (Config.UseTraps) {
 				check = ClassAttack.checkTraps({x: 15094, y: 5028});
 
@@ -55,7 +56,7 @@ function Baal() {
 				}
 			}
 
-			if (Config.AttackSkill[3] === 256) { // shock-web
+            if (Config.AttackSkill[3] === Skills.Assassin.Shock_Field) { // shock-web
 				return Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
 			}
 
@@ -66,23 +67,23 @@ function Baal() {
 	};
 
 	this.checkThrone = function () {
-		var monster = getUnit(1);
+        var monster = getUnit(UnitType.NPC);
 
 		if (monster) {
 			do {
 				if (Attack.checkMonster(monster) && monster.y < 5080) {
 					switch (monster.classid) {
-					case 23:
-					case 62:
+                        case UnitClassID.fallen5:
+                        case UnitClassID.fallenshaman5:
 						return 1;
-					case 105:
-					case 381:
+                        case UnitClassID.unraveler5:
+                        case UnitClassID.skmage_cold3:
 						return 2;
-					case 557:
+                        case UnitClassID.baalhighpriest:
 						return 3;
-					case 558:
+                        case UnitClassID.venomlord:
 						return 4;
-					case 571:
+                        case UnitClassID.baalminion1:
 						return 5;
 					default:
 						Attack.getIntoPosition(monster, 10, 0x4);
@@ -103,7 +104,7 @@ function Baal() {
 			pos = [15094, 5022, 15094, 5041, 15094, 5060, 15094, 5041, 15094, 5022];
 
 		if (Config.AvoidDolls) {
-			monster = getUnit(1, 691);
+            monster = getUnit(UnitType.NPC, UnitClassID.bonefetish7);
 
 			if (monster) {
 				do {
@@ -125,12 +126,12 @@ function Baal() {
 	};
 
 	this.checkHydra = function () {
-		var monster = getUnit(1, "hydra");
+        var monster = getUnit(UnitType.NPC, "hydra");
 		if (monster) {
 			do {
-				if (monster.mode !== 12 && monster.getStat(172) !== 2) {
+                if (monster.mode !== NPCModes.dead && monster.getStat(Stats.alignment) !== 2) {
 					Pather.moveTo(15072, 5002);
-					while (monster.mode !== 12) {
+                    while (monster.mode !== NPCModes.dead) {
 						delay(500);
 						if (!copyUnit(monster).x) {
 							break;
@@ -147,7 +148,7 @@ function Baal() {
 
 	this.announce = function () {
 		var count, string, souls, dolls,
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 
 		if (monster) {
 			count = 0;
@@ -158,11 +159,11 @@ function Baal() {
 						count += 1;
 					}
 
-					if (!souls && monster.classid === 641) {
+                    if (!souls && monster.classid === UnitClassID.willowisp7) {
 						souls = true;
 					}
 
-					if (!dolls && monster.classid === 691) {
+                    if (!dolls && monster.classid === UnitClassID.bonefetish7) {
 						dolls = true;
 					}
 				}
@@ -197,26 +198,26 @@ function Baal() {
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(Config.RandomPrecast ? "random" : 129);
+    Pather.useWaypoint(Config.RandomPrecast ? "random" : Areas.Act5.The_Worldstone_Keep_Level_2);
 	Precast.doPrecast(true);
 
-	if (me.area !== 129) {
-		Pather.useWaypoint(129);
+    if (me.area !== Areas.Act5.The_Worldstone_Keep_Level_2) {
+        Pather.useWaypoint(Areas.Act5.The_Worldstone_Keep_Level_2);
 	}
 
-	if (!Pather.moveToExit([130, 131], true)) {
+    if (!Pather.moveToExit([Areas.Act5.The_Worldstone_Keep_Level_3, Areas.Act5.Throne_Of_Destruction], true)) {
 		throw new Error("Failed to move to Throne of Destruction.");
 	}
 
 	Pather.moveTo(15095, 5029);
 
-	if (Config.Baal.DollQuit && getUnit(1, 691)) {
+    if (Config.Baal.DollQuit && getUnit(UnitType.NPC, UnitClassID.bonefetish7)) {
 		say("Dolls found! NG.");
 
 		return true;
 	}
 
-	if (Config.Baal.SoulQuit && getUnit(1, 641)) {
+    if (Config.Baal.SoulQuit && getUnit(UnitType.NPC, UnitClassID.willowisp7)) {
 		say("Souls found! NG.");
 
 		return true;
@@ -241,15 +242,15 @@ function Baal() {
 
 	tick = getTickCount();
 
-	Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+    Pather.moveTo(15094, me.classid === ClassID.Paladin ? 5029 : 5038);
 
 MainLoop:
 	while (true) {
-		if (getDistance(me, 15094, me.classid === 3 ? 5029 : 5038) > 3) {
-			Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+        if (getDistance(me, 15094, me.classid === ClassID.Paladin ? 5029 : 5038) > 3) {
+            Pather.moveTo(15094, me.classid === ClassID.Paladin ? 5029 : 5038);
 		}
 
-		if (!getUnit(1, 543)) {
+        if (!getUnit(UnitType.NPC, UnitClassID.baalthrone)) {
 			break MainLoop;
 		}
 
@@ -287,8 +288,8 @@ MainLoop:
 			break MainLoop;
 		default:
 			if (getTickCount() - tick < 7e3) {
-				if (me.getState(2)) {
-					Skill.setSkill(109, 0);
+                if (me.getState(States.POISON)) {
+                    Skill.setSkill(Skills.Paladin.Cleansing, 0);
 				}
 
 				break;
@@ -313,11 +314,11 @@ MainLoop:
 		delay(5000);
 		Precast.doPrecast(true);
 
-		while (getUnit(1, 543)) {
+        while (getUnit(UnitType.NPC, UnitClassID.baalthrone)) {
 			delay(500);
 		}
 
-		portal = getUnit(2, 563);
+        portal = getUnit(UnitType.Object, UniqueObjectIds.Worldstone_Chamber);
 
 		if (portal) {
 			Pather.usePortal(null, null, portal);
@@ -326,7 +327,7 @@ MainLoop:
 		}
 
 		Pather.moveTo(15134, 5923);
-		Attack.kill(544); // Baal
+        Attack.kill(UnitClassID.baalcrab); // Baal
 		Pickit.pickItems();
 	}
 

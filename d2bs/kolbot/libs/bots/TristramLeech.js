@@ -3,6 +3,7 @@
 *   @author	 ToS/XxXGoD/YGM
 *   @desc	   Tristram Leech (Helper)
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function TristramLeech() {
 
@@ -10,11 +11,11 @@ function TristramLeech() {
 	
 	// Get leader's Unit
 	this.getLeaderUnit = function (name) {
-		var player = getUnit(0, name);
+        var player = getUnit(UnitType.Player, name);
 
 		if (player) {
 			do {
-				if (player.mode !== 0 && player.mode !== 17) {
+                if (player.mode !== PlayerModes.Death && player.mode !== PlayerModes.Dead) {
 					return player;
 				}
 			} while (player.getNext());
@@ -24,7 +25,7 @@ function TristramLeech() {
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(1); // Back To Rouge
+    Pather.useWaypoint(Areas.Act1.Rogue_Encampment); // Back To Rouge
 	Town.move("portalspot"); // Portal Spot
 
 	leader = Config.Leader;
@@ -35,18 +36,18 @@ function TristramLeech() {
 		var whereisleader = getParty(leader);
 		
 		if (whereisleader) {
-			if (whereisleader.area === 83) {
+            if (whereisleader.area === Areas.Act3.Travincal) {
 			   return false;
 			}
-			if (whereisleader.area === 108) {
+            if (whereisleader.area === Areas.Act4.Chaos_Sanctuary) {
 			   return false;
 			}
-			if (whereisleader.area === 131) {
+            if (whereisleader.area === Areas.Act5.Throne_Of_Destruction) {
 			   return false;
 			}
 		}
 		
-		if (Pather.usePortal(38, leader)) {
+        if (Pather.usePortal(Areas.Act1.Tristram, leader)) {
 			break;
 		}
 		
@@ -65,7 +66,7 @@ function TristramLeech() {
 		var whereisleader = getParty(leader);
 			
 		if (whereisleader) {
-			if (whereisleader.area === 38) {
+            if (whereisleader.area === Areas.Act1.Tristram) {
 				break;
 			}
 		}
@@ -73,7 +74,7 @@ function TristramLeech() {
 		delay(1000);
 	}
 
-	while (whereisleader.area === 38) {
+    while (whereisleader.area === Areas.Act1.Tristram) {
 
 		var whereisleader = getParty(leader);
 		var leaderUnit = this.getLeaderUnit(leader);

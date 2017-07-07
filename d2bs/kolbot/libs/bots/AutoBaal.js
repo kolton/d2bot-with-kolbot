@@ -6,6 +6,7 @@
 *				Reenters throne/chamber upon death and picks the corpse back up
 *				Make sure you setup safeMsg and baalMsg accordingly
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function AutoBaal() {
 	// editable variables
@@ -51,15 +52,15 @@ function AutoBaal() {
 		var monster, monList, index;
 
 		switch (me.classid) {
-		case 0:
+            case ClassID.Amazon:
 			break;
-		case 1:
+            case ClassID.Sorceress:
 			break;
-		case 2:
+            case ClassID.Necromancer:
 			ClassAttack.raiseArmy(50);
 
 			if (Config.Curse[1] > 0) {
-				monster = getUnit(1);
+                monster = getUnit(UnitType.NPC);
 
 				if (monster) {
 					do {
@@ -72,22 +73,24 @@ function AutoBaal() {
 			}
 
 			break;
-		case 3:
+            case ClassID.Paladin:
 			break;
-		case 4:
+            case ClassID.Barbarian:
 			break;
-		case 5:
+            case ClassID.Druid:
 			break;
-		case 6:
+            case ClassID.Assassin:
 			break;
 		}
 
-		if ([24, 49, 51, 56, 59, 84, 93, 140, 244].indexOf(Config.AttackSkill[1]) === -1 &&
-				[24, 49, 51, 56, 59, 84, 93, 140, 244].indexOf(Config.AttackSkill[3]) === -1) {
+        if ([Skills.Amazon.Charged_Strike, Skills.Sorceress.Lightning, Skills.Sorceress.Fire_Wall, Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard,
+        Skills.Necromancer.Bone_Spear, Skills.Necromancer.Bone_Spirit, Skills.Barbarian.Double_Throw, Skills.Druid.Volcano].indexOf(Config.AttackSkill[1]) === -1 &&
+            [Skills.Amazon.Charged_Strike, Skills.Sorceress.Lightning, Skills.Sorceress.Fire_Wall, Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard,
+            Skills.Necromancer.Bone_Spear, Skills.Necromancer.Bone_Spirit, Skills.Barbarian.Double_Throw, Skills.Druid.Volcano].indexOf(Config.AttackSkill[3]) === -1) {
 			return false;
 		}
 
-		monster = getUnit(1);
+        monster = getUnit(UnitType.NPC);
 		monList = [];
 
 		if (monster) {
@@ -177,13 +180,13 @@ function AutoBaal() {
 	Town.doChores();
 	Town.move("portalspot");
 
-	if (leader || autoLeaderDetect(131)) { // find the first player in area 131 - throne of destruction
+    if (leader || autoLeaderDetect(Areas.Act5.Throne_Of_Destruction)) { // find the first player in area 131 - throne of destruction
 		while (Misc.inMyParty(leader)) { // do our stuff while partied
 			if (hotCheck) {
-				Pather.useWaypoint(4);
+                Pather.useWaypoint(Areas.Act1.Stony_Field);
 				Precast.doPrecast(true);
 
-				for (i = 4; i > 1; i -= 1) {
+                for (i = Areas.Act1.Stony_Field; i > Areas.Act1.Rogue_Encampment; i -= 1) {
 					if (Misc.getShrinesInArea(i, 15, true)) {
 						break;
 					}
@@ -191,9 +194,9 @@ function AutoBaal() {
 
 				if (i === 1) {
 					Town.goToTown();
-					Pather.useWaypoint(5);
+                    Pather.useWaypoint(Areas.Act1.Dark_Wood);
 
-					for (i = 5; i < 8; i += 1) {
+                    for (i = Areas.Act1.Dark_Wood; i < Areas.Act1.Den_Of_Evil; i += 1) {
 						if (Misc.getShrinesInArea(i, 15, true)) {
 							break;
 						}
@@ -206,27 +209,27 @@ function AutoBaal() {
 				hotCheck = false;
 			}
 
-			if (throneCheck && me.area === 109) { // wait for throne signal - leader's safe message
+            if (throneCheck && me.area === Areas.Act5.Harrogath) { // wait for throne signal - leader's safe message
 				print("ÿc4AutoBaal: ÿc0Trying to take TP to throne.");
-				Pather.usePortal(131, null); // take TP to throne
+                Pather.usePortal(Areas.Act5.Throne_Of_Destruction, null); // take TP to throne
 				Pather.moveTo(Config.AutoBaal.LeechSpot[0], Config.AutoBaal.LeechSpot[1]); // move to a safe spot
 				Precast.doPrecast(true);
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
 			}
 
-			if (!baalCheck && me.area === 131 && Config.AutoBaal.LongRangeSupport) {
+            if (!baalCheck && me.area === Areas.Act5.Throne_Of_Destruction && Config.AutoBaal.LongRangeSupport) {
 				this.longRangeSupport();
 			}
 
-			if (baalCheck && me.area === 131) { // wait for baal signal - leader's baal message
+            if (baalCheck && me.area === Areas.Act5.Throne_Of_Destruction) { // wait for baal signal - leader's baal message
 				Pather.moveTo(15092, 5010); // move closer to chamber portal
 				Precast.doPrecast(false);
 
-				while (getUnit(1, 543)) { // wait for baal to go through the portal
+                while (getUnit(UnitType.NPC, UnitClassID.baalthrone)) { // wait for baal to go through the portal
 					delay(500);
 				}
 
-				portal = getUnit(2, 563);
+                portal = getUnit(UnitType.Object, UniqueObjectIds.Worldstone_Chamber);
 
 				delay(2000); // wait for others to enter first - helps  with curses and tentacles from spawning around you
 				print("ÿc4AutoBaal: ÿc0Entering chamber.");
@@ -238,17 +241,17 @@ function AutoBaal() {
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
 			}
 
-			baal = getUnit(1, 544);
+            baal = getUnit(UnitType.NPC, UnitClassID.baalcrab);
 
 			if (baal) {
-				if (baal.mode === 0 || baal.mode === 12) {
+                if (baal.mode === NPCModes.death || baal.mode === NPCModes.dead) {
 					break;
 				}
 
 				this.longRangeSupport();
 			}
 
-			if (me.mode === 17) { // death check
+            if (me.mode === PlayerModes.Dead) { // death check
 				me.revive(); // revive if dead
 			}
 

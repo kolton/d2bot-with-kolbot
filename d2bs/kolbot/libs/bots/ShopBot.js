@@ -1,3 +1,5 @@
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 function ShopBot() {
 	var i, tickCount,
 		cycles = 0,
@@ -90,7 +92,7 @@ function ShopBot() {
 			moveNPC(npc, path[i], path[i + 1]);
 
 			for (j = 0; j < leadTimeout; j += 1) {
-				while (npc.mode === 2) {
+                while (npc.mode === NPCModes.walk) {
 					delay(100);
 				}
 
@@ -116,7 +118,7 @@ function ShopBot() {
 	};
 
 	this.openMenu = function (npc) {
-		if (npc.type !== 1) {
+        if (npc.type !== UnitType.NPC) {
 			throw new Error("Unit.openMenu: Must be used on NPCs.");
 		}
 
@@ -128,7 +130,7 @@ function ShopBot() {
 			me.cancel();
 		}
 
-		if (getUIFlag(0x08)) {
+        if (getUIFlag(UIFlags.npc_menu)) {
 			return true;
 		}
 
@@ -137,7 +139,7 @@ function ShopBot() {
 				Pather.walkTo(npc.x, npc.y);
 			}
 
-			if (!getUIFlag(0x08)) {
+            if (!getUIFlag(UIFlags.npc_menu)) {
 				sendPacket(1, 0x13, 4, 1, 4, npc.gid);
 				sendPacket(1, 0x2f, 4, 1, 4, npc.gid);
 			}
@@ -145,7 +147,7 @@ function ShopBot() {
 			tick = getTickCount();
 
 			while (getTickCount() - tick < Math.max(Math.round((i + 1) * 250 / (i / 3 + 1)), me.ping + 1)) {
-				if (getUIFlag(0x08)) {
+                if (getUIFlag(UIFlags.npc_menu)) {
 					//print("openMenu try: " + i);
 
 					return true;
@@ -251,13 +253,13 @@ function ShopBot() {
 			return true;
 		}
 
-		unit = getUnit(2, "waypoint");
+        unit = getUnit(UnitType.Object, "waypoint");
 
 		if (!unit) {
 			return false;
 		}
 
-		if (getUIFlag(0x08)) {
+        if (getUIFlag(UIFlags.npc_menu)) {
 			interactedNPC = getInteractedNPC();
 
 			if (interactedNPC) {
@@ -309,13 +311,13 @@ function ShopBot() {
 			if (!npc) {
 				Town.move(name);
 
-				npc = getUnit(1, name);
+                npc = getUnit(UnitType.NPC, name);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, name);
+                npc = getUnit(UnitType.NPC, name);
 			}
 
 			if (!npc) {
@@ -327,11 +329,11 @@ function ShopBot() {
 			}
 
 			if (!this.paths[name]) {
-				if (!getUnit(2, "waypoint")) {
+                if (!getUnit(UnitType.Object, "waypoint")) {
 					Town.move("waypoint");
 				}
 
-				wp = getUnit(2, "waypoint");
+                wp = getUnit(UnitType.Object, "waypoint");
 				wp = {x: wp.x, y: wp.y};
 
 				Town.move(name);
@@ -361,23 +363,23 @@ function ShopBot() {
 					break;
 				}
 			} else {
-				if (!this.useWp(40)) {
+                if (!this.useWp(Areas.Act2.Lut_Gholein)) {
 					break;
 				}
 			}
 
-			npc = this.npcs[name] || getUnit(1, NPC.Elzix);
+            npc = this.npcs[name] || getUnit(UnitType.NPC, NPC.Elzix);
 
 			if (!npc) {
 				Town.move(NPC.Elzix);
 
-				npc = getUnit(1, NPC.Elzix);
+                npc = getUnit(UnitType.NPC, NPC.Elzix);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Elzix);
+                npc = getUnit(UnitType.NPC, NPC.Elzix);
 			}
 
 			if (!npc) {
@@ -398,23 +400,23 @@ function ShopBot() {
 					break;
 				}
 			} else {
-				if (!this.useWp(40)) {
+                if (!this.useWp(Areas.Act2.Lut_Gholein)) {
 					break;
 				}
 			}
 
-			npc = this.npcs[name] || getUnit(1, NPC.Fara);
+            npc = this.npcs[name] || getUnit(UnitType.NPC, NPC.Fara);
 
 			if (!npc) {
 				Town.move(NPC.Fara);
 
-				npc = getUnit(1, NPC.Fara);
+                npc = getUnit(UnitType.NPC, NPC.Fara);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Fara);
+                npc = getUnit(UnitType.NPC, NPC.Fara);
 			}
 
 			if (!npc) {
@@ -435,7 +437,7 @@ function ShopBot() {
 					break;
 				}
 			} else {
-				if (!this.useWp(40)) {
+                if (!this.useWp(Areas.Act2.Lut_Gholein)) {
 					break;
 				}
 			}
@@ -445,13 +447,13 @@ function ShopBot() {
 			if (!npc) {
 				Town.move(NPC.Drognan);
 
-				npc = getUnit(1, NPC.Drognan);
+                npc = getUnit(UnitType.NPC, NPC.Drognan);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Drognan);
+                npc = getUnit(UnitType.NPC, NPC.Drognan);
 			}
 
 			if (!npc) {
@@ -472,23 +474,23 @@ function ShopBot() {
 					break;
 				}
 			} else {
-				if (!this.useWp(75)) {
+                if (!this.useWp(Areas.Act3.Kurast_Docktown)) {
 					break;
 				}
 			}
 
-			npc = this.npcs[name] || getUnit(1, NPC.Ormus);
+            npc = this.npcs[name] || getUnit(UnitType.NPC, NPC.Ormus);
 
 			if (!npc) {
 				Town.move(NPC.Ormus);
 
-				npc = getUnit(1, NPC.Ormus);
+                npc = getUnit(UnitType.NPC, NPC.Ormus);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Ormus);
+                npc = getUnit(UnitType.NPC, NPC.Ormus);
 			}
 
 			if (!npc) {
@@ -509,23 +511,23 @@ function ShopBot() {
 					break;
 				}
 			} else {
-				if (!this.useWp(75)) {
+                if (!this.useWp(Areas.Act3.Kurast_Docktown)) {
 					break;
 				}
 			}
 
-			npc = this.npcs[name] || getUnit(1, NPC.Asheara);
+            npc = this.npcs[name] || getUnit(UnitType.NPC, NPC.Asheara);
 
 			if (!npc) {
 				Town.move(NPC.Asheara);
 
-				npc = getUnit(1, NPC.Asheara);
+                npc = getUnit(UnitType.NPC, NPC.Asheara);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Asheara);
+                npc = getUnit(UnitType.NPC, NPC.Asheara);
 			}
 
 			if (!npc) {
@@ -546,23 +548,23 @@ function ShopBot() {
 					break;
 				}
 			} else {
-				if (!this.useWp(109)) {
+                if (!this.useWp(Areas.Act5.Harrogath)) {
 					break;
 				}
 			}
 
-			npc = this.npcs[name] || getUnit(1, NPC.Anya);
+            npc = this.npcs[name] || getUnit(UnitType.NPC, NPC.Anya);
 
 			if (!npc) {
 				Town.move(NPC.Anya);
 
-				npc = getUnit(1, NPC.Anya);
+                npc = getUnit(UnitType.NPC, NPC.Anya);
 			}
 
 			if (!npc) {
 				Town.move("waypoint");
 
-				npc = getUnit(1, NPC.Anya);
+                npc = getUnit(UnitType.NPC, NPC.Anya);
 			}
 
 			if (!npc) {
@@ -620,7 +622,7 @@ function ShopBot() {
 		Config.ShopBot.ShopNPC[i] = Config.ShopBot.ShopNPC[i].toLowerCase();
 	}
 
-	if (Config.ShopBot.MinGold && me.getStat(14) + me.getStat(15) < Config.ShopBot.MinGold) {
+    if (Config.ShopBot.MinGold && me.getStat(Stats.gold) + me.getStat(Stats.goldbank) < Config.ShopBot.MinGold) {
 		return true;
 	}
 
@@ -643,7 +645,7 @@ function ShopBot() {
 		}
 
 		if (me.inTown) {
-			this.useWp([35, 48, 101, 107, 113][me.act - 1]);
+            this.useWp([Areas.Act1.Catacombs_Level_2, Areas.Act2.A2_Sewers_Level_2, Areas.Act3.Durance_Of_Hate_Level_2, Areas.Act4.River_Of_Flame, Areas.Act5.Crystalized_Passage][me.act - 1]);
 		}
 
 		cycles += 1;

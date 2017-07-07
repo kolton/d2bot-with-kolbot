@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Barbarian attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
@@ -10,7 +11,7 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(Config.AttackSkill[0])) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+        if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(Config.AttackSkill[0])) && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
@@ -25,7 +26,7 @@ var ClassAttack = {
 		var index,
 			attackSkill = -1;
 
-		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
+        index = ((unit.spectype & 0x7) || unit.type === UnitType.Player) ? 1 : 3;
 
 		if (Attack.getCustomAttack(unit)) {
 			attackSkill = Attack.getCustomAttack(unit)[0];
@@ -72,7 +73,7 @@ var ClassAttack = {
 		}
 
 		if (pickit) {
-			this.findItem(me.area === 83 ? 60 : 20);
+            this.findItem(me.area === Areas.Act3.Travincal ? 60 : 20);
 		}
 	},
 
@@ -84,7 +85,7 @@ var ClassAttack = {
 		}
 
 		switch (attackSkill) {
-		case 151:
+            case Skills.Barbarian.Whirlwind:
 			if (Math.ceil(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x1)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x1, 2)) {
 					return 0;
@@ -144,7 +145,7 @@ var ClassAttack = {
 			return false;
 		}
 
-		return Skill.cast(151, Skill.getHand(151), me.x, me.y);
+        return Skill.cast(Skills.Barbarian.Whirlwind, Skill.getHand(Skills.Barbarian.Whirlwind), me.x, me.y);
 	},
 
 	checkCloseMonsters: function (range) {
@@ -166,7 +167,7 @@ var ClassAttack = {
 	},
 
 	findItem: function (range) {
-		if (!Config.FindItem || !me.getSkill(142, 1)) {
+        if (!Config.FindItem || !me.getSkill(Skills.Barbarian.Find_Item, 1)) {
 			return false;
 		}
 
@@ -178,11 +179,11 @@ var ClassAttack = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			corpse = getUnit(1);
+            corpse = getUnit(UnitType.NPC);
 
 			if (corpse) {
 				do {
-					if ((corpse.mode === 0 || corpse.mode === 12) && getDistance(corpse, orgX, orgY) <= range && this.checkCorpse(corpse)) {
+                    if ((corpse.mode === NPCModes.death || corpse.mode === NPCModes.dead) && getDistance(corpse, orgX, orgY) <= range && this.checkCorpse(corpse)) {
 						corpseList.push(copyUnit(corpse));
 					}
 				} while (corpse.getNext());
@@ -216,12 +217,12 @@ MainLoop:
 
 CorpseLoop:
 					for (j = 0; j < 3; j += 1) {
-						Skill.cast(142, 3, corpse);
+                        Skill.cast(142, 3, corpse);
 
 						tick = getTickCount();
 
 						while (getTickCount() - tick < 1000) {
-							if (corpse.getState(118)) {
+                            if (corpse.getState(States.CORPSE_NOSELECT)) {
 								Pickit.fastPick();
 
 								break CorpseLoop;
@@ -235,7 +236,7 @@ CorpseLoop:
 		}
 
 		if (retry) {
-			return this.findItem(me.area === 83 ? 60 : 20);
+            return this.findItem(me.area === Areas.Act3.Travincal ? 60 : 20);
 		}
 
 		if (Config.FindItemSwitch) {
@@ -248,25 +249,25 @@ CorpseLoop:
 	},
 
 	checkCorpse: function (unit) {
-		if (unit.mode !== 0 && unit.mode !== 12) {
+        if (unit.mode !== NPCModes.death && unit.mode !== NPCModes.dead) {
 			return false;
 		}
 
-		if ([345, 346, 347].indexOf(unit.classid) === -1 && unit.spectype === 0) {
+        if ([UnitClassID.councilmember1, UnitClassID.councilmember2, UnitClassID.councilmember3].indexOf(unit.classid) === -1 && unit.spectype === 0) {
 			return false;
 		}
 
-		if (unit.classid <= 575 && !getBaseStat("monstats2", unit.classid, "corpseSel")) { // monstats2 doesn't contain guest monsters info. sigh..
+        if (unit.classid <= UnitClassID.sk_archer6 && !getBaseStat("monstats2", unit.classid, "corpseSel")) { // monstats2 doesn't contain guest monsters info. sigh..
 			return false;
 		}
 
 		if (getDistance(me, unit) <= 25 &&
-				!unit.getState(1) && // freeze
-				!unit.getState(96) && // revive
-				!unit.getState(99) && // redeemed
-				!unit.getState(104) && // nodraw
-				!unit.getState(107) && // shatter
-				!unit.getState(118) // noselect
+            !unit.getState(States.FREEZE) && // freeze
+            !unit.getState(States.REVIVE) && // revive
+            !unit.getState(States.REDEEMED) && // redeemed
+            !unit.getState(States.CORPSE_NODRAW) && // nodraw
+            !unit.getState(States.SHATTER) && // shatter
+            !unit.getState(States.CORPSE_NOSELECT) // noselect
 				) {
 			return true;
 		}

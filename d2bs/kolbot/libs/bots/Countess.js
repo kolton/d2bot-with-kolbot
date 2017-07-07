@@ -3,19 +3,20 @@
 *	@author		kolton
 *	@desc		kill The Countess and optionally kill Ghosts along the way
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Countess() {
 	var i, poi;
 
 	Town.doChores();
-	Pather.useWaypoint(6);
+    Pather.useWaypoint(Areas.Act1.Black_Marsh);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true)) {
+    if (!Pather.moveToExit([Areas.Act1.Forgotten_Tower, Areas.Act1.Tower_Cellar_Level_1, Areas.Act1.Tower_Cellar_Level_2, Areas.Act1.Tower_Cellar_Level_3, Areas.Act1.Tower_Cellar_Level_4, Areas.Act1.Tower_Cellar_Level_5], true)) {
 		throw new Error("Failed to move to Countess");
 	}
 
-	poi = getPresetUnit(me.area, 2, 580);
+    poi = getPresetUnit(me.area, UnitType.Object, 580);
 
 	if (!poi) {
 		throw new Error("Failed to move to Countess (preset not found)");

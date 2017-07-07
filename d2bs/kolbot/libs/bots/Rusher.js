@@ -11,6 +11,7 @@
 *				supported sequences are: andariel, cube, amulet, staff, summoner, duriel, travincal, mephisto, diablo
 *				example: do travincal
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Rusher() {
 	load("tools/rushthread.js");
@@ -69,19 +70,19 @@ function Rusher() {
 			}
 		} while (party.getNext());
 
-		if (minArea <= 39) {
+        if (minArea <= Areas.Act1.Moo_Moo_Farm) {
 			return 1;
 		}
 
-		if (minArea >= 40 && minArea <= 74) {
+        if (minArea >= Areas.Act2.Lut_Gholein && minArea <= Areas.Act2.Arcane_Sanctuary) {
 			return 2;
 		}
 
-		if (minArea >= 75 && minArea <= 102) {
+        if (minArea >= Areas.Act3.Kurast_Docktown && minArea <= Areas.Act3.Durance_Of_Hate_Level_3) {
 			return 3;
 		}
 
-		if (minArea >= 103 && minArea <= 108) {
+        if (minArea >= Areas.Act4.The_Pandemonium_Fortress && minArea <= Areas.Act4.Chaos_Sanctuary) {
 			return 4;
 		}
 

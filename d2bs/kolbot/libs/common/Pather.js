@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		handle player movement
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 // Perform certain actions after moving to each node
 var NodeAction = {
@@ -21,8 +22,8 @@ var NodeAction = {
 	killMonsters: function (arg) {
 		var monList;
 
-		if (Config.Countess.KillGhosts && [21, 22, 23, 24, 25].indexOf(me.area) > -1) {
-			monList = Attack.getMob(38, 0, 30);
+        if (Config.Countess.KillGhosts && [Areas.Act1.Tower_Cellar_Level_1, Areas.Act1.Tower_Cellar_Level_2, Areas.Act1.Tower_Cellar_Level_3, Areas.Act1.Tower_Cellar_Level_4, Areas.Act1.Tower_Cellar_Level_5].indexOf(me.area) > -1) {
+            monList = Attack.getMob(MonsterClassID.wraith1.hcIdx, 0, 30);
 
 			if (monList) {
 				Attack.clearList(monList);
@@ -114,7 +115,11 @@ var Pather = {
 	walkDistance: 10,
 	teleDistance: 40,
 	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17, 0x19, 0x1A],
-	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
+    wpAreas: [Areas.Act1.Rogue_Encampment, Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field, Areas.Act1.Dark_Wood, Areas.Act1.Black_Marsh, Areas.Act1.Outer_Cloister, Areas.Act1.Jail_Level_1, Areas.Act1.Inner_Cloister, Areas.Act1.Catacombs_Level_2,
+        Areas.Act2.Lut_Gholein, Areas.Act2.A2_Sewers_Level_2, Areas.Act2.Dry_Hills, Areas.Act2.Halls_Of_The_Dead_Level_2, Areas.Act2.Far_Oasis, Areas.Act2.Lost_City, Areas.Act2.Palace_Cellar_Level_1, Areas.Act2.Arcane_Sanctuary, Areas.Act2.Canyon_Of_The_Magi,
+        Areas.Act3.Kurast_Docktown, Areas.Act3.Spider_Forest, Areas.Act3.Great_Marsh, Areas.Act3.Flayer_Jungle, Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Travincal, Areas.Act3.Durance_Of_Hate_Level_2,
+        Areas.Act4.The_Pandemonium_Fortress, Areas.Act4.City_Of_The_Damned, Areas.Act4.River_Of_Flame,
+        Areas.Act5.Harrogath, Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Crystalized_Passage, Areas.Act5.Glacial_Trail, Areas.Act5.Halls_Of_Pain, Areas.Act5.Frozen_Tundra, Areas.Act5.Ancients_Way, Areas.Act5.The_Worldstone_Keep_Level_2],
 	recursion: true,
 
 	/*
@@ -164,8 +169,8 @@ var Pather = {
 			pop = false;
 		}
 
-		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
-							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+        this.useTeleport = this.teleport && !me.getState(States.WOLF) && !me.getState(States.WOLF) && !me.inTown &&
+            ((me.classid === ClassID.Sorceress && me.getSkill(Skills.Sorceress.Teleport, 1)) || me.getStat(Stats.item_nonclassskill, Skills.Sorceress.Teleport));
 
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
@@ -179,7 +184,7 @@ var Pather = {
 			return this.walkTo(x, y);
 		}
 
-		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
+        path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([Areas.Act2.Maggot_Lair_Level_1, Areas.Act2.Maggot_Lair_Level_2, Areas.Act2.Maggot_Lair_Level_3].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
 		if (!path) {
 			throw new Error("moveTo: Failed to generate path.");
@@ -215,7 +220,7 @@ var Pather = {
 			*/
 			if (getDistance(me, node) > 2) {
 				// Make life in Maggot Lair easier
-				if ([62, 63, 64].indexOf(me.area) > -1) {
+                if ([Areas.Act2.Maggot_Lair_Level_1, Areas.Act2.Maggot_Lair_Level_2, Areas.Act2.Maggot_Lair_Level_3].indexOf(me.area) > -1) {
 					adjustedNode = this.getNearestWalkable(node.x, node.y, 15, 3, 0x1 | 0x4 | 0x800 | 0x1000);
 
 					if (adjustedNode) {
@@ -249,8 +254,8 @@ var Pather = {
 							cleared = true;
 						}
 
-						if (fail > 1 && me.getSkill(143, 1)) {
-							Skill.cast(143, 0, node.x, node.y);
+                        if (fail > 1 && me.getSkill(Skills.Barbarian.Leap_Attack, 1)) {
+                            Skill.cast(Skills.Barbarian.Leap_Attack, 0, node.x, node.y);
 						}
 					}
 
@@ -304,7 +309,7 @@ var Pather = {
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			if (Config.PacketCasting) {
-				Skill.setSkill(54, 0);
+				Skill.setSkill(Skills.Sorceress.Teleport, 0);
 				Packet.castSkill(0, x, y);
 			} else {
 				Skill.cast(54, 0, x, y);
@@ -353,14 +358,14 @@ MainLoop:
 				me.runwalk = 1;
 			}
 
-			if (Config.Charge && me.classid === 3 && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
-				if (Config.Vigor) {
-					Skill.setSkill(115, 0);
+            if (Config.Charge && me.classid === ClassID.Paladin && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(Skills.Paladin.Charge, 1)) {
+                if (Config.Vigor) {
+                    Skill.setSkill(Skills.Paladin.Vigor, 0);
 				}
 
 				Misc.click(0, 1, x, y);
 
-				while (me.mode !== 1 && me.mode !== 5 && !me.dead) {
+                while (me.mode !== PlayerModes.Neutral && me.mode !== PlayerModes.Town_Neutral && !me.dead) {
 					delay(40);
 				}
 			}
@@ -370,9 +375,9 @@ MainLoop:
 			me.runwalk = 1;
 		}
 
-		while (getDistance(me.x, me.y, x, y) > minDist && !me.dead) {
-			if (me.classid === 3 && Config.Vigor) {
-				Skill.setSkill(115, 0);
+        while (getDistance(me.x, me.y, x, y) > minDist && !me.dead) {
+            if (me.classid === ClassID.Paladin && Config.Vigor) {
+				Skill.setSkill(Skills.Paladin.Vigor, 0);
 			}
 
 			if (this.openDoors(x, y) && getDistance(me.x, me.y, x, y) <= minDist) {
@@ -385,7 +390,7 @@ MainLoop:
 			nTimer = getTickCount();
 
 ModeLoop:
-			while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
+        while (me.mode !== PlayerModes.Walk && me.mode !== PlayerModes.Run && me.mode !== PlayerModes.Town_Walk) {
 				if (me.dead) {
 					return false;
 				}
@@ -427,7 +432,7 @@ ModeLoop:
 			}
 
 			// Wait until we're done walking - idle or dead
-			while (getDistance(me.x, me.y, x, y) > minDist && me.mode !== 1 && me.mode !== 5 && !me.dead) {
+            while (getDistance(me.x, me.y, x, y) > minDist && me.mode !== PlayerModes.Neutral && me.mode !== PlayerModes.Town_Neutral && !me.dead) {
 				delay(10);
 			}
 
@@ -451,7 +456,7 @@ ModeLoop:
 
 		// Regular doors
 		var i, tick,
-			door = getUnit(2, "door", 0);
+            door = getUnit(UnitType.Object, "door", ObjectModes.Neutral);
 
 		if (door) {
 			do {
@@ -463,7 +468,7 @@ ModeLoop:
 						tick = getTickCount();
 
 						while (getTickCount() - tick < 1000) {
-							if (door.mode === 2) {
+                            if (door.mode === ObjectModes.Opened) {
 								me.overhead("Opened a door!");
 
 								return true;
@@ -489,9 +494,9 @@ ModeLoop:
 		clearPath - kill monsters while moving
 		pop - remove last node
 	*/
-	moveToUnit: function (unit, offX, offY, clearPath, pop) {
-		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
-							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+    moveToUnit: function (unit, offX, offY, clearPath, pop) {
+        this.useTeleport = this.teleport && !me.getState(States.WOLF) && !me.getState(States.BEAR) && !me.inTown &&
+            ((me.classid === ClassID.Sorceress && me.getSkill(Skills.Sorceress.Teleport, 1)) || me.getStat(Stats.item_nonclassskill, Skills.Sorceress.Teleport));
 
 		if (offX === undefined) {
 			offX = 0;
@@ -522,7 +527,7 @@ ModeLoop:
 			this.moveTo(unit.x + offX, unit.y + offY, 0, clearPath, true);
 		}
 
-		return this.moveTo(unit.x + offX, unit.y + offY, this.useTeleport && unit.type && unit.type === 1 ? 3 : 0, clearPath, pop);
+        return this.moveTo(unit.x + offX, unit.y + offY, this.useTeleport && unit.type && unit.type === UnitType.NPC ? 3 : 0, clearPath, pop);
 	},
 
 	/*
@@ -781,7 +786,7 @@ ModeLoop:
 				Town.move("waypoint");
 			}
 
-			wp = getUnit(2, "waypoint");
+            wp = getUnit(UnitType.Object, "waypoint");
 
 			if (wp && wp.area === me.area) {
 				if (!me.inTown && getDistance(me, wp) > 7) {
@@ -797,8 +802,8 @@ ModeLoop:
 
 					tick = getTickCount();
 
-					while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
-						if (getUIFlag(0x14)) { // Waypoint screen is open
+                    while (getTickCount() - tick < Math.max(Math.round((i + 1) * 1000 / (i / 5 + 1)), me.ping * 2)) {
+                        if (getUIFlag(UIFlags.waypoint)) { // Waypoint screen is open
 							delay(500);
 
 							switch (targetArea) {
@@ -806,8 +811,8 @@ ModeLoop:
 								while (true) {
 									targetArea = this.wpAreas[rand(0, this.wpAreas.length - 1)];
 
-									// get a valid wp, avoid towns
-									if ([1, 40, 75, 103, 109].indexOf(targetArea) === -1 && getWaypoint(this.wpAreas.indexOf(targetArea))) {
+                                    // get a valid wp, avoid towns
+                                    if ([Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath].indexOf(targetArea) === -1 && getWaypoint(this.wpAreas.indexOf(targetArea))) {
 										break;
 									}
 
@@ -838,7 +843,7 @@ ModeLoop:
 						delay(10);
 					}
 
-					if (!getUIFlag(0x14)) {
+                    if (!getUIFlag(UIFlags.waypoint)) {
 						print("waypoint retry " + (i + 1));
 						this.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
 						Packet.flash(me.gid);
@@ -847,7 +852,7 @@ ModeLoop:
 					}
 				}
 
-				if (!check || getUIFlag(0x14)) {
+                if (!check || getUIFlag(UIFlags.waypoint)) {
 					delay(200);
 					wp.interact(targetArea);
 
@@ -901,17 +906,17 @@ ModeLoop:
 				break;
 			}
 
-			tpTome = me.findItem("tbk", 0, 3);
+            tpTome = me.findItem("tbk", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 			if (!tpTome) {
 				throw new Error("makePortal: No TP tomes.");
 			}
 
-			if (!tpTome.getStat(70)) {
+			if (!tpTome.getStat(Stats.quantity)) {
 				throw new Error("makePortal: No scrolls.");
 			}
 
-			oldPortal = getUnit(2, "portal");
+            oldPortal = getUnit(UnitType.Object, "portal");
 
 			if (oldPortal) {
 				do {
@@ -929,7 +934,7 @@ ModeLoop:
 
 MainLoop:
 			while (getTickCount() - tick < Math.max(500 + i * 100, me.ping * 2 + 100)) {
-				portal = getUnit(2, "portal");
+                portal = getUnit(UnitType.Object, "portal");
 
 				if (portal) {
 					do {
@@ -986,7 +991,7 @@ MainLoop:
 
 			if (portal) {
 				if (i === 0) {
-					useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
+					useTK = me.classid === ClassID.Sorceress && me.getSkill(Skills.Sorceress.Telekinesis, 1) && me.inTown && portal.getParent();
 				}
 
 				if (portal.area === me.area) {
@@ -995,7 +1000,7 @@ MainLoop:
 							Attack.getIntoPosition(portal, 13, 0x4);
 						}
 
-						Skill.cast(43, 0, portal);
+                        Skill.cast(Skills.Sorceress.Telekinesis, 0, portal);
 					} else {
 						if (getDistance(me, portal) > 5) {
 							this.moveToUnit(portal);
@@ -1009,13 +1014,13 @@ MainLoop:
 					}
 				}
 
-				if (portal.classid === 298 && portal.mode !== 2) { // Portal to/from Arcane
+                if (portal.classid === UniqueObjectIds.Arcane_Portal && portal.mode !== ObjectModes.Opened) { // Portal to/from Arcane
 					Misc.click(0, 0, portal);
 
 					tick = getTickCount();
 
-					while (getTickCount() - tick < 2000) {
-						if (portal.mode === 2 || me.area === 74) {
+                    while (getTickCount() - tick < 2000) {
+                        if (portal.mode === ObjectModes.Opened || me.area === Areas.Act2.Arcane_Sanctuary) {
 							break;
 						}
 
@@ -1056,7 +1061,7 @@ MainLoop:
 		owner - name of the portal's owner
 	*/
 	getPortal: function (targetArea, owner) {
-		var portal = getUnit(2, "portal");
+        var portal = getUnit(UnitType.Object, "portal");
 
 		if (portal) {
 			do {
@@ -1181,13 +1186,13 @@ MainLoop:
 			return true;
 		// For the other acts, check the "Able to go to Act *" quests
 		case 2:
-			return me.getQuest(7, 0) === 1;
+                return me.getQuest(Quests.Act1.Able_to_go_to_Act_II, 0) === 1;
 		case 3:
-			return me.getQuest(15, 0) === 1;
+                return me.getQuest(Quests.Act2.Able_to_go_to_Act_III, 0) === 1;
 		case 4:
-			return me.getQuest(23, 0) === 1;
+                return me.getQuest(Quests.Act3.Able_to_go_to_Act_IV, 0) === 1;
 		case 5:
-			return me.getQuest(28, 0) === 1;
+                return me.getQuest(Quests.Act4.Able_to_go_to_Act_V, 0) === 1;
 		default:
 			return false;
 		}
@@ -1199,27 +1204,29 @@ MainLoop:
 		clearPath - clear path
 	*/
 	getWP: function (area, clearPath) {
-		var i, j, wp, preset,
-			wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
+        var i, j, wp, preset,
+            wpIDs = [UniqueObjectIds.Waypoint_Portal, UniqueObjectIds.Waypointi_Inner_Hell, UniqueObjectIds.Waypoint, UniqueObjectIds.WildernessWaypoint, UniqueObjectIds.Act3Waypoint_Town, UniqueObjectIds.Waypointh,
+                UniqueObjectIds.Waypoint_Celler, UniqueObjectIds.SewerWaypoint, UniqueObjectIds.TravincalWaypoint, UniqueObjectIds.PandamoniaWaypoint, UniqueObjectIds.VallyWaypoint, UniqueObjectIds.Waypoint2,
+                UniqueObjectIds.BaalWaypoint, UniqueObjectIds.WildernessWaypoint2, UniqueObjectIds.IcecaveWaypoint, UniqueObjectIds.TempleWaypoint];
 
 		if (area !== me.area) {
 			this.journeyTo(area);
 		}
 
 		for (i = 0; i < wpIDs.length; i += 1) {
-			preset = getPresetUnit(area, 2, wpIDs[i]);
+            preset = getPresetUnit(area, UnitType.Object, wpIDs[i]);
 
 			if (preset) {
 				this.moveToUnit(preset, 0, 0, clearPath);
 
-				wp = getUnit(2, "waypoint");
+                wp = getUnit(UnitType.Object, "waypoint");
 
 				if (wp) {
 					for (j = 0; j < 10; j += 1) {
 						Misc.click(0, 0, wp);
 						//wp.interact();
 
-						if (getUIFlag(0x14)) {
+                        if (getUIFlag(UIFlags.waypoint)) {
 							delay(500);
 							me.cancel();
 
@@ -1251,17 +1258,17 @@ MainLoop:
 		}
 
 		// handle variable flayer jungle entrances
-		if (target.course.indexOf(78) > -1) {
+        if (target.course.indexOf(Areas.Act3.Flayer_Jungle) > -1) {
 			Town.goToTown(3); // without initiated act, getArea().exits will crash
 
-			special = getArea(78);
+            special = getArea(Areas.Act3.Flayer_Jungle);
 
 			if (special) {
 				special = special.exits;
 
 				for (i = 0; i < special.length; i += 1) {
-					if (special[i].target === 77) {
-						target.course.splice(target.course.indexOf(78), 0, 77); // add great marsh if needed
+                    if (special[i].target === Areas.Act3.Great_Marsh) {
+                        target.course.splice(target.course.indexOf(Areas.Act3.Flayer_Jungle), 0, Areas.Act3.Great_Marsh); // add great marsh if needed
 
 						break;
 					}
@@ -1281,10 +1288,10 @@ MainLoop:
 			if (me.inTown && this.wpAreas.indexOf(target.course[0]) > -1 && getWaypoint(this.wpAreas.indexOf(target.course[0]))) {
 				this.useWaypoint(target.course[0], !this.plotCourse_openedWpMenu);
 				Precast.doPrecast(false);
-			} else if (me.area === 109 && target.course[0] === 110) { // Harrogath -> Bloody Foothills
+            } else if (me.area === Areas.Act5.Harrogath && target.course[0] === Areas.Act5.Bloody_Foothills) { // Harrogath -> Bloody Foothills
 				this.moveTo(5026, 5095);
 
-				unit = getUnit(2, 449); // Gate
+                unit = getUnit(UnitType.Object, UniqueObjectIds.Town_Main_Gate); // Gate
 
 				if (unit) {
 					for (i = 0; i < 3; i += 1) {
@@ -1306,48 +1313,48 @@ MainLoop:
 				}
 
 				this.moveToExit(target.course[0], true);
-			} else if (me.area === 4 && target.course[0] === 38) { // Stony Field -> Tristram
-				this.moveToPreset(me.area, 1, 737, 0, 0, false, true);
+            } else if (me.area === Areas.Act1.Stony_Field && target.course[0] === Areas.Act1.Tristram) { // Stony Field -> Tristram
+                this.moveToPreset(me.area, UnitType.Monster_or_NPC, SuperUniques.Rakanishu, 0, 0, false, true);
 
 				for (i = 0; i < 5; i += 1) {
-					if (this.usePortal(38)) {
+                    if (this.usePortal(Areas.Act1.Tristram)) {
 						break;
 					}
 
 					delay(1000);
-				}
-			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
-				this.moveToPreset(me.area, 5, 19);
-				this.useUnit(5, 19, 47);
-			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
-				this.moveToPreset(me.area, 2, 357);
+                }
+            } else if (me.area === Areas.Act2.Lut_Gholein && target.course[0] === Areas.Act2.A2_Sewers_Level_1) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
+                this.moveToPreset(me.area, UnitType.Warp, UniqueObjectIds.StoneGamma); // 19
+                this.useUnit(UnitType.Warp, UniqueObjectIds.StoneGamma, Areas.Act2.A2_Sewers_Level_1);
+            } else if (me.area === Areas.Act2.Arcane_Sanctuary && target.course[0] === Areas.Act2.Canyon_Of_The_Magi) { // Arcane Sanctuary -> Canyon of the Magi
+                this.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Horazons_Journal);
 
 				for (i = 0; i < 5; i += 1) {
-					unit = getUnit(2, 357);
+					unit = getUnit(UnitType.Object, UniqueObjectIds.Horazons_Journal);
 
 					Misc.click(0, 0, unit);
 					delay(1000);
 					me.cancel();
 
-					if (this.usePortal(46)) {
+                    if (this.usePortal(Areas.Act2.Canyon_Of_The_Magi)) {
 						break;
 					}
 				}
-			} else if (me.area === 54 && target.course[0] === 74) { // Palace -> Arcane
+            } else if (me.area === Areas.Act2.Palace_Cellar_Level_3 && target.course[0] === Areas.Act2.Arcane_Sanctuary) { // Palace -> Arcane
 				this.moveTo(10073, 8670);
-				this.usePortal(null);
-			} else if (me.area === 109 && target.course[0] === 121) { // Harrogath -> Nihlathak's Temple
+                this.usePortal(null);
+            } else if (me.area === Areas.Act5.Harrogath && target.course[0] === Areas.Act5.Nihlathaks_Temple) { // Harrogath -> Nihlathak's Temple
 				Town.move("anya");
-				this.usePortal(121);
-			} else if (me.area === 111 && target.course[0] === 125) { // Abaddon
-				this.moveToPreset(111, 2, 60);
-				this.usePortal(125);
-			} else if (me.area === 112 && target.course[0] === 126) { // Pits of Archeon
-				this.moveToPreset(112, 2, 60);
-				this.usePortal(126);
-			} else if (me.area === 117 && target.course[0] === 127) { // Infernal Pit
-				this.moveToPreset(117, 2, 60);
-				this.usePortal(127);
+                this.usePortal(Areas.Act5.Nihlathaks_Temple);
+            } else if (me.area === Areas.Act5.Frigid_Highlands && target.course[0] ===  Areas.Act5.Abaddon) { // Abaddon
+                this.moveToPreset(Areas.Act5.Frigid_Highlands, UnitType.Object, 60);
+                this.usePortal(Areas.Act5.Abaddon);
+            } else if (me.area === Areas.Act5.Arreat_Plateau && target.course[0] === Areas.Act5.Pit_Of_Acheron) { // Pits of Archeon
+                this.moveToPreset(Areas.Act5.Arreat_Plateau, UnitType.Object, 60);
+                this.usePortal(Areas.Act5.Pit_Of_Acheron);
+            } else if (me.area === Areas.Act5.Frozen_Tundra && target.course[0] === Areas.Act5.Infernal_Pit) { // Infernal Pit
+                this.moveToPreset(Areas.Act5.Frozen_Tundra, UnitType.Object, 60);
+                this.usePortal(Areas.Act5.Infernal_Pit);
 			} else {
 				this.moveToExit(target.course[0], true);
 			}
@@ -1369,7 +1376,30 @@ MainLoop:
 		var node, prevArea,
 			useWP = false,
 			arr = [],
-			previousAreas = [0, 0, 1, 2, 3, 10, 5, 6, 2, 3, 4, 6, 7, 9, 10, 11, 12, 3, 17, 17, 6, 20, 21, 22, 23, 24, 7, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 4, 1, 1, 40, 41, 42, 43, 44, 74, 40, 47, 48, 40, 50, 51, 52, 53, 41, 42, 56, 45, 55, 57, 58, 43, 62, 63, 44, 46, 46, 46, 46, 46, 46, 46, 1, 54, 1, 75, 76, 76, 78, 79, 80, 81, 82, 76, 76, 78, 86, 78, 88, 87, 89, 80, 92, 80, 80, 81, 81, 82, 82, 83, 100, 101, 1, 103, 104, 105, 106, 107, 1, 109, 110, 111, 112, 113, 113, 115, 115, 117, 118, 118, 109, 121, 122, 123, 111, 112, 117, 120, 128, 129, 130, 131, 109, 109, 109, 109],
+            previousAreas = [Areas.None, Areas.None, Areas.Act1.Rogue_Encampment, Areas.Act1.Blood_Moor, Areas.Act1.Cold_Plains, Areas.Act1.Underground_Passage_Level_1, Areas.Act1.Dark_Wood,
+                Areas.Act1.Black_Marsh, Areas.Act1.Blood_Moor, Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field, Areas.Act1.Black_Marsh, Areas.Act1.Tamoe_Highland, Areas.Act1.Cave_Level_1,
+                Areas.Act1.Underground_Passage_Level_1, Areas.Act1.Hole_Level_1, Areas.Act1.Pit_Level_1, Areas.Act1.Cold_Plains, Areas.Act1.Burial_Grounds, Areas.Act1.Burial_Grounds,
+                Areas.Act1.Black_Marsh, Areas.Act1.Forgotten_Tower, Areas.Act1.Tower_Cellar_Level_1, Areas.Act1.Tower_Cellar_Level_2, Areas.Act1.Tower_Cellar_Level_3,
+                Areas.Act1.Tower_Cellar_Level_4, Areas.Act1.Tamoe_Highland, Areas.Act1.Monastery_Gate, Areas.Act1.Outer_Cloister, Areas.Act1.Barracks, Areas.Act1.Jail_Level_1,
+                Areas.Act1.Jail_Level_2, Areas.Act1.Jail_Level_3, Areas.Act1.Inner_Cloister, Areas.Act1.Cathedral, Areas.Act1.Catacombs_Level_1, Areas.Act1.Catacombs_Level_2,
+                Areas.Act1.Catacombs_Level_3, Areas.Act1.Stony_Field, Areas.Act1.Rogue_Encampment, Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act2.Rocky_Waste,
+                Areas.Act2.Dry_Hills, Areas.Act2.Far_Oasis, Areas.Act2.Lost_City, Areas.Act2.Arcane_Sanctuary, Areas.Act2.Lut_Gholein, Areas.Act2.A2_Sewers_Level_1, Areas.Act2.A2_Sewers_Level_2,
+                Areas.Act2.Lut_Gholein, Areas.Act2.Harem_Level_1, Areas.Act2.Harem_Level_2, Areas.Act2.Palace_Cellar_Level_1, Areas.Act2.Palace_Cellar_Level_2, Areas.Act2.Rocky_Waste,
+                Areas.Act2.Dry_Hills, Areas.Act2.Halls_Of_The_Dead_Level_1, Areas.Act2.Valley_Of_Snakes, Areas.Act2.Stony_Tomb_Level_1, Areas.Act2.Halls_Of_The_Dead_Level_2,
+                Areas.Act2.Claw_Viper_Temple_Level_1, Areas.Act2.Far_Oasis, Areas.Act2.Maggot_Lair_Level_1, Areas.Act2.Maggot_Lair_Level_2, Areas.Act2.Lost_City, Areas.Act2.Canyon_Of_The_Magi,
+                Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi, Areas.Act2.Canyon_Of_The_Magi,
+                Areas.Act2.Canyon_Of_The_Magi, Areas.Act1.Rogue_Encampment, Areas.Act2.Palace_Cellar_Level_3, Areas.Act1.Rogue_Encampment, Areas.Act3.Kurast_Docktown, Areas.Act3.Spider_Forest,
+                Areas.Act3.Spider_Forest, Areas.Act3.Flayer_Jungle, Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Kurast_Causeway,
+                Areas.Act3.Spider_Forest, Areas.Act3.Spider_Forest, Areas.Act3.Flayer_Jungle, Areas.Act3.Swampy_Pit_Level_1, Areas.Act3.Flayer_Jungle, Areas.Act3.Flayer_Dungeon_Level_1,
+                Areas.Act3.Swampy_Pit_Level_2, Areas.Act3.Flayer_Dungeon_Level_2, Areas.Act3.Kurast_Bazaar, Areas.Act3.A3_Sewers_Level_1, Areas.Act3.Kurast_Bazaar, Areas.Act3.Kurast_Bazaar,
+                Areas.Act3.Upper_Kurast, Areas.Act3.Upper_Kurast, Areas.Act3.Kurast_Causeway, Areas.Act3.Kurast_Causeway, Areas.Act3.Travincal, Areas.Act3.Durance_Of_Hate_Level_1,
+                Areas.Act3.Durance_Of_Hate_Level_2, Areas.Act1.Rogue_Encampment, Areas.Act4.The_Pandemonium_Fortress, Areas.Act4.Outer_Steppes, Areas.Act4.Plains_Of_Despair,
+                Areas.Act4.City_Of_The_Damned, Areas.Act4.River_Of_Flame, Areas.Act1.Rogue_Encampment, Areas.Act5.Harrogath, Areas.Act5.Bloody_Foothills, Areas.Act5.Frigid_Highlands,
+                Areas.Act5.Arreat_Plateau, Areas.Act5.Crystalized_Passage, Areas.Act5.Crystalized_Passage, Areas.Act5.Glacial_Trail, Areas.Act5.Glacial_Trail, Areas.Act5.Frozen_Tundra,
+                Areas.Act5.Ancients_Way, Areas.Act5.Ancients_Way, Areas.Act5.Harrogath, Areas.Act5.Nihlathaks_Temple, Areas.Act5.Halls_Of_Anguish, Areas.Act5.Halls_Of_Pain,
+                Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Frozen_Tundra, Areas.Act5.Arreat_Summit, Areas.Act5.The_Worldstone_Keep_Level_1,
+                Areas.Act5.The_Worldstone_Keep_Level_2, Areas.Act5.The_Worldstone_Keep_Level_3, Areas.Act5.Throne_Of_Destruction, Areas.Act5.Harrogath, Areas.Act5.Harrogath,
+                Areas.Act5.Harrogath, Areas.Act5.Harrogath],
 			visitedNodes = [],
 			toVisitNodes = [{from: dest, to: null}];
 
@@ -1446,8 +1476,8 @@ MainLoop:
 		dest - destination area id
 		src - starting area id
 	*/
-	areasConnected: function (src, dest) {
-		if (src === 46 && dest === 74) {
+    areasConnected: function (src, dest) {
+        if (src === Areas.Act2.Canyon_Of_The_Magi && dest === Areas.Act2.Arcane_Sanctuary) {
 			return false;
 		}
 

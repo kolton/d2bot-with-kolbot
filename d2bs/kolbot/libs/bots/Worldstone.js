@@ -3,18 +3,19 @@
 *	@author		kolton
 *	@desc		Clear Worldstone levels
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Worldstone() {
 	Town.doChores();
-	Pather.useWaypoint(129);
+	Pather.useWaypoint(Areas.Act5.The_Worldstone_Keep_Level_2);
 	Precast.doPrecast(true);
 	Attack.clearLevel(Config.ClearType);
 
-	if (Pather.moveToExit(128, true)) {
+    if (Pather.moveToExit(Areas.Act5.The_Worldstone_Keep_Level_1, true)) {
 		Attack.clearLevel(Config.ClearType);
 	}
 
-	if (Pather.moveToExit([129, 130], true)) {
+    if (Pather.moveToExit([Areas.Act5.The_Worldstone_Keep_Level_2, Areas.Act5.The_Worldstone_Keep_Level_3], true)) {
 		Attack.clearLevel(Config.ClearType);
 	}
 

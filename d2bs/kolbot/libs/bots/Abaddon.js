@@ -3,13 +3,14 @@
 *	@author		kolton
 *	@desc		clear Abaddon
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Abaddon() {
 	Town.doChores();
-	Pather.useWaypoint(111);
+    Pather.useWaypoint(Areas.Act5.Frigid_Highlands);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(111, 2, 60) || !Pather.usePortal(125)) {
+    if (!Pather.moveToPreset(Areas.Act5.Frigid_Highlands, UnitType.Object, UniqueObjectIds.Permanent_Town_Portal) || !Pather.usePortal(Areas.Act5.Abaddon)) {
 		throw new Error("Failed to move to Abaddon");
 	}
 

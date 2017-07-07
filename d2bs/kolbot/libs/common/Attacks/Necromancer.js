@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Necromancer attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	novaTick: 0,
@@ -14,47 +15,47 @@ var ClassAttack = {
 
 		for (i = 0; i < Config.Curse.length; i += 1) {
 			switch (Config.Curse[i]) {
-			case 0: //nothing
+                case Skills.common.Attack: //nothing
 				this.curseState[i] = 0;
 
 				break;
-			case 66: //amplify damage
+                case Skills.Necromancer.Amplify_Damage: //amplify damage
 				this.curseState[i] = 9;
 
 				break;
-			case 71: //dim vision
+                case Skills.Necromancer.Dim_Vision: //dim vision
 				this.curseState[i] = 23;
 
 				break;
-			case 72: //weaken
+                case Skills.Necromancer.Weaken: //weaken
 				this.curseState[i] = 19;
 
 				break;
-			case 76: //iron maiden
+                case Skills.Necromancer.Iron_Maiden: //iron maiden
 				this.curseState[i] = 55;
 
 				break;
-			case 77: //terror
+                case Skills.Necromancer.Terror: //terror
 				this.curseState[i] = 56;
 
 				break;
-			case 81: //confuse
+                case Skills.Necromancer.Confuse: //confuse
 				this.curseState[i] = 59;
 
 				break;
-			case 82: //life tap
+                case Skills.Necromancer.Life_Tap: //life tap
 				this.curseState[i] = 58;
 
 				break;
-			case 86: //attract
+                case Skills.Necromancer.Attract: //attract
 				this.curseState[i] = 57;
 
 				break;
-			case 87: //decrepify
+                case Skills.Necromancer.Decrepify: //decrepify
 				this.curseState[i] = 60;
 
 				break;
-			case 91: //lower resist
+                case Skills.Necromancer.Lower_Resist: //lower resist
 				this.curseState[i] = 61;
 
 				break;
@@ -78,7 +79,7 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+        if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
@@ -129,7 +130,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedSkill = Config.AttackSkill[5];
 		}
 
@@ -142,7 +143,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			untimedSkill = Config.AttackSkill[6];
 		}
 
@@ -216,7 +217,7 @@ var ClassAttack = {
 			}
 		}
 
-		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
+        if (timedSkill > -1 && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(timedSkill))) {
 			switch (timedSkill) {
 			case 92: // Poison Nova
 				if (!this.novaTick || getTickCount() - this.novaTick > Config.PoisonNovaDelay * 1000) {
@@ -286,7 +287,7 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			if (!me.getState(121)) {
+            if (!me.getState(States.SKILLDELAY)) {
 				break;
 			}
 
@@ -306,16 +307,16 @@ var ClassAttack = {
 			return false;
 		}
 
-		if (unit.getState(57)) { // attract can't be overridden
+        if (unit.getState(States.ATTRACT)) { // attract can't be overridden
 			return false;
 		}
 
 		switch (unit.classid) {
-		case 206: // Foul Crow Nest
-		case 258: // Water Watcher
-		case 261: // Water Watcher
-		case 266: // Flavie
-		case 528: // Evil Demon Hut
+            case UnitClassID.crownest1: // Foul Crow Nest
+            case UnitClassID.tentacle1: // Water Watcher
+            case UnitClassID.tentaclehead1: // Water Watcher
+            case UnitClassID.navi: // Flavie
+            case UnitClassID.evilhut: // Evil Demon Hut
 			return false;
 		}
 
@@ -330,28 +331,28 @@ var ClassAttack = {
 		}
 
 		if (Config.Skeletons === "max") {
-			skill = me.getSkill(70, 1);
+            skill = me.getSkill(Skills.Necromancer.Raise_Skeleton, 1);
 			maxSkeletons = skill < 4 ? skill : (Math.floor(skill / 3) + 2);
 		} else {
 			maxSkeletons = Config.Skeletons;
 		}
 
 		if (Config.SkeletonMages === "max") {
-			skill = me.getSkill(80, 1);
+            skill = me.getSkill(Skills.Necromancer.Raise_Skeletal_Mage, 1);
 			maxMages = skill < 4 ? skill : (Math.floor(skill / 3) + 2);
 		} else {
 			maxMages = Config.SkeletonMages;
 		}
 
 		if (Config.Revives === "max") {
-			skill = me.getSkill(95, 1);
+            skill = me.getSkill(Skills.Necromancer.Revive, 1);
 			maxRevives = skill;
 		} else {
 			maxRevives = Config.Revives;
 		}
 
 		for (i = 0; i < 3; i += 1) {
-			corpse = getUnit(1, -1, 12);
+            corpse = getUnit(UnitType.NPC, -1, NPCModes.dead);
 			corpseList = [];
 
 			if (corpse) {
@@ -367,7 +368,7 @@ MainLoop:
 				corpse = corpseList.shift();
 
 				if (me.getMinionCount(4) < maxSkeletons) {
-					if (!Skill.cast(70, 0, corpse)) {
+                    if (!Skill.cast(Skills.Necromancer.Raise_Skeleton, 0, corpse)) {
 						return false;
 					}
 
@@ -382,7 +383,7 @@ MainLoop:
 						delay(10);
 					}
 				} else if (me.getMinionCount(5) < maxMages) {
-					if (!Skill.cast(80, 0, corpse)) {
+                    if (!Skill.cast(Skills.Necromancer.Raise_Skeletal_Mage, 0, corpse)) {
 						return false;
 					}
 
@@ -400,7 +401,7 @@ MainLoop:
 					if (this.checkCorpse(corpse, true)) {
 						print("Reviving " + corpse.name);
 
-						if (!Skill.cast(95, 0, corpse)) {
+                        if (!Skill.cast(Skills.Necromancer.Revive, 0, corpse)) {
 							return false;
 						}
 
@@ -425,14 +426,14 @@ MainLoop:
 	},
 
 	explodeCorpses: function (unit) {
-		if (Config.ExplodeCorpses === 0 || unit.mode === 0 || unit.mode === 12) {
+        if (Config.ExplodeCorpses === 0 || unit.mode === NPCModes.death || unit.mode === NPCModes.dead) {
 			return false;
 		}
 
 		var i,
 			corpseList = [],
 			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3),
-			corpse = getUnit(1, -1, 12);
+            corpse = getUnit(UnitType.NPC, -1, NPCModes.dead);
 
 		if (corpse) {
 			do {
@@ -485,7 +486,7 @@ MainLoop:
 	},
 
 	checkCorpseNearMonster: function (monster, range) {
-		var corpse = getUnit(1, -1, 12);
+        var corpse = getUnit(UnitType.NPC, -1, NPCModes.dead);
 
 		if (range === undefined) { // Assume CorpseExplosion if no range specified
 			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3);
@@ -503,7 +504,7 @@ MainLoop:
 	},
 
 	checkCorpse: function (unit, revive) {
-		if (unit.mode !== 12) {
+        if (unit.mode !== NPCModes.dead) {
 			return false;
 		}
 
@@ -512,7 +513,7 @@ MainLoop:
 		}
 
 		var baseId = getBaseStat("monstats", unit.classid, "baseid"),
-			badList = [312, 571];
+            badList = [UnitClassID.doomknight3, UnitClassID.baalminion1];
 
 		if (revive && ((unit.spectype & 0x7) || badList.indexOf(baseId) > -1 || (Config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3))) {
 			return false;
@@ -523,12 +524,12 @@ MainLoop:
 		}
 
 		if (getDistance(me, unit) <= 25 && !checkCollision(me, unit, 0x4) &&
-				!unit.getState(1) && // freeze
-				!unit.getState(96) && // revive
-				!unit.getState(99) && // redeemed
-				!unit.getState(104) && // nodraw
-				!unit.getState(107) && // shatter
-				!unit.getState(118) // noselect
+            !unit.getState(States.FREEZE) && // freeze
+            !unit.getState(States.REVIVE) && // revive
+            !unit.getState(States.REDEEMED) && // redeemed
+            !unit.getState(States.CORPSE_NODRAW) && // nodraw
+            !unit.getState(States.SHATTER) && // shatter
+            !unit.getState(States.CORPSE_NOSELECT) // noselect
 				) {
 			return true;
 		}

@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		clear Chaos Sanctuary and kill Diablo
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Diablo() {
 	// Sort function
@@ -53,7 +54,7 @@ function Diablo() {
 
 	// general functions
 	this.getLayout = function (seal, value) {
-		var sealPreset = getPresetUnit(108, 2, seal);
+        var sealPreset = getPresetUnit(Areas.Act4.Chaos_Sanctuary, UnitType.Object, seal);
 
 		if (!seal) {
 			throw new Error("Seal preset not found. Can't continue.");
@@ -67,18 +68,18 @@ function Diablo() {
 	};
 
 	this.initLayout = function () {
-		this.vizLayout = this.getLayout(396, 5275);
-		this.seisLayout = this.getLayout(394, 7773);
-		this.infLayout = this.getLayout(392, 7893);
+        this.vizLayout = this.getLayout(UniqueObjectIds.Diablo_Seal5, 5275);
+        this.seisLayout = this.getLayout(UniqueObjectIds.Diablo_Seal3, 7773);
+        this.infLayout = this.getLayout(UniqueObjectIds.Diablo_Seal1, 7893);
 	};
 
 	this.openSeal = function (classid) {
 		var i, seal, warn;
 
 		switch (classid) {
-		case 396:
-		case 394:
-		case 392:
+            case UniqueObjectIds.Diablo_Seal5:
+            case UniqueObjectIds.Diablo_Seal3:
+            case UniqueObjectIds.Diablo_Seal1:
 			warn = true;
 
 			break;
@@ -89,9 +90,9 @@ function Diablo() {
 		}
 
 		for (i = 0; i < 5; i += 1) {
-			Pather.moveToPreset(me.area, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
+            Pather.moveToPreset(me.area, UnitType.Object, classid, classid === UniqueObjectIds.Diablo_Seal3 ? 5 : 2, classid === UniqueObjectIds.Diablo_Seal3 ? 5 : 0);
 
-			seal = getUnit(2, classid);
+            seal = getUnit(UnitType.Object, classid);
 
 			if (!seal) {
 				return false;
@@ -108,10 +109,10 @@ function Diablo() {
 			warn = false;
 
 			seal.interact();
-			delay(classid === 394 ? 1000 : 500);
+            delay(classid === UniqueObjectIds.Diablo_Seal3 ? 1000 : 500);
 
 			if (!seal.mode) {
-				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
+                if (classid === UniqueObjectIds.Diablo_Seal3 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
 					Pather.moveTo(seal.x + 15, seal.y);
 				} else {
 					Pather.moveTo(seal.x - 5, seal.y - 5);
@@ -129,51 +130,51 @@ function Diablo() {
 	this.chaosPreattack = function (name, amount) {
 		var i, n, target, positions;
 
-		switch (me.classid) {
-		case 0:
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			target = getUnit(1, name);
+        switch (me.classid) {
+            case ClassID.Amazon:
+                break;
+            case ClassID.Sorceress:
+                break;
+            case ClassID.Necromancer:
+                break;
+            case ClassID.Paladin:
+                target = getUnit(1, name);
 
-			if (!target) {
-				return;
-			}
+                if (!target) {
+                    return;
+                }
 
-			positions = [[6, 11], [0, 8], [8, -1], [-9, 2], [0, -11], [8, -8]];
+                positions = [[6, 11], [0, 8], [8, -1], [-9, 2], [0, -11], [8, -8]];
 
-			for (i = 0; i < positions.length; i += 1) {
-				if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
-					Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
-					Skill.setSkill(Config.AttackSkill[2], 0);
+                for (i = 0; i < positions.length; i += 1) {
+                    if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
+                        Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
+                        Skill.setSkill(Config.AttackSkill[2], 0);
 
-					for (n = 0; n < amount; n += 1) {
-						Skill.cast(Config.AttackSkill[1], 1);
-					}
+                        for (n = 0; n < amount; n += 1) {
+                            Skill.cast(Config.AttackSkill[1], 1);
+                        }
 
-					break;
-				}
-			}
+                        break;
+                    }
+                }
 
-			break;
-		case 4:
-			break;
-		case 5:
-			break;
-		case 6:
-			break;
-		}
+                break;
+            case ClassID.Barbarian:
+                break;
+            case ClassID.Druid:
+                break;
+            case ClassID.Assassin:
+                break;
+        }
 	};
 
 	this.getBoss = function (name) {
 		var i, boss,
-			glow = getUnit(2, 131);
+            glow = getUnit(UnitType.Object, UniqueObjectIds.Vile_Dog_Afterglow);
 
 		for (i = 0; i < 16; i += 1) {
-			boss = getUnit(1, name);
+            boss = getUnit(UnitType.NPC, name);
 
 			if (boss) {
 				this.chaosPreattack(name, 8);
@@ -191,7 +192,7 @@ function Diablo() {
 		print("Viz layout " + this.vizLayout);
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB);
 
-		if (!this.openSeal(395) || !this.openSeal(396)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal4) || !this.openSeal(UniqueObjectIds.Diablo_Seal5)) {
 			throw new Error("Failed to open Vizier seals.");
 		}
 
@@ -212,7 +213,7 @@ function Diablo() {
 		print("Seis layout " + this.seisLayout);
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB);
 
-		if (!this.openSeal(394)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal3)) {
 			throw new Error("Failed to open de Seis seal.");
 		}
 
@@ -233,7 +234,7 @@ function Diablo() {
 		print("Inf layout " + this.infLayout);
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB);
 
-		if (!this.openSeal(392)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal1)) {
 			throw new Error("Failed to open Infector seals.");
 		}
 
@@ -247,7 +248,7 @@ function Diablo() {
 			throw new Error("Failed to kill Infector");
 		}
 
-		if (!this.openSeal(393)) {
+        if (!this.openSeal(UniqueObjectIds.Diablo_Seal2)) {
 			throw new Error("Failed to open Infector seals.");
 		}
 
@@ -261,9 +262,9 @@ function Diablo() {
 		while (getTickCount() - tick < 30000) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
-				case 1: // Sorceress
-					if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
-						if (me.getState(121)) {
+                    case ClassID.Sorceress: // Sorceress
+                        if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+                            if (me.getState(States.SKILLDELAY)) {
 							delay(500);
 						} else {
 							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
@@ -275,13 +276,13 @@ function Diablo() {
 					delay(500);
 
 					break;
-				case 3: // Paladin
+                    case ClassID.Paladin: // Paladin
 					Skill.setSkill(Config.AttackSkill[2]);
 					Skill.cast(Config.AttackSkill[1], 1);
 
 					break;
-				case 5: // Druid
-					if (Config.AttackSkill[1] === 245) {
+                    case ClassID.Druid: // Druid
+                        if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
 						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
 
 						break;
@@ -290,7 +291,7 @@ function Diablo() {
 					delay(500);
 
 					break;
-				case 6: // Assassin
+                    case ClassID.Assassin: // Assassin
 					if (Config.UseTraps) {
 						trapCheck = ClassAttack.checkTraps({x: 7793, y: 5293});
 
@@ -313,7 +314,7 @@ function Diablo() {
 				delay(500);
 			}
 
-			if (getUnit(1, 243)) {
+            if (getUnit(UnitType.NPC, UnitClassID.diablo)) {
 				return true;
 			}
 		}
@@ -350,7 +351,7 @@ function Diablo() {
 
 		var i,
 			oldPos = {x: me.x, y: me.y},
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 
 		if (monster) {
 			do {
@@ -378,12 +379,12 @@ function Diablo() {
 	this.defendPlayers = function () {
 		var player,
 			oldPos = {x: me.x, y: me.y},
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 
 		if (monster) {
 			do {
 				if (Attack.checkMonster(monster)) {
-					player = getUnit(0);
+                    player = getUnit(UnitType.Player);
 
 					if (player) {
 						do {
@@ -421,8 +422,8 @@ function Diablo() {
 	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
 	Precast.doPrecast(true);
 
-	if (me.area !== 107) {
-		Pather.useWaypoint(107);
+    if (me.area !== Areas.Act4.River_Of_Flame) {
+        Pather.useWaypoint(Areas.Act4.River_Of_Flame);
 	}
 
 	if (!Pather.moveTo(7790, 5544)) {
@@ -462,16 +463,16 @@ function Diablo() {
 	Precast.doPrecast(true);
 	this.infectorSeal();
 
-	switch (me.classid) {
-	case 1:
-		Pather.moveTo(7792, 5294);
+    switch (me.classid) {
+        case ClassID.Sorceress:
+            Pather.moveTo(7792, 5294);
 
-		break;
-	default:
-		Pather.moveTo(7788, 5292);
+            break;
+        default:
+            Pather.moveTo(7788, 5292);
 
-		break;
-	}
+            break;
+    }
 
 
 	if (Config.PublicMode) {
@@ -479,7 +480,7 @@ function Diablo() {
 	}
 
 	this.diabloPrep();
-	Attack.kill(243); // Diablo
+    Attack.kill(UnitClassID.diablo); // Diablo
 	Pickit.pickItems();
 
 	return true;

@@ -45,6 +45,7 @@
 *	reload - reload script. Use only in case of emergency, or after editing character config.
 *	quit - exit game
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Follower() {
 	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit, player,
@@ -71,7 +72,7 @@ function Follower() {
 
 	// Get leader's Unit
 	this.getLeaderUnit = function (name) {
-		var player = getUnit(0, name);
+        var player = getUnit(UnitType.Player, name);
 
 		if (player) {
 			do {
@@ -86,19 +87,19 @@ function Follower() {
 
 	// Get leader's act from Party Unit
 	this.checkLeaderAct = function (unit) {
-		if (unit.area <= 39) {
+        if (unit.area <= Areas.Act1.Moo_Moo_Farm) {
 			return 1;
 		}
 
-		if (unit.area >= 40 && unit.area <= 74) {
+        if (unit.area >= Areas.Act2.Lut_Gholein && unit.area <= Areas.Act2.Arcane_Sanctuary) {
 			return 2;
 		}
 
-		if (unit.area >= 75 && unit.area <= 102) {
+        if (unit.area >= Areas.Act3.Kurast_Docktown && unit.area <= Areas.Act3.Durance_Of_Hate_Level_3) {
 			return 3;
 		}
 
-		if (unit.area >= 103 && unit.area <= 108) {
+        if (unit.area >= Areas.Act4.The_Pandemonium_Fortress && unit.area <= Areas.Act4.Chaos_Sanctuary) {
 			return 4;
 		}
 
@@ -121,14 +122,14 @@ function Follower() {
 		}
 
 		if (unit.inTown) {
-			target = getUnit(2, "waypoint");
+            target = getUnit(UnitType.Object, "waypoint");
 
 			if (target && getDistance(me, target) < 20) {
 				return 3;
 			}
 		}
 
-		target = getUnit(2, "portal");
+        target = getUnit(UnitType.Object, "portal");
 
 		if (target) {
 			do {
@@ -141,22 +142,22 @@ function Follower() {
 		}
 
 		// Arcane<->Cellar portal
-		if ((me.area === 74 && area === 54) || (me.area === 54 && area === 74)) {
+        if ((me.area === Areas.Act2.Arcane_Sanctuary && area === Areas.Act2.Palace_Cellar_Level_3) || (me.area === Areas.Act2.Palace_Cellar_Level_3 && area === Areas.Act2.Arcane_Sanctuary)) {
 			Pather.usePortal(null);
 
 			return 4;
 		}
 
 		// Tal-Rasha's tomb->Duriel's lair
-		if (me.area >= 66 && me.area <= 72 && area === 73) {
-			Pather.useUnit(2, 100, area);
+        if (me.area >= Areas.Act2.Tal_Rashas_Tomb_1 && me.area <= Areas.Act2.Tal_Rashas_Tomb_7 && area === Areas.Act2.Duriels_Lair) {
+            Pather.useUnit(UnitType.Object, UniqueObjectIds.Portal_To_Duriel, area);
 
 			return 4;
 		}
 
 		// Throne->Chamber
-		if (me.area === 131 && area === 132) {
-			target = getUnit(2, 563);
+        if (me.area === Areas.Act5.Throne_Of_Destruction && area === Areas.Act5.The_Worldstone_Chamber) {
+            target = getUnit(UnitType.Object, UniqueObjectIds.Worldstone_Chamber);
 
 			if (target) {
 				Pather.usePortal(null, null, target);
@@ -251,28 +252,28 @@ function Follower() {
 
 		switch (act) {
 		case 2:
-			if (me.area >= 40) {
+                if (me.area >= Areas.Act2.Lut_Gholein) {
 				break;
 			}
 
 			Town.move("warriv");
 
-			npc = getUnit(1, 155);
+            npc = getUnit(UnitType.NPC, UnitClassID.warriv1);
 
 			if (npc) {
 				npc.openMenu();
-				Misc.useMenu(0x0D36);
+                Misc.useMenu(NPCMenu.Go_East);
 			}
 
 			break;
 		case 3:
-			if (me.area >= 75) {
+                if (me.area >= Areas.Act3.Kurast_Docktown) {
 				break;
 			}
 
 			Town.move("palace");
 
-			npc = getUnit(1, 201);
+            npc = getUnit(UnitType.NPC, UnitClassID.jerhyn);
 
 			if (npc) {
 				npc.openMenu();
@@ -281,23 +282,23 @@ function Follower() {
 
 			Town.move("meshif");
 
-			npc = getUnit(1, 210);
+            npc = getUnit(UnitType.NPC, UnitClassID.meshif1);
 
 			if (npc) {
 				npc.openMenu();
-				Misc.useMenu(0x0D38);
+                Misc.useMenu(NPCMenu.Sail_East);
 			}
 
 			break;
 		case 4:
-			if (me.area >= 103) {
+                if (me.area >= Areas.Act4.The_Pandemonium_Fortress) {
 				break;
 			}
 
 			if (me.inTown) {
 				Town.move("cain");
 
-				npc = getUnit(1, 245);
+                npc = getUnit(UnitType.NPC, UnitClassID.cain3);
 
 				if (npc) {
 					npc.openMenu();
@@ -305,12 +306,12 @@ function Follower() {
 				}
 
 				Town.move("portalspot");
-				Pather.usePortal(102, null);
+                Pather.usePortal(Areas.Act3.Durance_Of_Hate_Level_3, null);
 			}
 
 			delay(1500);
 
-			target = getUnit(2, 342);
+            target = getUnit(UnitType.Object, UniqueObjectIds.Hellgate);
 
 			if (target) {
 				Pather.moveTo(target.x - 3, target.y - 1);
@@ -320,20 +321,20 @@ function Follower() {
 
 			break;
 		case 5:
-			if (me.area >= 109) {
+                if (me.area >= Areas.Act5.Harrogath) {
 				break;
 			}
 
 			Town.move("tyrael");
 
-			npc = getUnit(1, "tyrael");
+            npc = getUnit(UnitType.NPC, "tyrael");
 
 			if (npc) {
 				npc.openMenu();
 				me.cancel();
 
 				try {
-					Pather.useUnit(2, 566, 109);
+                    Pather.useUnit(UnitType.Object, UniqueObjectIds.Harrogath_LastPortal, Areas.Act5.Harrogath);
 				} catch (a5e) {
 
 				}
@@ -379,11 +380,11 @@ function Follower() {
 
 		var status,
 			pickList = [],
-			item = getUnit(4);
+            item = getUnit(UnitType.Item);
 
 		if (item) {
 			do {
-				if ((item.mode === 3 || item.mode === 5) && item.itemType >= 76 && item.itemType <= 78 && getDistance(me, item) <= range) {
+                if ((item.mode === ItemModes.Item_on_ground || item.mode === ItemModes.Item_being_dropped) && item.itemType >= NTItemTypes.healingpotion && item.itemType <= NTItemTypes.rejuvpotion && getDistance(me, item) <= range) {
 					pickList.push(copyUnit(item));
 				}
 			} while (item.getNext());
@@ -418,11 +419,11 @@ function Follower() {
 
 		ox = me.x;
 		oy = me.y;
-		unit = getUnit(2);
+        unit = getUnit(UnitType.Object);
 
 		if (unit) {
 			do {
-				if (containers.indexOf(unit.name.toLowerCase()) > -1 && unit.mode === 0 && getDistance(me, unit) <= range) {
+                if (containers.indexOf(unit.name.toLowerCase()) > -1 && unit.mode === ObjectModes.Neutral && getDistance(me, unit) <= range) {
 					unitList.push(copyUnit(unit));
 				}
 			} while (unit.getNext());
@@ -522,13 +523,13 @@ function Follower() {
 
 				break;
 			case "r":
-				if (me.mode === 17) {
+                    if (me.mode === PlayerModes.Dead) {
 					me.revive();
 				}
 
 				break;
 			default:
-				if (me.classid === 3 && msg.indexOf("aura ") > -1) {
+                    if (me.classid === ClassID.Paladin && msg.indexOf("aura ") > -1) {
 					piece = msg.split(" ")[0];
 
 					if (piece === me.name || piece === "all") {
@@ -632,7 +633,7 @@ function Follower() {
 
 	// Main Loop
 	while (Misc.inMyParty(Config.Leader)) {
-		if (me.mode === 17) {
+        if (me.mode === PlayerModes.Dead) {
 			while (!me.inTown) {
 				me.revive();
 				delay(1000);
@@ -656,7 +657,7 @@ function Follower() {
 			}
 
 			if (!leaderUnit) {
-				player = getUnit(0);
+                player = getUnit(UnitType.Player);
 
 				if (player) {
 					do {
@@ -685,7 +686,7 @@ function Follower() {
 			}
 
 			if (leader.area !== me.area && !me.inTown) {
-				while (leader.area === 0) {
+                while (leader.area === Areas.None) {
 					delay(100);
 				}
 
@@ -714,7 +715,7 @@ function Follower() {
 					break;
 				}
 
-				while (me.area === 0) {
+                while (me.area === Areas.None) {
 					delay(100);
 				}
 
@@ -724,10 +725,10 @@ function Follower() {
 
 		switch (action) {
 		case "cow":
-			if (me.area === 1) {
+                if (me.area === Areas.Act1.Rogue_Encampment) {
 				Town.move("portalspot");
 
-				if (!Pather.usePortal(39)) {
+                if (!Pather.usePortal(Areas.Act1.Moo_Moo_Farm)) {
 					say("Failed to use cow portal.");
 				}
 			}
@@ -745,7 +746,7 @@ function Follower() {
 
 			delay(rand(1, 3) * 500);
 
-			unit = getUnit(2, "waypoint");
+            unit = getUnit(UnitType.Object, "waypoint");
 
 			if (unit) {
 WPLoop:
@@ -763,7 +764,7 @@ WPLoop:
 							unit.interact();
 						}
 
-						if (getUIFlag(0x14)) {
+                        if (getUIFlag(UIFlags.waypoint)) {
 							break WPLoop;
 						}
 
@@ -772,7 +773,7 @@ WPLoop:
 				}
 			}
 
-			if (getUIFlag(0x14)) {
+            if (getUIFlag(UIFlags.waypoint)) {
 				say("Got wp.");
 			} else {
 				say("Failed to get wp.");
@@ -837,13 +838,13 @@ WPLoop:
 
 			break;
 		case "h":
-			if (me.classid === 4) {
-				Skill.cast(130);
+                if (me.classid === ClassID.Barbarian) {
+                    Skill.cast(Skills.Barbarian.Howl);
 			}
 
 			break;
 		case "bo":
-			if (me.classid === 4) {
+                if (me.classid === ClassID.Barbarian) {
 				Precast.doPrecast(true);
 			}
 
@@ -856,15 +857,15 @@ WPLoop:
 
 			break;
 		case me.name + " tp":
-			unit = me.findItem("tbk", 0, 3);
+                unit = me.findItem("tbk", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
-			if (unit && unit.getStat(70)) {
+            if (unit && unit.getStat(Stats.quantity)) {
 				unit.interact();
 
 				break;
 			}
 
-			unit = me.findItem("tsc", 0, 3);
+            unit = me.findItem("tsc", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 			if (unit) {
 				unit.interact();

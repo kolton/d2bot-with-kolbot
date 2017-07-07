@@ -27,6 +27,7 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function main() {
 	var i, mercHP, ironGolem, tick, merc,
@@ -125,13 +126,13 @@ function main() {
 		});
 
 		for (i = 0; i < items.length; i += 1) {
-			if (type < 3 && items[i].mode === 0 && items[i].location === 3 && items[i].itemType === pottype) {
+            if (type < 3 && items[i].mode === ItemModes.Item_In_Inventory_Stash_Cube_Or_Store && items[i].location === ItemLocation.Inventory && items[i].itemType === pottype) {
 				print("ÿc2Drinking potion from inventory.");
 
 				return copyUnit(items[i]);
 			}
 
-			if (items[i].mode === 2 && items[i].itemType === pottype) {
+            if (items[i].mode === ItemModes.Item_in_belt && items[i].itemType === pottype) {
 				return copyUnit(items[i]);
 			}
 		}
@@ -191,7 +192,7 @@ function main() {
 		switch (type) {
 		case 0:
 		case 1:
-			if ((timerLastDrink[type] && (tNow - timerLastDrink[type] < 1000)) || me.getState(type === 0 ? 100 : 106)) {
+                if ((timerLastDrink[type] && (tNow - timerLastDrink[type] < 1000)) || me.getState(type === 0 ? States.HEALTHPOT : States.MANAPOT)) {
 				return false;
 			}
 
@@ -211,22 +212,22 @@ function main() {
 			break;
 		}
 
-		if (me.mode === 0 || me.mode === 17 || me.mode === 18) { // mode 18 - can't drink while leaping/whirling etc.
+        if (me.mode === PlayerModes.Death || me.mode === PlayerModes.Dead || me.mode === PlayerModes.Sequence) { // mode 18 - can't drink while leaping/whirling etc.
 			return false;
 		}
 
 		switch (type) {
 		case 0:
 		case 3:
-			pottype = 76;
+                pottype = NTItemTypes.healingpotion;
 
 			break;
 		case 1:
-			pottype = 77;
+                pottype = NTItemTypes.manapotion;
 
 			break;
 		default:
-			pottype = 78;
+                pottype = NTItemTypes.rejuvpotion;
 
 			break;
 		}
@@ -234,7 +235,7 @@ function main() {
 		potion = this.getPotion(pottype, type);
 
 		if (potion) {
-			if (me.mode === 0 || me.mode === 17) {
+            if (me.mode === PlayerModes.Death || me.mode === PlayerModes.Dead) {
 				return false;
 			}
 
@@ -242,7 +243,7 @@ function main() {
 				potion.interact();
 			} else {
 				try {
-					clickItem(2, potion);
+                    clickItem(ClickType.Shift_Left_Click, potion);
 				} catch (e) {
 					print("Couldn't give the potion to merc.");
 				}
@@ -258,7 +259,7 @@ function main() {
 
 	this.getNearestMonster = function () {
 		var gid, distance,
-			monster = getUnit(1),
+            monster = getUnit(UnitType.NPC),
 			range = 30;
 
 		if (monster) {
@@ -289,11 +290,11 @@ function main() {
 
 	this.checkVipers = function () {
 		var owner,
-			monster = getUnit(1, 597);
+            monster = getUnit(UnitType.NPC, UnitClassID.clawviper9);
 
 		if (monster) {
 			do {
-				if (monster.getState(96)) {
+                if (monster.getState(States.REVIVE)) {
 					owner = monster.getParent();
 
 					if (owner && owner.name !== me.name) {
@@ -308,7 +309,7 @@ function main() {
 
 	this.getIronGolem = function () {
 		var owner,
-			golem = getUnit(1, 291);
+            golem = getUnit(UnitType.NPC, UnitClassID.irongolem);
 
 		if (golem) {
 			do {
@@ -353,8 +354,8 @@ function main() {
 			break;
 		case 107: // Numpad +
 			showConsole();
-			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39) +
-				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
+            print("ÿc4MF: ÿc0" + me.getStat(Stats.item_magicbonus) + " ÿc4GF: ÿc0" + me.getStat(Stats.item_goldbonus) + " ÿc1FR: ÿc0" + me.getStat(Stats.fireresist) +
+                " ÿc3CR: ÿc0" + me.getStat(Stats.coldresist) + " ÿc9LR: ÿc0" + me.getStat(Stats.lightresist) + " ÿc2PR: ÿc0" + me.getStat(Stats.poisonresist));
 
 			break;
 		case 101: // numpad 5
@@ -428,7 +429,7 @@ function main() {
 				break;
 			}
 
-			if (Config.SoJWaitTime && me.gametype === 1) { // only do this in expansion
+			if (Config.SoJWaitTime && me.gametype === GameType.Expansion) { // only do this in expansion
 				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants on IP " + me.gameserverip.split(".")[3], 7);
 				Messaging.sendToScript("default.dbj", "soj");
 			}
@@ -443,7 +444,7 @@ function main() {
 				break;
 			}
 
-			if (Config.StopOnDClone && me.gametype === 1) { // only do this in expansion
+            if (Config.StopOnDClone && me.gametype === GameType.Expansion) { // only do this in expansion
 				D2Bot.printToConsole("Diablo Walks the Earth", 7);
 
 				cloneWalked = true;
@@ -510,10 +511,10 @@ function main() {
 	//addEventListener("gamepacket", Events.gamePacket);
 
 	// Load Fastmod
-	Packet.changeStat(105, Config.FCR);
-	Packet.changeStat(99, Config.FHR);
-	Packet.changeStat(102, Config.FBR);
-	Packet.changeStat(93, Config.IAS);
+    Packet.changeStat(Stats.item_fastercastrate, Config.FCR);
+    Packet.changeStat(Stats.item_fastergethitrate, Config.FHR);
+    Packet.changeStat(Stats.item_fasterblockrate, Config.FBR);
+    Packet.changeStat(Stats.item_fasterattackrate, Config.IAS);
 
 	if (Config.QuitListMode > 0) {
 		this.initQuitList();
@@ -555,7 +556,7 @@ function main() {
 					break;
 				}
 
-				if (Config.IronGolemChicken > 0 && me.classid === 2) {
+                if (Config.IronGolemChicken > 0 && me.classid === ClassID.Necromancer) {
 					if (!ironGolem || copyUnit(ironGolem).x === undefined) {
 						ironGolem = this.getIronGolem();
 					}
@@ -575,7 +576,7 @@ function main() {
 					mercHP = getMercHP();
 					merc = me.getMerc();
 
-					if (mercHP > 0 && merc && merc.mode !== 12) {
+                    if (mercHP > 0 && merc && merc.mode !== NPCModes.dead) {
 						if (mercHP < Config.MercChicken) {
 							D2Bot.printToConsole("Merc Chicken in " + Pather.getAreaName(me.area), 9);
 							D2Bot.updateChickens();

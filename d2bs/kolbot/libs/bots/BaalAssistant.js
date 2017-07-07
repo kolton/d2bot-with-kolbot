@@ -3,6 +3,7 @@
  *	@author		kolton, modified by YGM
  *	@desc		Help or Leech Baal Runs.
  */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
  
 function BaalAssistant() {
 	
@@ -97,47 +98,47 @@ function BaalAssistant() {
 	this.preattack = function () {
 		var check;
 		switch (me.classid) {
-			case 1:
+            case ClassID.Sorceress:
 				// Sorceress
-				if ([49].indexOf(Config.AttackSkill[1]) > -1) {
-					if (me.getState(121)) {
+                if ([Skills.Sorceress.Lightning].indexOf(Config.AttackSkill[1]) > -1) {
+                    if (me.getState(States.SKILLDELAY)) {
 						delay(500);
 					} else {
 						Skill.cast(Config.AttackSkill[1], 0, 15094, 5028);
 					}
 				}
-				if ([53].indexOf(Config.AttackSkill[1]) > -1) {
-					if (me.getState(121)) {
+                if ([Skills.Sorceress.Chain_Lightning].indexOf(Config.AttackSkill[1]) > -1) {
+                    if (me.getState(States.SKILLDELAY)) {
 						delay(500);
 					} else {
 						Skill.cast(Config.AttackSkill[1], 0, 15094, 5028);
 					}
 				}
-				if ([56].indexOf(Config.AttackSkill[1]) > -1) {
-					if (me.getState(121)) {
+                if ([Skills.Sorceress.Meteor].indexOf(Config.AttackSkill[1]) > -1) {
+                    if (me.getState(States.SKILLDELAY)) {
 						delay(500);
 					} else {
 						Skill.cast(Config.AttackSkill[1], 0, 15093, 5028);
 					}
 				}
-				if ([59].indexOf(Config.AttackSkill[1]) > -1) {
-					if (me.getState(121)) {
+                if ([Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[1]) > -1) {
+                    if (me.getState(States.SKILLDELAY)) {
 						delay(500);
 					} else {
 						Skill.cast(Config.AttackSkill[1], 0, 15095, 5028);
 					}
 				}
-				if ([64].indexOf(Config.AttackSkill[1]) > -1) {
-					if (me.getState(121)) {
+                if ([Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+                    if (me.getState(States.SKILLDELAY)) {
 						delay(500);
 					} else {
 						Skill.cast(Config.AttackSkill[1], 0, 15094, 5028);
 					}
 				}
 				return true;
-			case 3:
+            case ClassID.Paladin:
 				// Paladin
-				if (Config.AttackSkill[3] !== 112) {
+                if (Config.AttackSkill[3] !== Skills.Paladin.Blessed_Hammer) {
 					return false;
 				}
 				if (getDistance(me, 15094, 5029) > 3) {
@@ -148,14 +149,14 @@ function BaalAssistant() {
 				}
 				Skill.cast(Config.AttackSkill[3], 1);
 				return true;
-			case 5:
+            case ClassID.Druid:
 				// Druid
-				if (Config.AttackSkill[3] === 245) {
+                if (Config.AttackSkill[3] === Skills.Druid.Tornado) {
 					Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
 					return true;
 				}
 				break;
-			case 6:
+            case ClassID.Assassin:
 				// Assassin
 				if (Config.UseTraps) {
 					check = ClassAttack.checkTraps({
@@ -176,22 +177,22 @@ function BaalAssistant() {
 	};
 
 	this.checkThrone = function () {
-		var monster = getUnit(1);
+        var monster = getUnit(UnitType.NPC);
 		if (monster) {
 			do {
 				if (Attack.checkMonster(monster) && monster.y < 5080) {
 					switch (monster.classid) {
-						case 23:
-						case 62:
+                        case UnitClassID.fallen5:
+                        case UnitClassID.fallenshaman5:
 							return 1;
-						case 105:
-						case 381:
+                        case UnitClassID.unraveler5:
+                        case UnitClassID.skmage_cold3:
 							return 2;
-						case 557:
+                        case UnitClassID.baalhighpriest:
 							return 3;
-						case 558:
+                        case UnitClassID.venomlord:
 							return 4;
-						case 571:
+                        case UnitClassID.baalminion1:
 							return 5;
 						default:
 							if (Helper) {
@@ -212,7 +213,7 @@ function BaalAssistant() {
 		monList = [],
 			pos = [15094, 5022, 15094, 5041, 15094, 5060, 15094, 5041, 15094, 5022];
 		if (Config.AvoidDolls) {
-			monster = getUnit(1, 691);
+            monster = getUnit(UnitType.NPC, UnitClassID.bonefetish7);
 			if (monster) {
 				do {
 					if (monster.x >= 15072 && monster.x <= 15118 && monster.y >= 5002 && monster.y <= 5079 && Attack.checkMonster(monster) && Attack.skipCheck(monster)) {
@@ -231,12 +232,12 @@ function BaalAssistant() {
 	};
 
 	this.checkHydra = function () {
-		var monster = getUnit(1, "hydra");
+        var monster = getUnit(UnitType.NPC, "hydra");
 		if (monster) {
 			do {
-				if (monster.mode !== 12 && monster.getStat(172) !== 2) {
+                if (monster.mode !== NPCModes.dead && monster.getStat(Stats.alignment) !== 2) {
 					Pather.moveTo(15072, 5002);
-					while (monster.mode !== 12) {
+                    while (monster.mode !== NPCModes.dead) {
 						delay(500);
 						if (!copyUnit(monster).x) {
 							break;
@@ -255,10 +256,10 @@ function BaalAssistant() {
 			partycheck = getParty();
 			if (partycheck) {
 				do {
-					if (partycheck.area === 131) {
+                    if (partycheck.area === Areas.Act5.Throne_Of_Destruction) {
 						return false;
 					}
-					if (partycheck.area === 107 || partycheck.area === 108) {
+                    if (partycheck.area === Areas.Act4.River_Of_Flame || partycheck.area === Areas.Act4.Chaos_Sanctuary) {
 						return true;
 					}
 				} while (partycheck.getNext());
@@ -311,10 +312,10 @@ function BaalAssistant() {
 	Town.goToTown(5);
 	Town.doChores();
 
-	if (Leader || autoLeaderDetect(109) || autoLeaderDetect(130) || autoLeaderDetect(131)) {
+    if (Leader || autoLeaderDetect(Areas.Act5.Harrogath) || autoLeaderDetect(Areas.Act5.The_Worldstone_Keep_Level_3) || autoLeaderDetect(Areas.Act5.Throne_Of_Destruction)) {
 		print("ÿc<Leader: " + Leader);
 		while (Misc.inMyParty(Leader)) {
-			if (!secondAttempt && !safeCheck && !baalCheck && !ShrineStatus && GetShrine && me.area === 109 && me.area !== 131 && me.area !== 132) {
+            if (!secondAttempt && !safeCheck && !baalCheck && !ShrineStatus && GetShrine && me.area === Areas.Act5.Harrogath && me.area !== Areas.Act5.Throne_Of_Destruction && me.area !== Areas.Act5.The_Worldstone_Chamber) {
 
 				if (GetShrineWaitForHotTP) {
 					for (i = 0; i < Wait; i += 1) {
@@ -332,10 +333,10 @@ function BaalAssistant() {
 				}
 
 				if (!ShrineStatus) {
-					Pather.useWaypoint(4);
+                    Pather.useWaypoint(Areas.Act1.Stony_Field);
 					Precast.doPrecast(true);
 
-					for (i = 4; i > 1; i -= 1) {
+                    for (i = Areas.Act1.Stony_Field; i > Areas.Act1.Rogue_Encampment; i -= 1) {
 						if (safeCheck) {
 							break;
 						}
@@ -347,10 +348,10 @@ function BaalAssistant() {
 					if (!safeCheck) {
 						if (i === 1) {
 							Town.goToTown();
-							Pather.useWaypoint(5);
+                            Pather.useWaypoint(Areas.Act1.Dark_Wood);
 							Precast.doPrecast(true);
 
-							for (i = 5; i < 8; i += 1) {
+                            for (i = Areas.Act1.Dark_Wood; i < Areas.Act1.Den_Of_Evil; i += 1) {
 								if (safeCheck) {
 									break;
 								}
@@ -365,30 +366,30 @@ function BaalAssistant() {
 				ShrineStatus = true;
 			}
 
-			if (firstAttempt && !secondAttempt && !safeCheck && !baalCheck && me.area !== 131 && me.area !== 132) {
+            if (firstAttempt && !secondAttempt && !safeCheck && !baalCheck && me.area !== Areas.Act5.Throne_Of_Destruction && me.area !== Areas.Act5.The_Worldstone_Chamber) {
 				if (RandomPrecast) {
 					Pather.useWaypoint("random");
 					Precast.doPrecast(true);
 				} else {
-					Pather.useWaypoint(129);
+                    Pather.useWaypoint(Areas.Act5.The_Worldstone_Keep_Level_2);
 					Precast.doPrecast(true);
 				}
 			}
 
-			if (me.area !== 131 && me.area !== 132) {
+            if (me.area !== Areas.Act5.Throne_Of_Destruction && me.area !== Areas.Act5.The_Worldstone_Chamber) {
 				if (SkipTP) {
 					if (firstAttempt && !secondAttempt) {
-						if (me.area !== 129) {
-							Pather.useWaypoint(129);
+                        if (me.area !== Areas.Act5.The_Worldstone_Keep_Level_2) {
+                            Pather.useWaypoint(Areas.Act5.The_Worldstone_Keep_Level_2);
 						}
-						if (!Pather.moveToExit([130, 131], false)) {
+                        if (!Pather.moveToExit([Areas.Act5.The_Worldstone_Keep_Level_3, Areas.Act5.Throne_Of_Destruction], false)) {
 							throw new Error("Failed to move to WSK3.");
 						}
 
 						this.checkParty();
 
 						for (i = 0; i < 3; i += 1) {
-							entrance = getUnit(5, 82);
+                            entrance = getUnit(UnitType.Warp, 82);
 
 							if (entrance) {
 								break;
@@ -401,13 +402,13 @@ function BaalAssistant() {
 							Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
 						}
 
-						if (!Pather.moveToExit(131, true) || !Pather.moveTo(15118, 5002)) {
+                        if (!Pather.moveToExit(Areas.Act5.Throne_Of_Destruction, true) || !Pather.moveTo(15118, 5002)) {
 							throw new Error("Failed to move to Throne of Destruction.");
 						}
 
 						Pather.moveTo(15095, 5029);
 
-						if ((SoulQuit && getUnit(1, 641)) || (DollQuit && getUnit(1, 691))) {
+                        if ((SoulQuit && getUnit(UnitType.NPC, UnitClassID.willowisp7)) || (DollQuit && getUnit(UnitType.NPC, UnitClassID.bonefetish7))) {
 							print("Undead soul killers or Undead stygian dolls found, ending script.");
 							return true;
 						}
@@ -425,8 +426,8 @@ function BaalAssistant() {
 					} else {
 						if (me.intown) {
 							Town.move("portalspot");
-							Pather.usePortal(131, null);
-							if (me.mode === 17) {
+                            Pather.usePortal(Areas.Act5.Throne_Of_Destruction, null);
+                            if (me.mode === PlayerModes.Dead) {
 								me.revive();
 							}
 							if (Helper) {
@@ -439,8 +440,8 @@ function BaalAssistant() {
 					}
 				} else {
 					if (firstAttempt && !secondAttempt) {
-						if (me.area !== 109) {
-							Pather.useWaypoint(109);
+                        if (me.area !== Areas.Act5.Harrogath) {
+                            Pather.useWaypoint(Areas.Act5.Harrogath);
 						}
 
 						Town.move("portalspot");
@@ -459,7 +460,7 @@ function BaalAssistant() {
 						}
 
 						for (i = 0; i < Wait; i += 1) {
-							if (Pather.usePortal(131, null)) {
+                            if (Pather.usePortal(Areas.Act5.Throne_Of_Destruction, null)) {
 								break;
 							}
 
@@ -470,7 +471,7 @@ function BaalAssistant() {
 							throw new Error("No portals to Throne.");
 						}
 
-						if ((SoulQuit && getUnit(1, 691)) || (DollQuit && getUnit(1, 690))) {
+                        if ((SoulQuit && getUnit(UnitType.NPC, UnitClassID.bonefetish7)) || (DollQuit && getUnit(UnitType.NPC, UnitClassID.bonefetish6))) {
 							print("Undead soul killers or Undead stygian dolls found, ending script.");
 							return true;
 						}
@@ -487,8 +488,8 @@ function BaalAssistant() {
 					} else {
 						if (me.intown) {
 							Town.move("portalspot");
-							Pather.usePortal(131, null);
-							if (me.mode === 17) {
+                            Pather.usePortal(Areas.Act5.Throne_Of_Destruction, null);
+                            if (me.mode === PlayerModes.Dead) {
 								me.revive();
 							}
 							if (Helper) {
@@ -509,13 +510,13 @@ function BaalAssistant() {
 				delay(100);
 			}
 
-			if (safeCheck && !baalCheck && me.area === 131 && me.area !== 132) {
+            if (safeCheck && !baalCheck && me.area === Areas.Act5.Throne_Of_Destruction && me.area !== Areas.Act5.The_Worldstone_Chamber) {
 				if (!baalCheck && !throneStatus) {
 					if (Helper) {
 						Attack.clear(15);
 						this.clearThrone();
 
-						Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+                        Pather.moveTo(15094, me.classid === ClassID.Paladin ? 5029 : 5038);
 						Precast.doPrecast(true);
 					}
 
@@ -523,12 +524,12 @@ function BaalAssistant() {
 
 					MainLoop: while (true) {
 						if (Helper) {
-							if (getDistance(me, 15094, me.classid === 3 ? 5029 : 5038) > 3) {
-								Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+                            if (getDistance(me, 15094, me.classid === ClassID.Paladin ? 5029 : 5038) > 3) {
+                                Pather.moveTo(15094, me.classid === ClassID.Paladin ? 5029 : 5038);
 							}
 						}
 
-						if (!getUnit(1, 543)) {
+                        if (!getUnit(UnitType.NPC, UnitClassID.baalthrone)) {
 							break MainLoop;
 						}
 
@@ -567,7 +568,7 @@ function BaalAssistant() {
 								if (Helper) {
 									Attack.clear(40);
 								} else {
-									while (Attack.checkMonster(getUnit(1, 571)) || Attack.checkMonster(getUnit(1, 572)) || Attack.checkMonster(getUnit(1, 573))) {
+                                    while (Attack.checkMonster(getUnit(UnitType.NPC, UnitClassID.baalminion1)) || Attack.checkMonster(getUnit(UnitType.NPC, UnitClassID.baalminion2)) || Attack.checkMonster(getUnit(UnitType.NPC, UnitClassID.baalminion3))) {
 										delay(1000);
 									}
 									delay(1000);
@@ -576,8 +577,8 @@ function BaalAssistant() {
 								break MainLoop;
 							default:
 								if (getTickCount() - tick < 7e3) {
-									if (me.getState(2)) {
-										Skill.setSkill(109, 0);
+                                    if (me.getState(States.POISON)) {
+                                        Skill.setSkill(Skills.Paladin.Cleansing, 0);
 									}
 
 									break;
@@ -605,7 +606,7 @@ function BaalAssistant() {
 				delay(100);
 			}
 
-			if ((throneStatus || baalCheck) && KillBaal && me.area === 131) {
+            if ((throneStatus || baalCheck) && KillBaal && me.area === Areas.Act5.Throne_Of_Destruction) {
 				if (Helper) {
 					Pather.moveTo(15090, 5008);
 					delay(2000);
@@ -615,11 +616,11 @@ function BaalAssistant() {
 					Precast.doPrecast(true);
 				}
 
-				while (getUnit(1, 543)) {
+                while (getUnit(UnitType.NPC, UnitClassID.baalthrone)) {
 					delay(500);
 				}
 
-				portal = getUnit(2, 563);
+                portal = getUnit(UnitType.Object, UniqueObjectIds.Worldstone_Chamber);
 
 				if (portal) {
 					if (Helper) {
@@ -632,31 +633,31 @@ function BaalAssistant() {
 					throw new Error("Couldn't find portal.");
 				}
 
-				if (me.mode === 17) {
+                if (me.mode === PlayerModes.Dead) {
 					me.revive();
 				}
 
 				if (Helper) {
 					delay(1000);
 					Pather.moveTo(15134, 5923);
-					baal = getUnit(1, 544);
-					Attack.kill(544);
+                    baal = getUnit(UnitType.NPC, UnitClassID.baalcrab);
+                    Attack.kill(UnitClassID.baalcrab);
 					Pickit.pickItems();
 					if (ngCheck) {
 						return true;
 					}
-					if (baal && (baal.mode === 0 || baal.mode === 12)) {
+                    if (baal && (baal.mode === NPCModes.death || baal.mode === NPCModes.dead)) {
 						return true;
 					}
 				} else {
 					Pather.moveTo(15177, 5952);
-					baal = getUnit(1, 544);
+                    baal = getUnit(UnitType.NPC, UnitClassID.baalcrab);
 					while (baal) {
 						delay(1000);
 						if (ngCheck) {
 							return true;
 						}
-						if (baal && (baal.mode === 0 || baal.mode === 12)) {
+                        if (baal && (baal.mode === NPCModes.death || baal.mode === NPCModes.dead)) {
 							return true;
 						}
 					}

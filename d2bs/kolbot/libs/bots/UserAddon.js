@@ -6,6 +6,7 @@
 *				Shows monster's classid, HP percent and resistances.
 *				Shows other players' gear.
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function UserAddon() {
 	var i, unit, title, dummy,
@@ -57,7 +58,7 @@ function UserAddon() {
 
 		Pickit.fastPick();
 
-		unit = getUnit(101);
+        unit = getUnit(UnitType.Selected_Unit);
 
 		info.createInfo(unit);
 		delay(20);
@@ -77,20 +78,20 @@ function UnitInfo() {
 			return;
 		}
 
-		switch (unit.type) {
-		case 0:
-			this.playerInfo(unit);
+        switch (unit.type) {
+            case UnitType.Player:
+                this.playerInfo(unit);
 
-			break;
-		case 1:
-			this.monsterInfo(unit);
+                break;
+            case UnitType.NPC:
+                this.monsterInfo(unit);
 
-			break;
-		case 4:
-			this.itemInfo(unit);
+                break;
+            case UnitType.Item:
+                this.itemInfo(unit);
 
-			break;
-		}
+                break;
+        }
 	};
 
 	this.playerInfo = function (unit) {
@@ -124,7 +125,7 @@ function UnitInfo() {
 				if (items[i].getFlag(0x4000000)) {
 					string = items[i].fname.split("\n")[1] + "ÿc0 " + items[i].fname.split("\n")[0];
 				} else {
-					string = quality[items[i].quality] + (items[i].quality > 4 && items[i].getFlag(0x10) ? items[i].fname.split("\n").reverse()[0].replace("ÿc4", "") : items[i].name);
+                    string = quality[items[i].quality] + (items[i].quality > 4 && items[i].getFlag(ItemFlags.isIdentified) ? items[i].fname.split("\n").reverse()[0].replace("ÿc4", "") : items[i].name);
 				}
 
 				this.hooks.push(new Text(string, this.x, this.y + (i + 2) * 15, 0, 13, 2));
@@ -163,12 +164,12 @@ function UnitInfo() {
 
 		this.hooks.push(new Text("Classid: ÿc0" + unit.classid, this.x, this.y, 4, 13, 2));
 		this.hooks.push(new Text("HP percent: ÿc0" + Math.round(unit.hp * 100 / 128), this.x, this.y + 15, 4, 13, 2));
-		this.hooks.push(new Text("Fire resist: ÿc0" + unit.getStat(39), this.x, this.y + 30, 4, 13, 2));
-		this.hooks.push(new Text("Cold resist: ÿc0" + unit.getStat(43), this.x, this.y + 45, 4, 13, 2));
-		this.hooks.push(new Text("Lightning resist: ÿc0" + unit.getStat(41), this.x, this.y + 60, 4, 13, 2));
-		this.hooks.push(new Text("Poison resist: ÿc0" + unit.getStat(45), this.x, this.y + 75, 4, 13, 2));
-		this.hooks.push(new Text("Physical resist: ÿc0" + unit.getStat(36), this.x, this.y + 90, 4, 13, 2));
-		this.hooks.push(new Text("Magic resist: ÿc0" + unit.getStat(37), this.x, this.y + 105, 4, 13, 2));
+        this.hooks.push(new Text("Fire resist: ÿc0" + unit.getStat(Stats.fireresist), this.x, this.y + 30, 4, 13, 2));
+        this.hooks.push(new Text("Cold resist: ÿc0" + unit.getStat(Stats.coldresist), this.x, this.y + 45, 4, 13, 2));
+        this.hooks.push(new Text("Lightning resist: ÿc0" + unit.getStat(Stats.lightresist), this.x, this.y + 60, 4, 13, 2));
+        this.hooks.push(new Text("Poison resist: ÿc0" + unit.getStat(Stats.poisonresist), this.x, this.y + 75, 4, 13, 2));
+        this.hooks.push(new Text("Physical resist: ÿc0" + unit.getStat(Stats.damageresist), this.x, this.y + 90, 4, 13, 2));
+        this.hooks.push(new Text("Magic resist: ÿc0" + unit.getStat(Stats.magicresist), this.x, this.y + 105, 4, 13, 2));
 
 		this.cleared = false;
 
@@ -213,7 +214,7 @@ function UnitInfo() {
 			}
 		}
 
-		if (unit.quality === 4 && unit.getFlag(0x10)) {
+        if (unit.quality === ItemQuality.Magic && unit.getFlag(ItemFlags.isIdentified)) {
 			this.hooks.push(new Text("Prefix: ÿc0" + unit.prefixnum, this.x, this.y + frameYsize - 5, 4, 13, 2));
 			this.hooks.push(new Text("Suffix: ÿc0" + unit.suffixnum, this.x, this.y + frameYsize + 10, 4, 13, 2));
 

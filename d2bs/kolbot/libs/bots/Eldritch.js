@@ -3,23 +3,24 @@
 *	@author		kolton
 *	@desc		kill Eldritch the Rectifier, optionally kill Shenk the Overseer, Dac Farren and open chest
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Eldritch() {
 	var chest;
 
 	Town.doChores();
-	Pather.useWaypoint(111);
+    Pather.useWaypoint(Areas.Act5.Frigid_Highlands);
 	Precast.doPrecast(true);
 	Pather.moveTo(3745, 5084);
 	Attack.clear(15, 0, getLocaleString(22500)); // Eldritch the Rectifier
 
 	if (Config.Eldritch.OpenChest) {
-		chest = getPresetUnit(me.area, 2, 455);
+        chest = getPresetUnit(me.area, UnitType.Object, UniqueObjectIds.Special_Chest);
 
 		if (chest) {
 			Pather.moveToUnit(chest);
 
-			chest = getUnit(2, 455);
+            chest = getUnit(UnitType.Object, UniqueObjectIds.Special_Chest);
 
 			if (Misc.openChest(chest)) {
 				Pickit.pickItems();

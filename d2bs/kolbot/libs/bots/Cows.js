@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		clear the Moo Moo Farm without killing the Cow King
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Cows() {
 	this.buildCowRooms = function () {
@@ -10,7 +11,7 @@ function Cows() {
 			finalRooms = [],
 			indexes = [];
 
-		kingPreset = getPresetUnit(me.area, 1, 773);
+        kingPreset = getPresetUnit(me.area, UnitType.NPC, SuperUniques.The_Cow_King);
 		badRooms = getRoom(kingPreset.roomx * 5 + kingPreset.x, kingPreset.roomy * 5 + kingPreset.y).getNearby();
 
 		for (i = 0; i < badRooms.length; i += 1) {
@@ -81,16 +82,16 @@ function Cows() {
 	this.getLeg = function () {
 		var i, portal, wirt, leg, gid;
 
-		if (me.getItem(88)) {
-			return me.getItem(88);
+        if (me.getItem(ItemClassIds.Wirts_Leg)) {
+            return me.getItem(ItemClassIds.Wirts_Leg);
 		}
 
-		Pather.useWaypoint(4);
+        Pather.useWaypoint(Areas.Act1.Stony_Field);
 		Precast.doPrecast(true);
-		Pather.moveToPreset(me.area, 1, 737, 8, 8);
+        Pather.moveToPreset(me.area, UnitType.NPC, SuperUniques.Rakanishu, 8, 8);
 
 		for (i = 0; i < 6; i += 1) {
-			portal = Pather.getPortal(38);
+            portal = Pather.getPortal(Areas.Act1.Tristram);
 
 			if (portal) {
 				Pather.usePortal(null, null, portal);
@@ -107,13 +108,13 @@ function Cows() {
 
 		Pather.moveTo(25048, 5177);
 
-		wirt = getUnit(2, 268);
+        wirt = getUnit(UnitType.Object, UniqueObjectIds.Wirts_Body);
 
 		for (i = 0; i < 8; i += 1) {
 			wirt.interact();
 			delay(500);
 
-			leg = getUnit(4, 88);
+            leg = getUnit(UnitType.Item, ItemClassIds.Wirts_Leg);
 
 			if (leg) {
 				gid = leg.gid;
@@ -130,7 +131,7 @@ function Cows() {
 	
 	this.getTome = function () {
 		var tome,
-			myTome = me.findItem("tbk", 0, 3),
+            myTome = me.findItem("tbk", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory),
 			akara = Town.initNPC("Shop");
 
 		tome = me.getItem("tbk");
@@ -183,7 +184,7 @@ function Cows() {
 		delay(500);
 
 		for (i = 0; i < 10; i += 1) {
-			if (Pather.getPortal(39)) {
+            if (Pather.getPortal(Areas.Act1.Moo_Moo_Farm)) {
 				return true;
 			}
 
@@ -196,23 +197,23 @@ function Cows() {
 	var leg, tome;
 
 	// we can begin now
-	if (me.getQuest(4, 10)) { // king dead or cain not saved
+    if (me.getQuest(Quests.Act1.The_Search_for_Cain, 10)) { // king dead or cain not saved
 		throw new Error("Already killed the Cow King.");
 	}
 
-	if (!me.getQuest(4, 0)) {
+    if (!me.getQuest(Quests.Act1.The_Search_for_Cain, 0)) {
 		throw new Error("Cain quest incomplete");
 	}
 
 	switch (me.gametype) {
-	case 0: // classic
-		if (!me.getQuest(26, 0)) { // diablo not completed
+	case GameType.Classic: // classic
+            if (!me.getQuest(Quests.Act4.Terrors_End, 0)) { // diablo not completed
 			throw new Error("Diablo quest incomplete.");
 		}
 
 		break;
-	case 1: // expansion
-		if (!me.getQuest(40, 0)) { // baal not completed
+	case GameType.Expansion: // expansion
+            if (!me.getQuest(Quests.Act5.Eve_of_Destruction, 0)) { // baal not completed
 			throw new Error("Baal quest incomplete.");
 		}
 
@@ -226,7 +227,7 @@ function Cows() {
 	tome = this.getTome();
 
 	this.openPortal(leg, tome);
-	Pather.usePortal(39);
+    Pather.usePortal(Areas.Act1.Moo_Moo_Farm);
 	Precast.doPrecast(false);
 	this.clearCowLevel();
 

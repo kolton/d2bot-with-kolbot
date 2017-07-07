@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		multi-profile gambling system
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var Gambling = {
 	Teams: {
@@ -105,14 +106,14 @@ var Gambling = {
 			Town.goToTown(1);
 			Town.move("stash");
 
-			while (me.getStat(14) + me.getStat(15) > info.goldReserve) {
-				gold(me.getStat(14)); // drop current gold
+            while (me.getStat(Stats.gold) + me.getStat(Stats.goldbank) > info.goldReserve) {
+                gold(me.getStat(Stats.gold)); // drop current gold
 				Town.openStash();
 
-				if (me.getStat(15) <= me.getStat(12) * 1e4) { // check stashed gold vs max carrying capacity
-					gold(me.getStat(15) - info.goldReserve, 4); // leave minGold in stash, pick the rest
+                if (me.getStat(Stats.goldbank) <= me.getStat(Stats.level) * 1e4) { // check stashed gold vs max carrying capacity
+                    gold(me.getStat(Stats.goldbank) - info.goldReserve, 4); // leave minGold in stash, pick the rest
 				} else {
-					gold(me.getStat(12) * 1e4, 4); // pick max carrying capacity
+                    gold(me.getStat(Stats.level) * 1e4, 4); // pick max carrying capacity
 				}
 
 				delay(1000);

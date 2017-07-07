@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Wereform attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
@@ -37,7 +38,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedSkill = Config.AttackSkill[5];
 		}
 
@@ -50,7 +51,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			untimedSkill = Config.AttackSkill[6];
 		}
 
@@ -103,7 +104,7 @@ var ClassAttack = {
 			return 2;
 		}
 
-		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
+        if (timedSkill > -1 && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(timedSkill))) {
 			if (Skill.getRange(timedSkill) < 4 && !Attack.validSpot(unit.x, unit.y)) {
 				return 0;
 			}
@@ -162,7 +163,7 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			if (!me.getState(121)) {
+            if (!me.getState(States.SKILLDELAY)) {
 				break;
 			}
 

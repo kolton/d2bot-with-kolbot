@@ -6,6 +6,7 @@
 *	@notes		This system is experimental, there will be no support offered for it.
 *				If you can't get it to work, leave it be.
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var CraftingSystem = {};
 
@@ -222,7 +223,7 @@ CraftingSystem.fullSets = [];
 // Check whether item can be used for crafting
 CraftingSystem.validItem = function (item) {
 	switch (item.itemType) {
-	case 58: // Jewel
+        case NTItemTypes.jewel: // Jewel
 		return NTIP.CheckItem(item) === 0; // Use junk jewels only
 	}
 
@@ -255,7 +256,7 @@ CraftingSystem.keepItem = function (item) {
 		}
 
 		if (info.worker) {
-			if (item.quality === 8) { // Let pickit decide whether to keep crafted
+            if (item.quality === ItemQuality.Crafted) { // Let pickit decide whether to keep crafted
 				return false;
 			}
 
@@ -336,7 +337,7 @@ CraftingSystem.buildLists = function (onlyNeeded) {
 		CraftingSystem.neededItems = [];
 		CraftingSystem.validGids = [];
 		CraftingSystem.fullSets = [];
-		CraftingSystem.itemList = me.findItems(-1, 0);
+        CraftingSystem.itemList = me.findItems(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		for (i = 0; i < info.Sets.length; i += 1) {
 			if (!onlyNeeded || info.Sets[i].Enabled) {
@@ -406,13 +407,13 @@ CraftingSystem.checkSubrecipes = function () {
 
 	for (i = 0; i < CraftingSystem.neededItems.length; i += 1) {
 		switch (CraftingSystem.neededItems[i]) {
-		case 561: // Pgems
-		case 566:
-		case 571:
-		case 576:
-		case 581:
-		case 586:
-		case 601:
+            case ItemClassIds.Perfect_Amethyst: // Pgems
+            case ItemClassIds.Perfect_Topaz:
+            case ItemClassIds.Perfect_Sapphire:
+            case ItemClassIds.Perfect_Emerald:
+            case ItemClassIds.Perfect_Ruby:
+            case ItemClassIds.Perfect_Diamond:
+            case ItemClassIds.Perfect_Skull:
 			if (Cubing.subRecipes.indexOf(CraftingSystem.neededItems[i]) === -1) {
 				Cubing.subRecipes.push(CraftingSystem.neededItems[i]);
 				Cubing.recipes.push({
@@ -506,11 +507,11 @@ CraftingSystem.dropGold = function () {
 	Town.goToTown(1);
 	Town.move("stash");
 
-	if (me.getStat(14) >= 10000) {
+    if (me.getStat(Stats.gold) >= 10000) {
 		gold(10000);
-	} else if (me.getStat(15) + me.getStat(14) >= 10000) {
+    } else if (me.getStat(Stats.goldbank) + me.getStat(Stats.gold) >= 10000) {
 		Town.openStash();
-		gold(10000 - me.getStat(14), 4);
+        gold(10000 - me.getStat(Stats.gold), 4);
 		gold(10000);
 	}
 };

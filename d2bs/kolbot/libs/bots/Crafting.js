@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Part of CraftingSystem
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var info,
 	gameRequest = false;
@@ -132,13 +133,13 @@ function getNPCName(idList) {
 
 	for (i = 0; i < idList.length; i += 1) {
 		switch (idList[i]) {
-		case 345: // Light Belt
-		case 391: // Sharkskin Belt
+            case ItemClassIds.Light_Belt: // Light Belt
+            case ItemClassIds.Sharkskin_Belt: // Sharkskin Belt
 			return "elzix";
-		case 346: // Belt
-		case 392: // Mesh Belt
-		case 342: // Light Plated Boots
-		case 388: // Battle Boots
+            case ItemClassIds.Belt: // Belt
+            case ItemClassIds.Mesh_Belt: // Mesh Belt
+            case ItemClassIds.Light_Plated_Boots: // Light Plated Boots
+            case ItemClassIds.Battle_Boots: // Battle Boots
 			return "fara";
 		}
 	}
@@ -164,7 +165,7 @@ function countItems(idList, quality) {
 	var item,
 		count = 0;
 
-	item = me.getItem(-1, 0);
+    item = me.getItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 	if (item) {
 		do {
@@ -181,7 +182,7 @@ function updateInfo() {
 	var i, j, items;
 
 	if (info) {
-		items = me.findItems(-1, 0);
+        items = me.findItems(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		for (i = 0; i < info.Sets.length; i += 1) {
 MainSwitch:
@@ -273,13 +274,13 @@ function runewordIngredient(item) {
 
 function pickItems() {
 	var items = [],
-		item = getUnit(4, -1, 3);
+        item = getUnit(UnitType.Item, -1, ItemLocation.Inventory);
 
 	if (item) {
 		updateInfo();
 
 		do {
-			if (checkItem(item) || item.classid === 523 || Pickit.checkItem(item).result > 0) {
+            if (checkItem(item) || item.classid === ItemClassIds.Gold || Pickit.checkItem(item).result > 0) {
 				items.push(copyUnit(item));
 			}
 		} while (item.getNext());
@@ -354,7 +355,7 @@ function shopStuff(npcId, classids, amount) {
 			moveNPC(npc, path[i], path[i + 1]);
 
 			for (j = 0; j < leadTimeout; j += 1) {
-				while (npc.mode === 2) {
+                while (npc.mode === NPCModes.walk) {
 					delay(100);
 				}
 
@@ -406,7 +407,7 @@ function shopStuff(npcId, classids, amount) {
 				for (i = 0; i < items.length; i += 1) {
 					if (Storage.Inventory.CanFit(items[i]) &&
 							Pickit.canPick(items[i]) &&
-							me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0) &&
+                        me.getStat(Stats.gold) + me.getStat(Stats.goldbank) >= items[i].getItemCost(0) &&
 							classids.indexOf(items[i].classid) > -1) {
 
 						//print("Bought " + items[i].name);
@@ -430,7 +431,7 @@ function shopStuff(npcId, classids, amount) {
 	switch (npcId.toLowerCase()) {
 	case "fara":
 		wpArea = 48;
-		town = 40;
+        town = Areas.Act2.Lut_Gholein;
 		path = [5112, 5094, 5092, 5096, 5078, 5098, 5070, 5085];
 		menuId = "Repair";
 
@@ -438,18 +439,18 @@ function shopStuff(npcId, classids, amount) {
 			throw new Error("Failed to get to NPC");
 		}
 
-		npc = getUnit(1, NPC.Fara);
+        npc = getUnit(UnitType.NPC, NPC.Fara);
 
 		break;
 	case "elzix":
 		wpArea = 48;
-		town = 40;
+        town = Areas.Act2.Lut_Gholein;
 		path = [5038, 5099, 5059, 5102, 5068, 5090, 5067, 5086];
 		menuId = "Shop";
 
 		Town.goToTown(2);
 
-		if (!getUnit(1, NPC.Elzix)) {
+        if (!getUnit(UnitType.NPC, NPC.Elzix)) {
 			Town.move(NPC.Elzix);
 		}
 
@@ -458,7 +459,7 @@ function shopStuff(npcId, classids, amount) {
 		break;
 	case "drognan":
 		wpArea = 48;
-		town = 40;
+        town = Areas.Act2.Lut_Gholein;
 		path = [5093, 5049, 5088, 5060, 5093, 5079, 5078, 5087, 5070, 5085];
 		menuId = "Shop";
 
@@ -466,12 +467,12 @@ function shopStuff(npcId, classids, amount) {
 			throw new Error("Failed to get to NPC");
 		}
 
-		npc = getUnit(1, NPC.Drognan);
+        npc = getUnit(UnitType.NPC, NPC.Drognan);
 
 		break;
 	case "ormus":
 		wpArea = 101;
-		town = 75;
+        town = Areas.Act3.Kurast_Docktown;
 		path = [5147, 5089, 5156, 5075, 5157, 5063, 5160, 5050];
 		menuId = "Shop";
 
@@ -479,12 +480,12 @@ function shopStuff(npcId, classids, amount) {
 			throw new Error("Failed to get to NPC");
 		}
 
-		npc = getUnit(1, NPC.Ormus);
+        npc = getUnit(UnitType.NPC, NPC.Ormus);
 
 		break;
 	case "anya":
 		wpArea = 129;
-		town = 109;
+        town = Areas.Act5.Harrogath;
 		path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5068];
 		menuId = "Shop";
 
@@ -492,12 +493,12 @@ function shopStuff(npcId, classids, amount) {
 			throw new Error("Failed to get to NPC");
 		}
 
-		npc = getUnit(1, NPC.Anya);
+        npc = getUnit(UnitType.NPC, NPC.Anya);
 
 		break;
 	case "malah":
 		wpArea = 113;
-		town = 109;
+        town = Areas.Act5.Harrogath;
 		path = [5077, 5032, 5089, 5025, 5100, 5021, 5106, 5051, 5116, 5071];
 		menuId = "Shop";
 
@@ -505,7 +506,7 @@ function shopStuff(npcId, classids, amount) {
 			throw new Error("Failed to get to NPC");
 		}
 
-		npc = getUnit(1, NPC.Malah);
+        npc = getUnit(UnitType.NPC, NPC.Malah);
 
 		break;
 	default:

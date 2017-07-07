@@ -6,94 +6,96 @@
 
 // TODO: Config.Runewords[i][0] can be false, but array methods can be used on it
 
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 var Runeword = {
-	// 1.09
-	AncientsPledge: [617, 618, 616], // Ral + Ort + Tal
-	Black: [619, 625, 613], // Thul + Io + Nef
-	Fury: [640, 634, 614], // Jah + Gul + Eth
-	HolyThunder: [614, 617, 618, 616], // Eth + Ral + Ort + Tal
-	Honor: [620, 610, 615, 612, 621], // Amn + El + Ith + Tir + Sol
-	KingsGrace: [620, 617, 619], // Amn + Ral + Thul
-	Leaf: [612, 617], // Tir + Ral
-	Lionheart: [624, 626, 628], // Hel + Lum + Fal
-	Lore: [618, 621], // Ort + Sol
-	Malice: [615, 610, 614], // Ith + El + Eth
-	Melody: [622, 627, 613], // Shael + Ko + Nef
-	Memory: [626, 625, 621, 614], // Lum + Io + Sol + Eth
-	Nadir: [613, 612], // Nef + Tir
-	Radiance: [613, 621, 615], // Nef + Sol + Ith
-	Rhyme: [622, 614], // Shael + Eth
-	Silence: [623, 611, 624, 633, 612, 635], // Dol + Eld + Hel + Ist + Tir + Vex
-	Smoke: [613, 626], // Nef + Lum
-	Stealth: [616, 614], // Tal + Eth
-	Steel: [612, 610], // Tir + El
-	Strength: [620, 612], // Amn + Tir
-	Venom: [616, 623, 632], // Tal + Dol + Mal
-	Wealth: [629, 627, 612], // Lem + Ko + Tir
-	White: [623, 625], // Dol + Io
-	Zephyr: [618, 614], // Ort + Eth
+    // 1.09
+    AncientsPledge: [ItemClassIds.Ral_Rune, ItemClassIds.Ort_Rune, ItemClassIds.Tal_Rune], // Ral + Ort + Tal
+    Black: [ItemClassIds.Thul_Rune, ItemClassIds.Io_Rune, ItemClassIds.Nef_Rune], // Thul + Io + Nef
+    Fury: [ItemClassIds.Jah_Rune, ItemClassIds.Gul_Rune, ItemClassIds.Eth_Rune], // Jah + Gul + Eth
+    HolyThunder: [ItemClassIds.Eth_Rune, ItemClassIds.Ral_Rune, ItemClassIds.Ort_Rune, ItemClassIds.Tal_Rune], // Eth + Ral + Ort + Tal
+    Honor: [ItemClassIds.Amn_Rune, ItemClassIds.El_Rune, ItemClassIds.Ith_Rune, ItemClassIds.Tir_Rune, ItemClassIds.Sol_Rune], // Amn + El + Ith + Tir + Sol
+    KingsGrace: [ItemClassIds.Amn_Rune, ItemClassIds.Ral_Rune, ItemClassIds.Thul_Rune], // Amn + Ral + Thul
+    Leaf: [ItemClassIds.Tir_Rune, ItemClassIds.Ral_Rune], // Tir + Ral
+    Lionheart: [ItemClassIds.Hel_Rune, ItemClassIds.Lum_Rune, ItemClassIds.Fal_Rune], // Hel + Lum + Fal
+    Lore: [ItemClassIds.Ort_Rune, ItemClassIds.Sol_Rune], // Ort + Sol
+    Malice: [ItemClassIds.Ith_Rune, ItemClassIds.El_Rune, ItemClassIds.Eth_Rune], // Ith + El + Eth
+    Melody: [ItemClassIds.Shael_Rune, ItemClassIds.Ko_Rune, ItemClassIds.Nef_Rune], // Shael + Ko + Nef
+    Memory: [ItemClassIds.Lum_Rune, ItemClassIds.Io_Rune, ItemClassIds.Sol_Rune, ItemClassIds.Eth_Rune], // Lum + Io + Sol + Eth
+    Nadir: [ItemClassIds.Nef_Rune, ItemClassIds.Tir_Rune], // Nef + Tir
+    Radiance: [ItemClassIds.Nef_Rune, ItemClassIds.Sol_Rune, ItemClassIds.Ith_Rune], // Nef + Sol + Ith
+    Rhyme: [ItemClassIds.Shael_Rune, ItemClassIds.Eth_Rune], // Shael + Eth
+    Silence: [ItemClassIds.Dol_Rune, ItemClassIds.Eld_Rune, ItemClassIds.Hel_Rune, ItemClassIds.Ist_Rune, ItemClassIds.Tir_Rune, ItemClassIds.Vex_Rune], // Dol + Eld + Hel + Ist + Tir + Vex
+    Smoke: [ItemClassIds.Nef_Rune, ItemClassIds.Lum_Rune], // Nef + Lum
+    Stealth: [ItemClassIds.Tal_Rune, ItemClassIds.Eth_Rune], // Tal + Eth
+    Steel: [ItemClassIds.Tir_Rune, ItemClassIds.El_Rune], // Tir + El
+    Strength: [ItemClassIds.Amn_Rune, ItemClassIds.Tir_Rune], // Amn + Tir
+    Venom: [ItemClassIds.Tal_Rune, ItemClassIds.Dol_Rune, ItemClassIds.Mal_Rune], // Tal + Dol + Mal
+    Wealth: [ItemClassIds.Lem_Rune, ItemClassIds.Ko_Rune, ItemClassIds.Tir_Rune], // Lem + Ko + Tir
+    White: [ItemClassIds.Dol_Rune, ItemClassIds.Io_Rune], // Dol + Io
+    Zephyr: [ItemClassIds.Ort_Rune, ItemClassIds.Eth_Rune], // Ort + Eth
 
 	// 1.10
-	Beast: [639, 612, 631, 632, 626], // Ber + Tir + Um + Mal + Lum
-	Bramble: [617, 636, 638, 614], // Ral + Ohm + Sur + Eth
-	BreathoftheDying: [635, 624, 610, 611, 642, 614], // Vex + Hel + El + Eld + Zod + Eth
-	CallToArms: [620, 617, 632, 633, 636], // Amn + Ral + Mal + Ist + Ohm
-	ChainsofHonor: [623, 631, 639, 633], // Dol + Um + Ber + Ist
-	Chaos: [628, 636, 631], // Fal + Ohm + Um
-	CrescentMoon: [622, 631, 612], // Shael + Um + Tir
-	Delirium: [629, 633, 625], // Lem + Ist + Io
-	Doom: [624, 636, 631, 637, 641], // Hel + Ohm + Um + Lo + Cham
-	Duress: [622, 631, 619], // Shael + Um + Thul
-	Enigma: [640, 615, 639], // Jah + Ith + Ber
-	Eternity: [620, 639, 633, 621, 638], // Amn + Ber + Ist + Sol + Sur
-	Exile: [635, 636, 633, 623], // Vex + Ohm + Ist + Dol
-	Famine: [628, 636, 618, 640], // Fal + Ohm + Ort + Jah
-	Gloom: [628, 631, 630], // Fal + Um + Pul
-	HandofJustice: [638, 641, 620, 637], // Sur + Cham + Amn + Lo
-	HeartoftheOak: [627, 635, 630, 619], // Ko + Vex + Pul + Thul
-	Kingslayer: [632, 631, 634, 628], // Mal + Um + Gul + Fal
-	Passion: [623, 618, 611, 629], // Dol + Ort + Eld + Lem
-	Prudence: [632, 612], // Mal + Tir
-	Sanctuary: [627, 627, 632], // Ko + Ko + Mal
-	Splendor: [614, 626], // Eth + Lum
-	Stone: [622, 631, 630, 626], // Shael + Um + Pul + Lum
-	Wind: [638, 610], // Sur + El
+    Beast: [ItemClassIds.Ber_Rune, ItemClassIds.Tir_Rune, ItemClassIds.Um_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Lum_Rune], // Ber + Tir + Um + Mal + Lum
+    Bramble: [ItemClassIds.Ral_Rune, ItemClassIds.Ohm_Rune, ItemClassIds.Sur_Rune, ItemClassIds.Eth_Rune], // Ral + Ohm + Sur + Eth
+    BreathoftheDying: [ItemClassIds.Vex_Rune, ItemClassIds.Hel_Rune, ItemClassIds.El_Rune, ItemClassIds.Eld_Rune, ItemClassIds.Zod_Rune, ItemClassIds.Eth_Rune], // Vex + Hel + El + Eld + Zod + Eth
+    CallToArms: [ItemClassIds.Amn_Rune, ItemClassIds.Ral_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Ist_Rune, ItemClassIds.Ohm_Rune], // Amn + Ral + Mal + Ist + Ohm
+    ChainsofHonor: [ItemClassIds.Dol_Rune, ItemClassIds.Um_Rune, ItemClassIds.Ber_Rune, ItemClassIds.Ist_Rune], // Dol + Um + Ber + Ist
+    Chaos: [ItemClassIds.Fal_Rune, ItemClassIds.Ohm_Rune, ItemClassIds.Um_Rune], // Fal + Ohm + Um
+    CrescentMoon: [ItemClassIds.Shael_Rune, ItemClassIds.Um_Rune, ItemClassIds.Tir_Rune], // Shael + Um + Tir
+    Delirium: [ItemClassIds.Lem_Rune, ItemClassIds.Ist_Rune, ItemClassIds.Io_Rune], // Lem + Ist + Io
+    Doom: [ItemClassIds.Hel_Rune, ItemClassIds.Ohm_Rune, ItemClassIds.Um_Rune, ItemClassIds.Lo_Rune, ItemClassIds.Cham_Rune], // Hel + Ohm + Um + Lo + Cham
+    Duress: [ItemClassIds.Shael_Rune, ItemClassIds.Um_Rune, ItemClassIds.Thul_Rune], // Shael + Um + Thul
+    Enigma: [ItemClassIds.Jah_Rune, ItemClassIds.Ith_Rune, ItemClassIds.Ber_Rune], // Jah + Ith + Ber
+    Eternity: [ItemClassIds.Amn_Rune, ItemClassIds.Ber_Rune, ItemClassIds.Ist_Rune, ItemClassIds.Sol_Rune, ItemClassIds.Sur_Rune], // Amn + Ber + Ist + Sol + Sur
+    Exile: [ItemClassIds.Vex_Rune, ItemClassIds.Ohm_Rune, ItemClassIds.Ist_Rune, ItemClassIds.Dol_Rune], // Vex + Ohm + Ist + Dol
+    Famine: [ItemClassIds.Fal_Rune, ItemClassIds.Ohm_Rune, ItemClassIds.Ort_Rune, ItemClassIds.Jah_Rune], // Fal + Ohm + Ort + Jah
+    Gloom: [ItemClassIds.Fal_Rune, ItemClassIds.Um_Rune, ItemClassIds.Pul_Rune], // Fal + Um + Pul
+    HandofJustice: [ItemClassIds.Sur_Rune, ItemClassIds.Cham_Rune, ItemClassIds.Amn_Rune, ItemClassIds.Lo_Rune], // Sur + Cham + Amn + Lo
+    HeartoftheOak: [ItemClassIds.Ko_Rune, ItemClassIds.Vex_Rune, ItemClassIds.Pul_Rune, ItemClassIds.Thul_Rune], // Ko + Vex + Pul + Thul
+    Kingslayer: [ItemClassIds.Mal_Rune, ItemClassIds.Um_Rune, ItemClassIds.Gul_Rune, ItemClassIds.Fal_Rune], // Mal + Um + Gul + Fal
+    Passion: [ItemClassIds.Dol_Rune, ItemClassIds.Ort_Rune, ItemClassIds.Eld_Rune, ItemClassIds.Lem_Rune], // Dol + Ort + Eld + Lem
+    Prudence: [ItemClassIds.Mal_Rune, ItemClassIds.Tir_Rune], // Mal + Tir
+    Sanctuary: [ItemClassIds.Ko_Rune, ItemClassIds.Ko_Rune, ItemClassIds.Mal_Rune], // Ko + Ko + Mal
+    Splendor: [ItemClassIds.Eth_Rune, ItemClassIds.Lum_Rune], // Eth + Lum
+    Stone: [ItemClassIds.Shael_Rune, ItemClassIds.Um_Rune, ItemClassIds.Pul_Rune, ItemClassIds.Lum_Rune], // Shael + Um + Pul + Lum
+    Wind: [ItemClassIds.Sur_Rune, ItemClassIds.El_Rune], // Sur + El
 
 	// Don't use ladder-only on NL
-	Brand: me.ladder ? [640, 637, 632, 634] : false, // Jah + Lo + Mal + Gul
-	Death: me.ladder ? [624, 610, 635, 618, 634] : false, // Hel + El + Vex + Ort + Gul
-	Destruction: me.ladder ? [635, 637, 639, 640, 627] : false, // Vex + Lo + Ber + Jah + Ko
-	Dragon: me.ladder ? [638, 637, 621] : false, // Sur + Lo + Sol
-	Dream: me.ladder ? [625, 640, 630] : false, // Io + Jah + Pul
-	Edge: me.ladder ? [612, 616, 620] : false, // Tir + Tal + Amn
-	Faith: me.ladder ? [636, 640, 629, 611] : false, // Ohm + Jah + Lem + Eld
-	Fortitude: me.ladder ? [610, 621, 623, 637] : false, // El + Sol + Dol + Lo
-	Grief: me.ladder ? [614, 612, 637, 632, 617] : false, // Eth + Tir + Lo + Mal + Ral
-	Harmony: me.ladder ? [612, 615, 621, 627] : false, // Tir + Ith + Sol + Ko
-	Ice: me.ladder ? [620, 622, 640, 637] : false, // Amn + Shael + Jah + Lo
-	"Infinity": me.ladder ? [639, 632, 639, 633] : false, // Ber + Mal + Ber + Ist
-	Insight: me.ladder ? [617, 612, 616, 621] : false, // Ral + Tir + Tal + Sol
-	LastWish: me.ladder ? [640, 632, 640, 638, 640, 639] : false, // Jah + Mal + Jah + Sur + Jah + Ber
-	Lawbringer: me.ladder ? [620, 629, 627] : false, // Amn + Lem + Ko
-	Oath: me.ladder ? [622, 630, 632, 626] : false, // Shael + Pul + Mal + Lum
-	Obedience: me.ladder ? [624, 627, 619, 614, 628] : false, // Hel + Ko + Thul + Eth + Fal
-	Phoenix: me.ladder ? [635, 635, 637, 640] : false, // Vex + Vex + Lo + Jah
-	Pride: me.ladder ? [641, 638, 625, 637] : false, // Cham + Sur + Io + Lo
-	Rift: me.ladder ? [624, 627, 629, 634] : false, // Hel + Ko + Lem + Gul
-	Spirit: me.ladder ? [616, 619, 618, 620] : false, // Tal + Thul + Ort + Amn
-	VoiceofReason: me.ladder ? [629, 627, 610, 611] : false, // Lem + Ko + El + Eld
-	Wrath: me.ladder ? [630, 626, 639, 632] : false, // Pul + Lum + Ber + Mal
+    Brand: me.ladder ? [ItemClassIds.Jah_Rune, ItemClassIds.Lo_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Gul_Rune] : false, // Jah + Lo + Mal + Gul
+    Death: me.ladder ? [ItemClassIds.Hel_Rune, ItemClassIds.El_Rune, ItemClassIds.Vex_Rune, ItemClassIds.Ort_Rune, ItemClassIds.Gul_Rune] : false, // Hel + El + Vex + Ort + Gul
+    Destruction: me.ladder ? [ItemClassIds.Vex_Rune, ItemClassIds.Lo_Rune, ItemClassIds.Ber_Rune, ItemClassIds.Jah_Rune, ItemClassIds.Ko_Rune] : false, // Vex + Lo + Ber + Jah + Ko
+    Dragon: me.ladder ? [ItemClassIds.Sur_Rune, ItemClassIds.Lo_Rune, ItemClassIds.Sol_Rune] : false, // Sur + Lo + Sol
+    Dream: me.ladder ? [ItemClassIds.Io_Rune, ItemClassIds.Jah_Rune, ItemClassIds.Pul_Rune] : false, // Io + Jah + Pul
+    Edge: me.ladder ? [ItemClassIds.Tir_Rune, ItemClassIds.Tal_Rune, ItemClassIds.Amn_Rune] : false, // Tir + Tal + Amn
+    Faith: me.ladder ? [ItemClassIds.Ohm_Rune, ItemClassIds.Jah_Rune, ItemClassIds.Lem_Rune, ItemClassIds.Eld_Rune] : false, // Ohm + Jah + Lem + Eld
+    Fortitude: me.ladder ? [ItemClassIds.El_Rune, ItemClassIds.Sol_Rune, ItemClassIds.Dol_Rune, ItemClassIds.Lo_Rune] : false, // El + Sol + Dol + Lo
+    Grief: me.ladder ? [ItemClassIds.Eth_Rune, ItemClassIds.Tir_Rune, ItemClassIds.Lo_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Ral_Rune] : false, // Eth + Tir + Lo + Mal + Ral
+    Harmony: me.ladder ? [ItemClassIds.Tir_Rune, ItemClassIds.Ith_Rune, ItemClassIds.Sol_Rune, ItemClassIds.Ko_Rune] : false, // Tir + Ith + Sol + Ko
+    Ice: me.ladder ? [ItemClassIds.Amn_Rune, ItemClassIds.Shael_Rune, ItemClassIds.Jah_Rune, ItemClassIds.Lo_Rune] : false, // Amn + Shael + Jah + Lo
+    "Infinity": me.ladder ? [ItemClassIds.Ber_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Ber_Rune, ItemClassIds.Ist_Rune] : false, // Ber + Mal + Ber + Ist
+    Insight: me.ladder ? [ItemClassIds.Ral_Rune, ItemClassIds.Tir_Rune, ItemClassIds.Tal_Rune, ItemClassIds.Sol_Rune] : false, // Ral + Tir + Tal + Sol
+    LastWish: me.ladder ? [ItemClassIds.Jah_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Jah_Rune, ItemClassIds.Sur_Rune, ItemClassIds.Jah_Rune, ItemClassIds.Ber_Rune] : false, // Jah + Mal + Jah + Sur + Jah + Ber
+    Lawbringer: me.ladder ? [ItemClassIds.Amn_Rune, ItemClassIds.Lem_Rune, ItemClassIds.Ko_Rune] : false, // Amn + Lem + Ko
+    Oath: me.ladder ? [ItemClassIds.Shael_Rune, ItemClassIds.Pul_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Lum_Rune] : false, // Shael + Pul + Mal + Lum
+    Obedience: me.ladder ? [ItemClassIds.Hel_Rune, ItemClassIds.Ko_Rune, ItemClassIds.Thul_Rune, ItemClassIds.Eth_Rune, ItemClassIds.Fal_Rune] : false, // Hel + Ko + Thul + Eth + Fal
+    Phoenix: me.ladder ? [ItemClassIds.Vex_Rune, ItemClassIds.Vex_Rune, ItemClassIds.Lo_Rune, ItemClassIds.Jah_Rune] : false, // Vex + Vex + Lo + Jah
+    Pride: me.ladder ? [ItemClassIds.Cham_Rune, ItemClassIds.Sur_Rune, ItemClassIds.Io_Rune, ItemClassIds.Lo_Rune] : false, // Cham + Sur + Io + Lo
+    Rift: me.ladder ? [ItemClassIds.Hel_Rune, ItemClassIds.Ko_Rune, ItemClassIds.Lem_Rune, ItemClassIds.Gul_Rune] : false, // Hel + Ko + Lem + Gul
+    Spirit: me.ladder ? [ItemClassIds.Tal_Rune, ItemClassIds.Thul_Rune, ItemClassIds.Ort_Rune, ItemClassIds.Amn_Rune] : false, // Tal + Thul + Ort + Amn
+    VoiceofReason: me.ladder ? [ItemClassIds.Lem_Rune, ItemClassIds.Ko_Rune, ItemClassIds.El_Rune, ItemClassIds.Eld_Rune] : false, // Lem + Ko + El + Eld
+    Wrath: me.ladder ? [ItemClassIds.Pul_Rune, ItemClassIds.Lum_Rune, ItemClassIds.Ber_Rune, ItemClassIds.Mal_Rune] : false, // Pul + Lum + Ber + Mal
 
 	// 1.11
-	Bone: [621, 631, 631], // Sol + Um + Um
-	Enlightenment: [630, 617, 621], // Pul + Ral + Sol
-	Myth: [624, 620, 613], // Hel + Amn + Nef
-	Peace: [622, 619, 620], // Shael + Thul + Amn
-	Principle: [617, 634, 611], // Ral + Gul + Eld
-	Rain: [618, 632, 615], // Ort + Mal + Ith
-	Treachery: [622, 619, 629], // Shael + Thul + Lem
+    Bone: [ItemClassIds.Sol_Rune, ItemClassIds.Um_Rune, ItemClassIds.Um_Rune], // Sol + Um + Um
+    Enlightenment: [ItemClassIds.Pul_Rune, ItemClassIds.Ral_Rune, ItemClassIds.Sol_Rune], // Pul + Ral + Sol
+    Myth: [ItemClassIds.Hel_Rune, ItemClassIds.Amn_Rune, ItemClassIds.Nef_Rune], // Hel + Amn + Nef
+    Peace: [ItemClassIds.Shael_Rune, ItemClassIds.Thul_Rune, ItemClassIds.Amn_Rune], // Shael + Thul + Amn
+    Principle: [ItemClassIds.Ral_Rune, ItemClassIds.Gul_Rune, ItemClassIds.Eld_Rune], // Ral + Gul + Eld
+    Rain: [ItemClassIds.Ort_Rune, ItemClassIds.Mal_Rune, ItemClassIds.Ith_Rune], // Ort + Mal + Ith
+    Treachery: [ItemClassIds.Shael_Rune, ItemClassIds.Thul_Rune, ItemClassIds.Lem_Rune], // Shael + Thul + Lem
 
-	Test: [624, 624, 624]
+    Test: [ItemClassIds.Hel_Rune, ItemClassIds.Hel_Rune, ItemClassIds.Hel_Rune]
 };
 
 var Runewords = {
@@ -157,7 +159,7 @@ var Runewords = {
 
 		this.validGids = [];
 		this.needList = [];
-		items = me.findItems(-1, 0);
+        items = me.findItems(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		for (i = 0; i < Config.Runewords.length; i += 1) {
 			if (!baseCheck) {
@@ -184,8 +186,8 @@ RuneLoop:
 		}
 
 		// hel rune for rerolling purposes
-		if (baseCheck) {
-			hel = me.getItem(624, 0);
+        if (baseCheck) {
+            hel = me.getItem(ItemClassIds.Hel_Rune, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 			if (hel) {
 				do {
@@ -197,7 +199,7 @@ RuneLoop:
 				} while (hel.getNext());
 			}
 
-			this.needList.push(624);
+            this.needList.push(ItemClassIds.Hel_Rune);
 		}
 	},
 
@@ -221,7 +223,7 @@ RuneLoop:
 	checkRunewords: function () {
 		var i, j, k, items, base, itemList;
 
-		items = me.findItems(-1, 0); // get items in inventory/stash
+        items = me.findItems(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store); // get items in inventory/stash
 
 		for (i = 0; i < Config.Runewords.length; i += 1) {
 			itemList = []; // reset item list
@@ -262,7 +264,7 @@ RuneLoop:
 			return false;
 		}
 
-		if (unit.itemType === 74 && this.needList.indexOf(unit.classid) > -1) { // rune
+        if (unit.itemType === NTItemTypes.rune && this.needList.indexOf(unit.classid) > -1) { // rune
 			return true;
 		}
 
@@ -283,12 +285,12 @@ RuneLoop:
 		if (typeof base === "object") {
 			item = base;
 		} else {
-			item = me.getItem(base, 0);
+            item = me.getItem(base, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 		}
 
 		if (item) {
 			do {
-				if (item && item.quality < 4 && item.getStat(194) === runeword.length) {
+                if (item && item.quality < ItemQuality.Magic && item.getStat(Stats.item_numsockets) === runeword.length) {
 					/* check if item has items socketed in it
 						better check than getFlag(0x4000000) because randomly socketed items return false for it
 					*/
@@ -336,7 +338,7 @@ RuneLoop:
 	getScroll: function () {
 		var i, scroll, npc;
 
-		scroll = me.getItem(529, 0); // check if we already have the scroll
+        scroll = me.getItem(ItemClassIds.Scroll_Of_Town_Portal, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store); // check if we already have the scroll
 
 		if (scroll) {
 			return scroll;
@@ -348,13 +350,13 @@ RuneLoop:
 			return false;
 		}
 
-		scroll = npc.getItem(529);
+        scroll = npc.getItem(ItemClassIds.Scroll_Of_Town_Portal);
 
 		if (scroll) {
 			for (i = 0; i < 3; i += 1) {
 				scroll.buy(true);
 
-				if (me.getItem(529)) {
+                if (me.getItem(ItemClassIds.Scroll_Of_Town_Portal)) {
 					break;
 				}
 			}
@@ -362,7 +364,7 @@ RuneLoop:
 
 		me.cancel();
 
-		return me.getItem(529, 0);
+        return me.getItem(ItemClassIds.Scroll_Of_Town_Portal, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 	},
 
 	makeRunewords: function () {
@@ -408,8 +410,8 @@ RuneLoop:
 	rerollRunewords: function () {
 		var i, base, scroll, hel;
 
-		for (i = 0; i < Config.Runewords.length; i += 1) {
-			hel = me.getItem(624, 0);
+        for (i = 0; i < Config.Runewords.length; i += 1) {
+            hel = me.getItem(ItemClassIds.Hel_Rune, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 			if (!hel) {
 				return false;
@@ -447,7 +449,7 @@ RuneLoop:
 
 		this.buildLists();
 
-		while (getUIFlag(0x1A) || getUIFlag(0x19)) {
+        while (getUIFlag(UIFlags.Cube_is_open) || getUIFlag(UIFlags.Stash_is_open)) {
 			me.cancel();
 			delay(300);
 		}

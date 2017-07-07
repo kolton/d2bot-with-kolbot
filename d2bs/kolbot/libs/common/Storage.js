@@ -3,6 +3,7 @@
 *	@author		McGod, kolton (small kolbot related edits)
 *	@desc		manage inventory, belt, stash, cube
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var Container = function (name, width, height, location) {
 	var h, w;
@@ -30,8 +31,8 @@ var Container = function (name, width, height, location) {
 	this.Mark = function (item) {
 		var x, y;
 
-		//Make sure it is in this container.
-		if (item.location !== this.location || item.mode !== 0) {
+        //Make sure it is in this container.
+        if (item.location !== this.location || item.mode !== ItemModes.Item_In_Inventory_Stash_Cube_Or_Store) {
 			return false;
 		}
 
@@ -58,7 +59,7 @@ var Container = function (name, width, height, location) {
 		reference = baseRef.slice(0);
 
 		//Make sure it is in this container.
-		if (item.mode !== 0 || item.location !== this.location) {
+        if (item.mode !== ItemModes.Item_In_Inventory_Stash_Cube_Or_Store || item.location !== this.location) {
 			return false;
 		}
 
@@ -161,12 +162,12 @@ Loop:
 			}
 
 			//Can't deal with items on ground!
-			if (item.mode === 3) {
+            if (item.mode === ItemModes.Item_on_ground) {
 				return false;
 			}
 
 			//Item already on the cursor.
-			if (me.itemoncursor && item.mode !== 4) {
+            if (me.itemoncursor && item.mode !== ItemModes.Item_on_cursor) {
 				return false;
 			}
 
@@ -290,7 +291,7 @@ Loop:
 
 var Storage = new function () {
 	this.Init = function () {
-		this.StashY = me.gametype === 0 ? 4 : 8;
+		this.StashY = me.gametype === GameType.Classic ? 4 : 8;
 		this.Inventory = new Container("Inventory", 10, 4, 3);
 		this.TradeScreen = new Container("Inventory", 10, 4, 5);
 		this.Stash = new Container("Stash", 6, this.StashY, 7);
@@ -301,15 +302,15 @@ var Storage = new function () {
 		this.Reload();
 	};
 
-	this.BeltSize = function () {
-		var item = me.getItem(-1, 1); // get equipped item
+    this.BeltSize = function() {
+        var item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc); // get equipped item
 
 		if (!item) { // nothing equipped
 			return 1;
 		}
 
-		do {
-			if (item.bodylocation === 8) { // belt slot
+        do {
+            if (item.bodylocation === ItemBodyLocation.BELT) { // belt slot
 				switch (item.code) {
 				case "lbl": // sash
 				case "vbl": // light belt
@@ -340,28 +341,28 @@ var Storage = new function () {
 		}
 
 		do {
-			switch (item.location) {
-			case 3:
-				this.Inventory.Mark(item);
+            switch (item.location) {
+                case ItemLocation.Inventory:
+                    this.Inventory.Mark(item);
 
-				break;
-			case 5:
-				this.TradeScreen.Mark(item);
+                    break;
+                case ItemLocation.Trade:
+                    this.TradeScreen.Mark(item);
 
-				break;
-			case 2:
-				this.Belt.Mark(item);
+                    break;
+                case ItemLocation.Belt:
+                    this.Belt.Mark(item);
 
-				break;
-			case 6:
-				this.Cube.Mark(item);
+                    break;
+                case ItemLocation.Cube:
+                    this.Cube.Mark(item);
 
-				break;
-			case 7:
-				this.Stash.Mark(item);
+                    break;
+                case ItemLocation.Stash:
+                    this.Stash.Mark(item);
 
-				break;
-			}
+                    break;
+            }
 		} while (item.getNext());
 
 		return true;

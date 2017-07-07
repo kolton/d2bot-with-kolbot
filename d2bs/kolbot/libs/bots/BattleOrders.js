@@ -3,22 +3,26 @@
 *	@author		kolton
 *	@desc		give or receive Battle Orders buff
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function BattleOrders() {
 	this.giveBO = function (list) {
 		var i, unit,
-			failTimer = 60,
+			failTimer = 20,
 			tick = getTickCount();
 
 		for (i = 0; i < list.length; i += 1) {
 			unit = getUnit(0, list[i]);
 
 			if (unit) {
-				while (!unit.getState(32) && copyUnit(unit).x) {
+                while (!unit.getState(States.BATTLEORDERS) && copyUnit(unit).x) {
 					if (getTickCount() - tick >= failTimer * 1000) {
 						showConsole();
 						print("ÿc1BO timeout fail.");
-						quit();
+						//quit();
+						Precast.doPrecast(true);
+						delay(1000);
+						return false;
 					}
 
 					Precast.doPrecast(true);
@@ -33,29 +37,33 @@ function BattleOrders() {
 	Town.doChores();
 
 	try {
-		Pather.useWaypoint(35, true); // catacombs
+        Pather.useWaypoint(Areas.Act1.Catacombs_Level_2, true); // catacombs
 	} catch (wperror) {
 		showConsole();
 		print("ÿc1Failed to take waypoint.");
-		quit();
+						//quit();
+						return false;
 	}
 
 	Pather.moveTo(me.x + 6, me.y + 6);
 
 	var i,
 		tick = getTickCount(),
-		failTimer = 60;
+		failTimer = 20;
 
 MainLoop:
 	while (true) {
 		switch (Config.BattleOrders.Mode) {
 		case 0: // Give BO
 			for (i = 0; i < Config.BattleOrders.Getters.length; i += 1) {
-				while (!Misc.inMyParty(Config.BattleOrders.Getters[i]) || !getUnit(0, Config.BattleOrders.Getters[i])) {
+                while (!Misc.inMyParty(Config.BattleOrders.Getters[i]) || !getUnit(UnitType.Player, Config.BattleOrders.Getters[i])) {
 					if (getTickCount() - tick >= failTimer * 1000) {
+						Precast.doPrecast(true);
+						delay(1000);
 						showConsole();
 						print("ÿc1BO timeout fail.");
-						quit();
+						//quit();
+						return false;
 					}
 
 					delay(500);
@@ -68,16 +76,17 @@ MainLoop:
 
 			break;
 		case 1: // Get BO
-			if (me.getState(32)) {
+                if (me.getState(Areas.Act1.Inner_Cloister)) {
 				delay(1000);
 
 				break MainLoop;
 			}
 
-			if (getTickCount() - tick >= failTimer * 1000) {
+			if (getTickCount() - tick >= (failTimer + 5) * 1000) {
 				showConsole();
 				print("ÿc1BO timeout fail.");
-				quit();
+						//quit();
+						return false;
 			}
 
 			break;
@@ -86,7 +95,7 @@ MainLoop:
 		delay(500);
 	}
 
-	Pather.useWaypoint(1);
+Pather.useWaypoint(Areas.Act1.Rogue_Encampment);
 
 	if (Config.BattleOrders.Mode === 0 && Config.BattleOrders.Wait) {
 		for (i = 0; i < Config.BattleOrders.Getters.length; i += 1) {

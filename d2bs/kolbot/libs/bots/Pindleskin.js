@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		kill Pindleskin and optionally Nihlathak
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Pindleskin() {
 	var anya;
@@ -11,17 +12,17 @@ function Pindleskin() {
 	Town.doChores();
 
 	if (Config.Pindleskin.UseWaypoint) {
-		Pather.useWaypoint(123);
+		Pather.useWaypoint(Areas.Act5.Halls_Of_Pain);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([122, 121], true)) {
+        if (!Pather.moveToExit([Areas.Act5.Halls_Of_Anguish, Areas.Act5.Nihlathaks_Temple], true)) {
 			throw new Error("Failed to move to Nihlahak's Temple");
 		}
 	} else {
 		Town.move("anya");
 
-		if (!Pather.getPortal(121) && me.getQuest(37, 1)) {
-			anya = getUnit(1, NPC.Anya);
+        if (!Pather.getPortal(Areas.Act5.Nihlathaks_Temple) && me.getQuest(Quests.Act5.Prison_of_Ice, 1)) {
+            anya = getUnit(UnitType.NPC, NPC.Anya);
 
 			if (anya) {
 				anya.openMenu();
@@ -29,7 +30,7 @@ function Pindleskin() {
 			}
 		}
 
-		if (!Pather.usePortal(121)) {
+        if (!Pather.usePortal(Areas.Act5.Nihlathaks_Temple)) {
 			throw new Error("Failed to use portal.");
 		}
 
@@ -45,23 +46,23 @@ function Pindleskin() {
 	}
 
 	if (Config.Pindleskin.KillNihlathak) {
-		if (!Pather.moveToExit([122, 123, 124], true)) {
+        if (!Pather.moveToExit([Areas.Act5.Halls_Of_Anguish, Areas.Act5.Halls_Of_Pain, Areas.Act5.Halls_Of_Vaught], true)) {
 			throw new Error("Failed to move to Halls of Vaught");
 		}
 
-		Pather.moveToPreset(me.area, 2, 462, 10, 10);
+        Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Nihlathak_Outside_Town, 10, 10);
 
-		if (Config.Pindleskin.ViperQuit && getUnit(1, 597)) {
+        if (Config.Pindleskin.ViperQuit && getUnit(UnitType.NPC, UnitClassID.clawviper9)) {
 			print("Tomb Vipers found.");
 
 			return true;
 		}
 		
 		if (Config.Pindleskin.ClearVipers) {
-			Attack.clearList(Attack.getMob(597, 0, 20));
+            Attack.clearList(Attack.getMob(UnitClassID.clawviper9, 0, 20));
 		}
 
-		Attack.kill(526); // Nihlathak
+        Attack.kill(UnitClassID.nihlathakboss); // Nihlathak
 		//Attack.clear(15, 0, 526);
 		Pickit.pickItems();
 	}

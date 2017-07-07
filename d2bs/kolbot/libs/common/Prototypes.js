@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		various 'Unit' and 'me' prototypes
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 // Shuffle Array
 // http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
@@ -39,22 +40,22 @@ Unit.prototype.__defineGetter__("idle",
 			throw new Error("Unit.idle: Must be used with player units.");
 		}
 
-		return (this.mode === 1 || this.mode === 5 || this.mode === 17); // Dead is pretty idle too
+        return (this.mode === PlayerModes.Neutral || this.mode === PlayerModes.Town_Neutral || this.mode === PlayerModes.Dead); // Dead is pretty idle too
 	});
 
 Unit.prototype.__defineGetter__("gold",
 	function () {
-		return this.getStat(14) + this.getStat(15);
+		return this.getStat(Stats.gold) + this.getStat(Stats.goldbank);
 	});
 
 // Death check
 Unit.prototype.__defineGetter__("dead",
 	function () {
 		switch (this.type) {
-		case 0: // Player
-			return this.mode === 0 || this.mode === 17;
-		case 1: // Monster
-			return this.mode === 0 || this.mode === 12;
+            case UnitType.Player: // Player
+                return this.mode === PlayerModes.Death || this.mode === PlayerModes.Dead;
+            case UnitType.NPC: // Monster
+                return this.mode === NPCModes.death || this.mode === NPCModes.dead;
 		default:
 			return false;
 		}
@@ -67,13 +68,13 @@ Unit.prototype.__defineGetter__("inTown",
 			throw new Error("Unit.inTown: Must be used with player units.");
 		}
 
-		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
+        return [Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath].indexOf(this.area) > -1;
 	});
 
 // Check if party unit is in town
 Party.prototype.__defineGetter__("inTown",
 	function () {
-		return [1, 40, 75, 103, 109].indexOf(this.area) > -1;
+        return [Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath].indexOf(this.area) > -1;
 	});
 
 Unit.prototype.__defineGetter__("attacking",
@@ -82,7 +83,8 @@ Unit.prototype.__defineGetter__("attacking",
 			throw new Error("Unit.attacking: Must be used with player units.");
 		}
 
-		return [7, 8, 10, 11, 12, 13, 14, 15, 16, 18].indexOf(this.mode) > -1;
+        return [PlayerModes.Attack1, PlayerModes.Attack2, PlayerModes.Cast, PlayerModes.Throw, PlayerModes.Kick, PlayerModes.Skill1,
+                PlayerModes.Skill2, PlayerModes.Skill3, PlayerModes.Skill4, PlayerModes.Sequence].indexOf(this.mode) > -1;
 	});
 
 // Open NPC menu
@@ -99,7 +101,7 @@ Unit.prototype.openMenu = function (addDelay) {
 		addDelay = 0;
 	}
 
-	if (getUIFlag(0x08)) {
+	if (getUIFlag(UIFlags.npc_menu)) {
 		return true;
 	}
 
@@ -115,19 +117,19 @@ Unit.prototype.openMenu = function (addDelay) {
 			// delay?
 		}
 
-		if (!getUIFlag(0x08)) {
+        if (!getUIFlag(UIFlags.npc_menu)) {
 			delay(100);
 			this.interact();
 		}
 
 		for (j = 0; j < 40; j += 1) {
-			if (j > 0 && j % 10 === 0 && !getUIFlag(0x08)) {
+            if (j > 0 && j % 10 === 0 && !getUIFlag(UIFlags.npc_menu)) {
 				me.cancel();
 				delay(400);
 				this.interact();
 			}
 
-			if (getUIFlag(0x08)) {
+            if (getUIFlag(UIFlags.npc_menu)) {
 				delay(Math.max(700 + me.ping, 500 + me.ping * 2 + addDelay * 500));
 
 				return true;
@@ -150,7 +152,7 @@ Unit.prototype.startTrade = function (mode) {
 		throw new Error("Unit.startTrade: Must be used on NPCs.");
 	}
 
-	if (getUIFlag(0x0C)) {
+    if (getUIFlag(UIFlags.Shop_open_at_NPC)) {
 		return true;
 	}
 
@@ -164,7 +166,7 @@ Unit.prototype.startTrade = function (mode) {
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 1000) {
-				if (getUIFlag(0x0C) && this.itemcount > 0) {
+                if (getUIFlag(UIFlags.Shop_open_at_NPC) && this.itemcount > 0) {
 					delay(200);
 
 					return true;
@@ -185,20 +187,20 @@ Unit.prototype.buy = function (shiftBuy, gamble) {
 		return Packet.buyItem(this, shiftBuy, gamble);
 	}
 
-	if (this.type !== 4) { // Check if it's an item we want to buy
+    if (this.type !== UnitType.Item) { // Check if it's an item we want to buy
 		throw new Error("Unit.buy: Must be used on items.");
 	}
 
-	if (!getUIFlag(0xC) || (this.getParent() && this.getParent().gid !== getInteractedNPC().gid)) { // Check if it's an item belonging to a NPC
+    if (!getUIFlag(UIFlags.Shop_open_at_NPC) || (this.getParent() && this.getParent().gid !== getInteractedNPC().gid)) { // Check if it's an item belonging to a NPC
 		throw new Error("Unit.buy: Must be used in shops.");
 	}
 
-	if (me.getStat(14) + me.getStat(15) < this.getItemCost(0)) { // Can we afford the item?
+	if (me.getStat(Stats.gold) + me.getStat(Stats.goldbank) < this.getItemCost(0)) { // Can we afford the item?
 		return false;
 	}
 
 	var i, tick,
-		oldGold = me.getStat(14) + me.getStat(15),
+        oldGold = me.getStat(Stats.gold) + me.getStat(Stats.goldbank),
 		itemCount = me.itemcount;
 
 	for (i = 0; i < 3; i += 1) {
@@ -209,7 +211,7 @@ Unit.prototype.buy = function (shiftBuy, gamble) {
 		tick = getTickCount();
 
 		while (getTickCount() - tick < Math.max(2000, me.ping * 2 + 500)) {
-			if (shiftBuy && me.getStat(14) + me.getStat(15) < oldGold) {
+            if (shiftBuy && me.getStat(Stats.gold) + me.getStat(Stats.goldbank) < oldGold) {
 				delay(500);
 
 				return true;
@@ -231,7 +233,7 @@ Unit.prototype.buy = function (shiftBuy, gamble) {
 // Item owner name
 Unit.prototype.__defineGetter__("parentName",
 	function () {
-		if (this.type !== 4) {
+        if (this.type !== UnitType.Item) {
 			throw new Error("Unit.parentName: Must be used with item units.");
 		}
 
@@ -250,11 +252,11 @@ Unit.prototype.sell = function () {
 		return Packet.sellItem(this);
 	}
 
-	if (this.type !== 4) { // Check if it's an item we want to buy
+    if (this.type !== UnitType.Item) { // Check if it's an item we want to buy
 		throw new Error("Unit.sell: Must be used on items.");
 	}
 
-	if (!getUIFlag(0xC)) { // Check if it's an item belonging to a NPC
+    if (!getUIFlag(UIFlags.Shop_open_at_NPC)) { // Check if it's an item belonging to a NPC
 		throw new Error("Unit.sell: Must be used in shops.");
 	}
 
@@ -281,22 +283,22 @@ Unit.prototype.sell = function () {
 };
 
 Unit.prototype.toCursor = function () {
-	if (this.type !== 4) {
+    if (this.type !== UnitType.Item) {
 		throw new Error("Unit.toCursor: Must be used with items.");
 	}
 
-	if (me.itemoncursor && this.mode === 4) {
+    if (me.itemoncursor && this.mode === ItemModes.Item_on_cursor) {
 		return true;
 	}
 
 	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
-		try {
-			if (this.mode === 1) {
-				clickItem(0, this.bodylocation); // fix for equipped items (cubing viper staff for example)
+        try {
+            if (this.mode === ItemModes.Item_equipped_self_or_merc) {
+				clickItem(ClickType.Left_Click, this.bodylocation); // fix for equipped items (cubing viper staff for example)
 			} else {
-				clickItem(0, this);
+                clickItem(ClickType.Left_Click, this);
 			}
 		} catch (e) {
 			return false;
@@ -319,7 +321,7 @@ Unit.prototype.toCursor = function () {
 };
 
 Unit.prototype.drop = function () {
-	if (this.type !== 4) {
+    if (this.type !== UnitType.Item) {
 		throw new Error("Unit.drop: Must be used with items.");
 	}
 
@@ -482,8 +484,8 @@ Unit.prototype.getSuffix = function (id) {
 Unit.prototype.__defineGetter__("dexreq",
 	function () {
 		var finalReq,
-			ethereal = this.getFlag(0x400000),
-			reqModifier = this.getStat(91),
+            ethereal = this.getFlag(ItemFlags.isEthereal),
+            reqModifier = this.getStat(Stats.item_req_percent),
 			baseReq = getBaseStat("items", this.classid, "reqdex");
 
 		finalReq = baseReq + Math.floor(baseReq * reqModifier / 100);
@@ -498,8 +500,8 @@ Unit.prototype.__defineGetter__("dexreq",
 Unit.prototype.__defineGetter__("strreq",
 	function () {
 		var finalReq,
-			ethereal = this.getFlag(0x400000),
-			reqModifier = this.getStat(91),
+            ethereal = this.getFlag(ItemFlags.isEthereal),
+            reqModifier = this.getStat(Stats.item_req_percent),
 			baseReq = getBaseStat("items", this.classid, "reqstr");
 
 		finalReq = baseReq + Math.floor(baseReq * reqModifier / 100);
@@ -513,15 +515,15 @@ Unit.prototype.__defineGetter__("strreq",
 
 Unit.prototype.__defineGetter__('itemclass',
 	function () {
-		if (getBaseStat(0, this.classid, 'code') === undefined) {
+        if (getBaseStat(BaseStat.items, this.classid, 'code') === undefined) {
 			return 0;
 		}
 
-		if (getBaseStat(0, this.classid, 'code') === getBaseStat(0, this.classid, 'ultracode')) {
+        if (getBaseStat(BaseStat.items, this.classid, 'code') === getBaseStat(BaseStat.items, this.classid, 'ultracode')) {
 			return 2;
 		}
 
-		if (getBaseStat(0, this.classid, 'code') === getBaseStat(0, this.classid, 'ubercode')) {
+        if (getBaseStat(BaseStat.items, this.classid, 'code') === getBaseStat(BaseStat.items, this.classid, 'ubercode')) {
 			return 1;
 		}
 
@@ -532,85 +534,85 @@ Unit.prototype.getStatEx = function (id, subid) {
 	var i, temp, rval, regex;
 
 	switch (id) {
-	case 20: // toblock
-		switch (this.classid) {
-		case 328: // buckler
-			return this.getStat(20);
-		case 413: // preserved
-		case 483: // mummified
-		case 503: // minion
-			return this.getStat(20) - 3;
-		case 329: // small
-		case 414: // zombie
-		case 484: // fetish
-		case 504: // hellspawn
-			return this.getStat(20) - 5;
-		case 331: // kite
-		case 415: // unraveller
-		case 485: // sexton
-		case 505: // overseer
-			return this.getStat(20) - 8;
-		case 351: // spiked
-		case 374: // deefender
-		case 416: // gargoyle
-		case 486: // cantor
-		case 506: // succubus
-		case 408: // targe
-		case 478: // akaran t
-			return this.getStat(20) - 10;
-		case 330: // large
-		case 375: // round
-		case 417: // demon
-		case 487: // hierophant
-		case 507: // bloodlord
-			return this.getStat(20) - 12;
-		case 376: // scutum
-			return this.getStat(20) - 14;
-		case 409: // rondache
-		case 479: // akaran r
-			return this.getStat(20) - 15;
-		case 333: // goth
-		case 379: // ancient
-			return this.getStat(20) - 16;
-		case 397: // barbed
-			return this.getStat(20) - 17;
-		case 377: // dragon
-			return this.getStat(20) - 18;
-		case 502: // vortex
-			return this.getStat(20) - 19;
-		case 350: // bone
-		case 396: // grim
-		case 445: // luna
-		case 467: // blade barr
-		case 466: // troll
-		case 410: // heraldic
-		case 480: // protector
-			return this.getStat(20) - 20;
-		case 444: // heater
-		case 447: // monarch
-		case 411: // aerin
-		case 481: // gilded
-		case 501: // zakarum
-			return this.getStat(20) - 22;
-		case 332: // tower
-		case 378: // pavise
-		case 446: // hyperion
-		case 448: // aegis
-		case 449: // ward
-			return this.getStat(20) - 24;
-		case 412: // crown
-		case 482: // royal
-		case 500: // kurast
-			return this.getStat(20) - 25;
-		case 499: // sacred r
-			return this.getStat(20) - 28;
-		case 498: // sacred t
-			return this.getStat(20) - 30;
+        case Stats.toblock: // toblock
+            switch (this.classid) {
+                case ItemClassIds.Buckler: // buckler
+                return this.getStat(Stats.toblock);
+                case ItemClassIds.Preserved_Head: // preserved
+		case ItemClassIds.Mummified_Trophy: // mummified
+        case ItemClassIds.Minion_Skull: // minion
+                return this.getStat(Stats.toblock) - 3;
+        case ItemClassIds.Small_Shield: // small
+        case ItemClassIds.Zombie_Head: // zombie
+        case ItemClassIds.Fetish_Trophy: // fetish
+        case ItemClassIds.Hellspawn_Skull: // hellspawn
+                return this.getStat(Stats.toblock) - 5;
+        case ItemClassIds.Kite_Shield: // kite
+        case ItemClassIds.Unraveller_Head: // unraveller
+        case ItemClassIds.Sexton_Trophy: // sexton
+        case ItemClassIds.Overseer_Skull: // overseer
+                return this.getStat(Stats.toblock) - 8;
+        case ItemClassIds.Spiked_Shield: // spiked
+        case ItemClassIds.Defender: // deefender
+        case ItemClassIds.Gargoyle_Head: // gargoyle
+        case ItemClassIds.Cantor_Trophy: // cantor
+        case ItemClassIds.Succubus_Skull: // succubus
+        case ItemClassIds.Targe: // targe
+        case ItemClassIds.Akaran_Targe: // akaran t
+                return this.getStat(Stats.toblock) - 10;
+        case ItemClassIds.Large_Shield: // large
+        case ItemClassIds.Round_Shield: // round
+        case ItemClassIds.Demon_Head: // demon
+        case ItemClassIds.Hierophant_Trophy: // hierophant
+        case ItemClassIds.Bloodlord_Skull: // bloodlord
+                return this.getStat(Stats.toblock) - 12;
+        case ItemClassIds.Scutum: // scutum
+                return this.getStat(Stats.toblock) - 14;
+        case ItemClassIds.Rondache: // rondache
+        case ItemClassIds.Akaran_Rondache: // akaran r
+                return this.getStat(Stats.toblock) - 15;
+        case ItemClassIds.Gothic_Shield: // goth
+        case ItemClassIds.Ancient_Shield: // ancient
+                return this.getStat(Stats.toblock) - 16;
+        case ItemClassIds.Barbed_Shield: // barbed
+                return this.getStat(Stats.toblock) - 17;
+        case ItemClassIds.Dragon_Shield: // dragon
+                return this.getStat(Stats.toblock) - 18;
+        case ItemClassIds.Vortex_Shield: // vortex
+                return this.getStat(Stats.toblock) - 19;
+        case ItemClassIds.Bone_Shield: // bone
+        case ItemClassIds.Grim_Shield: // grim
+        case ItemClassIds.Luna: // luna
+        case ItemClassIds.Blade_Barrier: // blade barr
+        case ItemClassIds.Troll_Nest: // troll
+        case ItemClassIds.Heraldic_Shield: // heraldic
+        case ItemClassIds.Protector_Shield: // protector
+                return this.getStat(Stats.toblock) - 20;
+        case ItemClassIds.Heater: // heater
+        case ItemClassIds.Monarch: // monarch
+        case ItemClassIds.Aerin_Shield: // aerin
+        case ItemClassIds.Gilded_Shield: // gilded
+        case ItemClassIds.Zakarum_Shield: // zakarum
+                return this.getStat(Stats.toblock) - 22;
+        case ItemClassIds.Tower_Shield: // tower
+        case ItemClassIds.Pavise: // pavise
+        case ItemClassIds.Hyperion: // hyperion
+        case ItemClassIds.Aegis: // aegis
+        case ItemClassIds.Ward: // ward
+                return this.getStat(Stats.toblock) - 24;
+        case ItemClassIds.Crown_Shield: // crown
+        case ItemClassIds.Royal_Shield: // royal
+        case ItemClassIds.Kurast_Shield: // kurast
+                return this.getStat(Stats.toblock) - 25;
+        case ItemClassIds.Sacred_Rondache: // sacred r
+                return this.getStat(Stats.toblock) - 28;
+        case ItemClassIds.Sacred_Targe: // sacred t
+                return this.getStat(Stats.toblock) - 30;
 		}
 
 		break;
-	case 21: // plusmindamage
-	case 22: // plusmaxdamage
+        case Stats.mindamage: // plusmindamage
+        case Stats.maxdamage: // plusmaxdamage
 		if (subid === 1) {
 			temp = this.getStat(-1);
 			rval = 0;
@@ -638,19 +640,19 @@ Unit.prototype.getStatEx = function (id, subid) {
 		}
 
 		break;
-	case 31: // plusdefense
+        case Stats.armorclass: // plusdefense
 		if (subid === 0) {
 			if ([0, 1].indexOf(this.mode) < 0) {
 				break;
 			}
 
-			switch (this.itemType) {
-			case 58: // jewel
-			case 82: // charms
-			case 83:
-			case 84:
+            switch (this.itemType) {
+                case NTItemTypes.jewel: // jewel
+                case NTItemTypes.smallcharm: // charms
+                case NTItemTypes.mediumcharm:
+                case NTItemTypes.largecharm:
 				// defense is the same as plusdefense for these items
-				return this.getStat(31);
+                    return this.getStat(Stats.armorclass);
 			}
 
 			if (!this.desc) {
@@ -670,17 +672,17 @@ Unit.prototype.getStatEx = function (id, subid) {
 		}
 
 		break;
-	case 57:
+        case Stats.poisonmindam:
 		if (subid === 1) {
-			return Math.round(this.getStat(57) * this.getStat(59) / 256);
+            return Math.round(this.getStat(Stats.poisonmindam) * this.getStat(Stats.poisonlength) / 256);
 		}
 
 		break;
-	case 83: // itemaddclassskills
+        case Stats.item_addclassskills: // itemaddclassskills
 		if (subid === undefined) {
 			for (i = 0; i < 7; i += 1) {
-				if (this.getStat(83, i)) {
-					return this.getStat(83, i);
+                if (this.getStat(Stats.item_addclassskills, i)) {
+                    return this.getStat(Stats.item_addclassskills, i);
 				}
 			}
 
@@ -688,13 +690,13 @@ Unit.prototype.getStatEx = function (id, subid) {
 		}
 
 		break;
-	case 188: // itemaddskilltab
+        case Stats.item_addskill_tab: // itemaddskilltab
 		if (subid === undefined) {
 			temp = [0, 1, 2, 8, 9, 10, 16, 17, 18, 24, 25, 26, 32, 33, 34, 40, 41, 42, 48, 49, 50];
 
 			for (i = 0; i < temp.length; i += 1) {
-				if (this.getStat(188, temp[i])) {
-					return this.getStat(188, temp[i]);
+                if (this.getStat(Stats.item_addskill_tab, temp[i])) {
+                    return this.getStat(Stats.item_addskill_tab, temp[i]);
 				}
 			}
 
@@ -702,9 +704,9 @@ Unit.prototype.getStatEx = function (id, subid) {
 		}
 
 		break;
-	case 195: // itemskillonattack
-	case 198: // itemskillonhit
-	case 204: // itemchargedskill
+        case Stats.item_skillonattack: // itemskillonattack
+        case Stats.item_skillonhit: // itemskillonhit
+        case Stats.item_charged_skill: // itemchargedskill
 		if (subid === undefined) {
 			temp = this.getStat(-2);
 
@@ -726,7 +728,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 		break;
 	}
 
-	if (this.getFlag(0x04000000)) { // Runeword
+    if (this.getFlag(ItemFlags.isRuneword)) { // Runeword
 		switch (id) {
 		case 16: // enhanceddefense
 			if ([0, 1].indexOf(this.mode) < 0) {
@@ -814,17 +816,23 @@ Unit.prototype.getColor = function () {
 			white: 20
 		};
 
-	// check type
-	if ([2, 3, 15, 16, 19, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 42, 43, 44, 67, 68, 71, 72, 85, 86, 87, 88].indexOf(this.itemType) === -1) {
+    // check type
+    
+    if ([NTItemTypes.shield, NTItemTypes.armor, NTItemTypes.boots, NTItemTypes.gloves, NTItemTypes.belt,
+        NTItemTypes.scepter, NTItemTypes.wand, NTItemTypes.staff, NTItemTypes.bow, NTItemTypes.axe,
+        NTItemTypes.club, NTItemTypes.sword, NTItemTypes.hammer, NTItemTypes.knife, NTItemTypes.spear,
+        NTItemTypes.polearm, NTItemTypes.crossbow, NTItemTypes.mace, NTItemTypes.helm, NTItemTypes.throwingknife,
+        NTItemTypes.throwingaxe, NTItemTypes.javelin, NTItemTypes.handtohand, NTItemTypes.orb, NTItemTypes.primalhelm,
+        NTItemTypes.pelt, NTItemTypes.amazonbow, NTItemTypes.amazonspear, NTItemTypes.amazonjavelin, NTItemTypes.assassinclaw].indexOf(this.itemType) === -1) {
 		return -1;
 	}
 
-	// check quality
-	if ([4, 5, 6, 7].indexOf(this.quality) === -1) {
+    // check quality
+    if ([ItemQuality.Magic, ItemQuality.Set, ItemQuality.Rare, ItemQuality.Unique].indexOf(this.quality) === -1) {
 		return -1;
 	}
 
-	if (this.quality === 4 || this.quality === 6) {
+    if (this.quality === ItemQuality.Magic || this.quality === ItemQuality.Rare) {
 		colors = {
 			"Screaming": Color.orange,
 			"Howling": Color.orange,
@@ -973,12 +981,12 @@ Unit.prototype.getColor = function () {
 			"of Wizardry": Color.darkgold
 		};
 
-		switch (this.itemType) {
-		case 15: // boots
+        switch (this.itemType) {
+            case NTItemTypes.boots: // boots
 			colors["of Precision"] = Color.darkgold;
 
 			break;
-		case 16: // gloves
+            case NTItemTypes.gloves: // gloves
 			colors["of Alacrity"] = Color.darkyellow;
 			colors["of the Leech"] = Color.crystalred;
 			colors["of the Bat"] = Color.crystalred;
@@ -986,20 +994,20 @@ Unit.prototype.getColor = function () {
 
 			break;
 		}
-	} else if (this.quality === 5) { // Set
-		if (this.getFlag(0x10)) {
+	} else if (this.quality === ItemQuality.Set) { // Set
+        if (this.getFlag(ItemFlags.isIdentified)) {
 			for (i = 0; i < 127; i += 1) {
-				if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(16, i, 3))) > -1) {
-					return getBaseStat(16, i, 12) > 20 ? -1 : getBaseStat(16, i, 12);
+                if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(BaseStat.setitems, i, 3))) > -1) {
+                    return getBaseStat(BaseStat.setitems, i, 12) > 20 ? -1 : getBaseStat(BaseStat.setitems, i, 12);
 				}
 			}
 		} else {
 			return Color.lightyellow; // Unidentified set item
 		}
-	} else if (this.quality === 7) { // Unique
+	} else if (this.quality === ItemQuality.Unique) { // Unique
 		for (i = 0; i < 401; i += 1) {
-			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
-				return getBaseStat(17, i, 13) > 20 ? -1 : getBaseStat(17, i, 13);
+            if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(BaseStat.uniqueitems, i, 2))) > -1) {
+                return getBaseStat(BaseStat.uniqueitems, i, 13) > 20 ? -1 : getBaseStat(BaseStat.uniqueitems, i, 13);
 			}
 		}
 	}

@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Works in conjunction with OrgTorch script. Allows the uber killer to get keys from other profiles.
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var TorchSystem = {
 	LogKeys: false,
@@ -34,13 +35,13 @@ var TorchSystem = {
 
 		// Edit here!
 
-		"PROFILE NAME": { // Farmer profile name
-			// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
-			KeyFinderProfiles: [""],
-
-			// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
-			FarmGame: ""
-		}
+		//"CrenoxTorch1": { // Farmer profile name
+		//	// Put key finder profiles here. Example - KeyFinderProfiles: ["MF 1", "MF 2"],
+		//	KeyFinderProfiles: ["crx3", "crx11"],
+        //
+		//	// Put the game name of uber killer here (without numbers). Key finders will join this game to drop keys. Example - FarmGame: "Ubers-",
+		//	FarmGame: ""
+		//}
 
 // #################################################################################
 	},
@@ -168,7 +169,7 @@ var TorchSystem = {
 					}
 				}
 
-				if (me.getStat(14) >= 100000) {
+                if (me.getStat(Stats.gold) >= 100000) {
 					gold(100000);
 				}
 

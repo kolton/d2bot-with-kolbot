@@ -1,3 +1,5 @@
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 var AutoMule = {
 	Mules: {
 		"Mule1":  {
@@ -414,18 +416,18 @@ MainLoop:
 			return false;
 		}
 
-		item = me.getItem(-1, 0);
+        item = me.getItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 		items = [];
 
 		if (item) {
 			do {
 				if (Town.ignoredItemTypes.indexOf(item.itemType) === -1 &&
-						(Pickit.checkItem(item).result > 0 || (item.location === 7 && info.muleInfo.hasOwnProperty("muleOrphans") && info.muleInfo.muleOrphans)) &&
-						item.classid !== 549 && // Don't drop Horadric Cube
-						(item.classid !== 603 || item.quality !== 7) && // Don't drop Annihilus
-						(item.classid !== 604 || item.quality !== 7) && // Don't drop Hellfire Torch
-						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
-						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
+                    (Pickit.checkItem(item).result > 0 || (item.location === ItemLocation.Stash && info.muleInfo.hasOwnProperty("muleOrphans") && info.muleInfo.muleOrphans)) &&
+                    item.classid !== ItemClassIds.Horadric_Cube && // Don't drop Horadric Cube
+                    (item.classid !== ItemClassIds.Small_Charm || item.quality !== ItemQuality.Unique) && // Don't drop Annihilus
+                    (item.classid !== ItemClassIds.Large_Charm || item.quality !== ItemQuality.Unique) && // Don't drop Hellfire Torch
+                    (item.location === ItemLocation.Stash || (item.location === ItemLocation.Inventory && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
+                    ((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [ItemClassIds.Key_Of_Terror, ItemClassIds.Key_Of_Hate, ItemClassIds.Key_Of_Destruction].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
 						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) { // Don't drop Runeword/Cubing/CraftingSystem ingredients
 					items.push(copyUnit(item));
 				}
@@ -487,7 +489,7 @@ MainLoop:
 		var item;
 
 		if (dropAnni) {
-			item = me.findItem(603, 0, -1, 7);
+            item = me.findItem(ItemClassIds.Small_Charm, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, -1, ItemQuality.Unique);
 
 			if (item && !Storage.Inventory.IsLocked(item, Config.Inventory)) {
 				D2Bot.printToConsole("AutoMule: Transfering Anni.", 7);
@@ -501,7 +503,7 @@ MainLoop:
 			return false;
 		}
 
-		item = me.findItem(604, 0, -1, 7);
+        item = me.findItem(ItemClassIds.Large_Charm, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, -1, ItemQuality.Unique);
 
 		if (item) {
 			D2Bot.printToConsole("AutoMule: Transfering Torch.", 7);

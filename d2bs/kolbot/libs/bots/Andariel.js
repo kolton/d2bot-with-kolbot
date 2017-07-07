@@ -3,11 +3,12 @@
 *	@author		kolton
 *	@desc		kill Andariel
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Andariel() {
 	this.killAndariel = function () {
 		var i,
-			target = getUnit(1, 156);
+            target = getUnit(UnitType.NPC, UnitClassID.andariel);
 
 		if (!target) {
 			throw new Error("Andariel not found.");
@@ -15,7 +16,7 @@ function Andariel() {
 
 		if (Config.MFLeader) {
 			Pather.makePortal();
-			say("kill " + 156);
+            say("kill " + UnitClassID.andariel);
 		}
 
 		for (i = 0; i < 300; i += 1) {
@@ -34,19 +35,19 @@ function Andariel() {
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(35);
+    Pather.useWaypoint(Areas.Act1.Catacombs_Level_2);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([36, 37], true)) {
+    if (!Pather.moveToExit([Areas.Act1.Catacombs_Level_3, Areas.Act1.Catacombs_Level_4], true)) {
 		throw new Error("Failed to move to Catacombs Level 4");
 	}
 
 	Pather.moveTo(22549, 9520);
 
-	if (me.classid === 1 && me.gametype === 0) {
+    if (me.classid === ClassID.Sorceress && me.gametype === GameType.Classic) {
 		this.killAndariel();
 	} else {
-		Attack.kill(156); // Andariel
+        Attack.kill(UnitClassID.andariel); // Andariel
 	}
 
 	delay(2000); // Wait for minions to die.

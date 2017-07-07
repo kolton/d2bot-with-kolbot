@@ -19,6 +19,7 @@ js_strict(true);
 if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
 if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
 if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var AutoBuildTemplate = {
 
@@ -28,7 +29,7 @@ var AutoBuildTemplate = {
 			Update: function () {
 			
 				Scripts.ClearAnyArea = true;							// We are only level 1 so we will start by clearing Blood Moor
-					Config.ClearAnyArea.AreaList = [2];
+                    Config.ClearAnyArea.AreaList = [Areas.Act1.Blood_Moor];
 				Config.ClearType = 0; 									// Monster spectype to kill in level clear scripts (0 = all)
 				
 				// Config.PickitFiles.push("level/1.nip");				// File "level/1.nip" is not included, it's just an example.
@@ -36,17 +37,17 @@ var AutoBuildTemplate = {
 				Config.OpenChests		= true; 						// Open chests. Controls key buying.
 				Config.LogExperience	= false; 						// Print experience statistics in the manager.
 				Config.StashGold 		= 200;							// Minimum amount of gold to stash.
-				Config.AttackSkill		= [0, 36, -1, 36, 36, 0, 0];	// At level 1 we start with a +1 Fire Bolt staff
-				Config.LowManaSkill		= [0, 0];
+                Config.AttackSkill      = [Skills.common.Attack, Skills.Sorceress.Fire_Bolt, Skills.None, Skills.Sorceress.Fire_Bolt, Skills.Sorceress.Fire_Bolt, Skills.common.Attack, Skills.common.Attack];	// At level 1 we start with a +1 Fire Bolt staff
+                Config.LowManaSkill     = [Skills.common.Attack, Skills.common.Attack];
 				Config.PublicMode		= 1;
-				Config.ScanShrines		= [15, 13, 12, 14, 7, 6, 2];	
+                Config.ScanShrines = [Shrines.experience, Shrines.mana_recharge, Shrines.skill, Shrines.stamina, Shrines.combat, Shrines.armor, Shrines.health];	
 				Config.BeltColumn		= ["hp", "hp", "hp", "mp"];		// Keep tons of health potions!
 			}
 		},
 		
 	2:	{
-			SkillPoints: [36], 											// Fire Bolt + 1
-			StatPoints: [0, 3, 3, 3, 3],								// Strength + 1 , Vitality + 4
+            SkillPoints: [Skills.Sorceress.Fire_Bolt], 											// Fire Bolt + 1
+            StatPoints: [Stats.strength, Stats.vitality, Stats.vitality, Stats.vitality, Stats.vitality],								// Strength + 1 , Vitality + 4
 			Update: function () {
 				// Config.PickitFiles.splice(Config.PickitFiles.indexOf("level/1.nip"), 1);	// Will remove index "level/1.nip" from Config.PickitFiles
 				// Config.PickitFiles.push("level/2.nip");
@@ -56,16 +57,16 @@ var AutoBuildTemplate = {
 		},
 		
 	3:	{
-			SkillPoints: [39], 										// Ice Bolt + 1
-			StatPoints: [0, 0, 3, 3, 3],							// Strength + 2 , Vitality + 3
+            SkillPoints: [Skills.Sorceress.Ice_Bolt], 										// Ice Bolt + 1
+            StatPoints: [Stats.strength, Stats.strength, Stats.vitality, Stats.vitality, Stats.vitality],							// Strength + 2 , Vitality + 3
 			Update: function () {
-				Config.AttackSkill = [39, 36, -1, 36, 0, 0, 0];		// Ice Bolt and Fire Bolt
+                Config.AttackSkill = [Skills.Sorceress.Ice_Bolt, Skills.Sorceress.Fire_Bolt, Skills.None, Skills.Sorceress.Fire_Bolt, Skills.common.Attack, Skills.common.Attack, Skills.common.Attack];		// Ice Bolt and Fire Bolt
 			}
 		},
 		
 	4:	{
-			SkillPoints: [37],											// Warmth + 1
-			StatPoints: [0, 0, 0, 3, 3],							// Strength + 3 , Vitality + 2
+            SkillPoints: [Skills.Sorceress.Warmth],											// Warmth + 1
+            StatPoints: [Stats.strength, Stats.strength, Stats.strength, Stats.vitality, Stats.vitality],							// Strength + 3 , Vitality + 2
 			Update: function () {
 				Scripts.Corpsefire = true;							// Lets try Corpsefire now that we're level 4
 					Config.Corpsefire.ClearDen = true;
@@ -79,23 +80,23 @@ var AutoBuildTemplate = {
 		},
 
 	5:	{
-			SkillPoints: [38],											// Charged Bolt + 1
-			StatPoints: [0, 0, 0, 0, 3],							// Strength + 4 , Vitality + 1
+            SkillPoints: [Skills.Sorceress.Charged_Bolt],											// Charged Bolt + 1
+            StatPoints: [Stats.strength, Stats.strength, Stats.strength, Stats.strength, Stats.vitality],							// Strength + 4 , Vitality + 1
 			Update: function () {
 				
 				Scripts.ClearAnyArea = true;						// Now we'll try enabling it again Cold Plains and Stony Field
-					Config.ClearAnyArea.AreaList = [3, 4]; 				
+                Config.ClearAnyArea.AreaList = [Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field]; 				
 				
-				Config.ScanShrines	= [15, 13, 12];
-				Config.AttackSkill 	= [39, 36, -1, 38, 0, 39, 0];	// All the bolts!
+                Config.ScanShrines = [Shrines.experience, Shrines.mana_recharge, Shrines.skill];
+                Config.AttackSkill = Skills.common.Attack, Skills.Sorceress.Fire_Bolt, Skills.None, Skills.Sorceress.Charged_Bolt, Skills.common.Attack, Skills.Sorceress.Ice_Bolt, Skills.common.Attack];	// All the bolts!
 			}
 		},
 
 	6:	{
-			SkillPoints: [36],											// Fire Bolt + 1
-			StatPoints: [0, 0, 3, 3, 2],							// Strength + 2 , Vitality + 2, Dexterity + 1
+            SkillPoints: [Skills.Sorceress.Fire_Bolt],											// Fire Bolt + 1
+            StatPoints: [Stats.strength, Stats.strength, Stats.vitality, Stats.vitality, Stats.dexterity],							// Strength + 2 , Vitality + 2, Dexterity + 1
 			Update: function () {
-				Config.AttackSkill = [39, 36, -1, 36, 0, 38, 0];	// All the bolts!
+                Config.AttackSkill = [Skills.Sorceress.Ice_Bolt, Skills.Sorceress.Fire_Bolt, Skills.None, Skills.Sorceress.Fire_Bolt, Skills.common.Attack, Skills.Sorceress.Charged_Bolt, Skills.common.Attack];	// All the bolts!
 			}
 		},
 

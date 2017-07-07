@@ -3,10 +3,11 @@
 *	@author		kolton
 *	@desc		kill seal bosses and Diablo
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function FastDiablo() {
 	this.getLayout = function (seal, value) {
-		var sealPreset = getPresetUnit(108, 2, seal);
+        var sealPreset = getPresetUnit(Areas.Act4.Chaos_Sanctuary, UnitType.Object, seal);
 
 		if (!seal) {
 			throw new Error("Seal preset not found");
@@ -20,14 +21,14 @@ function FastDiablo() {
 	};
 
 	this.initLayout = function () {
-		this.vizLayout = this.getLayout(396, 5275);
-		this.seisLayout = this.getLayout(394, 7773);
-		this.infLayout = this.getLayout(392, 7893);
+        this.vizLayout = this.getLayout(UniqueObjectIds.Diablo_Seal5, 5275);
+        this.seisLayout = this.getLayout(UniqueObjectIds.Diablo_Seal3, 7773);
+        this.infLayout = this.getLayout(UniqueObjectIds.Diablo_Seal1, 7893);
 	};
 
 	this.getBoss = function (name) {
 		var i, boss,
-			glow = getUnit(2, 131);
+            glow = getUnit(UnitType.Object, UniqueObjectIds.Vile_Dog_Afterglow);
 
 		for (i = 0; i < 24; i += 1) {
 			boss = getUnit(1, name);
@@ -55,103 +56,103 @@ function FastDiablo() {
 	this.chaosPreattack = function (name, amount) {
 		var i, n, target, positions;
 
-		switch (me.classid) {
-		case 0:
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			target = getUnit(1, name);
+        switch (me.classid) {
+            case ClassID.Amazon:
+                break;
+            case ClassID.Sorceress:
+                break;
+            case ClassID.Necromancer:
+                break;
+            case ClassID.Paladin:
+                target = getUnit(UnitType.NPC, name);
 
-			if (!target) {
-				return;
-			}
+                if (!target) {
+                    return;
+                }
 
-			positions = [[6, 11], [0, 8], [8, -1], [-9, 2], [0, -11], [8, -8]];
+                positions = [[6, 11], [0, 8], [8, -1], [-9, 2], [0, -11], [8, -8]];
 
-			for (i = 0; i < positions.length; i += 1) {
-				if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
-					Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
-					Skill.setSkill(Config.AttackSkill[2], 0);
+                for (i = 0; i < positions.length; i += 1) {
+                    if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
+                        Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
+                        Skill.setSkill(Config.AttackSkill[2], 0);
 
-					for (n = 0; n < amount; n += 1) {
-						Skill.cast(Config.AttackSkill[1], 1);
-					}
+                        for (n = 0; n < amount; n += 1) {
+                            Skill.cast(Config.AttackSkill[1], 1);
+                        }
 
-					break;
-				}
-			}
+                        break;
+                    }
+                }
 
-			break;
-		case 4:
-			break;
-		case 5:
-			break;
-		case 6:
-			break;
-		}
+                break;
+            case ClassID.Barbarian:
+                break;
+            case ClassID.Druid:
+                break;
+            case ClassID.Assassin:
+                break;
+        }
 	};
 
 	this.diabloPrep = function () {
 		var trapCheck,
 			tick = getTickCount();
 
-		while (getTickCount() - tick < 17500) {
+		while (getTickCount() - tick < 20000) {
 			if (getTickCount() - tick >= 8000) {
-				switch (me.classid) {
-				case 1: // Sorceress
-					if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
-						if (me.getState(121)) {
-							delay(500);
-						} else {
-							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
-						}
+                switch (me.classid) {
+                    case ClassID.Sorceress: // Sorceress
+                        if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+                            if (me.getState(States.SKILLDELAY)) {
+                                delay(500);
+                            } else {
+                                Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+                            }
 
-						break;
-					}
+                            break;
+                        }
 
-					delay(500);
+                        delay(500);
 
-					break;
-				case 3: // Paladin
-					Skill.setSkill(Config.AttackSkill[2]);
-					Skill.cast(Config.AttackSkill[1], 1);
+                        break;
+                    case ClassID.Paladin: // Paladin
+                        Skill.setSkill(Config.AttackSkill[2]);
+                        Skill.cast(Config.AttackSkill[1], 1);
 
-					break;
-				case 5: // Druid
-					if (Config.AttackSkill[1] === 245) {
-						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+                        break;
+                    case ClassID.Druid: // Druid
+                        if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
+                            Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
 
-						break;
-					}
+                            break;
+                        }
 
-					delay(500);
+                        delay(500);
 
-					break;
-				case 6: // Assassin
-					if (Config.UseTraps) {
-						trapCheck = ClassAttack.checkTraps({x: 7793, y: 5293});
+                        break;
+                    case ClassID.Assassin: // Assassin
+                        if (Config.UseTraps) {
+                            trapCheck = ClassAttack.checkTraps({ x: 7793, y: 5293 });
 
-						if (trapCheck) {
-							ClassAttack.placeTraps({x: 7793, y: 5293, classid: 243}, trapCheck);
+                            if (trapCheck) {
+                                ClassAttack.placeTraps({ x: 7793, y: 5293, classid: UnitClassID.diablo }, trapCheck);
 
-							break;
-						}
-					}
+                                break;
+                            }
+                        }
 
-					delay(500);
+                        delay(500);
 
-					break;
-				default:
-					delay(500);
-				}
+                        break;
+                    default:
+                        delay(500);
+                }
 			} else {
 				delay(500);
 			}
 
-			if (getUnit(1, 243)) {
+            if (getUnit(UnitType.NPC, UnitClassID.diablo)) {
 				return true;
 			}
 		}
@@ -163,14 +164,14 @@ function FastDiablo() {
 		var i, j, seal;
 
 		for (i = 0; i < 5; i += 1) {
-			Pather.moveToPreset(108, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
+            Pather.moveToPreset(Areas.Act4.Chaos_Sanctuary, UnitType.Object, classid, classid === UniqueObjectIds.Diablo_Seal3 ? 5 : 2, classid === UniqueObjectIds.Diablo_Seal3 ? 5 : 0);
 
 			if (i > 1) {
 				Attack.clear(10);
 			}
 
 			for (j = 0; j < 3; j += 1) {
-				seal = getUnit(2, classid);
+                seal = getUnit(UnitType.Object, classid);
 
 				if (seal) {
 					break;
@@ -188,10 +189,10 @@ function FastDiablo() {
 			}
 
 			sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
-			delay(classid === 394 ? 1000 : 500);
+            delay(classid === UniqueObjectIds.Diablo_Seal3 ? 1000 : 500);
 
 			if (!seal.mode) {
-				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
+                if (classid === UniqueObjectIds.Diablo_Seal3 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
 					Pather.moveTo(seal.x + 15, seal.y);
 				} else {
 					Pather.moveTo(seal.x - 5, seal.y - 5);
@@ -207,11 +208,11 @@ function FastDiablo() {
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(107);
+    Pather.useWaypoint(Areas.Act4.River_Of_Flame);
 	Precast.doPrecast(true);
 	this.initLayout();
-	this.openSeal(395);
-	this.openSeal(396);
+    this.openSeal(UniqueObjectIds.Diablo_Seal4);
+    this.openSeal(UniqueObjectIds.Diablo_Seal5);
 
 	if (this.vizLayout === 1) {
 		Pather.moveTo(7691, 5292);
@@ -223,7 +224,7 @@ function FastDiablo() {
 		throw new Error("Failed to kill Vizier");
 	}
 
-	this.openSeal(394);
+    this.openSeal(UniqueObjectIds.Diablo_Seal3);
 
 	if (this.seisLayout === 1) {
 		Pather.moveTo(7771, 5196);
@@ -235,8 +236,8 @@ function FastDiablo() {
 		throw new Error("Failed to kill de Seis");
 	}
 
-	this.openSeal(392);
-	this.openSeal(393);
+    this.openSeal(UniqueObjectIds.Diablo_Seal1);
+    this.openSeal(UniqueObjectIds.Diablo_Seal2);
 
 	if (this.infLayout === 1) {
 		delay(1);
@@ -250,7 +251,7 @@ function FastDiablo() {
 
 	Pather.moveTo(7788, 5292);
 	this.diabloPrep();
-	Attack.kill(243); // Diablo
+    Attack.kill(UnitClassID.diablo); // Diablo
 	Pickit.pickItems();
 
 	return true;

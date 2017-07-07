@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Rushee script that works with Rusher
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Rushee() {
 	var act, leader, target,
@@ -20,19 +21,19 @@ function Rushee() {
 
 	// Get leader's act from Party Unit
 	this.checkLeaderAct = function (unit) {
-		if (unit.area <= 39) {
+        if (unit.area <= Areas.Act1.Moo_Moo_Farm) {
 			return 1;
 		}
 
-		if (unit.area >= 40 && unit.area <= 74) {
+        if (unit.area >= Areas.Act2.Lut_Gholein && unit.area <= Areas.Act2.Arcane_Sanctuary) {PlayerModes.Dead
 			return 2;
 		}
 
-		if (unit.area >= 75 && unit.area <= 102) {
+        if (unit.area >= Areas.Act3.Kurast_Docktown && unit.area <= Areas.Act3.Durance_Of_Hate_Level_3) {
 			return 3;
 		}
 
-		if (unit.area >= 103 && unit.area <= 108) {
+        if (unit.area >= Areas.Act4.The_Pandemonium_Fortress && unit.area <= Areas.Act4.Chaos_Sanctuary) {
 			return 4;
 		}
 
@@ -40,11 +41,11 @@ function Rushee() {
 	};
 
 	this.revive = function () {
-		while (me.mode === 0) {
+        while (me.mode === PlayerModes.Death) {
 			delay(40);
 		}
 
-		if (me.mode === 17) {
+        if (me.mode === PlayerModes.Dead) {
 			me.revive();
 
 			while (!me.inTown) {
@@ -72,7 +73,7 @@ function Rushee() {
 			return false;
 		}
 
-		chest = getUnit(2, chestid);
+        chest = getUnit(UnitType.Object, chestid);
 
 		if (!chest) {
 			return false;
@@ -80,7 +81,7 @@ function Rushee() {
 
 		Misc.openChest(chest);
 
-		item = getUnit(4, classid);
+        item = getUnit(UnitType.Item, classid);
 
 		if (!item) {
 			if (getTickCount() - tick < 500) {
@@ -94,10 +95,10 @@ function Rushee() {
 	};
 
 	this.checkQuestMonster = function (classid) {
-		var monster = getUnit(1, classid);
+        var monster = getUnit(UnitType.NPC, classid);
 
 		if (monster) {
-			while (monster.mode !== 12 && monster.mode !== 0) {
+            while (monster.mode !== NPCModes.dead && monster.mode !== NPCModes.death) {
 				delay(500);
 			}
 
@@ -157,7 +158,7 @@ function Rushee() {
 	this.placeStaff = function () {
 		var staff, item,
 			tick = getTickCount(),
-			orifice = getUnit(2, 152);
+            orifice = getUnit(UnitType.Object, UniqueObjectIds.Holder_For_Horadric_Staff);
 
 		if (!orifice) {
 			return false;
@@ -165,7 +166,7 @@ function Rushee() {
 
 		Misc.openChest(orifice);
 
-		staff = me.getItem(91);
+        staff = me.getItem(ItemClassIds.Horadric_Staff);
 
 		if (!staff) {
 			if (getTickCount() - tick < 500) {
@@ -180,7 +181,7 @@ function Rushee() {
 		delay(750 + me.ping);
 
 		// unbug cursor
-		item = me.findItem(-1, 0, 3);
+        item = me.findItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 		if (item && item.toCursor()) {
 			Storage.Inventory.MoveTo(item);
@@ -193,7 +194,7 @@ function Rushee() {
 		var npc,
 			preArea = me.area;
 
-		if (me.mode === 17) {
+        if (me.mode === PlayerModes.Dead) {
 			me.revive();
 
 			while (!me.inTown) {
@@ -214,13 +215,13 @@ function Rushee() {
 
 				Town.move("warriv");
 
-				npc = getUnit(1, "warriv");
+                npc = getUnit(UnitType.NPC, "warriv");
 
 				if (!npc || !npc.openMenu()) {
 					return false;
 				}
 
-				Misc.useMenu(0x0D36);
+                Misc.useMenu(NPCMenu.Go_East);
 
 				break;
 			case 3:
@@ -228,10 +229,10 @@ function Rushee() {
 					break;
 				}
 
-				Pather.usePortal(50, Config.Leader);
-				Pather.moveToExit(40, true);
+                Pather.usePortal(Areas.Act2.Harem_Level_1, Config.Leader);
+                Pather.moveToExit(Areas.Act2.Lut_Gholein, true);
 
-				npc = getUnit(1, "jerhyn");
+                npc = getUnit(UnitType.NPC, "jerhyn");
 
 				if (!npc || !npc.openMenu()) {
 					Pather.moveTo(5166, 5206);
@@ -240,8 +241,8 @@ function Rushee() {
 				}
 
 				me.cancel();
-				Pather.moveToExit(50, true);
-				Pather.usePortal(40, Config.Leader);
+                Pather.moveToExit(Areas.Act2.Harem_Level_1, true);
+                Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader);
 				Town.move("meshif");
 
 				npc = getUnit(1, "meshif");
@@ -250,7 +251,7 @@ function Rushee() {
 					return false;
 				}
 
-				Misc.useMenu(0x0D38);
+                Misc.useMenu(NPCMenu.Sail_East);
 
 				break;
 			case 4:
@@ -261,14 +262,14 @@ function Rushee() {
 				if (me.inTown) {
 					Town.move("cain");
 
-					npc = getUnit(1, "deckard cain");
+                    npc = getUnit(UnitType.NPC, "deckard cain");
 
 					if (!npc || !npc.openMenu()) {
 						return false;
 					}
 
 					me.cancel();
-					Pather.usePortal(102, Config.Leader);
+                    Pather.usePortal(Areas.Act3.Durance_Of_Hate_Level_3, Config.Leader);
 				} else {
 					delay(1500);
 				}
@@ -284,7 +285,7 @@ function Rushee() {
 
 				Town.move("tyrael");
 
-				npc = getUnit(1, "tyrael");
+                npc = getUnit(UnitType.NPC, "tyrael");
 
 				if (!npc || !npc.openMenu()) {
 					return false;
@@ -292,11 +293,11 @@ function Rushee() {
 
 				delay(me.ping + 1);
 
-				if (getUnit(2, 566)) {
+                if (getUnit(UnitType.Object, UniqueObjectIds.Harrogath_LastPortal)) {
 					me.cancel();
-					Pather.useUnit(2, 566, 109);
+                    Pather.useUnit(UnitType.Object, UniqueObjectIds.Harrogath_LastPortal, Areas.Act5.Harrogath);
 				} else {
-					Misc.useMenu(0x58D2);
+                    Misc.useMenu(NPCMenu.Travel_to_Harrogath);
 				}
 
 				break;
@@ -350,13 +351,13 @@ function Rushee() {
 				switch (actions[0]) {
 				case "all in":
 					switch (leader.area) {
-					case 49: // Pick Book of Skill, use Book of Skill
+                        case Areas.Act2.A2_Sewers_Level_3: // Pick Book of Skill, use Book of Skill
 						Town.move("portalspot");
-						Pather.usePortal(49, Config.Leader);
+                        Pather.usePortal(Areas.Act2.A2_Sewers_Level_3, Config.Leader);
 						delay(500);
 
 						while (true) {
-							target = getUnit(4, 552);
+                            target = getUnit(UnitType.Item, ItemClassIds.Book_Of_Skill);
 
 							if (!target) {
 								break;
@@ -365,15 +366,15 @@ function Rushee() {
 							Pickit.pickItem(target);
 							delay(250);
 
-							if (me.getItem(552)) {
+                            if (me.getItem(ItemClassIds.Book_Of_Skill)) {
 								print("Using book of skill");
-								clickItem(1, me.getItem(552));
+                                clickItem(ClickType.Right_Click, me.getItem(ItemClassIds.Book_Of_Skill));
 
 								break;
 							}
 						}
 
-						Pather.usePortal(40, Config.Leader);
+                        Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader);
 						actions.shift();
 
 						break;
@@ -404,8 +405,8 @@ function Rushee() {
 					}
 
 					switch (leader.area) {
-					case 37: // Catacombs level 4
-						if (!Pather.usePortal(37, Config.Leader)) {
+                        case Areas.Act1.Catacombs_Level_4: // Catacombs level 4
+                            if (!Pather.usePortal(Areas.Act1.Catacombs_Level_4, Config.Leader)) {
 							break;
 						}
 
@@ -418,29 +419,29 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 49:
+                        case Areas.Act2.A2_Sewers_Level_3:
 						Town.move("portalspot");
 
-						if (Pather.usePortal(49, Config.Leader)) {
+                        if (Pather.usePortal(Areas.Act2.A2_Sewers_Level_3, Config.Leader)) {
 							actions.shift();
 						}
 
 						break;
-					case 60: // Halls of the Dead level 3
-						Pather.usePortal(60, Config.Leader);
-						this.getQuestItem(549, 354);
-						Pather.usePortal(40, Config.Leader);
+                        case Areas.Act2.Halls_Of_The_Dead_Level_3: // Halls of the Dead level 3
+                            Pather.usePortal(Areas.Act2.Halls_Of_The_Dead_Level_3, Config.Leader);
+                            this.getQuestItem(ItemClassIds.Horadric_Cube, ItemClassIds.Casque);
+                        Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader);
 
 						actions.shift();
 
 						break;
-					case 61: // Claw Viper Temple level 2
-						Pather.usePortal(61, Config.Leader);
-						this.getQuestItem(521, 149);
-						Pather.usePortal(40, Config.Leader);
+                        case Areas.Act2.Claw_Viper_Temple_Level_2: // Claw Viper Temple level 2
+                            Pather.usePortal(Areas.Act2.Claw_Viper_Temple_Level_2, Config.Leader);
+                            this.getQuestItem(ItemClassIds.Viper_Amulet, ItemClassIds.Lance);
+                        Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader);
 						Town.move("drognan");
 
-						target = getUnit(1, "drognan");
+                        target = getUnit(UnitType.NPC, "drognan");
 
 						if (target && target.openMenu()) {
 							actions.shift();
@@ -451,46 +452,46 @@ function Rushee() {
 						Town.move("portalspot");
 
 						break;
-					case 64: // Maggot Lair level 3
-						Pather.usePortal(64, Config.Leader);
-						this.getQuestItem(92, 356);
+                        case Areas.Act2.Maggot_Lair_Level_3: // Maggot Lair level 3
+                            Pather.usePortal(Areas.Act2.Maggot_Lair_Level_3, Config.Leader);
+                            this.getQuestItem(ItemClassIds.Staff_of_Kings, ItemClassIds.Winged_Helm);
 						delay(500);
-						Pather.usePortal(40, Config.Leader);
+                        Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader);
 						this.cubeStaff();
 
 						actions.shift();
 
 						break;
-					case 74: // Arcane Sanctuary
-						if (!Pather.usePortal(74, Config.Leader)) {
+                        case Areas.Act2.Arcane_Sanctuary: // Arcane Sanctuary
+                            if (!Pather.usePortal(Areas.Act2.Arcane_Sanctuary, Config.Leader)) {
 							break;
 						}
 
 						actions.shift();
 
 						break;
-					case 66: // Tal Rasha's Tombs
-					case 67:
-					case 68:
-					case 69:
-					case 70:
-					case 71:
-					case 72:
+                        case Areas.Act2.Tal_Rashas_Tomb_1: // Tal Rasha's Tombs
+					case Areas.Act2.Tal_Rashas_Tomb_2:
+					case Areas.Act2.Tal_Rashas_Tomb_3:
+					case Areas.Act2.Tal_Rashas_Tomb_4:
+					case Areas.Act2.Tal_Rashas_Tomb_5:
+					case Areas.Act2.Tal_Rashas_Tomb_6:
+                    case Areas.Act2.Tal_Rashas_Tomb_7:
 						Pather.usePortal(null, Config.Leader);
 						this.placeStaff();
-						Pather.usePortal(40, Config.Leader);
+                        Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader);
 						actions.shift();
 
 						break;
-					case 73: // Duriel's Lair
-						Pather.usePortal(73, Config.Leader);
+                    case Areas.Act2.Duriels_Lair: // Duriel's Lair
+                            Pather.usePortal(Areas.Act2.Duriels_Lair, Config.Leader);
 						this.tyraelTalk();
 
 						actions.shift();
 
 						break;
-					case 83: // Travincal
-						if (!Pather.usePortal(83, Config.Leader)) {
+                    case Areas.Act3.Travincal: // Travincal
+                            if (!Pather.usePortal(Areas.Act3.Travincal, Config.Leader)) {
 							me.cancel();
 
 							break;
@@ -499,25 +500,25 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 94: // Ruined Temple
-						if (!Pather.usePortal(94, Config.Leader)) {
+                    case Areas.Act3.Ruined_Temple: // Ruined Temple
+                            if (!Pather.usePortal(Areas.Act3.Ruined_Temple, Config.Leader)) {
 							me.cancel();
 
 							break;
 						}
 
-						target = getUnit(2, 193);
+                            target = getUnit(UnitType.Object, UniqueObjectIds.Lam_Esens_Tome);
 
 						Misc.openChest(target);
 						delay(300);
 
-						target = getUnit(4, 548);
+                        target = getUnit(UnitType.Item, ItemClassIds.Lam_Esens_Tome);
 
 						Pickit.pickItem(target);
-						Pather.usePortal(75, Config.Leader);
+                        Pather.usePortal(Areas.Act3.Kurast_Docktown, Config.Leader);
 						Town.move("alkor");
 
-						target = getUnit(1, "alkor");
+                        target = getUnit(UnitType.NPC, "alkor");
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -527,8 +528,8 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 102: // Durance of Hate level 3
-						if (!Pather.usePortal(102, Config.Leader)) {
+                    case Areas.Act3.Durance_Of_Hate_Level_3: // Durance of Hate level 3
+                            if (!Pather.usePortal(Areas.Act3.Durance_Of_Hate_Level_3, Config.Leader)) {
 							me.cancel();
 
 							break;
@@ -537,21 +538,21 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 104: // sometimes the portal can be in city of the damned...
-					case 105:
+                    case Areas.Act4.Outer_Steppes: // sometimes the portal can be in city of the damned...
+                    case Areas.Act4.Plains_Of_Despair:
 						if (Pather.usePortal(null, Config.Leader)) {
 							actions.shift();
 						}
 
 						break;
-					case 108: // Chaos Sanctuary
-						Pather.usePortal(108, Config.Leader);
+                    case Areas.Act4.Chaos_Sanctuary: // Chaos Sanctuary
+                            Pather.usePortal(Areas.Act4.Chaos_Sanctuary, Config.Leader);
 						Pather.moveTo(7762, 5268);
 						Packet.flash(me.gid);
 						delay(500);
 						Pather.walkTo(7763, 5267, 2);
 
-						while (!getUnit(1, 243)) {
+                        while (!getUnit(UnitType.NPC, UnitClassID.diablo)) {
 							delay(500);
 						}
 
@@ -559,24 +560,24 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 110: // Bloody Foothils
-						Pather.usePortal(110, Config.Leader);
+                    case Areas.Act5.Bloody_Foothills: // Bloody Foothils
+                            Pather.usePortal(Areas.Act5.Bloody_Foothills, Config.Leader);
 						actions.shift();
 
 						break;
-					case 114: // Frozen River
+                    case Areas.Act5.Frozen_River: // Frozen River
 						Town.move("malah");
 
-						target = getUnit(1, "malah");
+                        target = getUnit(UnitType.NPC, "malah");
 
 						if (target && target.openMenu()) {
 							me.cancel();
 						}
 
-						Pather.usePortal(114, Config.Leader);
+                        Pather.usePortal(Areas.Act5.Frozen_River, Config.Leader);
 						delay(500);
 
-						target = getUnit(2, 558);
+                        target = getUnit(UnitType.Object, UniqueObjectIds.Frozen_Anya);
 
 						if (target) {
 							Pather.moveToUnit(target);
@@ -599,11 +600,11 @@ function Rushee() {
 					if (!Config.Rushee.Quester) {
 						switch (leader.area) {
 						// Non-questers can piggyback off quester out messages
-						case 110: // Shenk
+                            case Areas.Act5.Bloody_Foothills: // Shenk
 							if (me.act === 5) {
 								Town.move("larzuk");
 
-								target = getUnit(1, "larzuk");
+                                target = getUnit(UnitType.NPC, "larzuk");
 
 								if (target && target.openMenu()) {
 									me.cancel();
@@ -611,29 +612,29 @@ function Rushee() {
 							}
 
 							break;
-						case 114: // Anya
+                            case Areas.Act5.Frozen_River: // Anya
 							if (me.act === 5) {
 								Town.move("malah");
 
-								target = getUnit(1, "malah");
+                                target = getUnit(UnitType.NPC, "malah");
 
 								if (target && target.openMenu()) {
 									me.cancel();
 								}
 
-								if (me.getItem(646)) {
+                                if (me.getItem(ItemClassIds.Scroll_Of_Resistance)) {
 									print("Using scroll of resistance");
-									clickItem(1, me.getItem(646));
+                                    clickItem(ClickType.Right_Click, me.getItem(ItemClassIds.Scroll_Of_Resistance));
 								}
 							}
 
 							break;
-						case 104:
-						case 105:
-							if (me.act === 4 && this.checkQuest(25, 1)) {
+                            case Areas.Act4.Outer_Steppes:
+                            case Areas.Act4.Plains_Of_Despair:
+                                if (me.act === 4 && this.checkQuest(Quests.Act4.The_Fallen_Angel, 1)) {
 								Town.move(NPC.Tyrael);
 
-								target = getUnit(1, "tyrael");
+                                target = getUnit(UnitType.NPC, "tyrael");
 
 								if (target && target.openMenu()) {
 									me.cancel();
@@ -649,7 +650,7 @@ function Rushee() {
 					}
 
 					switch (me.area) {
-					case 37: // Catacombs level 4
+                        case Areas.Act1.Catacombs_Level_4: // Catacombs level 4
 						this.revive();
 
 						// Go to town if not there, break if procedure fails
@@ -657,7 +658,7 @@ function Rushee() {
 							break;
 						}
 
-						if (!this.checkQuest(6, 4)) {
+                        if (!this.checkQuest(Quests.Act1.Sisters_to_the_Slaughter, 4)) {
 							D2Bot.printToConsole("Andariel quest failed", 9);
 							quit();
 						}
@@ -665,26 +666,26 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 49: // Sewers 3
+                        case Areas.Act2.A2_Sewers_Level_3: // Sewers 3
 						this.revive();
 
-						if (!me.inTown && !Pather.usePortal(40, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader)) {
 							break;
 						}
 
 						actions.shift();
 
 						break;
-					case 74: // Arcane Sanctuary
+                        case Areas.Act2.Arcane_Sanctuary: // Arcane Sanctuary
 						this.revive();
 
-						if (!me.inTown && !Pather.usePortal(40, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act2.Lut_Gholein, Config.Leader)) {
 							break;
 						}
 
 						Town.move("atma");
 
-						target = getUnit(1, 176); // Atma
+                        target = getUnit(UnitType.NPC, UnitClassID.atma); // Atma
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -692,7 +693,7 @@ function Rushee() {
 							break;
 						}
 
-						if (!this.checkQuest(13, 0)) {
+                        if (!this.checkQuest(Quests.Act2.The_Summoner, 0)) {
 							D2Bot.printToConsole("Summoner quest failed", 9);
 							quit();
 						}
@@ -701,16 +702,16 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 83: // Travincal
+                        case Areas.Act3.Travincal: // Travincal
 						this.revive();
 
-						if (!me.inTown && !Pather.usePortal(75, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act3.Kurast_Docktown, Config.Leader)) {
 							break;
 						}
 
 						Town.move("cain");
 
-						target = getUnit(1, NPC.Cain);
+                        target = getUnit(UnitType.NPC, NPC.Cain);
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -718,7 +719,7 @@ function Rushee() {
 							break;
 						}
 
-						if (!this.checkQuest(21, 0)) {
+                        if (!this.checkQuest(Quests.Act3.The_Blackened_Temple, 0)) {
 							D2Bot.printToConsole("Travincal quest failed", 9);
 							quit();
 						}
@@ -727,28 +728,28 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 102: // Durance 2
+                        case Areas.Act3.Durance_Of_Hate_Level_3: // Durance 2
 						this.revive();
 
-						if (!Pather.usePortal(75, Config.Leader)) {
+                        if (!Pather.usePortal(75, Config.Leader)) {
 							break;
 						}
 
 						actions.shift();
 
 						break;
-					case 104:
-					case 105:
+                        case Areas.Act4.Outer_Steppes:
+                        case Areas.Act4.Plains_Of_Despair:
 						this.revive();
 
-						if (!me.inTown && !Pather.usePortal(103, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act4.The_Pandemonium_Fortress, Config.Leader)) {
 							break;
 						}
 
-						if (this.checkQuest(25, 1)) {
+                        if (this.checkQuest(Quests.Act4.The_Fallen_Angel, 1)) {
 							Town.move(NPC.Tyrael);
 
-							target = getUnit(1, "tyrael");
+                            target = getUnit(UnitType.NPC, "tyrael");
 
 							if (target && target.openMenu()) {
 								me.cancel();
@@ -760,32 +761,32 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 108: // Chaos Sanctuary
+                        case Areas.Act4.Chaos_Sanctuary: // Chaos Sanctuary
 						this.revive();
 
-						if (me.gametype === 0) {
+						if (me.gametype === GameType.Classic) {
 							D2Bot.restart();
 
 							break;
 						}
 
-						if (!me.inTown && !Pather.usePortal(103, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act4.The_Pandemonium_Fortress, Config.Leader)) {
 							break;
 						}
 
 						actions.shift();
 
 						break;
-					case 110: // Bloody Foothils
+                        case Areas.Act5.Bloody_Foothills: // Bloody Foothils
 						this.revive();
 
-						if (!me.inTown && !Pather.usePortal(109, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act5.Harrogath, Config.Leader)) {
 							break;
 						}
 
 						Town.move("larzuk");
 
-						target = getUnit(1, "larzuk");
+                        target = getUnit(UnitType.NPC, "larzuk");
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -795,24 +796,24 @@ function Rushee() {
 						actions.shift();
 
 						break;
-					case 114: // Frozen River
+                        case Areas.Act5.Frozen_River: // Frozen River
 						this.revive();
 
-						if (!me.inTown && !Pather.usePortal(109, Config.Leader)) {
+                        if (!me.inTown && !Pather.usePortal(Areas.Act5.Harrogath, Config.Leader)) {
 							break;
 						}
 
 						Town.move("malah");
 
-						target = getUnit(1, "malah");
+                        target = getUnit(UnitType.NPC, "malah");
 
 						if (target && target.openMenu()) {
 							me.cancel();
 						}
 
-						if (me.getItem(646)) {
+                        if (me.getItem(ItemClassIds.Scroll_Of_Resistance)) {
 							print("Using Scroll of Resistance");
-							clickItem(1, me.getItem(646));
+                            clickItem(ClickType.Right_Click, me.getItem(ItemClassIds.Scroll_Of_Resistance));
 						}
 
 						Town.move("portalspot");
@@ -846,30 +847,30 @@ function Rushee() {
 					}
 
 					switch (leader.area) {
-					case 120: // Arreat Summit
-						if (!Pather.usePortal(120, Config.Leader)) {
+                        case Areas.Act5.Arreat_Summit: // Arreat Summit
+                            if (!Pather.usePortal(Areas.Act5.Arreat_Summit, Config.Leader)) {
 							break;
 						}
 
 						// Wait until portal is gone
-						while (Pather.getPortal(109, Config.Leader)) {
+                            while (Pather.getPortal(Areas.Act5.Harrogath, Config.Leader)) {
 							delay(500);
 						}
 
 						// Wait until portal is up again
-						while (!Pather.getPortal(109, Config.Leader)) {
+                            while (!Pather.getPortal(Areas.Act5.Harrogath, Config.Leader)) {
 							delay(500);
 						}
 
-						if (!Pather.usePortal(109, Config.Leader)) {
+                            if (!Pather.usePortal(Areas.Act5.Harrogath, Config.Leader)) {
 							break;
 						}
 
 						actions.shift();
 
 						break;
-					case 132: // Worldstone Chamber
-						if (!Pather.usePortal(132, Config.Leader)) {
+                        case Areas.Act5.The_Worldstone_Chamber: // Worldstone Chamber
+                            if (!Pather.usePortal(Areas.Act5.The_Worldstone_Chamber, Config.Leader)) {
 							break;
 						}
 
@@ -893,7 +894,7 @@ function Rushee() {
 						break;
 					}
 
-					target = getUnit(1, "jerhyn");
+                    target = getUnit(UnitType.NPC, "jerhyn");
 
 					if (target) {
 						target.openMenu();
@@ -946,7 +947,7 @@ function Rushee() {
 				}
 			}
 		} catch (e) {
-			if (me.mode === 17) {
+            if (me.mode === PlayerModes.Dead) {
 				me.revive();
 
 				while (!me.inTown) {
@@ -955,7 +956,7 @@ function Rushee() {
 			}
 		}
 
-		if (getUIFlag(0x17)) {
+        if (getUIFlag(UIFlags.Trade_Prompt_up_ok_cancel_player_or_in_Trade_w_player)) {
 			me.cancel();
 		}
 

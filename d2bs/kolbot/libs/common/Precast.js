@@ -3,14 +3,15 @@
 *	@author		D3STROY3R, kolton
 *	@desc		handle player prebuff sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var Precast = new function () {
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;
 
-	this.weaponSwitch = function (slot) {
-		if (me.gametype === 0) {
+    this.weaponSwitch = function (slot) {
+        if (me.gametype === GameType.Classic) {
 			return true;
 		}
 
@@ -50,19 +51,19 @@ var Precast = new function () {
 	};
 
 	this.precastCTA = function (force) {
-		if (!force && me.getState(32)) {
+        if (!force && me.getState(States.BATTLEORDERS)) {
 			return true;
 		}
 
-		if (me.gametype === 0 || me.classid === 4 || me.inTown) {
+		if (me.gametype === GameType.Classic || me.classid === ClassID.Barbarian || me.inTown) {
 			return false;
 		}
 
-		if (this.BOSwitch()) {
-			Skill.cast(155, 0); // Battle Command
-			Skill.cast(149, 0); // Battle Orders
+        if (this.BOSwitch()) {
+            Skill.cast(Skills.Barbarian.Battle_Command, 0); // Battle Command
+            Skill.cast(Skills.Barbarian.Battle_Orders, 0); // Battle Orders
 
-			this.BODuration = (20 + me.getSkill(149, 1) * 10 + (me.getSkill(138, 0) + me.getSkill(155, 0)) * 5) * 1000;
+            this.BODuration = (20 + me.getSkill(Skills.Barbarian.Battle_Orders, 1) * 10 + (me.getSkill(Skills.Barbarian.Shout, 0) + me.getSkill(Skills.Barbarian.Battle_Command, 0)) * 5) * 1000;
 			this.BOTick = getTickCount();
 
 			this.weaponSwitch(Math.abs(this.haveCTA - 1));
@@ -78,38 +79,38 @@ var Precast = new function () {
 			sumCurr = 0,
 			sumSwap = 0;
 
-		switch (skillId) {
-		case 117: // Holy Shield
+        switch (skillId) {
+            case Skills.Paladin.Holy_Shield: // Holy Shield
 			sumCurr = 0;
 			sumSwap = 0;
 			item = me.getItem();
 
 			if (item) {
-				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+                do {
+                    if (item.bodylocation === ItemBodyLocation.RIGHT_ARM || item.bodylocation === ItemBodyLocation.LEFT_ARM) {
+                        sumCurr += (item.getStat(Stats.item_allskills) + item.getStat(Stats.item_addclassskills, BaseStat.skills) + item.getStat(Stats.item_addskill_tab, BaseStat.pettype) + item.getStat(Stats.item_singleskill, skillId) + item.getStat(Stats.item_nonclassskill, skillId));
 					}
 
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
+                    if (item.bodylocation === ItemBodyLocation.RIGHT_ARM_SECONDARY || item.bodylocation === ItemBodyLocation.LEFT_ARM_SECONDARY) {
+                        sumSwap += (item.getStat(Stats.item_allskills) + item.getStat(Stats.item_addclassskills, BaseStat.skills) + item.getStat(Stats.item_addskill_tab, BaseStat.pettype) + item.getStat(Stats.item_singleskill, skillId) + item.getStat(Stats.item_nonclassskill, skillId));
 					}
 				} while (item.getNext());
 			}
 
-			break;
-		case 52: // Enchant
+            break;
+            case Skills.Sorceress.Enchant: // Enchant
 			sumCurr = 0;
 			sumSwap = 0;
 			item = me.getItem();
 
 			if (item) {
 				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
+                    if (item.bodylocation === ItemBodyLocation.RIGHT_ARM || item.bodylocation === ItemBodyLocation.LEFT_ARM) {
+                        sumCurr += (item.getStat(Stats.item_allskills) + item.getStat(Stats.item_addclassskills, BaseStat.monster_or_npc_stats) + item.getStat(Stats.item_addskill_tab, BaseStat.levels) + item.getStat(Stats.item_singleskill, skillId) + item.getStat(Stats.item_nonclassskill, skillId));
 					}
 
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
+                    if (item.bodylocation === ItemBodyLocation.RIGHT_ARM_SECONDARY || item.bodylocation === ItemBodyLocation.LEFT_ARM_SECONDARY) {
+                        sumSwap += (item.getStat(Stats.item_allskills) + item.getStat(Stats.item_addclassskills, BaseStat.monster_or_npc_stats) + item.getStat(Stats.item_addskill_tab, BaseStat.levels) + item.getStat(Stats.item_singleskill, skillId) + item.getStat(Stats.item_nonclassskill, skillId));
 					}
 				} while (item.getNext());
 			}
@@ -144,40 +145,40 @@ var Precast = new function () {
 		var buffSummons = false;
 
 		// Force BO 15 seconds before it expires
-		this.precastCTA(!me.getState(32) || force || (getTickCount() - this.BOTick >= this.BODuration - 15000));
+        this.precastCTA(!me.getState(States.BATTLEORDERS) || force || (getTickCount() - this.BOTick >= this.BODuration - 15000));
 
 		switch (me.classid) {
-		case 0: // Amazon
+		case ClassID.Amazon: // Amazon
 			if (Config.SummonValkyrie) {
-				this.summon(32); // Valkyrie
-			}
+                this.summon(Skills.Amazon.Valkyrie); // Valkyrie
+                } 
 
 			break;
-		case 1: // Sorceress
-			if (!me.getState(38) || force) { // ts
-				Skill.cast(57, 0); // Thunder Storm
+		case ClassID.Sorceress: // Sorceress
+			if (!me.getState(States.THUNDERSTORM) || force) { // ts
+                Skill.cast(Skills.Sorceress.Thunder_Storm, 0); // Thunder Storm
 			}
 
-			if (!me.getState(30) || force) {
-				Skill.cast(58, 0); // Energy Shield
+			if (!me.getState(States.ENERGYSHIELD) || force) {
+				Skill.cast(Skills.Sorceress.Energy_Shield, 0); // Energy Shield
 			}
 
-			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
-				if (!Skill.cast(50, 0)) { // Shiver Armor
-					if (!Skill.cast(60, 0)) { // Chilling Armor
-						Skill.cast(40, 0); // Frozen Armor
+            if ((!me.getState(States.SHIVERARMOR) && !me.getState(States.FROZENARMOR) && !me.getState(States.CHILLINGARMOR)) || force) {
+				if (!Skill.cast(Skills.Sorceress.Shiver_Armor, 0)) { // Shiver Armor
+                    if (!Skill.cast(Skills.Sorceress.Chilling_Armor, 0)) { // Chilling Armor
+                        Skill.cast(Skills.Sorceress.Frozen_Armor, 0); // Frozen Armor
 					}
 				}
 			}
 
-			if (me.getSkill(52, 0) && (!me.getState(16) || force)) {
+            if (me.getSkill(Skills.Sorceress.Enchant, 0) && (!me.getState(States.ENCHANT) || force)) {
 				this.enchant();
 			}
 
 			break;
-		case 2: // Necromancer
-			if (!me.getState(14) || force) {
-				Skill.cast(68, 0);
+		case ClassID.Necromancer: // Necromancer
+                if (!me.getState(States.BONEARMOR) || force) {
+                    Skill.cast(Skills.Necromancer.Bone_Armor, 0);
 			}
 
 			switch (Config.Golem) {
@@ -186,41 +187,41 @@ var Precast = new function () {
 				break;
 			case 1:
 			case "Clay":
-				this.summon(75);
+				this.summon(Skills.Necromancer.Clay_Golem);
 				break;
 			case 2:
 			case "Blood":
-				this.summon(85);
+                    this.summon(Skills.Necromancer.BloodGolem);
 				break;
 			case 3:
 			case "Fire":
-				this.summon(94);
+                    this.summon(Skills.Necromancer.FireGolem);
 				break;
 			}
 
 			break;
-		case 3: // Paladin
-			if (!me.getState(101) || force) {
-				this.precastSkill(117); // Holy Shield
+		case ClassID.Paladin: // Paladin
+                if (!me.getState(States.HOLYSHIELD) || force) {
+				this.precastSkill(Skills.Paladin.Holy_Shield); // Holy Shield
 			}
 
 			break;
-		case 4: // Barbarian - TODO: BO duration
-			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
+		case ClassID.Barbarian: // Barbarian - TODO: BO duration
+                if (!me.getState(States.BATTLEORDERS) || !me.getState(States.BATTLECOMMAND) || !me.getState(States.SHOUT) || force) {
 				if (Config.BOSwitch) {
 					Precast.weaponSwitch(Config.BOSwitch);
 				}
 
-				if (!me.getState(51) || force) {
-					Skill.cast(155, 0); // Battle Command
+                if (!me.getState(States.BATTLECOMMAND) || force) {
+                    Skill.cast(Skills.Barbarian.Battle_Command, 0); // Battle Command
 				}
 
-				if (!me.getState(32) || force) {
-					Skill.cast(149, 0); // Battle Orders
+                if (!me.getState(States.BATTLEORDERS) || force) {
+					Skill.cast(Skills.Barbarian.Battle_Orders, 0); // Battle Orders
 				}
 
-				if (!me.getState(26) || force) {
-					Skill.cast(138, 0); // Shout
+				if (!me.getState(States.SHOUT) || force) {
+					Skill.cast(Skills.Barbarian.Shout, 0); // Shout
 				}
 
 				if (Config.BOSwitch) {
@@ -229,29 +230,29 @@ var Precast = new function () {
 			}
 
 			break;
-		case 5: // Druid
-			if (!me.getState(151) || force) {
-				Skill.cast(235, 0); // Cyclone Armor
+		case ClassID.Druid: // Druid
+                if (!me.getState(States.CYCLONEARMOR) || force) {
+				Skill.cast(Skills.Druid.Cyclone_Armor, 0); // Cyclone Armor
 			}
 
-			if (Config.SummonRaven) {
-				this.summon(221); // Raven
+                if (Config.SummonRaven) {
+                    this.summon(Skills.Druid.Raven); // Raven
 			}
 
 			switch (Config.SummonAnimal) {
 			case 1:
-			case "Spirit Wolf":
-				buffSummons = this.summon(227) || buffSummons; // Summon Spirit Wolf
+            case "Spirit Wolf":
+                buffSummons = this.summon(Skills.Druid.Summon_Spirit_Wolf) || buffSummons; // Summon Spirit Wolf
 
 				break;
 			case 2:
 			case "Dire Wolf":
-				buffSummons = this.summon(237) || buffSummons; // Summon Dire Wolf
+                    buffSummons = this.summon(Skills.Druid.Summon_Fenris) || buffSummons; // Summon Dire Wolf
 
 				break;
 			case 3:
 			case "Grizzly":
-				buffSummons = this.summon(247) || buffSummons; // Summon Grizzly
+                    buffSummons = this.summon(Skills.Druid.Summon_Grizzly) || buffSummons; // Summon Grizzly
 
 				break;
 			}
@@ -259,17 +260,17 @@ var Precast = new function () {
 			switch (Config.SummonVine) {
 			case 1:
 			case "Poison Creeper":
-				buffSummons = this.summon(222) || buffSummons; // Poison Creeper
+                    buffSummons = this.summon(Skills.Druid.Plague_Poppy) || buffSummons; // Poison Creeper
 
 				break;
 			case 2:
 			case "Carrion Vine":
-				buffSummons = this.summon(231) || buffSummons; // Carrion Vine
+                    buffSummons = this.summon(Skills.Druid.Cycle_of_Life) || buffSummons; // Carrion Vine
 
 				break;
 			case 3:
 			case "Solar Creeper":
-				buffSummons = this.summon(241) || buffSummons; // Solar Creeper
+                    buffSummons = this.summon(Skills.Druid.Vines) || buffSummons; // Solar Creeper
 
 				break;
 			}
@@ -277,23 +278,23 @@ var Precast = new function () {
 			switch (Config.SummonSpirit) {
 			case 1:
 			case "Oak Sage":
-				buffSummons = this.summon(226) || buffSummons; // Oak Sage
+                    buffSummons = this.summon(Skills.Druid.Oak_Sage) || buffSummons; // Oak Sage
 
 				break;
 			case 2:
 			case "Heart of Wolverine":
-				buffSummons = this.summon(236) || buffSummons; // Heart of Wolverine
+                    buffSummons = this.summon(Skills.Druid.Heart_of_Wolverine) || buffSummons; // Heart of Wolverine
 
 				break;
 			case 3:
 			case "Spirit of Barbs":
-				buffSummons = this.summon(246) || buffSummons; // Spirit of Barbs
+                    buffSummons = this.summon(Skills.Druid.Spirit_of_Barbs) || buffSummons; // Spirit of Barbs
 
 				break;
 			}
 
-			if (!me.getState(144) || force) {
-				Skill.cast(250, 0); // Hurricane
+            if (!me.getState(States.HURRICANE) || force) {
+				Skill.cast(Skills.Druid.Hurricane, 0); // Hurricane
 			}
 
 			if (buffSummons) {
@@ -301,31 +302,31 @@ var Precast = new function () {
 			}
 
 			break;
-		case 6: // Assassin
-			if (Config.UseFade && (!me.getState(159) || force)) {
-				Skill.cast(267, 0); // Fade
+		case ClassID.Assassin: // Assassin
+                if (Config.UseFade && (!me.getState(States.FADE) || force)) {
+				Skill.cast(Skills.Assassin.Fade, 0); // Fade
 			}
 
-			if (Config.UseVenom && (!me.getState(31) || force)) {
-				Skill.cast(278, 0); // Venom
+                if (Config.UseVenom && (!me.getState(States.VENOMCLAWS) || force)) {
+                    Skill.cast(Skills.Assassin.Venom, 0); // Venom
 			}
 
-			if (!me.getState(158) || force) {
-				Skill.cast(277, 0); // Blade Shield	
+                if (!me.getState(States.BLADESHIELD) || force) {
+				Skill.cast(Skills.Assassin.Blade_Shield, 0); // Blade Shield	
 			}
 
-			if (!Config.UseFade && Config.UseBoS && (!me.getState(157) || force)) {
-				Skill.cast(258, 0); // Burst of Speed
+                if (!Config.UseFade && Config.UseBoS && (!me.getState(States.QUICKNESS) || force)) {
+                    Skill.cast(Skills.Assassin.Quickness, 0); // Burst of Speed
 			}
 
 			switch (Config.SummonShadow) {
 			case 1:
 			case "Warrior":
-				this.summon(268); // Shadow Warrior
+                    this.summon(Skills.Assassin.Shadow_Warrior); // Shadow Warrior
 				break;
 			case 2:
 			case "Master":
-				this.summon(279); // Shadow Master
+				this.summon(Skills.Assassin.Shadow_Master); // Shadow Master
 				break;
 			}
 
@@ -337,20 +338,20 @@ var Precast = new function () {
 		var item;
 
 		if (this.haveCTA < 0) {
-			item = me.getItem(-1, 1);
+            item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc);
 
 			if (item) {
 MainLoop:
 				do {
 					if (item.getPrefix(20519)) { // Call to Arms
-						switch (item.bodylocation) {
-						case 4:
-						case 5:
+                        switch (item.bodylocation) {
+                            case ItemBodyLocation.RIGHT_ARM:
+                            case ItemBodyLocation.LEFT_ARM:
 							this.haveCTA = me.weaponswitch;
 
 							break MainLoop;
-						case 11:
-						case 12:
+                            case ItemBodyLocation.RIGHT_ARM_SECONDARY:
+                            case ItemBodyLocation.LEFT_ARM_SECONDARY:
 							this.haveCTA = Math.abs(me.weaponswitch - 1);
 
 							break MainLoop;
@@ -376,49 +377,49 @@ MainLoop:
 			count = 1;
 
 		switch (skillId) {
-		case 32: // Valkyrie
+		case Skills.Amazon.Valkyrie: // Valkyrie
 			minion = 2;
 
 			break;
-		case 75: // Clay Golem
-		case 85: // Blood Golem
-		case 94: // Fire Golem
+		case Skills.Necromancer.Clay_Golem: // Clay Golem
+        case Skills.Necromancer.BloodGolem: // Blood Golem
+        case Skills.Necromancer.FireGolem: // Fire Golem
 			minion = 3;
 
 			break;
-		case 221: // Raven
+		case Skills.Druid.Raven: // Raven
 			minion = 10;
-			count = Math.min(me.getSkill(221, 1), 5);
+            count = Math.min(me.getSkill(Skills.Druid.Raven, 1), 5);
 
 			break;
-		case 226: // Oak Sage
-		case 236: // Heart of Wolverine
-		case 246: // Spirit of Barbs
+		case Skills.Druid.Oak_Sage: // Oak Sage
+		case Skills.Druid.Heart_of_Wolverine: // Heart of Wolverine
+        case Skills.Druid.Spirit_of_Barbs: // Spirit of Barbs
 			minion = 13;
 
 			break;
-		case 222: // Poison Creeper
-		case 231: // Carrion Vine
-		case 241: // Solar Creeper
+        case Skills.Druid.Plague_Poppy: // Poison Creeper
+        case Skills.Druid.Cycle_of_Life: // Carrion Vine
+        case Skills.Druid.Vines: // Solar Creeper
 			minion = 14;
 
 			break;
-		case 227: // Spirit Wolf
+        case Skills.Druid.Summon_Spirit_Wolf: // Spirit Wolf
 			minion = 11;
-			count = Math.min(me.getSkill(227, 1), 5);
+            count = Math.min(me.getSkill(Skills.Druid.Summon_Spirit_Wolf, 1), 5);
 
 			break;
-		case 237: // Dire Wolf
+        case Skills.Druid.Summon_Fenris: // Dire Wolf
 			minion = 12;
-			count = Math.min(me.getSkill(237, 1), 3);
+            count = Math.min(me.getSkill(Skills.Druid.Summon_Fenris, 1), 3);
 
 			break;
-		case 247: // Grizzly
+        case Skills.Druid.Summon_Grizzly: // Grizzly
 			minion = 15;
 
 			break;
-		case 268: // Shadow Warrior
-		case 279: // Shadow Master
+		case Skills.Assassin.Shadow_Warrior: // Shadow Warrior
+        case Skills.Assassin.Shadow_Master: // Shadow Master
 			minion = 16;
 
 			break;
@@ -436,7 +437,7 @@ MainLoop:
 
 	this.enchant = function () {
 		var unit, swapped,
-			slot = this.getBetterSlot(52),
+            slot = this.getBetterSlot(Skills.Sorceress.Enchant),
 			chanted = [];
 
 		if (slot !== me.weaponswitch) {
@@ -446,24 +447,24 @@ MainLoop:
 		this.weaponSwitch(slot);
 
 		// Player
-		unit = getUnit(0);
+        unit = getUnit(UnitType.Player);
 
 		if (unit) {
 			do {
-				if (!unit.dead && Misc.inMyParty(unit.name) && getDistance(me, unit) <= 40) {
-					Skill.cast(52, 0, unit);
+                if (!unit.dead && Misc.inMyParty(unit.name) && getDistance(me, unit) <= 40) {
+                    Skill.cast(Skills.Sorceress.Enchant, 0, unit);
 					chanted.push(unit.name);
 				}
 			} while (unit.getNext());
 		}
 
 		// Minion
-		unit = getUnit(1);
+        unit = getUnit(UnitType.NPC);
 
 		if (unit) {
 			do {
 				if (unit.getParent() && chanted.indexOf(unit.getParent().name) > -1 && getDistance(me, unit) <= 40) {
-					Skill.cast(52, 0, unit);
+					Skill.cast(Skills.Sorceress.Enchant, 0, unit);
 				}
 			} while (unit.getNext());
 		}

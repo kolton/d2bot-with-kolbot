@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Paladin attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
@@ -11,7 +12,7 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+        if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (getDistance(me, unit) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
@@ -27,7 +28,7 @@ var ClassAttack = {
 			attackSkill = -1,
 			aura = -1;
 
-		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
+        index = ((unit.spectype & 0x7) || unit.type === UnitType.Player) ? 1 : 3;
 
 		if (Attack.getCustomAttack(unit)) {
 			attackSkill = Attack.getCustomAttack(unit)[0];
@@ -85,7 +86,7 @@ var ClassAttack = {
 		Misc.unShift();
 		Precast.doPrecast(false);
 
-		if (Config.Redemption instanceof Array && (me.hp * 100 / me.hpmax < Config.Redemption[0] || me.mp * 100 / me.mpmax < Config.Redemption[1]) && Skill.setSkill(124, 0)) {
+        if (Config.Redemption instanceof Array && (me.hp * 100 / me.hpmax < Config.Redemption[0] || me.mp * 100 / me.mpmax < Config.Redemption[1]) && Skill.setSkill(Skills.Paladin.Redemption, 0)) {
 			delay(1500);
 		}
 	},
@@ -98,8 +99,8 @@ var ClassAttack = {
 		}
 
 		switch (attackSkill) {
-		case 112:
-			if (unit.classid === 691 && Config.AvoidDolls) {
+            case Skills.Paladin.Blessed_Hammer:
+                if (unit.classid === UnitClassID.bonefetish7 && Config.AvoidDolls) {
 				this.dollAvoid(unit);
 
 				if (aura > -1) {
@@ -115,7 +116,7 @@ var ClassAttack = {
 				//print("Can't get to " + unit.name);
 
 				// Fallback to secondary skill if it exists
-				if (Config.AttackSkill[5] > -1 && Config.AttackSkill[5] !== 112 && Attack.checkResist(unit, Config.AttackSkill[5])) {
+                if (Config.AttackSkill[5] > -1 && Config.AttackSkill[5] !== Skills.Paladin.Blessed_Hammer && Attack.checkResist(unit, Config.AttackSkill[5])) {
 					return this.doCast(unit, Config.AttackSkill[5], Config.AttackSkill[6]);
 				}
 
@@ -135,13 +136,13 @@ var ClassAttack = {
 			for (i = 0; i < 3; i += 1) {
 				Skill.cast(attackSkill, Skill.getHand(attackSkill), unit);
 
-				if (!Attack.checkMonster(unit) || getDistance(me, unit) > 9 || unit.type === 0) {
+                if (!Attack.checkMonster(unit) || getDistance(me, unit) > 9 || unit.type === UnitType.Player) {
 					break;
 				}
 			}
 
 			return 1;
-		case 101:
+            case Skills.Paladin.Holy_Bolt:
 			if (getDistance(me, unit) > Skill.getRange(attackSkill) + 3 || CollMap.checkColl(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x4)) {
 					return 0;
@@ -165,8 +166,8 @@ var ClassAttack = {
 			}
 
 			return 1;
-		case 121: // FoH
-			if (!me.getState(121)) {
+            case Skills.Paladin.Fist_of_the_Heavens: // FoH
+                if (!me.getState(States.SKILLDELAY)) {
 				if (getDistance(me, unit) > Skill.getRange(attackSkill) || CollMap.checkColl(me, unit, 0x2004, 2)) {
 					if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x2004, true)) {
 						return 0;
@@ -191,7 +192,7 @@ var ClassAttack = {
 			}
 
 			if (Math.floor(getDistance(me, unit)) > Skill.getRange(attackSkill) || checkCollision(me, unit, 0x4)) {
-				walk = attackSkill !== 97 && Skill.getRange(attackSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
+                walk = attackSkill !== Skills.Paladin.Smite && Skill.getRange(attackSkill) < 4 && getDistance(me, unit) < 10 && !checkCollision(me, unit, 0x1);
 
 				// walk short distances instead of tele for melee attacks. teleport if failed to walk
 				if (!Attack.getIntoPosition(unit, Skill.getRange(attackSkill), 0x4, walk)) {
@@ -211,7 +212,7 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			if (!me.getState(121)) {
+            if (!me.getState(States.SKILLDELAY)) {
 				break;
 			}
 
@@ -245,15 +246,15 @@ var ClassAttack = {
 		}
 
 		switch (unit.type) {
-		case 0: // Player
+            case UnitType.Player: // Player
 			x = unit.x;
 			y = unit.y;
 			positions = [[x + 2, y], [x + 2, y + 1]];
 
 			break;
-		case 1: // Monster
-			x = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targetx : unit.x;
-			y = (unit.mode === 2 || unit.mode === 15) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targety : unit.y;
+            case UnitType.NPC: // Monster
+                x = (unit.mode === NPCModes.walk || unit.mode === NPCModes.run) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targetx : unit.x;
+                y = (unit.mode === NPCModes.walk || unit.mode === NPCModes.run) && getDistance(me, unit) < 10 && getDistance(me, unit.targetx, unit.targety) > 5 ? unit.targety : unit.y;
 			positions = [[x + 2, y + 1], [x, y + 3], [x + 2, y - 1], [x - 2, y + 2], [x - 5, y]];
 
 			if (size === 3) {
@@ -289,7 +290,7 @@ var ClassAttack = {
 		var i;
 
 		if (Math.round(getDistance(me, x, y) > 0)) {
-			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
+            if (Pather.teleport && !me.inTown && me.getStat(Stats.item_nonclassskill, Skills.Sorceress.Teleport)) {
 				if (getDistance(me, x, y) > 40) {
 					Pather.moveTo(x, y);
 				} else {

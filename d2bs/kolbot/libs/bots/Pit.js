@@ -3,13 +3,14 @@
 *	@author		kolton
 *	@desc		clear Pit
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Pit() {
 	Town.doChores();
-	Pather.useWaypoint(6);
+    Pather.useWaypoint(Areas.Act1.Black_Marsh);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([7, 12], true)) {
+    if (!Pather.moveToExit([Areas.Act1.Tamoe_Highland, Areas.Act1.Pit_Level_1], true)) {
 		throw new Error("Failed to move to Pit level 1");
 	}
 
@@ -17,7 +18,7 @@ function Pit() {
 		Attack.clearLevel(Config.ClearType);
 	}
 
-	if (!Pather.moveToExit(16, true, Config.Pit.ClearPath)) {
+    if (!Pather.moveToExit(Areas.Act1.Pit_Level_2, true, Config.Pit.ClearPath)) {
 		throw new Error("Failed to move to Pit level 2");
 	}
 

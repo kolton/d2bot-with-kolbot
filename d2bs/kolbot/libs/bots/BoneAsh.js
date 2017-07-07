@@ -3,10 +3,11 @@
 *	@author		kolton
 *	@desc		kill Bone Ash
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function BoneAsh() {
 	Town.doChores();
-	Pather.useWaypoint(32);
+    Pather.useWaypoint(Areas.Act1.Inner_Cloister);
 	Precast.doPrecast(true);
 
 	if (!Pather.moveTo(20047, 4898)) {

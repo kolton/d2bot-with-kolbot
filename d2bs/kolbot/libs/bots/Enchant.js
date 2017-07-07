@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Enchant other players, open cow portal and give waypoints on command
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Enchant() {
 	var command, hostile, nick, spot, tick, s, m,
@@ -18,7 +19,7 @@ function Enchant() {
 		}
 
 		var partyUnit,
-			unit = getUnit(0, nick);
+            unit = getUnit(UnitType.Player, nick);
 
 		if (getDistance(me, unit) > 35) {
 			say("Get closer.");
@@ -31,11 +32,11 @@ function Enchant() {
 
 			// wait until party area is readable?
 
-			if ([40, 75, 103, 109].indexOf(partyUnit.area) > -1) {
+            if ([Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath].indexOf(partyUnit.area) > -1) {
 				say("Wait for me at waypoint.");
-				Town.goToTown([1, 40, 75, 103, 109].indexOf(partyUnit.area) + 1); // index+1 for town 2,3,4,5
+                Town.goToTown([Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath].indexOf(partyUnit.area) + 1); // index+1 for town 2,3,4,5
 
-				unit = getUnit(0, nick);
+                unit = getUnit(UnitType.Player, nick);
 			} else {
 				say("You need to be in one of the towns.");
 
@@ -52,7 +53,7 @@ function Enchant() {
 						return false;
 					}
 
-					Skill.setSkill(52, 0);
+                    Skill.setSkill(Skills.Sorceress.Enchant, 0);
 					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
 					delay(500);
 				}
@@ -61,12 +62,12 @@ function Enchant() {
 			say("Couldn't find you, champ.");
 		}
 
-		unit = getUnit(1);
+        unit = getUnit(UnitType.NPC);
 
 		if (unit) {
 			do {
 				if (unit.getParent() && unit.getParent().name === nick) { // merc or any other owned unit
-					Skill.setSkill(52, 0);
+                    Skill.setSkill(Skills.Sorceress.Enchant, 0);
 					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
 					delay(500);
 				}
@@ -81,12 +82,12 @@ function Enchant() {
 			chanted = [];
 
 		// Player
-		unit = getUnit(0);
+        unit = getUnit(UnitType.Player);
 
 		if (unit) {
 			do {
-				if (unit.name !== me.name && !unit.dead && shitList.indexOf(unit.name) === -1 && Misc.inMyParty(unit.name) && !unit.getState(16) && getDistance(me, unit) <= 40) {
-					Skill.setSkill(52, 0);
+                if (unit.name !== me.name && !unit.dead && shitList.indexOf(unit.name) === -1 && Misc.inMyParty(unit.name) && !unit.getState(States.ENCHANT) && getDistance(me, unit) <= 40) {
+                    Skill.setSkill(Skills.Sorceress.Enchant, 0);
 					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
 					delay(500);
 					chanted.push(unit.name);
@@ -99,8 +100,8 @@ function Enchant() {
 
 		if (unit) {
 			do {
-				if (unit.getParent() && chanted.indexOf(unit.getParent().name) > -1 && !unit.getState(16) && getDistance(me, unit) <= 40) {
-					Skill.setSkill(52, 0);
+                if (unit.getParent() && chanted.indexOf(unit.getParent().name) > -1 && !unit.getState(States.ENCHANT) && getDistance(me, unit) <= 40) {
+                    Skill.setSkill(Skills.Sorceress.Enchant, 0);
 					sendPacket(1, 0x11, 4, unit.type, 4, unit.gid);
 					delay(500);
 				}
@@ -113,12 +114,12 @@ function Enchant() {
 	this.getLeg = function () {
 		var i, portal, wirt, leg, gid, wrongLeg;
 
-		if (me.getItem(88)) {
-			return me.getItem(88);
+        if (me.getItem(ItemClassIds.Wirts_Leg)) {
+            return me.getItem(ItemClassIds.Wirts_Leg);
 		}
 
 		if (!Config.Enchant.GetLeg) {
-			leg = getUnit(4, 88);
+            leg = getUnit(UnitType.Item, ItemClassIds.Wirts_Leg);
 
 			if (leg) {
 				do {
@@ -139,12 +140,12 @@ function Enchant() {
 			return false;
 		}
 
-		Pather.useWaypoint(4);
+        Pather.useWaypoint(Areas.Act1.Stony_Field);
 		Precast.doPrecast(true);
-		Pather.moveToPreset(me.area, 1, 737, 8, 8);
+        Pather.moveToPreset(me.area, UnitType.NPC, SuperUniques.Rakanishu, 8, 8);
 
 		for (i = 0; i < 6; i += 1) {
-			portal = Pather.getPortal(38);
+            portal = Pather.getPortal(Areas.Act1.Tristram);
 
 			if (portal) {
 				Pather.usePortal(null, null, portal);
@@ -164,13 +165,13 @@ function Enchant() {
 
 		Pather.moveTo(25048, 5177);
 
-		wirt = getUnit(2, 268);
+        wirt = getUnit(UnitType.Object, UniqueObjectIds.Wirts_Body);
 
 		for (i = 0; i < 8; i += 1) {
 			wirt.interact();
 			delay(500);
 
-			leg = getUnit(4, 88);
+            leg = getUnit(UnitType.Item, ItemClassIds.Wirts_Leg);
 
 			if (leg) {
 				gid = leg.gid;
@@ -191,7 +192,7 @@ function Enchant() {
 	this.getTome = function () {
 		var tome, akara, myTome;
 
-		myTome = me.findItem("tbk", 0, 3);
+        myTome = me.findItem("tbk", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 		tome = me.getItem("tbk");
 
 		// In case of 2 tomes or tome stuck in cube
@@ -205,7 +206,7 @@ function Enchant() {
 
 		Town.move("akara");
 
-		akara = getUnit(1, NPC.Akara);
+        akara = getUnit(UnitType.NPC, NPC.Akara);
 
 		if (!akara || akara.area !== me.area || getDistance(me, akara) > 20) {
 			say("Akara not found.");
@@ -213,7 +214,7 @@ function Enchant() {
 			return false;
 		}
 
-		myTome = me.findItem("tbk", 0, 3);
+        myTome = me.findItem("tbk", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 		tome = me.getItem("tbk");
 
 		if (tome) {
@@ -256,35 +257,35 @@ function Enchant() {
 			return true;
 		}
 
-		if (Pather.getPortal(39)) {
+        if (Pather.getPortal(Areas.Act1.Moo_Moo_Farm)) {
 			say("Cow portal already open.");
 
 			return true;
 		}
 
-		if (me.getQuest(4, 10)) { // king dead or cain not saved
+        if (me.getQuest(Quests.Act1.The_Search_for_Cain, 10)) { // king dead or cain not saved
 			say("Can't open the portal because I killed Cow King.");
 
 			return false;
 		}
 
-		if (Config.Enchant.GetLeg && !me.getQuest(4, 0)) {
+        if (Config.Enchant.GetLeg && !me.getQuest(Quests.Act1.The_Search_for_Cain, 0)) {
 			say("Can't get leg because I don't have Cain quest.");
 
 			return false;
 		}
 
 		switch (me.gametype) {
-		case 0: // classic
-			if (!me.getQuest(26, 0)) { // diablo not completed
+		case GameType.Classic: // classic
+                if (!me.getQuest(Quests.Act4.Terrors_End, 0)) { // diablo not completed
 				say("I don't have Diablo quest.");
 
 				return false;
 			}
 
 			break;
-		case 1: // expansion
-			if (!me.getQuest(40, 0)) { // baal not completed
+		case GameType.Expansion: // expansion
+                if (!me.getQuest(Quests.Act5.Eve_of_Destruction, 0)) { // baal not completed
 				say("I don't have Baal quest.");
 
 				return false;
@@ -315,7 +316,7 @@ function Enchant() {
 		delay(500);
 
 		for (i = 0; i < 10; i += 1) {
-			if (Pather.getPortal(39)) {
+            if (Pather.getPortal(Areas.Act1.Moo_Moo_Farm)) {
 				return true;
 			}
 
@@ -379,23 +380,23 @@ function Enchant() {
 
 		switch (act) {
 		case 1:
-			wpList = [3, 4, 5, 6, 27, 29, 32, 35];
+                wpList = [Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field, Areas.Act1.Dark_Wood, Areas.Act1.Black_Marsh, Areas.Act1.Outer_Cloister, Areas.Act1.Jail_Level_1, Areas.Act1.Inner_Cloister, Areas.Act1.Catacombs_Level_2];
 
 			break;
 		case 2:
-			wpList = [48, 42, 57, 43, 44, 52, 74, 46];
+                wpList = [Areas.Act2.A2_Sewers_Level_2, Areas.Act2.Dry_Hills, Areas.Act2.Halls_Of_The_Dead_Level_2, Areas.Act2.Far_Oasis, Areas.Act2.Lost_City, Areas.Act2.Palace_Cellar_Level_1, Areas.Act2.Arcane_Sanctuary, Areas.Act2.Canyon_Of_The_Magi];
 
 			break;
 		case 3:
-			wpList = [76, 77, 78, 79, 80, 81, 83, 101];
+                wpList = [Areas.Act3.Spider_Forest, Areas.Act3.Great_Marsh, Areas.Act3.Flayer_Jungle, Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Travincal, Areas.Act3.Durance_Of_Hate_Level_2];
 
 			break;
 		case 4:
-			wpList = [106, 107];
+                wpList = [Areas.Act4.City_Of_The_Damned, Areas.Act4.River_Of_Flame];
 
 			break;
 		case 5:
-			wpList = [111, 112, 113, 115, 123, 117, 118, 129];
+                wpList = [Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Crystalized_Passage, Areas.Act5.Glacial_Trail, Areas.Act5.Halls_Of_Pain, Areas.Act5.Frozen_Tundra, Areas.Act5.Ancients_Way, Areas.Act5.The_Worldstone_Keep_Level_2];
 
 			break;
 		}
@@ -447,19 +448,19 @@ MainLoop:
 		if (unit) {
 			do {
 				if (unit.name === name) {
-					if (unit.area <= 39) {
+                    if (unit.area <= Areas.Act1.Moo_Moo_Farm) {
 						return 1;
 					}
 
-					if (unit.area >= 40 && unit.area <= 74) {
+                    if (unit.area >= Areas.Act2.Lut_Gholein && unit.area <= Areas.Act2.Arcane_Sanctuary) {
 						return 2;
 					}
 
-					if (unit.area >= 75 && unit.area <= 102) {
+                    if (unit.area >= Areas.Act3.Kurast_Docktown && unit.area <= Areas.Act3.Durance_Of_Hate_Level_3) {
 						return 3;
 					}
 
-					if (unit.area >= 103 && unit.area <= 108) {
+                    if (unit.area >= Areas.Act4.The_Pandemonium_Fortress && unit.area <= Areas.Act4.Chaos_Sanctuary) {
 						return 4;
 					}
 
@@ -547,7 +548,7 @@ MainLoop:
 	function GreetEvent(mode, param1, param2, name1, name2) {
 		switch (mode) {
 		case 0x02:
-			if (me.inTown && me.mode === 5) { // idle in town
+                if (me.inTown && me.mode === PlayerModes.Town_Neutral) { // idle in town
 				greet.push(name1);
 			}
 

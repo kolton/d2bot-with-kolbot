@@ -6,6 +6,7 @@
  * !!!Never comment out something you're not sure about, set it to false or disable as noted in description if you don't want to use it.
  * true and false are case sensitive. Good: Config.SomeVar = true; Bad: Config.SomeVar = True;
  */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function LoadConfig() {
 	/* Sequence config
@@ -193,14 +194,14 @@ function LoadConfig() {
 		Config.ShopBot.ScanIDs = [];
 		Config.ShopBot.CycleDelay = 0; // Delay between shopping cycles in milliseconds, might help with crashes.
 		Config.ShopBot.QuitOnMatch = false; // Leave game as soon as an item is shopped.
-	Scripts.ChestMania = false; // Open chests in configured areas. See sdk/areas.txt
-		Config.ChestMania.Act1 = [13, 14, 15, 16, 18, 19]; // List of act 1 areas to open chests in
-		Config.ChestMania.Act2 = [55, 59, 65, 66, 67, 68, 69, 70, 71, 72]; // List of act 2 areas to open chests in
-		Config.ChestMania.Act3 = [79, 80, 81, 92, 93, 84, 85, 90]; // List of act 3 areas to open chests in
-		Config.ChestMania.Act4 = []; // List of act 4 areas to open chests in
-		Config.ChestMania.Act5 = [115, 116, 119, 125, 126, 127]; // List of act 5 areas to open chests in
-	Scripts.ClearAnyArea = false; // Clear any area. Uses Config.ClearType to determine which type of monsters to kill.
-		Config.ClearAnyArea.AreaList = []; // List of area ids to clear. See sdk/areas.txt
+    Scripts.ChestMania = false; // Open chests in configured areas. See sdk/areas.txt
+        Config.ChestMania.Act1 = [Areas.Act1.Cave_Level_2, Areas.Act1.Underground_Passage_Level_2, Areas.Act1.Hole_Level_2, Areas.Act1.Pit_Level_2, Areas.Act1.Crypt, Areas.Act1.Mausoleum]; // List of act 1 areas to open chests in
+        Config.ChestMania.Act2 = [Areas.Act2.Stony_Tomb_Level_1, Areas.Act2.Stony_Tomb_Level_2, Areas.Act2.Ancient_Tunnels, Areas.Act2.Tal_Rashas_Tomb_1, Areas.Act2.Tal_Rashas_Tomb_2, Areas.Act2.Tal_Rashas_Tomb_3, Areas.Act2.Tal_Rashas_Tomb_4, Areas.Act2.Tal_Rashas_Tomb_5, Areas.Act2.Tal_Rashas_Tomb_6, Areas.Act2.Tal_Rashas_Tomb_7]; // List of act 2 areas to open chests in
+        Config.ChestMania.Act3 = [Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.A3_Sewers_Level_1, Areas.Act3.A3_Sewers_Level_2, Areas.Act3.Spider_Cave, Areas.Act3.Spider_Cavern, Areas.Act3.Swampy_Pit_Level_3]; // List of act 3 areas to open chests in
+        Config.ChestMania.Act4 = []; // List of act 4 areas to open chests in
+        Config.ChestMania.Act5 = [Areas.Act5.Glacial_Trail, Areas.Act5.Drifter_Cavern, Areas.Act5.Icy_Cellar, Areas.Act5.Abaddon, Areas.Act5.Pit_Of_Acheron, Areas.Act5.Infernal_Pit]; // List of act 5 areas to open chests in
+    Scripts.ClearAnyArea = false; // Clear any area. Uses Config.ClearType to determine which type of monsters to kill.
+        Config.ClearAnyArea.AreaList = []; // List of area ids to clear. See sdk/areas.txt  (Enums Example: [Areas.Act1.Cave_Level_2, Areas.Act3.Kurast_Bazaar, Areas.Act5.Pit_Of_Acheron];  Ref. at https://pastebin.com/pRFkqDzb)
 
 	// *** Guest scripts ***
 
@@ -401,7 +402,7 @@ function LoadConfig() {
 
 	// Shrine Scanner - scan for shrines while moving.
 	// Put the shrine types in order of priority (from highest to lowest). For a list of types, see sdk/shrines.txt
-	Config.ScanShrines = [];
+    Config.ScanShrines = []; // Available Shrines: [Shrines.refilling, Shrines.health, Shrines.mana, Shrines.experience, Shrines.skill, Shrines.resist_lightning, Shrines.resist_fire, Shrines.armor, Shrines.combat, Shrines.resist_cold, Shrines.resist_poison, Shrines.mana_recharge, Shrines.stamina, Shrines.portal, Shrines.gem, Shrines.monster, Shrines.exploding, Shrines.poison];
 
 	// MF Switch
 	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.
@@ -441,14 +442,15 @@ function LoadConfig() {
 	/* Attack config
 	 * To disable an attack, set it to -1
 	 * Skills MUST be POSITIVE numbers. For reference see http://pastebin.com/baShRwWM
+     * Example of Enums using: Config.AttackSkill[1] = Skills.Paladin.Blessed_Hammer; For Reference see https://pastebin.com/K7qCZw81
 	 */
-	Config.AttackSkill[0] = -1; // Preattack skill.
-	Config.AttackSkill[1] = -1; // Primary skill to bosses.
-	Config.AttackSkill[2] = -1; // Primary aura to bosses
-	Config.AttackSkill[3] = -1; // Primary skill to others.
-	Config.AttackSkill[4] = -1; // Primary aura to others.
-	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
-	Config.AttackSkill[6] = -1; // Secondary aura.
+	Config.AttackSkill[0] = None; // Preattack skill.
+	Config.AttackSkill[1] = None; // Primary skill to bosses.
+	Config.AttackSkill[2] = None; // Primary aura to bosses
+	Config.AttackSkill[3] = None; // Primary skill to others.
+	Config.AttackSkill[4] = None; // Primary aura to others.
+	Config.AttackSkill[5] = None; // Secondary skill if monster is immune to primary.
+    Config.AttackSkill[6] = None; // Secondary aura.
 
 	// Low mana skills - these will be used if main skills can't be cast.
 	Config.LowManaSkill[0] = -1; // Low mana skill.

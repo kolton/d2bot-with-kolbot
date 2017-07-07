@@ -4,15 +4,16 @@
 *	@desc		Convert keys to organs and organs to torches. It can work with TorchSystem to get keys from other characters
 *	@notes		Search for the word "Start" and follow the comments if you want to know what this script does and when.
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function OrgTorch() {
 	this.doneAreas = [];
 
 	// Identify & mule
 	this.checkTorch = function () {
-		if (me.area === 136) {
+		if (me.area === Areas.UberLevels.Tristram) {
 			Pather.moveTo(25105, 5140);
-			Pather.usePortal(109);
+            Pather.usePortal(Areas.Act5.Harrogath);
 		}
 
 		Town.doChores();
@@ -25,7 +26,7 @@ function OrgTorch() {
 
 		if (item) {
 			do {
-				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
+                if (item.quality === ItemQuality.Unique && Pickit.checkItem(item).result === 1) {
 					if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("torchMuleInfo")) {
 						scriptBroadcast("muleTorch");
 						//quit();
@@ -59,7 +60,7 @@ function OrgTorch() {
 	// Try to lure a monster - wait until it's close enough
 	this.lure = function (bossId) {
 		var tick,
-			unit = getUnit(1, bossId);
+            unit = getUnit(UnitType.NPC, bossId);
 
 		if (unit) {
 			tick = getTickCount();
@@ -96,18 +97,18 @@ function OrgTorch() {
 
 	// Get fade in River of Flames
 	this.getFade = function () {
-		if (Config.OrgTorch.GetFade && me.classid === 3) {
-			if (!me.getState(159)) {
+        if (Config.OrgTorch.GetFade && me.classid === ClassID.Paladin) {
+            if (!me.getState(States.FADE)) {
 				print("Getting Fade");
-				Pather.useWaypoint(107);
+                Pather.useWaypoint(Areas.Act4.River_Of_Flame);
 				Precast.doPrecast(true);
 				Pather.moveTo(7811, 5872);
 
-				if (me.classid === 3 && me.getSkill(125, 1)) {
-					Skill.setSkill(125, 0);
+                if (me.classid === ClassID.Paladin && me.getSkill(Skills.Paladin.Salvation, 1)) {
+                    Skill.setSkill(Skills.Paladin.Salvation, 0);
 				}
 
-				while (!me.getState(159)) {
+                while (!me.getState(States.FADE)) {
 					delay(100);
 				}
 
@@ -121,9 +122,9 @@ function OrgTorch() {
 	// Open a red portal. Mode 0 = mini ubers, mode 1 = Tristram
 	this.openPortal = function (mode) {
 		var portal,
-			item1 = mode === 0 ? me.findItem("pk1", 0) : me.findItem("dhn", 0),
-			item2 = mode === 0 ? me.findItem("pk2", 0) : me.findItem("bey", 0),
-			item3 = mode === 0 ?  me.findItem("pk3", 0) : me.findItem("mbr", 0);
+            item1 = mode === ItemModes.Item_In_Inventory_Stash_Cube_Or_Store ? me.findItem("pk1", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store) : me.findItem("dhn", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store),
+            item2 = mode === ItemModes.Item_In_Inventory_Stash_Cube_Or_Store ? me.findItem("pk2", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store) : me.findItem("bey", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store),
+            item3 = mode === ItemModes.Item_In_Inventory_Stash_Cube_Or_Store ? me.findItem("pk3", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store) : me.findItem("mbr", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		Town.goToTown(5);
 		Town.doChores();
@@ -140,21 +141,21 @@ function OrgTorch() {
 			transmute();
 			delay(1000);
 
-			portal = getUnit(2, "portal");
+            portal = getUnit(UnitType.Object, "portal");
 
 			if (portal) {
 				do {
 					switch (mode) {
-					case 0:
-						if ([133, 134, 135].indexOf(portal.objtype) > -1 && this.doneAreas.indexOf(portal.objtype) === -1) {
+                        case ObjectModes.Neutral:
+                            if ([UniqueObjectIds.Shrine3, UniqueObjectIds.Shrine4, UniqueObjectIds.Shrine5].indexOf(portal.objtype) > -1 && this.doneAreas.indexOf(portal.objtype) === -1) {
 							this.doneAreas.push(portal.objtype);
 
 							return copyUnit(portal);
 						}
 
 						break;
-					case 1:
-						if (portal.objtype === 136) {
+                        case ObjectModes.Operating:
+                            if (portal.objtype === UniqueObjectIds.Shrine6) {
 							return copyUnit(portal);
 						}
 
@@ -172,16 +173,16 @@ function OrgTorch() {
 		var i, findLoc, skillBackup;
 
 		switch (me.area) {
-		case 133: // Matron's Den
+            case Areas.UberLevels.Matrons_Den: // Matron's Den
 			Precast.doPrecast(true);
-			Pather.moveToPreset(133, 2, 397, 2, 2);
-			Attack.kill(707);
+            Pather.moveToPreset(Areas.UberLevels.Matrons_Den, UnitType.Object, UniqueObjectIds.Sparklychest, 2, 2);
+            Attack.kill(UnitClassID.Lilith);
 			//Attack.clear(5);
 			Pickit.pickItems();
 			Town.goToTown();
 
 			break;
-		case 134: // Forgotten Sands
+            case Areas.UberLevels.Fogotten_Sands: // Forgotten Sands
 			Precast.doPrecast(true);
 
 			findLoc = [20196, 8694, 20308, 8588, 20187, 8639, 20100, 8550, 20103, 8688, 20144, 8709, 20263, 8811, 20247, 8665];
@@ -190,25 +191,25 @@ function OrgTorch() {
 				Pather.moveTo(findLoc[i], findLoc[i + 1]);
 				delay(500);
 
-				if (getUnit(1, 708)) {
+                if (getUnit(UnitType.NPC, UnitClassID.Uber_Duriel)) {
 					break;
 				}
 			}
 
-			Attack.kill(708);
+            Attack.kill(UnitClassID.Uber_Duriel);
 			Pickit.pickItems();
 			Town.goToTown();
 
 			break;
-		case 135: // Furnace of Pain
+            case Areas.UberLevels.Furnace_of_Pain: // Furnace of Pain
 			Precast.doPrecast(true);
-			Pather.moveToPreset(135, 2, 397, 2, 2);
-			Attack.kill(706);
+            Pather.moveToPreset(Areas.UberLevels.Furnace_of_Pain, UnitType.Object, UniqueObjectIds.Sparklychest, 2, 2);
+            Attack.kill(UnitClassID.Uber_Izual);
 			Pickit.pickItems();
 			Town.goToTown();
 
 			break;
-		case 136: // Tristram
+            case Areas.UberLevels.Tristram: // Tristram
 			Pather.moveTo(25068, 5078);
 			Precast.doPrecast(true);
 
@@ -218,26 +219,26 @@ function OrgTorch() {
 				Pather.moveTo(findLoc[i], findLoc[i + 1]);
 			}
 
-			Skill.setSkill(125, 0);
-			this.lure(704);
+            Skill.setSkill(Skills.Paladin.Salvation, 0);
+            this.lure(UnitClassID.Uber_Mephisto);
 			Pather.moveTo(25129, 5198);
-			Skill.setSkill(125, 0);
-			this.lure(704);
+            Skill.setSkill(Skills.Paladin.Salvation, 0);
+            this.lure(UnitClassID.Uber_Mephisto);
 
-			if (!getUnit(1, 704)) {
+            if (!getUnit(UnitType.NPC, UnitClassID.Uber_Mephisto)) {
 				Pather.moveTo(25122, 5170);
 			}
 
-			if (Config.OrgTorch.UseSalvation && me.classid === 3 && me.getSkill(125, 1)) {
+            if (Config.OrgTorch.UseSalvation && me.classid === ClassID.Paladin && me.getSkill(Skills.Paladin.Salvation, 1)) {
 				skillBackup = Config.AttackSkill[2];
-				Config.AttackSkill[2] = 125;
+                Config.AttackSkill[2] = Skills.Paladin.Salvation;
 
 				Attack.init();
 			}
 
-			Attack.kill(704);
+            Attack.kill(UnitClassID.Uber_Mephisto);
 
-			if (skillBackup && me.classid === 3 && me.getSkill(125, 1)) {
+            if (skillBackup && me.classid === ClassID.Paladin && me.getSkill(Skills.Paladin.Salvation, 1)) {
 				Config.AttackSkill[2] = skillBackup;
 
 				Attack.init();
@@ -246,17 +247,17 @@ function OrgTorch() {
 			Pather.moveTo(25162, 5141);
 			delay(3250);
 
-			if (!getUnit(1, 709)) {
+            if (!getUnit(UnitType.NPC, UnitClassID.Pandemonium_Diablo)) {
 				Pather.moveTo(25122, 5170);
 			}
 
-			Attack.kill(709);
+            Attack.kill(UnitClassID.Pandemonium_Diablo);
 
-			if (!getUnit(1, 705)) {
+            if (!getUnit(UnitType.NPC, UnitClassID.Uber_Baal)) {
 				Pather.moveTo(25122, 5170);
 			}
 
-			Attack.kill(705);
+            Attack.kill(UnitClassID.Uber_Baal);
 			Pickit.pickItems();
 			this.checkTorch();
 
@@ -324,7 +325,12 @@ function OrgTorch() {
 								print("Got key count request from: " + obj.profile);
 
 								// Get the number of needed keys
-								neededItems = {pk1: 3 - tkeys, pk2: 3 - hkeys, pk3: 3 - dkeys, rv: this.juvCheck()};
+								//neededItems = {pk1: 3 - tkeys, pk2: 3 - hkeys, pk3: 3 - dkeys, rv: this.juvCheck()};
+								//print("Needed Keys: (" + (3 - tkeys).toString() + "," + (3 - hkeys).toString() + "," + (3 - dkeys).toString() + ")");
+								
+								// Get the number of needed keys
+								neededItems = {pk1: (6 - tkeys), pk2: (6 - hkeys), pk3: (6 - dkeys), rv: this.juvCheck()};
+								print("Needed Keys: (" + (6 - tkeys).toString() + "," + (6 - hkeys).toString() + "," + (6 - dkeys).toString() + ") Rejuv: " + this.juvCheck().toString());
 
 								sendCopyData(null, obj.profile, 6, JSON.stringify({name: "neededItems", value: neededItems}));
 							}
@@ -353,9 +359,9 @@ function OrgTorch() {
 			}
 
 			// Get the number keys
-			tkeys = me.findItems("pk1", 0).length || 0;
-			hkeys = me.findItems("pk2", 0).length || 0;
-			dkeys = me.findItems("pk3", 0).length || 0;
+			tkeys = me.findItems("pk1", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+			hkeys = me.findItems("pk2", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+            dkeys = me.findItems("pk3", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
 
 			// Stop the loop if we  have enough keys or if wait time expired
 			if (((tkeys >= 3 && hkeys >= 3 && dkeys >= 3) || (Config.OrgTorch.WaitTimeout && (getTickCount() - timer > Config.OrgTorch.WaitTimeout * 1000 * 60))) && this.aloneInGame()) {
@@ -391,12 +397,12 @@ function OrgTorch() {
 	}
 
 	// Count keys and organs
-	tkeys = me.findItems("pk1", 0).length || 0;
-	hkeys = me.findItems("pk2", 0).length || 0;
-	dkeys = me.findItems("pk3", 0).length || 0;
-	brains = me.findItems("mbr", 0).length || 0;
-	eyes = me.findItems("bey", 0).length || 0;
-	horns = me.findItems("dhn", 0).length || 0;
+	tkeys = me.findItems("pk1", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+	hkeys = me.findItems("pk2", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+    dkeys = me.findItems("pk3", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+    brains = me.findItems("mbr", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+    eyes = me.findItems("bey", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+    horns = me.findItems("dhn", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
 
 	// End the script if we don't have enough keys nor organs
 	if ((tkeys < 3 || hkeys < 3 || dkeys < 3) && (brains < 1 || eyes < 1 || horns < 1)) {
@@ -436,9 +442,9 @@ function OrgTorch() {
 	}
 
 	// Count organs
-	brains = me.findItems("mbr", 0).length || 0;
-	eyes = me.findItems("bey", 0).length || 0;
-	horns = me.findItems("dhn", 0).length || 0;
+    brains = me.findItems("mbr", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+    eyes = me.findItems("bey", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
+    horns = me.findItems("dhn", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store).length || 0;
 
 	// We have enough organs, do Tristram
 	if (brains && eyes && horns) {

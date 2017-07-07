@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		Assassin attack sequence
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var ClassAttack = {
 	lastTrapPos: {},
@@ -13,7 +14,7 @@ var ClassAttack = {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
+        if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
 					return false;
@@ -29,7 +30,7 @@ var ClassAttack = {
 			timedSkill = -1,
 			untimedSkill = -1;
 
-		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
+        index = ((unit.spectype & 0x7) || unit.type === UnitType.Player) ? 1 : 3;
 		checkTraps = this.checkTraps(unit);
 
 		if (checkTraps) {
@@ -43,8 +44,8 @@ var ClassAttack = {
 		}
 
 		// Cloak of Shadows - can't be cast again until previous one runs out and next to useless if cast in precast sequence (won't blind anyone)
-		if (Config.UseCloakofShadows && me.getSkill(264, 1) && getDistance(me, unit) < 20 && !me.getState(121) && !me.getState(153)) {
-			Skill.cast(264, 0);
+        if (Config.UseCloakofShadows && me.getSkill(Skills.Assassin.Cloak_of_Shadows, 1) && getDistance(me, unit) < 20 && !me.getState(States.SKILLDELAY) && !me.getState(States.CLOAK_OF_SHADOWS)) {
+            Skill.cast(Skills.Assassin.Cloak_of_Shadows, 0);
 		}
 
 		// Get timed skill
@@ -56,7 +57,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			timedSkill = Config.AttackSkill[5];
 		}
 
@@ -69,7 +70,7 @@ var ClassAttack = {
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+        } else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
 			untimedSkill = Config.AttackSkill[6];
 		}
 
@@ -122,9 +123,9 @@ var ClassAttack = {
 			return 2;
 		}
 
-		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
+        if (timedSkill > -1 && (!me.getState(States.SKILLDELAY) || !Skill.isTimed(timedSkill))) {
 			switch (timedSkill) {
-			case 151: // Whirlwind
+                case Skills.Barbarian.Whirlwind: // Whirlwind
 				if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x1)) {
 					if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x1)) {
 						return 0;
@@ -180,7 +181,7 @@ var ClassAttack = {
 		}
 
 		for (i = 0; i < 25; i += 1) {
-			if (!me.getState(121)) {
+            if (!me.getState(States.SKILLDELAY)) {
 				break;
 			}
 
@@ -213,11 +214,11 @@ var ClassAttack = {
 			for (j = -1; j <= 1; j += 1) {
 				if (Math.abs(i) === Math.abs(j)) { // used for X formation
 					// unit can be an object with x, y props too, that's why having "mode" prop is checked
-					if (traps >= amount || (unit.hasOwnProperty("mode") && (unit.mode === 0 || unit.mode === 12))) {
+                    if (traps >= amount || (unit.hasOwnProperty("mode") && (unit.mode === NPCModes.death || unit.mode === NPCModes.dead))) {
 						return true;
 					}
 
-					if ((unit.hasOwnProperty("classid") && [211, 242, 243, 544].indexOf(unit.classid) > -1) || (unit.hasOwnProperty("type") && unit.type === 0)) { // Duriel, Mephisto, Diablo, Baal, other players
+                    if ((unit.hasOwnProperty("classid") && [UnitClassID.duriel, UnitClassID.mephisto, UnitClassID.diablo, UnitClassID.baalcrab].indexOf(unit.classid) > -1) || (unit.hasOwnProperty("type") && unit.type === UnitType.Player)) { // Duriel, Mephisto, Diablo, Baal, other players
 						if (traps >= Config.BossTraps.length) {
 							return true;
 						}
@@ -258,7 +259,7 @@ var ClassAttack = {
 			coords = [Math.round((Math.cos((angle + angles[i]) * Math.PI / 180)) * 4 + unit.x), Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * 4 + unit.y)];
 
 			if (!CollMap.checkColl(me, {x: coords[0], y: coords[1]}, 0x1, 1)) {
-				return Skill.cast(151, 0, coords[0], coords[1]);
+                return Skill.cast(Skills.Barbarian.Whirlwind, 0, coords[0], coords[1]);
 			}
 		}
 
@@ -266,6 +267,6 @@ var ClassAttack = {
 			return false;
 		}
 
-		return Skill.cast(151, 0, me.x, me.y);
+        return Skill.cast(Skills.Barbarian.Whirlwind, 0, me.x, me.y);
 	}
 };

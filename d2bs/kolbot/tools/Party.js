@@ -11,7 +11,8 @@ function main() {
 	include("common/Cubing.js");
 	include("common/Runewords.js");
 	include("common/Misc.js");
-	include("common/Prototypes.js");
+    include("common/Prototypes.js");
+    if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 	Config.init();
 
 	var i, myPartyId, player, otherParty, shitList, currScript, scriptList,
@@ -107,7 +108,7 @@ function main() {
 							}
 
 							if (player.partyflag === 4) {
-								clickParty(player, 2); // cancel invitation
+                                clickParty(player, ClickTypeParty.Join_party); // cancel invitation
 								delay(100);
 							}
 
@@ -119,7 +120,7 @@ function main() {
 						}
 
 						if (player.partyflag !== 4 && (Config.PublicMode === 1 || player.partyflag !== 2) && player.partyid === 65535) {
-							clickParty(player, 2);
+                            clickParty(player, ClickTypeParty.Join_party);
 							delay(100);
 						}
 
@@ -134,7 +135,7 @@ function main() {
 						}
 
 						if (player.partyflag === 2 && (!otherParty || player.partyid === otherParty) && (getTickCount() - partyTick >= 2000 || Config.FastParty)) {
-							clickParty(player, 2);
+                            clickParty(player, ClickTypeParty.Join_party);
 							delay(100);
 						}
 
@@ -153,7 +154,7 @@ function main() {
 								say(player.name + " is shitlisted. Do not invite them.");
 							}
 
-							clickParty(player, 3);
+                            clickParty(player, ClickTypeParty.Leave_party);
 							delay(100);
 						}
 					}

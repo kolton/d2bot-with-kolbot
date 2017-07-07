@@ -3,25 +3,26 @@
 *	@author		kolton
 *	@desc		kill Nihlathak
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Nihlathak() {
 	Town.doChores();
-	Pather.useWaypoint(123);
+    Pather.useWaypoint(Areas.Act5.Halls_Of_Pain);
 	Precast.doPrecast(false);
 
-	if (!Pather.moveToExit(124, true)) {
+    if (!Pather.moveToExit(Areas.Act5.Halls_Of_Vaught, true)) {
 		throw new Error("Failed to go to Nihlathak");
 	}
 
-	Pather.moveToPreset(me.area, 2, 462, 0, 0, false, true);
+    Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Nihlathak_Outside_Town, 0, 0, false, true);
 
-	if (Config.Nihlathak.ViperQuit && getUnit(1, 597)) {
+    if (Config.Nihlathak.ViperQuit && getUnit(UnitType.NPC, UnitClassID.clawviper9)) {
 		print("Tomb Vipers found.");
 
 		return true;
 	}
 
-	Attack.kill(526); // Nihlathak
+    Attack.kill(UnitClassID.nihlathakboss); // Nihlathak
 	Pickit.pickItems();
 
 	return true;

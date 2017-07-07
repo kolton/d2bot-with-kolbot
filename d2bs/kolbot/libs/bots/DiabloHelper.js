@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		help leading player in clearing Chaos Sanctuary and killing Diablo
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function DiabloHelper() {
 	// Sort function
@@ -53,7 +54,7 @@ function DiabloHelper() {
 
 	// general functions
 	this.getLayout = function (seal, value) {
-		var sealPreset = getPresetUnit(108, 2, seal);
+        var sealPreset = getPresetUnit(Areas.Act4.Chaos_Sanctuary, UnitType.Object, seal);
 
 		if (!seal) {
 			throw new Error("Seal preset not found. Can't continue");
@@ -67,9 +68,9 @@ function DiabloHelper() {
 	};
 
 	this.initLayout = function () {
-		this.vizLayout = this.getLayout(396, 5275); // 1 = "Y", 2 = "L"
-		this.seisLayout = this.getLayout(394, 7773); // 1 = "2", 2 = "5"
-		this.infLayout = this.getLayout(392, 7893); // 1 = "I", 2 = "J"
+        this.vizLayout = this.getLayout(UniqueObjectIds.Diablo_Seal5, 5275); // 1 = "Y", 2 = "L"
+        this.seisLayout = this.getLayout(UniqueObjectIds.Diablo_Seal3, 7773); // 1 = "2", 2 = "5"
+        this.infLayout = this.getLayout(UniqueObjectIds.Diablo_Seal1, 7893); // 1 = "I", 2 = "J"
 	};
 
 	this.getBoss = function (name) {
@@ -80,7 +81,7 @@ function DiabloHelper() {
 				delay(500);
 			}
 
-			glow = getUnit(2, 131);
+            glow = getUnit(UnitType.Object, UniqueObjectIds.Vile_Dog_Afterglow);
 
 			if (glow) {
 				break;
@@ -167,9 +168,9 @@ function DiabloHelper() {
 		while (getTickCount() - tick < 30000) {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
-				case 1: // Sorceress
-					if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
-						if (me.getState(121)) {
+                    case ClassID.Sorceress: // Sorceress
+                        if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+                            if (me.getState(States.SKILLDELAY)) {
 							delay(500);
 						} else {
 							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
@@ -181,13 +182,13 @@ function DiabloHelper() {
 					delay(500);
 
 					break;
-				case 3: // Paladin
+                    case ClassID.Paladin: // Paladin
 					Skill.setSkill(Config.AttackSkill[2]);
 					Skill.cast(Config.AttackSkill[1], 1);
 
 					break;
-				case 5: // Druid
-					if (Config.AttackSkill[1] === 245) {
+                    case ClassID.Druid: // Druid
+                        if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
 						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
 
 						break;
@@ -196,12 +197,12 @@ function DiabloHelper() {
 					delay(500);
 
 					break;
-				case 6: // Assassin
+                    case ClassID.Assassin: // Assassin
 					if (Config.UseTraps) {
 						trapCheck = ClassAttack.checkTraps({x: 7793, y: 5293});
 
 						if (trapCheck) {
-							ClassAttack.placeTraps({x: 7793, y: 5293, classid: 243}, trapCheck);
+                            ClassAttack.placeTraps({ x: 7793, y: 5293, classid: UnitClassID.diablo}, trapCheck);
 
 							break;
 						}
@@ -219,7 +220,7 @@ function DiabloHelper() {
 				delay(500);
 			}
 
-			if (getUnit(1, 243)) {
+            if (getUnit(UnitType.NPC, UnitClassID.diablo)) {
 				return true;
 			}
 		}
@@ -259,9 +260,9 @@ function DiabloHelper() {
 		}
 
 		switch (me.classid) {
-		case 1:
-			if ([56, 59, 64].indexOf(Config.AttackSkill[1]) > -1) {
-				if (me.getState(121)) {
+            case ClassID.Sorceress:
+                if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+                    if (me.getState(States.SKILLDELAY)) {
 					delay(500);
 				} else {
 					Skill.cast(Config.AttackSkill[1], 0, coords[0], coords[1]);
@@ -271,9 +272,9 @@ function DiabloHelper() {
 			}
 
 			break;
-		case 3:
+            case ClassID.Paladin:
 			break;
-		case 6:
+            case ClassID.Assassin:
 			if (Config.UseTraps) {
 				trapCheck = ClassAttack.checkTraps({x: coords[0], y: coords[1]});
 
@@ -386,19 +387,19 @@ AreaInfoLoop:
 
 		if (party) {
 			do {
-				if (party.area === 131 || party.area === 132) { // Player is in Throne of Destruction or Worldstone Chamber
+                if (party.area === Areas.Act5.Throne_Of_Destruction || party.area === Areas.Act5.The_Worldstone_Chamber) { // Player is in Throne of Destruction or Worldstone Chamber
 					return false; // End script
 				}
 			} while (party.getNext());
 		}
 	}
 
-	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
+    Pather.useWaypoint(Config.RandomPrecast ? "random" : Areas.Act4.River_Of_Flame);
 	Precast.doPrecast(true);
 
 	if (Config.DiabloHelper.SkipTP) {
-		if (me.area !== 107) {
-			Pather.useWaypoint(107);
+        if (me.area !== Areas.Act4.River_Of_Flame) {
+            Pather.useWaypoint(Areas.Act4.River_Of_Flame);
 		}
 
 		if (!Pather.moveTo(7790, 5544)) {
@@ -415,7 +416,7 @@ CSLoop:
 
 			if (party) {
 				do {
-					if (party.name !== me.name && party.area === 108 && (!Config.Leader || party.name === Config.Leader)) {
+                    if (party.name !== me.name && party.area === Areas.Act4.Chaos_Sanctuary && (!Config.Leader || party.name === Config.Leader)) {
 						break CSLoop;
 					}
 				} while (party.getNext());
@@ -429,11 +430,11 @@ CSLoop:
 			throw new Error("Player wait timed out (" + (Config.Leader ? "Leader not" : "No players") + " found in Chaos)");
 		}
 	} else {
-		Pather.useWaypoint(103);
+        Pather.useWaypoint(Areas.Act4.The_Pandemonium_Fortress);
 		Town.move("portalspot");
 
 		for (i = 0; i < Config.DiabloHelper.Wait; i += 1) {
-			if (Pather.getPortal(108, Config.Leader || null) && Pather.usePortal(108, Config.Leader || null)) {
+            if (Pather.getPortal(Areas.Act4.Chaos_Sanctuary, Config.Leader || null) && Pather.usePortal(Areas.Act4.Chaos_Sanctuary, Config.Leader || null)) {
 				break;
 			}
 
@@ -463,7 +464,7 @@ CSLoop:
 	this.infectorSeal();
 
 	switch (me.classid) {
-	case 1:
+        case ClassID.Sorceress:
 		Pather.moveTo(7793, 5291);
 
 		break;
@@ -474,7 +475,7 @@ CSLoop:
 	}
 
 	this.diabloPrep();
-	Attack.kill(243); // Diablo
+    Attack.kill(UnitClassID.diablo); // Diablo
 	Pickit.pickItems();
 
 	return true;

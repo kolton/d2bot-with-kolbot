@@ -3,6 +3,7 @@
 *	@author		kolton
 *	@desc		walking Chaos Sanctuary leecher
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var stopLvl = 99;
 
@@ -30,7 +31,7 @@ function Wakka() {
 				if (suspect.area === destination) { // first player in our party found in destination area...
 					leader = suspect.name; // ... is our leader
 
-					if (suspect.area === 131) {
+                    if (suspect.area === Areas.Act5.Throne_Of_Destruction) {
 						return false;
 					}
 
@@ -56,7 +57,7 @@ function Wakka() {
 
 	this.checkMonsters = function (range, dodge) {
 		var monList = [],
-			monster = getUnit(1);
+            monster = getUnit(UnitType.NPC);
 
 		if (monster) {
 			do {
@@ -84,21 +85,21 @@ function Wakka() {
 	};
 
 	this.getLayout = function (seal, value) {
-		var sealPreset = getPresetUnit(108, 2, seal);
+        var sealPreset = getPresetUnit(Areas.Act4.Chaos_Sanctuary, UnitType.Object, seal);
 
 		if (!seal) {
 			throw new Error("Seal preset not found. Can't continue.");
 		}
 
 		switch (seal) {
-		case 396:
+            case UniqueObjectIds.Diablo_Seal5:
 			if (sealPreset.roomy * 5 + sealPreset.y === value) {
 				return 1;
 			}
 
 			break;
-		case 394:
-		case 392:
+            case UniqueObjectIds.Diablo_Seal3:
+            case UniqueObjectIds.Diablo_Seal1:
 			if (sealPreset.roomx * 5 + sealPreset.x === value) {
 				return 1;
 			}
@@ -110,24 +111,24 @@ function Wakka() {
 	};
 
 	this.getCoords = function () {
-		this.vizCoords = this.getLayout(396, 5275) === 1 ? [7707, 5274] : [7708, 5298];
-		this.seisCoords = this.getLayout(394, 7773) === 1 ? [7812, 5223] : [7809, 5193];
-		this.infCoords = this.getLayout(392, 7893) === 1 ? [7868, 5294] : [7882, 5306];
+        this.vizCoords = this.getLayout(UniqueObjectIds.Diablo_Seal5, 5275) === 1 ? [7707, 5274] : [7708, 5298];
+        this.seisCoords = this.getLayout(UniqueObjectIds.Diablo_Seal3, 7773) === 1 ? [7812, 5223] : [7809, 5193];
+        this.infCoords = this.getLayout(UniqueObjectIds.Diablo_Seal1, 7893) === 1 ? [7868, 5294] : [7882, 5306];
 	};
 
 	this.checkBoss = function (name) {
 		var i, boss,
-			glow = getUnit(2, 131);
+            glow = getUnit(UnitType.Object, UniqueObjectIds.Vile_Dog_Afterglow);
 
 		if (glow) {
 			for (i = 0; i < 10; i += 1) {
-				if (me.getStat(12) >= stopLvl) {
+                if (me.getStat(Stats.level) >= stopLvl) {
 					D2Bot.stop();
 				}
 
-				boss = getUnit(1, name);
+                boss = getUnit(UnitType.NPC, name);
 
-				if (boss && boss.mode === 12) {
+                if (boss && boss.mode === NPCModes.dead) {
 					return true;
 				}
 
@@ -141,14 +142,14 @@ function Wakka() {
 	};
 
 	this.getCorpse = function () {
-		if (me.mode === 17) {
+        if (me.mode === PlayerModes.Dead) {
 			me.revive();
 		}
 
 		var corpse,
 			rval = false;
 
-		corpse = getUnit(0, me.name, 17);
+        corpse = getUnit(UnitType.Player, me.name, PlayerModes.Dead);
 
 		if (corpse) {
 			do {
@@ -173,16 +174,16 @@ function Wakka() {
 		}
 
 		while (path.length > 0) {
-			if (me.getStat(12) >= stopLvl) {
+            if (me.getStat(Stats.level) >= stopLvl) {
 				D2Bot.stop();
 			}
 
-			if (me.mode === 17 || me.inTown) {
+            if (me.mode === PlayerModes.Dead || me.inTown) {
 				return false;
 			}
 
 			if (!leaderUnit || !copyUnit(leaderUnit).x) {
-				leaderUnit = getUnit(0, leader);
+                leaderUnit = getUnit(UnitType.Player, leader);
 			}
 
 			if (leaderUnit) {
@@ -250,20 +251,24 @@ function Wakka() {
 			throw new Error("Wakka: Leader not partied");
 		}
 	}
-
-	autoLeaderDetect(108);
+	else {
+        autoLeaderDetect(Areas.Act4.Chaos_Sanctuary);
+	}
+	//print(leader);
 	Town.doChores();
 
+		//print("1");
 	if (leader) {
+		//print("2");
 		while (Misc.inMyParty(leader)) {
-			if (me.getStat(12) >= stopLvl) {
+            if (me.getStat(Stats.level) >= stopLvl) {
 				D2Bot.stop();
 			}
 
 			switch (me.area) {
-			case 103:
+                case Areas.Act4.The_Pandemonium_Fortress:
 				//portal = Pather.getPortal(108, leader);
-				portal = Pather.getPortal(108, null);
+                    portal = Pather.getPortal(Areas.Act4.Chaos_Sanctuary, null);
 
 				if (portal) {
 					if (!safeTP) {
@@ -275,12 +280,12 @@ function Wakka() {
 				}
 
 				break;
-			case 108:
+                case Areas.Act4.Chaos_Sanctuary:
 				if (!safeTP) {
 					if (this.checkMonsters(25, false)) {
 						me.overhead("hot tp");
 						//Pather.usePortal(103, leader);
-						Pather.usePortal(103, null);
+                        Pather.usePortal(Areas.Act4.The_Pandemonium_Fortress, null);
 						this.getCorpse();
 
 						break;
@@ -362,16 +367,16 @@ function Wakka() {
 
 				Pather.moveTo(7767, 5263);
 
-				diablo = getUnit(1, 243);
+                diablo = getUnit(UnitType.NPC, UnitClassID.diablo);
 
-				if (diablo && (diablo.mode === 0 || diablo.mode === 12)) {
+                if (diablo && (diablo.mode === NPCModes.death || diablo.mode === NPCModes.dead)) {
 					return true;
 				}
 
 				break;
 			}
 
-			if (me.mode === 17) {
+            if (me.mode === PlayerModes.Dead) {
 				me.revive();
 			}
 

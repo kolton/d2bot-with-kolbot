@@ -1,3 +1,6 @@
+
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
+
 var answer = false,
 	request = false,	
 
@@ -12,7 +15,7 @@ var answer = false,
 				Pally: "",
 				Mine: 0
 		},
-	init: function () {
+        init: function () {
 		AutoAssign.updateNames(); //initiates all scripts
 		
 		//Do something else? What else do we need to do...
@@ -118,13 +121,13 @@ var answer = false,
 		var obj = {name : name, level : level};
 		
 			switch (classid) {
-				case 1:
+				case ClassID.Sorceress:
 					this.Sorcs.push(obj);
 				break;
-				case 3:
+				case ClassID.Paladin:
 					this.Pallys.push(obj);
 				break;
-				case 4:
+				case ClassID.Barbarian:
 					this.Barbs.push(obj);
 				break;
 			}

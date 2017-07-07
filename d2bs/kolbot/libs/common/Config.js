@@ -5,6 +5,7 @@
 */
 
 var Scripts = {};
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 var Config = {
 	init: function (notify) {
@@ -485,5 +486,33 @@ var Config = {
 		Template: "",
 		Verbose: false,
 		DebugMode: false
-	}
+	},
+	AndiFastExp: {
+		KillNihlathak: false,
+		FastChaos: false,
+		Wait: 120,
+		Helper: false,
+		BaalHelper: false,
+		GetShrine: false,
+		StopSeekingExpShrineAfterGotOne: false,
+		GetShrineWaitForHotTP: false,
+		DollQuit: false,
+		SoulQuit: false,
+		SkipTP: false,
+		WaitForSafeTP: false,
+		KillBaal: false,
+		HotTPMessage: [],
+		SafeTPMessage: [],
+		BaalMessage: [],
+		NextGameMessage: [],
+		PrepareDiablo: false,
+		DiabloPercent: 30,
+		PrepareNihlatak: false,
+		NihlatakPercent: 30,
+		NihlathakViperQuit: true,
+		XPChar: false,
+		NeedBo: false,
+		GiveBo: false,
+		BoWaitTime: 30		
+	},
 };

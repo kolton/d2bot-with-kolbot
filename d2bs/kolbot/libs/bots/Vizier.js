@@ -3,12 +3,13 @@
 *	@author		kolton
 *	@desc		kill Grand Vizier of Chaos
 */
+if (!isIncluded("common/Enums.js")) { include("common/Enums.js"); };
 
 function Vizier() {
 	var i, tick, seal;
 	
 	this.openSeal = function (id) {
-		Pather.moveToPreset(108, 2, id, 4);
+        Pather.moveToPreset(Areas.Act4.Chaos_Sanctuary, UnitType.Object, id, 4);
 
 		seal = getUnit(2, id);
 
@@ -32,14 +33,14 @@ function Vizier() {
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(107);
+    Pather.useWaypoint(Areas.Act4.River_Of_Flame);
 	Precast.doPrecast(true);
 
-	if (!this.openSeal(396) || !this.openSeal(395)) {
+    if (!this.openSeal(UniqueObjectIds.Diablo_Seal5) || !this.openSeal(UniqueObjectIds.Diablo_Seal4)) {
 		throw new Error("Failed to open seals");
 	}
 
-	Pather.moveToPreset(108, 2, 396, 4);
+    Pather.moveToPreset(Areas.Act4.Chaos_Sanctuary, UnitType.Object, UniqueObjectIds.Diablo_Seal5, ObjectModes.Special2);
 
 	for (i = 0; i < 10; i += 1) {
 		if (getUnit(1, getLocaleString(2851))) {
