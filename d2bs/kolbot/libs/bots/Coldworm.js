@@ -8,12 +8,12 @@ function Coldworm() {
 	var i;
 
 	Town.doChores();
-	Pather.useWaypoint(43);
+	Pather.useWaypoint(Areas.Act2.Far_Oasis);
 	Precast.doPrecast(true);
 	
 	// Beetleburst, added by 13ack.Stab
 	if (Config.Coldworm.KillBeetleburst) {
-		if (!Pather.moveToPreset(me.area, 1, 747)) {
+		if (!Pather.moveToPreset(me.area, UnitType.NPC, SuperUniques.Beetleburst)) {
 			throw new Error("Failed to move to Beetleburst");
 		}
 			
@@ -31,11 +31,11 @@ function Coldworm() {
 	}
 
 	if (!Config.Coldworm.ClearMaggotLair) {
-		if (!Pather.moveToPreset(me.area, 2, 356)) {
+		if (!Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Staff_Of_Kings_Chest)) {
 			throw new Error("Failed to move to Coldworm");
 		}
 
-		Attack.clear(15, 0, 284);
+		Attack.clear(15, 0, UnitClassID.maggotqueen1);
 	}
 
 	return true;

@@ -6,10 +6,10 @@
 
 function UndergroundPassage() {
 	Town.doChores();
-	Pather.useWaypoint(4);
+	Pather.useWaypoint(Areas.Act1.Stony_Field);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([10, 14], true)) {
+	if (!Pather.moveToExit([Areas.Act1.Underground_Passage_Level_1, Areas.Act1.Underground_Passage_Level_2], true)) {
 		throw new Error("Failed to move to Underground passage level 2");
 	}
 

@@ -31,7 +31,7 @@ var Container = function (name, width, height, location) {
 		var x, y;
 
 		//Make sure it is in this container.
-		if (item.location !== this.location || item.mode !== 0) {
+		if (item.location !== this.location || item.mode !== ItemModes.Item_In_Inventory_Stash_Cube_Or_Store) {
 			return false;
 		}
 
@@ -58,7 +58,7 @@ var Container = function (name, width, height, location) {
 		reference = baseRef.slice(0);
 
 		//Make sure it is in this container.
-		if (item.mode !== 0 || item.location !== this.location) {
+		if (item.mode !== ItemModes.Item_In_Inventory_Stash_Cube_Or_Store || item.location !== this.location) {
 			return false;
 		}
 
@@ -161,12 +161,12 @@ Loop:
 			}
 
 			//Can't deal with items on ground!
-			if (item.mode === 3) {
+			if (item.mode === ItemModes.Item_on_ground) {
 				return false;
 			}
 
 			//Item already on the cursor.
-			if (me.itemoncursor && item.mode !== 4) {
+			if (me.itemoncursor && item.mode !== ItemModes.Item_on_cursor) {
 				return false;
 			}
 
@@ -290,7 +290,7 @@ Loop:
 
 var Storage = new function () {
 	this.Init = function () {
-		this.StashY = me.gametype === 0 ? 4 : 8;
+		this.StashY = me.gametype === GameType.Classic ? 4 : 8;
 		this.Inventory = new Container("Inventory", 10, 4, 3);
 		this.TradeScreen = new Container("Inventory", 10, 4, 5);
 		this.Stash = new Container("Stash", 6, this.StashY, 7);
@@ -301,15 +301,15 @@ var Storage = new function () {
 		this.Reload();
 	};
 
-	this.BeltSize = function () {
-		var item = me.getItem(-1, 1); // get equipped item
+	this.BeltSize = function() {
+		var item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc); // get equipped item
 
 		if (!item) { // nothing equipped
 			return 1;
 		}
 
 		do {
-			if (item.bodylocation === 8) { // belt slot
+			if (item.bodylocation === ItemBodyLocation.BELT) { // belt slot
 				switch (item.code) {
 				case "lbl": // sash
 				case "vbl": // light belt
@@ -341,23 +341,23 @@ var Storage = new function () {
 
 		do {
 			switch (item.location) {
-			case 3:
+			case ItemLocation.Inventory:
 				this.Inventory.Mark(item);
 
 				break;
-			case 5:
+			case ItemLocation.Trade:
 				this.TradeScreen.Mark(item);
 
 				break;
-			case 2:
+			case ItemLocation.Belt:
 				this.Belt.Mark(item);
 
 				break;
-			case 6:
+			case ItemLocation.Cube:
 				this.Cube.Mark(item);
 
 				break;
-			case 7:
+			case ItemLocation.Stash:
 				this.Stash.Mark(item);
 
 				break;

@@ -6,10 +6,10 @@
 
 function Snapchip() {
 	Town.doChores();
-	Pather.useWaypoint(118);
+	Pather.useWaypoint(Areas.Act5.Ancients_Way);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(119, true) || !Pather.moveToPreset(me.area, 2, 397)) {
+	if (!Pather.moveToExit(Areas.Act5.Icy_Cellar, true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Sparklychest)) {
 		throw new Error("Failed to move to Snapchip Shatter");
 	}
 

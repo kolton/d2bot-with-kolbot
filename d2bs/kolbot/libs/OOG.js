@@ -427,8 +427,8 @@ var DataFile = {
 		for (i = 0; i < statArr.length; i += 1) {
 			switch (statArr[i]) {
 			case "experience":
-				obj.experience = me.getStat(13);
-				obj.level = me.getStat(12);
+				obj.experience = me.getStat(Stats.experience);
+				obj.level = me.getStat(Stats.level);
 
 				break;
 			case "lastArea":
@@ -444,7 +444,7 @@ var DataFile = {
 					break;
 				}
 
-				obj.gold = me.getStat(14) + me.getStat(15);
+				obj.gold = me.getStat(Stats.gold) + me.getStat(Stats.goldbank);
 
 				break;
 			case "name":

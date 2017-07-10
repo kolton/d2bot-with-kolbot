@@ -13,12 +13,12 @@ function TravincalLeech() {
 	}
 
 	while (Misc.inMyParty(Config.Leader)) {
-		if (me.inTown && Pather.getPortal(83, Config.Leader)) {
-			Pather.usePortal(83, Config.Leader);
+		if (me.inTown && Pather.getPortal(Areas.Act3.Travincal, Config.Leader)) {
+			Pather.usePortal(Areas.Act3.Travincal, Config.Leader);
 			Town.getCorpse();
 		}
 
-		if (me.mode === 17) {
+		if (me.mode === PlayerModes.Dead) {
 			me.revive();
 
 			while (!me.inTown) {

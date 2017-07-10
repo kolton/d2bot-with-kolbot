@@ -9,94 +9,94 @@ var Skill = {
 
 	getRange: function (skillId) {
 		switch (skillId) {
-		case 0: // Normal Attack
+		case Skills.common.Attack: // Normal Attack
 			return Attack.usingBow() ? 20 : 3;
-		case 10: // Jab
-		case 14: // Power Strike
-		case 19: // Impale
-		case 30: // Fend
-		case 34: // Lightning Strike
-		case 73: // Poison Dagger
-		case 96: // Sacrifice
-		case 97: // Smite
-		case 106: // Zeal
-		case 112: // Blessed Hammer
-		case 116: // Conversion
-		case 126: // Bash
-		case 133: // Double Swing
-		case 139: // Stun
-		case 144: // Concentrate
-		case 147: // Frenzy
-		case 152: // Berserk
-		case 232: // Feral Rage
-		case 233: // Maul
-		case 238: // Rabies
-		case 239: // Fire Claws
-		case 242: // Hunger
-		case 248: // Fury
-		case 255: // Dragon Talon
-		case 260: // Dragon Claw
-		case 270: // Dragon Tail
+		case Skills.Amazon.Jab: // Jab
+		case Skills.Amazon.Power_Strike: // Power Strike
+		case Skills.Amazon.Impale: // Impale
+		case Skills.Amazon.Fend: // Fend
+		case Skills.Amazon.Lightning_Strike: // Lightning Strike
+		case Skills.Amazon.Poison_Javelin: // Poison Dagger
+		case Skills.Paladin.Sacrifice: // Sacrifice
+		case Skills.Paladin.Smite: // Smite
+		case Skills.Paladin.Zeal: // Zeal
+		case Skills.Paladin.Blessed_Hammer: // Blessed Hammer
+		case Skills.Paladin.Conversion: // Conversion
+		case Skills.Barbarian.Bash: // Bash
+		case Skills.Barbarian.Double_Swing: // Double Swing
+		case Skills.Barbarian.Stun: // Stun
+		case Skills.Barbarian.Concentrate: // Concentrate
+		case Skills.Barbarian.Frenzy: // Frenzy
+		case Skills.Barbarian.Berserk: // Berserk
+		case Skills.Druid.Feral_Rage: // Feral Rage
+		case Skills.Druid.Maul: // Maul
+		case Skills.Druid.Rabies: // Rabies
+		case Skills.Druid.Fire_Claws: // Fire Claws
+		case Skills.Druid.Hunger: // Hunger
+		case Skills.Druid.Fury: // Fury
+		case Skills.Assassin.Dragon_Talon: // Dragon Talon
+		case Skills.Assassin.Dragon_Claw: // Dragon Claw
+		case Skills.Assassin.Dragon_Tail: // Dragon Tail
 			return 3;
-		case 146: // Battle Cry
-		case 154: // War Cry
+		case Skills.Barbarian.Battle_Cry: // Battle Cry
+		case Skills.Barbarian.War_Cry: // War Cry
 			return 4;
-		case 44: // Frost Nova
-		case 240: // Twister
-		case 245: // Tornado
+		case Skills.Sorceress.Frost_Nova: // Frost Nova
+		case Skills.Druid.Twister: // Twister
+		case Skills.Druid.Tornado: // Tornado
 		case 500: // Summoner
 			return 5;
-		case 38: // Charged Bolt
+		case Skills.Sorceress.Charged_Bolt: // Charged Bolt
 			return 6;
-		case 48: // Nova
-		case 151: // Whirlwind
+		case Skills.Sorceress.Nova: // Nova
+		case Skills.Barbarian.Whirlwind: // Whirlwind
 			return 7;
-		case 92: // Poison Nova
+		case Skills.Necromancer.Poison_Nova: // Poison Nova
 			return 8;
-		case 101: // Holy Bolt
-		case 107: // Charge
-		case 130: // Howl
-		case 132: // Leap
-		case 225: // Firestorm
-		case 229: // Molten Boulder
-		case 230: // Arctic Blast
-		case 243: // Shock Wave
+		case Skills.Paladin.Holy_Bolt: // Holy Bolt
+		case Skills.Paladin.Charge: // Charge
+		case Skills.Barbarian.Howl: // Howl
+		case Skills.Barbarian.Leap: // Leap
+		case Skills.Druid.Firestorm: // Firestorm
+		case Skills.Druid.Molten_Boulder: // Molten Boulder
+		case Skills.Druid.Arctic_Blast: // Arctic Blast
+		case Skills.Druid.Shock_Wave: // Shock Wave
 			return 10;
-		case 64: // Frozen Orb
-		case 67: // Teeth
-		case 234: // Fissure
-		case 244: // Volcano
-		case 251: // Fire Blast
-		case 256: // Shock Web
-		case 257: // Blade Sentinel
-		case 266: // Blade Fury
+		case Skills.Sorceress.Frozen_Orb: // Frozen Orb
+		case Skills.Necromancer.Teeth: // Teeth
+		case Skills.Druid.Eruption: // Fissure
+		case Skills.Druid.Volcano: // Volcano
+		case Skills.Assassin.Fire_Trauma: // Fire Blast
+		case Skills.Assassin.Shock_Field: // Shock Web
+		case Skills.Assassin.Blade_Sentinel: // Blade Sentinel
+		case Skills.Assassin.Blade_Fury: // Blade Fury
 			return 15;
-		case 121: // Fist of the Heavens
-		case 253: // Psychic Hammer
-		case 275: // Dragon Flight
+		case Skills.Paladin.Fist_of_the_Heavens: // Fist of the Heavens
+		case Skills.Assassin.Psychic_Hammer: // Psychic Hammer
+		case Skills.Assassin.Dragon_Flight: // Dragon Flight
 			return 20;
 		// Variable range
-		case 42: // Static Field
-			if (me.gametype === 1) {
-				return Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
+		case Skills.Sorceress.Static_Field: // Static Field
+			if (me.gametype === GameType.Expansion) {
+				return Math.floor((me.getSkill(Skills.Sorceress.Static_Field, 1) + 4) * 2 / 3);
 			}
 
 			return 20;
-		case 49: // Lightning
-		case 84: // Bone Spear
-		case 93: // Bone Spirit
+		case Skills.Sorceress.Lightning: // Lightning
+		case Skills.Necromancer.Bone_Spear: // Bone Spear
+		case Skills.Necromancer.Bone_Spirit: // Bone Spirit
 			if (this.usePvpRange) {
 				return 40;
 			}
 
 			return 15;
-		case 24: // Charged Strike
-		case 47:
-		case 51:
-		case 53:
-		case 56:
-		case 59:
-		case 273: // Mind Blast
+		case Skills.Amazon.Charged_Strike: // Charged Strike
+		case Skills.Sorceress.Fire_Ball:
+		case Skills.Sorceress.Fire_Wall:
+		case Skills.Sorceress.Chain_Lightning:
+		case Skills.Sorceress.Meteor:
+		case Skills.Sorceress.Blizzard:
+		case Skills.Assassin.Mind_Blast: // Mind Blast
 			if (this.usePvpRange) {
 				return 40;
 			}
@@ -114,99 +114,99 @@ var Skill = {
 
 	getHand: function (skillId) {
 		switch (skillId) {
-		case 6:
-		case 7:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 18:
-		case 19:
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		case 27:
-		case 29:
-		case 30:
-		case 31:
-		case 33:
-		case 34:
-		case 35:
-		case 36:
-		case 37:
-		case 38:
-		case 39:
-		case 41:
-		case 45:
-		case 47:
-		case 49:
-		case 53:
-		case 55:
-		case 61:
-		case 63:
-		case 64:
-		case 65:
-		case 67:
-		case 73:
-		case 79:
-		case 84:
-		case 89:
-		case 93:
-		case 101:
-		case 107:
-		case 111:
-		case 112:
-		case 121:
-		case 132:
-		case 140:
-		case 143:
-		case 151:
-		case 225:
-		case 229:
-		case 230:
-		case 240:
-		case 243:
-		case 245:
-		case 251:
-		case 254:
-		case 256:
-		case 257:
-		case 259:
-		case 263:
-		case 265:
-		case 266:
-		case 269:
-		case 274:
-		case 275:
+		case Skills.Amazon.Magic_Arrow:
+		case Skills.Amazon.Fire_Arrow:
+		case Skills.Amazon.Critical_Strike:
+		case Skills.Amazon.Jab:
+		case Skills.Amazon.Cold_Arrow:
+		case Skills.Amazon.Multiple_Shot:
+		case Skills.Amazon.Dodge:
+		case Skills.Amazon.Power_Strike:
+		case Skills.Amazon.Poison_Javelin:
+		case Skills.Amazon.Exploding_Arrow:
+		case Skills.Amazon.Avoid:
+		case Skills.Amazon.Impale:
+		case Skills.Amazon.Lightning_Bolt:
+		case Skills.Amazon.Ice_Arrow:
+		case Skills.Amazon.Guided_Arrow:
+		case Skills.Amazon.Penetrate:
+		case Skills.Amazon.Charged_Strike:
+		case Skills.Amazon.Plague_Javelin:
+		case Skills.Amazon.Strafe:
+		case Skills.Amazon.Immolation_Arrow:
+		case Skills.Amazon.Evade:
+		case Skills.Amazon.Fend:
+		case Skills.Amazon.Freezing_Arrow:
+		case Skills.Amazon.Pierce:
+		case Skills.Amazon.Lightning_Strike:
+		case Skills.Amazon.Lightning_Fury:
+		case Skills.Sorceress.Fire_Bolt:
+		case Skills.Sorceress.Warmth:
+		case Skills.Sorceress.Charged_Bolt:
+		case Skills.Sorceress.Ice_Bolt:
+		case Skills.Sorceress.Inferno:
+		case Skills.Sorceress.Ice_Blast:
+		case Skills.Sorceress.Fire_Ball:
+		case Skills.Sorceress.Lightning:
+		case Skills.Sorceress.Chain_Lightning:
+		case Skills.Sorceress.Glacial_Spike:
+		case Skills.Sorceress.Fire_Mastery:
+		case Skills.Sorceress.Lightning_Mastery:
+		case Skills.Sorceress.Frozen_Orb:
+		case Skills.Sorceress.Cold_Mastery:
+		case Skills.Necromancer.Teeth:
+		case Skills.Necromancer.Poison_Dagger:
+		case Skills.Necromancer.Golem_Mastery:
+		case Skills.Necromancer.Bone_Spear:
+		case Skills.Necromancer.Summon_Resist:
+		case Skills.Necromancer.Bone_Spirit:
+		case Skills.Paladin.Holy_Bolt:
+		case Skills.Paladin.Charge:
+		case Skills.Paladin.Vengeance:
+		case Skills.Paladin.Blessed_Hammer:
+		case Skills.Paladin.Fist_of_the_Heavens:
+		case Skills.Barbarian.Leap:
+		case Skills.Barbarian.Double_Throw:
+		case Skills.Barbarian.Leap_Attack:
+		case Skills.Barbarian.Whirlwind:
+		case Skills.Druid.Firestorm:
+		case Skills.Druid.Molten_Boulder:
+		case Skills.Druid.Arctic_Blast:
+		case Skills.Druid.Twister:
+		case Skills.Druid.Shock_Wave:
+		case Skills.Druid.Tornado:
+		case Skills.Assassin.Fire_Trauma:
+		case Skills.Assassin.Tiger_Strike:
+		case Skills.Assassin.Shock_Field:
+		case Skills.Assassin.Blade_Sentinel:
+		case Skills.Assassin.Fists_of_Fire:
+		case Skills.Assassin.Weapon_Block:
+		case Skills.Assassin.Cobra_Strike:
+		case Skills.Assassin.Blade_Fury:
+		case Skills.Assassin.Claws_of_Thunder:
+		case Skills.Assassin.Blades_of_Ice:
+		case Skills.Assassin.Dragon_Flight:
 			return 1;
-		case 0: // Normal Attack
-		case 96: // Sacrifice
-		case 97: // Smite
-		case 106: // Zeal
-		case 116: // Conversion
-		case 126: // Bash
-		case 133: // Double Swing
-		case 139: // Stun
-		case 144: // Concentrate
-		case 147: // Frenzy
-		case 152: // Berserk
-		case 232: // Feral Rage
-		case 233: // Maul
-		case 238: // Rabies
-		case 239: // Fire Claws
-		case 242: // Hunger
-		case 248: // Fury
-		case 255: // Dragon Talon
-		case 260: // Dragon Claw
-		case 270: // Dragon Tail
+		case Skills.common.Attack: // Normal Attack
+		case Skills.Paladin.Sacrifice: // Sacrifice
+		case Skills.Paladin.Smite: // Smite
+		case Skills.Paladin.Zeal: // Zeal
+		case Skills.Paladin.Conversion: // Conversion
+		case Skills.Barbarian.Bash: // Bash
+		case Skills.Barbarian.Double_Swing: // Double Swing
+		case Skills.Barbarian.Stun: // Stun
+		case Skills.Barbarian.Concentrate: // Concentrate
+		case Skills.Barbarian.Frenzy: // Frenzy
+		case Skills.Barbarian.Berserk: // Berserk
+		case Skills.Druid.Feral_Rage: // Feral Rage
+		case Skills.Druid.Maul: // Maul
+		case Skills.Druid.Rabies: // Rabies
+		case Skills.Druid.Fire_Claws: // Fire Claws
+		case Skills.Druid.Hunger: // Hunger
+		case Skills.Druid.Fury: // Fury
+		case Skills.Assassin.Dragon_Talon: // Dragon Talon
+		case Skills.Assassin.Dragon_Claw: // Dragon Claw
+		case Skills.Assassin.Dragon_Tail: // Dragon Tail
 			return 2; // Shift bypass
 		}
 
@@ -233,7 +233,7 @@ var Skill = {
 		// No mana to cast
 		if (this.getManaCost(skillId) > me.mp) {
 			// Maybe delay on ALL skills that we don't have enough mana for?
-			if (Config.AttackSkill.concat([42, 54]).concat(Config.LowManaSkill).indexOf(skillId) > -1) {
+			if (Config.AttackSkill.concat([Skills.Sorceress.Static_Field, Skills.Sorceress.Teleport]).concat(Config.LowManaSkill).indexOf(skillId) > -1) {
 				delay(300);
 			}
 
@@ -335,7 +335,7 @@ MainLoop:
 					break;
 				}
 
-				if (me.getState(121)) {
+				if (me.getState(States.SKILLDELAY)) {
 					break;
 				}
 
@@ -349,7 +349,7 @@ MainLoop:
 	// Put a skill on desired slot
 	setSkill: function (skillId, hand) {
 		// Check if the skill is already set
-		if (me.getSkill(hand === 0 ? 2 : 3) === skillId) {
+		if (me.getSkill(hand === 0 ? Skills.common.Throw : Skills.common.Unsummon) === skillId) {
 			return true;
 		}
 
@@ -394,27 +394,33 @@ MainLoop:
 
 	// Timed skills
 	isTimed: function (skillId) {
-		return [15, 25, 27, 51, 56, 59, 62, 64, 121, 225, 223, 228, 229, 234, 244, 247, 249, 250, 256, 268, 275, 277, 279].indexOf(skillId) > -1;
+		return [Skills.Amazon.Poison_Javelin, Skills.Amazon.Plague_Javelin, Skills.Amazon.Immolation_Arrow,
+			Skills.Sorceress.Fire_Wall, Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Hydra, Skills.Sorceress.Frozen_Orb,
+			Skills.Paladin.Fist_of_the_Heavens,
+			Skills.Druid.Firestorm, Skills.Druid.Wearwolf, Skills.Druid.Wearbear, Skills.Druid.Molten_Boulder, Skills.Druid.Eruption, Skills.Druid.Volcano, Skills.Druid.Summon_Grizzly, Skills.Druid.Armageddon, Skills.Druid.Hurricane,
+			Skills.Assassin.Shock_Field, Skills.Assassin.Shadow_Warrior, Skills.Assassin.Dragon_Flight, Skills.Assassin.Blade_Shield, Skills.Assassin.Shadow_Master]
+			.indexOf(skillId) > -1;
 	},
 
 	// Wereform skill check
 	wereFormCheck: function (skillId) {
-		if (!me.getState(139) && !me.getState(140)) {
+		if (!me.getState(States.WOLF) && !me.getState(States.BEAR)) {
 			return true;
 		}
 
 		// Can be cast by both
-		if ([0, 1, 221, 222, 226, 227, 231, 236, 237, 239, 241, 242, 246, 247, 249].indexOf(skillId) > -1) {
+		if ([Skills.common.Attack, Skills.common.Kick, Skills.Druid.Raven, Skills.Druid.Plague_Poppy, Skills.Druid.Oak_Sage, Skills.Druid.Summon_Spirit_Wolf, Skills.Druid.Cycle_of_Life, Skills.Druid.Heart_of_Wolverine,
+			Skills.Druid.Summon_Fenris, Skills.Druid.Fire_Claws, Skills.Druid.Vines, Skills.Druid.Hunger, Skills.Druid.Spirit_of_Barbs, Skills.Druid.Summon_Grizzly, Skills.Druid.Armageddon].indexOf(skillId) > -1) {
 			return true;
 		}
 
 		// Can be cast by werewolf only
-		if (me.getState(139) && [223, 232, 238, 248].indexOf(skillId) > -1) {
+		if (me.getState(States.WOLF) && [Skills.Druid.Wearwolf, Skills.Druid.Feral_Rage, Skills.Druid.Rabies, Skills.Druid.Fury].indexOf(skillId) > -1) {
 			return true;
 		}
 
 		// Can be cast by werebear only
-		if (me.getState(140) && [228, 233, 243].indexOf(skillId) > -1) {
+		if (me.getState(States.BEAR) && [Skills.Druid.Wearbear, Skills.Druid.Maul, Skills.Druid.Shock_Wave].indexOf(skillId) > -1) {
 			return true;
 		}
 
@@ -423,7 +429,11 @@ MainLoop:
 
 	// Skills that cn be cast in town
 	townSkill: function (skillId) {
-		return [32, 40, 43, 50, 52, 58, 60, 68, 75, 85, 94, 117, 221, 222, 226, 227, 235, 236, 237, 246, 247, 258, 267, 268, 277, 278, 279].indexOf(skillId) > -1;
+		return [Skills.Amazon.Valkyrie, Skills.Sorceress.Frozen_Armor, Skills.Sorceress.Telekinesis, Skills.Sorceress.Shiver_Armor, Skills.Sorceress.Enchant, Skills.Sorceress.Energy_Shield,
+			Skills.Sorceress.Chilling_Armor, Skills.Necromancer.Bone_Armor, Skills.Necromancer.Clay_Golem, Skills.Necromancer.BloodGolem, Skills.Necromancer.FireGolem, Skills.Paladin.Holy_Shield,
+			Skills.Druid.Raven, Skills.Druid.Plague_Poppy, Skills.Druid.Oak_Sage, Skills.Druid.Summon_Spirit_Wolf, Skills.Druid.Cyclone_Armor, Skills.Druid.Heart_of_Wolverine,
+			Skills.Druid.Summon_Fenris, Skills.Druid.Spirit_of_Barbs, Skills.Druid.Summon_Grizzly, Skills.Assassin.Quickness, Skills.Assassin.Fade, Skills.Assassin.Shadow_Warrior,
+			Skills.Assassin.Blade_Shield, Skills.Assassin.Venom, Skills.Assassin.Shadow_Master].indexOf(skillId) > -1;
 	},
 
 	manaCostList: {},
@@ -440,8 +450,8 @@ MainLoop:
 
 		var skillLvl = me.getSkill(skillId, 1),
 			effectiveShift = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
-			lvlmana = getBaseStat(3, skillId, "lvlmana") === 65535 ? -1 : getBaseStat(3, skillId, "lvlmana"), // Correction for skills that need less mana with levels (kolton)
-			ret = Math.max((getBaseStat(3, skillId, "mana") + lvlmana * (skillLvl - 1)) * (effectiveShift[getBaseStat(3, skillId, "manashift")] / 256), getBaseStat(3, skillId, "minmana"));
+			lvlmana = getBaseStat(BaseStat.skills, skillId, "lvlmana") === 65535 ? -1 : getBaseStat(BaseStat.skills, skillId, "lvlmana"), // Correction for skills that need less mana with levels (kolton)
+			ret = Math.max((getBaseStat(BaseStat.skills, skillId, "mana") + lvlmana * (skillLvl - 1)) * (effectiveShift[getBaseStat(BaseStat.skills, skillId, "manashift")] / 256), getBaseStat(3, skillId, "minmana"));
 
 		if (!this.manaCostList.hasOwnProperty(skillId)) {
 			this.manaCostList[skillId] = ret;
@@ -457,15 +467,15 @@ var Item = {
 	},
 
 	canEquip: function (item) {
-		if (item.type !== 4) { // Not an item
+		if (item.type !== NTItemTypes.gold) { // Not an item
 			return false;
 		}
 
-		if (!item.getFlag(0x10)) { // Unid item
+		if (!item.getFlag(ItemFlags.isIdentified)) { // Unid item
 			return false;
 		}
 
-		if (item.getStat(92) > me.getStat(12) || item.dexreq > me.getStat(2) || item.strreq > me.getStat(0)) { // Higher requirements
+		if (item.getStat(Stats.item_levelreq) > me.getStat(Stats.level) || item.dexreq > me.getStat(Stats.dexterity) || item.strreq > me.getStat(Stats.strength)) { // Higher requirements
 			return false;
 		}
 
@@ -479,13 +489,13 @@ var Item = {
 		}
 
 		// Already equipped in the right slot
-		if (item.mode === 1 && item.bodylocation === bodyLoc) {
+		if (item.mode === ItemModes.Item_equipped_self_or_merc && item.bodylocation === bodyLoc) {
 			return true;
 		}
 
 		var i, cursorItem;
 
-		if (item.location === 7) {
+		if (item.location === ItemLocation.Stash) {
 			if (!Town.openStash()) {
 				return false;
 			}
@@ -542,71 +552,71 @@ var Item = {
 		var bodyLoc;
 
 		switch (item.itemType) {
-		case 2: // Shield
-		case 70: // Auric Shields
-			bodyLoc = 5;
+		case NTItemTypes.shield: // Shield
+		case NTItemTypes.auricshields: // Auric Shields
+			bodyLoc = ItemBodyLocation.LEFT_ARM;
 
 			break;
-		case 3: // Armor
-			bodyLoc = 3;
+		case NTItemTypes.armor: // Armor
+			bodyLoc = ItemBodyLocation.TORSO;
 
 			break;
-		case 5: // Arrows
-		case 6: // Bolts
-			bodyLoc = 5;
+		case NTItemTypes.bowquiver: // Arrows
+		case NTItemTypes.crossbowquiver: // Bolts
+			bodyLoc = ItemBodyLocation.LEFT_ARM;
 
 			break;
-		case 10: // Ring
-			bodyLoc = [6, 7];
+		case NTItemTypes.ring: // Ring
+			bodyLoc = [ItemBodyLocation.RIGHT_RING, ItemBodyLocation.LEFT_RING];
 
 			break;
-		case 12: // Amulet
-			bodyLoc = 2;
+		case NTItemTypes.amulet: // Amulet
+			bodyLoc = ItemBodyLocation.NECK;
 
 			break;
-		case 15: // Boots
-			bodyLoc = 9;
+		case NTItemTypes.boots: // Boots
+			bodyLoc = ItemBodyLocation.FEET;
 
 			break;
-		case 16: // Gloves
-			bodyLoc = 10;
+		case NTItemTypes.gloves: // Gloves
+			bodyLoc = ItemBodyLocation.GLOVES;
 
 			break;
-		case 19: // Belt
-			bodyLoc = 8;
+		case NTItemTypes.belt: // Belt
+			bodyLoc = ItemBodyLocation.BELT;
 
 			break;
-		case 37: // Helm
-		case 71: // Barb Helm
-		case 75: // Circlet
-			bodyLoc = 1;
+		case NTItemTypes.helm: // Helm
+		case NTItemTypes.primalhelm: // Barb Helm
+		case NTItemTypes.circlet: // Circlet
+			bodyLoc = ItemBodyLocation.HEAD;
 
 			break;
-		case 24: // 
-		case 25: // 
-		case 26: // 
-		case 27: // 
-		case 28: // 
-		case 29: // 
-		case 30: // 
-		case 31: // 
-		case 32: // 
-		case 33: // 
-		case 34: // 
-		case 35: // 
-		case 36: // 
-		case 42: // 
-		case 43: // 
-		case 44: // 
-		case 67: // Handtohand (Assasin Claw)
-		case 68: // 
-		case 69: // 
-		case 72: // 
-		case 85: // 
-		case 86: // 
-		case 87: // 
-		case 88: // 
-			bodyLoc = 4;
+		case NTItemTypes.scepter: // 
+		case NTItemTypes.wand: // 
+		case NTItemTypes.staff: // 
+		case NTItemTypes.bow: // 
+		case NTItemTypes.axe: // 
+		case NTItemTypes.club: // 
+		case NTItemTypes.sword: // 
+		case NTItemTypes.hammer: // 
+		case NTItemTypes.knife: // 
+		case NTItemTypes.spear: // 
+		case NTItemTypes.polearm: // 
+		case NTItemTypes.crossbow: // 
+		case NTItemTypes.mace: // 
+		case NTItemTypes.throwingknife: // 
+		case NTItemTypes.throwingaxe: // 
+		case NTItemTypes.javelin: // 
+		case NTItemTypes.handtohand: // Handtohand (Assasin Claw)
+		case NTItemTypes.orb: // 
+		case NTItemTypes.voodooheads: // 
+		case NTItemTypes.pelt: // 
+		case NTItemTypes.amazonbow: // 
+		case NTItemTypes.amazonspear: // 
+		case NTItemTypes.amazonjavelin: // 
+		case NTItemTypes.assassinclaw: // 
+			bodyLoc = ItemBodyLocation.RIGHT_ARM;
 
 			break;
 		default:
@@ -632,7 +642,7 @@ var Item = {
 		if (tier > 0 && bodyLoc) {
 			for (i = 0; i < bodyLoc.length; i += 1) {
 				// Low tier items shouldn't be kept if they can't be equipped
-				if (tier > this.getEquippedItem(bodyLoc[i]).tier && (this.canEquip(item) || !item.getFlag(0x10))) {
+				if (tier > this.getEquippedItem(bodyLoc[i]).tier && (this.canEquip(item) || !item.getFlag(ItemFlags.isIdentified))) {
 					return true;
 				}
 			}
@@ -690,12 +700,12 @@ var Item = {
 
 			if (tier > 0 && bodyLoc) {
 				for (j = 0; j < bodyLoc.length; j += 1) {
-					if ([3, 7].indexOf(items[0].location) > -1 && tier > this.getEquippedItem(bodyLoc[j]).tier && this.getEquippedItem(bodyLoc[j]).classid !== 174) { // khalim's will adjustment
-						if (!items[0].getFlag(0x10)) { // unid
-							tome = me.findItem(519, 0, 3);
+					if ([3, 7].indexOf(items[0].location) > -1 && tier > this.getEquippedItem(bodyLoc[j]).tier && this.getEquippedItem(bodyLoc[j]).classid !== ItemClassIds.Khalims_Will) { // khalim's will adjustment
+						if (!items[0].getFlag(ItemFlags.isIdentified)) { // unid
+							tome = me.findItem(ItemClassIds.Tome_Of_Identify, 0, ItemLocation.Inventory);
 
-							if (tome && tome.getStat(70) > 0) {
-								if (items[0].location === 7) {
+							if (tome && tome.getStat(Stats.quantity) > 0) {
+								if (items[0].location === ItemLocation.Stash) {
 									Town.openStash();
 								}
 
@@ -807,7 +817,7 @@ var Misc = {
 	// Get number of players within getUnit distance
 	getNearbyPlayerCount: function () {
 		var count = 0,
-			player = getUnit(0);
+			player = getUnit(UnitType.Player);
 
 		if (player) {
 			do {
@@ -847,7 +857,7 @@ var Misc = {
 		}
 
 		// locked chest, no keys
-		if (me.classid !== 6 && unit.islocked && !me.findItem(543, 0, 3)) {
+		if (me.classid !== ClassID.Assassin && unit.islocked && !me.findItem(ItemClassIds.Key, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory)) {
 			return false;
 		}
 
@@ -891,7 +901,7 @@ var Misc = {
 		}
 
 		coords = [];
-		presetUnits = getPresetUnits(area, 2);
+		presetUnits = getPresetUnits(area, UnitType.Object);
 
 		if (!chestIds) {
 			chestIds = [
@@ -951,11 +961,11 @@ var Misc = {
 			];
 		}
 
-		unit = getUnit(2);
+		unit = getUnit(UnitType.Object);
 
 		if (unit) {
 			do {
-				if (unit.name && unit.mode === 0 && getDistance(me.x, me.y, unit.x, unit.y) <= range && containers.indexOf(unit.name.toLowerCase()) > -1) {
+				if (unit.name && unit.mode === ObjectModes.Neutral && getDistance(me.x, me.y, unit.x, unit.y) <= range && containers.indexOf(unit.name.toLowerCase()) > -1) {
 					unitList.push(copyUnit(unit));
 				}
 			} while (unit.getNext());
@@ -995,32 +1005,32 @@ var Misc = {
 
 			for (i = 0; i < Config.ScanShrines.length; i += 1) {
 				switch (Config.ScanShrines[i]) {
-				case 0: // None
-				case 1: // Refilling
-				case 2: // Health
-				case 3: // Mana
-				case 4: // Health Exchange (doesn't exist)
-				case 5: // Mana Exchange (doesn't exist)
-				case 16: // Enirhs (doesn't exist)
-				case 17: // Portal
-				case 18: // Gem
-				case 19: // Fire
-				case 20: // Monster
-				case 21: // Exploding
-				case 22: // Poison
+				case Shrines.null: // None
+				case Shrines.refilling: // Refilling
+				case Shrines.health: // Health
+				case Shrines.mana: // Mana
+				case Shrines.health_exchange: // Health Exchange (doesn't exist)
+				case Shrines.mana_exchange: // Mana Exchange (doesn't exist)
+				case Shrines.enirhs: // Enirhs (doesn't exist)
+				case Shrines.portal: // Portal
+				case Shrines.gem: // Gem
+				case Shrines.fire: // Fire
+				case Shrines.monster: // Monster
+				case Shrines.exploding: // Exploding
+				case Shrines.poison: // Poison
 					this.shrineStates[i] = 0; // no state
 
-					break;
-				case 6: // Armor
-				case 7: // Combat
-				case 8: // Resist Fire
-				case 9: // Resist Cold
-				case 10: // Resist Lightning
-				case 11: // Resist Poison
-				case 12: // Skill
-				case 13: // Mana recharge
-				case 14: // Stamina
-				case 15: // Experience
+						break;
+				case Shrines.armor: // Armor
+				case Shrines.combat: // Combat
+				case Shrines.resist_fire: // Resist Fire
+				case Shrines.resist_cold: // Resist Cold
+				case Shrines.resist_lightning: // Resist Lightning
+				case Shrines.resist_poison: // Resist Poison
+				case Shrines.skill: // Skill
+				case Shrines.mana_recharge: // Mana recharge
+				case Shrines.stamina: // Stamina
+				case Shrines.experience: // Experience
 					// Both states and shrines are arranged in same order with armor shrine starting at 128
 					this.shrineStates[i] = Config.ScanShrines[i] + 122;
 
@@ -1029,12 +1039,12 @@ var Misc = {
 			}
 		}
 
-		shrine = getUnit(2, "shrine");
+		shrine = getUnit(UnitType.Object, "shrine");
 
 		if (shrine) {
 			// Build a list of nearby shrines
 			do {
-				if (shrine.mode === 0 && getDistance(me.x, me.y, shrine.x, shrine.y) <= range) {
+				if (shrine.mode === ObjectModes.Neutral && getDistance(me.x, me.y, shrine.x, shrine.y) <= range) {
 					shrineList.push(copyUnit(shrine));
 				}
 			} while (shrine.getNext());
@@ -1057,7 +1067,7 @@ var Misc = {
 							this.getShrine(shrineList[j]);
 
 							// Gem shrine - pick gem
-							if (Config.ScanShrines[i] === 18) {
+							if (Config.ScanShrines[i] === Shrines.gem) {
 								Pickit.pickItems();
 							}
 						}
@@ -1119,11 +1129,11 @@ var Misc = {
 
 			Pather.moveTo(coords[0], coords[1], 2);
 
-			shrine = getUnit(2, "shrine");
+			shrine = getUnit(UnitType.Object, "shrine");
 
 			if (shrine) {
 				do {
-					if (shrine.objtype === type && shrine.mode === 0) {
+					if (shrine.objtype === type && shrine.mode === ObjectModes.Neutral) {
 						Pather.moveTo(shrine.x - 2, shrine.y - 2);
 
 						if (!use || this.getShrine(shrine)) {
@@ -1177,7 +1187,7 @@ var Misc = {
 
 	getItemSockets: function (unit) {
 		var i, code,
-			sockets = unit.getStat(194),
+			sockets = unit.getStat(Stats.item_numsockets),
 			subItems = unit.getItems(),
 			tempArray = [];
 
@@ -1229,7 +1239,7 @@ var Misc = {
 			if (tempArray[i]) {
 				code = tempArray[i].code;
 
-				if ([10, 12, 58, 82, 83, 84].indexOf(tempArray[i].itemType) > -1) {
+				if ([NTItemTypes.ring, NTItemTypes.amulet, NTItemTypes.jewel, NTItemTypes.smallcharm, NTItemTypes.mediumcharm, NTItemTypes.largecharm].indexOf(tempArray[i].itemType) > -1) {
 					code += (tempArray[i].gfx + 1);
 				}
 			} else {
@@ -1309,127 +1319,127 @@ var Misc = {
 			}
 		}
 
-		if (unit.getFlag(0x10)) {
+		if (unit.getFlag(ItemFlags.isIdentified)) {
 			switch (unit.quality) {
-			case 5: // Set
+				case ItemQuality.Set: // Set
 				switch (unit.classid) {
-				case 27: // Angelic sabre
+				case ItemClassIds.Sabre: // Angelic sabre
 					code = "inv9sbu";
 
 					break;
-				case 74: // Arctic short war bow
+				case ItemClassIds.Short_War_Bow: // Arctic short war bow
 					code = "invswbu";
 
 					break;
-				case 308: // Berserker's helm
+				case ItemClassIds.Helm: // Berserker's helm
 					code = "invhlmu";
 
 					break;
-				case 330: // Civerb's large shield
+				case ItemClassIds.Large_Shield: // Civerb's large shield
 					code = "invlrgu";
 
 					break;
-				case 31: // Cleglaw's long sword
-				case 227: // Szabi's cryptic sword
+				case ItemClassIds.Long_Sword: // Cleglaw's long sword
+				case ItemClassIds.Cryptic_Sword: // Szabi's cryptic sword
 					code = "invlsdu";
 
 					break;
-				case 329: // Cleglaw's small shield
+				case ItemClassIds.Small_Shield: // Cleglaw's small shield
 					code = "invsmlu";
 
 					break;
-				case 328: // Hsaru's buckler
+				case ItemClassIds.Buckler: // Hsaru's buckler
 					code = "invbucu";
 
 					break;
-				case 306: // Infernal cap / Sander's cap
+				case ItemClassIds.Cap: // Infernal cap / Sander's cap
 					code = "invcapu";
 
 					break;
-				case 30: // Isenhart's broad sword
+				case ItemClassIds.Broad_Sword: // Isenhart's broad sword
 					code = "invbsdu";
 
 					break;
-				case 309: // Isenhart's full helm
+				case ItemClassIds.Full_Helm: // Isenhart's full helm
 					code = "invfhlu";
 
 					break;
-				case 333: // Isenhart's gothic shield
+				case ItemClassIds.Gothic_Shield: // Isenhart's gothic shield
 					code = "invgtsu";
 
 					break;
-				case 326: // Milabrega's ancient armor
-				case 442: // Immortal King's sacred armor
+				case ItemClassIds.Ancient_Armor: // Milabrega's ancient armor
+				case ItemClassIds.Sacred_Armor: // Immortal King's sacred armor
 					code = "invaaru";
 
 					break;
-				case 331: // Milabrega's kite shield
+				case ItemClassIds.Kite_Shield: // Milabrega's kite shield
 					code = "invkitu";
 
 					break;
-				case 332: // Sigon's tower shield
+				case ItemClassIds.Tower_Shield: // Sigon's tower shield
 					code = "invtowu";
 
 					break;
-				case 325: // Tancred's full plate mail
+				case ItemClassIds.Full_Plate_Mail: // Tancred's full plate mail
 					code = "invfulu";
 
 					break;
-				case 3: // Tancred's military pick
+				case ItemClassIds.Military_Pick: // Tancred's military pick
 					code = "invmpiu";
 
 					break;
-				case 113: // Aldur's jagged star
+				case ItemClassIds.Jagged_Star: // Aldur's jagged star
 					code = "invmstu";
 
 					break;
-				case 234: // Bul-Kathos' colossus blade
+				case ItemClassIds.Colossus_Blade: // Bul-Kathos' colossus blade
 					code = "invgsdu";
 
 					break;
-				case 372: // Grizwold's ornate plate
+				case ItemClassIds.Ornate_Plate: // Grizwold's ornate plate
 					code = "invxaru";
 
 					break;
-				case 366: // Heaven's cuirass
-				case 215: // Heaven's reinforced mace
-				case 449: // Heaven's ward
-				case 426: // Heaven's spired helm
+				case ItemClassIds.Cuirass: // Heaven's cuirass
+				case ItemClassIds.Reinforced_Mace: // Heaven's reinforced mace
+				case ItemClassIds.Ward: // Heaven's ward
+				case ItemClassIds.Spired_Helm: // Heaven's spired helm
 					code = "inv" + unit.code + "s";
 
 					break;
-				case 357: // Hwanin's grand crown
+				case ItemClassIds.Grand_Crown: // Hwanin's grand crown
 					code = "invxrnu";
 
 					break;
-				case 195: // Nalya's scissors suwayyah
+				case ItemClassIds.Scissors_Suwayyah: // Nalya's scissors suwayyah
 					code = "invskru";
 
 					break;
-				case 395: // Nalya's grim helm
-				case 465: // Trang-Oul's bone visage
+				case ItemClassIds.Grim_Helm: // Nalya's grim helm
+				case ItemClassIds.Bone_Visage: // Trang-Oul's bone visage
 					code = "invbhmu";
 
 					break;
-				case 261: // Naj's elder staff
+				case ItemClassIds.Elder_Staff: // Naj's elder staff
 					code = "invcstu";
 
 					break;
-				case 375: // Orphan's round shield
+				case ItemClassIds.Round_Shield: // Orphan's round shield
 					code = "invxmlu";
 
 					break;
-				case 12: // Sander's bone wand
+				case ItemClassIds.Bone_Wand: // Sander's bone wand
 					code = "invbwnu";
 
 					break;
 				}
 
 				break;
-			case 7: // Unique
+			case ItemQuality.Unique: // Unique
 				for (i = 0; i < 401; i += 1) {
-					if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
-						code = getBaseStat(17, i, "invfile");
+					if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(BaseStat.uniqueitems, i, 2))) > -1) {
+						code = getBaseStat(BaseStat.uniqueitems, i, "invfile");
 
 						break;
 					}
@@ -1443,12 +1453,12 @@ var Misc = {
 			if (["ci2", "ci3"].indexOf(unit.code) > -1) { // Tiara/Diadem
 				code = unit.code;
 			} else {
-				code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
+				code = getBaseStat(BaseStat.items, unit.classid, 'normcode') || unit.code;
 			}
 
 			code = code.replace(" ", "");
 
-			if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
+			if ([NTItemTypes.ring, NTItemTypes.amulet, NTItemTypes.jewel, NTItemTypes.smallcharm, NTItemTypes.mediumcharm, NTItemTypes.largecharm].indexOf(unit.itemType) > -1) {
 				code += (unit.gfx + 1);
 			}
 		}
@@ -1457,7 +1467,7 @@ var Misc = {
 
 		if (sock) {
 			do {
-				if (sock.itemType === 58) {
+				if (sock.itemType === NTItemTypes.jewel) {
 					desc += "\n\n";
 					desc += this.getItemDesc(sock);
 				}
@@ -1492,14 +1502,14 @@ var Misc = {
 			return false;
 		case "1":
 		case "werewolf":
-			state = 139;
-			skill = 223;
+			state = States.WOLF;
+			skill = Skills.Druid.Wearwolf;
 
 			break;
 		case "2":
 		case "werebear":
-			state = 140;
-			skill = 228;
+			state = States.BEAR;
+			skill = Skills.Druid.Wearbear;
 
 			break;
 		default:
@@ -1533,14 +1543,14 @@ var Misc = {
 	unShift: function () {
 		var i, tick;
 
-		if (me.getState(139) || me.getState(140)) {
+		if (me.getState(States.WOLF) || me.getState(States.BEAR)) {
 			for (i = 0; i < 3; i += 1) {
-				Skill.cast(me.getState(139) ? 223 : 228);
+				Skill.cast(me.getState(States.WOLF) ? Skills.Druid.Wearwolf : Skills.Druid.Wearbear);
 
 				tick = getTickCount();
 
 				while (getTickCount() - tick < 2000) {
-					if (!me.getState(139) && !me.getState(140)) {
+					if (!me.getState(States.WOLF) && !me.getState(States.BEAR)) {
 						delay(250);
 
 						return true;
@@ -1572,7 +1582,7 @@ var Misc = {
 			needmp = true;
 
 		// Can't tp from uber trist or when dead
-		if (me.area === 136 || me.dead) {
+		if (me.area === Areas.UberLevels.Tristram || me.dead) {
 			return false;
 		}
 
@@ -1581,7 +1591,7 @@ var Misc = {
 				if (me.gold > 1000) {
 					for (i = 0; i < 4; i += 1) {
 						if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
-							potion = me.getItem(-1, 2); // belt item
+							potion = me.getItem(-1, ItemLocation.Belt); // belt item
 
 							if (potion) {
 								do {
@@ -1601,7 +1611,7 @@ var Misc = {
 						}
 
 						if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
-							potion = me.getItem(-1, 2); // belt item
+							potion = me.getItem(-1, ItemLocation.Belt); // belt item
 
 							if (potion) {
 								do {
@@ -1933,27 +1943,27 @@ var Experience = {
 
 	// Percent progress into the current level. Format: xx.xx%
 	progress: function () {
-		return me.getStat(12) === 99 ? 0 : (((me.getStat(13) - this.totalExp[me.getStat(12)]) / this.nextExp[me.getStat(12)]) * 100).toFixed(2);
+		return me.getStat(Stats.level) === 99 ? 0 : (((me.getStat(Stats.experience) - this.totalExp[me.getStat(Stats.level)]) / this.nextExp[me.getStat(Stats.level)]) * 100).toFixed(2);
 	},
 
 	// Total experience gained in current run
 	gain: function () {
-		return (me.getStat(13) - DataFile.getStats().experience);
+		return (me.getStat(Stats.experience) - DataFile.getStats().experience);
 	},
 
 	// Percent experience gained in current run
 	gainPercent: function () {
-		return me.getStat(12) === 99 ? 0 : (this.gain() * 100 / this.nextExp[me.getStat(12)]).toFixed(6);
+		return me.getStat(Stats.level) === 99 ? 0 : (this.gain() * 100 / this.nextExp[me.getStat(Stats.level)]).toFixed(6);
 	},
 
 	// Runs until next level
 	runsToLevel: function () {
-		return Math.round(((100 - this.progress()) / 100) * this.nextExp[me.getStat(12)] / this.gain());
+		return Math.round(((100 - this.progress()) / 100) * this.nextExp[me.getStat(Stats.level)] / this.gain());
 	},
 
 	// Total runs needed for next level (not counting current progress)
 	totalRunsToLevel: function () {
-		return Math.round(this.nextExp[me.getStat(12)] / this.gain());
+		return Math.round(this.nextExp[me.getStat(Stats.level)] / this.gain());
 	},
 
 	// Total time till next level
@@ -1998,13 +2008,13 @@ var Experience = {
 			timeToLevel = this.timeToLevel();
 
 		//string = "[Game: " + me.gamename + (me.gamepassword ? "//" + me.gamepassword : "") + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP: " + gain + "] [Games ETA: " + runsToLevel + "] [Time ETA: " + timeToLevel + "]";
-		string = "[Game: " + me.gamename + (me.gamepassword ? "//" + me.gamepassword : "") + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP: " + gain + "] [Games ETA: " + runsToLevel + "]";
+		string = "[Game: " + me.gamename + (me.gamepassword ? "//" + me.gamepassword : "") + getGameTime + "] [Level: " + me.getStat(Stats.level) + " (" + progress + "%)] [XP: " + gain + "] [Games ETA: " + runsToLevel + "]";
 
 		if (gain) {
 			D2Bot.printToConsole(string, 4);
 
-			if (me.getStat(12) > DataFile.getStats().level) {
-				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12), 5);
+			if (me.getStat(Stats.level) > DataFile.getStats().level) {
+				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(Stats.level), 5);
 			}
 		}
 	}
@@ -2012,11 +2022,11 @@ var Experience = {
 
 var Packet = {
 	openMenu: function (unit) {
-		if (unit.type !== 1) {
+		if (unit.type !== UnitType.NPC) {
 			throw new Error("openMenu: Must be used on NPCs.");
 		}
 
-		if (getUIFlag(0x08)) {
+		if (getUIFlag(UIFlags.npc_menu)) {
 			return true;
 		}
 
@@ -2031,18 +2041,18 @@ var Packet = {
 				Packet.flash(me.gid);
 			}
 
-			if (!getUIFlag(0x08)) {
+			if (!getUIFlag(UIFlags.npc_menu)) {
 				sendPacket(1, 0x13, 4, 1, 4, unit.gid);
 			}
 
 			for (j = 0; j < 40; j += 1) {
-				if (j > 0 && j % 8 === 0 && !getUIFlag(0x08)) {
+				if (j > 0 && j % 8 === 0 && !getUIFlag(UIFlags.npc_menu)) {
 					me.cancel();
 					delay(300);
 					sendPacket(1, 0x13, 4, 1, 4, unit.gid);
 				}
 
-				if (getUIFlag(0x08)) {
+				if (getUIFlag(UIFlags.npc_menu)) {
 					delay(Math.max(500, me.ping * 2));
 
 					return true;
@@ -2056,11 +2066,11 @@ var Packet = {
 	},
 
 	startTrade: function (unit, mode) {
-		if (unit.type !== 1) {
+		if (unit.type !== UnitType.NPC) {
 			throw new Error("Unit.startTrade: Must be used on NPCs.");
 		}
 
-		if (getUIFlag(0x0C)) {
+		if (getUIFlag(UIFlags.Shop_open_at_NPC)) {
 			return true;
 		}
 
@@ -2088,7 +2098,7 @@ var Packet = {
 
 	buyItem: function (unit, shiftBuy, gamble) {
 		var i, tick,
-			oldGold = me.getStat(14) + me.getStat(15),
+			oldGold = me.getStat(Stats.gold) + me.getStat(Stats.goldbank),
 			itemCount = me.itemcount,
 			npc = getInteractedNPC();
 
@@ -2096,7 +2106,7 @@ var Packet = {
 			throw new Error("buyItem: No NPC menu open.");
 		}
 
-		if (me.getStat(14) + me.getStat(15) < unit.getItemCost(0)) { // Can we afford the item?
+		if (me.getStat(Stats.gold) + me.getStat(Stats.goldbank) < unit.getItemCost(0)) { // Can we afford the item?
 			return false;
 		}
 
@@ -2106,7 +2116,7 @@ var Packet = {
 			tick = getTickCount();
 
 			while (getTickCount() - tick < Math.max(2000, me.ping * 2 + 500)) {
-				if (shiftBuy && me.getStat(14) + me.getStat(15) < oldGold) {
+				if (shiftBuy && me.getStat(Stats.gold) + me.getStat(Stats.goldbank) < oldGold) {
 					return true;
 				}
 
@@ -2122,7 +2132,7 @@ var Packet = {
 	},
 
 	sellItem: function (unit) {
-		if (unit.type !== 4) { // Check if it's an item we want to buy
+		if (unit.type !== NTItemTypes.gold) { // Check if it's an item we want to buy
 			throw new Error("Unit.sell: Must be used on items.");
 		}
 
@@ -2155,7 +2165,7 @@ var Packet = {
 	identifyItem: function (unit, tome) {
 		var i, tick;
 
-		if (!unit || unit.getFlag(0x10)) {
+		if (!unit || unit.getFlag(ItemFlags.isIdentified)) {
 			return false;
 		}
 
@@ -2186,7 +2196,7 @@ CursorLoop:
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 2000) {
-				if (unit.getFlag(0x10)) {
+				if (unit.getFlag(ItemFlags.isIdentified)) {
 					delay(50);
 
 					return true;
