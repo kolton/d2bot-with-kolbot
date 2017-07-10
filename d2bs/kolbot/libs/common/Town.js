@@ -46,18 +46,18 @@ var Town = {
 	],
 
 	ignoredItemTypes: [ // Items that won't be stashed
-		5, // Arrows
-		6, // Bolts
-		18, // Book (Tome)
-		22, // Scroll
-		38, // Missile Potion
-		41, // Key
-		76, // Healing Potion
-		77, // Mana Potion
-		78, // Rejuvenation Potion
-		79, // Stamina Potion
-		80, // Antidote Potion
-		81 // Thawing Potion
+		NTItemTypes.bowquiver, // Arrows
+		NTItemTypes.crossbowquiver, // Bolts
+		NTItemTypes.book, // Book (Tome)
+		NTItemTypes.scroll, // Scroll
+		NTItemTypes.missilepotion, // Missile Potion
+		NTItemTypes.key, // Key
+		NTItemTypes.healingpotion, // Healing Potion
+		NTItemTypes.manapotion, // Mana Potion
+		NTItemTypes.rejuvpotion, // Rejuvenation Potion
+		NTItemTypes.staminapotion, // Stamina Potion
+		NTItemTypes.antidotepotion, // Antidote Potion
+		NTItemTypes.thawingpotion // Thawing Potion
 	],
 
 	// Do town chores
@@ -69,7 +69,7 @@ var Town = {
 		var i,
 			cancelFlags = [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x19, 0x1a];
 
-		if (me.classid === 4 && Config.FindItem && Config.FindItemSwitch) { // weapon switch fix in case last game dropped with item find switch on
+		if (me.classid === ClassID.Barbarian && Config.FindItem && Config.FindItemSwitch) { // weapon switch fix in case last game dropped with item find switch on
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
 
@@ -84,10 +84,10 @@ var Town = {
 		this.heal();
 		this.identify();
 		this.shopItems();
-		this.fillTome(518);
+		this.fillTome(ItemClassIds.Tome_Of_Town_Portal);
 
 		if (Config.FieldID) {
-			this.fillTome(519);
+			this.fillTome(ItemClassIds.Tome_Of_Identify);
 		}
 
 		this.buyPotions();
@@ -120,7 +120,7 @@ var Town = {
 		var i, npc, item;
 
 		// golden bird stuff
-		if (me.getItem(546)) {
+		if (me.getItem(ItemClassIds.A_Jade_Figurine)) {
 			this.goToTown(3);
 			this.move("meshif");
 
@@ -132,11 +132,11 @@ var Town = {
 			}
 		}
 
-		if (me.getItem(547)) {
+		if (me.getItem(ItemClassIds.The_Golden_Bird)) {
 			this.goToTown(3);
 			this.move("alkor");
 
-			npc = getUnit(1, "alkor");
+			npc = getUnit(UnitType.NPC, "alkor");
 
 			if (npc) {
 				for (i = 0; i < 2; i += 1) {
@@ -146,10 +146,10 @@ var Town = {
 			}
 		}
 
-		if (me.getItem(545)) {
-			item = me.getItem(545);
+		if (me.getItem(ItemClassIds.Potion_of_Life)) {
+			item = me.getItem(ItemClassIds.Potion_of_Life);
 
-			if (item.location > 3) {
+			if (item.location > ItemLocation.Inventory) {
 				this.openStash();
 			}
 
@@ -177,16 +177,16 @@ var Town = {
 		}
 
 		if (!npc) {
-			npc = getUnit(1, this.tasks[me.act - 1][task]);
+			npc = getUnit(UnitType.NPC, this.tasks[me.act - 1][task]);
 
 			if (!npc) {
 				this.move(this.tasks[me.act - 1][task]);
 
-				npc = getUnit(1, this.tasks[me.act - 1][task]);
+				npc = getUnit(UnitType.NPC, this.tasks[me.act - 1][task]);
 			}
 		}
 
-		if (!npc || npc.area !== me.area || (!getUIFlag(0x08) && !npc.openMenu())) {
+		if (!npc || npc.area !== me.area || (!getUIFlag(UIFlags.npc_menu) && !npc.openMenu())) {
 			return false;
 		}
 
@@ -194,19 +194,19 @@ var Town = {
 		case "Shop":
 		case "Repair":
 		case "Gamble":
-			if (!getUIFlag(0x0C) && !npc.startTrade(task)) {
+			if (!getUIFlag(UIFlags.Shop_open_at_NPC) && !npc.startTrade(task)) {
 				return false;
 			}
 
 			break;
 		case "Key":
-			if (!getUIFlag(0x0C) && !npc.startTrade(me.act === 3 ? "Repair" : "Shop")) {
+			if (!getUIFlag(UIFlags.Shop_open_at_NPC) && !npc.startTrade(me.act === 3 ? "Repair" : "Shop")) {
 				return false;
 			}
 
 			break;
 		case "CainID":
-			Misc.useMenu(0x0FB4);
+			Misc.useMenu(NPCMenu.Identify_Items);
 			me.cancel();
 
 			break;
@@ -235,7 +235,7 @@ var Town = {
 		}
 
 		// Status effects
-		if (Config.HealStatus && (me.getState(2) || me.getState(9) || me.getState(61))) {
+		if (Config.HealStatus && (me.getState(States.POISON) || me.getState(States.AMPLIFYDAMAGE) || me.getState(States.LOWERRESIST))) {
 			return true;
 		}
 
@@ -260,17 +260,17 @@ var Town = {
 
 		// HP/MP Buffer
 		if (Config.HPBuffer > 0 || Config.MPBuffer > 0) {
-			pot = me.getItem(-1, 0);
+			pot = me.getItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 			if (pot) {
 				do {
-					if (pot.location === 3) {
+					if (pot.location === ItemLocation.Inventory) {
 						switch (pot.itemType) {
-						case 76:
+						case NTItemTypes.healingpotion:
 							buffer.hp += 1;
 
 							break;
-						case 77:
+						case NTItemTypes.manapotion:
 							buffer.mp += 1;
 
 							break;
@@ -410,7 +410,7 @@ var Town = {
 	// Return column status (needed potions in each column)
 	checkColumns: function (beltSize) {
 		var col = [beltSize, beltSize, beltSize, beltSize],
-			pot = me.getItem(-1, 2); // Mode 2 = in belt
+			pot = me.getItem(-1, ItemModes.Item_in_belt); // Mode 2 = in belt
 
 		if (!pot) { // No potions
 			return col;
@@ -462,8 +462,8 @@ var Town = {
 
 		delay(500);
 
-		if (code === 518 && !me.findItem(518, 0, 3)) {
-			tome = npc.getItem(518);
+		if (code === ItemClassIds.Tome_Of_Town_Portal && !me.findItem(ItemClassIds.Tome_Of_Town_Portal, 0, ItemLocation.Inventory)) {
+			tome = npc.getItem(ItemClassIds.Tome_Of_Town_Portal);
 
 			if (tome && Storage.Inventory.CanFit(tome)) {
 				try {
@@ -479,7 +479,7 @@ var Town = {
 			}
 		}
 
-		scroll = npc.getItem(code === 518 ? 529 : 530);
+		scroll = npc.getItem(code === ItemClassIds.Tome_Of_Town_Portal ? ItemClassIds.Scroll_Of_Town_Portal : ItemClassIds.Scroll_Of_Identify);
 
 		if (!scroll) {
 			return false;
@@ -496,21 +496,21 @@ var Town = {
 		return true;
 	},
 
-	checkScrolls: function (id) {
-		var tome = me.findItem(id, 0, 3);
+	checkScrolls: function(id) {
+		var tome = me.findItem(id, 0, ItemLocation.Inventory);
 
 		if (!tome) {
 			switch (id) {
-			case 519:
-			case "ibk":
-				return 20; // Ignore missing ID tome
-			case 518:
-			case "tbk":
-				return 0; // Force TP tome check
+				case ItemClassIds.Tome_Of_Identify:
+				case "ibk":
+					return 20; // Ignore missing ID tome
+				case ItemClassIds.Tome_Of_Town_Portal:
+				case "tbk":
+					return 0; // Force TP tome check
 			}
 		}
 
-		return tome.getStat(70);
+		return tome.getStat(Stats.quantity);
 	},
 
 	identify: function () {
@@ -528,7 +528,7 @@ var Town = {
 		// Avoid unnecessary NPC visits
 		for (i = 0; i < list.length; i += 1) {
 			// Only unid items or sellable junk (low level) should trigger a NPC visit
-			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1 || (!list[i].getFlag(0x10) && Item.hasTier(list[i])))) {
+			if ((!list[i].getFlag(ItemFlags.isIdentified) || Config.LowGold > 0) && ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1 || (!list[i].getFlag(ItemFlags.isIdentified) && Item.hasTier(list[i])))) {
 				break;
 			}
 		}
@@ -543,21 +543,21 @@ var Town = {
 			return false;
 		}
 
-		tome = me.findItem(519, 0, 3);
+		tome = me.findItem(ItemClassIds.Tome_Of_Identify, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
-		if (tome && tome.getStat(70) < list.length) {
-			this.fillTome(519);
+		if (tome && tome.getStat(Stats.quantity) < list.length) {
+			this.fillTome(ItemClassIds.Tome_Of_Identify);
 		}
 
 MainLoop:
 		while (list.length > 0) {
 			item = list.shift();
 
-			if (!item.getFlag(0x10) && item.location === 3 && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
+			if (!item.getFlag(ItemFlags.isIdentified) && item.location === ItemLocation.Inventory && this.ignoredItemTypes.indexOf(item.itemType) === -1) {
 				result = Pickit.checkItem(item);
 
 				// Force ID for unid items matching autoEquip criteria
-				if (result.result === 1 && !item.getFlag(0x10) && Item.hasTier(item)) {
+				if (result.result === 1 && !item.getFlag(ItemFlags.isIdentified) && Item.hasTier(item)) {
 					result.result = -1;
 				}
 
@@ -573,11 +573,11 @@ MainLoop:
 					if (tome) {
 						this.identifyItem(item, tome);
 					} else {
-						scroll = npc.getItem(530);
+						scroll = npc.getItem(ItemClassIds.Scroll_Of_Identify);
 
 						if (scroll) {
 							if (!Storage.Inventory.CanFit(scroll)) {
-								tpTome = me.findItem(518, 0, 3);
+								tpTome = me.findItem(ItemClassIds.Tome_Of_Town_Portal, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 								if (tpTome) {
 									tpTomePos = {x: tpTome.x, y: tpTome.y};
@@ -594,7 +594,7 @@ MainLoop:
 							}
 						}
 
-						scroll = me.findItem(530, 0, 3);
+						scroll = me.findItem(ItemClassIds.Scroll_Of_Identify, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 						if (!scroll) {
 							break MainLoop;
@@ -612,7 +612,7 @@ MainLoop:
 					switch (result.result) {
 					case 1:
 						// Couldn't id autoEquip item. Don't log it.
-						if (result.result === 1 && Config.AutoEquip && !item.getFlag(0x10) && Item.autoEquipCheck(item)) {
+							if (result.result === 1 && Config.AutoEquip && !item.getFlag(ItemFlags.isIdentified) && Item.autoEquipCheck(item)) {
 							break;
 						}
 
@@ -652,7 +652,7 @@ MainLoop:
 			}
 		}
 
-		this.fillTome(518); // Check for TP tome in case it got sold for ID scrolls
+		this.fillTome(ItemClassIds.Tome_Of_Town_Portal); // Check for TP tome in case it got sold for ID scrolls
 
 		return true;
 	},
@@ -741,9 +741,9 @@ MainLoop:
 			return false;
 		}
 
-		tome = me.findItem(519, 0, 3);
+		tome = me.findItem(ItemClassIds.Tome_Of_Identify, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
-		if (!tome || tome.getStat(70) < list.length) {
+		if (!tome || tome.getStat(Stats.quantity) < list.length) {
 			return false;
 		}
 
@@ -752,7 +752,7 @@ MainLoop:
 			result = Pickit.checkItem(item);
 
 			// Force ID for unid items matching autoEquip criteria
-			if (result.result === 1 && !item.getFlag(0x10) && Item.hasTier(item)) {
+			if (result.result === 1 && !item.getFlag(ItemFlags.isIdentified) && Item.hasTier(item)) {
 				result.result = -1;
 			}
 
@@ -800,14 +800,14 @@ MainLoop:
 
 	getUnids: function () {
 		var list = [],
-			item = me.getItem(-1, 0);
+			item = me.getItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		if (!item) {
 			return false;
 		}
 
 		do {
-			if (item.location === 3 && !item.getFlag(0x10)) {
+			if (item.location === ItemLocation.Inventory && !item.getFlag(ItemFlags.isIdentified)) {
 				list.push(copyUnit(item));
 			}
 		} while (item.getNext());
@@ -826,7 +826,7 @@ MainLoop:
 
 		var i, tick;
 
-		if (!unit || unit.getFlag(0x10)) {
+		if (!unit || unit.getFlag(ItemFlags.isIdentified)) {
 			return false;
 		}
 
@@ -855,13 +855,13 @@ CursorLoop:
 
 		for (i = 0; i < 3; i += 1) {
 			if (getCursorType() === 6) {
-				clickItem(0, unit);
+				clickItem(ClickType.Left_Click, unit);
 			}
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 500) {
-				if (unit.getFlag(0x10)) {
+				if (unit.getFlag(ItemFlags.isIdentified)) {
 					delay(50);
 
 					return true;
@@ -908,7 +908,7 @@ CursorLoop:
 
 			if (result.result === 1 && Item.autoEquipCheck(items[i])) {
 				try {
-					if (Storage.Inventory.CanFit(items[i]) && me.getStat(14) + me.getStat(15) >= items[i].getItemCost(0)) {
+					if (Storage.Inventory.CanFit(items[i]) && me.getStat(Stats.gold) + me.getStat(Stats.goldbank) >= items[i].getItemCost(0)) {
 						Misc.itemLogger("Shopped", items[i]);
 						Misc.logItem("Shopped", items[i], result.line);
 						items[i].buy();
@@ -964,7 +964,7 @@ CursorLoop:
 			return false;
 		}
 
-		items = me.findItems(-1, 0, 3);
+		items = me.findItems(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 		while (items && items.length > 0) {
 			list.push(items.shift().gid);
@@ -1045,12 +1045,12 @@ CursorLoop:
 
 	getGambledItem: function (list) {
 		var i, j,
-			items = me.findItems(-1, 0, 3);
+			items = me.findItems(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 		for (i = 0; i < items.length; i += 1) {
 			if (list.indexOf(items[i].gid) === -1) {
 				for (j = 0; j < 3; j += 1) {
-					if (items[i].getFlag(0x10)) {
+					if (items[i].getFlag(ItemFlags.isIdentified)) {
 						break;
 					}
 
@@ -1099,17 +1099,17 @@ CursorLoop:
 	},
 
 	checkKeys: function () {
-		if (!Config.OpenChests || me.classid === 6 || me.gold < 540 || (!me.getItem("key") && !Storage.Inventory.CanFit({sizex: 1, sizey: 1}))) {
+		if (!Config.OpenChests || me.classid === ClassID.Assassin || me.gold < 540 || (!me.getItem("key") && !Storage.Inventory.CanFit({sizex: 1, sizey: 1}))) {
 			return 12;
 		}
 
 		var i,
 			count = 0,
-			key = me.findItems(543, 0, 3);
+			key = me.findItems(ItemClassIds.Key, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory);
 
 		if (key) {
 			for (i = 0; i < key.length; i += 1) {
-				count += key[i].getStat(70);
+				count += key[i].getStat(Stats.quantity);
 			}
 		}
 
@@ -1136,16 +1136,16 @@ CursorLoop:
 		if (items && items.length) {
 			while (items.length > 0) {
 				switch (items.shift().itemType) {
-				case 2:
-				case 3:
-				case 15:
-				case 16:
-				case 19:
-				case 69:
-				case 70:
-				case 71:
-				case 72:
-				case 75:
+				case NTItemTypes.shield:
+				case NTItemTypes.armor:
+				case NTItemTypes.boots:
+				case NTItemTypes.gloves:
+				case NTItemTypes.belt:
+				case NTItemTypes.voodooheads:
+				case NTItemTypes.auricshields:
+				case NTItemTypes.primalhelm:
+				case NTItemTypes.pelt:
+				case NTItemTypes.circlet:
 					needRal += 1;
 
 					break;
@@ -1158,14 +1158,14 @@ CursorLoop:
 		}
 
 		switch (item.classid) {
-		case 617:
-			if (needRal && (!me.findItems(617) || me.findItems(617) < needRal)) {
+		case ItemClassIds.Ral_Rune:
+				if (needRal && (!me.findItems(ItemClassIds.Ral_Rune) || me.findItems(ItemClassIds.Ral_Rune) < needRal)) {
 				return true;
 			}
 
 			break;
-		case 618:
-			if (needOrt && (!me.findItems(618) || me.findItems(618) < needOrt)) {
+		case ItemClassIds.Ort_Rune:
+				if (needOrt && (!me.findItems(ItemClassIds.Ort_Rune) || me.findItems(ItemClassIds.Ort_Rune) < needOrt)) {
 				return true;
 			}
 
@@ -1176,14 +1176,14 @@ CursorLoop:
 	},
 
 	cubeRepair: function () {
-		if (!Config.CubeRepair || !me.getItem(549)) {
+		if (!Config.CubeRepair || !me.getItem(ItemClassIds.Horadric_Cube)) {
 			return false;
 		}
 
 		var items = this.getItemsForRepair(Config.RepairPercent, false);
 
 		items.sort(function (a, b) {
-			return a.getStat(72) * 100 / a.getStat(73) - b.getStat(72) * 100 / b.getStat(73);
+			return a.getStat(Stats.durability) * 100 / a.getStat(Stats.maxdurability) - b.getStat(Stats.durability) * 100 / b.getStat(Stats.maxdurability);
 		});
 
 		while (items.length > 0) {
@@ -1202,21 +1202,21 @@ CursorLoop:
 		}
 
 		switch (item.itemType) {
-		case 2:
-		case 3:
-		case 15:
-		case 16:
-		case 19:
-		case 69:
-		case 70:
-		case 71:
-		case 72:
-		case 75:
-			rune = me.getItem(617); // Ral rune
+		case NTItemTypes.shield:
+		case NTItemTypes.armor:
+		case NTItemTypes.boots:
+		case NTItemTypes.gloves:
+		case NTItemTypes.belt:
+		case NTItemTypes.voodooheads:
+		case NTItemTypes.auricshields:
+		case NTItemTypes.primalhelm:
+		case NTItemTypes.pelt:
+		case NTItemTypes.circlet:
+			rune = me.getItem(ItemClassIds.Ral_Rune); // Ral rune
 
 			break;
 		default:
-			rune = me.getItem(618); // Ort rune
+			rune = me.getItem(ItemClassIds.Ort_Rune); // Ort rune
 
 			break;
 		}
@@ -1229,7 +1229,7 @@ CursorLoop:
 						delay(1000 + me.ping);
 					}
 
-					cubeItems = me.findItems(-1, -1, 6); // Get cube contents
+					cubeItems = me.findItems(-1, -1, ItemLocation.Cube); // Get cube contents
 
 					if (cubeItems.length === 1) { // We expect only one item in cube
 						cubeItems[0].toCursor();
@@ -1332,11 +1332,11 @@ CursorLoop:
 		if (bowCheck) {
 			switch (bowCheck) {
 			case "bow":
-				quiver = me.getItem("aqv", 1); // Equipped arrow quiver
+				quiver = me.getItem("aqv", ItemModes.Item_equipped_self_or_merc); // Equipped arrow quiver
 
 				break;
 			case "crossbow":
-				quiver = me.getItem("cqv", 1); // Equipped bolt quiver
+				quiver = me.getItem("cqv", ItemModes.Item_equipped_self_or_merc); // Equipped bolt quiver
 
 				break;
 			}
@@ -1344,7 +1344,7 @@ CursorLoop:
 			if (!quiver) { // Out of arrows/bolts
 				repairAction.push("buyQuiver");
 			} else {
-				quantity = quiver.getStat(70);
+				quantity = quiver.getStat(Stats.quantity);
 
 				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= Config.RepairPercent) {
 					repairAction.push("buyQuiver");
@@ -1367,29 +1367,29 @@ CursorLoop:
 	getItemsForRepair: function (repairPercent, chargedItems) {
 		var i, charge, quantity, durability,
 			itemList = [],
-			item = me.getItem(-1, 1);
+			item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc);
 
 		if (item) {
 			do {
-				if (!item.getFlag(0x400000)) { // Skip ethereal items
+				if (!item.getFlag(ItemFlags.isEthereal)) { // Skip ethereal items
 					switch (item.itemType) {
-					// Quantity check
-					case 42: // Throwing knives
-					case 43: // Throwing axes
-					case 44: // Javelins
-					case 87: // Amazon javelins
-						quantity = item.getStat(70);
+						// Quantity check
+						case NTItemTypes.throwingknife: // Throwing knives
+						case NTItemTypes.throwingaxe: // Throwing axes
+						case NTItemTypes.javelin: // Javelins
+						case NTItemTypes.amazonjavelin: // Amazon javelins
+						quantity = item.getStat(Stats.quantity);
 
-						if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+						if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(Stats.item_extra_stack)) <= repairPercent) { // Stat 254 = increased stack size
 							itemList.push(copyUnit(item));
 						}
 
 						break;
 					// Durability check
 					default:
-						durability = item.getStat(72);
+						durability = item.getStat(Stats.durability);
 
-						if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
+						if (typeof durability === "number" && durability * 100 / item.getStat(Stats.maxdurability) <= repairPercent) {
 							itemList.push(copyUnit(item));
 						}
 
@@ -1483,7 +1483,7 @@ MainLoop:
 	needMerc: function () {
 		var i, merc;
 
-		if (me.gametype === 0 || !Config.UseMerc || me.gold < me.mercrevivecost) { // gametype 0 = classic
+		if (me.gametype === GameType.Classic || !Config.UseMerc || me.gold < me.mercrevivecost) { // gametype 0 = classic
 			return false;
 		}
 
@@ -1491,7 +1491,7 @@ MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			merc = me.getMerc();
 
-			if (merc && merc.mode !== 0 && merc.mode !== 12) {
+			if (merc && merc.mode !== NPCModes.death && merc.mode !== NPCModes.dead) {
 				return false;
 			}
 
@@ -1506,7 +1506,7 @@ MainLoop:
 	},
 
 	canStash: function (item) {
-		var ignoredClassids = [91, 174]; // Some quest items that have to be in inventory or equipped
+		var ignoredClassids = [ItemClassIds.Horadric_Staff, ItemClassIds.Khalims_Will]; // Some quest items that have to be in inventory or equipped
 
 		if (this.ignoredItemTypes.indexOf(item.itemType) > -1 || ignoredClassids.indexOf(item.classid) > -1 || !Storage.Stash.CanFit(item)) {
 			return false;
@@ -1553,8 +1553,8 @@ MainLoop:
 
 		// Stash gold
 		if (stashGold) {
-			if (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5 && this.openStash()) {
-				gold(me.getStat(14), 3);
+			if (me.getStat(Stats.gold) >= Config.StashGold && me.getStat(Stats.goldbank) < 25e5 && this.openStash()) {
+				gold(me.getStat(Stats.gold), 3);
 				delay(1000);
 				me.cancel();
 			}
@@ -1564,7 +1564,7 @@ MainLoop:
 	},
 
 	needStash: function () {
-		if (Config.StashGold && me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5) {
+		if (Config.StashGold && me.getStat(Stats.gold) >= Config.StashGold && me.getStat(Stats.goldbank) < 25e5) {
 			return true;
 		}
 
@@ -1581,21 +1581,21 @@ MainLoop:
 	},
 
 	openStash: function () {
-		if (getUIFlag(0x19)) {
+		if (getUIFlag(UIFlags.Stash_is_open)) {
 			return true;
 		}
 
 		var i, tick, stash,
-			telekinesis = me.classid === 1 && me.getSkill(43, 1);
+			telekinesis = me.classid === ClassID.Sorceress && me.getSkill(Skills.Sorceress.Telekinesis, 1);
 
 		for (i = 0; i < 5; i += 1) {
 			this.move("stash");
 
-			stash = getUnit(2, 267);
+			stash = getUnit(2, UniqueObjectIds.Bank);
 
 			if (stash) {
 				if (telekinesis) {
-					Skill.cast(43, 0, stash);
+					Skill.cast(Skills.Sorceress.Telekinesis, 0, stash);
 				} else {
 					Misc.click(0, 0, stash);
 					//stash.interact();
@@ -1604,7 +1604,7 @@ MainLoop:
 				tick = getTickCount();
 
 				while (getTickCount() - tick < 1000) {
-					if (getUIFlag(0x19)) {
+					if (getUIFlag(UIFlags.Stash_is_open)) {
 						delay(200);
 
 						return true;
@@ -1636,9 +1636,9 @@ MainLoop:
 			timer = getTickCount();
 
 		// No equipped items - high chance of dying in last game, force retries
-		if (!me.getItem(-1, 1)) {
+		if (!me.getItem(-1, ItemModes.Item_equipped_self_or_merc)) {
 			for (i = 0; i < 5; i += 1) {
-				corpse = getUnit(0, me.name, 17);
+				corpse = getUnit(UnitType.Player, me.name, PlayerModes.Dead);
 
 				if (corpse) {
 					break;
@@ -1647,7 +1647,7 @@ MainLoop:
 				delay(500);
 			}
 		} else {
-			corpse = getUnit(0, me.name, 17);
+			corpse = getUnit(UnitType.Player, me.name, PlayerModes.Dead);
 		}
 
 		if (!corpse) {
@@ -1680,12 +1680,12 @@ MainLoop:
 				D2Bot.stop();
 			}
 
-			if (!getUnit(0, -1, -1, gid)) {
+			if (!getUnit(UnitType.Player, -1, -1, gid)) {
 				corpseList.shift();
 			}
 		}
 
-		if (me.gametype === 0) {
+		if (me.gametype === GameType.Classic) {
 			this.checkShard();
 		}
 
@@ -1695,11 +1695,11 @@ MainLoop:
 	checkShard: function () {
 		var shard,
 			check = {left: false, right: false},
-			item = me.getItem("bld", 0);
+			item = me.getItem("bld", ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		if (item) {
 			do {
-				if (item.location === 3 && item.quality === 7) {
+				if (item.location === ItemLocation.Inventory && item.quality === ItemQuality.Unique) {
 					shard = copyUnit(item);
 
 					break;
@@ -1711,15 +1711,15 @@ MainLoop:
 			return true;
 		}
 
-		item = me.getItem(-1, 1);
+		item = me.getItem(-1, ItemModes.Item_equipped_self_or_merc);
 
 		if (item) {
 			do {
-				if (item.bodylocation === 4) {
+				if (item.bodylocation === ItemBodyLocation.RIGHT_ARM) {
 					check.right = true;
 				}
 
-				if (item.bodylocation === 5) {
+				if (item.bodylocation === ItemBodyLocation.LEFT_ARM) {
 					check.left = true;
 				}
 			} while (item.getNext());
@@ -1729,14 +1729,14 @@ MainLoop:
 			shard.toCursor();
 
 			while (me.itemoncursor) {
-				clickItem(0, 4);
+				clickItem(ClickType.Left_Click, ItemBodyLocation.RIGHT_ARM);
 				delay(500);
 			}
 		} else if (!check.left) {
 			shard.toCursor();
 
 			while (me.itemoncursor) {
-				clickItem(0, 5);
+				clickItem(ClickType.Left_Click, ItemBodyLocation.LEFT_ARM);
 				delay(500);
 			}
 		}
@@ -1749,25 +1749,25 @@ MainLoop:
 			delay(100);
 		}
 
-		var item = me.getItem(-1, 2),
+		var item = me.getItem(-1, ItemLocation.Belt),
 			clearList = [];
 
 		if (item) {
 			do {
 				switch (item.itemType) {
-				case 76: // Healing
+				case NTItemTypes.healingpotion: // Healing
 					if (Config.BeltColumn[item.x % 4] !== "hp") {
 						clearList.push(copyUnit(item));
 					}
 
 					break;
-				case 77: // Mana
+				case NTItemTypes.manapotion: // Mana
 					if (Config.BeltColumn[item.x % 4] !== "mp") {
 						clearList.push(copyUnit(item));
 					}
 
 					break;
-				case 78: // Rejuvenation
+				case NTItemTypes.rejuvpotion: // Rejuvenation
 					if (Config.BeltColumn[item.x % 4] !== "rv") {
 						clearList.push(copyUnit(item));
 					}
@@ -1790,8 +1790,8 @@ MainLoop:
 			items = me.getItems();
 
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if (items[i].location === 3 && items[i].mode === 0 && items[i].itemType === 22) {
-				if (getUIFlag(0xC) || (Config.PacketShopping && getInteractedNPC() && getInteractedNPC().itemcount > 0)) { // Might as well sell the item if already in shop
+			if (items[i].location === ItemLocation.Inventory && items[i].mode === ItemModes.Item_In_Inventory_Stash_Cube_Or_Store && items[i].itemType === NTItemTypes.scroll) {
+				if (getUIFlag(UIFlags.Shop_open_at_NPC) || (Config.PacketShopping && getInteractedNPC() && getInteractedNPC().itemcount > 0)) { // Might as well sell the item if already in shop
 					print("clearInventory sell " + items[i].name);
 					Misc.itemLogger("Sold", items[i]);
 					items[i].sell();
@@ -1812,11 +1812,11 @@ MainLoop:
 		this.checkQuestItems(); // only golden bird quest for now
 
 		// Return potions to belt
-		item = me.getItem(-1, 0);
+		item = me.getItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		if (item) {
 			do {
-				if (item.location === 3 && [76, 77, 78].indexOf(item.itemType) > -1) {
+				if (item.location === ItemLocation.Inventory && [NTItemTypes.healingpotion, NTItemTypes.manapotion, NTItemTypes.rejuvpotion].indexOf(item.itemType) > -1) {
 					items.push(copyUnit(item));
 				}
 			} while (item.getNext());
@@ -1836,10 +1836,10 @@ MainLoop:
 					if (item.code.indexOf(Config.BeltColumn[i]) > -1 && col[i] > 0) {
 						if (col[i] === beltSize) { // Pick up the potion and put it in belt if the column is empty
 							if (item.toCursor()) {
-								clickItem(0, i, 0, 2);
+								clickItem(ClickType.Left_Click, i, 0, 2);
 							}
 						} else {
-							clickItem(2, item.x, item.y, item.location); // Shift-click potion
+							clickItem(ClickType.Shift_Left_Click, item.x, item.y, item.location); // Shift-click potion
 						}
 
 						delay(me.ping + 200);
@@ -1851,7 +1851,7 @@ MainLoop:
 		}
 
 		// Cleanup remaining potions
-		item = me.getItem(-1, 0);
+		item = me.getItem(-1, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store);
 
 		if (item) {
 			items = [
@@ -1860,11 +1860,11 @@ MainLoop:
 			];
 
 			do {
-				if (item.itemType === 76) {
+				if (item.itemType === NTItemTypes.healingpotion) {
 					items[0].push(copyUnit(item));
 				}
 
-				if (item.itemType === 77) {
+				if (item.itemType === NTItemTypes.manapotion) {
 					items[1].push(copyUnit(item));
 				}
 			} while (item.getNext());
@@ -1886,29 +1886,29 @@ MainLoop:
 		items = Storage.Inventory.Compare(Config.Inventory);
 
 		for (i = 0; !!items && i < items.length; i += 1) {
-			if ([18, 41, 76, 77, 78].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or potions
-					// Keep some quest items
-					items[i].classid !== 524 && // Scroll of Inifuss
-					items[i].classid !== 525 && // Key to Cairn Stones
-					items[i].classid !== 549 && // Horadric Cube
-					items[i].classid !== 92 && // Staff of Kings
-					items[i].classid !== 521 && // Viper Amulet
-					items[i].classid !== 91 && // Horadric Staff
-					items[i].classid !== 552 && // Book of Skill
-					items[i].classid !== 545 && // Potion of Life
-					items[i].classid !== 546 && // A Jade Figurine
-					items[i].classid !== 547 && // The Golden Bird
-					items[i].classid !== 548 && // Lam Esen's Tome
-					items[i].classid !== 553 && // Khalim's Eye
-					items[i].classid !== 554 && // Khalim's Heart 
-					items[i].classid !== 555 && // Khalim's Brain
-					items[i].classid !== 173 && // Khalim's Flail
-					items[i].classid !== 174 && // Khalim's Will
-					items[i].classid !== 644 && // Malah's Potion
-					items[i].classid !== 646 && // Scroll of Resistance
-					//
-					(items[i].code !== 529 || !!me.findItem(518, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
-					(items[i].code !== 530 || !!me.findItem(519, 0, 3)) && // Don't throw scrolls if no tome is found (obsolete code?)
+			if ([NTItemTypes.book, NTItemTypes.key, NTItemTypes.healingpotion, NTItemTypes.manapotion, NTItemTypes.rejuvpotion].indexOf(items[i].itemType) === -1 && // Don't drop tomes, keys or potions
+				// Keep some quest items
+				items[i].classid !== ItemClassIds.Scroll_Of_Inifuss && // Scroll of Inifuss
+				items[i].classid !== ItemClassIds.Key_To_The_Cairn_Stones && // Key to Cairn Stones
+				items[i].classid !== ItemClassIds.Horadric_Cube && // Horadric Cube
+				items[i].classid !== ItemClassIds.Staff_of_Kings && // Staff of Kings
+				items[i].classid !== ItemClassIds.Viper_Amulet && // Viper Amulet
+				items[i].classid !== ItemClassIds.Horadric_Staff && // Horadric Staff
+				items[i].classid !== ItemClassIds.Book_Of_Skill && // Book of Skill
+				items[i].classid !== ItemClassIds.Potion_of_Life && // Potion of Life
+				items[i].classid !== ItemClassIds.A_Jade_Figurine && // A Jade Figurine
+				items[i].classid !== ItemClassIds.The_Golden_Bird && // The Golden Bird
+				items[i].classid !== ItemClassIds.Lam_Esens_Tome && // Lam Esen's Tome
+				items[i].classid !== ItemClassIds.Khalims_Eye && // Khalim's Eye
+				items[i].classid !== ItemClassIds.Khalims_Heart && // Khalim's Heart 
+				items[i].classid !== ItemClassIds.Khalims_Brain && // Khalim's Brain
+				items[i].classid !== ItemClassIds.Khalims_Flail && // Khalim's Flail
+				items[i].classid !== ItemClassIds.Khalims_Will && // Khalim's Will
+				items[i].classid !== ItemClassIds.Malahs_Potion && // Malah's Potion
+				items[i].classid !== ItemClassIds.Scroll_Of_Resistance && // Scroll of Resistance
+				//
+				(items[i].code !== ItemClassIds.Scroll_Of_Town_Portal || !!me.findItem(ItemClassIds.Tome_Of_Town_Portal, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory)) && // Don't throw scrolls if no tome is found (obsolete code?)
+				(items[i].code !== ItemClassIds.Scroll_Of_Identify || !!me.findItem(ItemClassIds.Tome_Of_Identify, ItemModes.Item_In_Inventory_Stash_Cube_Or_Store, ItemLocation.Inventory)) && // Don't throw scrolls if no tome is found (obsolete code?)
 					!Cubing.keepItem(items[i]) && // Don't throw cubing ingredients
 					!Runewords.keepItem(items[i]) && // Don't throw runeword ingredients
 					!CraftingSystem.keepItem(items[i]) // Don't throw crafting system ingredients
@@ -1921,12 +1921,12 @@ MainLoop:
 
 				switch (result) {
 				case 0: // Drop item
-					if ((getUIFlag(0x0C) || getUIFlag(0x08)) && (items[i].getItemCost(1) <= 1 || items[i].itemType === 39)) { // Quest items and such
+					if ((getUIFlag(UIFlags.Shop_open_at_NPC) || getUIFlag(UIFlags.npc_menu)) && (items[i].getItemCost(1) <= 1 || items[i].itemType === NTItemTypes.quest)) { // Quest items and such
 						me.cancel();
 						delay(200);
 					}
 
-					if (getUIFlag(0xC) || (Config.PacketShopping && getInteractedNPC() && getInteractedNPC().itemcount > 0)) { // Might as well sell the item if already in shop
+					if (getUIFlag(UIFlags.Shop_open_at_NPC) || (Config.PacketShopping && getInteractedNPC() && getInteractedNPC().itemcount > 0)) { // Might as well sell the item if already in shop
 						print("clearInventory sell " + items[i].name);
 						Misc.itemLogger("Sold", items[i]);
 						items[i].sell();
@@ -1961,9 +1961,9 @@ MainLoop:
 
 		switch (me.act) {
 		case 1:
-			var fire,
-				wp = getPresetUnit(1, 2, 119),
-				fireUnit = getPresetUnit(1, 2, 39);
+				var fire,
+					wp = getPresetUnit(Areas.Act1.Rogue_Encampment, UnitType.Object, UniqueObjectIds.Waypoint_Portal),
+					fireUnit = getPresetUnit(Areas.Act1.Rogue_Encampment, UnitType.Object, UniqueObjectIds.RogueBonfire);
 
 			if (!fireUnit) {
 				return false;
@@ -2084,7 +2084,7 @@ MainLoop:
 
 	moveToSpot: function (spot) {
 		var i, path, townSpot,
-			longRange = (me.classid === 1 && this.telekinesis && me.getSkill(43, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint";
+			longRange = (me.classid === ClassID.Sorceress && this.telekinesis && me.getSkill(Skills.Sorceress.Telekinesis, 1) && ["stash", "portalspot"].indexOf(spot) > -1) || spot === "waypoint";
 
 		if (!this.act[me.act - 1].hasOwnProperty("spot") || !this.act[me.act - 1].spot.hasOwnProperty(spot)) {
 			return false;
@@ -2112,20 +2112,20 @@ MainLoop:
 			}
 
 			switch (spot) {
-			case "stash":
-				if (!!getUnit(2, 267)) {
+				case "stash":
+					if (!!getUnit(UnitType.Object, UniqueObjectIds.Bank)) {
 					return true;
 				}
 
 				break;
 			case "cain":
-				if (!!getUnit(1, NPC.Cain)) {
+				if (!!getUnit(UnitType.NPC, NPC.Cain)) {
 					return true;
 				}
 
 				break;
 			case "palace":
-				if (!!getUnit(1, "jerhyn")) {
+				if (!!getUnit(UnitType.NPC, "jerhyn")) {
 					return true;
 				}
 
@@ -2138,13 +2138,13 @@ MainLoop:
 
 				break;
 			case "waypoint":
-				if (!!getUnit(2, "waypoint")) {
+				if (!!getUnit(UnitType.Object, "waypoint")) {
 					return true;
 				}
 
 				break;
 			default:
-				if (!!getUnit(1, spot)) {
+				if (!!getUnit(UnitType.NPC, spot)) {
 					return true;
 				}
 
@@ -2156,7 +2156,7 @@ MainLoop:
 	},
 
 	goToTown: function (act, wpmenu) {
-		var towns = [1, 40, 75, 103, 109];
+		var towns = [Areas.Act1.Rogue_Encampment, Areas.Act2.Lut_Gholein, Areas.Act3.Kurast_Docktown, Areas.Act4.The_Pandemonium_Fortress, Areas.Act5.Harrogath];
 
 		if (!me.inTown) {
 			if (!Pather.makePortal()) {

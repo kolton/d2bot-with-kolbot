@@ -6,10 +6,10 @@
 
 function Icehawk() {
 	Town.doChores();
-	Pather.useWaypoint(80);
+	Pather.useWaypoint(Areas.Act3.Kurast_Bazaar);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([92, 93], false)) {
+	if (!Pather.moveToExit([Areas.Act3.A3_Sewers_Level_1, Areas.Act3.A3_Sewers_Level_2], false)) {
 		throw new Error("Failed to move to Icehawk");
 	}
 

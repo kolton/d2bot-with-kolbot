@@ -41,7 +41,7 @@ function Gamble() {
 
 				Town.stash();
 
-				gold = getUnit(4, 523, 3);
+				gold = getUnit(UnitType.Item, ItemClassIds.Gold, 3);
 
 				if (!gold || !Pickit.canPick(gold)) {
 					break;

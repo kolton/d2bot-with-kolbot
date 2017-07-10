@@ -168,7 +168,7 @@ var TorchSystem = {
 					}
 				}
 
-				if (me.getStat(14) >= 100000) {
+				if (me.getStat(Stats.gold) >= 100000) {
 					gold(100000);
 				}
 

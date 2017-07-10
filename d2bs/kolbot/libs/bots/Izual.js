@@ -6,14 +6,14 @@
 
 function Izual() {
 	Town.doChores();
-	Pather.useWaypoint(106);
+	Pather.useWaypoint(Areas.Act4.City_Of_The_Damned);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(105, 1, 256)) {
+	if (!Pather.moveToPreset(Areas.Act4.Plains_Of_Despair, UnitType.NPC, UnitClassID.izual)) {
 		throw new Error("Failed to move to Izual.");
 	}
 
-	Attack.kill(256); // Izual
+	Attack.kill(UnitClassID.izual); // Izual
 	Pickit.pickItems();
 
 	return true;

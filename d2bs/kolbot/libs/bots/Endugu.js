@@ -6,10 +6,10 @@
 
 function Endugu() {
 	Town.doChores();
-	Pather.useWaypoint(78);
+	Pather.useWaypoint(Areas.Act3.Flayer_Jungle);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([88, 89, 91], true) || !Pather.moveToPreset(me.area, 2, 406)) {
+	if (!Pather.moveToExit([Areas.Act3.Flayer_Dungeon_Level_1, Areas.Act3.Flayer_Dungeon_Level_2, Areas.Act3.Flayer_Dungeon_Level_3], true) || !Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Khalim_Chest2)) {
 		throw new Error("Failed to move to Endugu");
 	}
 

@@ -6,10 +6,10 @@
 
 function Hephasto() {
 	Town.doChores();
-	Pather.useWaypoint(107);
+	Pather.useWaypoint(Areas.Act4.River_Of_Flame);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(me.area, 2, 376)) {
+	if (!Pather.moveToPreset(me.area, UnitType.Object, UniqueObjectIds.Forge_Hell)) {
 		throw new Error("Failed to move to Hephasto");
 	}
 
