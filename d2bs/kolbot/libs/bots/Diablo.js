@@ -280,8 +280,8 @@ function Diablo() {
 					Skill.cast(Config.AttackSkill[1], 1);
 
 					break;
-					case ClassID.Druid: // Druid
-						if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
+				case ClassID.Druid: // Druid
+					if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
 						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
 
 						break;

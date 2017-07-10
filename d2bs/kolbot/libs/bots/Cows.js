@@ -206,13 +206,13 @@ function Cows() {
 
 	switch (me.gametype) {
 	case GameType.Classic: // classic
-			if (!me.getQuest(Quests.Act4.Terrors_End, 0)) { // diablo not completed
+		if (!me.getQuest(Quests.Act4.Terrors_End, 0)) { // diablo not completed
 			throw new Error("Diablo quest incomplete.");
 		}
 
 		break;
 	case GameType.Expansion: // expansion
-			if (!me.getQuest(Quests.Act5.Eve_of_Destruction, 0)) { // baal not completed
+		if (!me.getQuest(Quests.Act5.Eve_of_Destruction, 0)) { // baal not completed
 			throw new Error("Baal quest incomplete.");
 		}
 

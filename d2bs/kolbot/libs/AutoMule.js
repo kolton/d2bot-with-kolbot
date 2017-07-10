@@ -428,7 +428,7 @@ MainLoop:
 						(item.location === ItemLocation.Stash || (item.location === ItemLocation.Inventory && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [ItemClassIds.Key_Of_Terror, ItemClassIds.Key_Of_Hate, ItemClassIds.Key_Of_Destruction].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
 						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) { // Don't drop Runeword/Cubing/CraftingSystem ingredients
-						items.push(copyUnit(item));
+					items.push(copyUnit(item));
 				}
 			} while (item.getNext());
 		}

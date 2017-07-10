@@ -168,14 +168,14 @@ function DiabloHelper() {
 			if (getTickCount() - tick >= 8000) {
 				switch (me.classid) {
 				case ClassID.Sorceress: // Sorceress
-						if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
-							if (me.getState(States.SKILLDELAY)) {
-							delay(500);
-						} else {
-							Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
-						}
+					if ([Skills.Sorceress.Meteor, Skills.Sorceress.Blizzard, Skills.Sorceress.Frozen_Orb].indexOf(Config.AttackSkill[1]) > -1) {
+						if (me.getState(States.SKILLDELAY)) {
+						delay(500);
+					} else {
+						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
+					}
 
-						break;
+					break;
 					}
 
 					delay(500);
@@ -187,7 +187,7 @@ function DiabloHelper() {
 
 					break;
 				case ClassID.Druid: // Druid
-						if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
+					if (Config.AttackSkill[1] === Skills.Druid.Tornado) {
 						Skill.cast(Config.AttackSkill[1], 0, 7793, 5293);
 
 						break;
@@ -463,7 +463,7 @@ CSLoop:
 	this.infectorSeal();
 
 	switch (me.classid) {
-		case ClassID.Sorceress:
+	case ClassID.Sorceress:
 		Pather.moveTo(7793, 5291);
 
 		break;

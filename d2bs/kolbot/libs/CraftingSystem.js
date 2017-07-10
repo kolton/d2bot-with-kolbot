@@ -254,8 +254,8 @@ CraftingSystem.keepItem = function (item) {
 			return CraftingSystem.validGids.indexOf(item.gid) > -1;
 		}
 
-	if (info.worker) {
-            if (item.quality === ItemQuality.Crafted) { // Let pickit decide whether to keep crafted
+		if (info.worker) {
+			if (item.quality === ItemQuality.Crafted) { // Let pickit decide whether to keep crafted
 				return false;
 			}
 

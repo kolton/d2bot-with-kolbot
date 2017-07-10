@@ -132,13 +132,13 @@ function getNPCName(idList) {
 
 	for (i = 0; i < idList.length; i += 1) {
 		switch (idList[i]) {
-			case ItemClassIds.Light_Belt: // Light Belt
-			case ItemClassIds.Sharkskin_Belt: // Sharkskin Belt
+		case ItemClassIds.Light_Belt: // Light Belt
+		case ItemClassIds.Sharkskin_Belt: // Sharkskin Belt
 			return "elzix";
-			case ItemClassIds.Belt: // Belt
-			case ItemClassIds.Mesh_Belt: // Mesh Belt
-			case ItemClassIds.Light_Plated_Boots: // Light Plated Boots
-			case ItemClassIds.Battle_Boots: // Battle Boots
+		case ItemClassIds.Belt: // Belt
+		case ItemClassIds.Mesh_Belt: // Mesh Belt
+		case ItemClassIds.Light_Plated_Boots: // Light Plated Boots
+		case ItemClassIds.Battle_Boots: // Battle Boots
 			return "fara";
 		}
 	}

@@ -276,7 +276,7 @@ function Enchant() {
 
 		switch (me.gametype) {
 		case GameType.Classic: // classic
-				if (!me.getQuest(Quests.Act4.Terrors_End, 0)) { // diablo not completed
+			if (!me.getQuest(Quests.Act4.Terrors_End, 0)) { // diablo not completed
 				say("I don't have Diablo quest.");
 
 				return false;
@@ -379,23 +379,23 @@ function Enchant() {
 
 		switch (act) {
 		case 1:
-				wpList = [Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field, Areas.Act1.Dark_Wood, Areas.Act1.Black_Marsh, Areas.Act1.Outer_Cloister, Areas.Act1.Jail_Level_1, Areas.Act1.Inner_Cloister, Areas.Act1.Catacombs_Level_2];
+			wpList = [Areas.Act1.Cold_Plains, Areas.Act1.Stony_Field, Areas.Act1.Dark_Wood, Areas.Act1.Black_Marsh, Areas.Act1.Outer_Cloister, Areas.Act1.Jail_Level_1, Areas.Act1.Inner_Cloister, Areas.Act1.Catacombs_Level_2];
 
 			break;
 		case 2:
-				wpList = [Areas.Act2.A2_Sewers_Level_2, Areas.Act2.Dry_Hills, Areas.Act2.Halls_Of_The_Dead_Level_2, Areas.Act2.Far_Oasis, Areas.Act2.Lost_City, Areas.Act2.Palace_Cellar_Level_1, Areas.Act2.Arcane_Sanctuary, Areas.Act2.Canyon_Of_The_Magi];
+			wpList = [Areas.Act2.A2_Sewers_Level_2, Areas.Act2.Dry_Hills, Areas.Act2.Halls_Of_The_Dead_Level_2, Areas.Act2.Far_Oasis, Areas.Act2.Lost_City, Areas.Act2.Palace_Cellar_Level_1, Areas.Act2.Arcane_Sanctuary, Areas.Act2.Canyon_Of_The_Magi];
 
 			break;
 		case 3:
-				wpList = [Areas.Act3.Spider_Forest, Areas.Act3.Great_Marsh, Areas.Act3.Flayer_Jungle, Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Travincal, Areas.Act3.Durance_Of_Hate_Level_2];
+			wpList = [Areas.Act3.Spider_Forest, Areas.Act3.Great_Marsh, Areas.Act3.Flayer_Jungle, Areas.Act3.Lower_Kurast, Areas.Act3.Kurast_Bazaar, Areas.Act3.Upper_Kurast, Areas.Act3.Travincal, Areas.Act3.Durance_Of_Hate_Level_2];
 
 			break;
 		case 4:
-				wpList = [Areas.Act4.City_Of_The_Damned, Areas.Act4.River_Of_Flame];
+			wpList = [Areas.Act4.City_Of_The_Damned, Areas.Act4.River_Of_Flame];
 
 			break;
 		case 5:
-				wpList = [Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Crystalized_Passage, Areas.Act5.Glacial_Trail, Areas.Act5.Halls_Of_Pain, Areas.Act5.Frozen_Tundra, Areas.Act5.Ancients_Way, Areas.Act5.The_Worldstone_Keep_Level_2];
+			wpList = [Areas.Act5.Frigid_Highlands, Areas.Act5.Arreat_Plateau, Areas.Act5.Crystalized_Passage, Areas.Act5.Glacial_Trail, Areas.Act5.Halls_Of_Pain, Areas.Act5.Frozen_Tundra, Areas.Act5.Ancients_Way, Areas.Act5.The_Worldstone_Keep_Level_2];
 
 			break;
 		}
@@ -547,7 +547,7 @@ MainLoop:
 	function GreetEvent(mode, param1, param2, name1, name2) {
 		switch (mode) {
 		case 0x02:
-				if (me.inTown && me.mode === PlayerModes.Town_Neutral) { // idle in town
+			if (me.inTown && me.mode === PlayerModes.Town_Neutral) { // idle in town
 				greet.push(name1);
 			}
 

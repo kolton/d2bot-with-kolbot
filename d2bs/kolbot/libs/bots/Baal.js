@@ -20,8 +20,8 @@ function Baal() {
 			case Skills.Sorceress.Frozen_Orb:
 				if (me.getState(States.SKILLDELAY)) {
 					while (me.getState(States.SKILLDELAY)) {
-					delay(100);
-				}
+						delay(100);
+					}
 				} else {
 					return Skill.cast(Config.AttackSkill[1], 0, 15094 + rand(-1, 1), 5028);
 				}
@@ -31,7 +31,7 @@ function Baal() {
 
 			break;
 		case ClassID.Paladin: // Paladin
-				if (Config.AttackSkill[3] === Skills.Paladin.Blessed_Hammer) {
+			if (Config.AttackSkill[3] === Skills.Paladin.Blessed_Hammer) {
 				if (Config.AttackSkill[4] > 0) {
 					Skill.setSkill(Config.AttackSkill[4], 0);
 				}
@@ -41,7 +41,7 @@ function Baal() {
 
 			break;
 		case ClassID.Druid: // Druid
-				if (Config.AttackSkill[3] === Skills.Druid.Tornado) {
+			if (Config.AttackSkill[3] === Skills.Druid.Tornado) {
 				return Skill.cast(Config.AttackSkill[3], 0, 15094 + rand(-1, 1), 5028);
 			}
 

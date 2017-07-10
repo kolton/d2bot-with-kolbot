@@ -106,7 +106,7 @@ var Gambling = {
 			Town.move("stash");
 
 			while (me.getStat(Stats.gold) + me.getStat(Stats.goldbank) > info.goldReserve) {
-                gold(me.getStat(Stats.gold)); // drop current gold
+				gold(me.getStat(Stats.gold)); // drop current gold
 				Town.openStash();
 
 				if (me.getStat(Stats.goldbank) <= me.getStat(Stats.level) * 1e4) { // check stashed gold vs max carrying capacity
