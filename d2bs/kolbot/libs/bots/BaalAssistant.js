@@ -67,6 +67,16 @@ function BaalAssistant() {
 		}
 	});
 
+	addEventListener('copydata',
+
+    function ReceiveCopyData(mode, msg) {
+             switch (mode) {  // Message is irrelevant
+             case 6969: 
+             safeCheck = true;
+             break;
+             }
+    });
+	
 	function autoLeaderDetect(destination) {
 		do {
 			solofail = 0;
@@ -235,7 +245,14 @@ function BaalAssistant() {
 		if (monster) {
 			do {
 				if (monster.mode !== 12 && monster.getStat(172) !== 2) {
-					Pather.moveTo(15072, 5002);
+					switch (Math.floor(Math.random() * 2)) {
+					case 0:
+					Pather.moveTo(15075 + rand(-1, 1), 5002);
+					break;
+					case 1:
+					Pather.moveTo(15113 + rand(-1, 1), 5006);
+					break;
+					}
 					while (monster.mode !== 12) {
 						delay(500);
 						if (!copyUnit(monster).x) {
@@ -405,19 +422,19 @@ function BaalAssistant() {
 							throw new Error("Failed to move to Throne of Destruction.");
 						}
 
-						Pather.moveTo(15095, 5029);
+						Pather.moveTo(15095 + rand(0, 1), 5029 + rand(0, 1));
 
 						if ((SoulQuit && getUnit(1, 641)) || (DollQuit && getUnit(1, 691))) {
 							print("Undead soul killers or Undead stygian dolls found, ending script.");
 							return true;
 						}
 
-						Pather.moveTo(15118, 5002);
+						Pather.moveTo(15118 + rand(0, 1), 5002 + rand(0, 1));
 						if (Helper) {
 							Attack.clear(15);
-							Pather.moveTo(15118, 5002);
+							Pather.moveTo(15118 + rand(0, 1), 5002 + rand(0, 1));
 						} else {
-							Pather.moveTo(15117, 5045);
+							Pather.moveTo(15117 + rand(0, 1), 5045 + rand(0, 1));
 						}
 
 						secondAttempt = true;
@@ -431,9 +448,9 @@ function BaalAssistant() {
 							}
 							if (Helper) {
 								Attack.clear(15);
-								Pather.moveTo(15118, 5002);
+								Pather.moveTo(15118 + rand(0, 1), 5002 + rand(0, 1));
 							} else {
-								Pather.moveTo(15117, 5045);
+								Pather.moveTo(15117 + rand(0, 1), 5045 + rand(0, 1));
 							}
 						}
 					}
@@ -477,9 +494,9 @@ function BaalAssistant() {
 
 						if (Helper) {
 							Attack.clear(15);
-							Pather.moveTo(15118, 5002);
+							Pather.moveTo(15118 + rand(0, 1), 5002 + rand(0, 1));
 						} else {
-							Pather.moveTo(15117, 5045);
+							Pather.moveTo(15117 + rand(0, 1), 5045 + rand(0, 1));
 						}
 
 						secondAttempt = true;
@@ -493,9 +510,9 @@ function BaalAssistant() {
 							}
 							if (Helper) {
 								Attack.clear(15);
-								Pather.moveTo(15118, 5002);
+								Pather.moveTo(15118 + rand(0, 1), 5002 + rand(0, 1));
 							} else {
-								Pather.moveTo(15117, 5045);
+								Pather.moveTo(15117 + rand(0, 1), 5045 + rand(0, 1));
 							}
 						}
 					}
@@ -515,7 +532,7 @@ function BaalAssistant() {
 						Attack.clear(15);
 						this.clearThrone();
 
-						Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+						Pather.moveTo(15094 - rand(0, 1), me.classid === 3 ? 5029 + rand(-1, 1) : 5038 + rand(0, 1));
 						Precast.doPrecast(true);
 					}
 
@@ -524,7 +541,7 @@ function BaalAssistant() {
 					MainLoop: while (true) {
 						if (Helper) {
 							if (getDistance(me, 15094, me.classid === 3 ? 5029 : 5038) > 3) {
-								Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+								Pather.moveTo(15094 - rand(0, 1), me.classid === 3 ? 5029 + rand(-1, 1) : 5038 + rand(0, 1));
 							}
 						}
 
@@ -638,7 +655,7 @@ function BaalAssistant() {
 
 				if (Helper) {
 					delay(1000);
-					Pather.moveTo(15134, 5923);
+					Pather.moveTo(15134 + rand(0, 1), 5923 + rand(0, 1));
 					baal = getUnit(1, 544);
 					Attack.kill(544);
 					Pickit.pickItems();

@@ -341,9 +341,7 @@ var Config = {
 		DollQuit: false,
 		SoulQuit: false,
 		KillBaal: false,
-		HotTPMessage: "Hot TP!",
-		SafeTPMessage: "Safe TP!",
-		BaalMessage: "Baal!"
+		SafeProfiles: []
 	},
 	BaalAssistant: {
 		KillNihlathak: false,

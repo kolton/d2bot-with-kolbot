@@ -111,13 +111,11 @@ function LoadConfig() {
 		Config.Snapchip.ClearIcyCellar = true;
 	Scripts.Worldstone = false;
 	Scripts.Baal = false;
-		Config.Baal.HotTPMessage = "Hot TP!";
-		Config.Baal.SafeTPMessage = "Safe TP!";
-		Config.Baal.BaalMessage = "Baal!";
 		Config.Baal.SoulQuit = false; // End script if Souls (Undead Soul Killers) are found.
 		Config.Baal.DollQuit = false; // End script if Dolls (Undead Stigyan Dolls) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
-
+		Config.Baal.SafeProfiles = []; // Array of profiles that should take a safe TP. Works with BaalAssistant. Leave it blank if you don't have any. Example: Config.Baal.SafeProfiles = ["PrOfiLe1", "proFilE2"];
+		
 	/* ### leeching section ###
 	* Unless stated otherwise, leader's character name isn't needed on order to run.
 	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)

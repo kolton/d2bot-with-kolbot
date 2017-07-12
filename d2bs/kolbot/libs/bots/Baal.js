@@ -6,7 +6,7 @@
 
 function Baal() {
 	var portal, tick;
-
+		
 	this.preattack = function () {
 		var check;
 
@@ -48,7 +48,7 @@ function Baal() {
 			break;
 		case 6: // Assassin
 			if (Config.UseTraps) {
-				check = ClassAttack.checkTraps({x: 15094, y: 5028});
+			    check = ClassAttack.checkTraps({ x: 15094, y: 5028 });
 
 				if (check) {
 					return ClassAttack.placeTraps({x: 15094, y: 5028}, 5);
@@ -56,7 +56,7 @@ function Baal() {
 			}
 
 			if (Config.AttackSkill[3] === 256) { // shock-web
-				return Skill.cast(Config.AttackSkill[3], 0, 15094, 5028);
+			    return Skill.cast(Config.AttackSkill[3], 0, 15094 + rand(-1, 1), 5028);
 			}
 
 			break;
@@ -129,7 +129,14 @@ function Baal() {
 		if (monster) {
 			do {
 				if (monster.mode !== 12 && monster.getStat(172) !== 2) {
-					Pather.moveTo(15072, 5002);
+					switch (Math.floor(Math.random() * 2)) {
+					    case 0:
+					        Pather.moveTo(15075 + rand(0, 2), 5002);
+					        break;
+					    case 1:
+					        Pather.moveTo(15113 + rand(0, 2), 5006 + rand(-1, 1));
+					        break;
+					}
 					while (monster.mode !== 12) {
 						delay(500);
 						if (!copyUnit(monster).x) {
@@ -145,57 +152,6 @@ function Baal() {
 		return true;
 	};
 
-	this.announce = function () {
-		var count, string, souls, dolls,
-			monster = getUnit(1);
-
-		if (monster) {
-			count = 0;
-
-			do {
-				if (Attack.checkMonster(monster) && monster.y < 5094) {
-					if (getDistance(me, monster) <= 40) {
-						count += 1;
-					}
-
-					if (!souls && monster.classid === 641) {
-						souls = true;
-					}
-
-					if (!dolls && monster.classid === 691) {
-						dolls = true;
-					}
-				}
-			} while (monster.getNext());
-		}
-
-		if (count > 30) {
-			string = "DEADLY!!!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else if (count > 20) {
-			string = "Lethal!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else if (count > 10) {
-			string = "Dangerous!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else if (count > 0) {
-			string = "Warm" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else {
-			string = "Cool TP. No immediate monsters.";
-		}
-
-		if (souls) {
-			string += " Souls ";
-
-			if (dolls) {
-				string += "and Dolls ";
-			}
-
-			string += "in area.";
-		} else if (dolls) {
-			string += " Dolls in area.";
-		}
-
-		say(string);
-	};
-
 	Town.doChores();
 	Pather.useWaypoint(Config.RandomPrecast ? "random" : 129);
 	Precast.doPrecast(true);
@@ -208,45 +164,62 @@ function Baal() {
 		throw new Error("Failed to move to Throne of Destruction.");
 	}
 
-	Pather.moveTo(15095, 5029);
+	Pather.moveTo(15095 + rand(-1, 1), 5029 + rand(-1, 1));
 
 	if (Config.Baal.DollQuit && getUnit(1, 691)) {
-		say("Dolls found! NG.");
 
 		return true;
 	}
 
 	if (Config.Baal.SoulQuit && getUnit(1, 641)) {
-		say("Souls found! NG.");
 
 		return true;
 	}
 
 	if (Config.PublicMode) {
-		this.announce();
-		Pather.moveTo(15118, 5002);
+	    switch (rand(0, 4)) {
+	        case 0:
+	            Pather.moveTo(15077 + rand(-1 , 2), 5041 + rand(0, 2));
+	            break;
+	        case 1:
+	            Pather.moveTo(15075 + rand(-1, 2), 5069 + rand(0, 2));
+	            break;
+	        case 2:
+	            Pather.moveTo(15115 + rand(-1, 2), 5070 + rand(0, 2));
+	            break;
+	        case 3:
+	            Pather.moveTo(15113 + rand(0, 2), 5042 + rand(0, 2));
+	            break;
+	        case 4:
+	            Pather.moveTo(15112 + rand(0, 2), 5010 + rand(0, 2));
+	            break;
+		}
 		Pather.makePortal();
-		say(Config.Baal.HotTPMessage);
 		Attack.clear(15);
 	}
 
 	this.clearThrone();
 
 	if (Config.PublicMode) {
-		Pather.moveTo(15118, 5045);
-		Pather.makePortal();
-		say(Config.Baal.SafeTPMessage);
+		var i, msg = "safe";
+		if (Config.Baal.SafeProfiles.length > 0) {
+		    for (i = 0; i < Config.Baal.SafeProfiles.length; i++) {
+		        sendCopyData(null, Config.Baal.SafeProfiles[i], 6969, msg);
+		    }
+		}
+		else {
 		Precast.doPrecast(true);
+		}
 	}
 
 	tick = getTickCount();
 
-	Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+	Pather.moveTo(15094 - rand(-2, 2), me.classid === 3 ? 5029 + rand(0, 2) : 5038 + rand(0, 2));
 
 MainLoop:
 	while (true) {
 		if (getDistance(me, 15094, me.classid === 3 ? 5029 : 5038) > 3) {
-			Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
+			Pather.moveTo(15094 - rand(-2, 2), me.classid === 3 ? 5029 + rand(0, 2) : 5038 + rand(0, 2));
 		}
 
 		if (!getUnit(1, 543)) {
@@ -305,9 +278,6 @@ MainLoop:
 	}
 
 	if (Config.Baal.KillBaal) {
-		if (Config.PublicMode) {
-			say(Config.Baal.BaalMessage);
-		}
 
 		Pather.moveTo(15090, 5008);
 		delay(5000);
