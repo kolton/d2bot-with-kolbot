@@ -322,11 +322,11 @@ var D2Bot = {
         	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
-	setProfile: function (account, password, character, difficulty, realm, infotag) {
+	setProfile: function (account, password, character, difficulty, realm, infoTag, gamePath) {
 		var obj = {
 			profile: me.profile,
 			func: "setProfile",
-			args: [account, password, character, difficulty, realm, infotag]
+			args: [account, password, character, difficulty, realm, infoTag, gamePath]
 		};
 
         	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
