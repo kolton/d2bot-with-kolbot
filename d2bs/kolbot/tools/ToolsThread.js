@@ -387,6 +387,10 @@ function main() {
 			print(this.getNearestPreset());
 
 			break;
+		case 96: // numpad 0 - precast
+			Precast.doPrecast(true);
+
+			break;
 		}
 	};
 
