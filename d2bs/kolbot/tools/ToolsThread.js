@@ -354,7 +354,9 @@ function main() {
 		case 107: // Numpad +
 			showConsole();
 			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39) +
-				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45));
+				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45) + 
+				" FCR: " + me.getStat(105) + " IAS: " + me.getStat(93) + " FBR: " + me.getStat(102) + 
+				" FHR: " + me.getStat(99) + " FRW: " + me.getStat(96));
 
 			break;
 		case 101: // numpad 5
