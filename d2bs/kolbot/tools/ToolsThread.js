@@ -383,6 +383,7 @@ function main() {
 			break;
 		case 102: // Numpad 6
 			MuleLogger.logChar();
+			me.overhead("Logged char: " + me.name);
 
 			break;
 		case 109: // Numpad -
