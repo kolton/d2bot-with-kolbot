@@ -353,10 +353,18 @@ function main() {
 			break;
 		case 107: // Numpad +
 			showConsole();
+
+			// me.getStat(105) will return real FCR from gear + Config.FCR from char cfg
+			var realFCR = me.getStat(105) - Config.FCR;
+			var realIAS = me.getStat(93) - Config.IAS;
+			var realFBR = me.getStat(102) - Config.FBR;
+			var realFHR = me.getStat(99) - Config.FHR;
+
 			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39) +
 				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45) + 
-				" FCR: " + me.getStat(105) + " IAS: " + me.getStat(93) + " FBR: " + me.getStat(102) + 
-				" FHR: " + me.getStat(99) + " FRW: " + me.getStat(96));
+				"\n" + 
+				"FCR: " + realFCR + " IAS: " + realIAS + " FBR: " + realFBR + 
+				" FHR: " + realFHR + " FRW: " + me.getStat(96));
 
 			break;
 		case 101: // numpad 5
