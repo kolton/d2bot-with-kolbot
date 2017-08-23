@@ -617,6 +617,12 @@ ModeLoop:
 					/* i < areas.length - 1 is for crossing multiple areas.
 						In that case we must use the exit before the last area.
 					*/
+					if (me.area == 44) { // fix for Blizzard's most recent change
+						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 74).gid);
+						delay(1000);
+						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "TrappDoor").gid);
+						return true;
+					}
 					if (use || i < areas.length - 1) {
 						switch (currExit.type) {
 						case 1: // walk through
