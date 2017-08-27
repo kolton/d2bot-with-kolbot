@@ -1322,10 +1322,10 @@ MainLoop:
 
 					delay(1000);
 				}
-			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
+			} /*else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor); Disabled in order to use the other exit instead.
 				this.moveToPreset(me.area, 5, 19);
 				this.useUnit(5, 19, 47);
-			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
+			}*/ else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 
 				for (i = 0; i < 5; i += 1) {
