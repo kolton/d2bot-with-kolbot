@@ -628,6 +628,17 @@ ModeLoop:
 						}
 						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "TrappDoor").gid);
 						return true;
+					} else if (me.area == 92 & targetArea == 93){
+						this.moveToPreset(92, 2, 366);
+						switch (getUnit(2, 367).mode){
+							case 0:
+							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 367).gid);
+							delay(500);
+							break;
+							case 2:
+							break;
+						}
+					sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 366).gid);
 					} else if (targetArea == 94 || targetArea == 95 || targetArea == 96 || targetArea == 97 || targetArea == 98 || targetArea == 99) { // Act 3 Temple areas
 						switch (getUnit(2, "stair").mode) { // Check if stairs have already been clicked for some reason (multiple scripts in the same area?)
 							case 0: 
@@ -639,6 +650,8 @@ ModeLoop:
 						}
 						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "stair").gid);
 						return true;
+					} else if (me.area == 120 && targetArea == 128 && getUnit(2, 547).mode == 2) {
+						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 547).gid);
 					}
 					if (use || i < areas.length - 1) {
 						switch (currExit.type) {
