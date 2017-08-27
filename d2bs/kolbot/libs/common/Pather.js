@@ -652,7 +652,7 @@ ModeLoop:
 						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "stair").gid);
 						return true;
 					} else if (me.area == 120 && targetArea == 128) {
-						switch (getUnit(2, 547).mode){
+						switch (getUnit(2, 547).mode) {
 							case 0:
 							if (me.getQuest(39, 0) == 1) {
 								sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 547).gid);
@@ -667,6 +667,15 @@ ModeLoop:
 							}
 						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 547).gid);
 						return true;
+					} else if (me.area == 83 && targetArea == 100) {
+						if(getUnit(2, 386).mode === 2) {
+							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 386).gid);
+							return true;
+						}
+						else {
+							print("Travincal quest not completed. Can't interact with the exit.");
+							return true;
+						}
 					}
 					if (use || i < areas.length - 1) {
 						switch (currExit.type) {
