@@ -617,10 +617,27 @@ ModeLoop:
 					/* i < areas.length - 1 is for crossing multiple areas.
 						In that case we must use the exit before the last area.
 					*/
-					if (me.area == 44 && targetArea == 65) { // fix for Blizzard's most recent change
-						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 74).gid);
-						delay(1000);
+					if (targetArea == 65) { // Act 2 44 -> 65
+					    switch (getUnit(2, 74).mode){
+							case 0:
+							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 74).gid);
+							delay(500);
+							break;
+							case 2:
+							break;
+						}
 						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "TrappDoor").gid);
+						return true;
+					} else if (targetArea == 94 || targetArea == 95 || targetArea == 96 || targetArea == 97 || targetArea == 98 || targetArea == 99) { // Act 3 Temple areas
+						switch (getUnit(2, "stair").mode) { // Check if stairs have already been clicked for some reason (multiple scripts in the same area?)
+							case 0: 
+							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "stair").gid);
+							delay(500);
+							break;
+							case 2:
+							break;
+						}
+						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "stair").gid);
 						return true;
 					}
 					if (use || i < areas.length - 1) {
@@ -644,7 +661,6 @@ ModeLoop:
 							break;
 						}
 					}
-
 					break;
 				}
 			}
