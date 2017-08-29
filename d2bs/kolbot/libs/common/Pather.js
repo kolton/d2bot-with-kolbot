@@ -572,7 +572,7 @@ ModeLoop:
 		clearPath - kill monsters while moving
 	*/
 	moveToExit: function (targetArea, use, clearPath) {
-		var i, j, area, exits, targetRoom, dest, currExit,
+		var i, j, area, exits, targetRoom, dest, currExit, unit, lever,
 			areas = [];
 
 		if (targetArea instanceof Array) {
@@ -617,64 +617,92 @@ ModeLoop:
 					/* i < areas.length - 1 is for crossing multiple areas.
 						In that case we must use the exit before the last area.
 					*/
-					if (targetArea == 65) { // Act 2 44 -> 65
-					    switch (getUnit(2, 74).mode){
-							case 0:
-							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 74).gid);
-							delay(500);
-							break;
-							case 2:
-							break;
-						}
-						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "TrappDoor").gid);
-						return true;
-					} else if (me.area == 92 & targetArea == 93){
-						this.moveToPreset(92, 2, 366);
-						switch (getUnit(2, 367).mode){
-							case 0:
-							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 367).gid);
-							delay(500);
-							break;
-							case 2:
-							break;
-						}
-						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 366).gid);
-						return true;
-					} else if (targetArea == 94 || targetArea == 95 || targetArea == 96 || targetArea == 97 || targetArea == 98 || targetArea == 99) { // Act 3 Temple areas
-						switch (getUnit(2, "stair").mode) { // Check if stairs have already been clicked for some reason (multiple scripts in the same area?)
-							case 0: 
-							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "stair").gid);
-							delay(500);
-							break;
-							case 2:
-							break;
-						}
-						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, "stair").gid);
-						return true;
-					} else if (me.area == 120 && targetArea == 128) {
-						switch (getUnit(2, 547).mode) {
-							case 0:
-							if (me.getQuest(39, 0) == 1) {
-								sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 547).gid);
+					if (targetArea == 65) {
+						unit = getUnit(2, 74);
+						if (unit) {
+							switch (unit.mode) {
+								case 0:
+								sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 								delay(500);
 								break;
-							} else {
-								print("Ancients not done yet.");
-								return true;
+								case 2:
+								break;
 							}
-							case 2:
-							break;
-							}
-						sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 547).gid);
-						return true;
-					} else if (me.area == 83 && targetArea == 100) {
-						if(getUnit(2, 386).mode === 2) {
-							sendPacket(1, 0x13, 4, 0x02, 4, getUnit(2, 386).gid);
+							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 							return true;
 						}
-						else {
-							print("Travincal quest not completed. Can't interact with the exit.");
+						if (!unit) {
+							throw new Error("moveToExit: Unit not found.");
+						}
+					} else if (me.area == 92 && targetArea == 93) {
+						this.moveToPreset(92, 2, 366);
+						lever = getUnit(2, 367);
+						unit = getUnit(2, 366);
+						if (unit) {
+							switch (unit.mode) {
+								case 0:
+								sendPacket(1, 0x13, 4, 0x02, 4, lever.gid);
+								delay(500);
+								break;
+								case 2:
+								break;
+							}
+							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 							return true;
+						}	
+						if (!unit) {
+							throw new Error("moveToExit: Unit not found.");
+						}
+					} else if (targetArea == 94 || targetArea == 95 || targetArea == 96 || targetArea == 97 || targetArea == 98 || targetArea == 99) {
+						unit = getUnit(2, "stair");
+						if (unit) {
+							switch (unit.mode) {
+								case 0:
+								sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+								delay(500);
+								break;
+								case 2:
+								break;
+							}
+							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+							return true;
+						}
+						if (!unit) {
+							throw new Error("moveToExit: Unit not found.");
+						}
+					} else if (me.area == 120 && targetArea == 128) {
+						unit = getUnit(2, 547);
+						if (unit) {
+							switch (unit.mode) {
+								case 0:
+								if (me.getQuest(39, 0) == 1) {
+									sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+									delay(1000);
+									break;
+								} else {
+									throw new Error("moveToExit: Ancients not done yet.");
+								}
+								case 2:
+								break;
+							}
+							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+							return true;
+						}
+						if (!unit) {
+							throw new Error("moveToExit: Unit not found.");
+						}
+					} else if (me.area == 83 && targetArea == 100) {
+						unit = getUnit(2, 386);
+						if (unit) {
+							if (unit.mode == 2) {
+								sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+								return true;
+							} else {
+								throw new Error("moveToExit: Council not done yet.");
+							}
+						}
+						if (!unit) {
+							throw new Error("moveToExit: Unit not found.");
 						}
 					}
 					if (use || i < areas.length - 1) {
