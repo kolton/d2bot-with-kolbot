@@ -621,60 +621,64 @@ ModeLoop:
 						unit = getUnit(2, 74);
 						if (unit) {
 							switch (unit.mode) {
-								case 0:
+							case 0:
 								sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 								delay(500);
 								break;
-								case 2:
+							case 2:
 								break;
 							}
 							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 							return true;
-						}
-						if (!unit) {
+						} else {
 							throw new Error("moveToExit: Unit not found.");
 						}
-					} else if (me.area == 92 && targetArea == 93) {
+					}
+					if (me.area == 92 && targetArea == 93) {
 						this.moveToPreset(92, 2, 366);
 						lever = getUnit(2, 367);
 						unit = getUnit(2, 366);
 						if (unit) {
 							switch (unit.mode) {
-								case 0:
-								sendPacket(1, 0x13, 4, 0x02, 4, lever.gid);
-								delay(500);
-								break;
-								case 2:
+							case 0:
+								if (lever) {
+									sendPacket(1, 0x13, 4, 0x02, 4, lever.gid);
+									delay(500);
+									break;
+								} else {
+									throw new Error("moveToExit: Lever unit not found.");
+								}
+							case 2:
 								break;
 							}
 							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 							return true;
-						}	
-						if (!unit) {
+						} else {
 							throw new Error("moveToExit: Unit not found.");
 						}
-					} else if (targetArea == 94 || targetArea == 95 || targetArea == 96 || targetArea == 97 || targetArea == 98 || targetArea == 99) {
+					}
+					if (targetArea == 94 || targetArea == 95 || targetArea == 96 || targetArea == 97 || targetArea == 98 || targetArea == 99) {
 						unit = getUnit(2, "stair");
 						if (unit) {
 							switch (unit.mode) {
-								case 0:
+							case 0:
 								sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 								delay(500);
 								break;
-								case 2:
+							case 2:
 								break;
 							}
 							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 							return true;
-						}
-						if (!unit) {
+						} else {
 							throw new Error("moveToExit: Unit not found.");
 						}
-					} else if (me.area == 120 && targetArea == 128) {
+					}
+					if (me.area == 120 && targetArea == 128) {
 						unit = getUnit(2, 547);
 						if (unit) {
 							switch (unit.mode) {
-								case 0:
+							case 0:
 								if (me.getQuest(39, 0) == 1) {
 									sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 									delay(1000);
@@ -682,16 +686,16 @@ ModeLoop:
 								} else {
 									throw new Error("moveToExit: Ancients not done yet.");
 								}
-								case 2:
+							case 2:
 								break;
 							}
 							sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
 							return true;
-						}
-						if (!unit) {
+						} else {
 							throw new Error("moveToExit: Unit not found.");
 						}
-					} else if (me.area == 83 && targetArea == 100) {
+					}
+					if (me.area == 83 && targetArea == 100) {
 						unit = getUnit(2, 386);
 						if (unit) {
 							if (unit.mode == 2) {
@@ -700,8 +704,7 @@ ModeLoop:
 							} else {
 								throw new Error("moveToExit: Council not done yet.");
 							}
-						}
-						if (!unit) {
+						} else {
 							throw new Error("moveToExit: Unit not found.");
 						}
 					}
@@ -1403,10 +1406,23 @@ MainLoop:
 
 					delay(1000);
 				}
-			} /*else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor); Disabled in order to use the other exit instead.
+			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1
 				this.moveToPreset(me.area, 5, 19);
-				this.useUnit(5, 19, 47);
-			}*/ else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
+				unit = getUnit(2, 74);
+				if (unit) {
+					switch (unit.mode) {
+					case 0:
+						sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+						delay(500);
+						break;
+					case 2:
+						break;
+					}
+					sendPacket(1, 0x13, 4, 0x02, 4, unit.gid);
+				} else {
+					throw new Error("journeyTo: Unit not found");
+				}
+			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 
 				for (i = 0; i < 5; i += 1) {
