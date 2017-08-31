@@ -701,6 +701,9 @@ ModeLoop:
 	openExit: function (targetArea) {
 		switch (targetArea) {
 		case 47:
+			if (me.area === 40 && getDistance(me, 5218, 5180) < 20) {
+				break;
+			}
 		case 65:
 			return this.useUnit(2, 74, targetArea);
 		case 93:
@@ -809,9 +812,9 @@ ModeLoop:
 
 				if (me.area === 92) {
 					this.openUnit(2, 367);
+				} else {
+					this.openUnit(2, id);
 				}
-
-				this.openUnit(2, id);
 			}
 
 			delay(300);
