@@ -566,6 +566,140 @@ ModeLoop:
 	},
 
 	/*
+		Pather.waitForAreaChange(preArea, targetArea, timeout);
+		preArea area id where unit is standing
+		targetArea area id where unit should change to
+		maxTicks - max ticks to wait for change
+
+		returns true on successful area change. false otherwise
+	*/
+	waitForAreaChange : function (preArea, targetArea, maxTicks){
+		var tick = getTickCount();
+		while (getTickCount() - tick < maxTicks) {
+			if ((!targetArea && me.area !== preArea) || me.area === targetArea) {
+				delay(100);
+
+				return true;
+			}
+
+			delay(10);
+		}
+		return false;
+	},
+
+	/*
+		Pather.waitTIllExitOpen(unit, maxTicks);
+		unit -  the unit representing an exit
+		maxTicks -  max wait for exit to open
+
+		returns true if exit opened correctly
+	 */
+	waitTillExitOpen: function (unit, maxTicks){
+		var tick = getTickCount();
+		while (getTickCount() - tick < maxTicks){
+			if(unit.mode === 2){
+				delay(100);
+				return true;
+			}
+			delay(10);
+		}
+
+		return false;
+	},
+
+	/*
+		Pather.sendInteractPacket(unit);
+		Sends a packet to interact with unit of type 2 or 5
+		unit - unit to interact with
+	 */
+	sendInteractPacket: function (unit){
+		if(unit.type != 2 && unit.type != 5){
+			return false;
+		}
+
+		sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+		return true;
+	},
+
+	/*
+		Pather.takeSpecialExit(lever, exit, targetArea);
+		lever - the unit used to open the exit. may actually be the same as exit
+		exit - the unit to interact with to change area
+		targetArea - id of the target area
+
+		returns true on success
+	 */
+	takeSpecialExit : function (lever, exit, targetArea){
+		var prearea = me.area;
+		if(!exit){
+			throw new Error("takeSpecialExit: Invalid exit to targetarea " + targetArea);
+		}
+
+		if (lever && exit.mode === 0) {
+			this.sendInteractPacket(lever);
+			this.waitTillExitOpen(exit, 3000);
+		}
+
+		if (exit.mode != 2) {
+			throw new Error("takeSpecialExit: Expected exit to be open, but it was not. targetarea: " + targetArea);
+		}
+
+		this.sendInteractPacket(exit);
+		if(!this.waitForAreaChange(prearea, targetArea, 3000)){
+			return false;
+		}
+
+		return true;
+	},
+
+	/*
+		Pather.getSpecialExitInfo(targetArea);
+
+		This function expects the user to be in range of the the exit to the targetArea, so it can retrieve
+		the correct units.
+
+		targetArea - id of target area
+		returns an object containing boolean that indicates if exit needs to be opened first, also lever and exit to
+		interact with.
+
+	 */
+	getSpecialExitInfo : function(targetArea){
+		// first handle special cases
+		var needOpenedExit = true;
+		var leverUnit, // unit used to open exit. may be same as exit itself
+			exitUnit; // exit to next area
+
+		if (me.area === 44 && targetArea === 65) { // Lost City -> ancient tunnels
+			leverUnit = getUnit(2, 74);
+			exitUnit = leverUnit;
+
+		} else if (me.area === 92 && targetArea === 93) { // A3 Sewers Level 1 -> A3 Sewers Level 2
+			leverUnit = getUnit(2, 367); // lever
+			exitUnit = getUnit(2, 366); // exit
+
+		} else if((me.area === 80 && (targetArea === 94 || targetArea === 95)) // kurast bazaar ->
+			||(me.area === 81 && (targetArea === 96 || targetArea === 97))	// upper kurast ->
+			||(me.area === 82 && (targetArea === 98 || targetArea === 99))) { // kurast causeway ->
+			leverUnit = getUnit(2, "stair");
+			exitUnit = leverUnit;
+
+		} else if (me.area === 120 && targetArea === 128) { // Arreat Summit -> The Worldstone Keep Level 1
+			exitUnit = getUnit(2, 547);
+			if (me.getQuest(39, 0) === 1) {
+				leverUnit = exitUnit;
+			}
+
+		} else if (me.area === 83 && targetArea === 100) { // Travincal -> Durance Of Hate Level 1
+			exitUnit = getUnit(2, 386);
+
+		} else {
+			needOpenedExit = false;
+		}
+
+		return {lever: leverUnit, exit: exitUnit, needOpenedExit: needOpenedExit};
+	},
+
+	/*
 		Pather.moveToExit(targetArea, use, clearPath);
 		targetArea - area id or array of area ids to move to
 		use - enter target area or last area in the array
@@ -618,24 +752,34 @@ ModeLoop:
 						In that case we must use the exit before the last area.
 					*/
 					if (use || i < areas.length - 1) {
-						switch (currExit.type) {
-						case 1: // walk through
-							targetRoom = this.getNearestRoom(areas[i]);
 
-							if (targetRoom) {
-								this.moveTo(targetRoom[0], targetRoom[1]);
-							} else {
-								// might need adjustments
+						var exitInfo = this.getSpecialExitInfo(targetArea);
+						if(exitInfo.needOpenedExit) {
+							if(!this.takeSpecialExit(exitInfo.lever, exitInfo.exit, targetArea)){
 								return false;
 							}
+						} else {
 
-							break;
-						case 2: // stairs
-							if (!this.useUnit(5, currExit.tileid, areas[i])) {
-								return false;
+							// do exit logic
+							switch (currExit.type) {
+								case 1: // walk through
+									targetRoom = this.getNearestRoom(areas[i]);
+
+									if (targetRoom) {
+										this.moveTo(targetRoom[0], targetRoom[1]);
+									} else {
+										// might need adjustments
+										return false;
+									}
+
+									break;
+								case 2: // stairs
+									if (!this.useUnit(5, currExit.tileid, areas[i])) {
+										return false;
+									}
+
+									break;
 							}
-
-							break;
 						}
 					}
 
@@ -701,7 +845,7 @@ ModeLoop:
 		targetArea - area id of where the unit leads to
 	*/
 	useUnit: function (type, id, targetArea) {
-		var i, tick, unit,
+		var i, unit,
 			preArea = me.area;
 
 		for (i = 0; i < 5; i += 1) {
@@ -724,18 +868,10 @@ ModeLoop:
 			}
 
 			delay(300);
-			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+			this.sendInteractPacket(unit);
 
-			tick = getTickCount();
-
-			while (getTickCount() - tick < 3000) {
-				if ((!targetArea && me.area !== preArea) || me.area === targetArea) {
-					delay(100);
-
-					return true;
-				}
-
-				delay(10);
+			if(this.waitForAreaChange(preArea, targetArea, 3000)){
+				return true;
 			}
 
 			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
@@ -1316,9 +1452,10 @@ MainLoop:
 
 					delay(1000);
 				}
-			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
+			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor); Disabled in order to use the other exit instead.
 				this.moveToPreset(me.area, 5, 19);
-				this.useUnit(5, 19, 47);
+				unit = getUnit(2, 74);
+				this.takeSpecialExit(unit, unit, target.course[0]);
 			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 
