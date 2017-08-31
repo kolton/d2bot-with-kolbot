@@ -565,27 +565,27 @@ ModeLoop:
 		return this.moveTo(presetUnit.roomx * 5 + presetUnit.x + offX, presetUnit.roomy * 5 + presetUnit.y + offY, 3, clearPath, pop);
 	},
 
-    /*
-    	Pather.waitForAreaChange(preArea, targetArea, timeout);
-    	preArea area id where unit is standing
-    	targetArea area id where unit should change to
-    	maxTicks - max ticks to wait for change
+	/*
+		Pather.waitForAreaChange(preArea, targetArea, timeout);
+		preArea area id where unit is standing
+		targetArea area id where unit should change to
+		maxTicks - max ticks to wait for change
 
-    	returns true on successful area change. false otherwise
- 	*/
-    waitForAreaChange : function (preArea, targetArea, maxTicks){
-        var tick = getTickCount();
-        while (getTickCount() - tick < maxTicks) {
-            if ((!targetArea && me.area !== preArea) || me.area === targetArea) {
-                delay(100);
+		returns true on successful area change. false otherwise
+	*/
+	waitForAreaChange : function (preArea, targetArea, maxTicks){
+		var tick = getTickCount();
+		while (getTickCount() - tick < maxTicks) {
+			if ((!targetArea && me.area !== preArea) || me.area === targetArea) {
+				delay(100);
 
-                return true;
-            }
+				return true;
+			}
 
-            delay(10);
-        }
-        return false;
-    },
+			delay(10);
+		}
+		return false;
+	},
 
 	/*
 		Pather.waitTIllExitOpen(unit, maxTicks);
@@ -595,11 +595,11 @@ ModeLoop:
 		returns true if exit opened correctly
 	 */
 	waitTillExitOpen: function (unit, maxTicks){
-    	var tick = getTickCount();
-    	while (getTickCount() - tick < maxTicks){
-    		if(unit.mode === 2){
+		var tick = getTickCount();
+		while (getTickCount() - tick < maxTicks){
+			if(unit.mode === 2){
 				delay(100);
-    			return true;
+				return true;
 			}
 			delay(10);
 		}
@@ -617,7 +617,7 @@ ModeLoop:
 			return false;
 		}
 
-        sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+		sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
 		return true;
 	},
 
@@ -630,26 +630,26 @@ ModeLoop:
 		returns true on success
 	 */
 	takeSpecialExit : function (lever, exit, targetArea){
-        var prearea = me.area;
-        if(!exit){
-            throw new Error("takeSpecialExit: Invalid exit to targetarea " + targetArea);
-        }
+		var prearea = me.area;
+		if(!exit){
+			throw new Error("takeSpecialExit: Invalid exit to targetarea " + targetArea);
+		}
 
-        if (lever && exit.mode === 0) {
-            this.sendInteractPacket(lever);
-            this.waitTillExitOpen(exit, 3000);
-        }
+		if (lever && exit.mode === 0) {
+			this.sendInteractPacket(lever);
+			this.waitTillExitOpen(exit, 3000);
+		}
 
-        if (exit.mode != 2) {
-            throw new Error("takeSpecialExit: Expected exit to be open, but it was not. targetarea: " + targetArea);
-        }
+		if (exit.mode != 2) {
+			throw new Error("takeSpecialExit: Expected exit to be open, but it was not. targetarea: " + targetArea);
+		}
 
-        this.sendInteractPacket(exit);
-        if(!this.waitForAreaChange(prearea, targetArea, 3000)){
-            return false;
-        }
+		this.sendInteractPacket(exit);
+		if(!this.waitForAreaChange(prearea, targetArea, 3000)){
+			return false;
+		}
 
-        return true;
+		return true;
 	},
 
 	/*
@@ -664,39 +664,39 @@ ModeLoop:
 
 	 */
 	getSpecialExitInfo : function(targetArea){
-        // first handle special cases
-        var needOpenedExit = true;
-        var leverUnit, // unit used to open exit. may be same as exit itself
-            exitUnit; // exit to next area
+		// first handle special cases
+		var needOpenedExit = true;
+		var leverUnit, // unit used to open exit. may be same as exit itself
+			exitUnit; // exit to next area
 
-        if (me.area === 44 && targetArea === 65) { // Lost City -> ancient tunnels
-            leverUnit = getUnit(2, 74);
-            exitUnit = leverUnit;
+		if (me.area === 44 && targetArea === 65) { // Lost City -> ancient tunnels
+			leverUnit = getUnit(2, 74);
+			exitUnit = leverUnit;
 
-        } else if (me.area === 92 && targetArea === 93) { // A3 Sewers Level 1 -> A3 Sewers Level 2
-            leverUnit = getUnit(2, 367); // lever
-            exitUnit = getUnit(2, 366); // exit
+		} else if (me.area === 92 && targetArea === 93) { // A3 Sewers Level 1 -> A3 Sewers Level 2
+			leverUnit = getUnit(2, 367); // lever
+			exitUnit = getUnit(2, 366); // exit
 
-        } else if((me.area === 80 && (targetArea === 94 || targetArea === 95)) // kurast bazaar ->
-            ||(me.area === 81 && (targetArea === 96 || targetArea === 97))	// upper kurast ->
-            ||(me.area === 82 && (targetArea === 98 || targetArea === 99))) { // kurast causeway ->
-            leverUnit = getUnit(2, "stair");
-            exitUnit = leverUnit;
+		} else if((me.area === 80 && (targetArea === 94 || targetArea === 95)) // kurast bazaar ->
+			||(me.area === 81 && (targetArea === 96 || targetArea === 97))	// upper kurast ->
+			||(me.area === 82 && (targetArea === 98 || targetArea === 99))) { // kurast causeway ->
+			leverUnit = getUnit(2, "stair");
+			exitUnit = leverUnit;
 
-        } else if (me.area === 120 && targetArea === 128) { // Arreat Summit -> The Worldstone Keep Level 1
-            exitUnit = getUnit(2, 547);
-            if (me.getQuest(39, 0) === 1) {
-                leverUnit = exitUnit;
-            }
+		} else if (me.area === 120 && targetArea === 128) { // Arreat Summit -> The Worldstone Keep Level 1
+			exitUnit = getUnit(2, 547);
+			if (me.getQuest(39, 0) === 1) {
+				leverUnit = exitUnit;
+			}
 
-        } else if (me.area === 83 && targetArea === 100) { // Travincal -> Durance Of Hate Level 1
-            exitUnit = getUnit(2, 386);
+		} else if (me.area === 83 && targetArea === 100) { // Travincal -> Durance Of Hate Level 1
+			exitUnit = getUnit(2, 386);
 
-        } else {
-            needOpenedExit = false;
-        }
+		} else {
+			needOpenedExit = false;
+		}
 
-        return {lever: leverUnit, exit: exitUnit, needOpenedExit: needOpenedExit};
+		return {lever: leverUnit, exit: exitUnit, needOpenedExit: needOpenedExit};
 	},
 
 	/*
@@ -753,34 +753,34 @@ ModeLoop:
 					*/
 					if (use || i < areas.length - 1) {
 
-                        var exitInfo = this.getSpecialExitInfo(targetArea);
-                        if(exitInfo.needOpenedExit) {
+						var exitInfo = this.getSpecialExitInfo(targetArea);
+						if(exitInfo.needOpenedExit) {
 							if(!this.takeSpecialExit(exitInfo.lever, exitInfo.exit, targetArea)){
-                            	return false;
+								return false;
 							}
-                        } else {
+						} else {
 
-                            // do exit logic
-                            switch (currExit.type) {
-                                case 1: // walk through
-                                    targetRoom = this.getNearestRoom(areas[i]);
+							// do exit logic
+							switch (currExit.type) {
+								case 1: // walk through
+									targetRoom = this.getNearestRoom(areas[i]);
 
-                                    if (targetRoom) {
-                                        this.moveTo(targetRoom[0], targetRoom[1]);
-                                    } else {
-                                        // might need adjustments
-                                        return false;
-                                    }
+									if (targetRoom) {
+										this.moveTo(targetRoom[0], targetRoom[1]);
+									} else {
+										// might need adjustments
+										return false;
+									}
 
-                                    break;
-                                case 2: // stairs
-                                    if (!this.useUnit(5, currExit.tileid, areas[i])) {
-                                        return false;
-                                    }
+									break;
+								case 2: // stairs
+									if (!this.useUnit(5, currExit.tileid, areas[i])) {
+										return false;
+									}
 
-                                    break;
-                            }
-                        }
+									break;
+							}
+						}
 					}
 
 					break;
