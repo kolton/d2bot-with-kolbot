@@ -631,7 +631,7 @@ ModeLoop:
 
 							break;
 						case 2: // stairs
-							if (!this.useUnit(5, currExit.tileid, areas[i])) {
+							if (!this.openExit(targetArea) && !this.useUnit(5, currExit.tileid, areas[i])) {
 								return false;
 							}
 
@@ -695,6 +695,85 @@ ModeLoop:
 	},
 
 	/*
+		Pather.openExit(targetArea);
+		targetArea - area id of where the unit leads to
+	*/
+	openExit: function (targetArea) {
+		switch (targetArea) {
+		case 47:
+		case 65:
+			return this.useUnit(2, 74, targetArea);
+		case 93:
+			return this.useUnit(2, 366, targetArea);
+		case 94:
+		case 95:
+		case 96:
+		case 97:
+		case 98:
+		case 99:
+			return this.useUnit(2, "stair", targetArea);
+		case 100:
+			return this.useUnit(2, 386, targetArea);
+		case 128:
+			return this.useUnit(2, 547, targetArea);
+		}
+
+		return false;
+	},
+
+	/*
+		Pather.openUnit(id);
+		type - type of the unit to open
+		id - id of the unit to open
+	*/
+	openUnit: function (type, id) {
+		var i, tick, unit;
+
+		for (i = 0; i < 5; i += 1) {
+			unit = getUnit(type, id);
+
+			if (unit) {
+				break;
+			}
+
+			delay(200);
+		}
+
+		if (!unit) {
+			throw new Error("openUnit: Unit not found. ID: " + unit);
+		}
+
+		if (unit.mode != 0) {
+			return true;
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			if (getDistance(me, unit) > 5) {
+				this.moveToUnit(unit);
+			}
+
+			delay(300);
+			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 1500) {
+				if (unit.mode != 0) {
+					delay(100);
+
+					return true;
+				}
+
+				delay(10);
+			}
+
+			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
+		}
+
+		return false;
+	},
+
+	/*
 		Pather.useUnit(type, id, targetArea);
 		type - type of the unit to use
 		id - id of the unit to use
@@ -721,6 +800,18 @@ ModeLoop:
 		for (i = 0; i < 3; i += 1) {
 			if (getDistance(me, unit) > 5) {
 				this.moveToUnit(unit);
+			}
+
+			if (type === 2 && unit.mode === 0) {
+				if ((me.area === 83 || me.area === 120) && (targetArea == 100 || targetArea == 128) && me.getQuest(39, 0) !== 1) {
+					throw new Error("useUnit: Incomplete quest.");
+				}
+
+				if (me.area === 92) {
+					this.openUnit(2, 367);
+				}
+
+				this.openUnit(2, id);
 			}
 
 			delay(300);
@@ -1318,7 +1409,7 @@ MainLoop:
 				}
 			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
 				this.moveToPreset(me.area, 5, 19);
-				this.useUnit(5, 19, 47);
+				this.useUnit(2, 74, 47);
 			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 
