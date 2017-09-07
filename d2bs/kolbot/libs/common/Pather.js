@@ -716,8 +716,16 @@ ModeLoop:
 		case 99:
 			return this.useUnit(2, "stair", targetArea);
 		case 100:
+			if (me.area === 101) {
+				break;
+			}
+			
 			return this.useUnit(2, 386, targetArea);
 		case 128:
+			if (me.area === 129) {
+				break;
+			}
+			
 			return this.useUnit(2, 547, targetArea);
 		}
 
@@ -806,7 +814,7 @@ ModeLoop:
 			}
 
 			if (type === 2 && unit.mode === 0) {
-				if ((me.area === 83 || me.area === 120) && (targetArea == 100 || targetArea == 128) && me.getQuest(39, 0) !== 1) {
+				if ((me.area === 83 && targetArea === 100 && me.getQuest(21, 0) !== 1) || (me.area === 120 && targetArea === 128 && me.getQuest(39, 0) !== 1)) {
 					throw new Error("useUnit: Incomplete quest.");
 				}
 
