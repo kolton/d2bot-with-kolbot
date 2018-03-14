@@ -150,7 +150,7 @@ Loop:
 	 *	Takes any item and moves it into given buffer.
 	 */
 	this.MoveTo = function (item) {
-		var nPos, n, nDelay;
+		var nPos, n, nDelay, tick;
 
 		try {
 			//Can we even fit it in here?
@@ -170,12 +170,35 @@ Loop:
 				return false;
 			}
 
+            //Failed to open proper buffer
+            if (!Town.openStash() || (item.location === 6 && !Cubing.openCube())) {
+                return false;
+            }
+
 			//Pick to cursor if not already.
-			item.toCursor();
+			if (!item.toCursor()) {
+				return false;
+			}
+
+			tick = getTickCount();
+
+			while (getUIFlag(0x1a)) {
+				if (getTickCount() - tick > 500) {
+					print("Failed to close Cube");
+					return false;
+				}
+
+				me.cancel(0);
+				delay(me.ping * 2 + 100);
+			}
 
 			//Loop three times to try and place it.
 			for (n = 0; n < 5; n += 1) {
-				clickItem(0, nPos.y, nPos.x, this.location);
+				if (this.location === 6) { // place item into cube
+					sendPacket(1, 0x2a, 4, getUnit(100).gid, 4, me.getItem(549).gid);
+				} else {
+					clickItem(0, nPos.y, nPos.x, this.location);
+				}
 
 				nDelay = getTickCount();
 

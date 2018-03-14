@@ -289,6 +289,13 @@ Unit.prototype.toCursor = function () {
 		return true;
 	}
 
+	if (this.location === 7) {
+		Town.openStash();
+	}
+
+	if (this.location === 6) {
+		Cubing.openCube();
+	}
 	var i, tick;
 
 	for (i = 0; i < 3; i += 1) {
@@ -327,6 +334,17 @@ Unit.prototype.drop = function () {
 
 	if (!this.toCursor()) {
 		return false;
+	}
+
+	tick = getTickCount();
+
+	while (getUIFlag(0x1a) || getUIFlag(0x19)) {
+		if (getTickCount() - tick > 500) {
+			return false;
+		}
+		
+		me.cancel(0);
+		delay(me.ping * 2 + 100);
 	}
 
 	for (i = 0; i < 3; i += 1) {
