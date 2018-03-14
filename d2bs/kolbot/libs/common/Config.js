@@ -210,7 +210,7 @@ var Config = {
 	FBR: 0,
 	IAS: 0,
 	PacketCasting: 0,
-	WaypointMenu: false,
+	WaypointMenu: true,
 
 	// Anti-hostile
 	AntiHostile: false,

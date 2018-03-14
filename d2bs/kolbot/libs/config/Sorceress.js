@@ -413,7 +413,7 @@ function LoadConfig() {
 	Config.FBR = 0; // 0 - disable, 1 to 255 - set value of Faster Block Recovery.
 	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of Increased Attack Speed.
 	Config.PacketCasting = 0; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
-	Config.WaypointMenu = false; // Set to true for Single and private realms
+	Config.WaypointMenu = true;
 
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile.
