@@ -150,7 +150,7 @@ Loop:
 	 *	Takes any item and moves it into given buffer.
 	 */
 	this.MoveTo = function (item) {
-		var nPos, n, nDelay, tick;
+		var nPos, n, nDelay, tick, cItem, cube;
 
 		try {
 			//Can we even fit it in here?
@@ -195,7 +195,12 @@ Loop:
 			//Loop three times to try and place it.
 			for (n = 0; n < 5; n += 1) {
 				if (this.location === 6) { // place item into cube
-					sendPacket(1, 0x2a, 4, getUnit(100).gid, 4, me.getItem(549).gid);
+					cItem = getUnit(100);
+					cube = me.getItem(549);
+					
+					if (cItem !== null && cube !== null) {
+						sendPacket(1, 0x2a, 4, cItem.gid, 4, cube.gid);
+					}
 				} else {
 					clickItem(0, nPos.y, nPos.x, this.location);
 				}
