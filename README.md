@@ -4,7 +4,7 @@
 - [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)
 - [Microsoft .NET Framework 4.0 (or higher)](https://www.microsoft.com/net/download/Windows/run)
 
-## MASTER Branch (also known as TRUNK) branch.
+## MASTER Branch (also known as TRUNK).
 
 The package contains 3 distinct components:
 - D2BS - core
@@ -14,7 +14,7 @@ The package contains 3 distinct components:
 If you want to contribute to kolbot code, make sure you use JSLint for final polish.
 If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask around.
 
-JSLint options for kolbot code: [http://pastebin.com/4t5J9QpL](https://codepad.ml/#kolbotjslint)
+JSLint options for kolbot code: [https://codepad.ml/#kolbotjslint](https://codepad.ml/#kolbotjslint)
 
 ## Getting started
 - [D2Bot # Manager Setup](https://github.com/kolton/d2bot-with-kolbot/wiki/D2Bot-%23-Manager-Setup)
