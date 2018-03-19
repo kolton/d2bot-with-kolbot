@@ -312,6 +312,26 @@ var D2Bot = {
 		sendCopyData(null, profile, 3, JSON.stringify(obj));
 	},
 
+	getProfile: function () {
+		var obj = {
+			profile: me.profile,
+			func: "getProfile",
+			args: []
+		};
+
+        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	setProfile: function (account, password, character, difficulty, realm, infoTag, gamePath) {
+		var obj = {
+			profile: me.profile,
+			func: "setProfile",
+			args: [account, password, character, difficulty, realm, infoTag, gamePath]
+		};
+
+        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
 	// Store info in d2bot# cache
 	store: function (info) {
 		this.remove();
