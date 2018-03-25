@@ -15,6 +15,9 @@ function LoadConfig() {
 	 
 	// User addon script. Read the description in libs/bots/UserAddon.js
 	Scripts.UserAddon = true; // !!!YOU MUST SET THIS TO FALSE IF YOU WANT TO RUN BOSS/AREA SCRIPTS!!!
+	
+	//Manual play script with some extra tools and commands (.help in chat for commands)
+	Scripts.Manual = false;
 
 	// Battle orders script - Use this for 2+ characters (for example BO barb + sorc)
 	Scripts.BattleOrders = false;
