@@ -1285,21 +1285,28 @@ NTIPAliasStat["unused191"] = 191;
 NTIPAliasStat["unused192"] = 192;
 NTIPAliasStat["unused193"] = 193;
 NTIPAliasStat["itemnumsockets"] = 194;	NTIPAliasStat["sockets"] = 194;
-NTIPAliasStat["itemskillonattack"] = 195;
-NTIPAliasStat["itemskillonkill"] = 196;
-NTIPAliasStat["itemskillondeath"] = 197;
+NTIPAliasStat["itemskillonattack"] = [195, 1];
+NTIPAliasStat["itemskillonattacklevel"] = [195, 2];
+NTIPAliasStat["itemskillonkill"] = [196, 1];
+NTIPAliasStat["itemskillonkilllevel"] = [196, 2];
+NTIPAliasStat["itemskillondeath"] = [197, 1];
+NTIPAliasStat["itemskillondeathlevel"] = [197, 2];
 
-NTIPAliasStat["itemskillonhit"] = 198;
-NTIPAliasStat["amplifydamageonhit"] = [198,4225];
+NTIPAliasStat["itemskillonhit"] = [198, 1];
+NTIPAliasStat["itemskillonhitlevel"] = [198, 2];
+//NTIPAliasStat["amplifydamageonhit"] = [198,4225];
 
-NTIPAliasStat["itemskillonlevelup"] = 199;
+NTIPAliasStat["itemskillonlevelup"] = [199, 1];
+NTIPAliasStat["itemskillonleveluplevel"] = [199, 2];
 NTIPAliasStat["unused200"] = 200;
-NTIPAliasStat["itemskillongethit"] = 201;
+NTIPAliasStat["itemskillongethit"] = [201, 1];
+NTIPAliasStat["itemskillongethitlevel"] = [201, 2];
 NTIPAliasStat["unused202"] = 202;
 NTIPAliasStat["unused203"] = 203;
 
-NTIPAliasStat["itemchargedskill"] = 204;
-NTIPAliasStat["teleportcharges"] = [204,3461];
+NTIPAliasStat["itemchargedskill"] = [204, 1];
+NTIPAliasStat["itemchargedskilllevel"] = [204, 2];
+//NTIPAliasStat["teleportcharges"] = [204,3461];
 
 NTIPAliasStat["unused204"] = 205;
 NTIPAliasStat["unused205"] = 206;
