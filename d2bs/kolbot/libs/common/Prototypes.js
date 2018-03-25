@@ -685,7 +685,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/Ã¿c[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -726,9 +726,13 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 		break;
 	case 195: // itemskillonattack
+	case 196: // itemskillonkill
+	case 197: // itemskillondeath
 	case 198: // itemskillonhit
+	case 199: // itemskillonlevelup
+	case 201: // itemskillongethit
 	case 204: // itemchargedskill
-		if (subid === undefined) {
+		if (subid === 1) {
 			temp = this.getStat(-2);
 
 			if (temp.hasOwnProperty(id)) {
@@ -740,6 +744,23 @@ Unit.prototype.getStatEx = function (id, subid) {
 					}
 				} else {
 					return temp[id].skill;
+				}
+			}
+
+			return 0;
+		}
+		if (subid === 2) {
+			temp = this.getStat(-2);
+
+			if (temp.hasOwnProperty(id)) {
+				if (temp[id] instanceof Array) {
+					for (i = 0; i < temp[id].length; i += 1) {
+						if (temp[id][i] !== undefined) {
+							return temp[id][i].level;
+						}
+					}
+				} else {
+					return temp[id].level;
 				}
 			}
 
@@ -764,7 +785,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/Ã¿c[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -782,7 +803,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/Ã¿c[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
