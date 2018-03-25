@@ -150,13 +150,18 @@ Loop:
 	 *	Takes any item and moves it into given buffer.
 	 */
 	this.MoveTo = function (item) {
-		var nPos, n, nDelay, tick, cItem, cube;
+		var nPos, n, nDelay, cItem, cube;
 
 		try {
 			//Can we even fit it in here?
 			nPos = this.FindSpot(item);
 
 			if (!nPos) {
+				return false;
+			}
+
+			//Cube -> Stash, must place item in inventory first
+			if (item.location === 6 && this.location === 7 && !Storage.Inventory.MoveTo(item)) {
 				return false;
 			}
 
@@ -178,18 +183,6 @@ Loop:
 			//Pick to cursor if not already.
 			if (!item.toCursor()) {
 				return false;
-			}
-
-			tick = getTickCount();
-
-			while (getUIFlag(0x1a)) {
-				if (getTickCount() - tick > 500) {
-					print("Failed to close Cube");
-					return false;
-				}
-
-				me.cancel(0);
-				delay(me.ping * 2 + 100);
 			}
 
 			//Loop three times to try and place it.
