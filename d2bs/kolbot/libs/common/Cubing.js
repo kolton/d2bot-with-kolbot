@@ -1067,11 +1067,7 @@ IngredientLoop:
 		}
 
 		while (items.length) {
-			if (Storage.Inventory.CanFit(items[0])) {
-				Storage.Inventory.MoveTo(items[0]);
-			} else if (Storage.Stash.CanFit(items[0])) {
-				Storage.Stash.MoveTo(items[0]);
-			} else {
+			if (!Storage.Stash.MoveTo(items[0]) && !Storage.Inventory.MoveTo(items[0])) {
 				return false;
 			}
 
