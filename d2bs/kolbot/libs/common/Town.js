@@ -2077,7 +2077,7 @@ MainLoop:
 
 	moveToSpot: function (spot) {
 		var i, path, townSpot,
-			longRange = (me.classid === 1 && this.telekinesis && me.getSkill(43, 1) && ["portalspot"].indexOf(spot) > -1) || spot === "waypoint";
+			longRange = (spot === "waypoint");
 
 		if (!this.act[me.act - 1].hasOwnProperty("spot") || !this.act[me.act - 1].spot.hasOwnProperty(spot)) {
 			return false;
