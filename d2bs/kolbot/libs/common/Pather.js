@@ -1072,7 +1072,7 @@ MainLoop:
 
 		me.cancel();
 
-		var i, tick, portal, useTK,
+		var i, tick, portal,
 			preArea = me.area;
 
 		for (i = 0; i < 10; i += 1) {
@@ -1087,27 +1087,15 @@ MainLoop:
 			portal = unit ? copyUnit(unit) : this.getPortal(targetArea, owner);
 
 			if (portal) {
-				if (i === 0) {
-					useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
-				}
-
 				if (portal.area === me.area) {
-					if (useTK) {
-						if (getDistance(me, portal) > 13) {
-							Attack.getIntoPosition(portal, 13, 0x4);
-						}
+					if (getDistance(me, portal) > 5) {
+						this.moveToUnit(portal);
+					}
 
-						Skill.cast(43, 0, portal);
+					if (i < 2) {
+						sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
 					} else {
-						if (getDistance(me, portal) > 5) {
-							this.moveToUnit(portal);
-						}
-
-						if (i < 2) {
-							sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
-						} else {
-							Misc.click(0, 0, portal);
-						}
+						Misc.click(0, 0, portal);
 					}
 				}
 
@@ -1139,8 +1127,6 @@ MainLoop:
 
 				if (i > 1) {
 					Packet.flash(me.gid);
-
-					useTK = false;
 				}
 			} else {
 				Packet.flash(me.gid);
