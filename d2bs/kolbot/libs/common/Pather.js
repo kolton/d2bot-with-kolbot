@@ -826,7 +826,12 @@ ModeLoop:
 			}
 
 			delay(300);
-			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+
+			if (type === 5) {
+				Misc.click(0, 0, unit);
+			} else {
+				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+			}
 
 			tick = getTickCount();
 
