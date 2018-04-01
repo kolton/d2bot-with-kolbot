@@ -736,9 +736,11 @@ var Misc = {
 
 		switch (arguments.length) {
 		case 2:
+			me.blockMouse = true;
 			clickMap(button, shift, me.x, me.y);
 			delay(20);
 			clickMap(button + 2, shift, me.x, me.y);
+			me.blockMouse = false;
 
 			break;
 		case 3:
@@ -746,15 +748,19 @@ var Misc = {
 				throw new Error("Misc.click: Third arg must be a Unit.");
 			}
 
+			me.blockMouse = true;
 			clickMap(button, shift, x);
 			delay(20);
 			clickMap(button + 2, shift, x);
+			me.blockMouse = false;
 
 			break;
 		case 4:
+			me.blockMouse = true;
 			clickMap(button, shift, x, y);
 			delay(20);
 			clickMap(button + 2, shift, x, y);
+			me.blockMouse = false;
 
 			break;
 		}

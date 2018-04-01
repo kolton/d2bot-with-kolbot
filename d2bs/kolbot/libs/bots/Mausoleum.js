@@ -27,7 +27,7 @@ function Mausoleum() {
 
 	if (Config.Mausoleum.ClearCrypt) {
 		// Crypt exit is... awkward
-		if (!(Pather.moveToExit(17, true) && Pather.moveToPreset(17, 5, 6, 5, 0) && Pather.moveToExit(18, true))) {
+		if (!(Pather.moveToExit(17, true) && Pather.moveToPreset(17, 5, 6) && Pather.moveToExit(18, true))) {
 			throw new Error("Failed to move to Crypt");
 		}
 
