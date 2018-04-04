@@ -14,7 +14,7 @@ The package contains 3 distinct components:
 If you want to contribute to kolbot code, make sure you use JSLint for final polish.
 If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask around.
 
-JSLint options for kolbot code: [https://codepad.ml/#kolbotjslint](https://codepad.ml/#kolbotjslint)
+JSLint options for kolbot code: [https://gist.githubusercontent.com](https://gist.githubusercontent.com/noah-/d917342e52281d54c404e0b2c18b0c6e/raw/fbade95e38b103d2654b90d85ef62a51c4295153/jslint.config)
 
 ## Getting Started
 - [D2Bot # Manager Setup](https://github.com/kolton/d2bot-with-kolbot/wiki/D2Bot-%23-Manager-Setup)
