@@ -291,6 +291,14 @@ Unit.prototype.toCursor = function () {
 
 	var i, tick;
 
+	if (this.location === 7) {
+		Town.openStash();
+	}
+
+	if (this.location === 6) {
+		Cubing.openCube();
+	}
+
 	for (i = 0; i < 3; i += 1) {
 		try {
 			if (this.mode === 1) {
@@ -323,10 +331,25 @@ Unit.prototype.drop = function () {
 		throw new Error("Unit.drop: Must be used with items.");
 	}
 
-	var i, tick;
+	var i, tick, timeout;
 
 	if (!this.toCursor()) {
 		return false;
+	}
+
+	tick = getTickCount();
+	timeout = Math.max(1000, me.ping * 6);
+
+	while (getUIFlag(0x1a) || getUIFlag(0x19) || !me.gameReady) {
+		if (getTickCount() - tick > timeout) {
+			return false;
+		}
+
+		if (getUIFlag(0x1a) || getUIFlag(0x19)) {
+			me.cancel(0);
+		}
+
+		delay(me.ping * 2 + 100);
 	}
 
 	for (i = 0; i < 3; i += 1) {

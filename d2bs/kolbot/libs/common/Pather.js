@@ -631,7 +631,7 @@ ModeLoop:
 
 							break;
 						case 2: // stairs
-							if (!this.useUnit(5, currExit.tileid, areas[i])) {
+							if (!this.openExit(targetArea) && !this.useUnit(5, currExit.tileid, areas[i])) {
 								return false;
 							}
 
@@ -695,6 +695,96 @@ ModeLoop:
 	},
 
 	/*
+		Pather.openExit(targetArea);
+		targetArea - area id of where the unit leads to
+	*/
+	openExit: function (targetArea) {
+		switch (targetArea) {
+		case 47:
+			if (me.area === 40 && getDistance(me, 5218, 5180) < 20) {
+				break;
+			}
+		case 65:
+			return this.useUnit(2, 74, targetArea);
+		case 93:
+			return this.useUnit(2, 366, targetArea);
+		case 94:
+		case 95:
+		case 96:
+		case 97:
+		case 98:
+		case 99:
+			return this.useUnit(2, "stair", targetArea);
+		case 100:
+			if (me.area === 101) {
+				break;
+			}
+			
+			return this.useUnit(2, 386, targetArea);
+		case 128:
+			if (me.area === 129) {
+				break;
+			}
+			
+			return this.useUnit(2, 547, targetArea);
+		}
+
+		return false;
+	},
+
+	/*
+		Pather.openUnit(id);
+		type - type of the unit to open
+		id - id of the unit to open
+	*/
+	openUnit: function (type, id) {
+		var i, tick, unit;
+
+		for (i = 0; i < 5; i += 1) {
+			unit = getUnit(type, id);
+
+			if (unit) {
+				break;
+			}
+
+			delay(200);
+		}
+
+		if (!unit) {
+			throw new Error("openUnit: Unit not found. ID: " + unit);
+		}
+
+		if (unit.mode != 0) {
+			return true;
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			if (getDistance(me, unit) > 5) {
+				this.moveToUnit(unit);
+			}
+
+			delay(300);
+			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 1500) {
+				if (unit.mode != 0) {
+					delay(100);
+
+					return true;
+				}
+
+				delay(10);
+			}
+
+			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
+		}
+
+		return false;
+	},
+
+	/*
 		Pather.useUnit(type, id, targetArea);
 		type - type of the unit to use
 		id - id of the unit to use
@@ -723,8 +813,25 @@ ModeLoop:
 				this.moveToUnit(unit);
 			}
 
+			if (type === 2 && unit.mode === 0) {
+				if ((me.area === 83 && targetArea === 100 && me.getQuest(21, 0) !== 1) || (me.area === 120 && targetArea === 128 && me.getQuest(39, 0) !== 1)) {
+					throw new Error("useUnit: Incomplete quest.");
+				}
+
+				if (me.area === 92) {
+					this.openUnit(2, 367);
+				} else {
+					this.openUnit(2, id);
+				}
+			}
+
 			delay(300);
-			sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+
+			if (type === 5) {
+				Misc.click(0, 0, unit);
+			} else {
+				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+			}
 
 			tick = getTickCount();
 
@@ -970,7 +1077,7 @@ MainLoop:
 
 		me.cancel();
 
-		var i, tick, portal, useTK,
+		var i, tick, portal,
 			preArea = me.area;
 
 		for (i = 0; i < 10; i += 1) {
@@ -985,27 +1092,15 @@ MainLoop:
 			portal = unit ? copyUnit(unit) : this.getPortal(targetArea, owner);
 
 			if (portal) {
-				if (i === 0) {
-					useTK = me.classid === 1 && me.getSkill(43, 1) && me.inTown && portal.getParent();
-				}
-
 				if (portal.area === me.area) {
-					if (useTK) {
-						if (getDistance(me, portal) > 13) {
-							Attack.getIntoPosition(portal, 13, 0x4);
-						}
+					if (getDistance(me, portal) > 5) {
+						this.moveToUnit(portal);
+					}
 
-						Skill.cast(43, 0, portal);
+					if (i < 2) {
+						sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
 					} else {
-						if (getDistance(me, portal) > 5) {
-							this.moveToUnit(portal);
-						}
-
-						if (i < 2) {
-							sendPacket(1, 0x13, 4, 0x2, 4, portal.gid);
-						} else {
-							Misc.click(0, 0, portal);
-						}
+						Misc.click(0, 0, portal);
 					}
 				}
 
@@ -1037,8 +1132,6 @@ MainLoop:
 
 				if (i > 1) {
 					Packet.flash(me.gid);
-
-					useTK = false;
 				}
 			} else {
 				Packet.flash(me.gid);
@@ -1318,7 +1411,7 @@ MainLoop:
 				}
 			} else if (me.area === 40 && target.course[0] === 47) { // Lut Gholein -> Sewers Level 1 (use Trapdoor)
 				this.moveToPreset(me.area, 5, 19);
-				this.useUnit(5, 19, 47);
+				this.useUnit(2, 74, 47);
 			} else if (me.area === 74 && target.course[0] === 46) { // Arcane Sanctuary -> Canyon of the Magi
 				this.moveToPreset(me.area, 2, 357);
 

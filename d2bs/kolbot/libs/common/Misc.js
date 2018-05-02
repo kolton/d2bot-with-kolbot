@@ -736,9 +736,11 @@ var Misc = {
 
 		switch (arguments.length) {
 		case 2:
+			me.blockMouse = true;
 			clickMap(button, shift, me.x, me.y);
 			delay(20);
 			clickMap(button + 2, shift, me.x, me.y);
+			me.blockMouse = false;
 
 			break;
 		case 3:
@@ -746,15 +748,19 @@ var Misc = {
 				throw new Error("Misc.click: Third arg must be a Unit.");
 			}
 
+			me.blockMouse = true;
 			clickMap(button, shift, x);
 			delay(20);
 			clickMap(button + 2, shift, x);
+			me.blockMouse = false;
 
 			break;
 		case 4:
+			me.blockMouse = true;
 			clickMap(button, shift, x, y);
 			delay(20);
 			clickMap(button + 2, shift, x, y);
+			me.blockMouse = false;
 
 			break;
 		}
@@ -1272,7 +1278,7 @@ var Misc = {
 		case "Shopped":
 		case "Gambled":
 		case "Dropped":
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
 
 			break;
 		case "No room for":
@@ -1280,7 +1286,7 @@ var Misc = {
 
 			break;
 		default:
-			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
 
 			break;
 		}
@@ -1296,7 +1302,7 @@ var Misc = {
 
 		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim();
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|\/|\\/, "").trim();
 
 		desc = this.getItemDesc(unit);
 		color = unit.getColor();

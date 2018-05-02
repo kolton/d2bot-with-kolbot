@@ -98,7 +98,7 @@ var MuleLogger = {
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]/, "").trim();
+			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]|\/|\\/, "").trim();
 
 		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid;
 		color = unit.getColor();

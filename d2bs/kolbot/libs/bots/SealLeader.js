@@ -149,7 +149,7 @@ function SealLeader() {
 		var i, j, seal;
 
 		for (i = 0; i < 5; i += 1) {
-			Pather.moveToPreset(108, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
+			Pather.moveToPreset(108, 2, classid, 2, 0);
 
 			if (i > 1) {
 				Attack.clear(10);
@@ -273,6 +273,7 @@ function SealLeader() {
 	say("in");
 	this.diabloPrep();
 	Attack.kill(243); // Diablo
+	say("done");
 	Pickit.pickItems();
 
 	return true;

@@ -150,13 +150,18 @@ Loop:
 	 *	Takes any item and moves it into given buffer.
 	 */
 	this.MoveTo = function (item) {
-		var nPos, n, nDelay;
+		var nPos, n, nDelay, cItem, cube;
 
 		try {
 			//Can we even fit it in here?
 			nPos = this.FindSpot(item);
 
 			if (!nPos) {
+				return false;
+			}
+
+			//Cube -> Stash, must place item in inventory first
+			if (item.location === 6 && this.location === 7 && !Storage.Inventory.MoveTo(item)) {
 				return false;
 			}
 
@@ -170,12 +175,28 @@ Loop:
 				return false;
 			}
 
+            //Failed to open proper buffer
+            if (!Town.openStash() || (item.location === 6 && !Cubing.openCube())) {
+                return false;
+            }
+
 			//Pick to cursor if not already.
-			item.toCursor();
+			if (!item.toCursor()) {
+				return false;
+			}
 
 			//Loop three times to try and place it.
 			for (n = 0; n < 5; n += 1) {
-				clickItem(0, nPos.y, nPos.x, this.location);
+				if (this.location === 6) { // place item into cube
+					cItem = getUnit(100);
+					cube = me.getItem(549);
+					
+					if (cItem !== null && cube !== null) {
+						sendPacket(1, 0x2a, 4, cItem.gid, 4, cube.gid);
+					}
+				} else {
+					clickItem(0, nPos.y, nPos.x, this.location);
+				}
 
 				nDelay = getTickCount();
 
