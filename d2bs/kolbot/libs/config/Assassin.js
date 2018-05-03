@@ -85,6 +85,7 @@ function LoadConfig() {
 		Config.Diablo.SealWarning = "Leave the seals alone!";
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
+		Config.Diablo.Skip = true;
 		Config.Diablo.DiabloMsg = "Diablo";
 	Scripts.SealLeader = false; // Clear a safe spot around seals and invite leechers in. Leechers should run SealLeecher script. Don't run with Diablo or FastDiablo.
 
