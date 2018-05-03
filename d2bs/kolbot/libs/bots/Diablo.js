@@ -111,8 +111,9 @@ function Diablo() {
 			delay(classid === 394 ? 1000 : 500);
 
 			if (!seal.mode) {
-				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
-					Pather.moveTo(seal.x + 15, seal.y);
+				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y - 1)) { // de seis optimization
+					//Pather.moveTo(seal.x + 15, seal.y);
+					Pather.moveToPreset(108, 2, classid, -3, 3);
 				} else {
 					Pather.moveTo(seal.x - 5, seal.y - 5);
 				}
@@ -217,7 +218,7 @@ function Diablo() {
 		}
 
 		if (this.seisLayout === 1) {
-			Pather.moveTo(7771, 5196);
+			Pather.moveTo(7790, 5200);
 		} else {
 			Pather.moveTo(7798, 5186);
 		}
@@ -477,10 +478,14 @@ function Diablo() {
 	if (Config.PublicMode) {
 		say(Config.Diablo.DiabloMsg);
 	}
+	
+	if (Config.Diablo.Skip){
+		return true;
+	} else {
+		this.diabloPrep();
+		Attack.kill(243); // Diablo
+		Pickit.pickItems();
 
-	this.diabloPrep();
-	Attack.kill(243); // Diablo
-	Pickit.pickItems();
-
-	return true;
+		return true;
+	}
 }
