@@ -148,7 +148,14 @@ function Rushee() {
 		print("making staff");
 		transmute();
 		delay(750 + me.ping);
-		Cubing.emptyCube();
+		
+		staff = me.getItem(91);
+		
+		if (!staff) {
+			return false;
+		}
+		
+		Storage.Inventory.MoveTo(staff);
 		me.cancel();
 
 		return true;
