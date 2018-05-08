@@ -89,7 +89,7 @@ function Diablo() {
 		}
 
 		for (i = 0; i < 5; i += 1) {
-			Pather.moveToPreset(me.area, 2, classid, 2, 0);
+			Pather.moveToPreset(108, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
 
 			seal = getUnit(2, classid);
 
@@ -106,8 +106,13 @@ function Diablo() {
 			}
 
 			warn = false;
-
-			seal.interact();
+			
+			if (classid === 394) {
+				Misc.click(0, 0, seal);
+			} else {
+				seal.interact();
+			}
+			
 			delay(classid === 394 ? 1000 : 500);
 
 			if (!seal.mode) {

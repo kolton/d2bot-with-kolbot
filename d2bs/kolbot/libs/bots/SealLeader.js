@@ -149,7 +149,7 @@ function SealLeader() {
 		var i, j, seal;
 
 		for (i = 0; i < 5; i += 1) {
-			Pather.moveToPreset(108, 2, classid, 2, 0);
+			Pather.moveToPreset(108, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
 
 			if (i > 1) {
 				Attack.clear(10);
@@ -173,7 +173,12 @@ function SealLeader() {
 				return true;
 			}
 
-			sendPacket(1, 0x13, 4, 0x2, 4, seal.gid);
+			if (classid === 394) {
+				Misc.click(0, 0, seal);
+			} else {
+				seal.interact();
+			}
+
 			delay(classid === 394 ? 1000 : 500);
 
 			if (!seal.mode) {
