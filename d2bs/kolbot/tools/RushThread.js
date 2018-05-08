@@ -559,14 +559,19 @@ function main() {
 		};
 
 		this.openSeal = function (id) {
-			Pather.moveToPreset(108, 2, id, 4);
+			Pather.moveToPreset(108, 2, id, id === 394 ? 5 : 2, id === 394 ? 5 : 0);
 
 			var i, tick,
 				seal = getUnit(2, id);
 
 			if (seal) {
 				for (i = 0; i < 3; i += 1) {
-					seal.interact();
+
+					if (id === 394) {
+						Misc.click(0, 0, seal);
+					} else {
+						seal.interact();
+					}
 
 					tick = getTickCount();
 
