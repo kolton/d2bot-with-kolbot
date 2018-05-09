@@ -6,13 +6,10 @@ function ShopBot() {
 		frequency = new Text("Valid item frequency:", 50, 275, 2, 1),
 		totalCyclesText = new Text("Total cycles:", 50, 290, 2, 1),
 		validItems = 0,
-		leadRetry = 10,
-		totalCycles = 0,
-		leadTimeout = 20; // NPC move timeout in seconds
+		totalCycles = 0;
 
 	this.pickEntries = [];
 	this.npcs = {};
-	this.paths = {};
 
 	this.buildPickList = function () {
 		var i, nipfile, line, lines, info,
@@ -20,7 +17,7 @@ function ShopBot() {
 			filename = filepath.substring(filepath.lastIndexOf("/") + 1, filepath.length);
 
 		if (!FileTools.exists(filepath)) {
-			Misc.errorReport("ÿc1NIP file doesn't exist: ÿc0" + filepath);
+			Misc.errorReport("Ã¿c1NIP file doesn't exist: Ã¿c0" + filepath);
 
 			return false;
 		}
@@ -28,7 +25,7 @@ function ShopBot() {
 		try {
 			nipfile = File.open(filepath, 0);
 		} catch (fileError) {
-			Misc.errorReport("ÿc1Failed to load NIP: ÿc0" + filename);
+			Misc.errorReport("Ã¿c1Failed to load NIP: Ã¿c0" + filename);
 		}
 
 		if (!nipfile) {
@@ -52,65 +49,6 @@ function ShopBot() {
 				this.pickEntries.push(line);
 			}
 		}
-
-		return true;
-	};
-
-	this.processPath = function (npc, path) {
-		var i,
-			cutIndex = 0,
-			dist = 100;
-
-		for (i = 0; i < path.length; i += 2) {
-			if (getDistance(npc, path[i], path[i + 1]) < dist) {
-				cutIndex = i;
-				dist = getDistance(npc, path[i], path[i + 1]);
-			}
-		}
-
-		return path.slice(cutIndex);
-	};
-
-	this.mover = function (npc, path) {
-		var i, j;
-
-		path = this.processPath(npc, path);
-
-		if (path.length === 2 && getDistance(npc.x, npc.y, path[0], path[1]) < 4) {
-			return true;
-		}
-
-		for (i = 0; i < path.length; i += 2) {
-			if (i === path.length - 2) {
-				Pather.moveTo(path[i] - 3, path[i + 1] - 3);
-			} else {
-				Pather.moveTo(path[i], path[i + 1]);
-			}
-
-			moveNPC(npc, path[i], path[i + 1]);
-
-			for (j = 0; j < leadTimeout; j += 1) {
-				while (npc.mode === 2) {
-					delay(100);
-				}
-
-				if (getDistance(me, npc) < (i === path.length - 2 ? 8 : 5)) {
-					break;
-				}
-
-				if (j > 0 && j % leadRetry === 0) {
-					moveNPC(npc, path[i], path[i + 1]);
-				}
-
-				delay(1000);
-			}
-
-			if (j === leadTimeout) {
-				return false;
-			}
-		}
-
-		delay(1000);
 
 		return true;
 	};
@@ -239,19 +177,41 @@ function ShopBot() {
 	};
 
 	this.useWp = function (area) {
-		if (totalCycles === 0) {
+		var i, unit, interactedNPC, tick;
+
+		if (getUIFlag(0x08)) {
+			interactedNPC = getInteractedNPC();
+
+			if (interactedNPC) {
+				sendPacket(1, 0x30, 4, interactedNPC.type, 4, interactedNPC.gid);
+			}
+
 			me.cancel();
-
-			return Pather.useWaypoint(area, true);
 		}
-
-		var i, tick, unit, interactedNPC;
 
 		if (me.area === area) {
 			return true;
 		}
 
-		unit = getUnit(2, "waypoint");
+		if (me.inTown) {
+			Town.move("waypoint");
+		}
+
+		if (!Pather.useWaypoint(area, true)) {
+			return false;
+		}
+
+		return true;
+	};
+
+	this.usePortal = function () {
+		var i, tick, unit, interactedNPC, initialArea;
+
+		if (me.area != 109 && me.area != 121) {
+			return false;
+		}
+
+		unit = getUnit(2, 60);
 
 		if (!unit) {
 			return false;
@@ -267,17 +227,19 @@ function ShopBot() {
 			me.cancel();
 		}
 
+		initialArea = me.area;
+
 		for (i = 0; i < 10; i += 1) {
 			if (me.area === unit.area && getDistance(me, unit) > 5) {
 				Pather.walkTo(unit.x, unit.y);
 			}
 
-			unit.interact(area);
+			unit.interact();
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < Math.max(Math.round((i + 1) * 250 / (i / 3 + 1)), me.ping + 1)) {
-				if (me.area === area) {
+				if (initialArea != me.area) {
 					return true;
 				}
 
@@ -289,303 +251,74 @@ function ShopBot() {
 	};
 
 	this.shopAtNPC = function (name) {
-		var i, path, npc, menuId, wp, temp;
+		var i, npc, wp, town,
+			menuId = "Shop";
 
 		switch (name) {
 		case "akara":
 		case "charsi":
-			if (me.inTown) {
-				if (!Town.goToTown(1)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(1)) {
-					break;
-				}
-			}
-
-			npc = this.npcs[name] || getUnit(1, name);
-
-			if (!npc) {
-				Town.move(name);
-
-				npc = getUnit(1, name);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, name);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			if (!this.paths[name]) {
-				if (!getUnit(2, "waypoint")) {
-					Town.move("waypoint");
-				}
-
-				wp = getUnit(2, "waypoint");
-				wp = {x: wp.x, y: wp.y};
-
-				Town.move(name);
-
-				path = getPath(me.area, npc.x, npc.y, wp.x + 2, wp.y + 2, 0, 8);
-				this.paths[name] = [];
-
-				for (i = 0; i < path.length; i += 1) {
-					temp = Pather.getNearestWalkable(path[i].x, path[i].y, 5, 1, 0x1 | 0x400, 4);
-
-					if (temp) {
-						this.paths[name] = this.paths[name].concat(temp);
-					} else {
-						this.paths[name].push(path[i].x);
-						this.paths[name].push(path[i].y);
-					}
-				}
-			}
-
-			path = this.paths[name];
-			menuId = "Shop";
+			town = 1;
+			wp = 1;
 
 			break;
 		case "elzix":
-			if (me.inTown) {
-				if (!Town.goToTown(2)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(40)) {
-					break;
-				}
-			}
-
-			npc = this.npcs[name] || getUnit(1, NPC.Elzix);
-
-			if (!npc) {
-				Town.move(NPC.Elzix);
-
-				npc = getUnit(1, NPC.Elzix);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, NPC.Elzix);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			path = [5038, 5099, 5059, 5102, 5068, 5090, 5067, 5086];
-			menuId = "Shop";
+		case "drognan":
+			town = 2;
+			wp = 40;
 
 			break;
 		case "fara":
-			if (me.inTown) {
-				if (!Town.goToTown(2)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(40)) {
-					break;
-				}
-			}
-
-			npc = this.npcs[name] || getUnit(1, NPC.Fara);
-
-			if (!npc) {
-				Town.move(NPC.Fara);
-
-				npc = getUnit(1, NPC.Fara);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, NPC.Fara);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			path = [5112, 5094, 5092, 5096, 5078, 5098, 5070, 5085];
+			town = 2;
+			wp = 40;
 			menuId = "Repair";
 
 			break;
-		case "drognan":
-			if (me.inTown) {
-				if (!Town.goToTown(2)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(40)) {
-					break;
-				}
-			}
-
-			npc = this.npcs[name] || getUnit(1, NPC.Drognan);
-
-			if (!npc) {
-				Town.move(NPC.Drognan);
-
-				npc = getUnit(1, NPC.Drognan);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, NPC.Drognan);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			path = [5093, 5049, 5088, 5060, 5093, 5079, 5078, 5087, 5070, 5085];
-			menuId = "Shop";
-
-			break;
-		case "ormus":
-			if (me.inTown) {
-				if (!Town.goToTown(3)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(75)) {
-					break;
-				}
-			}
-
-			npc = this.npcs[name] || getUnit(1, NPC.Ormus);
-
-			if (!npc) {
-				Town.move(NPC.Ormus);
-
-				npc = getUnit(1, NPC.Ormus);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, NPC.Ormus);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			path = [5135, 5093, 5147, 5089, 5156, 5075, 5157, 5063, 5160, 5050];
-			menuId = "Shop";
-
-			break;
 		case "asheara":
-			if (me.inTown) {
-				if (!Town.goToTown(3)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(75)) {
-					break;
-				}
-			}
+		case "ormus":
+			town = 3;
+			wp = 75;
 
-			npc = this.npcs[name] || getUnit(1, NPC.Asheara);
-
-			if (!npc) {
-				Town.move(NPC.Asheara);
-
-				npc = getUnit(1, NPC.Asheara);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, NPC.Asheara);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			path = [5049, 5093, 5067, 5092, 5084, 5093, 5110, 5093, 5132, 5093, 5147, 5086, 5154, 5070, 5160, 5049];
-			menuId = "Shop";
+			break;
+		case "jamella":
+			town = 4;
+			wp = 103;
 
 			break;
 		case "anya":
-			if (me.inTown) {
-				if (!Town.goToTown(5)) {
-					break;
-				}
-			} else {
-				if (!this.useWp(109)) {
-					break;
-				}
-			}
-
-			npc = this.npcs[name] || getUnit(1, NPC.Anya);
-
-			if (!npc) {
-				Town.move(NPC.Anya);
-
-				npc = getUnit(1, NPC.Anya);
-			}
-
-			if (!npc) {
-				Town.move("waypoint");
-
-				npc = getUnit(1, NPC.Anya);
-			}
-
-			if (!npc) {
-				break;
-			}
-
-			if (!this.npcs[name]) {
-				this.npcs[name] = copyUnit(npc);
-			}
-
-			path = [5122, 5119, 5129, 5105, 5123, 5087, 5115, 5070];
-			menuId = "Shop";
+			town = 5;
+			wp = 109;
 
 			break;
 		default:
 			throw new Error("Invalid NPC");
 		}
 
-		if (npc) {
-			if (!this.mover(npc, path)) {
+		if (me.inTown) {
+			if (!Town.goToTown(town)) {
 				return false;
 			}
+		} else {
+			if (!this.useWp(wp)) {
+				return false;
+			}
+		}
 
+		npc = this.npcs[name] || getUnit(1, name);
+
+		if (!npc || getDistance(me, npc) > 5) {
+			Town.move(name);
+			npc = getUnit(1, name);
+		}
+
+		if (!npc) {
+			return false;
+		}
+
+		if (!this.npcs[name]) {
+			this.npcs[name] = copyUnit(npc);
+		}
+
+		if (npc) {
 			if (Config.ShopBot.CycleDelay) {
 				delay(Config.ShopBot.CycleDelay);
 			}
@@ -604,7 +337,7 @@ function ShopBot() {
 			if (NTIPAliasClassID.hasOwnProperty(Config.ShopBot.ScanIDs[i].replace(/\s+/g, "").toLowerCase())) {
 				Config.ShopBot.ScanIDs[i] = NTIPAliasClassID[Config.ShopBot.ScanIDs[i].replace(/\s+/g, "").toLowerCase()];
 			} else {
-				Misc.errorReport("ÿc1Invalid ShopBot entry:ÿc0 " + Config.ShopBot.ScanIDs[i]);
+				Misc.errorReport("Ã¿c1Invalid ShopBot entry:Ã¿c0 " + Config.ShopBot.ScanIDs[i]);
 				Config.ShopBot.ScanIDs.splice(i, 1);
 
 				i -= 1;
@@ -643,7 +376,34 @@ function ShopBot() {
 		}
 
 		if (me.inTown) {
-			this.useWp([35, 48, 101, 107, 113][me.act - 1]);
+			var area = getArea(),
+				wp = getPresetUnit(me.area, 2, [119, 156, 237, 398, 429][me.act - 1]),
+				wpX = wp.roomx * 5 + wp.x,
+				wpY = wp.roomy * 5 + wp.y,
+				exit;
+
+			// calculate optimal path, waypoint is always better?
+			if (area.exits.length > 1) {
+				for (i = 0; i < area.exits.length-1; i++) {
+					if (getDistance(me, area.exits[i]) < getDistance(me, area.exits[i+1])) {
+						exit = getArea().exits[i];
+					}
+				}
+			} else {
+				exit = area.exits[0];
+			}
+
+			if (me.area === 109 && this.usePortal()) {
+				delay(3000);
+				this.usePortal();
+				delay(1500);
+			} else if (getDistance(me, exit) < getDistance(me, wpX, wpY)) {
+				Pather.moveToExit(me.area + 1, true);
+				Pather.moveToExit(me.area - 1, true);
+			} else {
+				this.useWp([35, 48, 101, 107, 113][me.act - 1]);
+			}
+
 		}
 
 		cycles += 1;
