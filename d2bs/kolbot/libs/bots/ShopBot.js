@@ -303,7 +303,7 @@ function ShopBot() {
 				delay(3000);
 				Pather.usePortal(109);
 
-				if (cycles === 0) {
+				if (totalCycles === 0) {
 					delay(10000);
 				}
 
