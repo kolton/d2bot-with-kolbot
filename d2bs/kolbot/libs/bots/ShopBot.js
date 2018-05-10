@@ -18,7 +18,6 @@ function ShopBot() {
 
 		if (!FileTools.exists(filepath)) {
 			Misc.errorReport("ÿc1NIP file doesn't exist: ÿc0" + filepath);
-
 			return false;
 		}
 
@@ -33,7 +32,6 @@ function ShopBot() {
 		}
 
 		lines = nipfile.readAllLines();
-
 		nipfile.close();
 
 		for (i = 0; i < lines.length; i += 1) {
@@ -84,8 +82,6 @@ function ShopBot() {
 
 			while (getTickCount() - tick < Math.max(Math.round((i + 1) * 250 / (i / 3 + 1)), me.ping + 1)) {
 				if (getUIFlag(0x08)) {
-					//print("openMenu try: " + i);
-
 					return true;
 				}
 
@@ -105,7 +101,6 @@ function ShopBot() {
 			D2Bot.printToConsole("Mule triggered");
 			scriptBroadcast("mule");
 			scriptBroadcast("quit");
-
 			return true;
 		}
 
@@ -122,7 +117,6 @@ function ShopBot() {
 
 			if (npc.itemcount > 0) {
 				//delay(200);
-
 				break;
 			}
 		}
@@ -158,7 +152,6 @@ function ShopBot() {
 				if (npc.startTrade(menuId)) {
 					Misc.logItem("Shopped", items[i]);
 					items[i].buy();
-
 					bought = true;
 				}
 
@@ -177,13 +170,12 @@ function ShopBot() {
 	};
 
 	this.shopAtNPC = function (name) {
-		var i, npc, wp, town,
+		var i, npc, wp,
 			menuId = "Shop";
 
 		switch (name) {
 		case "akara":
 		case "charsi":
-			town = 1;
 			wp = 1;
 
 			break;
@@ -191,23 +183,19 @@ function ShopBot() {
 			menuId = "Repair";
 		case "elzix":
 		case "drognan":
-			town = 2;
 			wp = 40;
 
 			break;
 		case "asheara":
 		case "ormus":
-			town = 3;
 			wp = 75;
 
 			break;
 		case "jamella":
-			town = 4;
 			wp = 103;
 
 			break;
 		case "anya":
-			town = 5;
 			wp = 109;
 
 			break;
@@ -215,14 +203,8 @@ function ShopBot() {
 			throw new Error("Invalid NPC");
 		}
 
-		if (me.inTown) {
-			if (!Town.goToTown(town)) {
-				return false;
-			}
-		} else {
-			if (!Pather.useWaypoint(wp)) {
-				return false;
-			}
+		if (!Pather.useWaypoint(wp)) {
+			return false;
 		}
 
 		npc = this.npcs[name] || getUnit(1, name);
@@ -240,14 +222,13 @@ function ShopBot() {
 			this.npcs[name] = copyUnit(npc);
 		}
 
-		if (npc) {
-			if (Config.ShopBot.CycleDelay) {
-				delay(Config.ShopBot.CycleDelay);
-			}
+		
+		if (Config.ShopBot.CycleDelay) {
+			delay(Config.ShopBot.CycleDelay);
+		}
 
-			if (this.openMenu(npc)) {
-				this.shopItems(npc, menuId);
-			}
+		if (this.openMenu(npc)) {
+			this.shopItems(npc, menuId);
 		}
 
 		return true;
@@ -261,7 +242,6 @@ function ShopBot() {
 			} else {
 				Misc.errorReport("ÿc1Invalid ShopBot entry:ÿc0 " + Config.ShopBot.ScanIDs[i]);
 				Config.ShopBot.ScanIDs.splice(i, 1);
-
 				i -= 1;
 			}
 		}
@@ -302,30 +282,24 @@ function ShopBot() {
 				wp = getPresetUnit(me.area, 2, [119, 156, 237, 398, 429][me.act - 1]),
 				wpX = wp.roomx * 5 + wp.x,
 				wpY = wp.roomy * 5 + wp.y,
-				exit;
-
-			// calculate optimal path, waypoint is always better?
-			if (area.exits.length > 1) {
-				for (i = 0; i < area.exits.length-1; i++) {
-					if (getDistance(me, area.exits[i]) < getDistance(me, area.exits[i+1])) {
-						exit = getArea().exits[i];
-					}
-				}
-			} else {
 				exit = area.exits[0];
+
+			for (i = 1; i < area.exits.length; i++) {
+				if (getDistance(me, exit) > getDistance(me, area.exits[i])) { 
+					exit = area.exits[i];
+				}
 			}
 
 			if (me.area === 109 && me.getQuest(37, 0) === 1 && me.getQuest(38, 0) !== 1 && Pather.usePortal(121)) {
 				delay(3000);
 				Pather.usePortal(109);
 				delay(1500);
-			} else if (getDistance(me, exit) < getDistance(me, wpX, wpY)) {
+			} else if (getDistance(me, exit) < (getDistance(me, wpX, wpY) + 9)) {
 				Pather.moveToExit(me.area + 1, true);
 				Pather.moveToExit(me.area - 1, true);
 			} else {
 				Pather.useWaypoint([35, 48, 101, 107, 113][me.act - 1]);
 			}
-
 		}
 
 		cycles += 1;
