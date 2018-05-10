@@ -174,8 +174,10 @@ function ShopBot() {
 			menuId = "Shop";
 
 		switch (name) {
-		case "akara":
 		case "charsi":
+			menuId = "Repair";
+		case "akara":
+		case "gheed":
 			wp = 1;
 
 			break;
@@ -186,15 +188,22 @@ function ShopBot() {
 			wp = 40;
 
 			break;
+		case "hratli":
+			menuId = "Repair";
 		case "asheara":
 		case "ormus":
 			wp = 75;
 
 			break;
+		case "halbu":
+			menuId = "Repair";
 		case "jamella":
 			wp = 103;
 
 			break;
+		case "larzuk":
+			menuId = "Repair";
+		case "malah":
 		case "anya":
 			wp = 109;
 
@@ -290,11 +299,16 @@ function ShopBot() {
 				}
 			}
 
-			if (me.area === 109 && me.getQuest(37, 0) === 1 && me.getQuest(38, 0) !== 1 && Pather.usePortal(121)) {
+			if (me.area === 109 && getDistance(me, 5117, 5119) < 20 && me.getQuest(37, 0) === 1 && me.getQuest(38, 0) !== 1 && Pather.usePortal(121)) {
 				delay(3000);
 				Pather.usePortal(109);
+
+				if (cycles === 0) {
+					delay(10000);
+				}
+
 				delay(1500);
-			} else if (getDistance(me, exit) < (getDistance(me, wpX, wpY) + 9)) {
+			} else if (getDistance(me, exit) < (getDistance(me, wpX, wpY) + 6)) {
 				Pather.moveToExit(me.area + 1, true);
 				Pather.moveToExit(me.area - 1, true);
 			} else {
