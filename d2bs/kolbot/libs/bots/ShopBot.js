@@ -176,80 +176,6 @@ function ShopBot() {
 		return true;
 	};
 
-	this.useWp = function (area) {
-		var i, unit, interactedNPC, tick;
-
-		if (getUIFlag(0x08)) {
-			interactedNPC = getInteractedNPC();
-
-			if (interactedNPC) {
-				sendPacket(1, 0x30, 4, interactedNPC.type, 4, interactedNPC.gid);
-			}
-
-			me.cancel();
-		}
-
-		if (me.area === area) {
-			return true;
-		}
-
-		if (me.inTown) {
-			Town.move("waypoint");
-		}
-
-		if (!Pather.useWaypoint(area, true)) {
-			return false;
-		}
-
-		return true;
-	};
-
-	this.usePortal = function () {
-		var i, tick, unit, interactedNPC, initialArea;
-
-		if (me.area != 109 && me.area != 121) {
-			return false;
-		}
-
-		unit = getUnit(2, 60);
-
-		if (!unit) {
-			return false;
-		}
-
-		if (getUIFlag(0x08)) {
-			interactedNPC = getInteractedNPC();
-
-			if (interactedNPC) {
-				sendPacket(1, 0x30, 4, interactedNPC.type, 4, interactedNPC.gid);
-			}
-
-			me.cancel();
-		}
-
-		initialArea = me.area;
-
-		for (i = 0; i < 10; i += 1) {
-			if (me.area === unit.area && getDistance(me, unit) > 5) {
-				Pather.walkTo(unit.x, unit.y);
-			}
-
-			unit.interact();
-
-			tick = getTickCount();
-
-			while (getTickCount() - tick < Math.max(Math.round((i + 1) * 250 / (i / 3 + 1)), me.ping + 1)) {
-				if (initialArea != me.area) {
-					return true;
-				}
-
-				delay(10);
-			}
-		}
-
-		return false;
-	};
-
 	this.shopAtNPC = function (name) {
 		var i, npc, wp, town,
 			menuId = "Shop";
@@ -261,16 +187,12 @@ function ShopBot() {
 			wp = 1;
 
 			break;
+		case "fara":
+			menuId = "Repair";
 		case "elzix":
 		case "drognan":
 			town = 2;
 			wp = 40;
-
-			break;
-		case "fara":
-			town = 2;
-			wp = 40;
-			menuId = "Repair";
 
 			break;
 		case "asheara":
@@ -298,7 +220,7 @@ function ShopBot() {
 				return false;
 			}
 		} else {
-			if (!this.useWp(wp)) {
+			if (!Pather.useWaypoint(wp)) {
 				return false;
 			}
 		}
@@ -393,15 +315,15 @@ function ShopBot() {
 				exit = area.exits[0];
 			}
 
-			if (me.area === 109 && this.usePortal()) {
+			if (me.area === 109 && me.getQuest(37, 0) === 1 && me.getQuest(38, 0) !== 1 && Pather.usePortal(121)) {
 				delay(3000);
-				this.usePortal();
+				Pather.usePortal(109);
 				delay(1500);
 			} else if (getDistance(me, exit) < getDistance(me, wpX, wpY)) {
 				Pather.moveToExit(me.area + 1, true);
 				Pather.moveToExit(me.area - 1, true);
 			} else {
-				this.useWp([35, 48, 101, 107, 113][me.act - 1]);
+				Pather.useWaypoint([35, 48, 101, 107, 113][me.act - 1]);
 			}
 
 		}
