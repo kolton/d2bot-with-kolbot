@@ -713,12 +713,11 @@ MainLoop:
 				}
 
 				switch (result.result) {
-                case 0:
-                    Misc.itemLogger("Dropped", unids[i], "cainID");
-                    this.initNPC("Shop", "clearInventory");
-                    unids[i].sell();
+				case 0:
+					Misc.itemLogger("Dropped", unids[i], "cainID");
+					unids[i].drop();
 
-                    break;
+					break;
 				case 1:
 					Misc.itemLogger("Kept", unids[i]);
 					Misc.logItem("Kept", unids[i], result.line);
