@@ -97,6 +97,7 @@ var Precast = new function () {
 			}
 
 			break;
+		case 58: // Energy Shield
 		case 52: // Enchant
 			sumCurr = 0;
 			sumSwap = 0;
