@@ -8,6 +8,7 @@ function ShopBot() {
 		validItems = 0,
 		totalCycles = 0;
 
+	Pather.teleport = false;
 	this.pickEntries = [];
 	this.npcs = {};
 
