@@ -97,6 +97,7 @@ var Precast = new function () {
 			}
 
 			break;
+		case 58: // Energy Shield
 		case 52: // Enchant
 			sumCurr = 0;
 			sumSwap = 0;
@@ -159,7 +160,7 @@ var Precast = new function () {
 			}
 
 			if (!me.getState(30) || force) {
-				Skill.cast(58, 0); // Energy Shield
+				this.energyshield(); //Energy Shield
 			}
 
 			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
@@ -474,4 +475,23 @@ MainLoop:
 
 		return true;
 	};
+	
+    this.energyshield = function () {
+        var swapped,
+            slot = this.getBetterSlot(58);
+
+        if (slot !== me.weaponswitch) {
+            swapped = true;
+        }
+
+        this.weaponSwitch(slot);
+
+        Skill.cast(58, 0);
+
+        if (swapped) {
+            this.weaponSwitch(Math.abs(slot - 1));
+        }
+
+        return true;
+    };	
 };
