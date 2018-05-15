@@ -12,7 +12,7 @@ var ClassAttack = {
 		}
 
 		if (!me.getState(30) && me.getSkill(58, 1)) {
-			Skill.cast(58, 0);
+            Precast.energyshield(); //Energy Shield
 		}
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
