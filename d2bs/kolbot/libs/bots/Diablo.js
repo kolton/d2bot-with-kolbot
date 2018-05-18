@@ -475,17 +475,15 @@ function Diablo() {
 	}
 
 
-	if (Config.PublicMode) {
-		say(Config.Diablo.DiabloMsg);
-	}
-	
-	if (Config.Diablo.Skip){
-		return true;
-	} else {
+	if (Config.Diablo.KillDiablo){
+		if (Config.PublicMode) {
+			say(Config.Diablo.DiabloMsg);
+		} 
+		
 		this.diabloPrep();
 		Attack.kill(243); // Diablo
 		Pickit.pickItems();
-
-		return true;
-	}
+	}	
+	
+	return true;
 }
