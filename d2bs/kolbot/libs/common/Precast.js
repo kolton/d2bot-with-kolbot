@@ -154,7 +154,7 @@ var Precast = new function () {
 			}
 
 			if (!me.getState(30) || force) {
-				this.energyshield(); //Energy Shield
+				this.precastSkill(58); //Energy Shield
 			}
 
 			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
@@ -469,23 +469,4 @@ MainLoop:
 
 		return true;
 	};
-	
-    this.energyshield = function () {
-        var swapped,
-            slot = this.getBetterSlot(58);
-
-        if (slot !== me.weaponswitch) {
-            swapped = true;
-        }
-
-        this.weaponSwitch(slot);
-
-        Skill.cast(58, 0);
-
-        if (swapped) {
-            this.weaponSwitch(Math.abs(slot - 1));
-        }
-
-        return true;
-    };	
 };
