@@ -74,48 +74,42 @@ var Precast = new function () {
 	};
 
 	this.getBetterSlot = function (skillId) {
-		var item,
+		var item, classid, skillTab,
 			sumCurr = 0,
 			sumSwap = 0;
 
 		switch (skillId) {
 		case 117: // Holy Shield
-			sumCurr = 0;
-			sumSwap = 0;
-			item = me.getItem();
+			classid = 3;
+			skillTab = 24;
 
-			if (item) {
-				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-				} while (item.getNext());
-			}
+			break;
+		case 52: // Enchant
+			classid = 1;
+			skillTab = 8;
 
 			break;
 		case 58: // Energy Shield
-		case 52: // Enchant
-			sumCurr = 0;
-			sumSwap = 0;
-			item = me.getItem();
-
-			if (item) {
-				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-				} while (item.getNext());
-			}
+			classid = 1;
+			skillTab = 9;
 
 			break;
+		default:
+			return me.weaponswitch;
+		}
+    
+		item = me.getItem();
+
+		if (item) {
+			do {
+				if (item.bodylocation === 4 || item.bodylocation === 5) {
+					sumCurr += (item.getStat(127) + item.getStat(83, classid) + item.getStat(188, skillTab) + item.getStat(107, skillId) + item.getStat(97, skillId));
+				}
+
+				if (item.bodylocation === 11 || item.bodylocation === 12) {
+					sumSwap += (item.getStat(127) + item.getStat(83, classid) + item.getStat(188, skillTab) + item.getStat(107, skillId) + item.getStat(97, skillId));
+				}
+			} while (item.getNext());
 		}
 
 		print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap);
