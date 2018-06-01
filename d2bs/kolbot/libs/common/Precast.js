@@ -154,7 +154,7 @@ var Precast = new function () {
 			}
 
 			if (!me.getState(30) || force) {
-				this.precastSkill(58); //Energy Shield
+				this.precastSkill(58); // Energy Shield
 			}
 
 			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
