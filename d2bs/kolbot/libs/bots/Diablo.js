@@ -438,7 +438,13 @@ function Diablo() {
 
 	if (Config.Diablo.Entrance) {
 		Attack.clear(30, 0, false, this.sort);
-		Pather.moveTo(7790, 5544);
+			
+		if (Config.Diablo.ClearPath) { 
+			Pather.moveTo(7790, 5544, 3, true);
+		}
+		else if (!Config.Diablo.ClearPath) {
+			Pather.moveTo(7790, 5544);
+		}
 
 		if (Config.PublicMode) {
 			Pather.makePortal();

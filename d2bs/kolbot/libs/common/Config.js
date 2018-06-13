@@ -343,7 +343,8 @@ var Config = {
 		KillBaal: false,
 		HotTPMessage: "Hot TP!",
 		SafeTPMessage: "Safe TP!",
-		BaalMessage: "Baal!"
+		BaalMessage: "Baal!",
+		ClearPath: false
 	},
 	BaalAssistant: {
 		KillNihlathak: false,
@@ -378,7 +379,8 @@ var Config = {
 		SealWarning: "Leave the seals alone!",
 		EntranceTP: "Entrance TP up",
 		StarTP: "Star TP up",
-		DiabloMsg: "Diablo"
+		DiabloMsg: "Diablo",
+		ClearPath: false
 	},
 	DiabloHelper: {
 		Wait: 120,
