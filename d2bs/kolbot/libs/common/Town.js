@@ -325,7 +325,7 @@ var Town = {
 				pot = this.getPotion(npc, Config.BeltColumn[i]);
 
 				if (pot) {
-					//print("Ã¿c2column Ã¿c0" + i + "Ã¿c2 needs Ã¿c0" + col[i] + " Ã¿c2potions");
+					//print("ÿc2column ÿc0" + i + "ÿc2 needs ÿc0" + col[i] + " ÿc2potions");
 
 					// Shift+buy will trigger if there's no empty columns or if only the current column is empty
 					if (useShift) {
@@ -771,7 +771,7 @@ MainLoop:
 					Misc.itemLogger("Dropped", item, "fieldID");
 
 					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality)  > -1) {
-						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/Ã¿c[0-9!"+<;.*]/, "").trim());
+						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim());
 
 						if (Config.DroppedItemsAnnounce.LogToOOG && Config.DroppedItemsAnnounce.OOGQuality.indexOf(item.quality) > -1) {
 							Misc.logItem("Field Dropped", item, result.line);
@@ -895,7 +895,7 @@ CursorLoop:
 			return false;
 		}
 
-		print("Ã¿c4MiniShopBotÃ¿c0: Scanning " + npc.itemcount + " items.");
+		print("ÿc4MiniShopBotÿc0: Scanning " + npc.itemcount + " items.");
 
 		do {
 			if (this.ignoredItemTypes.indexOf(item.itemType) === -1) {
@@ -941,7 +941,7 @@ CursorLoop:
 					if (NTIPAliasClassID.hasOwnProperty(Config.GambleItems[i].replace(/\s+/g, "").toLowerCase())) {
 						this.gambleIds.push(NTIPAliasClassID[Config.GambleItems[i].replace(/\s+/g, "").toLowerCase()]);
 					} else {
-						Misc.errorReport("Ã¿c1Invalid gamble entry:Ã¿c0 " + Config.GambleItems[i]);
+						Misc.errorReport("ÿc1Invalid gamble entry:ÿc0 " + Config.GambleItems[i]);
 					}
 				} else {
 					this.gambleIds.push(Config.GambleItems[i]);
@@ -1242,8 +1242,8 @@ CursorLoop:
 						delay(me.ping * 2 + 500);
 
 						if (cubeItems[0].bodylocation === bodyLoc) {
-							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/Ã¿c[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
-							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/Ã¿c[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
+							print(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.");
+							D2Bot.printToConsole(cubeItems[0].fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "").trim() + " successfully repaired and equipped.", 5);
 
 							return true;
 						}
@@ -1358,7 +1358,7 @@ CursorLoop:
 				repairAction.push("repair");
 			}
 		} else {
-			print("Ã¿c4Town: Ã¿c1Can't afford repairs.");
+			print("ÿc4Town: ÿc1Can't afford repairs.");
 		}
 
 		return repairAction;
@@ -1893,7 +1893,7 @@ MainLoop:
 					items[i].classid !== 547 && // The Golden Bird
 					items[i].classid !== 548 && // Lam Esen's Tome
 					items[i].classid !== 553 && // Khalim's Eye
-					items[i].classid !== 554 && // Khalim's Heart 
+					items[i].classid !== 554 && // Khalim's Heart
 					items[i].classid !== 555 && // Khalim's Brain
 					items[i].classid !== 173 && // Khalim's Flail
 					items[i].classid !== 174 && // Khalim's Will
