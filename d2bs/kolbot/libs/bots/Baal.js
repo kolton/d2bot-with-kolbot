@@ -203,7 +203,7 @@ function Baal() {
 	if (me.area !== 129) {
 		Pather.useWaypoint(129);
 	}
-//Check Config.Baal.ClearPath option for true or false and clear the path if walking.
+
 	switch(Config.Baal.ClearPath) {
 		case true: {
 			if (!Pather.moveToExit([130, 131], true, true)) {

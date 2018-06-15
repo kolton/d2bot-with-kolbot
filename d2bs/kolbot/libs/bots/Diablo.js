@@ -429,17 +429,15 @@ function Diablo() {
 	if (me.area !== 107) {
 		Pather.useWaypoint(107);
 	}
-//Check Config.Diablo.ClearPath option for true or false and clear the path if walking.
 	switch(Config.Diablo.ClearPath) {
 		case true: {
-			say("Clearing path to chaos.");
 			if (!Pather.moveTo(7790, 5544, 5, true)) {
-			throw new Error("Failed to move to Throne of Destruction.");
+			throw new Error("Failed to move to The Chaos Sanctuary.");
 			}
 		}
 		case false: {
 			if (!Pather.moveTo(7790, 5544)) {
-			throw new Error("Failed to move to Throne of Destruction.");
+			throw new Error("Failed to move to The Chaos Sanctuary.");
 			}
 		}
 	}

@@ -86,7 +86,7 @@ function LoadConfig() {
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
 		Config.Diablo.DiabloMsg = "Diablo";
-		Config.Diablo.ClearPath = false; //Clear path if walking to Diablo.
+		Config.Diablo.ClearPath = false; // Clear path if walking to Diablo.
 	Scripts.SealLeader = false; // Clear a safe spot around seals and invite leechers in. Leechers should run SealLeecher script. Don't run with Diablo or FastDiablo.
 
 	// *** act 5 ***
