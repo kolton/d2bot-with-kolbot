@@ -84,14 +84,43 @@ var Precast = new function () {
 			skillTab = 24;
 
 			break;
+		case 40: // Frozen Armor
+		case 50: // Shiver Armor
+		case 60: // Chilling Armor		
+			classid = 1;
+			skillTab = 10;
+
+			break;
 		case 52: // Enchant
 			classid = 1;
 			skillTab = 8;
 
 			break;
+		case 57: // Thunder Storm
 		case 58: // Energy Shield
 			classid = 1;
 			skillTab = 9;
+
+			break;
+		case 68: // Bone Armor
+			classid = 2;
+			skillTab = 17;
+
+			break;
+		case 235: // Cyclone Armor
+			classid = 5;
+			skillTab = 42;
+
+			break;
+		case 258: // Burst of Speed
+		case 267: // Fade
+			classid = 6;
+			skillTab = 49;
+
+			break;
+		case 277: // Blade Shield
+			classid = 6;
+			skillTab = 48;
 
 			break;
 		default:
@@ -149,8 +178,8 @@ var Precast = new function () {
 
 			break;
 		case 1: // Sorceress
-			if (!me.getState(38) || force) { // ts
-				Skill.cast(57, 0); // Thunder Storm
+			if (!me.getState(38) || force) {
+				this.precastSkill(57); // Thunder Storm
 			}
 
 			if (!me.getState(30) || force) {
@@ -158,9 +187,9 @@ var Precast = new function () {
 			}
 
 			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
-				if (!Skill.cast(50, 0)) { // Shiver Armor
-					if (!Skill.cast(60, 0)) { // Chilling Armor
-						Skill.cast(40, 0); // Frozen Armor
+				if (!this.precastSkill(50)) { // Shiver Armor
+					if (!this.precastSkill(60)) { // Chilling Armor
+						this.precastSkill(40); // Frozen Armor
 					}
 				}
 			}
@@ -172,7 +201,7 @@ var Precast = new function () {
 			break;
 		case 2: // Necromancer
 			if (!me.getState(14) || force) {
-				Skill.cast(68, 0);
+				this.precastSkill(68); // Bone Armor
 			}
 
 			switch (Config.Golem) {
@@ -226,7 +255,7 @@ var Precast = new function () {
 			break;
 		case 5: // Druid
 			if (!me.getState(151) || force) {
-				Skill.cast(235, 0); // Cyclone Armor
+				this.precastSkill(235); // Cyclone Armor
 			}
 
 			if (Config.SummonRaven) {
@@ -298,7 +327,7 @@ var Precast = new function () {
 			break;
 		case 6: // Assassin
 			if (Config.UseFade && (!me.getState(159) || force)) {
-				Skill.cast(267, 0); // Fade
+				this.precastSkill(267); // Fade
 			}
 
 			if (Config.UseVenom && (!me.getState(31) || force)) {
@@ -306,11 +335,11 @@ var Precast = new function () {
 			}
 
 			if (!me.getState(158) || force) {
-				Skill.cast(277, 0); // Blade Shield	
+				this.precastSkill(277); // Blade Shield	
 			}
 
 			if (!Config.UseFade && Config.UseBoS && (!me.getState(157) || force)) {
-				Skill.cast(258, 0); // Burst of Speed
+				this.precastSkill(258); // Burst of Speed
 			}
 
 			switch (Config.SummonShadow) {
