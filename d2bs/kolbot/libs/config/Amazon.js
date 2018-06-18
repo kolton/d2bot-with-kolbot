@@ -118,6 +118,12 @@ function LoadConfig() {
 		Config.Baal.DollQuit = false; // End script if Dolls (Undead Stigyan Dolls) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
 
+	/* Optimized baal script, specially for a team but also solo */
+    Scripts.TeamBaal = false;
+		Config.TeamBaal.Teleport = true;        // Should this char teleport to baal or wait in town for tp?
+		Config.TeamBaal.Waves = true;           // Should it clear the waves
+		Config.TeamBaal.KillBaal = true;        // Should it kill baal?
+
 	/* ### leeching section ###
 	* Unless stated otherwise, leader's character name isn't needed on order to run.
 	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)

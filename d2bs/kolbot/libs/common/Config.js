@@ -23,7 +23,7 @@ var Config = {
 					if (CustomConfig.hasOwnProperty(n)) {
 						if (CustomConfig[n].indexOf(me.profile) > -1) {
 							if (notify) {
-								print("ÿc2Loading custom config: ÿc9" + n + ".js");
+								print("ï¿½c2Loading custom config: ï¿½c9" + n + ".js");
 							}
 
 							configFilename = n + ".js";
@@ -67,14 +67,14 @@ var Config = {
 			}
 		} else {
 			if (notify) {
-				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
-				print("ÿc1Loading default config.");
+				print("ï¿½c1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
+				print("ï¿½c1Loading default config.");
 			}
 
 			// Try to find default config
 			if (!FileTools.exists("libs/config/" + classes[me.classid] + ".js")) {
 				D2Bot.printToConsole("Not going well? Read the wiki: https://github.com/kolton/d2bot-with-kolbot/wiki");
-				throw new Error("ÿc1Default config not found. \nÿc9     Try reading the kolbot wiki.");
+				throw new Error("ï¿½c1Default config not found. \nï¿½c9     Try reading the kolbot wiki.");
 			}
 
 			try {
@@ -82,7 +82,7 @@ var Config = {
 					throw new Error();
 				}
 			} catch (e) {
-				throw new Error("ÿc1Failed to load default config.");
+				throw new Error("ï¿½c1Failed to load default config.");
 			}
 		}
 
@@ -90,7 +90,7 @@ var Config = {
 			LoadConfig.call();
 		} catch (e2) {
 			if (notify) {
-				print("ÿc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
+				print("ï¿½c8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
 
 				throw new Error("Config.init: Error in character config.");
 			}
@@ -101,7 +101,7 @@ var Config = {
 				AutoBuild.initialize();
 			}
 		} catch (e3) {
-			print("ÿc8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
+			print("ï¿½c8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
 			print(e3.toSource());
 		}
 	},
@@ -361,6 +361,12 @@ var Config = {
 		SafeTPMessage: [],
 		BaalMessage: [],
 		NextGameMessage: []
+	},
+
+	TeamBaal: {
+        Teleport: false,
+		Waves: false,
+		KillBaal: false,
 	},
 	BaalHelper: {
 		Wait: 120,
