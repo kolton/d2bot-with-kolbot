@@ -35,13 +35,15 @@ function TeamBaal() {
                 baal.util.print('Teleporting to throne');
                 Town.doChores();
 
-                // Doing chores can take some time. So much time in fact, maybe another char already is at throne or almost
-                if (baal.data.communication.portalReady || baal.data.communication.AtWorldstoneLvl3) {
-                    return true; // Returning true, since we succeed as a team to get to throne
-                }
+
 
                 Pather.useWaypoint(Pather.area.WorldstoneLvl2, true);
                 Precast.doPrecast(true);
+
+                // Doing chores & precast can take some time. So much time in fact, maybe another char already is at throne or almost
+                if (baal.data.communication.portalReady || baal.data.communication.AtWorldstoneLvl3) {
+                    return Pather.useWaypoint(Pather.area.PandemoniumFortress); // Returning true, since we succeed as a team to get to throne
+                }
 
                 // Move to lvl 3
                 if (!Pather.moveToExit(Pather.area.WorldstoneLvl3, true)) {
@@ -72,7 +74,13 @@ function TeamBaal() {
             waves: function () {
                 // Go to throne
                 if (me.area !== Pather.area.ThroneOfDestruction) {
-                    baal.util.goBo();
+
+
+                    // In case we abandoned teleporting to throne, we dont need to bo again
+                    if (!Config.TeamBaal.Teleport) {
+                        baal.util.goBo();
+                    }
+
                     baal.util.print('Go to throne');
                     baal.util.toAct5();
 
@@ -103,9 +111,10 @@ function TeamBaal() {
                     baal.util.waves.clearThrone(0); // Clearing throne
                 }
 
-                // Now it's safe. Let the others know too
-                baal.data.communication.portalSafe = true;
-                baal.util.msg.sendData();
+
+                // Sended the "throne is safe" bool to others here before.
+                // However, if we do set baaltick at the same moment here, the game freezes and crashes
+                // So its moved the preattack line @ util.waves.doWaves
 
                 // From here, we don't want that an trapsin cast mindblast
                 baal.util.buildSpecific.Assasin.removeMindBlast();
@@ -114,11 +123,22 @@ function TeamBaal() {
                 while (baal.util.waves.doWaves()) {
                     delay(1);
                 }
-
+                removeEventListener('gamepacket',baal.util.events.gameEvent);
                 // From here, it's save to use mindblast again
                 baal.util.buildSpecific.Assasin.addMindBlast();
 
+
+
+                // Ugly trick for an even uglyer problem. Somehow if the bot send a msg and at the same time
+                // gamepacket updates the tick. This freeze's the bot and make it crash.
+                // Wait for baal to laugh and we can safely continue.
+
+                // var oldtick = baal.data.throne.wavetick;
+                // while (oldtick === baal.data.throne.wavetick && getUnit(1, 543)) {
+                //     delay(100);
+                // }
                 // Done with the waves. Let the others know too.
+                delay(me.ping*5); // Avoid issues with the packet listener and sending a msg
                 baal.data.communication.wavesDone = true;
                 baal.util.msg.sendData();
 
@@ -182,6 +202,7 @@ function TeamBaal() {
                 Pickit.pickItems();
                 baal.data.communication.bossDone = true;
                 baal.util.msg.sendData();
+                delay(me.ping*2);
             },
             waitForOthers: function () {
                 if (me.area !== 131) {
@@ -329,6 +350,7 @@ function TeamBaal() {
                     var propertyCheck = function(json) {
                         // Check if a json we received contains all the same variables in this version of communication
                         for (var i in baal.data.communication) {
+                            print('Debug:'+i);
                             if (!json.hasOwnProperty(i)) {
                                 return false;
                             }
@@ -340,8 +362,8 @@ function TeamBaal() {
                         case 107: // Requesting our data;
                             try {
                                  json =  JSON.parse(msg);
-                                if (!json && propertyCheck(json)) {
-                                    baal.data.communication = json;
+                                if (json && json.hasOwnProperty('profile')) {
+                                    sendCopyData(null, json.profile, 108, JSON.stringify(baal.data.communication));
                                     return true;
                                 }
                             } catch (e) {
@@ -352,7 +374,7 @@ function TeamBaal() {
                         case 108: // received data
                             try {
                                 json =  JSON.parse(msg);
-                                if (!json && propertyCheck(json)) {
+                                if (json && propertyCheck(json)) {
                                     baal.data.communication = json;
                                     return true;
                                 }
@@ -369,6 +391,7 @@ function TeamBaal() {
                     this.getOthers();
                     var i;
                     for (i = 0; i < baal.data.others.d2bsProfileName.length; i += 1) {
+                        print('send to: '+baal.data.others.d2bsProfileName[i]);
                         sendCopyData(null, baal.data.others.d2bsProfileName[i], mode, action);
                     }
                 },
@@ -384,12 +407,13 @@ function TeamBaal() {
                         }
                         return party;
                     };
-
+                    print('Getting others');
                     if (!baal.data.others.needUpdate) {
                         return false; // Only do this if someone joined/left since the last time we checked
                     }
 
-                    var i, tmpparty, party = this.getParty(), content, json,
+                    print('Updating...');
+                    var i, party, content, json,
                         fileList = dopen("data/").getFiles();
 
                     // Loop trough all files in data/
@@ -397,29 +421,33 @@ function TeamBaal() {
                         // Get the content of the profile file we found
                         content = Misc.fileAction('data/' + fileList[i].substring(0, fileList[i].indexOf(".json")) + '.json', 0);
 
+                        print('here @ others');
                         if (!content) {
                             continue; // Empty file or failed to retrieve data
                         }
 
                         // Parse the json
                         json = JSON.parse(content);
+                        print('json:'+content);
                         if (json && json.hasOwnProperty("name")) {
 
                             // Create a copy of the party, since we alter it
-                            tmpparty = copyUnit(party);
-                            if (!tmpparty) {
+                            party = this.getParty(party);
+                            if (!party) {
                                 continue;
                             }
 
                             do {
                                 // Is the ingame name the same as the ingame name listed in the json file?
-                                if (tmpparty.name === json.name) {
+                                if (party.name === json.name) {
 
                                     // Same name, so a char that is running with us
                                     baal.data.others.d2bsProfileName.push(fileList[i].substring(0, fileList[i].indexOf(".json")));
-                                    baal.data.others.inGameName.push(tmpparty.name);
+                                    baal.data.others.inGameName.push(party.name);
+
+                                    print('In game with us: '+ baal.data.others.d2bsProfileName);
                                 }
-                            } while (tmpparty.getNext());
+                            } while (party.getNext());
                         }
                     }
                     baal.data.others.needUpdate = false; // Updated now, so no need to update
@@ -427,10 +455,11 @@ function TeamBaal() {
                 },
                 requestData: function () { // Request what kind of data is already set. For example, is the portal up?
                     //ToDo: Write
+                    print('Asking update');
                     this.rawsend(107,JSON.stringify({profile: me.profile}))
                 },
                 sendData: function () { // Send data to others that run from the same pc
-
+                    print('Sending data');
                     this.rawsend(108,JSON.stringify(baal.data.communication))
                 }
 
@@ -674,7 +703,14 @@ function TeamBaal() {
                     wave = this.checkThrone();
                     if (!wave) {
                         this.moveToPreattack();
+                        // pre attacking
                         this.beforeWaveCasting(baal.data.throne.currentWave + 1, 12000 - (getTickCount() - baal.data.throne.wavetick));
+
+                        // Don't like to do it here, but atleast now we know its safe from crashing the game earlyer
+                        if (!baal.data.communication.portalSafe && 12000 - (getTickCount() - baal.data.throne.wavetick) < 8e3) {
+                            baal.data.communication.portalSafe = true;
+                            baal.util.msg.sendData();
+                        }
                         return true;
                     }
 
@@ -878,7 +914,6 @@ function TeamBaal() {
                 },
                 clearThrone: function (wave) {
                     // Temp
-                    baal.util.print('clearing');
                     var i, target, result,
                         gidAttack = [],
                         attackCount = 0,
@@ -926,7 +961,6 @@ function TeamBaal() {
 
                             // Using here a lower modulo so we do more often a timed attack @ waves
                             result = ClassAttack.doAttack(target, attackCount % 7 === 0);
-                            baal.util.print('Clearing');
 
                             if (result) {
                                 for (i = 0; i < gidAttack.length; i += 1) {
@@ -965,6 +999,11 @@ function TeamBaal() {
                             }
                         } else {
                             monsterList.shift();
+                        }
+
+                        // It happens from time to time, the one that teleported chickend and there is no tp to throne anymore
+                        if (!Pather.getPortal(Pather.area.Harrogath,null)) {
+                            Pather.makePortal(); // Make portal to Harrogath
                         }
                     }
 
