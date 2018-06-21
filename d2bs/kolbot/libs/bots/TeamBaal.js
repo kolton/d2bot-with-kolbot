@@ -1,9 +1,35 @@
 /**
  *    @filename    TeamBaal.js
  *    @author      Jaenster
- *    @desc        Throws a teamed baal run
+ *    @desc        Make a true party of a baalrun.
  */
+/*
 
+    Why TeamBaal and not baal / baalassistant ?
+    - The script is self aware of other bots in the same game (that run from the same pc). No config needed!
+    - Multiple chars can teleport to throne, no more leader bullshit
+    - Chars that don't do baal, go to town and leave party. So a baalparty is created
+    - Script detects automatically what build you are, and maximizes the attacks with the waves
+    - It does everything to prevent hydras being cast. Saves 8 seconds a run!
+    - Use the full power of a javazon, javazons speedup the game dramatically compared to baal/baalassistant. By me, 30 seconds avg a run
+    - No going to town anymore during a wave to make room for an item. Only after a wave
+    - It clears the throne allot faster. And no more unnecessary monster killing in begin of throne.
+    - No more teling around the throne, only kill the monsters that are needed to be killed for a wave to spawn
+    - New portal location that makes the run faster
+    - It predicts perfectly when a wave come. So, no more useless mana/javelin/arrows wasted
+    - All chars kill intruding monsters, not only a part of your team.
+    - Auto detects if a char is weak, if so it waits for a safetp
+    - Silence. The bot doesn't say anything
+    - A late joining char doesn't teleport to throne if someone is already on their way
+    - Good support for the non enigma chars
+
+    Future?
+    - XpShrine getting and sharing
+    - Baal party quitters when baal is almost dead
+    - Adding support for a teamed nihlathak run
+    - Make a TeamDiablo so the highest levels can run a teamed fast diarun in the time of a baalrun, and join later the baalrun
+    - Ideas? Let me know.
+ */
 function TeamBaal() {
     var baal = {
         run: function () {
@@ -34,7 +60,6 @@ function TeamBaal() {
             teleport: function () {
                 baal.util.print('Teleporting to throne');
                 Town.doChores();
-
 
 
                 Pather.useWaypoint(Pather.area.WorldstoneLvl2, true);
@@ -75,7 +100,6 @@ function TeamBaal() {
                 // Go to throne
                 if (me.area !== Pather.area.ThroneOfDestruction) {
 
-
                     // In case we abandoned teleporting to throne, we dont need to bo again
                     if (!Config.TeamBaal.Teleport) {
                         baal.util.goBo();
@@ -86,18 +110,16 @@ function TeamBaal() {
 
                     Town.doChores();
 
-                    /*
-                    while (!baal.data.communication.portalSafe || (baal.communication.portalReady && !baal.data.char.isWeak)) {
-                        delay(20);
-                    }*/
+                    if (baal.data.char.isWeak) { // Weak char? lets wait for a safe tp.
+                        while (!baal.data.communication.portalSafe) {
+                            delay(20);
+                        }
+                    }
 
                     if (!baal.util.takePortal(Pather.area.ThroneOfDestruction)) {
                         return false; // failed to get to throne
                     }
                 }
-
-                // Listen for the packet that baal generates when he does his typical laugh
-                addEventListener('gamepacket', baal.util.events.gamePacket);
 
                 // Barb's should bo here, since they have a good bo.
                 baal.util.buildSpecific.Barb.Bo();
@@ -106,15 +128,13 @@ function TeamBaal() {
                 Precast.doPrecast(false);
 
                 // Clear the throne if needed
-                if (!baal.data.communication.portalSafe)
-                {
+                if (!baal.data.communication.portalSafe) {
                     baal.util.waves.clearThrone(0); // Clearing throne
                 }
 
-
-                // Sended the "throne is safe" bool to others here before.
-                // However, if we do set baaltick at the same moment here, the game freezes and crashes
-                // So its moved the preattack line @ util.waves.doWaves
+                // Let the others know the portal is safe now
+                baal.data.communication.portalSafe = true;
+                baal.util.msg.sendData();
 
                 // From here, we don't want that an trapsin cast mindblast
                 baal.util.buildSpecific.Assasin.removeMindBlast();
@@ -123,22 +143,12 @@ function TeamBaal() {
                 while (baal.util.waves.doWaves()) {
                     delay(1);
                 }
-                removeEventListener('gamepacket',baal.util.events.gameEvent);
+
+                removeEventListener('gamepacket', baal.util.events.gamePacket);
                 // From here, it's save to use mindblast again
                 baal.util.buildSpecific.Assasin.addMindBlast();
 
-
-
-                // Ugly trick for an even uglyer problem. Somehow if the bot send a msg and at the same time
-                // gamepacket updates the tick. This freeze's the bot and make it crash.
-                // Wait for baal to laugh and we can safely continue.
-
-                // var oldtick = baal.data.throne.wavetick;
-                // while (oldtick === baal.data.throne.wavetick && getUnit(1, 543)) {
-                //     delay(100);
-                // }
-                // Done with the waves. Let the others know too.
-                delay(me.ping*5); // Avoid issues with the packet listener and sending a msg
+                // Let the others know the waves are done
                 baal.data.communication.wavesDone = true;
                 baal.util.msg.sendData();
 
@@ -148,7 +158,7 @@ function TeamBaal() {
             baal: function () {
                 this.useBaalPortal = function () {
                     Pather.moveTo(15092, 5011);
-                    Precast.doPrecast(false); // Not on true, we might have a more powerfull barb bo
+                    Precast.doPrecast(false); // Not on true, we might have a more powerful barb bo
 
                     while (getUnit(1, 543)) {
                         delay(500);
@@ -171,13 +181,13 @@ function TeamBaal() {
                         Town.moveToSpot('portal');
 
                         // There might be a portal up for the chamber
-                        if (!baal.util.takePortal(Area.WorldstoneChamber, 5)) {
+                        if (!baal.util.takePortal(Pather.area.WorldstoneChamber, 2)) {
 
                             // Failed to get to chamber, let's see if there is a throne portal up
-                            if (!baal.util.takePortal(Area.ThroneOfDestruction, 2)) {
+                            if (!baal.util.takePortal(Pather.area.ThroneOfDestruction, 2)) {
 
                                 // Its highly unlikely, but maybe now a portal to camber is up (leader could have recasted)
-                                baal.util.takePortal(Area.WorldstoneChamber, 2);
+                                baal.util.takePortal(Pather.Area.WorldstoneChamber, 2);
                             }
                         }
                     }
@@ -186,6 +196,7 @@ function TeamBaal() {
                     if (me.area === Pather.area.ThroneOfDestruction) {
                         return this.useBaalPortal(); // We are in the throne, so lets use the baal portal
                     }
+
                     return me.area === Pather.area.WorldstoneChamber;
                 };
 
@@ -193,7 +204,13 @@ function TeamBaal() {
                     return false;
                 }
                 // We can assume we are now in the Worldstone Chamber
-                Pather.moveTo(15136, 5943); //ToDo: Make a check here for teleport. Walking need different coordinates
+                if ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54)) {
+                    // teleport to baal
+                    Pather.moveTo(15146,5892);
+                } else {
+                    // walk to baal
+                    Pather.moveTo(15136, 5943);
+                }
                 try {
                     Attack.kill(544); // Baal
                 } catch (e) {
@@ -202,7 +219,8 @@ function TeamBaal() {
                 Pickit.pickItems();
                 baal.data.communication.bossDone = true;
                 baal.util.msg.sendData();
-                delay(me.ping*2);
+                delay(me.ping * 2);
+                return true;
             },
             waitForOthers: function () {
                 if (me.area !== 131) {
@@ -347,21 +365,10 @@ function TeamBaal() {
 
                 receivingData: function (mode, msg) {
                     var json;
-                    var propertyCheck = function(json) {
-                        // Check if a json we received contains all the same variables in this version of communication
-                        for (var i in baal.data.communication) {
-                            print('Debug:'+i);
-                            if (!json.hasOwnProperty(i)) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    };
-                    baal.util.print('Got msg: '+mode+' - '+msg);
                     switch (mode) {
                         case 107: // Requesting our data;
                             try {
-                                 json =  JSON.parse(msg);
+                                json = JSON.parse(msg);
                                 if (json && json.hasOwnProperty('profile')) {
                                     sendCopyData(null, json.profile, 108, JSON.stringify(baal.data.communication));
                                     return true;
@@ -372,16 +379,19 @@ function TeamBaal() {
                             break;
 
                         case 108: // received data
-                            try {
-                                json =  JSON.parse(msg);
-                                if (json && propertyCheck(json)) {
-                                    baal.data.communication = json;
-                                    return true;
+                            json = JSON.parse(msg);
+                            if (json) {
+                                for (var i in baal.data.communication) {
+                                    if (!json.hasOwnProperty(i)) {
+                                        if (baal.data.communication[i] !== json[i]) {
+                                            print('updated ' + i + ' to:' + json[i]);
+
+                                            // Note the bitwise OR here, only set a var to true, not to false, unless it already was false
+                                            baal.data.communication[i] = json[i] | baal.data.communication[i];
+                                        }
+                                    }
                                 }
-                            } catch (e) {
-                                // Nothing, shouldn't happen but you never know
                             }
-                            baal.util.print('Got a unexpected msg. Running any other profiles doing other things?');
                             break;
                     }
                 }
@@ -390,10 +400,16 @@ function TeamBaal() {
                 rawsend: function (mode, action) {
                     this.getOthers();
                     var i;
+
+                    // Removing gamepacket event to remove issues with sendcopydata
+                    removeEventListener('gamepacket', baal.util.events.gamePacket);
+
                     for (i = 0; i < baal.data.others.d2bsProfileName.length; i += 1) {
-                        print('send to: '+baal.data.others.d2bsProfileName[i]);
                         sendCopyData(null, baal.data.others.d2bsProfileName[i], mode, action);
                     }
+
+                    // Adding it again
+                    addEventListener('gamepacket', baal.util.events.gamePacket);
                 },
                 getOthers: function () {
                     this.getParty = function () {
@@ -407,12 +423,10 @@ function TeamBaal() {
                         }
                         return party;
                     };
-                    print('Getting others');
                     if (!baal.data.others.needUpdate) {
                         return false; // Only do this if someone joined/left since the last time we checked
                     }
 
-                    print('Updating...');
                     var i, party, content, json,
                         fileList = dopen("data/").getFiles();
 
@@ -421,14 +435,12 @@ function TeamBaal() {
                         // Get the content of the profile file we found
                         content = Misc.fileAction('data/' + fileList[i].substring(0, fileList[i].indexOf(".json")) + '.json', 0);
 
-                        print('here @ others');
                         if (!content) {
                             continue; // Empty file or failed to retrieve data
                         }
 
                         // Parse the json
                         json = JSON.parse(content);
-                        print('json:'+content);
                         if (json && json.hasOwnProperty("name")) {
 
                             // Create a copy of the party, since we alter it
@@ -445,7 +457,6 @@ function TeamBaal() {
                                     baal.data.others.d2bsProfileName.push(fileList[i].substring(0, fileList[i].indexOf(".json")));
                                     baal.data.others.inGameName.push(party.name);
 
-                                    print('In game with us: '+ baal.data.others.d2bsProfileName);
                                 }
                             } while (party.getNext());
                         }
@@ -455,12 +466,12 @@ function TeamBaal() {
                 },
                 requestData: function () { // Request what kind of data is already set. For example, is the portal up?
                     //ToDo: Write
-                    print('Asking update');
-                    this.rawsend(107,JSON.stringify({profile: me.profile}))
+                    this.rawsend(107, JSON.stringify({profile: me.profile}))
                 },
                 sendData: function () { // Send data to others that run from the same pc
-                    print('Sending data');
-                    this.rawsend(108,JSON.stringify(baal.data.communication))
+                    // Make sure we have a new object to avoid sendcopy issues
+                    // Sending copy
+                    this.rawsend(108, JSON.stringify(baal.data.communication));
                 }
 
             },
@@ -489,7 +500,7 @@ function TeamBaal() {
                         case baal.data.char.build.Trapsin: // Assassin
                             if ([3, 4, 5].indexOf(wave) !== -1) {
                                 // cloak of shadows. Prevents hydra
-                                Skill.cast(Skill.byName.CloakOfShadows);
+                                Skill.cast(Skill.byName.CloakofShadows);
                             }
                             break;
                         case baal.data.char.build.Warcry:
@@ -500,7 +511,7 @@ function TeamBaal() {
                     }
                     return true;
                 },
-                midattack: function (wave, target,count) {
+                midattack: function (wave, target, count) {
                     switch (baal.data.char.build.me) {
                         case baal.data.char.build.JavaZon:
                             if (count % 4) {
@@ -514,7 +525,7 @@ function TeamBaal() {
                             break;
 
                         case baal.data.char.build.CurseNecro:
-                            //ToDo: explode corpses like crazy. Great damage in a baalrun and makes waves go faster
+                        //ToDo: explode corpses like crazy. Great damage in a baalrun and makes waves go faster
                     }
                 },
                 Amazon: {
@@ -535,9 +546,9 @@ function TeamBaal() {
                         }
                         var i;
                         for (i = 0; i < 2 && targets.length > 5; i += 1) {
-                            print('Spamming fury');
                             Skill.cast(Skill.byName.LightningFury, 0, targets[0].x, targets[1].y); // Spam a lightingfury
                         }
+                        return true;
                     }
                 },
                 Barb: {
@@ -630,7 +641,7 @@ function TeamBaal() {
                                     }
                                     Config.SummonShadow = "Warrior"; // Master can cast MindBlast, we dont want that @ baalwaves
 
-                                    Config.UseFade = baal.util.resistanceAvg() < 45 && getSk(Presets.skill.Fade) !== 0; // Use fade if our avg res is less as 50 and we have the skill
+                                    Config.UseFade = baal.util.resistanceAvg() < 45 && getSk(Skill.byName.Fade) !== 0; // Use fade if our avg res is less as 50 and we have the skill
                                     Config.UseBoS = !Config.UseFade; // Use BoS if we dont use Fade
                                     break;
                             }
@@ -671,7 +682,7 @@ function TeamBaal() {
                             // Only if we don't teleport, or dont have CTA
                             if (!(Config.TeamBaal.teleport || baal.util.haveCTA())) {
                                 // Its better to cast stuff in town if we dont have CTA and we wait for tp anyway. Saves time in throne
-                                TownCast.forEach(Precast.summon);
+                                TownSummon.forEach(Precast.summon);
                             }
                             baal.util.print('Init done');
                         };
@@ -702,15 +713,13 @@ function TeamBaal() {
                     // Check the throne
                     wave = this.checkThrone();
                     if (!wave) {
+
+                        // Get to preattack spot
                         this.moveToPreattack();
-                        // pre attacking
+
+                        // pre attack
                         this.beforeWaveCasting(baal.data.throne.currentWave + 1, 12000 - (getTickCount() - baal.data.throne.wavetick));
 
-                        // Don't like to do it here, but atleast now we know its safe from crashing the game earlyer
-                        if (!baal.data.communication.portalSafe && 12000 - (getTickCount() - baal.data.throne.wavetick) < 8e3) {
-                            baal.data.communication.portalSafe = true;
-                            baal.util.msg.sendData();
-                        }
                         return true;
                     }
 
@@ -788,9 +797,10 @@ function TeamBaal() {
                             if (counter > 2e3 || counter < -1e3) {
                                 return false;
                             }
-                            Pather.moveTo(15087, 5024);
                             Skill.cast(Skill.byName.WarCry, 0); // cast war cry
-                            Pather.moveTo(15094, 5024);
+                            Pather.walkTo(15087, 5024);
+                            Skill.cast(Skill.byName.WarCry, 0); // cast war cry
+                            Pather.walkTo(15094, 5024);
                             return Skill.cast(Skill.byName.WarCry, 0); // cast war cry
 
 
@@ -944,7 +954,6 @@ function TeamBaal() {
                             if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
                                 Attack.deploy(target, Config.DodgeRange, 5, 9);
                             } else {
-                                baal.util.print('Getting into position');
                                 Attack.getIntoPosition(target, Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]), 0x4)
                             }
 
@@ -957,7 +966,7 @@ function TeamBaal() {
                             me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
 
                             // Some class specifics
-                            baal.util.buildSpecific.midattack(wave,target,attackCount);
+                            baal.util.buildSpecific.midattack(wave, target, attackCount);
 
                             // Using here a lower modulo so we do more often a timed attack @ waves
                             result = ClassAttack.doAttack(target, attackCount % 7 === 0);
@@ -977,13 +986,10 @@ function TeamBaal() {
 
                                 switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
                                     case 112:
-                                        //print(gidAttack[i].name + " " + gidAttack[i].attacks);
-
                                         // Tele in random direction with Blessed Hammer
                                         if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
                                             Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
                                         }
-
                                         break;
                                     default:
                                         // Flash with melee skills
@@ -1002,7 +1008,7 @@ function TeamBaal() {
                         }
 
                         // It happens from time to time, the one that teleported chickend and there is no tp to throne anymore
-                        if (!Pather.getPortal(Pather.area.Harrogath,null)) {
+                        if (!Pather.getPortal(Pather.area.Harrogath, null)) {
                             Pather.makePortal(); // Make portal to Harrogath
                         }
                     }
@@ -1037,9 +1043,9 @@ function TeamBaal() {
                 // Register a event listener for game events, "joining/creating stuff"
                 addEventListener('gamevent', baal.util.events.gameEvent);
 
+                // Listen for the packet that baal generates when he does his typical laugh
+                addEventListener('gamepacket', baal.util.events.gamePacket);
 
-                // Later in the script (baal.common.waves function) we also register a game packet listener.
-                // We not here to avoid any problems with "too much recursion"
 
                 // Request data the data we have from the others
                 baal.util.msg.requestData();
@@ -1064,7 +1070,8 @@ function TeamBaal() {
             throne: {
                 currentWave: 0,
                 wavetick: 0,
-                BaalPortalSpot: [15118, 5002],
+                //BaalPortalSpot: [15118, 5002], // classic spot
+                BaalPortalSpot: [15076,5031], // improved spot
                 preattackSpot: {
                     mine: [],
 
@@ -1115,3 +1122,4 @@ function TeamBaal() {
     };
     return baal.run();
 }
+
