@@ -23,7 +23,7 @@ var Config = {
 					if (CustomConfig.hasOwnProperty(n)) {
 						if (CustomConfig[n].indexOf(me.profile) > -1) {
 							if (notify) {
-								print("�c2Loading custom config: �c9" + n + ".js");
+								print("\xffc2Loading custom config: \xffc9" + n + ".js");
 							}
 
 							configFilename = n + ".js";
@@ -67,14 +67,14 @@ var Config = {
 			}
 		} else {
 			if (notify) {
-				print("�c1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
-				print("�c1Loading default config.");
+				print("\xffc1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
+				print("\xffc1Loading default config.");
 			}
 
 			// Try to find default config
 			if (!FileTools.exists("libs/config/" + classes[me.classid] + ".js")) {
 				D2Bot.printToConsole("Not going well? Read the wiki: https://github.com/kolton/d2bot-with-kolbot/wiki");
-				throw new Error("�c1Default config not found. \n�c9     Try reading the kolbot wiki.");
+				throw new Error("\xffc1Default config not found. \n\xffc9     Try reading the kolbot wiki.");
 			}
 
 			try {
@@ -82,7 +82,7 @@ var Config = {
 					throw new Error();
 				}
 			} catch (e) {
-				throw new Error("�c1Failed to load default config.");
+				throw new Error("\xffc1Failed to load default config.");
 			}
 		}
 
@@ -90,7 +90,7 @@ var Config = {
 			LoadConfig.call();
 		} catch (e2) {
 			if (notify) {
-				print("�c8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
+				print("\xffc8Error in " + e2.fileName.substring(e2.fileName.lastIndexOf("\\") + 1, e2.fileName.length) + "(line " + e2.lineNumber + "): " + e2.message);
 
 				throw new Error("Config.init: Error in character config.");
 			}
@@ -101,7 +101,7 @@ var Config = {
 				AutoBuild.initialize();
 			}
 		} catch (e3) {
-			print("�c8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
+			print("\xffc8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
 			print(e3.toSource());
 		}
 	},
