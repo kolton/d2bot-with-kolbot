@@ -62,16 +62,16 @@ function TeamBaal() {
                 Town.doChores();
 
 
-                Pather.useWaypoint(Pather.area.WorldstoneLvl2, true);
+                Pather.useWaypoint(Areas.WorldstoneLvl2, true);
                 Precast.doPrecast(true);
 
                 // Doing chores & precast can take some time. So much time in fact, maybe another char already is at throne or almost
                 if (baal.data.communication.portalReady || baal.data.communication.AtWorldstoneLvl3) {
-                    return Pather.useWaypoint(Pather.area.PandemoniumFortress); // Returning true, since we succeed as a team to get to throne
+                    return Pather.useWaypoint(Areas.PandemoniumFortress); // Returning true, since we succeed as a team to get to throne
                 }
 
                 // Move to lvl 3
-                if (!Pather.moveToExit(Pather.area.WorldstoneLvl3, true)) {
+                if (!Pather.moveToExit(Areas.WorldstoneLvl3, true)) {
                     baal.util.print("Failed to move to throne.");
                     return false;
                 }
@@ -82,14 +82,14 @@ function TeamBaal() {
                 baal.util.msg.sendData();
 
                 // Move to throne
-                if (!Pather.moveToExit(Pather.area.ThroneOfDestruction, true)) {
+                if (!Pather.moveToExit(Areas.ThroneOfDestruction, true)) {
                     baal.util.print("Failed to move to throne.");
                     return false;
                 }
                 Pather.moveTo(baal.data.throne.BaalPortalSpot[0], baal.data.throne.BaalPortalSpot[1]);
 
                 // Cast tp in ase there is no portal up yet
-                if (!Pather.getPortal(Pather.area.Harrogath)) {
+                if (!Pather.getPortal(Areas.Harrogath)) {
                     Pather.makePortal();
                     baal.data.communication.portalReady = true;
                     baal.util.msg.sendData();
@@ -98,7 +98,7 @@ function TeamBaal() {
             },
             waves: function () {
                 // Go to throne
-                if (me.area !== Pather.area.ThroneOfDestruction) {
+                if (me.area !== Areas.ThroneOfDestruction) {
 
                     // In case we abandoned teleporting to throne, we dont need to bo again
                     if (!Config.TeamBaal.Teleport) {
@@ -116,7 +116,7 @@ function TeamBaal() {
                         }
                     }
 
-                    if (!baal.util.takePortal(Pather.area.ThroneOfDestruction)) {
+                    if (!baal.util.takePortal(Areas.ThroneOfDestruction)) {
                         return false; // failed to get to throne
                     }
                 }
@@ -175,29 +175,29 @@ function TeamBaal() {
                 };
                 this.getToChamber = function () {
                     // Are we not in worldstone or throne?
-                    if (me.area !== Pather.area.WorldstoneChamber && me.area !== Pather.area.ThroneOfDestruction) {
+                    if (me.area !== Areas.WorldstoneChamber && me.area !== Areas.ThroneOfDestruction) {
 
                         baal.util.toAct5();
                         Town.moveToSpot('portal');
 
                         // There might be a portal up for the chamber
-                        if (!baal.util.takePortal(Pather.area.WorldstoneChamber, 2)) {
+                        if (!baal.util.takePortal(Areas.WorldstoneChamber, 2)) {
 
                             // Failed to get to chamber, let's see if there is a throne portal up
-                            if (!baal.util.takePortal(Pather.area.ThroneOfDestruction, 2)) {
+                            if (!baal.util.takePortal(Areas.ThroneOfDestruction, 2)) {
 
                                 // Its highly unlikely, but maybe now a portal to camber is up (leader could have recasted)
-                                baal.util.takePortal(Pather.Area.WorldstoneChamber, 2);
+                                baal.util.takePortal(Areas.WorldstoneChamber, 2);
                             }
                         }
                     }
 
                     // Are we in throne?
-                    if (me.area === Pather.area.ThroneOfDestruction) {
+                    if (me.area === Areas.ThroneOfDestruction) {
                         return this.useBaalPortal(); // We are in the throne, so lets use the baal portal
                     }
 
-                    return me.area === Pather.area.WorldstoneChamber;
+                    return me.area === Areas.WorldstoneChamber;
                 };
 
                 if (!this.getToChamber()) {
@@ -224,7 +224,7 @@ function TeamBaal() {
             },
             waitForOthers: function () {
                 if (me.area !== 131) {
-                    baal.util.takePortal(baal.common.area.Harrogath);
+                    baal.util.takePortal(Areas.Harrogath);
                 }
                 baal.util.print('Wait until others did baal');
                 baal.party.leave();
@@ -266,7 +266,7 @@ function TeamBaal() {
                 me.cancel();
                 Pather.useWaypoint('random');
                 Precast.doPrecast(true);
-                return Pather.useWaypoint(Pather.area.PandemoniumFortress);
+                return Pather.useWaypoint(Areas.PandemoniumFortress);
             },
             takePortal: function (area, waittime) {
                 var portal,
@@ -286,7 +286,7 @@ function TeamBaal() {
                     portal = Pather.getPortal(area, null);
                     if (portal && Misc.inMyParty(portal.getParent())) {
 
-                        if (Pather.usePortal(null, null, portal)) {
+                        if (!Pather.usePortal(null, null, portal)) {
                             return true;
                         }
                         failed = true;
@@ -307,7 +307,7 @@ function TeamBaal() {
                 return false; // Failed to take any portal
             },
             toAct5: function () {
-                if (me.area >= Pather.area.Harrogath) {
+                if (me.area >= Areas.Harrogath) {
                     return Town.goToTown(5); // if we cast a portal we are in act 5.
                 }
                 Town.goToTown(4); // Go to act 4.
@@ -329,11 +329,11 @@ function TeamBaal() {
                     if (!npc || !npc.openMenu()) {
                         return Town.goToTown(5); // Looks like we failed, lets go to act 5 by wp
                     }
-                    Misc.useMenu(0x58D2); // Travel to Harrogath
+                    Misc.useMenu(NPCMenu.TravelToHarrogath); // Travel to Harrogath
                 }
 
                 // Just to be sure. Sometimes stuff goes wrong, de-syncing / lag / whatever
-                return me.area !== Pather.area.Harrogath ? Town.goToTown(5) : true;
+                return me.area !== Areas.Harrogath ? Town.goToTown(5) : true;
             },
             events: {
                 gamePacket: function (bytes) {
@@ -484,29 +484,29 @@ function TeamBaal() {
 
                         case baal.data.char.build.LightSorc: // Sorceress
                         case baal.data.char.build.Blizzy: // Sorceress
-                            Skill.cast(Skill.byName.StaticField);
+                            Skill.cast(Skills.StaticField);
                             break;
 
                         case baal.data.char.build.CurseNecro: // Necro
                             if (wave === 3) {
                                 // Dim vision, prevents hydra
-                                Skill.cast(Skill.byName.DimVision, 0, 15094, 5028)
+                                Skill.cast(Skills.DimVision, 0, 15094, 5028)
                             } else {
                                 // Lower resist, helps every sorc/java. Every good fast run have either of those
-                                Skill.cast(Skill.byName.LowerResist, 0, 15094, 5028)
+                                Skill.cast(Skills.LowerResist, 0, 15094, 5028)
                             }
                             break;
 
                         case baal.data.char.build.Trapsin: // Assassin
                             if ([3, 4, 5].indexOf(wave) !== -1) {
                                 // cloak of shadows. Prevents hydra
-                                Skill.cast(Skill.byName.CloakofShadows);
+                                Skill.cast(Skills.CloakofShadows);
                             }
                             break;
                         case baal.data.char.build.Warcry:
                             // Prevents hydra's
                             if (wave !== 0) {
-                                Skill.cast(Skill.byName.WarCry, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1));
+                                Skill.cast(Skills.WarCry, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1));
                             }
                     }
                     return true;
@@ -521,7 +521,7 @@ function TeamBaal() {
 
                         case baal.data.char.build.LightSorc:
                         case baal.data.char.build.Blizzy:
-                            Skill.cast(Skill.byName.StaticField);
+                            Skill.cast(Skills.StaticField);
                             break;
 
                         case baal.data.char.build.CurseNecro:
@@ -546,7 +546,7 @@ function TeamBaal() {
                         }
                         var i;
                         for (i = 0; i < 2 && targets.length > 5; i += 1) {
-                            Skill.cast(Skill.byName.LightningFury, 0, targets[0].x, targets[1].y); // Spam a lightingfury
+                            Skill.cast(Skills.LightningFury, 0, targets[0].x, targets[1].y); // Spam a lightingfury
                         }
                         return true;
                     }
@@ -568,7 +568,7 @@ function TeamBaal() {
                         var i;
                         this.oldAttack = Config.AttackSkill;
                         for (i = 0; i < Config.AttackSkill.length; i += 1) {
-                            if (Config.AttackSkill[i] === Skill.byName.MindBlast) {
+                            if (Config.AttackSkill[i] === Skills.MindBlast) {
                                 Config.AttackSkill[i] = -1;
                             }
                         }
@@ -586,14 +586,14 @@ function TeamBaal() {
                         detectBuild = function () {
                             switch (classes[me.classid]) {
                                 case 'Amazon':
-                                    skill = getSk(Skill.byName.ChargedStrike) + getSk(Skill.byName.LightningFury);
+                                    skill = getSk(Skills.ChargedStrike) + getSk(Skills.LightningFury);
                                     if (skill > 38) {
                                         baal.data.char.build.me = baal.data.char.build.JavaZon;
                                     }
                                     break;
                                 case 'Sorceress':
-                                    var light = getSk(Skill.byName.ChainLightning) + getSk(Skill.byName.Lightning),
-                                        blizz = getSk(Skill.byName.Blizzard) + getSk(Skill.byName.IceBlast);
+                                    var light = getSk(Skills.ChainLightning) + getSk(Skills.Lightning),
+                                        blizz = getSk(Skills.Blizzard) + getSk(Skills.IceBlast);
 
                                     switch (true) {
                                         case light > blizz && light > 38:
@@ -605,14 +605,14 @@ function TeamBaal() {
                                     }
                                     break;
                                 case 'Necromancer':
-                                    skill = getSk(Skill.byName.LowerResist);
+                                    skill = getSk(Skills.LowerResist);
                                     if (skill > 1) {
                                         baal.data.char.build.me = baal.data.char.build.CurseNecro;
                                     }
                                     break;
                                 case 'Paladin':
-                                    var hammers = getSk(Skill.byName.Concentration) + getSk(Skill.byName.BlessedHammer),
-                                        smiting = getSk(Skill.byName.HolyShield) + getSk(Skill.byName.Fanaticism);
+                                    var hammers = getSk(Skills.Concentration) + getSk(Skills.BlessedHammer),
+                                        smiting = getSk(Skills.HolyShield) + getSk(Skills.Fanaticism);
                                     switch (true) {
                                         case hammers > smiting && hammers > 38:
                                             baal.data.char.build.me = baal.data.char.build.Hammerdin;
@@ -623,25 +623,25 @@ function TeamBaal() {
                                     }
                                     break;
                                 case 'Barbarian':
-                                    skill = getSk(Skill.byName.WarCry);
+                                    skill = getSk(Skills.WarCry);
                                     if (skill > 1) {
                                         baal.data.char.build.me = baal.data.char.build.Warcry;
                                     }
                                     break;
                                 case 'Druid':
-                                    skill = getSk(Skill.byName.Tornado) + getSk(Skill.byName.Twister);
+                                    skill = getSk(Skills.Tornado) + getSk(Skills.Twister);
                                     if (skill > 38) {
                                         baal.data.char.build.me = baal.data.char.build.EleDruid;
                                     }
                                     break;
                                 case 'Assassin':
-                                    skill = getSk(Skill.byName.LightningSentry) + getSk(Skill.byName.DeathSentry);
+                                    skill = getSk(Skills.LightningSentry) + getSk(Skills.DeathSentry);
                                     if (skill > 38) {
                                         baal.data.char.build.me = baal.data.char.build.Trapsin;
                                     }
                                     Config.SummonShadow = "Warrior"; // Master can cast MindBlast, we dont want that @ baalwaves
 
-                                    Config.UseFade = baal.util.resistanceAvg() < 45 && getSk(Skill.byName.Fade) !== 0; // Use fade if our avg res is less as 50 and we have the skill
+                                    Config.UseFade = baal.util.resistanceAvg() < 45 && getSk(Skills.Fade) !== 0; // Use fade if our avg res is less as 50 and we have the skill
                                     Config.UseBoS = !Config.UseFade; // Use BoS if we dont use Fade
                                     break;
                             }
@@ -650,11 +650,11 @@ function TeamBaal() {
                             var TownSummon = [], spot = baal.data.throne.preattackSpot.default;
                             switch (baal.data.char.build.me) {
                                 case baal.data.char.build.Trapsin:
-                                    TownSummon = [Skill.byName.ShadowWarrior];
+                                    TownSummon = [Skills.ShadowWarrior];
                                     break;
 
                                 case baal.data.char.build.EleDruid:
-                                    TownSummon = [Skill.byName.Oak, Skill.byName.Grizzly];
+                                    TownSummon = [Skills.Oak, Skills.Grizzly];
                                 // no break here, warning!
                                 case baal.data.char.build.Hammerdin:
                                 case baal.data.char.build.Warcry:
@@ -662,12 +662,12 @@ function TeamBaal() {
                                     break;
 
                                 case baal.data.char.build.JavaZon:
-                                    TownSummon = [Skill.byName.Valkyrie];
+                                    TownSummon = [Skills.Valkyrie];
                                     spot = baal.data.throne.preattackSpot.byBaal;
                                     break;
 
                                 case baal.data.char.build.CurseNecro:
-                                    TownSummon = [Skill.byName.BoneArmor];
+                                    TownSummon = [Skills.BoneArmor];
                                     break;
 
 
@@ -772,45 +772,45 @@ function TeamBaal() {
                             if ((counter > 45e2 || counter < -1e3)) {
                                 return false;
                             }
-                            return Skill.cast(Skill.byName.Blizzard, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1)); // cast blizzard
+                            return Skill.cast(Skills.Blizzard, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1)); // cast blizzard
 
                         case baal.data.char.build.CurseNecro:
                             if ((counter > 15e2 || counter < -1e3)) {
                                 return false;
                             }
-                            return Skill.cast(Skill.byName.LowerResist, 0, 15094, 5028);
+                            return Skill.cast(Skills.LowerResist, 0, 15094, 5028);
 
                         case baal.data.char.build.Hammerdin: // Paladin
                             if ((counter > 45e2 || counter < -1e3)) {
                                 return false;
                             }
-                            Skill.setSkill(Skill.byName.Concentration, 0);
-                            return Skill.cast(Skill.byName.BlessedHammer, 1);
+                            Skill.setSkill(Skills.Concentration, 0);
+                            return Skill.cast(Skills.BlessedHammer, 1);
 
                         case baal.data.char.build.JavaZon:
                             if ((counter > 15e2 || counter < -1e3)) {
                                 return false;
                             }
-                            return Skill.cast(Skill.byName.LightningFury, 0, 15091, 5031);
+                            return Skill.cast(Skills.LightningFury, 0, 15091, 5031);
 
                         case baal.data.char.build.Warcry:
                             if (counter > 2e3 || counter < -1e3) {
                                 return false;
                             }
-                            Skill.cast(Skill.byName.WarCry, 0); // cast war cry
+                            Skill.cast(Skills.WarCry, 0); // cast war cry
                             Pather.walkTo(15087, 5024);
-                            Skill.cast(Skill.byName.WarCry, 0); // cast war cry
+                            Skill.cast(Skills.WarCry, 0); // cast war cry
                             Pather.walkTo(15094, 5024);
-                            return Skill.cast(Skill.byName.WarCry, 0); // cast war cry
+                            return Skill.cast(Skills.WarCry, 0); // cast war cry
 
 
                         case baal.data.char.build.EleDruid: // Druid
                             switch (wave) {
                                 case 3:
                                     // Twister gives a stun, and that prevents hydra's
-                                    return Skill.cast(Skill.byName.Twister, 0, baal.data.throne.preattackSpot.byBaal[0], baal.data.throne.preattackSpot.byBaal[1]);
+                                    return Skill.cast(Skills.Twister, 0, baal.data.throne.preattackSpot.byBaal[0], baal.data.throne.preattackSpot.byBaal[1]);
                                 default:
-                                    return Skill.cast(Skill.byName.Tornado, 0, baal.data.throne.preattackSpot.byBaal[0], baal.data.throne.preattackSpot.byBaal[1]);
+                                    return Skill.cast(Skills.Tornado, 0, baal.data.throne.preattackSpot.byBaal[0], baal.data.throne.preattackSpot.byBaal[1]);
                             }
 
                         case baal.data.char.build.Trapsin: // Assassin
@@ -818,13 +818,13 @@ function TeamBaal() {
                             if (counter > 4e3 || counter < 1e3) {
                                 return false;
                             }
-                            return Skill.cast(Skill.byName.ShockField);
+                            return Skill.cast(Skills.ShockField);
 
                         case baal.data.char.build.LightSorc:
                             if (counter > 2e3 || counter < -1e3) {
                                 return false;
                             }
-                            return Skill.cast(Skill.byName.ChainLightning, 0, baal.data.throne.preattackSpot.byBaal[0], baal.data.throne.preattackSpot.byBaal[1]); // cast chainlighting for max dmg
+                            return Skill.cast(Skills.ChainLightning, 0, baal.data.throne.preattackSpot.byBaal[0], baal.data.throne.preattackSpot.byBaal[1]); // cast chainlighting for max dmg
                     }
                     return true;
                 },
@@ -844,9 +844,9 @@ function TeamBaal() {
                             for (i = 0; i < 4; i += 1) {
                                 if (i === 2) {
                                     // Place a death sentry in the middle
-                                    Skill.cast(Skill.byName.DeathSentry, 0, 15090 + (i * 2), 5035);
+                                    Skill.cast(Skills.DeathSentry, 0, 15090 + (i * 2), 5035);
                                 } else {
-                                    Skill.cast(Skill.byName.LightningSentry, 0, 15090 + (i * 2), 5035);
+                                    Skill.cast(Skills.LightningSentry, 0, 15090 + (i * 2), 5035);
                                 }
                             }
                             return true;
@@ -876,21 +876,21 @@ function TeamBaal() {
                                     || (monster.y > 5073 && monster.y < 5096
                                         && monster.x > 15088 && monster.x < 15103))) {
                                 switch (monster.classid) {
-                                    case 23:
-                                    case 62:
+                                    case Monsters.WarpedFallen:
+                                    case Monsters.WarpedShaman:
                                         baal.util.print('Detected wave 1');
                                         return 1;
-                                    case 105:
-                                    case 381:
+                                    case Monsters.Mummy:
+                                    case Monsters.BaalColdMage:
                                         baal.util.print('Detected wave 2');
                                         return 2;
-                                    case 557:
+                                    case Monsters.Council4:
                                         baal.util.print('Detected wave 3');
                                         return 3;
-                                    case 558:
+                                    case Monsters.VenomLord2:
                                         baal.util.print('Detected wave 4');
                                         return 4;
-                                    case 571:
+                                    case Monsters.ListerTheTormenter:
                                         baal.util.print('Detected wave 5');
                                         return 5;
                                     default:
@@ -984,22 +984,12 @@ function TeamBaal() {
                                 gidAttack[i].attacks += 1;
                                 attackCount += 1;
 
-                                switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
-                                    case 112:
-                                        // Tele in random direction with Blessed Hammer
-                                        if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
-                                            Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
-                                        }
-                                        break;
-                                    default:
-                                        // Flash with melee skills
-                                        if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
-                                            //Packet.flash(me.gid);
-                                            Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
-                                        }
-
-                                        break;
+                                // Flash with melee skills
+                                if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+                                    //Packet.flash(me.gid);
+                                    Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
                                 }
+
                             } else {
                                 monsterList.shift();
                             }
@@ -1008,7 +998,7 @@ function TeamBaal() {
                         }
 
                         // It happens from time to time, the one that teleported chickend and there is no tp to throne anymore
-                        if (!Pather.getPortal(Pather.area.Harrogath, null)) {
+                        if (!Pather.getPortal(Areas.Harrogath, null)) {
                             Pather.makePortal(); // Make portal to Harrogath
                         }
                     }
