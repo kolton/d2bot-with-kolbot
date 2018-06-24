@@ -392,6 +392,14 @@ var Config = {
 		SkipIfBaal: false,
 		SkipTP: false
 	},
+    TeamDiablo: {
+        Teleport: false,
+        Viz: false,
+        Seis: false,
+        Inf: false,
+        Diablo: false,
+        Fast: false,
+    },
 	BattleOrders: {
 		Mode: 0,
 		Getters: [],

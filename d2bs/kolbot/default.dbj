@@ -9,6 +9,7 @@ include("Gambling.js");
 include("CraftingSystem.js");
 include("TorchSystem.js");
 include("MuleLogger.js");
+include("common/Enums.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/CollMap.js");
@@ -22,6 +23,7 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+include("common/Team.js");
 
 function main() {
 	D2Bot.init(); // Get D2Bot# handle
@@ -151,7 +153,7 @@ function main() {
 	}
 
 	if (Config.FastPick) {
-		print("ÿc2Fast pickit active.");
+		print("ï¿½c2Fast pickit active.");
 		addEventListener("itemaction", this.itemEvent);
 	}
 
