@@ -82,63 +82,6 @@ var TorchSystem = {
 		return false;
 	},
 
-	/*inGameCheck: function () {
-		var i, j, farmers, dropArray, item,
-			keyIds = ["pk1", "pk2", "pk3"];
-
-		farmers = this.getFarmers();
-
-		if (!farmers) {
-			return false;
-		}
-
-		for (i = 0; i < farmers.length; i += 1) {
-			if (farmers[i].FarmGame.length > 0 && me.gamename.toLowerCase().match(farmers[i].FarmGame.toLowerCase())) {
-				print("ÿc4Torch Systemÿc0: In Farm game.");
-				D2Bot.printToConsole("Torch System: In Farm game.", 7);
-				Town.goToTown(1);
-
-				if (!Town.openStash()) {
-					return false;
-				}
-
-				while (true) {
-					// Reset array
-					dropArray = [];
-
-					// Search for one of each key and put them in drop array
-					for (j = 0; j < 3; j += 1) {
-						// Find a key (one type per cycle)
-						item = me.getItem(keyIds[j]);
-
-						// Build an array of keys to drop
-						if (item) {
-							dropArray.push(copyUnit(item));
-						}
-					}
-
-					// Abort if there's no complete sets of keys
-					if (dropArray.length !== 3) {
-						break;
-					}
-
-					// Drop a keyset
-					for (j = 0; j < 3; j += 1) {
-						dropArray[j].drop();
-					}
-				}
-
-				delay(5000);
-				quit();
-				delay(10000);
-
-				return true;
-			}
-		}
-
-		return false;
-	},*/
-
 	inGameCheck: function () {
 		var i, j, neededItems,
 			farmers = this.getFarmers();
@@ -153,16 +96,15 @@ var TorchSystem = {
 				D2Bot.printToConsole("Torch System: Transfering keys.", 7);
 				D2Bot.updateStatus("Torch System: In game.");
 				Town.goToTown(1);
+				Town.move("stash");
 
-				if (Town.openStash()) {
-					neededItems = this.keyCheck();
+				neededItems = this.keyCheck();
 
-					if (neededItems) {
-						for (i in neededItems) {
-							if (neededItems.hasOwnProperty(i)) {
-								while (neededItems[i].length) {
-									neededItems[i].shift().drop();
-								}
+				if (neededItems) {
+					for (i in neededItems) {
+						if (neededItems.hasOwnProperty(i)) {
+							while (neededItems[i].length) {
+								neededItems[i].shift().drop();
 							}
 						}
 					}
@@ -174,7 +116,6 @@ var TorchSystem = {
 
 				delay(5000);
 				quit();
-				//delay(10000);
 
 				return true;
 			}
