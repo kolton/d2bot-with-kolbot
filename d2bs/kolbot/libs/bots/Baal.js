@@ -204,18 +204,9 @@ function Baal() {
 		Pather.useWaypoint(129);
 	}
 
-	switch(Config.Baal.ClearPath) {
-		case true: {
-			if (!Pather.moveToExit([130, 131], true, true)) {
-			throw new Error("Failed to move to Throne of Destruction.");
-			}
+	if (!Pather.moveToExit([130, 131], true, Config.Baal.Clearpath)) {
+		throw new Error("Failed to move to Throne of Destruction.");
 		}
-		case false: {
-			if (!Pather.moveToExit([130, 131], true)) {
-			throw new Error("Failed to move to Throne of Destruction.");
-			}
-		}
-	}
 
 	Pather.moveTo(15095, 5029);
 

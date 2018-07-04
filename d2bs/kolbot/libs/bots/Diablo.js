@@ -429,18 +429,10 @@ function Diablo() {
 	if (me.area !== 107) {
 		Pather.useWaypoint(107);
 	}
-	switch(Config.Diablo.ClearPath) {
-		case true: {
-			if (!Pather.moveTo(7790, 5544, 5, true)) {
-			throw new Error("Failed to move to The Chaos Sanctuary.");
-			}
+	
+	if (!Pather.moveTo(7790, 5544, 5, Config.Diablo.ClearPath)) {
+		throw new Error("Failed to move to The Chaos Sanctuary.");
 		}
-		case false: {
-			if (!Pather.moveTo(7790, 5544)) {
-			throw new Error("Failed to move to The Chaos Sanctuary.");
-			}
-		}
-	}
 	
 
 	this.initLayout();
