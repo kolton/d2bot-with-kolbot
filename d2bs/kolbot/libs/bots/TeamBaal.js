@@ -95,13 +95,17 @@ function TeamBaal() {
                 // Cast tp in ase there is no portal up yet
                 if (!Pather.getPortal(Areas.Harrogath)) {
                     Pather.makePortal();
+                    if (Config.TeamBaal.AnnounceChannel) {
+                        say(Config.TeamBaal.AnnounceChannel);
+                    }
                     Team.communication.baal.portalReady = true;
                     Team.msg.sendData('baal');
                 }
                 return true;
             },
             waves: function () {
-                // Go to throne
+
+                // Go to throne, if we are not already in the throne
                 if (me.area !== Areas.ThroneOfDestruction) {
 
                     // In case we abandoned teleporting to throne, we dont need to bo again
@@ -113,20 +117,59 @@ function TeamBaal() {
                     Team.util.toAct5();
 
                     Town.doChores();
-
-                    if (Team.char.isWeak) { // Weak char? lets wait for a safe tp.
-                        while (!Team.communication.baal.portalSafe) {
-                            delay(20);
-                        }
-                    }
+                    Town.moveToSpot('portal'); // wait at tp
 
                     if (!Team.util.takePortal(Areas.ThroneOfDestruction)) {
                         return false; // failed to get to throne
                     }
+                };
+
+                // Make sure the portal is safe. This can avoid quite deadly behaviour from throne
+                switch(Team.build.me) {
+
+                    case Team.build.Conviction:
+                    case Team.build.Smiter:
+                    case Team.build.Hammerdin:
+                        // Setup the best aura we can find for the leechers for a second
+                        break;
+
+                    case Team.build.JavaZon:
+                        // Spam a few javelins
+                        //Team.buildSpecific.Amazon.fury(); // Spam some fury's right away first
+                        break;
+
+                    case Team.build.Blizzy:
+                        Skill.cast(Skills.Blizzard,me.x,me.y); // Make a blizzard over our heads for us
+                        break;
+
+                    case Team.build.Trapsin:
+                        // Lay traps at baal's throne
+                        for (i = 0; i < 4; i += 1) {
+                            if (i === 2) {
+                                Skill.cast(Skills.DeathSentry, 0,15091, 5018);
+                            } else {
+                                Skill.cast(Skills.LightningSentry, 0, 15091, 5018);
+                            }
+                        }
+                        break;
+
+                    case Team.build.CurseNecro:
+                        // We want to lower curse everyone, But in the begin, its more handy to confuse everyone around us
+                        Skill.cast(Skills.Confuse);
+
+                        // The radius of Decrepify is less as Confuse, so the immediate surroundings we Decreprify
+                        //Skill.cast(Skills.Decrepify,me.x,me.y);
+                        break;
                 }
 
-                // Barb's should bo here, since they have a good bo.
-                Team.buildSpecific.Barb.Bo();
+                // If we don't have a bo yet, wait a second after getting in the portal to get bo.
+                if (me.getState(!me.getState(States.BattleOrders))
+                    && me.classid !== 4) {
+                    delay(500);
+                } else {
+                    // Barb's should bo here, since they have a good bo.
+                    Team.buildSpecific.Barb.Bo();
+                }
 
                 // Shouldn't be necessary, since chars with cta go bo and precast, and the rest precast in town.
                 Precast.doPrecast(false);
@@ -248,18 +291,19 @@ function TeamBaal() {
         util: {
             init: function () {
                 var spot = baal.data.preattackSpot.default;
-                switch (Team.char.build.me) {
-                    case Team.char.build.EleDruid:
-                    case Team.char.build.Hammerdin:
-                    case Team.char.build.Warcry:
+                switch (Team.build.me) {
+                    case Team.build.EleDruid:
+                    case Team.build.Hammerdin:
+                    case Team.build.Warcry:
                         spot = baal.data.preattackSpot.center;
                         break;
 
-                    case Team.char.build.JavaZon:
+                    case Team.build.Conviction:
+                    case Team.build.JavaZon:
                         spot = baal.data.preattackSpot.byBaal;
                         break;
 
-                    case Team.char.build.LightSorc:
+                    case Team.build.LightSorc:
                         spot = baal.data.preattackSpot.left;
                         break;
                 }
@@ -307,9 +351,10 @@ function TeamBaal() {
                 if (monster) {
                     do {
                         if (monster.mode !== 12 && monster.getStat(172) !== 2) {
-                            // Weak char?
-                            if (Team.char.isWeak) {
-                                Pather.moveTo(15118, 5002)
+                            // Incase we have the fire res aura, lets put it
+                            if (me.getSkill(Skills.ResistFire, 1)) {
+                                Skill.setSkill(Skills.ResistFire);
+                                break;
                             }
 
                             while (monster.mode !== 12) {
@@ -334,33 +379,49 @@ function TeamBaal() {
             // Spawn all kinds of stuff while we wait for the wave to come
             beforeWaveCasting: function (wave, counter) {
                 //Baal.print('timer:'+counter);
-                switch (Team.char.build.me) {
-                    case Team.char.build.Blizzy:
+                switch (Team.build.me) {
+
+                    case Team.build.FireBall:
+                        if ((counter > 27e2 || counter < -1e3)) {
+                            return false;
+                        }
+
+                        if (counter > 2000) {
+
+                            return Skill.cast(Skills.Meteor, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1));
+                        }
+                        return Skill.cast(Skills.FireBall, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1));
+
+
+                    case Team.build.Blizzy:
                         if ((counter > 45e2 || counter < -1e3)) {
                             return false;
                         }
-                        return Skill.cast(Skills.Blizzard, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1)); // cast blizzard
+                        return Skill.cast(Skills.Blizzard, 0, 15094 + rand(-1, 1), 5028 + rand(-1, 1));
 
-                    case Team.char.build.CurseNecro:
+                    case Team.build.CurseNecro:
                         if ((counter > 15e2 || counter < -1e3)) {
                             return false;
                         }
                         return Skill.cast(Skills.LowerResist, 0, 15094, 5028);
 
-                    case Team.char.build.Hammerdin: // Paladin
+                    case Team.build.Conviction:
+                        Skill.setSkill(Skills.Conviction, 0);
+                        break;
+                    case Team.build.Hammerdin: // Paladin
                         if ((counter > 45e2 || counter < -1e3)) {
                             return false;
                         }
                         Skill.setSkill(Skills.Concentration, 0);
                         return Skill.cast(Skills.BlessedHammer, 1);
 
-                    case Team.char.build.JavaZon:
+                    case Team.build.JavaZon:
                         if ((counter > 15e2 || counter < -1e3)) {
                             return false;
                         }
                         return Skill.cast(Skills.LightningFury, 0, 15091, 5031);
 
-                    case Team.char.build.Warcry:
+                    case Team.build.Warcry:
                         if (counter > 2e3 || counter < -1e3) {
                             return false;
                         }
@@ -371,7 +432,7 @@ function TeamBaal() {
                         return Skill.cast(Skills.WarCry, 0); // cast war cry
 
 
-                    case Team.char.build.EleDruid: // Druid
+                    case Team.build.EleDruid: // Druid
                         switch (wave) {
                             case 3:
                                 // Twister gives a stun, and that prevents hydra's
@@ -380,14 +441,14 @@ function TeamBaal() {
                                 return Skill.cast(Skills.Tornado, 0, baal.data.preattackSpot.byBaal[0], baal.data.preattackSpot.byBaal[1]);
                         }
 
-                    case Team.char.build.Trapsin: // Assassin
+                    case Team.build.Trapsin: // Assassin
                         // Don't do this 1 second before the wave come, so we can cast cloak of shadow directly
                         if (counter > 4e3 || counter < 1e3) {
                             return false;
                         }
                         return Skill.cast(Skills.ShockField);
 
-                    case Team.char.build.LightSorc:
+                    case Team.build.LightSorc:
                         if (counter > 2e3 || counter < -1e3) {
                             return false;
                         }
@@ -397,16 +458,43 @@ function TeamBaal() {
             },
 
             // Do certain stuff like replacing the traps after a wave
-            afterWaveCasting: function (wave) {
+            afterWaveChecks: function (wave) {
                 // Don't do this after wave 5
                 if (wave === 5) {
                     return true;
                 }
                 Precast.doPrecast(false); // Make sure everything is still here
 
+                // Check if we need to go to town to heal incase we are psn'ed and have low psn res
+                if (me.getState(2) && (me.getStat(Stats.Me.Poisonresist) - 100) < 50) {
+                    if (!Pather.usePortal(Areas.Harrogath, null)) {
+                        Pather.makePortal(true);
+                    }
+                    Town.initNPC("Heal", "heal"); // Talk to Malah
+
+                    if (Config.PacketShopping) { // Only with packet shopping. Otherwise its too fast
+                        Town.buyPotions(); // Since we are talking with Malah, we might as well buy some pots.
+                        Town.fillTome(518); // Since we are already in trade with Malah, we can also refill the tp tome
+                    }
+
+                    me.cancel();
+                    Town.moveToSpot('portal');
+
+                    // Go back
+                    if (!Pather.usePortal(Areas.ThroneOfDestruction, null)) {
+                        throw new Error('Portal to throne disappeared, wtf?'); // Portal is gone? wtf.
+                    }
+
+                    // Did we take our own portal, if so recast it
+                    if (!Pather.getPortal(Areas.Harrogath, null)) {
+                        Pather.makePortal();
+                    }
+                }
+
+
                 var i;
-                switch (Team.char.build.me) {
-                    case Team.char.build.Trapsin:
+                switch (Team.build.me) {
+                    case Team.build.Trapsin:
                         // Place traps again
                         for (i = 0; i < 4; i += 1) {
                             if (i === 2) {
@@ -417,7 +505,7 @@ function TeamBaal() {
                             }
                         }
                         return true;
-                    case Team.char.build.Warcry:
+                    case Team.build.Warcry:
                         // Give everyone a bo, to avoid stupid people with cta
                         return Precast.doPrecast(true);
                 }
@@ -426,6 +514,9 @@ function TeamBaal() {
 
             // Go to preattack position
             moveToPreattack: function () {
+                if (this.checkThrone()) {
+                    return;
+                }
                 if (getDistance(me, baal.data.preattackSpot.mine[0], baal.data.preattackSpot.mine[1]) < 5) {
                     return true; // Already pretty close, no need to move
                 }
@@ -484,19 +575,35 @@ function TeamBaal() {
                     wave = 0;
                 }
 
+                monsterList.sort(function(unitA,unitB) {
+                    return getDistance(me, unitA) - getDistance(me, unitB);
+                });
 
                 Team.buildSpecific.preattack(wave);
 
                 while (monsterList.length > 0 && attackCount < 300) {
+
+                    // Did i die? If so revive and pickup corpse
                     if (me.dead) {
-                        return false;
-                        //ToDo: Revive, come back to throne and pick up body
+                        var corpse_x = me.x, corpse_y = me.y;
+                        me.revive();
+                        Pather.usePortal(Areas.ThroneOfDestruction,null)
+                        Pather.moveTo(corpse_x,corpse_y);
+                        if (!Town.getCorpse()) {
+                            quit(); // failed to pick up corpse, probably cuz we died again. Fuck this, bye
+                        }
                     }
 
-                    monsterList.sort(Attack.sortMonsters);
+                    // resort
+                    monsterList.sort(function(unitA,unitB) {
+                        return getDistance(me, unitA) - getDistance(me, unitB);
+                    });
                     target = copyUnit(monsterList[0]);
 
                     if (target.x !== undefined && Attack.checkMonster(target)) {
+
+
+                        // Dodge or get in position
                         if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
                             Attack.deploy(target, Config.DodgeRange, 5, 9);
                         } else {
@@ -515,7 +622,14 @@ function TeamBaal() {
                         Team.buildSpecific.midattack(wave, target, attackCount);
 
                         // Using here a lower modulo so we do more often a timed attack @ waves
-                        result = ClassAttack.doAttack(target, attackCount % 7 === 0);
+                        switch (Team.build.me) {
+                            case Team.build.Conviction: // Doesn't need to attack, just convict like crazy
+                                Skill.setSkill(Skills.Conviction, 0);
+                                break;
+                            default:
+                                result = ClassAttack.doAttack(target, attackCount % 7 === 0);
+                        }
+
 
                         if (result) {
                             for (i = 0; i < gidAttack.length; i += 1) {
@@ -532,19 +646,21 @@ function TeamBaal() {
 
                             // Flash with melee skills
                             if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
-                                //Packet.flash(me.gid);
                                 Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
                             }
 
                         } else {
                             monsterList.shift();
+                            Pickit.pickItems();
                         }
                     } else {
                         monsterList.shift();
+                        Pickit.pickItems();
                     }
 
-                    // It happens from time to time, the one that teleported chickend and there is no tp to throne anymore
-                    if (!Pather.getPortal(Areas.Harrogath, null)) {
+                    // It happens from time to time, the one that teleported chickend and there is no tp to throne anymore,
+                    // only if we still can find baal's sitting in the throne
+                    if (!Pather.getPortal(Areas.Harrogath, null) && getUnit(1, Units.BaalSitting))  {
                         Pather.makePortal(); // Make portal to Harrogath
                     }
                 }
@@ -559,7 +675,7 @@ function TeamBaal() {
 
                 // Prepare for next wave
                 this.moveToPreattack();
-                this.afterWaveCasting();
+                this.afterWaveChecks();
 
                 // Some specific things after a wave?
                 if (wave === 3) {

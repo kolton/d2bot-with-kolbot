@@ -367,6 +367,7 @@ var Config = {
         Teleport: false,
 		Waves: false,
 		KillBaal: false,
+		AnnounceChannel: '',
 	},
 	BaalHelper: {
 		Wait: 120,

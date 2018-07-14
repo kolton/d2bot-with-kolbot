@@ -6,6 +6,8 @@
 
 var Team = {
     init: function () {
+        // To avoid blockage of the first char
+        Pather.moveTo(me.x+rand(-2,2),me.y+rand(-2,2));
         if (Team.data.initialized) {
             return true;
         }
@@ -62,10 +64,8 @@ var Team = {
 
             // Can we use any red portal?
             if (getUnit(2, 566)) {
-
                 // We found a red portal to act4. Highly unlikely but it could be
                 Pather.useUnit(2, 566, 109);
-
             } else {
                 var npc = getUnit(1, "tyrael");
                 if (!npc || !npc.openMenu()) {
@@ -153,10 +153,10 @@ var Team = {
                 do {
                     if (Attack.checkMonster(target) && Attack.skipCheck(target)) {
                         // Baal check, Be sure in throne we only clear *in* the chamber of the throne, not outside it
-                        if (me.area !== Areas.ThroneOfDestruction || (( target.y > 5002 && target.y < 5073
-                                && target.x > 15072 && target.x < 15118)
-                                || (target.y > 5073 && target.y < 5096
-                                    && target.x > 15088 && target.x < 15103))) {
+                        if (me.area !== Areas.ThroneOfDestruction || ((target.y > 5002 && target.y < 5073
+                            && target.x > 15072 && target.x < 15118)
+                            || (target.y > 5073 && target.y < 5096
+                                && target.x > 15088 && target.x < 15103))) {
                             monsterList.push(copyUnit(target));
                         }
                     }
@@ -166,10 +166,10 @@ var Team = {
             monsterList.sort(Attack.sortMonsters);
             return monsterList;
         },
-        doingBaal: function() {
+        doingBaal: function () {
             return Scripts.hasOwnProperty('TeamBaal');
         },
-        doingDiablo: function() {
+        doingDiablo: function () {
             return Scripts.hasOwnProperty('TeamDiablo');
         },
     },
@@ -182,7 +182,7 @@ var Team = {
             var i;
 
             // Ugly but works for now
-            removeEventListener('gamepacket',Team.events.gamePacket);
+            removeEventListener('gamepacket', Team.events.gamePacket);
 
             print('Sending: ' + action);
             for (i = 0; i < this.d2bsProfileName.length; i += 1) {
@@ -190,7 +190,7 @@ var Team = {
             }
 
             // Ugly but works for now
-            addEventListener('gamepacket',Team.events.gamePacket);
+            addEventListener('gamepacket', Team.events.gamePacket);
 
         },
         getOthers: function () {
@@ -248,7 +248,7 @@ var Team = {
         },
         requestData: function (to) {
             // Request what kind of data is already set. For example, is the portal up?
-            switch(to) {
+            switch (to) {
                 case 'baal':
                     this.rawsend(107, JSON.stringify({profile: me.profile}));
                     break;
@@ -261,7 +261,7 @@ var Team = {
             // Send data to others that run from the same pc
             // Make sure we have a new object to avoid sendcopy issues
             // Sending copy
-            switch(to) {
+            switch (to) {
                 case 'baal':
                     this.rawsend(108, JSON.stringify(Team.communication.baal));
                     break;
@@ -302,7 +302,7 @@ var Team = {
 
         receivingData: function (mode, msg) {
             var json;
-            print('Recv msg: '+mode+' - '+msg);
+            //print('Recv msg: ' + mode + ' - ' + msg);
             switch (mode) {
                 case 107: // Requesting our data for baal
                     try {
@@ -363,17 +363,17 @@ var Team = {
     },
     buildSpecific: {
         preattack: function (wave) {
-            switch (Team.char.build.me) {
-                case Team.char.build.JavaZon:
+            switch (Team.build.me) {
+                case Team.build.JavaZon:
                     this.Amazon.fury();
                     break;
 
-                case Team.char.build.LightSorc: // Sorceress
-                case Team.char.build.Blizzy: // Sorceress
+                case Team.build.LightSorc: // Sorceress
+                case Team.build.Blizzy: // Sorceress
                     Skill.cast(Skills.StaticField);
                     break;
 
-                case Team.char.build.CurseNecro: // Necro
+                case Team.build.CurseNecro: // Necro
                     if (wave === 3) {
                         // Dim vision, prevents hydra
                         Skill.cast(Skills.DimVision, 0, 15094, 5028)
@@ -383,13 +383,13 @@ var Team = {
                     }
                     break;
 
-                case Team.char.build.Trapsin: // Assassin
+                case Team.build.Trapsin: // Assassin
                     if ([3, 4, 5].indexOf(wave) !== -1) {
                         // cloak of shadows. Prevents hydra
                         Skill.cast(Skills.CloakofShadows);
                     }
                     break;
-                case Team.char.build.Warcry:
+                case Team.build.Warcry:
                     // Prevents hydra's
                     if (wave !== 0) {
                         Skill.cast(Skills.WarCry);
@@ -398,19 +398,19 @@ var Team = {
             return true;
         },
         midattack: function (wave, target, count) {
-            switch (Team.char.build.me) {
-                case Team.char.build.JavaZon:
+            switch (Team.build.me) {
+                case Team.build.JavaZon:
                     if (count % 4) {
                         this.Amazon.fury(target); // need to spam fury?
                     }
                     break;
 
-                case Team.char.build.LightSorc:
-                case Team.char.build.Blizzy:
+                case Team.build.LightSorc:
+                case Team.build.Blizzy:
                     Skill.cast(Skills.StaticField);
                     break;
 
-                case Team.char.build.CurseNecro:
+                case Team.build.CurseNecro:
                 //ToDo: explode corpses like crazy. Great damage in a baalrun and makes waves go faster
             }
         },
@@ -439,8 +439,8 @@ var Team = {
         },
         Barb: {
             Bo: function () {
-                switch (Team.char.build.me) {
-                    case Team.char.build.Warcry:
+                switch (Team.build.me) {
+                    case Team.build.Warcry:
                         Precast.doPrecast(true);
                         break;
                     default:
@@ -474,56 +474,78 @@ var Team = {
                         case 'Amazon':
                             skill = getSk(Skills.ChargedStrike) + getSk(Skills.LightningFury);
                             if (skill > 38) {
-                                Team.char.build.me = Team.char.build.JavaZon;
+                                Team.build.me = Team.build.JavaZon;
                             }
                             break;
                         case 'Sorceress':
                             var light = getSk(Skills.ChainLightning) + getSk(Skills.Lightning),
-                                blizz = getSk(Skills.Blizzard) + getSk(Skills.IceBlast);
+                                blizz = getSk(Skills.Blizzard) + getSk(Skills.IceBlast),
+                                fire = getSk(Skills.FireBall) + getSk(Skills.Meteor);
 
                             switch (true) {
-                                case light > blizz && light > 38:
-                                    Team.char.build.me = Team.char.build.LightSorc;
+                                case light > blizz
+                                && light > fire
+                                && light > 38:
+                                    Team.build.me = Team.build.LightSorc;
                                     break;
-                                case light < blizz && blizz > 38:
-                                    Team.char.build.me = Team.char.build.Blizzy;
+                                case blizz > light
+                                && blizz > fire
+                                && blizz > 38:
+                                    Team.build.me = Team.build.Blizzy;
                                     break;
+                                case fire > blizz
+                                && fire > light
+                                && fire > 38:
+                                    Team.build.me = Team.build.FireBall;
                             }
                             break;
                         case 'Necromancer':
                             skill = getSk(Skills.LowerResist);
                             if (skill > 1) {
-                                Team.char.build.me = Team.char.build.CurseNecro;
+                                Team.build.me = Team.build.CurseNecro;
                             }
                             break;
                         case 'Paladin':
                             var hammers = getSk(Skills.Concentration) + getSk(Skills.BlessedHammer),
-                                smiting = getSk(Skills.HolyShield) + getSk(Skills.Fanaticism);
+                                smiting = getSk(Skills.HolyShield) + getSk(Skills.Fanaticism),
+                                conviction = getSk(Skills.Vengeance) + getSk(Skills.Conviction);
                             switch (true) {
-                                case hammers > smiting && hammers > 38:
-                                    Team.char.build.me = Team.char.build.Hammerdin;
+                                case conviction > hammers
+                                && conviction > smiting:
+                                    Team.build.me = Team.build.Conviction;
+                                    Config.Vigor = false; // Don't use vigor, always have conviction
+                                    Config.AttackSkill[1] = Skills.Vengeance; // none
+                                    Config.AttackSkill[2] = Skills.Conviction; // none
+                                    Config.AttackSkill[3] = Skills.Vengeance; // none
+                                    Config.AttackSkill[4] = Skills.Conviction; // none
                                     break;
-                                case hammers < smiting && smiting > 38:
-                                    Team.char.build.me = Team.char.build.Smiter;
+                                case hammers > smiting
+                                && hammers > 38:
+                                    Team.build.me = Team.build.Hammerdin;
                                     break;
+                                case hammers < smiting
+                                && smiting > 38:
+                                    Team.build.me = Team.build.Smiter;
+                                    break;
+
                             }
                             break;
                         case 'Barbarian':
                             skill = getSk(Skills.WarCry);
                             if (skill > 1) {
-                                Team.char.build.me = Team.char.build.Warcry;
+                                Team.build.me = Team.build.Warcry;
                             }
                             break;
                         case 'Druid':
                             skill = getSk(Skills.Tornado) + getSk(Skills.Twister);
                             if (skill > 38) {
-                                Team.char.build.me = Team.char.build.EleDruid;
+                                Team.build.me = Team.build.EleDruid;
                             }
                             break;
                         case 'Assassin':
                             skill = getSk(Skills.LightningSentry) + getSk(Skills.DeathSentry);
                             if (skill > 38) {
-                                Team.char.build.me = Team.char.build.Trapsin;
+                                Team.build.me = Team.build.Trapsin;
                             }
                             Config.SummonShadow = "Warrior"; // Master can cast MindBlast, we dont want that @ baalwaves
 
@@ -533,30 +555,49 @@ var Team = {
                     }
                 },
                 setBuildDefaults = function () {
-                    var TownSummon = [];
-                    switch (Team.char.build.me) {
-                        case Team.char.build.Trapsin:
-                            TownSummon = [Skills.ShadowWarrior];
-                            break;
-
-                        case Team.char.build.EleDruid:
-                            TownSummon = [Skills.OakSage, Skills.SummonGrizzly];
-                            break;
-                        case Team.char.build.Hammerdin:
-                            TownSummon = [Skills.HolyShield];
-                            break;
-
-                        case Team.char.build.JavaZon:
-                            TownSummon = [Skills.Valkyrie];
-                            break;
-
-                        case Team.char.build.CurseNecro:
-                            TownSummon = [Skills.BoneArmor];
-                            break;
-                    }
-
                     // Only if we don't teleport, or dont have CTA
                     if (!(Config.TeamDiablo.teleport || Team.util.haveCTA())) {
+                        var TownSummon = [], skill;
+                        switch (Team.build.me) {
+                            case Team.build.Trapsin:
+                                TownSummon = [Skills.ShadowWarrior];
+                                break;
+
+                            case Team.build.EleDruid:
+                                TownSummon = [Skills.OakSage, Skills.SummonGrizzly];
+                                break;
+
+                            case Team.build.Smiter:
+                            case Team.build.Conviction:
+                            case Team.build.Hammerdin:
+                                TownSummon = [Skills.HolyShield];
+                                break;
+
+                            case Team.build.JavaZon:
+                                TownSummon = [Skills.Valkyrie];
+                                break;
+
+                            case Team.build.CurseNecro:
+                                TownSummon = [Skills.BoneArmor];
+                                break;
+
+                            case Team.build.Blizzy:
+                            case Team.build.LightSorc:
+                            case Team.build.FireBall:
+                                if (!me.getSkill(Skills.ShiverArmor, 1)) {
+                                    if (!me.getSkill(Skills.ChillingArmor, 1)) {
+                                        if (me.getSkill(Skills.FrozenArmor)) {
+                                            skill = Skills.FrozenArmor;
+                                        }
+                                    } else {
+                                        skill = Skills.ChillingArmor;
+                                    }
+                                } else {
+                                    skill = Skills.ShiverArmor;
+                                }
+                                TownSummon = [skill, Skills.EnergyShield]; // Cast the best armor & energy shield in town
+                                break;
+                        }
                         // Its better to cast stuff in town if we dont have CTA and we wait for tp anyway. Saves time in throne
                         TownSummon.forEach(Precast.summon);
                     }
@@ -586,28 +627,26 @@ var Team = {
             bossDone: false
         },
     },
-    char: {
-        isWeak: false,
-        build: {
-            me: 0,
-            Trapsin: 1,
-            Warcry: 2,
-            JavaZon: 3,
-            CurseNecro: 4,
-            EleDruid: 5,
-            Blizzy: 6,
-            Hammerdin: 7,
-            LightSorc: 8,
-            Smiter: 9
-        }
+    build: {
+        me: 0,
+        Trapsin: 1,
+        Warcry: 2,
+        JavaZon: 3,
+        CurseNecro: 4,
+        EleDruid: 5,
+        Blizzy: 6,
+        Hammerdin: 7,
+        LightSorc: 8,
+        Smiter: 9,
+        Conviction: 10,
+        FireBall: 11,
+
     },
     data: {
         initialized: false,
         baaltick: 0,
         //baalPortalSpot: [15118, 5002], // classic spot
         baalPortalSpot: [15076, 5031], // improved spot
-        others: {
-
-        }
+        others: {}
     }
 };
