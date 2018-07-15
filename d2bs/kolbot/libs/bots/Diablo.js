@@ -439,25 +439,15 @@ function Diablo() {
 
 	if (Config.Diablo.Entrance) {
 		Attack.clear(30, 0, false, this.sort);
-			
-		if (Config.Diablo.ClearPath) { 
-			Pather.moveTo(7790, 5544, 3, true);
-		}
-		else if (!Config.Diablo.ClearPath) {
-			Pather.moveTo(7790, 5544);
-		}
-
-		if (Config.PublicMode) {
-			Pather.makePortal();
-			say(Config.Diablo.EntranceTP);
-		}
-
+		Pather.moveTo(7790, 5544, 3, Config.Diablo.ClearPath);
 		Pather.moveTo(7790, 5544);
 		Precast.doPrecast(true);
 		Attack.clear(30, 0, false, this.sort);
 		this.followPath(this.entranceToStar);
-	} else {
-		Pather.moveTo(7774, 5305);
+	}
+	
+	else {
+		Pather.moveTo(7774, 5305, 3, Config.Diablo.Clearpath);
 		Attack.clear(15, 0, false, this.sort);
 	}
 

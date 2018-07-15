@@ -208,7 +208,7 @@ function Baal() {
 		throw new Error("Failed to move to Throne of Destruction.");
 		}
 
-	Pather.moveTo(15095, 5029);
+	Pather.moveTo(15095, 5029, 3, Config.Baal.Clearpath);
 
 	if (Config.Baal.DollQuit && getUnit(1, 691)) {
 		say("Dolls found! NG.");
