@@ -395,6 +395,7 @@ var Config = {
 	},
     TeamDiablo: {
         Teleport: false,
+        TeleportToThrone: false,
         Viz: false,
         Seis: false,
         Inf: false,

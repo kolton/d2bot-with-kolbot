@@ -156,9 +156,6 @@ function TeamBaal() {
                     case Team.build.CurseNecro:
                         // We want to lower curse everyone, But in the begin, its more handy to confuse everyone around us
                         Skill.cast(Skills.Confuse);
-
-                        // The radius of Decrepify is less as Confuse, so the immediate surroundings we Decreprify
-                        //Skill.cast(Skills.Decrepify,me.x,me.y);
                         break;
                 }
 
