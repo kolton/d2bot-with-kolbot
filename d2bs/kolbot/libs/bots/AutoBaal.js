@@ -78,7 +78,10 @@ function AutoBaal() {
 			break;
 		case 5:
 			break;
-		case 6:
+		case 6: // assasin
+			if (Config.UseTraps && ClassAttack.checkTraps({x: 15095, y: 5037})) {
+				ClassAttack.placeTraps({x: 15095, y: 5037}, 5);
+			}
 			break;
 		}
 
