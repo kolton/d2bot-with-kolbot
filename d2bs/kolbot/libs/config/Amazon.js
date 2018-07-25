@@ -111,6 +111,7 @@ function LoadConfig() {
 		Config.Snapchip.ClearIcyCellar = true;
 	Scripts.Worldstone = false;
 	Scripts.Baal = false;
+		Config.Baal.AnnounceMonsters = true; // Announces monster count and if souls or dolls are in area. E.g. "DEADLY!!! 32 monsters nearby. Souls and Dolls Dolls in area".
 		Config.Baal.HotTPMessage = "Hot TP!";
 		Config.Baal.SafeTPMessage = "Safe TP!";
 		Config.Baal.BaalMessage = "Baal!";

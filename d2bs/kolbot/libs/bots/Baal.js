@@ -146,54 +146,56 @@ function Baal() {
 	};
 
 	this.announce = function () {
-		var count, string, souls, dolls,
-			monster = getUnit(1);
+		if (Config.Baal.AnnounceMonsters) {
+			var count, string, souls, dolls,
+				monster = getUnit(1);
 
-		if (monster) {
-			count = 0;
+			if (monster) {
+				count = 0;
 
-			do {
-				if (Attack.checkMonster(monster) && monster.y < 5094) {
-					if (getDistance(me, monster) <= 40) {
-						count += 1;
+				do {
+					if (Attack.checkMonster(monster) && monster.y < 5094) {
+						if (getDistance(me, monster) <= 40) {
+							count += 1;
+						}
+
+						if (!souls && monster.classid === 641) {
+							souls = true;
+						}
+
+						if (!dolls && monster.classid === 691) {
+							dolls = true;
+						}
 					}
-
-					if (!souls && monster.classid === 641) {
-						souls = true;
-					}
-
-					if (!dolls && monster.classid === 691) {
-						dolls = true;
-					}
-				}
-			} while (monster.getNext());
-		}
-
-		if (count > 30) {
-			string = "DEADLY!!!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else if (count > 20) {
-			string = "Lethal!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else if (count > 10) {
-			string = "Dangerous!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else if (count > 0) {
-			string = "Warm" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
-		} else {
-			string = "Cool TP. No immediate monsters.";
-		}
-
-		if (souls) {
-			string += " Souls ";
-
-			if (dolls) {
-				string += "and Dolls ";
+				} while (monster.getNext());
 			}
 
-			string += "in area.";
-		} else if (dolls) {
-			string += " Dolls in area.";
-		}
+			if (count > 30) {
+				string = "DEADLY!!!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
+			} else if (count > 20) {
+				string = "Lethal!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
+			} else if (count > 10) {
+				string = "Dangerous!" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
+			} else if (count > 0) {
+				string = "Warm" + " " + count + " monster" + (count > 1 ? "s " : " ") + "nearby.";
+			} else {
+				string = "Cool TP. No immediate monsters.";
+			}
 
-		say(string);
+			if (souls) {
+				string += " Souls ";
+
+				if (dolls) {
+					string += "and Dolls ";
+				}
+
+				string += "in area.";
+			} else if (dolls) {
+				string += " Dolls in area.";
+			}
+
+			say(string);
+		}
 	};
 
 	Town.doChores();
