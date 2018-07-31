@@ -203,14 +203,10 @@ var D2Bot = {
 			profile = me.profile;
 		}
 
-		if (release === undefined) {
-			release = false;
-		}
-
 		var obj = {
 			profile: me.profile,
 			func: "stop",
-			args: [profile, release]
+			args: [profile, release ? "True" : "False"]
 		};
 
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
