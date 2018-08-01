@@ -7,7 +7,7 @@ var StarterConfig = {
 	CrashDelay: ((Math.random() * 60) + 60), // Seconds to wait after a d2 window crash
 	RealmDownDelay: ((Math.random() * 2) + 3), // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: ((Math.random() * 2) + 5), // Minutes to wait after Unable To Connect message
-	CDKeyInUseDelay: ((Math.random() * 2) + 5), // Minutes to wait before connecting again if CD-Key is in use.
+	CDKeyInUseDelay: ((Math.random() * 2) + 5), // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
 	ConnectingTimeout: ((Math.random() * 10) + 20), // Seconds to wait before cancelling the 'Connecting...' screen
 	PleaseWaitTimeout: ((Math.random() * 10) + 10), // Seconds to wait before cancelling the 'Please Wait...' screen
 	WaitInLineTimeout: ((Math.random() * 30) + 60), // Seconds to wait before cancelling the 'Waiting in Line...' screen
