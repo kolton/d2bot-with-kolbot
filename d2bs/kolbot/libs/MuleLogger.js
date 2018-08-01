@@ -2,6 +2,7 @@
 *	@filename	MuleLogger.js
 *	@author		kolton
 *	@desc		Log items on configurable accounts/characters
+*				+ option to perm the mules (use the 2nd line for IngameTime line ~ 32) with random moves in act 1
 */
 
 var MuleLogger = {
@@ -18,16 +19,17 @@ var MuleLogger = {
 			Individual entries are separated with a comma.
 		*/
 
-		"account/password/realm": ["all"]
+		"accountname/password/realm": ["all"]
 	},
 
 	LogGame: ["", ""], // ["gamename", "password"]
-	LogNames: true, // Put account/character name on the picture
+	LogNames: false, // Put account/character name on the picture
 	LogItemLevel: true, // Add item level to the picture
-	LogEquipped: false, // include equipped items
-	LogMerc: false, // include items merc has equipped (if alive)
+	LogEquipped: true, // include equipped items
+	LogMerc: true, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
-	IngameTime: 20, // Time to wait after leaving game
+	IngameTime: ((Math.random() * 30) + 180), // Time to wait in game to do not get RD
+	//IngameTime: ((Math.random() * 90) + 7230), // Time to wait in game for mule perming
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
@@ -68,16 +70,32 @@ var MuleLogger = {
 
 	inGameCheck: function () {
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("ÿc4MuleLoggerÿc0: Logging items on " + me.name + ".");
-			D2Bot.printToConsole("MuleLogger: Logging items on " + me.name + ".", 7);
+			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
+			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
 
-			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
+			var	tick = 180; // perming mule movement trigger
+
+			while ((getTickCount() - me.gamestarttime)/1000 < this.IngameTime) {
+				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
 				delay(1000);
+
+				if (this.IngameTime >= 7200) { // antiidle random moves for perming chars
+					var randloc,
+					loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"];
+
+					randloc = loc[Math.floor(Math.random() * loc.length)];
+
+					if ((getTickCount() - me.gamestarttime)/1000 >= tick ) {
+						print("ÿc4AntiIdle - ÿc2ON , ÿc0move to " + randloc);
+						delay((Math.random() * 2e4) + 1e4);
+						tick = tick + 180;
+						Town.move(randloc);
+					}
+				}
 			}
 
 			quit();
-			//delay(10000);
 
 			return true;
 		}
@@ -313,6 +331,10 @@ var MuleLogger = {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
+				if (this.skipItem(items[i].classid)) {
+					continue;
+				}
+
 				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image
@@ -370,5 +392,40 @@ var MuleLogger = {
 
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + ".txt", finalString);
 		print("Item logging done.");
+	},
+
+	skipItem: function (id) {
+
+		switch(id) {
+			case 515: // rejuvenationpotion
+			case 516: // fullrejuvenationpotion
+			case 518: // tomeoftownportal
+			case 519: // tomeofidentify
+			case 543: // key
+		  //case 549: // horadric cube
+			case 587: // minorhealingpotion
+			case 588: // lighthealingpotion
+			case 589: // healingpotion
+			case 590: // greathealingpotion
+			case 591: // superhealingpotion
+			case 592: // minormanapotion
+			case 593: // lightmanapotion
+			case 594: // manapotion
+			case 595: // greatermanapotion
+			case 596: // supermanapotion
+			case 513: // stamina potion
+			case 514: // antidote potion
+			case 517: // thawing potion
+			case   0: // hand axe
+			case  10: // wand
+			case  14: // club
+			case  25: // shortsword
+			case  47: // javelin
+			case  63: // shortstaff
+			case 175: // katar
+			case 328: // buckler
+				return true;
+		}
+		return false;
 	}
 };
