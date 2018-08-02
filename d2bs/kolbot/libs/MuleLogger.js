@@ -89,7 +89,7 @@ var MuleLogger = {
 				delay(1000);
 
 				if ((getTickCount() - me.gamestarttime)/1000 >= tick ) { // antiidle random moves
-					print("ÿc4AntiIdle - ÿc2ON , ÿc0move to " + randloc);
+					print("ÿc4AntiIdle - ÿc2ON ÿc0, moving to " + randloc);
 					tick = tick + ((Math.random() * 30) + 90);
 					Town.move(randloc);
 				}
@@ -397,12 +397,23 @@ var MuleLogger = {
 	skipItem: function (id) {
 
 		switch(id) {
+			//case 549: // horadric cube
+			case   0: // hand axe
+			case  10: // wand
+			case  14: // club
+			case  25: // shortsword
+			case  47: // javelin
+			case  63: // shortstaff
+			case 175: // katar
+			case 328: // buckler
+			case 513: // stamina potion
+			case 514: // antidote potion
 			case 515: // rejuvenationpotion
 			case 516: // fullrejuvenationpotion
+			case 517: // thawing potion
 			case 518: // tomeoftownportal
 			case 519: // tomeofidentify
 			case 543: // key
-		  //case 549: // horadric cube
 			case 587: // minorhealingpotion
 			case 588: // lighthealingpotion
 			case 589: // healingpotion
@@ -413,17 +424,6 @@ var MuleLogger = {
 			case 594: // manapotion
 			case 595: // greatermanapotion
 			case 596: // supermanapotion
-			case 513: // stamina potion
-			case 514: // antidote potion
-			case 517: // thawing potion
-			case   0: // hand axe
-			case  10: // wand
-			case  14: // club
-			case  25: // shortsword
-			case  47: // javelin
-			case  63: // shortstaff
-			case 175: // katar
-			case 328: // buckler
 				return true;
 		}
 		return false;
