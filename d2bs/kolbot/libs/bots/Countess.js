@@ -1,40 +1,20 @@
 /**
 *	@filename	Countess.js
-*	@author		kolton
-*	@desc		kill The Countess and optionally kill Ghosts along the way
+*	@author		kolton//Unseen Changed to clear on the way to countess for walking or teleporting and fixed common crash when trying to find countess
+*	@desc		walk/teleport to kill The Countess and monsters along the way
 */
 
 function Countess() {
-	var i, poi;
-
-	Town.doChores();
-	Pather.useWaypoint(6);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true)) {
-		throw new Error("Failed to move to Countess");
-	}
-
-	poi = getPresetUnit(me.area, 2, 580);
-
-	if (!poi) {
-		throw new Error("Failed to move to Countess (preset not found)");
-	}
-
-	switch (poi.roomx * 5 + poi.x) {
-	case 12565:
-		Pather.moveTo(12578, 11043);
-		break;
-	case 12526:
-		Pather.moveTo(12548, 11083);
-		break;
-	}
-
-	Attack.clear(20, 0, getLocaleString(2875)); // The Countess
-
-	if (Config.OpenChests) {
-		Misc.openChestsInArea();
-	}
+				Town.doChores();
+				Pather.useWaypoint(6, true);
+				Pather.moveToExit([20, 21], true, Config.ClearType);
+				Pather.moveToExit([21, 22], true, Config.ClearType);
+				Pather.moveToExit([22, 23], true, Config.ClearType);
+				Pather.moveToExit([23, 24], true, Config.ClearType);
+				Pather.moveToExit([24, 25], true, Config.ClearType);
+				Precast.doPrecast(true);
+				Attack.clearLevel();
+				Town.goToTown();
 
 	return true;
 }
