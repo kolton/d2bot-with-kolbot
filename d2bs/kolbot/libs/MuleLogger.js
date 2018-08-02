@@ -69,29 +69,27 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
+		var	tick, loc, randloc,
+			tick = ((Math.random() * 30) + 90); // antiidle movement trigger
+			loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"];
+			randloc = loc[Math.floor(Math.random() * loc.length)];
+
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
-
-			var	tick = 180; // perming mule movement trigger
+			print("ÿc2IngameTime ÿc0is set to: ÿc2" + parseInt(this.IngameTime) + "ÿc0 sec");
 
 			while ((getTickCount() - me.gamestarttime)/1000 < this.IngameTime) {
 				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
-				delay(1000);
 
-				if (this.IngameTime >= 7200) { // antiidle random moves for perming chars
-					var randloc,
-					loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"];
+				delay((Math.random() * 5000) + 5000);
+				Town.move(randloc);
 
-					randloc = loc[Math.floor(Math.random() * loc.length)];
-
-					if ((getTickCount() - me.gamestarttime)/1000 >= tick ) {
-						print("ÿc4AntiIdle - ÿc2ON , ÿc0move to " + randloc);
-						delay((Math.random() * 2e4) + 1e4);
-						tick = tick + 180;
-						Town.move(randloc);
-					}
+				if ((getTickCount() - me.gamestarttime)/1000 >= tick ) { // antiidle random moves
+					print("ÿc4AntiIdle - ÿc2ON , ÿc0move to " + randloc);
+					tick = tick + ((Math.random() * 30) + 90);
+					Town.move(randloc);
 				}
 			}
 
