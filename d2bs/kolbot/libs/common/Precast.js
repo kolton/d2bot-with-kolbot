@@ -148,7 +148,7 @@ var Precast = new function () {
 			} while (item.getNext());
 		}
 
-		print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap + ", skill " + skillId);
+		//print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap + ", skill " + skillId);
 
 		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
 	};
@@ -213,7 +213,7 @@ var Precast = new function () {
 
 			break;
 		case 2: // Necromancer
-			if (me.getSkill(68, 0) && !me.getState(14) || force) {
+			if (me.getSkill(68, 0) && (!me.getState(14) || force)) {
 				this.precastSkill(68); // Bone Armor
 			}
 
