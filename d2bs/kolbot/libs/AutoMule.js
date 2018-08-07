@@ -173,6 +173,12 @@ MainLoop:
 
 			switch (muleInfo.status) {
 			case "loading":
+				if (!stopCheck && muleObj.stopProfile && me.profile.toLowerCase() !== muleObj.stopProfile.toLowerCase()) {
+					D2Bot.stop(muleObj.stopProfile, true);
+
+					stopCheck = true;
+				}
+
 				failCount += 1;
 
 				break;
