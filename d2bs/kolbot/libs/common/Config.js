@@ -268,7 +268,6 @@ var Config = {
 	AvoidDolls: false,
 
 	// Barbarian specific
-	BOSwitch: 0,
 	FindItem: false,
 	FindItemSwitch: 1,
 

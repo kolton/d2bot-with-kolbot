@@ -79,11 +79,6 @@ var Precast = new function () {
 			sumSwap = 0;
 
 		switch (skillId) {
-		case 117: // Holy Shield
-			classid = 3;
-			skillTab = 24;
-
-			break;
 		case 40: // Frozen Armor
 		case 50: // Shiver Armor
 		case 60: // Chilling Armor		
@@ -105,6 +100,18 @@ var Precast = new function () {
 		case 68: // Bone Armor
 			classid = 2;
 			skillTab = 17;
+
+			break;
+		case 117: // Holy Shield
+			classid = 3;
+			skillTab = 24;
+
+			break;
+		case 138: // Shout
+		case 149: // Battle Orders
+		case 155: // Battle Command
+			classid = 4;
+			skillTab = 34;
 
 			break;
 		case 235: // Cyclone Armor
@@ -230,37 +237,29 @@ var Precast = new function () {
 
 			break;
 		case 3: // Paladin
-			if (me.getSkill(117, 0) && !me.getState(101) || force) {
+			if (me.getSkill(117, 0) && (!me.getState(101) || force)) {
 				this.precastSkill(117); // Holy Shield
 			}
 
 			break;
 		case 4: // Barbarian - TODO: BO duration
 			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
-				if (Config.BOSwitch) {
-					Precast.weaponSwitch(Config.BOSwitch);
-				}
-
 				if (!me.getState(51) || force) {
-					Skill.cast(155, 0); // Battle Command
+					this.precastSkill(155); // Battle Command
 				}
 
 				if (!me.getState(32) || force) {
-					Skill.cast(149, 0); // Battle Orders
+					this.precastSkill(149); // Battle Orders
 				}
 
 				if (!me.getState(26) || force) {
-					Skill.cast(138, 0); // Shout
-				}
-
-				if (Config.BOSwitch) {
-					Precast.weaponSwitch(Math.abs(Config.BOSwitch - 1));
+					this.precastSkill(138); // Shout
 				}
 			}
 
 			break;
 		case 5: // Druid
-			if (me.getSkill(235, 0) && !me.getState(151) || force) {
+			if (me.getSkill(235, 0) && (!me.getState(151) || force)) {
 				this.precastSkill(235); // Cyclone Armor
 			}
 
@@ -322,8 +321,12 @@ var Precast = new function () {
 				break;
 			}
 
-			if (me.getSkill(250, 0) && !me.getState(144) || force) {
+			if (me.getSkill(250, 0) && (!me.getState(144) || force)) {
 				Skill.cast(250, 0); // Hurricane
+			}
+
+			if (me.getSkill(226, 1) && (!me.getState(149) || force)) {
+				Skill.cast(226, 0); // Oak Sage
 			}
 
 			if (buffSummons) {
@@ -340,7 +343,7 @@ var Precast = new function () {
 				Skill.cast(278, 0); // Venom
 			}
 
-			if (me.getSkill(277, 0) && !me.getState(158) || force) {
+			if (me.getSkill(277, 0) && (!me.getState(158) || force)) {
 				this.precastSkill(277); // Blade Shield	
 			}
 
