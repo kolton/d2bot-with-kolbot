@@ -159,6 +159,13 @@ MainLoop:
 		while (true) {
 			// If nothing received our copy data start the mule profile
 			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: this.torchAnniCheck || 0}))) {
+				// If there is a profile to be stopped then stop it first
+				if (!stopCheck && muleObj.stopProfile && me.profile.toLowerCase() !== muleObj.stopProfile.toLowerCase()) {
+					D2Bot.stop(muleObj.stopProfile, true);
+
+					stopCheck = true;
+				}
+
 				D2Bot.start(muleObj.muleProfile);
 			}
 
@@ -167,7 +174,7 @@ MainLoop:
 			switch (muleInfo.status) {
 			case "loading":
 				if (!stopCheck && muleObj.stopProfile && me.profile.toLowerCase() !== muleObj.stopProfile.toLowerCase()) {
-					D2Bot.stop(muleObj.stopProfile);
+					D2Bot.stop(muleObj.stopProfile, true);
 
 					stopCheck = true;
 				}
@@ -236,7 +243,7 @@ MainLoop:
 
 		// No response - stop mule profile
 		if (failCount >= 60) {
-			D2Bot.stop(muleObj.muleProfile);
+			D2Bot.stop(muleObj.muleProfile, true);
 			delay(1000);
 		}
 
@@ -362,7 +369,7 @@ MainLoop:
 		}
 
 		removeEventListener("copydata", DropStatusEvent);
-		D2Bot.stop(muleObj.muleProfile);
+		D2Bot.stop(muleObj.muleProfile, true);
 		delay(1000);
 
 		if (muleObj.stopProfile) {
