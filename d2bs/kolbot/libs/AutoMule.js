@@ -18,6 +18,7 @@ var AutoMule = {
 
 			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
 			stopProfile: "",
+			stopProfileKeyRelease: false, // true = stopProfile key will get released on stop. useful when using 100% of your keys for botting.
 
 			// Trigger muling at the end of a game if used space in stash and inventory is equal to or more than given percent.
 			usedStashTrigger: 80,
@@ -159,6 +160,15 @@ MainLoop:
 		while (true) {
 			// If nothing received our copy data start the mule profile
 			if (!sendCopyData(null, muleObj.muleProfile, 10, JSON.stringify({profile: me.profile, mode: this.torchAnniCheck || 0}))) {
+				// if the mule profile isn't already running and there is a profile to be stopped, stop it before starting the mule profile
+				if (!stopCheck && muleObj.stopProfile && me.profile.toLowerCase() !== muleObj.stopProfile.toLowerCase()) {
+					D2Bot.stop(muleObj.stopProfile, muleObj.stopProfileKeyRelease);
+
+					stopCheck = true;
+
+					delay(2000); // prevents cd-key in use error if using -skiptobnet on mule profile
+				}
+
 				D2Bot.start(muleObj.muleProfile);
 			}
 
@@ -167,7 +177,7 @@ MainLoop:
 			switch (muleInfo.status) {
 			case "loading":
 				if (!stopCheck && muleObj.stopProfile && me.profile.toLowerCase() !== muleObj.stopProfile.toLowerCase()) {
-					D2Bot.stop(muleObj.stopProfile);
+					D2Bot.stop(muleObj.stopProfile, muleObj.stopProfileKeyRelease);
 
 					stopCheck = true;
 				}
@@ -236,7 +246,7 @@ MainLoop:
 
 		// No response - stop mule profile
 		if (failCount >= 60) {
-			D2Bot.stop(muleObj.muleProfile);
+			D2Bot.stop(muleObj.muleProfile, true);
 			delay(1000);
 		}
 
@@ -362,7 +372,7 @@ MainLoop:
 		}
 
 		removeEventListener("copydata", DropStatusEvent);
-		D2Bot.stop(muleObj.muleProfile);
+		D2Bot.stop(muleObj.muleProfile, true);
 		delay(1000);
 
 		if (muleObj.stopProfile) {
