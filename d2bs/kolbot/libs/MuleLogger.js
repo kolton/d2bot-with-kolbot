@@ -69,28 +69,27 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		var	tick, loc, randloc,
-			tick = ((Math.random() * 30) + 90); // antiidle movement trigger
-			loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"];
+		var	tick = ((Math.random() * 30) + 90), // antiidle movement trigger
+			loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"],
 			randloc = loc[Math.floor(Math.random() * loc.length)];
 
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
+			print("\xFFc4MuleLogger\xFFc0: Logging items on " + me.account + " - " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
-			print("ÿc2IngameTime ÿc0is set to: ÿc2" + parseInt(this.IngameTime) + "ÿc0 sec");
+			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + parseInt(this.IngameTime) + "\xFFc0 sec");
 
-			delay((Math.random() * 5000) + 5000);
+			delay(rand(3000, 10000));
 			Town.move(randloc);
 
 			while ((getTickCount() - me.gamestarttime)/1000 < this.IngameTime) {
-				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
+				me.overhead("\xFFc2Log items done. \xFFc4Stay in " + "\xFFc4game more:\xFFc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
 
 				delay(1000);
 
 				if ((getTickCount() - me.gamestarttime)/1000 >= tick ) { // antiidle random moves
-					print("ÿc4AntiIdle - ÿc2ON ÿc0, moving to " + randloc);
-					tick = tick + ((Math.random() * 30) + 90);
+					print("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to " + randloc);
+					tick = tick + rand(90, 180);
 					Town.move(randloc);
 				}
 			}
@@ -116,7 +115,7 @@ var MuleLogger = {
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]|\/|\\/, "").trim();
+			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|\xFF)c[0-9!"+<;.*]|\/|\\/, "").trim();
 
 		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid;
 		color = unit.getColor();
