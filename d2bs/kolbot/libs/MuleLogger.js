@@ -80,15 +80,15 @@ var MuleLogger = {
 			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + parseInt(this.IngameTime) + "\xFFc0 sec");
 
 			delay(rand(3000, 10000));
-			Town.move(randloc);
+			Town.move(loc[Math.floor(Math.random() * loc.length)]);
 
 			while ((getTickCount() - me.gamestarttime)/1000 < this.IngameTime) {
 				me.overhead("\xFFc2Log items done. \xFFc4Stay in " + "\xFFc4game more:\xFFc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
 
 				delay(1000);
-				randloc = loc[Math.floor(Math.random() * loc.length)];
 
 				if ((getTickCount() - me.gamestarttime)/1000 >= tick ) { // antiidle random moves
+					randloc = loc[Math.floor(Math.random() * loc.length)];
 					print("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to " + randloc);
 					tick = tick + rand(90, 180);
 					Town.move(randloc);
