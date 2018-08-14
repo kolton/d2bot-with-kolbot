@@ -69,9 +69,9 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		var	tick = ((Math.random() * 30) + 90), // antiidle movement trigger
-			loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"],
-			randloc = loc[Math.floor(Math.random() * loc.length)];
+		var	randloc,
+			tick = ((Math.random() * 30) + 90), // antiidle movement trigger
+			loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"];
 
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("\xFFc4MuleLogger\xFFc0: Logging items on " + me.account + " - " + me.name + ".");
@@ -86,6 +86,7 @@ var MuleLogger = {
 				me.overhead("\xFFc2Log items done. \xFFc4Stay in " + "\xFFc4game more:\xFFc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
 
 				delay(1000);
+				randloc = loc[Math.floor(Math.random() * loc.length)];
 
 				if ((getTickCount() - me.gamestarttime)/1000 >= tick ) { // antiidle random moves
 					print("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to " + randloc);
