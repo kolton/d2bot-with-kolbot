@@ -312,7 +312,7 @@ function main() {
 					DataFile.updateStats("ingameTick");
 				}
 
-				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart) + " IP: " + (me.gameserverip.length > 0 ? me.gameserverip.split(".")[3] : "0"));
 			}
 
 			delay(1000);
