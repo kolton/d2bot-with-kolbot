@@ -107,9 +107,11 @@ function timer(tick) {
 		return "";
 	}
 
-	var min, sec;
+	var hour, min, sec;
 
-	min = Math.floor((getTickCount() - tick) / 60000).toString();
+	hour = Math.floor((getTickCount() - tick) / 3600000).toString();
+
+	min = (Math.floor((getTickCount() - tick) / 60000) % 60).toString();
 
 	if (min <= 9) {
 		min = "0" + min;
@@ -121,7 +123,7 @@ function timer(tick) {
 		sec = "0" + sec;
 	}
 
-	return " (" + min + ":" + sec + ")";
+	return " (" + hour + ":" + min + ":" + sec + ")";
 }
 
 function main() {
