@@ -269,7 +269,7 @@ var D2Bot = {
 			args: []
 		};
 
-		//print("ÿc1Heart beat " + this.handle);
+		//print("?c1Heart beat " + this.handle);
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
@@ -315,7 +315,7 @@ var D2Bot = {
 			args: []
 		};
 
-        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+        sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
 	setProfile: function (account, password, character, difficulty, realm, infoTag, gamePath) {
@@ -325,7 +325,17 @@ var D2Bot = {
 			args: [account, password, character, difficulty, realm, infoTag, gamePath]
 		};
 
-        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+        sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	setTag: function (tag) {
+		var obj = {
+			profile: me.profile,
+			func: "setTag",
+			args: [JSON.stringify(tag)]
+		};
+
+        sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
 	// Store info in d2bot# cache
