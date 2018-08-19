@@ -301,17 +301,16 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
 
             for (var q in account) {
                 var res = account[q].split("\\");
+
+                if (!res || res.length < 3) {
+                    continue;
+                }
+
                 if (!listOfAccounts[res[1]]) {
                     listOfAccounts[res[1]] = [];
                 }
-				
-				var charkey;
-				
-				if (!res[2]) {
-					charkey = "sel";
-				} else {
-					charkey = res[2].split(".")[1];
-				}
+
+                var charkey = res[2].split(".")[1];
 
                 var checks = {
                     ladder: CurrentGameClass == "Ladder" ? true : false,
@@ -328,6 +327,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 if ((charCheck.ladder == checks.ladder) && (charCheck.lod == checks.lod) && (charCheck.sc == checks.sc)) 
                     listOfAccounts[res[1]].push(res[2]);
             }
+
             $("#characterSelect").html("");
             $("#accountSelect").html("");
             var csoption = $("<option/>");
