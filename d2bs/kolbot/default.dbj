@@ -9,6 +9,7 @@ include("Gambling.js");
 include("CraftingSystem.js");
 include("TorchSystem.js");
 include("MuleLogger.js");
+include("GameAction.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/CollMap.js");
@@ -89,6 +90,10 @@ function main() {
 				D2Bot.printToConsole("Profile not enabled for muling.");
 			}
 		}
+
+		if (mode === 1638) { // getProfile
+			GameAction.init(JSON.parse(msg).Tag);
+		}
 	};
 
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
@@ -99,6 +104,16 @@ function main() {
 	CraftingSystem.buildLists();
 	Runewords.init();
 	Cubing.init();
+
+	// Load events
+	addEventListener("scriptmsg", this.scriptEvent);
+	addEventListener("copydata", this.copyDataEvent);
+
+	// GameAction handler
+
+	if (GameAction.inGameCheck()) {
+		return true;
+	}
 
 	// AutoMule handler
 	if (AutoMule.inGameCheck()) {
@@ -133,9 +148,7 @@ function main() {
 
 	DataFile.updateStats(["experience", "name"]);
 
-	// Load events and threads
-	addEventListener("scriptmsg", this.scriptEvent);
-	addEventListener("copydata", this.copyDataEvent);
+	// Load threads
 	load("tools/ToolsThread.js");
 
 	if (Config.TownCheck || Config.TownHP || Config.TownMP) {
@@ -151,7 +164,7 @@ function main() {
 	}
 
 	if (Config.FastPick) {
-		print("ÿc2Fast pickit active.");
+		print("?c2Fast pickit active.");
 		addEventListener("itemaction", this.itemEvent);
 	}
 
