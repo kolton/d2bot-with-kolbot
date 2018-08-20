@@ -74,50 +74,79 @@ var Precast = new function () {
 	};
 
 	this.getBetterSlot = function (skillId) {
-		var item,
+		var item, classid, skillTab,
 			sumCurr = 0,
 			sumSwap = 0;
 
 		switch (skillId) {
-		case 117: // Holy Shield
-			sumCurr = 0;
-			sumSwap = 0;
-			item = me.getItem();
-
-			if (item) {
-				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 3) + item.getStat(188, 24) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-				} while (item.getNext());
-			}
+		case 40: // Frozen Armor
+		case 50: // Shiver Armor
+		case 60: // Chilling Armor		
+			classid = 1;
+			skillTab = 10;
 
 			break;
 		case 52: // Enchant
-			sumCurr = 0;
-			sumSwap = 0;
-			item = me.getItem();
-
-			if (item) {
-				do {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						sumCurr += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						sumSwap += (item.getStat(127) + item.getStat(83, 1) + item.getStat(188, 8) + item.getStat(107, skillId) + item.getStat(97, skillId));
-					}
-				} while (item.getNext());
-			}
+			classid = 1;
+			skillTab = 8;
 
 			break;
-		}
+		case 57: // Thunder Storm
+		case 58: // Energy Shield
+			classid = 1;
+			skillTab = 9;
 
-		print("\xFFc4Precast\xFFc0: Current " + sumCurr + ", Swap " + sumSwap);
+			break;
+		case 68: // Bone Armor
+			classid = 2;
+			skillTab = 17;
+
+			break;
+		case 117: // Holy Shield
+			classid = 3;
+			skillTab = 24;
+
+			break;
+		case 138: // Shout
+		case 149: // Battle Orders
+		case 155: // Battle Command
+			classid = 4;
+			skillTab = 34;
+
+			break;
+		case 235: // Cyclone Armor
+			classid = 5;
+			skillTab = 42;
+
+			break;
+		case 258: // Burst of Speed
+		case 267: // Fade
+			classid = 6;
+			skillTab = 49;
+
+			break;
+		case 277: // Blade Shield
+			classid = 6;
+			skillTab = 48;
+
+			break;
+		default:
+			return me.weaponswitch;
+		}
+    
+		item = me.getItem();
+
+		if (item) {
+			do {
+				if (item.bodylocation === 4 || item.bodylocation === 5) {
+					sumCurr += (item.getStat(127) + item.getStat(83, classid) + item.getStat(188, skillTab) + item.getStat(107, skillId) + item.getStat(97, skillId));
+				}
+
+				if (item.bodylocation === 11 || item.bodylocation === 12) {
+					sumSwap += (item.getStat(127) + item.getStat(83, classid) + item.getStat(188, skillTab) + item.getStat(107, skillId) + item.getStat(97, skillId));
+				}
+			} while (item.getNext());
+		}
 
 		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
 	};
@@ -154,19 +183,25 @@ var Precast = new function () {
 
 			break;
 		case 1: // Sorceress
-			if (!me.getState(38) || force) { // ts
-				Skill.cast(57, 0); // Thunder Storm
+			if (me.getSkill(57, 0) && (!me.getState(38) || force)) {
+				this.precastSkill(57); // Thunder Storm
 			}
 
-			if (!me.getState(30) || force) {
-				Skill.cast(58, 0); // Energy Shield
+			if (me.getSkill(58, 0) && (!me.getState(30) || force)) {
+				this.precastSkill(58); // Energy Shield
 			}
 
-			if ((!me.getState(88) && !me.getState(10) && !me.getState(20)) || force) {
-				if (!Skill.cast(50, 0)) { // Shiver Armor
-					if (!Skill.cast(60, 0)) { // Chilling Armor
-						Skill.cast(40, 0); // Frozen Armor
-					}
+			if (me.getSkill(50, 0)) {
+				if (!me.getState(88) || force) {
+					this.precastSkill(50); // Shiver Armor
+				}
+			} else if (me.getSkill(60, 0)) {
+				if (!me.getState(20) || force) {
+					this.precastSkill(60); // Chilling Armor
+				}
+			} else if (me.getSkill(40, 0)) {
+				if (!me.getState(10) || force) {
+					this.precastSkill(40); // Frozen Armor
 				}
 			}
 
@@ -176,8 +211,8 @@ var Precast = new function () {
 
 			break;
 		case 2: // Necromancer
-			if (!me.getState(14) || force) {
-				Skill.cast(68, 0);
+			if (me.getSkill(68, 0) && (!me.getState(14) || force)) {
+				this.precastSkill(68); // Bone Armor
 			}
 
 			switch (Config.Golem) {
@@ -200,38 +235,30 @@ var Precast = new function () {
 
 			break;
 		case 3: // Paladin
-			if (!me.getState(101) || force) {
+			if (me.getSkill(117, 0) && (!me.getState(101) || force)) {
 				this.precastSkill(117); // Holy Shield
 			}
 
 			break;
 		case 4: // Barbarian - TODO: BO duration
 			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
-				if (Config.BOSwitch) {
-					Precast.weaponSwitch(Config.BOSwitch);
-				}
-
 				if (!me.getState(51) || force) {
-					Skill.cast(155, 0); // Battle Command
+					this.precastSkill(155); // Battle Command
 				}
 
 				if (!me.getState(32) || force) {
-					Skill.cast(149, 0); // Battle Orders
+					this.precastSkill(149); // Battle Orders
 				}
 
 				if (!me.getState(26) || force) {
-					Skill.cast(138, 0); // Shout
-				}
-
-				if (Config.BOSwitch) {
-					Precast.weaponSwitch(Math.abs(Config.BOSwitch - 1));
+					this.precastSkill(138); // Shout
 				}
 			}
 
 			break;
 		case 5: // Druid
-			if (!me.getState(151) || force) {
-				Skill.cast(235, 0); // Cyclone Armor
+			if (me.getSkill(235, 0) && (!me.getState(151) || force)) {
+				this.precastSkill(235); // Cyclone Armor
 			}
 
 			if (Config.SummonRaven) {
@@ -292,8 +319,12 @@ var Precast = new function () {
 				break;
 			}
 
-			if (!me.getState(144) || force) {
+			if (me.getSkill(250, 0) && (!me.getState(144) || force)) {
 				Skill.cast(250, 0); // Hurricane
+			}
+
+			if (me.getSkill(226, 1) && (!me.getState(149) || force)) {
+				Skill.cast(226, 0); // Oak Sage
 			}
 
 			if (buffSummons) {
@@ -302,20 +333,20 @@ var Precast = new function () {
 
 			break;
 		case 6: // Assassin
-			if (Config.UseFade && (!me.getState(159) || force)) {
-				Skill.cast(267, 0); // Fade
+			if (me.getSkill(267, 0) && Config.UseFade && (!me.getState(159) || force)) {
+				this.precastSkill(267); // Fade
 			}
 
-			if (Config.UseVenom && (!me.getState(31) || force)) {
+			if (me.getSkill(278, 0) && Config.UseVenom && (!me.getState(31) || force)) {
 				Skill.cast(278, 0); // Venom
 			}
 
-			if (!me.getState(158) || force) {
-				Skill.cast(277, 0); // Blade Shield	
+			if (me.getSkill(277, 0) && (!me.getState(158) || force)) {
+				this.precastSkill(277); // Blade Shield	
 			}
 
-			if (!Config.UseFade && Config.UseBoS && (!me.getState(157) || force)) {
-				Skill.cast(258, 0); // Burst of Speed
+			if (me.getSkill(258, 0) && !Config.UseFade && Config.UseBoS && (!me.getState(157) || force)) {
+				this.precastSkill(258); // Burst of Speed
 			}
 
 			switch (Config.SummonShadow) {
