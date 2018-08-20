@@ -102,9 +102,13 @@ define(["events"],function (events) {
         D2BotAPI.on("login",function(username,password,callback){
             d2botConfig.username = username;
 
-            D2BotAPI.emit("challenge",function (err, challenge) {
-                d2botConfig.session = encrypt(challenge.body, password);
-                callback(err, d2botConfig.session);
+            D2BotAPI.emit("challenge",function (err, msg) {
+                if (msg.status != "success") {
+                    callback(msg.status, msg.body);
+                } else {
+                    d2botConfig.session = encrypt(msg.body, password);
+                    callback(err, d2botConfig.session);
+                }
             });
         })
 

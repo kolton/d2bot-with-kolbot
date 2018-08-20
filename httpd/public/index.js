@@ -84,6 +84,11 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     function login(username, password, callback)
     {
         API.emit('login', username, password, function (err, result) {
+            if (err) {
+                console.log(err);
+                return callback(false);
+            }
+
             cookie.data.username = username;
             cookie.data.session = result;
             cookie.data.loggedin = (username !== "public") ? true : false;
