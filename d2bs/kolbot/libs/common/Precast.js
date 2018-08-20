@@ -148,8 +148,6 @@ var Precast = new function () {
 			} while (item.getNext());
 		}
 
-		//print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap + ", skill " + skillId);
-
 		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
 	};
 
