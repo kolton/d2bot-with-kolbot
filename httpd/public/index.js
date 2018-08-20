@@ -124,7 +124,6 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     }
 
     function refreshList() {
-        window.loadMoreItem = false;
         $("#itemsList").html("");
         addItemstoList();
     }
@@ -233,7 +232,6 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
 
     function addItemstoList() {
         function doQuery($account, $character, loadMoreItem) {
-            window.loadMoreItem = false;
             API.emit("query", buildregex($("#searchItem").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
                 if (err) console.log(err);
                 var y = $(window).scrollTop();
@@ -241,7 +239,10 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                     $addItem(results[i]);
                 }
                 $(window).scrollTop(y);
-                window.loadMoreItem = loadMoreItem;
+                
+                if (loadMoreItem) { 
+                    loadMoreItem();
+                }
             });
         }
         var charListid, ended;
