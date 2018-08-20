@@ -14,6 +14,7 @@ var Skill = {
 		case 10: // Jab
 		case 14: // Power Strike
 		case 19: // Impale
+		case 24: // Charged Strike
 		case 30: // Fend
 		case 34: // Lightning Strike
 		case 73: // Poison Dagger
@@ -90,7 +91,6 @@ var Skill = {
 			}
 
 			return 15;
-		case 24: // Charged Strike
 		case 47:
 		case 51:
 		case 53:
@@ -582,30 +582,30 @@ var Item = {
 			bodyLoc = 1;
 
 			break;
-		case 24: // 
-		case 25: // 
-		case 26: // 
-		case 27: // 
-		case 28: // 
-		case 29: // 
-		case 30: // 
-		case 31: // 
-		case 32: // 
-		case 33: // 
-		case 34: // 
-		case 35: // 
-		case 36: // 
-		case 42: // 
-		case 43: // 
-		case 44: // 
+		case 24: //
+		case 25: //
+		case 26: //
+		case 27: //
+		case 28: //
+		case 29: //
+		case 30: //
+		case 31: //
+		case 32: //
+		case 33: //
+		case 34: //
+		case 35: //
+		case 36: //
+		case 42: //
+		case 43: //
+		case 44: //
 		case 67: // Handtohand (Assasin Claw)
-		case 68: // 
-		case 69: // 
-		case 72: // 
-		case 85: // 
-		case 86: // 
-		case 87: // 
-		case 88: // 
+		case 68: //
+		case 69: //
+		case 72: //
+		case 85: //
+		case 86: //
+		case 87: //
+		case 88: //
 			bodyLoc = 4;
 
 			break;
@@ -1162,14 +1162,14 @@ var Misc = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|ÿ)c/)) {
+				if (desc[i].match(/^(y|\xFF)c/)) {
 					stringColor = desc[i].substring(0, 3);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2");
+			desc[i] = desc[i].replace(/(y|\xFF)c([0-9!"+<;.*])/g, "\\xffc$2");
 		}
 
 		if (desc[desc.length - 1]) {
@@ -1268,7 +1268,7 @@ var Misc = {
 				return false;
 			}
 
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|\xFF)c[0-9!"+<;.*]/gi, "").trim();
 
 			break;
 		case "Kept":
@@ -1278,7 +1278,7 @@ var Misc = {
 		case "Shopped":
 		case "Gambled":
 		case "Dropped":
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|\xFF)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
 
 			break;
 		case "No room for":
@@ -1286,7 +1286,7 @@ var Misc = {
 
 			break;
 		default:
-			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|\xFF)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
 
 			break;
 		}
@@ -1302,7 +1302,7 @@ var Misc = {
 
 		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|\/|\\/, "").trim();
+			name = unit.fname.split("\n").reverse().join(" ").replace(/\xFFc[0-9!"+<;.*]|\/|\\/, "").trim();
 
 		desc = this.getItemDesc(unit);
 		color = unit.getColor();
@@ -1757,13 +1757,13 @@ MainLoop:
 
 		if (typeof error === "string") {
 			msg = error;
-			oogmsg = error.replace(/ÿc[0-9!"+<;.*]/gi, "");
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+			oogmsg = error.replace(/\xFFc[0-9!"+<;.*]/gi, "");
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/\xFFc[0-9!"+<;.*]/gi, "") + "\n";
 		} else {
 			source = error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length);
-			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
+			msg = "\xFFc1Error in \xFFc0" + script + " \xFFc1(" + source + " line \xFFc1" + error.lineNumber + "): \xFFc1" + error.message;
 			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/\xFFc[0-9!"+<;.*]/gi, "") + "\n";
 
 			if (error.hasOwnProperty("stack")) {
 				stack = error.stack;

@@ -216,7 +216,7 @@ MainLoop:
 
 CorpseLoop:
 					for (j = 0; j < 3; j += 1) {
-						Skill.cast(142, 3, corpse);
+						Skill.cast(142, 0, corpse);
 
 						tick = getTickCount();
 
