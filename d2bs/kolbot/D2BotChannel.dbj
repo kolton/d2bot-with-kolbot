@@ -463,7 +463,7 @@ MainLoop:
 		D2Bot.updateStatus("Join Game");
 
 		if (joinInfo.gameName !== "") {
-			print("ÿc2Joining ÿc0" + joinInfo.gameName);
+			print("\xFFc2Joining \xFFc0" + joinInfo.gameName);
 			ControlAction.setText(1, 606, 148, 155, 20, joinInfo.gamePass);
 			ControlAction.setText(1, 432, 148, 155, 20, joinInfo.gameName);
 
