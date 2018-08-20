@@ -117,7 +117,7 @@ var Precast = new function () {
 			break;
 		}
 
-		print("ÿc4Precastÿc0: Current " + sumCurr + ", Swap " + sumSwap);
+		print("\xFFc4Precast\xFFc0: Current " + sumCurr + ", Swap " + sumSwap);
 
 		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
 	};
