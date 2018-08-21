@@ -1616,8 +1616,9 @@ MainLoop:
 					this.move("stash");
 				}
 			}
-			getPacket(1, 0x77, 1, 0x10); // moved to stash but it's not open yet? spoof stash UI packet 0x77,0x10 to sync states with server
-			delay(Math.max(100, me.ping*2)); // give time for UI to update (avoids blank UI)
+
+			getPacket(1, 0x77, 1, 0x10); // spoof 0x77 to force client to show stash UI (exits black screen)
+			delay(Math.max(100, me.ping*2)); // give time for UI to update (helps avoid black screen)
 			me.cancel();
 		}
 
