@@ -1042,8 +1042,7 @@ IngredientLoop:
 
 			while (getTickCount() - tick < 1000) {
 				if (getUIFlag(0x1A)) {
-					delay(500);
-
+					delay(Math.max(75,me.ping*2));	// give time to get packet 0x77
 					return true;
 				}
 
