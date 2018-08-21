@@ -770,7 +770,7 @@ MainLoop:
 				case 0:
 					Misc.itemLogger("Dropped", item, "fieldID");
 
-					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality)  > -1) {
+					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality) > -1) {
 						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/\xFFc[0-9!"+<;.*]/, "").trim());
 
 						if (Config.DroppedItemsAnnounce.LogToOOG && Config.DroppedItemsAnnounce.OOGQuality.indexOf(item.quality) > -1) {
@@ -1599,7 +1599,7 @@ MainLoop:
 
 				while (getTickCount() - tick < 1000) {
 					if (getUIFlag(0x19)) {
-                        delay(Math.max(300, 100 + me.ping * 2)); // allow UI to initialize
+						delay(Math.max(300, 100 + me.ping * 2)); // allow UI to initialize
 
 						return true;
 					}
