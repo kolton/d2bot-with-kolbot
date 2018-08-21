@@ -35,9 +35,8 @@ var ClassAttack = {
 		if (Config.AggressiveCloak && Config.UseCloakofShadows && me.getSkill(264, 1) && !me.getState(121) && !me.getState(153)) {
 			if(getDistance(me, unit) < 20) {
 				Skill.cast(264, 0);
-			} else {
-				if(!Attack.getIntoPosition(unit, 20, 0x4))
-					return false;
+			} else if(!Attack.getIntoPosition(unit, 20, 0x4)) {
+				return false;
 			}
 		}
 
