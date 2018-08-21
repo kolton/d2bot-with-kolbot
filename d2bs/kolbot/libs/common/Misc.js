@@ -2307,7 +2307,8 @@ CursorLoop:
 	},
 
 	flash: function (gid) {
-		sendPacket(1, 0x4b, 4, 0, 4, gid);
+		// disabling packet flash
+		// sendPacket(1, 0x4b, 4, 0, 4, gid);
 	},
 
 	changeStat: function (stat, value) {
