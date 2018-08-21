@@ -1036,14 +1036,13 @@ IngredientLoop:
 		}
 
 		for (i = 0; i < 3; i += 1) {
-			cube.interact();
+			Misc.click(0, 0, cube);
+			delay(1000);	// give time to get packet 0x77
 
 			tick = getTickCount();
 
 			while (getTickCount() - tick < 1000) {
 				if (getUIFlag(0x1A)) {
-					delay(500); // wait for UI to initialize
-
 					return true;
 				}
 

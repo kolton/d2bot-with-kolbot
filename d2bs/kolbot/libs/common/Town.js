@@ -770,7 +770,7 @@ MainLoop:
 				case 0:
 					Misc.itemLogger("Dropped", item, "fieldID");
 
-					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality) > -1) {
+					if (Config.DroppedItemsAnnounce.Enable && Config.DroppedItemsAnnounce.Quality.indexOf(item.quality)  > -1) {
 						say("Dropped: [" + Pickit.itemQualityToName(item.quality).charAt(0).toUpperCase() + Pickit.itemQualityToName(item.quality).slice(1) + "] " + item.fname.split("\n").reverse().join(" ").replace(/\xFFc[0-9!"+<;.*]/, "").trim());
 
 						if (Config.DroppedItemsAnnounce.LogToOOG && Config.DroppedItemsAnnounce.OOGQuality.indexOf(item.quality) > -1) {
@@ -1555,7 +1555,7 @@ MainLoop:
 		if (stashGold) {
 			if (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5 && this.openStash()) {
 				gold(me.getStat(14), 3);
-				delay(1000); // allow UI to initialize
+				delay(Math.max(500, me.ping*2)); // give time to update UI just in case
 				me.cancel();
 			}
 		}
@@ -1589,21 +1589,19 @@ MainLoop:
 
 		for (i = 0; i < 5; i += 1) {
 			this.move("stash");
+
 			stash = getUnit(2, 267);
 
 			if (stash) {
 				Misc.click(0, 0, stash);
-				//stash.interact();
+				delay(Math.max(500, me.ping*2));	// give time to get packet 0x77
 
 				tick = getTickCount();
 
 				while (getTickCount() - tick < 1000) {
 					if (getUIFlag(0x19)) {
-						delay(Math.max(300, 100 + me.ping * 2)); // allow UI to initialize
-
 						return true;
 					}
-
 					delay(10);
 				}
 			}
@@ -1617,6 +1615,9 @@ MainLoop:
 					this.move("stash");
 				}
 			}
+
+			delay(Math.max(500, me.ping*2)); // give time for UI to update (helps avoid black screen)
+			me.cancel();
 		}
 
 		return false;
