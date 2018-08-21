@@ -1555,7 +1555,7 @@ MainLoop:
 		if (stashGold) {
 			if (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5 && this.openStash()) {
 				gold(me.getStat(14), 3);
-				delay(Math.max(75,me.ping*2)); // give time to update UI just in case
+				delay(Math.max(75, me.ping*2)); // give time to update UI just in case
 				me.cancel();
 			}
 		}
@@ -1594,7 +1594,7 @@ MainLoop:
 
 			if (stash) {
 				Misc.click(0, 0, stash);
-				delay(Math.max(75,me.ping*2));	// give time to get packet 0x77
+				delay(Math.max(75, me.ping*2));	// give time to get packet 0x77
 				//stash.interact();
 
 				tick = getTickCount();
@@ -1616,8 +1616,8 @@ MainLoop:
 					this.move("stash");
 				}
 			}
-			getPacket(1,0x77,1,0x10); // moved to stash but it's not open yet? spoof stash UI packet 0x77,0x10 to sync states with server
-			delay(Math.max(75,me.ping*2)); // give time for UI to update (avoids blank UI)
+			getPacket(1, 0x77, 1, 0x10); // moved to stash but it's not open yet? spoof stash UI packet 0x77,0x10 to sync states with server
+			delay(Math.max(75, me.ping*2)); // give time for UI to update (avoids blank UI)
 			me.cancel();
 		}
 
