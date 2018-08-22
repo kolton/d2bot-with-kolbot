@@ -300,8 +300,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     }
 
     function pupulateAccountCharSelect(realm, core, type, ladder) {
-
-        API.emit("accounts", "USEast", function (err, account) {
+        API.emit("accounts", realm, function (err, account) {
             if (err) console.log(err);
             listOfAccounts = {};
 
