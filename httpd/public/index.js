@@ -392,7 +392,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         }
         CurrentGameType = window.localStorage.getItem("CurrentGameType");
         if (!CurrentGameType) {
-            window.localStorage.setItem("CurrentGameType", "Lod");
+            window.localStorage.setItem("CurrentGameType", "Expansion");
             CurrentGameType = window.localStorage.getItem("CurrentGameType");
         }
         CurrentGameMode = window.localStorage.getItem("CurrentGameMode");
