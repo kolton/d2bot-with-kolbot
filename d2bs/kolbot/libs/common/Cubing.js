@@ -1042,7 +1042,7 @@ IngredientLoop:
 
 			while (getTickCount() - tick < 10000) {
 				if (getUIFlag(0x1A)) {
-					delay(Math.max(100, 100 + me.ping * 2)); // allow UI to initialize
+					delay(100 + me.ping * 2); // allow UI to initialize
 
 					return true;
 				}
