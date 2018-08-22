@@ -47,14 +47,14 @@ var MuleLogger = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|ÿ)c/)) {
+				if (desc[i].match(/^(y|\xFF)c/)) {
 					stringColor = desc[i].substring(0, 3);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2").replace("\xFF", "\\xff", "g");
+			desc[i] = desc[i].replace(/(y|\xFF)c([0-9!"+<;.*])/g, "\\xffc$2").replace("\xFF", "\\xff", "g");
 		}
 
 		if (logIlvl && desc[desc.length - 1]) {
@@ -72,6 +72,7 @@ var MuleLogger = {
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("\xFFc4MuleLogger\xFFc0: Logging items on " + me.account + " - " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
+
 			this.logChar();
 			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + parseInt(this.IngameTime) + "\xFFc0 sec");
 
