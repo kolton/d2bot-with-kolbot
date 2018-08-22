@@ -242,13 +242,13 @@ function timer(tick) {
 	return " (" + min + ":" + sec + ")";
 }
 
-function randomString(len,useNumbers = false) {
-	var i,
-		rval = "",
-		letters =  (useNumbers ? "abcdefghijklmnopqrstuvwxyz0123456789" : "abcdefghijklmnopqrstuvwxyz");
-	if(!len)
-		len=Math.floor(5+Math.random()*10);
-    for (i = 0; i < len; i += 1) {
+function randomString(len, useNumbers = false) {
+	var i, rval = "",
+		letters = useNumbers ? "abcdefghijklmnopqrstuvwxyz0123456789" : "abcdefghijklmnopqrstuvwxyz";
+
+	len = len ? len : Math.floor(5 + Math.random() * 10);
+
+	for (i = 0; i < len; i += 1) {
 		rval += letters[Math.floor(Math.random() * letters.length)];
 	}
 
@@ -563,7 +563,7 @@ MainSwitch:
 			D2Bot.updateRuns();
 		}
 
-		ControlAction.createGame((gameInfo.gameName === "?" ? randomString(null,true):gameInfo.gameName + gameCount), (gameInfo.gamePass==="?" ? randomString(null,true) : gameInfo.gamePass), gameInfo.difficulty, StarterConfig.CreateGameDelay * 1000);
+		ControlAction.createGame((gameInfo.gameName === "?" ? randomString(null,true) : gameInfo.gameName + gameCount), (gameInfo.gamePass === "?" ? randomString(null,true) : gameInfo.gamePass), gameInfo.difficulty, StarterConfig.CreateGameDelay * 1000);
 
 		lastGameStatus = "pending";
 
