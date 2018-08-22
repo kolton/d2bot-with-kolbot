@@ -1041,3 +1041,35 @@ Unit.prototype.getColor = function () {
 
 	return -1;
 };
+
+me.antiIdle = function (act) {
+	if (act === undefined) {
+		act = me.act;
+	}
+
+	var loc;
+    switch(act) {
+	case 1: loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"]
+		break;
+	case 2: loc = ["stash", "waypoint", "portalspot", "atma", "elzix", "drognan", "greiz", "lysander", "meshif"]
+		break;
+	case 3: loc = ["stash", "waypoint", "portalspot", "asheara", "ormus", "alkor", "hratli", "meshif"]
+		break;
+	case 4: loc = ["stash", "waypoint", "portalspot", "jamella", "tyrael", "cain", "halbu"]
+		break;
+	case 5: 
+		if (me.getQuest(37, 0) ) {
+			loc = ["stash", "waypoint", "portalspot", "malah", "cain", "larzuk", "qual-kehk", "anya"]
+		} else {
+			loc = ["stash", "waypoint", "portalspot", "malah", "cain", "larzuk", "qual-kehk", "nihlathak"]
+		}
+		break;
+	}
+
+	var	randloc = loc[Math.floor(Math.random() * loc.length)];
+
+	me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to " + randloc);
+	Town.move(randloc);
+
+	return;
+};
