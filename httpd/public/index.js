@@ -406,7 +406,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         }
         var clickedClass = "btn-success";
         //set button state
-        $("#gameRealm").find("#gameRealm-" + CurrentRealm).attr("selected", "selected")
+        $("#gameRealm").find(".gameRealm-" + CurrentRealm).attr("selected", "selected")
         $(".gameRealm-" + CurrentRealm).addClass(clickedClass);
         $(".gameType-" + CurrentGameType).addClass(clickedClass);
         $(".gameMode-" + CurrentGameMode).addClass(clickedClass);
