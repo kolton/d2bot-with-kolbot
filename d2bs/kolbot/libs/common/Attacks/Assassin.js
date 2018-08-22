@@ -32,10 +32,10 @@ var ClassAttack = {
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
 		// Cloak of Shadows (Aggressive) - can't be cast again until previous one runs out and next to useless if cast in precast sequence (won't blind anyone)
-		if (Config.AggressiveCloak && Config.UseCloakofShadows && me.getSkill(264, 1) && !me.getState(121) && !me.getState(153)) {
-			if(getDistance(me, unit) < 20) {
+		if( Config.AggressiveCloak && Config.UseCloakofShadows && me.getSkill(264, 1) && !me.getState(121) && !me.getState(153) ) {
+			if( getDistance(me, unit) < 20 ) {
 				Skill.cast(264, 0);
-			} else if(!Attack.getIntoPosition(unit, 20, 0x4)) {
+			} else if( !Attack.getIntoPosition(unit, 20, 0x4) ) {
 				return false;
 			}
 		}
@@ -53,7 +53,7 @@ var ClassAttack = {
 		}
 
 		// Cloak of Shadows (Defensive; default) - can't be cast again until previous one runs out and next to useless if cast in precast sequence (won't blind anyone)
-		if (!Config.AggressiveCloak && Config.UseCloakofShadows && me.getSkill(264, 1) && getDistance(me, unit) < 20 && !me.getState(121) && !me.getState(153)) {
+		if ( !Config.AggressiveCloak && Config.UseCloakofShadows && me.getSkill(264, 1) && getDistance(me, unit) < 20 && !me.getState(121) && !me.getState(153) ) {
 			Skill.cast(264, 0);
 		}
 
