@@ -1047,7 +1047,7 @@ me.antiIdle = function (act) {
 		act = me.act;
 	}
 
-	var loc;
+	var loc, randloc;
     switch(act) {
 	case 1: loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"]
 		break;
@@ -1057,7 +1057,7 @@ me.antiIdle = function (act) {
 		break;
 	case 4: loc = ["stash", "waypoint", "portalspot", "jamella", "tyrael", "cain", "halbu"]
 		break;
-	case 5: 
+	case 5:
 		if (me.getQuest(37, 0) ) {
 			loc = ["stash", "waypoint", "portalspot", "malah", "cain", "larzuk", "qual-kehk", "anya"]
 		} else {
@@ -1066,7 +1066,7 @@ me.antiIdle = function (act) {
 		break;
 	}
 
-	var	randloc = loc[Math.floor(Math.random() * loc.length)];
+	randloc = loc[Math.floor(Math.random() * loc.length)];
 
 	me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to " + randloc);
 	Town.move(randloc);

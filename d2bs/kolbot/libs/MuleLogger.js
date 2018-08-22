@@ -403,6 +403,8 @@ var MuleLogger = {
 		case 517: // thawing potion
 		case 518: // tomeoftownportal
 		case 519: // tomeofidentify
+		case 529: // scrolloftownportal
+		case 530: // scrollofidentify
 		case 543: // key
 		case 587: // minorhealingpotion
 		case 588: // lighthealingpotion
