@@ -242,7 +242,7 @@ function timer(tick) {
 	return " (" + min + ":" + sec + ")";
 }
 
-function randomString(len,useNumbers=false) {
+function randomString(len,useNumbers = false) {
 	var i,
 		rval = "",
 		letters =  (useNumbers ? "abcdefghijklmnopqrstuvwxyz0123456789" : "abcdefghijklmnopqrstuvwxyz");
