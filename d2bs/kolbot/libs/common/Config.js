@@ -286,6 +286,7 @@ var Config = {
 	UseBoS: false,
 	UseVenom: false,
 	UseCloakofShadows: false,
+	AggressiveCloak: false,
 	SummonShadow: false,
 
 	// Script specific
