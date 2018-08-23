@@ -1042,34 +1042,57 @@ Unit.prototype.getColor = function () {
 	return -1;
 };
 
-me.antiIdle = function (act) {
+me.antiIdle = function (act, timer) {
 	if (act === undefined) {
 		act = me.act;
 	}
 
-	var loc, randloc;
+	if (timer === undefined) {
+		timer = getTickCount() + 2 * 60 * 60 * 1000;
+	}
+
+	var aistart, tick, loc, randloc,
+		aistart = getTickCount(),
+		tick = 0;
+
     switch(act) {
-	case 1: loc = ["stash", "waypoint", "portalspot", "akara", "charsi", "kashya", "cain", "gheed"]
+	case 1:
+		if (me.getQuest(4, 0) ) {
+			loc = ["akara", "cain", "charsi", "gheed", "kashya", "portalspot", "stash", "waypoint", "warriv"];
+		} else {
+			loc = ["akara", "charsi", "gheed", "kashya", "portalspot", "stash", "waypoint", "warriv"];
+		}
 		break;
-	case 2: loc = ["stash", "waypoint", "portalspot", "atma", "elzix", "drognan", "greiz", "lysander", "meshif"]
+	case 2:
+		loc = ["atma", "cain", "fara", "elzix", "drognan", "greiz", "jerhyn", "lysander", "meshif", "portalspot", "stash", "waypoint", "warriv"];
 		break;
-	case 3: loc = ["stash", "waypoint", "portalspot", "asheara", "ormus", "alkor", "hratli", "meshif"]
+	case 3:
+		loc = ["alkor", "asheara", "hratli", "meshif", "ormus", "portalspot", "stash", "waypoint"];
 		break;
-	case 4: loc = ["stash", "waypoint", "portalspot", "jamella", "tyrael", "cain", "halbu"]
+	case 4:
+		loc = ["cain", "halbu", "jamella", "portalspot", "stash", "tyrael", "waypoint"];
 		break;
 	case 5:
 		if (me.getQuest(37, 0) ) {
-			loc = ["stash", "waypoint", "portalspot", "malah", "cain", "larzuk", "qual-kehk", "anya"]
+			loc = ["anya", "cain", "larzuk", "malah", "portalspot", "qual-kehk", "stash", "waypoint"];
 		} else {
-			loc = ["stash", "waypoint", "portalspot", "malah", "cain", "larzuk", "qual-kehk", "nihlathak"]
+			loc = ["cain", "larzuk", "malah", "nihlathak", "portalspot", "qual-kehk", "stash", "waypoint"];
 		}
 		break;
 	}
 
-	randloc = loc[Math.floor(Math.random() * loc.length)];
+	while (getTickCount() < timer) {
+		me.overhead("\xFFc4Stay in game more:\xFFc0           " + parseInt((timer - getTickCount())/1000) + " sec");
 
-	me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to " + randloc);
-	Town.move(randloc);
+		delay(1000);
+
+		if ((getTickCount() - aistart)/1000 >= tick ) {
+			randloc = loc[Math.floor(Math.random() * loc.length)];
+			me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to \xFFc2" + randloc);
+			Town.move(randloc);
+			tick = tick + rand(60, 120);
+		}
+	}
 
 	return;
 };

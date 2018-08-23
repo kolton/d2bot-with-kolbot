@@ -67,7 +67,6 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		var tick = 0;
 
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("\xFFc4MuleLogger\xFFc0: Logging items on " + me.account + " - " + me.name + ".");
@@ -77,14 +76,7 @@ var MuleLogger = {
 			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + parseInt(this.IngameTime) + "\xFFc0 sec");
 
 			while ((getTickCount() - me.gamestarttime)/1000 < this.IngameTime) {
-				me.overhead("\xFFc2Log items done. \xFFc4Stay in " + "\xFFc4game more:\xFFc0 " + parseInt(this.IngameTime - (getTickCount() - me.gamestarttime)/1000) + " sec");
-
-				delay(1000);
-
-				if ((getTickCount() - me.gamestarttime)/1000 >= tick ) {
-					me.antiIdle(1);
-					tick = tick + rand(90, 180);
-				}
+				me.antiIdle(1, me.gamestarttime + this.IngameTime*1000);
 			}
 
 			quit();
