@@ -1051,9 +1051,10 @@ me.antiIdle = function (act, timer) {
 		timer = getTickCount() + 2 * 60 * 60 * 1000;
 	}
 
-	var aistart, tick, loc, randloc,
+	var aistart, tick, loc, randloc, prevloc,
 		aistart = getTickCount(),
-		tick = 0;
+		tick = 0,
+		randloc = prevloc = " ";
 
     switch(act) {
 	case 1:
@@ -1087,10 +1088,13 @@ me.antiIdle = function (act, timer) {
 		delay(1000);
 
 		if ((getTickCount() - aistart)/1000 >= tick ) {
-			randloc = loc[Math.floor(Math.random() * loc.length)];
+			while (randloc === prevloc) {
+				randloc = loc[Math.floor(Math.random() * loc.length)];
+			}
 			me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to \xFFc2" + randloc);
 			Town.move(randloc);
 			tick = tick + rand(60, 120);
+			prevloc = randloc;
 		}
 	}
 
