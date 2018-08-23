@@ -48,10 +48,10 @@ function ReceiveCopyData(mode, msg) {
 			sendCopyData(null, me.windowtitle, 4, "pingrep");
 		}
 
-    case 1638: // getProfile
-        print("Recieved Profile Info");
+	case 1638: // getProfile
+		print("Recieved Profile Info");
 
-        tag = JSON.parse(msg).Tag;
+		tag = JSON.parse(msg).Tag;
 
 		break;
 	}
@@ -107,10 +107,10 @@ function main() {
 		delay(500);
 	}
 
-    while (!tag) {
-        D2Bot.getProfile();
-        delay(500);
-    }
+	while (!tag) {
+		D2Bot.getProfile();
+		delay(500);
+	}
 
 	if (gameInfo.rdBlocker) {
 		D2Bot.printToConsole("You must disable RD Blocker for Mule Logger to work properly. Stopping.");
@@ -187,7 +187,7 @@ MainSwitch:
 			break;
 		}
 
-        if (GameAction.gameInfo() !== null) { // a game name was specified
+		if (GameAction.gameInfo() !== null) { // a game name was specified
 			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create screen to check if character is dead or not
 				break;
 			}
@@ -197,39 +197,39 @@ MainSwitch:
 				break;
 			}
 
-            if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
-                break;
-            }
+			if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+				break;
+			}
 
-            if (!locationTimeout(5000, location)) { // in case join button gets bugged
-                if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
-                    break;
-                }
+			if (!locationTimeout(5000, location)) { // in case join button gets bugged
+				if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+					break;
+				}
 
-                if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
-                    break;
-                }
-            }
-        } else {
-            if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
-                break;
-            }
+				if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+					break;
+				}
+			}
+		} else {
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+				break;
+			}
 
 			if (getControl(6, 533, 469, 120, 20) && getControl(6, 533, 469, 120, 20).disabled === 4) { // dead HC character
 				ControlAction.click(6, 693, 490, 80, 20); // Quit from Lobby
 				break;
 			}
 
-            if (!locationTimeout(5000, location)) { // in case join button gets bugged
-                if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
-                    break;
-                }
+			if (!locationTimeout(5000, location)) { // in case join button gets bugged
+				if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
+					break;
+				}
 
-                if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
-                    break;
-                }
-            }
-        }
+				if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+					break;
+				}
+			}
+		}
 
 		break;
 	case 2: // Waiting In Line
@@ -239,39 +239,39 @@ MainSwitch:
 
 		break;
 	case 4: // Create Game
-        D2Bot.updateStatus("Creating Game");
+		D2Bot.updateStatus("Creating Game");
 
-        control = getControl(1, 657, 342, 27, 20);
+		control = getControl(1, 657, 342, 27, 20);
 
-        if (control && control.disabled === 5) {
-            ControlAction.click(6, 431, 341, 15, 16); // remove level restriction
-        }
+		if (control && control.disabled === 5) {
+			ControlAction.click(6, 431, 341, 15, 16); // remove level restriction
+		}
 
-        if (gameCount >= 99) {
-            gameCount = 1;
+		if (gameCount >= 99) {
+			gameCount = 1;
 
-            DataFile.updateStats("runs", gameCount);
-        }
+			DataFile.updateStats("runs", gameCount);
+		}
 
-        if (lastGameStatus === "pending") {
-            D2Bot.printToConsole("Failed to create game");
+		if (lastGameStatus === "pending") {
+			D2Bot.printToConsole("Failed to create game");
 
-            gameCount += 1;
-        }
+			gameCount += 1;
+		}
 
-        timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
-        ControlAction.createGame(gameInfo.gameName + gameCount, gameInfo.gamePass, 0);
-        locationTimeout(5000, location);
+		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
+		ControlAction.createGame(gameInfo.gameName + gameCount, gameInfo.gamePass, 0);
+		locationTimeout(5000, location);
 
-        lastGameStatus = "pending";
+		lastGameStatus = "pending";
 
 		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
-        var joinInfo = GameAction.gameInfo();
+		var joinInfo = GameAction.gameInfo();
 
 		joinGame(joinInfo.gameName, joinInfo.gamePass);
-        locationTimeout(5000, location);
+		locationTimeout(5000, location);
 
 		break;
 	case 6: // Ladder
@@ -281,9 +281,9 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
-        if (!charList) {
-            charList = GameAction.getCharacters();			
-        }
+		if (!charList) {
+			charList = GameAction.getCharacters();
+		}
 
 		// last char in list
 		if (!charList || !charList.length) {
@@ -358,7 +358,7 @@ MainSwitch:
 					ControlAction.timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
 					D2Bot.restart(true);
 				} else {
-					GameAction.update("done", "GameAction has failed due to disabled cdkey, location 10");				
+					GameAction.update("done", "GameAction has failed due to disabled cdkey, location 10");
 					D2Bot.stop();
 				}
 
