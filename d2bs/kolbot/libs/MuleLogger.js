@@ -11,14 +11,14 @@ var MuleLogger = {
 			"account2/password2/realm": ["charnameX", "charnameY etc"],
 			"account3/password3/realm": ["all"]
 
-			To log a full account, put "accountname/password/realm": ["all"]
+			To log a full account, put "account/password/realm": ["all"]
 
 			realm = useast, uswest, europe or asia
 
 			Individual entries are separated with a comma.
 		*/
 
-		"accountname/password/realm": ["all"]
+		"account/password/realm": ["all"]
 	},
 
 	LogGame: ["", ""], // ["gamename", "password"]
@@ -71,12 +71,12 @@ var MuleLogger = {
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("\xFFc4MuleLogger\xFFc0: Logging items on " + me.account + " - " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
-
 			this.logChar();
-			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + parseInt(this.IngameTime) + "\xFFc0 sec");
+			print(" ");
+			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + this.IngameTime + "\xFFc0 sec");
 
-			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
-				me.antiIdle(1, me.gamestarttime + this.IngameTime * 1000);
+			while (getTickCount() - me.gamestarttime < this.IngameTime * 1000) {
+				me.antiIdle(1, this.IngameTime);
 			}
 
 			quit();

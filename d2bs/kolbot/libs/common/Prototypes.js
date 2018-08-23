@@ -1042,13 +1042,13 @@ Unit.prototype.getColor = function () {
 	return -1;
 };
 
-me.antiIdle = function (act, timer) {
+me.antiIdle = function (act, timer) { // timer in seconds
 	if (act === undefined) {
 		act = me.act;
 	}
 
 	if (timer === undefined) {
-		timer = getTickCount() + 2 * 60 * 60 * 1000;
+		timer = rand(7230, 7290);
 	}
 
 	var aistart, tick, loc, randloc, prevloc,
@@ -1087,8 +1087,8 @@ me.antiIdle = function (act, timer) {
 		break;
 	}
 
-	while (getTickCount() < timer) {
-		me.overhead("\xFFc4Stay in game more:\xFFc0           " + parseInt((timer - getTickCount())/1000) + " sec");
+	while (getTickCount() - aistart < timer * 1000) {
+		me.overhead("\xFFc4Stay in game more:\xFFc0           " + Math.floor((aistart - getTickCount()) / 1000 + timer) + " sec");
 		delay(1000);
 
 		if ((getTickCount() - aistart) >= tick * 1000) {
