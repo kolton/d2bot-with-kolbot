@@ -188,6 +188,15 @@ MainSwitch:
 		}
 
         if (GameAction.gameInfo() !== null) { // a game name was specified
+			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create screen to check if character is dead or not
+				break;
+			}
+
+			if (getControl(6, 533, 469, 120, 20) && getControl(6, 533, 469, 120, 20).disabled === 4) { // dead HC character
+				ControlAction.click(6, 693, 490, 80, 20); // Quit from Lobby
+				break;
+			}
+
             if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
                 break;
             }
@@ -205,6 +214,11 @@ MainSwitch:
             if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
                 break;
             }
+
+			if (getControl(6, 533, 469, 120, 20) && getControl(6, 533, 469, 120, 20).disabled === 4) { // dead HC character
+				ControlAction.click(6, 693, 490, 80, 20); // Quit from Lobby
+				break;
+			}
 
             if (!locationTimeout(5000, location)) { // in case join button gets bugged
                 if (!ControlAction.click(6, 652, 469, 120, 20)) { // Join
@@ -412,6 +426,14 @@ MainSwitch:
 
 		if (charList[0].length === 0) { // "" empty string means all characters
 			charList = ControlAction.getCharacters();
+
+			// empty account
+			if (!charList || !charList.length) {
+				GameAction.update("done", "Account has no chars!");
+				D2Bot.stop();
+				delay(5000);
+				break;
+			}
 		}
 
 		currChar = charList.shift();
@@ -588,6 +610,11 @@ MainSwitch:
 		if (!locationTimeout(5000, location)) {
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
+
+		GameAction.update("done", "Account has no chars! location 42");
+		D2Bot.stop();
+		delay(5000);
+		break;
 
 		break;
 	default:
