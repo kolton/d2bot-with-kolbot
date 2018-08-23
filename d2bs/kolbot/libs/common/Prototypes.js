@@ -1056,41 +1056,46 @@ me.antiIdle = function (act, timer) {
 		tick = 0,
 		randloc = prevloc = " ";
 
-    switch(act) {
+	switch (act) {
 	case 1:
-		if (me.getQuest(4, 0) ) {
+		if (me.getQuest(4, 0)) {
 			loc = ["akara", "cain", "charsi", "gheed", "kashya", "portalspot", "stash", "waypoint", "warriv"];
 		} else {
 			loc = ["akara", "charsi", "gheed", "kashya", "portalspot", "stash", "waypoint", "warriv"];
 		}
+
 		break;
 	case 2:
 		loc = ["atma", "cain", "fara", "elzix", "drognan", "greiz", "jerhyn", "lysander", "meshif", "portalspot", "stash", "waypoint", "warriv"];
+
 		break;
 	case 3:
 		loc = ["alkor", "asheara", "hratli", "meshif", "ormus", "portalspot", "stash", "waypoint"];
+
 		break;
 	case 4:
 		loc = ["cain", "halbu", "jamella", "portalspot", "stash", "tyrael", "waypoint"];
+
 		break;
 	case 5:
-		if (me.getQuest(37, 0) ) {
+		if (me.getQuest(37, 0)) {
 			loc = ["anya", "cain", "larzuk", "malah", "portalspot", "qual-kehk", "stash", "waypoint"];
 		} else {
 			loc = ["cain", "larzuk", "malah", "nihlathak", "portalspot", "qual-kehk", "stash", "waypoint"];
 		}
+
 		break;
 	}
 
 	while (getTickCount() < timer) {
 		me.overhead("\xFFc4Stay in game more:\xFFc0           " + parseInt((timer - getTickCount())/1000) + " sec");
-
 		delay(1000);
 
-		if ((getTickCount() - aistart)/1000 >= tick ) {
+		if ((getTickCount() - aistart) >= tick * 1000) {
 			while (randloc === prevloc) {
 				randloc = loc[Math.floor(Math.random() * loc.length)];
 			}
+
 			me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to \xFFc2" + randloc);
 			Town.move(randloc);
 			tick = tick + rand(60, 120);

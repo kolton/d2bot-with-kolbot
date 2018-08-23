@@ -27,7 +27,7 @@ var MuleLogger = {
 	LogEquipped: false, // include equipped items
 	LogMerc: false, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
-	IngameTime: rand(180, 210), // Time to wait in game to do not get RD, or set the value rand(7230, 7290) for mule perming
+	IngameTime: rand(180, 210), // 180, 210 to avoid RD, increase to 7230, 7290 for mule perming
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
@@ -75,8 +75,8 @@ var MuleLogger = {
 			this.logChar();
 			print("\xFFc2IngameTime \xFFc0is set to: \xFFc2" + parseInt(this.IngameTime) + "\xFFc0 sec");
 
-			while ((getTickCount() - me.gamestarttime)/1000 < this.IngameTime) {
-				me.antiIdle(1, me.gamestarttime + this.IngameTime*1000);
+			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
+				me.antiIdle(1, me.gamestarttime + this.IngameTime * 1000);
 			}
 
 			quit();
