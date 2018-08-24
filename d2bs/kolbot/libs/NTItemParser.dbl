@@ -27,7 +27,7 @@ var NTIP = {},
 NTIP.OpenFile = function (filepath, notify) {
 	if (!FileTools.exists(filepath)) {
 		if (notify) {
-			Misc.errorReport("ÿc1NIP file doesn't exist: ÿc0" + filepath);
+			Misc.errorReport("Ã¿c1NIP file doesn't exist: Ã¿c0" + filepath);
 		}
 
 		return false;
@@ -42,7 +42,7 @@ NTIP.OpenFile = function (filepath, notify) {
 		nipfile = File.open(filepath, 0);
 	} catch (fileError) {
 		if (notify) {
-			Misc.errorReport("ÿc1Failed to load NIP: ÿc0" + filename);
+			Misc.errorReport("Ã¿c1Failed to load NIP: Ã¿c0" + filename);
 		}
 	}
 
@@ -72,7 +72,7 @@ NTIP.OpenFile = function (filepath, notify) {
 	}
 
 	if (notify) {
-		print("ÿc4Loaded NIP: ÿc2" + filename + "ÿc4. Lines: ÿc2" + lines.length + "ÿc4. Valid entries: ÿc2" + entries + ". ÿc4Time: ÿc2" + (getTickCount() - tick) + " ms");
+		print("Ã¿c4Loaded NIP: Ã¿c2" + filename + "Ã¿c4. Lines: Ã¿c2" + lines.length + "Ã¿c4. Valid entries: Ã¿c2" + entries + ". Ã¿c4Time: Ã¿c2" + (getTickCount() - tick) + " ms");
 	}
 
 	return true;
@@ -295,11 +295,11 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 			showConsole();
 
 			if (!entryList) {
-				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ") Error message: " + pickError.message + " Trigger item: " + item.fname.split("\n").reverse().join(" "));
+				Misc.errorReport("Ã¿c1Pickit error! Line # Ã¿c2" + stringArray[i].line + " Ã¿c1Entry: Ã¿c0" + stringArray[i].string + " (" + stringArray[i].file + ") Error message: " + pickError.message + " Trigger item: " + item.fname.split("\n").reverse().join(" "));
 
 				NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
 			} else {
-				Misc.errorReport("ÿc1Pickit error in runeword config!");
+				Misc.errorReport("Ã¿c1Pickit error in runeword config!");
 			}
 
 			result = 0;

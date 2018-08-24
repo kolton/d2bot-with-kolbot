@@ -17,7 +17,7 @@ function BattleOrders() {
 				while (!unit.getState(32) && copyUnit(unit).x) {
 					if (getTickCount() - tick >= failTimer * 1000) {
 						showConsole();
-						print("ÿc1BO timeout fail.");
+						print("Ã¿c1BO timeout fail.");
 						quit();
 					}
 
@@ -36,7 +36,7 @@ function BattleOrders() {
 		Pather.useWaypoint(35, true); // catacombs
 	} catch (wperror) {
 		showConsole();
-		print("ÿc1Failed to take waypoint.");
+		print("Ã¿c1Failed to take waypoint.");
 		quit();
 	}
 
@@ -54,7 +54,7 @@ MainLoop:
 				while (!Misc.inMyParty(Config.BattleOrders.Getters[i]) || !getUnit(0, Config.BattleOrders.Getters[i])) {
 					if (getTickCount() - tick >= failTimer * 1000) {
 						showConsole();
-						print("ÿc1BO timeout fail.");
+						print("Ã¿c1BO timeout fail.");
 						quit();
 					}
 
@@ -76,7 +76,7 @@ MainLoop:
 
 			if (getTickCount() - tick >= failTimer * 1000) {
 				showConsole();
-				print("ÿc1BO timeout fail.");
+				print("Ã¿c1BO timeout fail.");
 				quit();
 			}
 

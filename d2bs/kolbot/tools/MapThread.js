@@ -684,7 +684,7 @@ function main() {
 	include("common/attack.js");
 	include("common/pather.js");
 	load("tools/maphelper.js");
-	print("ÿc9Map Thread Loaded");
+	print("Ã¿c9Map Thread Loaded");
 
 	this.revealArea = function (area) {
 		if (!this.revealedAreas) {

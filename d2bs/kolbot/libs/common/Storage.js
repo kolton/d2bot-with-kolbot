@@ -231,7 +231,7 @@ Loop:
 			string = "";
 
 			for (y = 0; y < this.width; y += 1) {
-				string += (this.buffer[x][y] > 0) ? "\xFFc1x" : "\xFFc0o";
+				string += (this.buffer[x][y] > 0) ? "ÿc1x" : "ÿc0o";
 			}
 
 			print(string);
