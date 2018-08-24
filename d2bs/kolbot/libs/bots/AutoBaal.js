@@ -138,7 +138,7 @@ function AutoBaal() {
 
 				if (suspect.area === destination) { // first player in our party found in destination area...
 					leader = suspect.name; // ... is our leader
-					print("ÿc4AutoBaal: ÿc0Autodetected " + leader);
+					print("Ã¿c4AutoBaal: Ã¿c0Autodetected " + leader);
 					return true;
 				}
 			} while (suspect.getNext());
@@ -210,7 +210,7 @@ function AutoBaal() {
 			}
 
 			if (throneCheck && me.area === 109) { // wait for throne signal - leader's safe message
-				print("ÿc4AutoBaal: ÿc0Trying to take TP to throne.");
+				print("Ã¿c4AutoBaal: Ã¿c0Trying to take TP to throne.");
 				Pather.usePortal(131, null); // take TP to throne
 				Pather.moveTo(Config.AutoBaal.LeechSpot[0], Config.AutoBaal.LeechSpot[1]); // move to a safe spot
 				Precast.doPrecast(true);
@@ -232,7 +232,7 @@ function AutoBaal() {
 				portal = getUnit(2, 563);
 
 				delay(2000); // wait for others to enter first - helps  with curses and tentacles from spawning around you
-				print("ÿc4AutoBaal: ÿc0Entering chamber.");
+				print("Ã¿c4AutoBaal: Ã¿c0Entering chamber.");
 
 				if (Pather.usePortal(null, null, portal)) { // enter chamber
 					Pather.moveTo(15166, 5903); // go to a safe position

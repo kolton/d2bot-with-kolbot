@@ -1,4 +1,4 @@
-<HTML><HEAD><TITLE>d2jsp Command Reference</TITLE><STYLE>* { font-face: Tahoma }
+<HTML><HEAD><meta charset="utf-8"><TITLE>d2jsp Command Reference</TITLE><STYLE>* { font-face: Tahoma }
 TEXTAREA{width:500px;height:100px}
 A { font: 8pt tahoma; text-decoration: none; }
 A:hover { font: 8pt tahoma; text-decoration: underline; }
@@ -919,72 +919,72 @@ function main()<br />
 &nbsp;&nbsp;&nbsp;&nbsp;switch (me.screensize)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 0:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 640x480<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0Your screen size is: ÿc9640x480");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0Your screen size is: Ã¿c9640x480");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 2:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 800x600<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0Your screen size is: ÿc9800x600");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0Your screen size is: Ã¿c9800x600");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// hu?<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0Your screen size is: ÿc1unknown");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0Your screen size is: Ã¿c1unknown");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// Realm<br />
-&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0You are playing on realm: ÿc9" + me.realmshort + "ÿc0 (ÿc9" + me.realm + "ÿc0)");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0You are playing on realm: Ã¿c9" + me.realmshort + "Ã¿c0 (Ã¿c9" + me.realm + "Ã¿c0)");<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// Game name and password<br />
-&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0You are playing in the game: ÿc9" + me.gamename + " ÿc0/ ÿc9" + me.gamepassword);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0You are playing in the game: Ã¿c9" + me.gamename + " Ã¿c0/ Ã¿c9" + me.gamepassword);<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// Our local IP-Address<br />
-&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0Your local(!) IP-address is: ÿc9" + me.ip);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0Your local(!) IP-address is: Ã¿c9" + me.ip);<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// Server-IP<br />
-&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0This game is hosted on the server having IP-address: ÿc9" + me.gameserverip);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0This game is hosted on the server having IP-address: Ã¿c9" + me.gameserverip);<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// difficulty<br />
 &nbsp;&nbsp;&nbsp;&nbsp;switch (me.diff)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 0:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// normal<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc2You are playing a normal game.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c2You are playing a normal game.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 1:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// nighmare<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc9You are playing a nightmare game.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c9You are playing a nightmare game.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 2:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// hell<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc1You are playing a hell game.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c1You are playing a hell game.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc1Give njaguar a hint about this result...");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c1Give njaguar a hint about this result...");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;// HC / SC<br />
 &nbsp;&nbsp;&nbsp;&nbsp;if (me.playertype)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc1This is a hardcore game - take care.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c1This is a hardcore game - take care.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 &nbsp;&nbsp;&nbsp;&nbsp;else<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc2This is a softcore game - be calm.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c2This is a softcore game - be calm.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// Game start- and runtime<br />
-&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0Timestamp (ms) when the game was started/joined: ÿc9" + me.gamestarttime);<br />
-&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0You are in this game since ÿc9" + (me.gamestarttime-getTickCount()) + "ÿc0ms.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0Timestamp (ms) when the game was started/joined: Ã¿c9" + me.gamestarttime);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0You are in this game since Ã¿c9" + (me.gamestarttime-getTickCount()) + "Ã¿c0ms.");<br />
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;// Gametype<br />
 &nbsp;&nbsp;&nbsp;&nbsp;if (me.gametype)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0This is a Diablo LoD game.");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 5 acts<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0This is a Diablo LoD game.");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 5 acts<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 &nbsp;&nbsp;&nbsp;&nbsp;else<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0This is a Diablo Classic game.");&nbsp;&nbsp;&nbsp;&nbsp;// 4 acts<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0This is a Diablo Classic game.");&nbsp;&nbsp;&nbsp;&nbsp;// 4 acts<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<br />
 }</SPAN></TD></TR><TR><TD COLSPAN=2><STRONG>Usable: </STRONG>[In Game] </TD></TR></TABLE></TD></TR></TABLE>
@@ -1018,11 +1018,11 @@ me.golddialog recognize all four golddialogs:<br />
 {<br />
 &nbsp;&nbsp;&nbsp;&nbsp;if (me.golddialog)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0The golddialog is on the screen.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0The golddialog is on the screen.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 &nbsp;&nbsp;&nbsp;&nbsp;else<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0There is no golddialog on the screen.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0There is no golddialog on the screen.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 }</SPAN></TD></TR><TR><TD COLSPAN=2><STRONG>Usable: </STRONG>[In Game] </TD></TR></TABLE></TD></TR></TABLE>
 <TABLE WIDTH=100%><TR><TD><SPAN STYLE="width:50px">&nbsp;</SPAN></TD><TD WIDTH=100%><TABLE BORDER=1 CELLPADDING=10 CELLSPACING=0 BGCOLOR="#EEF2F7" WIDTH=100%><TR CLASS="menu"><TD WIDTH=100%><A NAME="me.ingame">me.<STRONG>ingame</STRONG></A></TD><TD BGCOLOR=WHITE ALIGN=CENTER WIDTH="100" NOWRAP><STRONG>Property</STRONG></TD></TR><TR><TD COLSPAN=2><STRONG>Summary:</STRONG> Returns whether in game or not</TD></TR><TR CLASS="menu"><TD COLSPAN=2><STRONG>Syntax:</STRONG><BR><SPAN CLASS="syntax">bool = me.ingame;<BR></SPAN></TD></TR><TR><TD COLSPAN=2><STRONG>Description:</STRONG><BR>Returns true if in game, false if not in game.</TD></TR><TR CLASS="menu"><TD COLSPAN=2><STRONG>Example:</STRONG><BR><SPAN CLASS="syntax">me.ingame;</SPAN></TD></TR><TR><TD COLSPAN=2><STRONG>Usable: </STRONG>[In Game] [Out of Game] </TD></TR></TABLE></TD></TR></TABLE>
@@ -1037,11 +1037,11 @@ You get an item to the mousecursor by clicking on it while your inventory is ope
 {<br />
 &nbsp;&nbsp;&nbsp;&nbsp;if (me.itemoncursor)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0There is an item on the mousecursor.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0There is an item on the mousecursor.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 &nbsp;&nbsp;&nbsp;&nbsp;else<br />
 &nbsp;&nbsp;&nbsp;&nbsp;{<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("ÿc0There is no item on the mousecursor.");<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Ã¿c0There is no item on the mousecursor.");<br />
 &nbsp;&nbsp;&nbsp;&nbsp;}<br />
 }</SPAN></TD></TR><TR><TD COLSPAN=2><STRONG>Usable: </STRONG>[In Game] </TD></TR></TABLE></TD></TR></TABLE>
 <TABLE WIDTH=100%><TR><TD><SPAN STYLE="width:50px">&nbsp;</SPAN></TD><TD WIDTH=100%><TABLE BORDER=1 CELLPADDING=10 CELLSPACING=0 BGCOLOR="#EEF2F7" WIDTH=100%><TR CLASS="menu"><TD WIDTH=100%><A NAME="me.ladder">me.<STRONG>ladder</STRONG></A></TD><TD BGCOLOR=WHITE ALIGN=CENTER WIDTH="100" NOWRAP><STRONG>Property</STRONG></TD></TR><TR><TD COLSPAN=2><STRONG>Summary:</STRONG> Determines if your character is a ladder character</TD></TR><TR CLASS="menu"><TD COLSPAN=2><STRONG>Syntax:</STRONG><BR><SPAN CLASS="syntax">int = me.ladder;<BR></SPAN></TD></TR><TR><TD COLSPAN=2><STRONG>Description:</STRONG><BR>Returns 0 if your character is NOT ladder, non-zero if they are.<br />

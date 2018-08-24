@@ -47,14 +47,12 @@ var MuleLogger = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|\xFF)c/)) {
-					stringColor = desc[i].substring(0, 3);
+				if (desc[i].match(/^(y|ÿ)c/)) {
+					stringColor = desc[i].substring(0, 4);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
 			}
-
-			desc[i] = desc[i].replace(/(y|\xFF)c([0-9!"+<;.*])/g, "\\xffc$2").replace("\xFF", "\\xff", "g");
 		}
 
 		if (logIlvl && desc[desc.length - 1]) {
@@ -68,7 +66,7 @@ var MuleLogger = {
 
 	inGameCheck: function () {
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("\xFFc4MuleLogger\xFFc0: Logging items on " + me.name + ".");
+			print("ÿc4MuleLoggerÿc0: Logging items on " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.name + ".", 7);
 			this.logChar();
 
@@ -98,7 +96,7 @@ var MuleLogger = {
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|\xFF)c[0-9!"+<;.*]|\/|\\/, "").trim();
+			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|\/|\\/, "").trim();
 
 		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid;
 		color = unit.getColor();
@@ -262,6 +260,7 @@ var MuleLogger = {
 			title: name,
 			description: desc,
 			header: header,
+			ethereal: unit.getFlag(0x400000),
 			sockets: Misc.getItemSockets(unit)
 		};
 	},
