@@ -1043,11 +1043,27 @@ Unit.prototype.getColor = function () {
 };
 
 me.antiIdle = function (act, timer) { // timer in seconds
-	if (act === undefined) {
+	if (!isIncluded("common/town.js")) {
+		include("common/town.js"); 
+	}
+
+	if (!isIncluded("common/pather.js")) {
+		include("common/pather.js"); 
+	}
+
+	if (!isIncluded("common/misc.js")) {
+		include("common/misc.js"); 
+	}
+
+	if (!isIncluded("common/collmap.js")) {
+		include("common/collmap.js"); 
+	}
+
+	if (act === undefined || act === null) {
 		act = me.act;
 	}
 
-	if (timer === undefined) {
+	if (timer === undefined || timer === null) {
 		timer = rand(7230, 7290);
 	}
 
@@ -1055,6 +1071,8 @@ me.antiIdle = function (act, timer) { // timer in seconds
 		aistart = getTickCount(),
 		tick = 0,
 		randloc = prevloc = " ";
+
+	print("\xFFc8antiIdle: \xFFc2on \xFFc8for " + timer + " sec");
 
 	switch (act) {
 	case 1:
@@ -1088,20 +1106,22 @@ me.antiIdle = function (act, timer) { // timer in seconds
 	}
 
 	while (getTickCount() - aistart < timer * 1000) {
-		me.overhead("\xFFc4Stay in game more:\xFFc0           " + Math.floor((aistart - getTickCount()) / 1000 + timer) + " sec");
+		me.overhead("\xFFc4anti-idle for:\xFFc0                      " + Math.floor((aistart - getTickCount()) / 1000 + timer) + " sec");
 		delay(1000);
 
-		if ((getTickCount() - aistart) >= tick * 1000) {
+		if (getTickCount() - aistart >= tick * 1000) {
 			while (randloc === prevloc) {
 				randloc = loc[Math.floor(Math.random() * loc.length)];
 			}
 
-			me.overhead("\xFFc4AntiIdle - \xFFc2ON \xFFc0, moving to \xFFc2" + randloc);
+			me.overhead("\xFFc4anti-idle: \xFFc2on \xFFc0, moving to " + randloc);
 			Town.move(randloc);
 			tick = tick + rand(60, 120);
 			prevloc = randloc;
 		}
 	}
+
+	print("\xFFc8antiIdle: \xFFc1off");
 
 	return;
 };
