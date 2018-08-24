@@ -329,6 +329,26 @@ MainLoop:
 						break;
 					}
 
+					if (["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(item.code) > -1 && !Config.ShowLowRunes) {
+						break;
+					}
+
+					if (["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(item.code) > -1 && !Config.ShowMiddleRunes) {
+						break;
+					}
+
+					if (["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(item.code) > -1 && !Config.ShowHighRunes) {
+						break;
+					}
+
+					if (["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(item.code) > -1 && !Config.ShowLowGems) {
+						break;
+					}
+
+					if (["glv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(item.code) > -1 && !Config.ShowHighGems) {
+						break;
+					}
+
 					Misc.logItem("Kept", item, keptLine);
 				}
 
