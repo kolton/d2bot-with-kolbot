@@ -104,18 +104,11 @@ var Skill = {
 			return 50;
 		// Variable range
 		case 42: // Static Field
-			if (me.gametype === 1) {
-				return Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
-			}
-
-			return 20;
+			return Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
 		case 132: // Leap
-			if (me.gametype === 1) {
-				var leap = [4, 7, 8, 10, 11, 12, 12, 13, 14, 14, 14, 14, 15, 16, 16, 16, 16, 16, 16, 16];
-				return leap[me.getSkill(132, 1)];
-			}
+			var leap = [4, 7, 8, 10, 11, 12, 12, 13, 14, 14, 14, 14, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 17];
 
-			return 10;
+			return leap[Math.min(me.getSkill(132, 1) - 1, 24)];
 		case 49: // Lightning
 		case 84: // Bone Spear
 		case 93: // Bone Spirit
@@ -2303,11 +2296,11 @@ CursorLoop:
 		hand = (hand === 0) ? 0x11 : 0x0a;
 		sendPacket(1, hand, 4, who.type, 4, who.gid);
 	},
-	/* // commented the patched function
-	moveNPC: function (npc, dwX, dwY) {
-		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
+
+	moveNPC: function (npc, dwX, dwY) { // commented the patched packet
+		//sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
 	},
-	*/
+
 	teleWalk: function (x, y, maxDist) {
 		var i;
 
