@@ -1031,23 +1031,50 @@ IngredientLoop:
 			return false;
 		}
 
-		if (getUIFlag(0x1A)) {
+		if (getUIFlag(0x1a)) {
 			return true;
+		}
+
+		if (cube.location === 7 && !Town.openStash()) {
+			return false;
 		}
 
 		for (i = 0; i < 3; i += 1) {
 			cube.interact();
-
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 10000) {
-				if (getUIFlag(0x1A)) {
+			while (getTickCount() - tick < 5000) {
+				if (getUIFlag(0x1a)) {
 					delay(100 + me.ping * 2); // allow UI to initialize
 
 					return true;
 				}
 
-				delay(10);
+				delay(100);
+			}
+		}
+
+		return false;
+	},
+
+	closeCube: function () {
+		var i, tick;
+
+		if (!getUIFlag(0x1a)) {
+			return true;
+		}
+
+		for (i = 0; i < 5; i++) {
+			me.cancel();
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 3000) {
+				if (!getUIFlag(0x1a)) {
+					delay(250 + me.ping * 2); // allow UI to initialize
+					return true;
+				}
+
+				delay(100);
 			}
 		}
 
