@@ -11,23 +11,31 @@ var Skill = {
 		switch (skillId) {
 		case 0: // Normal Attack
 			return Attack.usingBow() ? 20 : 3;
+		case 1: // Kick
+		case 5: // Left Hand Swing
 		case 10: // Jab
 		case 14: // Power Strike
 		case 19: // Impale
 		case 24: // Charged Strike
 		case 30: // Fend
 		case 34: // Lightning Strike
+		case 46: // Blaze
 		case 73: // Poison Dagger
 		case 96: // Sacrifice
 		case 97: // Smite
 		case 106: // Zeal
+		case 111: // Vengeance
 		case 112: // Blessed Hammer
 		case 116: // Conversion
 		case 126: // Bash
+		case 130: // Howl
+		case 131: // Find Potion
 		case 133: // Double Swing
 		case 139: // Stun
+		case 142: // Find Item
 		case 144: // Concentrate
 		case 147: // Frenzy
+		case 150: // Grim Ward
 		case 152: // Berserk
 		case 232: // Feral Rage
 		case 233: // Maul
@@ -54,6 +62,10 @@ var Skill = {
 			return 7;
 		case 92: // Poison Nova
 			return 8;
+		case 249: // Armageddon
+			return 9;
+		case 15: // Poison Javelin
+		case 25: // Plague Javelin
 		case 101: // Holy Bolt
 		case 107: // Charge
 		case 130: // Howl
@@ -63,6 +75,10 @@ var Skill = {
 		case 230: // Arctic Blast
 		case 243: // Shock Wave
 			return 10;
+		case 8: // Inner Sight
+		case 17: // Slow Missiles
+			return 13;
+		case 35: // Lightning Fury
 		case 64: // Frozen Orb
 		case 67: // Teeth
 		case 234: // Fissure
@@ -72,10 +88,20 @@ var Skill = {
 		case 257: // Blade Sentinel
 		case 266: // Blade Fury
 			return 15;
+		case 7: // Fire Arrow
+		case 12: // Multiple Shot
+		case 16: // Exploding Arrow
+		case 22: // Guided Arrow
+		case 27: // Immolation Arrow
+		case 31: // Freezing Arrow
+		case 95: // Revive
 		case 121: // Fist of the Heavens
+		case 140: // Double Throw
 		case 253: // Psychic Hammer
 		case 275: // Dragon Flight
 			return 20;
+		case 91: // Lower Resist
+			return 50;
 		// Variable range
 		case 42: // Static Field
 			if (me.gametype === 1) {
@@ -83,6 +109,13 @@ var Skill = {
 			}
 
 			return 20;
+		case 132: // Leap
+			if (me.gametype === 1) {
+				var leap = [4, 7, 8, 10, 11, 12, 12, 13, 14, 14, 14, 14, 15, 16, 16, 16, 16, 16, 16, 16];
+				return leap[me.getSkill(132, 1)];
+			}
+
+			return 10;
 		case 49: // Lightning
 		case 84: // Bone Spear
 		case 93: // Bone Spirit
@@ -91,11 +124,11 @@ var Skill = {
 			}
 
 			return 15;
-		case 47:
-		case 51:
-		case 53:
-		case 56:
-		case 59:
+		case 47: // Fire Ball
+		case 51: // Fire Wall
+		case 53: // Chain Lightning
+		case 56: // Meteor
+		case 59: // Blizzard
 		case 273: // Mind Blast
 			if (this.usePvpRange) {
 				return 40;
@@ -114,78 +147,78 @@ var Skill = {
 
 	getHand: function (skillId) {
 		switch (skillId) {
-		case 6:
-		case 7:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
-		case 18:
-		case 19:
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		case 27:
-		case 29:
-		case 30:
-		case 31:
-		case 33:
-		case 34:
-		case 35:
-		case 36:
-		case 37:
-		case 38:
-		case 39:
-		case 41:
-		case 45:
-		case 47:
-		case 49:
-		case 53:
-		case 55:
-		case 61:
-		case 63:
-		case 64:
-		case 65:
-		case 67:
-		case 73:
-		case 79:
-		case 84:
-		case 89:
-		case 93:
-		case 101:
-		case 107:
-		case 111:
-		case 112:
-		case 121:
-		case 132:
-		case 140:
-		case 143:
-		case 151:
-		case 225:
-		case 229:
-		case 230:
-		case 240:
-		case 243:
-		case 245:
-		case 251:
-		case 254:
-		case 256:
-		case 257:
-		case 259:
-		case 263:
-		case 265:
-		case 266:
-		case 269:
-		case 274:
-		case 275:
+		case 6: // Magic Arrow
+		case 7: // Fire Arrow
+		case 9: // Critical Strike
+		case 10: // Jab
+		case 11: // Cold Arrow
+		case 12: // Multiple Shot
+		case 13: // Dodge
+		case 14: // Power Strike
+		case 15: // Poison Javelin
+		case 16: // Exploding Arrow
+		case 18: // Avoid
+		case 19: // Impale
+		case 20: // Lightning Bolt
+		case 21: // Ice Arrow
+		case 22: // Guided Arrow
+		case 23: // Penetrate
+		case 24: // Charged Strike
+		case 25: // Plague Javelin
+		case 26: // Strafe
+		case 27: // Immolation Arrow
+		case 29: // Evade
+		case 30: // Fend
+		case 31: // Freezing Arrow
+		case 33: // Pierce
+		case 34: // Lightning Strike
+		case 35: // Lightning Fury
+		case 36: // Fire Bolt
+		case 37: // Warmth
+		case 38: // Charged Bolt
+		case 39: // Ice Bolt
+		case 41: // Inferno
+		case 45: // Ice Blast
+		case 47: // Fire Ball
+		case 49: // Lightning
+		case 53: // Chain Lightning
+		case 55: // Glacial Spike
+		case 61: // Fire Mastery
+		case 63: // Lightning Mastery
+		case 64: // Frozen Orb
+		case 65: // Cold Mastery
+		case 67: // Teeth
+		case 73: // Poison Dagger
+		case 79: // Golem Mastery
+		case 84: // Bone Spear
+		case 89: // Summon Resist
+		case 93: // Bone Spirit
+		case 101: // Holy Bolt
+		case 107: // Charge
+		case 111: // Vengeance
+		case 112: // Blessed Hammer
+		case 121: // Fist of the Heavens
+		case 132: // Leap
+		case 140: // Double Throw
+		case 143: // Leap Attack
+		case 151: // Whirlwind
+		case 225: // Firestorm
+		case 229: // Molten Boulder
+		case 230: // Arctic Blast
+		case 240: // Twister
+		case 243: // Shock Wave
+		case 245: // Tornado
+		case 251: // Fire Trauma
+		case 254: // Tiger Strike
+		case 256: // Shock Field
+		case 257: // Blade Sentinel
+		case 259: // Fists of Fire
+		case 263: // Weapon Block
+		case 265: // Cobra Strike
+		case 266: // Blade Fury
+		case 269: // Claws of Thunder
+		case 274: // Blades of Ice
+		case 275: // Dragon Flight
 			return 1;
 		case 0: // Normal Attack
 		case 96: // Sacrifice
@@ -2270,11 +2303,11 @@ CursorLoop:
 		hand = (hand === 0) ? 0x11 : 0x0a;
 		sendPacket(1, hand, 4, who.type, 4, who.gid);
 	},
-
+	/* // commented the patched function
 	moveNPC: function (npc, dwX, dwY) {
 		sendPacket(1, 0x59, 4, npc.type, 4, npc.gid, 4, dwX, 4, dwY);
 	},
-
+	*/
 	teleWalk: function (x, y, maxDist) {
 		var i;
 
