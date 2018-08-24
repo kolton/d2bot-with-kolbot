@@ -295,6 +295,14 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
+	// Manager Item Log
+	Config.ShowLowRunes = false; // show/stop low runes (El ÷ Dol) to appear in the item log
+	Config.ShowMiddleRunes = false; // show/stop middle runes (Hel ÷ Mal) to appear in the item log
+	Config.ShowHighRunes = true; // show/stop high runes (Ist ÷ Zod) to appear in the item log
+	Config.ShowLowGems = false; // show/stop low gems (chipped, flawed, normal) to appear in the item log
+	Config.ShowHighGems = false; // show/stop high gems (flawless, perfect) to appear in the item log
+	Config.ShowCubingInfo = true; // show/stop the cubing messages to appear on console and item log
+
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
 	Config.RepairPercent = 40; // Durability percent of any equipped item that will trigger repairs.

@@ -949,7 +949,10 @@ IngredientLoop:
 				transmute();
 				delay(700 + me.ping);
 				print("\xFFc4Cubing: " + string);
-				D2Bot.printToConsole(string, 5);
+				if (Config.ShowCubingInfo) {
+					D2Bot.printToConsole(string, 5);
+				}
+
 				this.update();
 
 				items = me.findItems(-1, -1, 6);
@@ -966,7 +969,9 @@ IngredientLoop:
 							break;
 						case 1:
 							Misc.itemLogger("Cubing Kept", items[j]);
-							Misc.logItem("Cubing Kept", items[j], result.line);
+							if (Config.ShowCubingInfo) {
+								Misc.logItem("Cubing Kept", items[j], result.line);
+							}
 
 							break;
 						case 5: // Crafting System

@@ -225,7 +225,7 @@ function LoadConfig() {
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
 	Config.HealMP = 0; // Go to a healer if under designated percent of mana.
-	Config.HealStatus = false; // Go to a healer if poisoned or cursed	
+	Config.HealStatus = false; // Go to a healer if poisoned or cursed
 	Config.UseMerc = true; // Use merc. This is ignored and always false in d2classic.
 	Config.MercWatch = false; // Instant merc revive during battle.
 
@@ -294,6 +294,14 @@ function LoadConfig() {
 	Config.FieldID = false; // Identify items in the field instead of going to town.
 	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
+
+	// Manager Item Log
+	Config.ShowLowRunes = false; // show/stop low runes (El ÷ Dol) to appear in the item log
+	Config.ShowMiddleRunes = false; // show/stop middle runes (Hel ÷ Mal) to appear in the item log
+	Config.ShowHighRunes = true; // show/stop high runes (Ist ÷ Zod) to appear in the item log
+	Config.ShowLowGems = false; // show/stop low gems (chipped, flawed, normal) to appear in the item log
+	Config.ShowHighGems = false; // show/stop high gems (flawless, perfect) to appear in the item log
+	Config.ShowCubingInfo = true; // show/stop the cubing messages to appear on console and item log
 
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
@@ -414,7 +422,7 @@ function LoadConfig() {
 	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
 	Config.PacketCasting = 0; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
 	Config.WaypointMenu = true;
-	
+
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
