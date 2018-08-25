@@ -107,7 +107,7 @@ var Skill = {
 		case 132: // Leap
 			var leap = [4, 7, 8, 10, 11, 12, 12, 13, 14, 14, 14, 14, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 17];
 
-      return leap[Math.min(me.getSkill(132, 1) - 1, 24)];
+			return leap[Math.min(me.getSkill(132, 1) - 1, 24)];
 		case 230: // Arctic Blast
 			var arctic = [5, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9, 10, 10, 10, 10, 11, 11, 12]; 
 
