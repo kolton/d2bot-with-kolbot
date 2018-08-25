@@ -107,10 +107,20 @@ td {
     image-rendering: crisp-edges;
 }
 
+.current-user-btn
+{
+    padding-right: 23px;
+    font-size: 22px;
+}
+
 .ld-input-icon {
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-right: 5px;
+    padding-right: 15px;
+}
+
+.ld-btn-icon {
+    padding-right: 20px;
 }
 
 .ld-item {
