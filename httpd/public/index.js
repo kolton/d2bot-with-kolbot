@@ -1,4 +1,5 @@
 var $ = window.jQuery;
+
 try {
     window.socket = window.io();
 }
@@ -101,7 +102,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     var CurrentGameType;
     var CurrentGameMode;
     var CurrentGameClass;
-    var listOfAccounts = {};
+    var AccountsMap = {};
 
     function showNotificaiton(text, perm)
     {
@@ -124,7 +125,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     }
 
     function refreshList() {
-        $("#itemsList").html("");
+        $("#items-list").html("");
         addItemstoList();
     }
 
@@ -165,7 +166,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
 			desc[desc.length - 1] = desc[desc.length - 1].trim();
 		}
 
-		desc = desc.join("<BR>");
+		desc = desc.join("<br>");
 
 		return desc;
 	}
@@ -177,14 +178,9 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
 
     function $addItem(result) {
         var itemUID = result.description.split("$")[1];
-        /*
-            var htmlTemplate = '<div class="row itemsListitem">' + '<div class="span2 "><img class="ld-item" src="data:image/jpeg;base64, ' + result.image + '" alt="Red dot" /> 
-            </div>' + '<div class="span5">' + cleanDecription(result.description) + '</div>' + '<div class="span5">' + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + '}' + "
-            <br/>" + (result.lod ? "Lod" : "Classic") + "/" + (result.sc ? "Softcore" : "Hardcore") + "/" + (result.ladder ? "Ladder" : "NonLadder") + '</div>' + '</div><hr>';
-        
-        */
+
         var description = cleanDecription(result.description).split("<br/>");
-        var title = description.shift()
+        var title = description.shift();
         description = description.join("<br/>")
 
         result.realm = CurrentRealm.toLowerCase();
@@ -196,7 +192,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 <img src="data:image/jpeg;base64, ` + result.image + `" alt="user" class="ld-item">
             </div>
             <div class="comment-text w-100">
-                 <h6 class="-medium">` + title + `</h6>
+                <h6 class="-medium">` + title + `</h6>
                 <span class="m-b-15 d-block">` + description + `
                 </span>
                 <div class="comment-footer">
@@ -214,7 +210,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         $item.click(function () {
             $(this).toggleClass("selected");
         });
-        $("#itemsList").append($item);
+        $("#items-list").append($item);
     }
 
     function buildregex(str) {
@@ -232,7 +228,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
 
     function addItemstoList() {
         function doQuery($account, $character, loadMoreItem) {
-            API.emit("query", buildregex($("#searchItem").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
+            API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
                 if (err) console.log(err);
                 var y = $(window).scrollTop();
                 for (var i in results) {
@@ -246,11 +242,11 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             });
         }
         var charListid, ended;
-        var account = $("#accountSelect").val();
-        var character = $("#characterSelect").val();
+        var account = $("#account-select").val();
+        var character = $("#character-select").val();
         if (character == "Show All" && account == "Show All") {
             var accList = [];
-            for (var i in listOfAccounts) {
+            for (var i in AccountsMap) {
                 accList.push(i);
             }
             var accountListid = 0;
@@ -259,26 +255,26 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             window.loadMoreItem = function () {
                 if (accountListid == accList.length) {
                     if (!ended) {
-                        $("#itemsList").append("<div>End Of Items on Accounts</div>");
+                        $("#items-list").append("<div>End Of Items on Accounts</div>");
                         ended = true;
                         window.loadMoreItem = false;
                     }
                     return;
                 }
-                if (charListid == listOfAccounts[accList[accountListid]].length) {
+                if (charListid == AccountsMap[accList[accountListid]].length) {
                     accountListid = accountListid + 1;
                     charListid = 0;
                     return;
                 }
                 var acc = accList[accountListid];
-                var char = listOfAccounts[accList[accountListid]][charListid];
+                var char = AccountsMap[accList[accountListid]][charListid];
                 charListid = charListid + 1;
                 doQuery(acc, char, window.loadMoreItem);
             };
         }
         else if (character == "Show All" && account != "Show All") {
             var charList = [];
-            $("#characterSelect").find("option").each(function (index) {
+            $("#character-select").find("option").each(function (index) {
                 charList.push(this.innerText);
             });
             charListid = 1;
@@ -286,23 +282,23 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             window.loadMoreItem = function () {
                 if (charListid == charList.length) {
                     if (!ended) {
-                        $("#itemsList").append("<div>End Of Items on Account</div>");
+                        $("#items-list").append("<div>End Of Items on Account</div>");
                         ended = true;
                     }
                     return;
                 }
                 var char = charList[charListid];
                 charListid = charListid + 1;
-                doQuery($("#accountSelect").val(), char, window.loadMoreItem);
+                doQuery($("#account-select").val(), char, window.loadMoreItem);
             };
         }
-        else doQuery($("#accountSelect").val(), character);
+        else doQuery($("#account-select").val(), character);
     }
 
     function pupulateAccountCharSelect(realm, core, type, ladder) {
         API.emit("accounts", realm, function (err, account) {
             if (err) console.log(err);
-            listOfAccounts = {};
+            AccountsMap = {};
 
             for (var q in account) {
                 var res = account[q].split("\\");
@@ -311,8 +307,8 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                     continue;
                 }
 
-                if (!listOfAccounts[res[1]]) {
-                    listOfAccounts[res[1]] = [];
+                if (!AccountsMap[res[1]]) {
+                    AccountsMap[res[1]] = [];
                 }
 
                 var charkey = res[2].split(".")[1];
@@ -330,29 +326,25 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 }
 
                 if ((charCheck.ladder == checks.ladder) && (charCheck.lod == checks.lod) && (charCheck.sc == checks.sc)) 
-                    listOfAccounts[res[1]].push(res[2]);
+                    AccountsMap[res[1]].push(res[2]);
             }
 
-            $("#characterSelect").html("");
-            $("#accountSelect").html("");
+            $("#character-select").html("");
+            $("#account-select").html("");
             var csoption = $("<option/>");
             csoption.text("Show All");
-            $("#characterSelect").append(csoption);
-            $("#accountSelect").append("");
+            $("#character-select").append(csoption);
+            $("#account-select").append("");
             var asoption = $("<option/>");
             asoption.text("Show All");
-            $("#accountSelect").append(asoption);
-            for (var i in listOfAccounts) {
+            $("#account-select").append(asoption);
+            for (var i in AccountsMap) {
                 asoption = $("<option/>");
                 asoption.text(i);
-                $("#accountSelect").append(asoption);
+                $("#account-select").append(asoption);
             }
             refreshList();
         });
-    }
-
-    function addMuleForLogging(realm, account, password, character) {
-        API.emit("addMule", realm, account, password, character)
     }
 
     var add_row_index = 1;
@@ -362,25 +354,25 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             $(".logged-in-out").fadeToggle("hide");
         }
 
-        $("#accountSelect").change(function () {
-            $("#characterSelect").html("");
+        $("#account-select").change(function () {
+            $("#character-select").html("");
             var $thisAccount = $(this).val();
             var csoption = $("<option/>");
             csoption.text("Show All");
-            $("#characterSelect").append(csoption);
-            for (var j in listOfAccounts[$thisAccount]) {
+            $("#character-select").append(csoption);
+            for (var j in AccountsMap[$thisAccount]) {
                 csoption = $("<option/>");
-                csoption.text(listOfAccounts[$thisAccount][j]);
-                $("#characterSelect").append(csoption);
+                csoption.text(AccountsMap[$thisAccount][j]);
+                $("#character-select").append(csoption);
             }
             refreshList();
         });
 
-        $("#searchItem").change(function () {
+        $("#search-bar").change(function () {
             refreshList();
         });
 
-        $("#characterSelect").change(function () {
+        $("#character-select").change(function () {
             refreshList();
         });
 
@@ -406,48 +398,51 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         }
         var clickedClass = "btn-success";
         //set button state
-        $("#gameRealm").find(".gameRealm-" + CurrentRealm).attr("selected", "selected")
-        $(".gameRealm-" + CurrentRealm).addClass(clickedClass);
-        $(".gameType-" + CurrentGameType).addClass(clickedClass);
-        $(".gameMode-" + CurrentGameMode).addClass(clickedClass);
-        $(".gameClass-" + CurrentGameClass).addClass(clickedClass);
+        $("#game-realm").find(".game-realm-" + CurrentRealm).attr("selected", "selected")
+        $(".game-realm-" + CurrentRealm).addClass(clickedClass);
+        $(".game-type-" + CurrentGameType).addClass(clickedClass);
+        $(".game-mode-" + CurrentGameMode).addClass(clickedClass);
+        $(".game-class-" + CurrentGameClass).addClass(clickedClass);
 
-        $("#gameRealm").change(function () {
+        $("#game-realm").change(function () {
             CurrentRealm = $(this).find("option:selected").text().trim();
             window.localStorage.setItem("CurrentRealm", CurrentRealm);
             pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
         });
 
-        $(".gameType").click(function () {
+        $(".game-type").off("click");
+        $(".game-type").click(function () {
             if (CurrentGameType == $(this).text().trim()) {
                 return;
             }
 
-            $(".gameType").removeClass(clickedClass);
+            $(".game-type").removeClass(clickedClass);
             $(this).addClass(clickedClass);
             CurrentGameType = $(this).text().trim();
             window.localStorage.setItem("CurrentGameType", CurrentGameType);
             pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
         });
 
-        $(".gameMode").click(function () {
+        $(".game-mode").off("click");
+        $(".game-mode").click(function () {
             if (CurrentGameMode == $(this).text().trim()) {
                 return;
             }
             
-            $(".gameMode").removeClass(clickedClass);
+            $(".game-mode").removeClass(clickedClass);
             $(this).addClass(clickedClass);
             CurrentGameMode = $(this).text().trim();
             window.localStorage.setItem("CurrentGameMode", CurrentGameMode);
             pupulateAccountCharSelect(CurrentRealm, CurrentGameMode, CurrentGameType, CurrentGameClass);
         });
 
-        $(".gameClass").click(function () {
+        $(".game-class").off("click");
+        $(".game-class").click(function () {
             if (CurrentGameClass == $(this).text().trim()) {
                 return;
             }
 
-            $(".gameClass").removeClass(clickedClass);
+            $(".game-class").removeClass(clickedClass);
             $(this).addClass(clickedClass);
             CurrentGameClass = $(this).text().trim().replace(' ', '');
             window.localStorage.setItem("CurrentGameClass", CurrentGameClass);
@@ -460,12 +455,12 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             setInterval(function () {
                 var pos;
 
-                var pageTopToDivBottom = $("#loadMore").offset().top + $("#loadMore")[0].scrollHeight;
+                var pageTopToDivBottom = $("#load-more").offset().top + $("#load-more")[0].scrollHeight;
                 var scrolledPlusViewable = $(window).scrollTop() + $(window).height();
 
                 if ($(window).scrollTop() > pageTopToDivBottom)
                     pos = "up";
-                else if (scrolledPlusViewable < $("#loadMore").offset().top)
+                else if (scrolledPlusViewable < $("#load-more").offset().top)
                     pos = "down";
                 else
                     pos = "see";
@@ -476,8 +471,9 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             }, 500);
         })
 
-        $("#log_accounts").click(function() {
-            var apipass = document.getElementById("log_accounts_api").value;
+        $("#log-accounts").off("click");
+        $("#log-accounts").click(function() {
+            var apipass = document.getElementById("log-accounts-api").value;
 
             if (!apipass || apipass.length < 1) {
                 return;
@@ -517,10 +513,11 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 document.getElementsByName('chars' + i)[0].value = "";
             }
 
-            $('#addAccountsModal').modal('hide');
+            $('#add-accounts-modal').modal('hide');
         });
 
-        $(".queueDrops-btn").click(function () {
+        $(".launch-btn").off("click");
+        $(".launch-btn").click(function () {
             var gamename = $("#gamename").val();
             var gamepass = $("#gamepass").val();
             var drops = {};
@@ -561,13 +558,8 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             }
         })
 
+        $(".logout-btn").off("click");
         $(".logout-btn").click(function () {
-            $(".queueDrops-btn").off("click");
-            $(".logout-btn").off("click");
-            $(".addMule-btn").off("click");
-            $(".gameType").off("click");
-            $(".gameMode").off("click");
-            $(".gameClass").off("click");
             $(".logged-in-out").fadeToggle("hide");
             login("public", "public", function(loggedin){});
         })
@@ -575,16 +567,16 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     }
 
     $(".add-acc-btn").click(function () {
-        $("#addAccountsModal").modal('show');
+        $("#add-accounts-modal").modal('show');
         while (add_row_index > 5) {
             $("#addr"+(add_row_index-1)).html('');
             add_row_index--;
         }
     });
 
-    $("#add_row").click(function(){
+    $("#add-row").click(function(){
         $('#addr'+add_row_index).html("<td data-label='Realm' class='ld-modal-col0'><select class='ld-select-add' name='realm" + add_row_index + "'><option>USEast</option><option>USWest</option><option>Europe</option><option>Asia</option></select></td><td data-label='Account' class='ld-modal-col1'><input class='ld-input-add' type='text' name='acc" + add_row_index + "' placeholder='Account' /></td><td data-label='Password' class='ld-modal-col2'><input class='ld-input-add' type='text' name='pass" + add_row_index + "' placeholder='Password'/></td><td data-label='Character(s)' class='ld-modal-col3'><input class='ld-input-add' type='text' name='chars" + add_row_index + "' placeholder='a, b, c or empty'/></td>");
-        $('#tab_logic').append('<tr id="addr'+(add_row_index+1)+'"></tr>');
+        $('#tab-logic').append('<tr id="addr'+(add_row_index+1)+'"></tr>');
         add_row_index++; 
     });
 
