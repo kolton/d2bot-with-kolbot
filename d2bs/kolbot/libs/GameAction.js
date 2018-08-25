@@ -15,8 +15,8 @@ var GameAction = {
 	// don't edit
 	init: function (task) {
 		this.task = JSON.parse(task);
-		
-		if (this.task["data"] && typeof this.task.data === 'string') { 
+
+		if (this.task["data"] && typeof this.task.data === 'string') {
 			this.task.data = JSON.parse(this.task.data);
 		}
 
@@ -32,29 +32,31 @@ var GameAction = {
 			data = JSON.stringify(data);
 		}
 
-        var tag = JSON.parse(JSON.stringify(this.task)); // deep copy
+		D2Bot.printToConsole(data);
+
+		var tag = JSON.parse(JSON.stringify(this.task)); // deep copy
 		tag.action = action;
 		tag.data = data;
 		D2Bot.setTag(tag);
 	},
 
 	gameInfo: function () {
-        var gi = { gameName: null, gamePass: null };
+		var gi = { gameName: null, gamePass: null };
 
 		switch (this.task.action) {
 		case "doMule":
-            gi = null;
+			gi = null;
 			break; // create random game
 		case "doDrop":
-            gi.gameName = this.task.data.gameName;
-            gi.gamePass = this.task.data.gamePass;
+			gi.gameName = this.task.data.gameName;
+			gi.gamePass = this.task.data.gamePass;
 			break; // join game
 		default:
-            gi = null;
+			gi = null;
 			break;
 		}
 
-        return gi;
+		return gi;
 	},
 
 	getLogin: function () {
@@ -62,12 +64,12 @@ var GameAction = {
 
 		if (this.task && this.task.data) {
 			li.password = this.load(this.task.hash);
-        }
+		}
 
 		// drop specific object
 		if  (this.task.data["items"] && this.task.data.items.length > 0) {
-            li.realm = this.task.data.items[0].realm
-            li.account = this.task.data.items[0].account;
+			li.realm = this.task.data.items[0].realm
+			li.account = this.task.data.items[0].account;
 		}
 
 		// mule log specific objects
@@ -81,24 +83,24 @@ var GameAction = {
 
 		if (!li.password || !li.account || !li.realm) {
 			this.update("done", "Realm, Account, or Password was invalid!");
-            D2Bot.stop();
-            delay(500);
+			D2Bot.stop();
+			delay(500);
 		}
 
-        return li;
+		return li;
 	},
 
 	getCharacters: function () {
-        var i = 0;
+		var i = 0;
 		var chars = [];
 
 		// drop specific object
 		if  (this.task.data["items"]) {
-            for (i = 0; i < this.task.data.items.length; i += 1) {
-                if (chars.indexOf(this.task.data.items[i].character) === -1) {
-                    chars.push(this.task.data.items[i].character);
-                }
-            }
+			for (i = 0; i < this.task.data.items.length; i += 1) {
+				if (chars.indexOf(this.task.data.items[i].character) === -1) {
+					chars.push(this.task.data.items[i].character);
+				}
+			}
 		}
 
 		// mule log specific object
@@ -180,10 +182,13 @@ var GameAction = {
 		var filename = "data/secure/" + hash + ".txt";
 
 		if (!FileTools.exists(filename)) {
-            throw new Error("File " + filename + " does not exist!");
+			this.update("done", "File " + filename + " does not exist!");
+			D2Bot.stop();
+			delay(500);
+			return;
 		}
 
-        return FileTools.readText(filename);
+		return FileTools.readText(filename);
 	},
 
 	save: function (hash, data) {
@@ -192,41 +197,41 @@ var GameAction = {
 	},
 
 	dropItems: function (droplist) {
-        if (!droplist) {
-            return;
-        }
+		if (!droplist) {
+			return;
+		}
 
-        while (!me.gameReady) {
-            delay(100);
-        }
+		while (!me.gameReady) {
+			delay(100);
+		}
 
-        var i, items = me.getItems();
+		var i, items = me.getItems();
 
-        if (!items || !items.length) {
-            return;
-        }
+		if (!items || !items.length) {
+			return;
+		}
 
-        for (i = 0; i < droplist.length; i += 1) {
-            if (droplist[i].character !== me.charname) {
-                continue;
-            }
+		for (i = 0; i < droplist.length; i += 1) {
+			if (droplist[i].character !== me.charname) {
+				continue;
+			}
 
-            var info = droplist[i].itemid.split(":");//":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y;
+			var info = droplist[i].itemid.split(":");//":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y;
 
-            var classid = info[1];
-            var loc = info[2];
-            var unitX = info[3];
-            var unitY = info[4];
+			var classid = info[1];
+			var loc = info[2];
+			var unitX = info[3];
+			var unitY = info[4];
 
-            // for debug purposes
-            print("classid: " + classid + " location: " + loc + " X: " + unitX + " Y: " + unitY);
+			// for debug purposes
+			print("classid: " + classid + " location: " + loc + " X: " + unitX + " Y: " + unitY);
 
-            for (var j = 0; j < items.length; j += 1) {
-                if (items[j].classid.toString() === classid &&  items[j].location.toString() === loc &&  items[j].x.toString() === unitX && items[j].y.toString() === unitY) {
-                    items[j].drop();
-                }
-            }
-        }
+			for (var j = 0; j < items.length; j += 1) {
+				if (items[j].classid.toString() === classid &&  items[j].location.toString() === loc &&  items[j].x.toString() === unitX && items[j].y.toString() === unitY) {
+					items[j].drop();
+				}
+			}
+		}
 	},
 
 	// Log kept item stats in the manager.

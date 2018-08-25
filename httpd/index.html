@@ -100,7 +100,7 @@
                                 <i class="ti-search"></i>
                             </a>
                             <form class="app-search position-absolute" onSubmit="javascript: return false;">
-                                <input type="text" class="form-control" placeholder="Search &amp; enter" id="searchItem">
+                                <input type="text" class="form-control" placeholder="Search &amp; enter" id="search-bar">
                                 <a class="srh-btn">
                                     <i class="ti-close"></i>
                                 </a>
@@ -186,9 +186,9 @@
                         <!-- <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="charts.html" aria-expanded="false"><i class="mdi mdi-chart-bar"></i><span class="hide-menu">Profile Status</span></a></li> -->
                         <li class="sidebar-item">
                             <a class="sidebar-link ld-pad-top waves-effect waves-dark" aria-expanded="true">
-                                <div class="btn-group" id="gameType">
-                                    <button class="btn btn-secondary ld-btn-side gameType gameType-Expansion"> Expansion </button>
-                                    <button class="btn btn-secondary ld-btn-side gameType gameType-Classic"> Classic </button>
+                                <div class="btn-group" id="game-type">
+                                    <button class="btn btn-secondary ld-btn-side game-type game-type-Expansion"> Expansion </button>
+                                    <button class="btn btn-secondary ld-btn-side game-type game-type-Classic"> Classic </button>
                                 </div>
                                 <br/>
                                 <br/>
@@ -196,9 +196,9 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link ld-sidebar-link waves-effect waves-dark" aria-expanded="true">
-                                <div class="btn-group" id="gameType">
-                                    <button class="btn btn-secondary ld-btn-side gameMode gameMode-Softcore"> Softcore </button>
-                                    <button class="btn btn-secondary ld-btn-side gameMode gameMode-Hardcore"> Hardcore </button>
+                                <div class="btn-group" id="game-type">
+                                    <button class="btn btn-secondary ld-btn-side game-mode game-mode-Softcore"> Softcore </button>
+                                    <button class="btn btn-secondary ld-btn-side game-mode game-mode-Hardcore"> Hardcore </button>
                                 </div>
                                 <br/>
                                 <br/>
@@ -206,9 +206,9 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link ld-sidebar-link waves-effect waves-dark" aria-expanded="true">
-                                <div class="btn-group" id="gameType">
-                                    <button class="btn btn-secondary ld-btn-side gameClass gameClass-Ladder"> Ladder </button>
-                                    <button class="btn btn-secondary ld-btn-side gameClass gameClass-NonLadder"> Non Ladder </button>
+                                <div class="btn-group" id="game-type">
+                                    <button class="btn btn-secondary ld-btn-side game-class game-class-Ladder"> Ladder </button>
+                                    <button class="btn btn-secondary ld-btn-side game-class game-class-NonLadder"> Non Ladder </button>
                                 </div>
                                 <br/>
                                 <br/>
@@ -218,12 +218,12 @@
                         <li class="sidebar-item">
                             <a class="sidebar-link ld-sidebar-link waves-effect waves-dark" aria-expanded="true">
                                 <div class="block">
-                                    <label for="gameRealm" class="control-label ld-label-side">Realm</label>
-                                    <select class="sidebar-item ld-select" id="gameRealm">
-                                        <option class="gameRealm-USEast">USEast</option>
-                                        <option class="gameRealm-USWest">USWest</option>
-                                        <option class="gameRealm-Europe">Europe</option>
-                                        <option class="gameRealm-Asia">Asia</option>
+                                    <label for="game-realm" class="control-label ld-label-side">Realm</label>
+                                    <select class="sidebar-item ld-select" id="game-realm">
+                                        <option class="game-realm-USEast">USEast</option>
+                                        <option class="game-realm-USWest">USWest</option>
+                                        <option class="game-realm-Europe">Europe</option>
+                                        <option class="game-realm-Asia">Asia</option>
                                     </select>
                                 </div>
                             </a>
@@ -231,8 +231,8 @@
                         <li class="sidebar-item">
                             <a class="sidebar-link ld-sidebar-link waves-effect waves-dark" href="javascript:void(0)" aria-expanded="true">
                                 <div class="block">
-                                    <label for="accountSelect" class="control-label ld-label-side">Account</label>
-                                    <select class="sidebar-item ld-select" id="accountSelect">
+                                    <label for="account-select" class="control-label ld-label-side">Account</label>
+                                    <select class="sidebar-item ld-select" id="account-select">
                                         <option>Show All</option>
                                     </select>
                                 </div>
@@ -241,8 +241,8 @@
                         <li class="sidebar-item">
                             <a class="sidebar-link ld-sidebar-link waves-effect waves-dark" href="javascript:void(0)" aria-expanded="true">
                                 <div class="block">
-                                    <label for="characterSelect" class="control-label ld-label-side">Character</label>
-                                    <select class="sidebar-item ld-select" id="characterSelect">
+                                    <label for="character-select" class="control-label ld-label-side">Character</label>
+                                    <select class="sidebar-item ld-select" id="character-select">
                                         <option>Show All</option>
                                     </select>
                                 </div>
@@ -268,7 +268,7 @@
                             </li>
                             <li class="sidebar-item">
                                 <a class="sidebar-link ld-sidebar-link waves-effect waves-dark" aria-expanded="true">
-                                    <button class="btn btn-secondary ld-btn-wide queueDrops-btn"> Launch </button>
+                                    <button class="btn btn-secondary ld-btn-wide launch-btn"> Launch </button>
                                     <br/>
                                     <br/>
                                 </a>
@@ -297,9 +297,9 @@
                         <div class="card">
                             <h4 class="card-title ld-title-indent">Inventory</h4>
                             <div class="comment-widgets scrollable">
-                                <div class="itemsList" id="itemsList"></div>
+                                <div class="items-list" id="items-list"></div>
 
-                                <div id="loadMore"></div>
+                                <div id="load-more"></div>
 
                             </div>
                         </div>
@@ -357,7 +357,7 @@
     <div class="modal fade hide" role="dialog" id="modelDialog"></div>
 
     <!-- Modal -->
-    <div class="modal fade" id="addAccountsModal" tabindex="-1" role="dialog" aria-labelledby="addAccountsModalTitle" aria-hidden="true">
+    <div class="modal fade" id="add-accounts-modal" tabindex="-1" role="dialog" aria-labelledby="addAccountsModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -368,7 +368,7 @@
             </div>
             <div class="modal-body">
             <div class="row clearfix">
-                <table class="table table-bordered table-hover" id="tab_logic">
+                <table class="table table-bordered table-hover" id="tab-logic">
                     <thead>
                         <tr>
                             <th scope="col" class="text-center">
@@ -411,9 +411,9 @@
             </div>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary mr-auto" id="add_row" >Add Row</button>
-            <input class="ld-input-api" id="log_accounts_api" type="password" placeholder='Password' />
-            <button type="button" class="btn btn-success" id="log_accounts" >Log Accounts</button>
+            <button type="button" class="btn btn-secondary mr-auto" id="add-row" >Add Row</button>
+            <input class="ld-input-api" id="log-accounts-api" type="password" placeholder='Password' />
+            <button type="button" class="btn btn-success" id="log-accounts" >Log Accounts</button>
             </div>
         </div>
         </div>
