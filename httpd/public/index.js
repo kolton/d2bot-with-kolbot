@@ -87,6 +87,10 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         API.emit('login', username, password, function (err, result) {
             if (err) {
                 console.log(err);
+                cookie.data.username = "";
+                cookie.data.session = "";
+                cookie.data.loggedin = false;
+                cookie.save();
                 return callback(false);
             }
 
@@ -478,21 +482,23 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 if (pos == "see") {
                     if (window.loadMoreItem) window.loadMoreItem();
                 }
+                
+                if (cookie.data.loggedin) {
+                    API.emit("poll", function (err, msg) {
+                        if (msg.body === "empty") {
+                            return;
+                        }
 
-                API.emit("poll", function (err, msg) {
-                    if (msg.body === "empty") {
-                        return;
-                    }
+                        msg.body = JSON.parse(msg.body);
 
-                    msg.body = JSON.parse(msg.body);
-
-                    for (var i = 0; i < msg.body.length; i++) {
-                        var data = JSON.parse(msg.body[i].body);
-                        showNotification("Game Action", data.data, false);
-                    }
-                });
-            }, 500);
-        })
+                        for (var i = 0; i < msg.body.length; i++) {
+                            var data = JSON.parse(msg.body[i].body);
+                            showNotification("Game Action", data.data, false);
+                        }
+                    });
+                }
+            }, 3000);
+        });
 
         $("#log-accounts").off("click");
         $("#log-accounts").click(function() {
