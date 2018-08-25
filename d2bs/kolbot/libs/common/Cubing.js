@@ -113,7 +113,7 @@ var Cubing = {
 				if (NTIPAliasClassID.hasOwnProperty(Config.Recipes[i][1].replace(/\s+/g, "").toLowerCase())) {
 					Config.Recipes[i][1] = NTIPAliasClassID[Config.Recipes[i][1].replace(/\s+/g, "").toLowerCase()];
 				} else {
-					Misc.errorReport("ÿc1Invalid cubing entry:ÿc0 " + Config.Recipes[i][1]);
+					Misc.errorReport("\xFFc1Invalid cubing entry:\xFFc0 " + Config.Recipes[i][1]);
 					Config.Recipes.splice(i, 1);
 
 					i -= 1;
@@ -948,8 +948,11 @@ IngredientLoop:
 
 				transmute();
 				delay(700 + me.ping);
-				print("ÿc4Cubing: " + string);
-				D2Bot.printToConsole(string, 5);
+				print("\xFFc4Cubing: " + string);
+				if (Config.ShowCubingInfo) {
+					D2Bot.printToConsole(string, 5);
+				}
+
 				this.update();
 
 				items = me.findItems(-1, -1, 6);
@@ -966,7 +969,9 @@ IngredientLoop:
 							break;
 						case 1:
 							Misc.itemLogger("Cubing Kept", items[j]);
-							Misc.logItem("Cubing Kept", items[j], result.line);
+							if (Config.ShowCubingInfo) {
+								Misc.logItem("Cubing Kept", items[j], result.line);
+							}
 
 							break;
 						case 5: // Crafting System
@@ -1031,23 +1036,50 @@ IngredientLoop:
 			return false;
 		}
 
-		if (getUIFlag(0x1A)) {
+		if (getUIFlag(0x1a)) {
 			return true;
+		}
+
+		if (cube.location === 7 && !Town.openStash()) {
+			return false;
 		}
 
 		for (i = 0; i < 3; i += 1) {
 			cube.interact();
-
 			tick = getTickCount();
 
-			while (getTickCount() - tick < 1000) {
-				if (getUIFlag(0x1A)) {
-					delay(500);
+			while (getTickCount() - tick < 5000) {
+				if (getUIFlag(0x1a)) {
+					delay(100 + me.ping * 2); // allow UI to initialize
 
 					return true;
 				}
 
-				delay(10);
+				delay(100);
+			}
+		}
+
+		return false;
+	},
+
+	closeCube: function () {
+		var i, tick;
+
+		if (!getUIFlag(0x1a)) {
+			return true;
+		}
+
+		for (i = 0; i < 5; i++) {
+			me.cancel();
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 3000) {
+				if (!getUIFlag(0x1a)) {
+					delay(250 + me.ping * 2); // allow UI to initialize
+					return true;
+				}
+
+				delay(100);
 			}
 		}
 

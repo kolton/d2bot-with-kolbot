@@ -295,6 +295,14 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
+	// Manager Item Log Screen
+	Config.ShowLowRunes = false; // show/hide low runes (El ÷ Dol) on the item log screen
+	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel ÷ Mal) on the item log screen
+	Config.ShowHighRunes = true; // show/hide high runes (Ist ÷ Zod) on the item log screen
+	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
+	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
+	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen
+
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
 	Config.RepairPercent = 40; // Durability percent of any equipped item that will trigger repairs.
@@ -466,7 +474,6 @@ function LoadConfig() {
 	Config.Wereform = false; // 0 / false - don't shapeshift, 1 / "Werewolf" - change to werewolf, 2 / "Werebear" - change to werebear
 
 	// Class specific config
-	Config.BOSwitch = 0; // Precast weapon slot - 0 = slot I, 1 = slot II
 	Config.FindItem = false; // Use Find Item skill on corpses after clearing.
 	Config.FindItemSwitch = 0; // Find Item weapon slot - 0 = slot I, 1 = slot II
 	

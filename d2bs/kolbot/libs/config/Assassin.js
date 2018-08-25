@@ -295,6 +295,14 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
+	// Manager Item Log Screen
+	Config.ShowLowRunes = false; // show/hide low runes (El ÷ Dol) on the item log screen
+	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel ÷ Mal) on the item log screen
+	Config.ShowHighRunes = true; // show/hide high runes (Ist ÷ Zod) on the item log screen
+	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
+	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
+	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen
+
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
 	Config.RepairPercent = 40; // Durability percent of any equipped item that will trigger repairs.
@@ -482,6 +490,7 @@ function LoadConfig() {
 	Config.UseBoS = false; // Set to true to use Burst of Speed prebuff. TODO: Casting in town + UseFade compatibility
 	Config.UseVenom = false; // Set to true to use Venom prebuff. Set to false if you don't have the skill and have Arachnid Mesh - it will cause connection drop otherwise.
 	Config.UseCloakofShadows = true; // Set to true to use Cloak of Shadows while fighting. Useful for blinding regular monsters/minions.
+	Config.AggressiveCloak = false; // Move into Cloak range or cast if already close
 	
 	
 	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )

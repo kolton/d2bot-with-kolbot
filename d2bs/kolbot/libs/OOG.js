@@ -269,7 +269,7 @@ var D2Bot = {
 			args: []
 		};
 
-		//print("?c1Heart beat " + this.handle);
+		//print("\xFFc1Heart beat " + this.handle);
 		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
