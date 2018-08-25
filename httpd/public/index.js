@@ -94,6 +94,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             cookie.data.session = result;
             cookie.data.loggedin = (username !== "public") ? true : false;
             cookie.save();
+            showNotificaiton("Now logged in as " + username, false);
             callback(cookie.data.loggedin);
         });        
     }
@@ -119,9 +120,17 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         </a>`;
 
         $('#ldNotify').append($(template));
-        if ($('#ldNotifyDrop').is(":hidden")){
-            $('#ldNotifyDrop').dropdown('toggle');
-        }
+        $("#ldNotifyDrop").click();
+
+        $(".ld-notify-card").off("click");
+        $(".ld-notify-card").click(function (event) {
+            if ($(this).hasClass("always-there")) {
+                return;
+            }
+
+            event.stopImmediatePropagation();
+            $(this).remove();
+        })
     }
 
     function refreshList() {
@@ -352,6 +361,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     function start(loggedin) {
         if (loggedin) {
             $(".logged-in-out").fadeToggle("hide");
+            $(".current-user-btn").html("<i class='font-24 mdi mdi-account-circle current-user-btn'></i>" + cookie.data.username + "</a>")
         }
 
         $("#account-select").change(function () {
@@ -579,14 +589,6 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         $('#tab-logic').append('<tr id="addr'+(add_row_index+1)+'"></tr>');
         add_row_index++; 
     });
-
-    $(".ld-notify-card").click(function () {
-        if ($(this).hasClass("always-there")) {
-            return;
-        }
-
-        $(this).remove();
-    })
 
     $("#login-ok-btn").click(function () {
         var username = String($("#ld-login-user").val());

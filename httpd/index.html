@@ -115,10 +115,10 @@
                         <!-- Messages -->
                         <!-- ============================================================== -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle waves-effect waves-dark" id="2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark" id="ldNotifyDrop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="font-24 mdi mdi-comment-processing"></i>
                             </a>
-                            <div id="ldNotifyDrop" class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown" aria-labelledby="2">
+                            <div class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown p-b-0" aria-labelledby="ldNotifyDrop">
                                 <ul class="list-style-none">
                                     <li>
                                         <div class="" id="ldNotify">
@@ -138,7 +138,7 @@
                             <a class="nav-link dropdown-toggle waves-effect waves-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="font-24 mdi mdi-account-circle"></i>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right user-dd animated">
+                            <div class="dropdown-menu dropdown-menu-right user-dd animated p-b-0">
                                 <div class="logged-in-out">
                                     <a class="dropdown-item input-group">
                                         <i class="ti-user m-r-5 m-l-5 ld-input-icon"></i>
@@ -149,17 +149,19 @@
                                         <input type="password" class="form-control" id="ld-login-pw" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" required="">
                                     </a>
                                     <a class="dropdown-item" id="login-ok-btn" href="javascript:void(0)">
-                                        <i class="fa fa-power-off m-r-5 m-l-5"></i> Login </a>
+                                        <i class="fa fa-power-off m-r-5 m-l-5 ld-btn-icon"></i> Login </a>
                                 </div>
                                 <div class="logged-in-out hide">
+                                    <a class="dropdown-item current-user-btn" href="javascript:void(0)">
+                                        <i class="font-24 mdi mdi-account-circle current-user-btn"></i> Public </a>
                                     <a class="dropdown-item add-acc-btn" href="javascript:void(0)">
-                                        <i class="ti-view-list-alt m-r-5 m-l-5"></i> Add Accounts </a>
+                                        <i class="ti-view-list-alt m-r-5 m-l-5 ld-btn-icon"></i> Add Accounts </a>
                                     <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="ti-user m-r-5 m-l-5"></i> View Profiles </a>
+                                        <i class="ti-user m-r-5 m-l-5 ld-btn-icon"></i> View Profiles </a>
                                     <a class="dropdown-item" href="javascript:void(0)">
-                                        <i class="ti-settings m-r-5 m-l-5"></i> Settings </a>
+                                        <i class="ti-settings m-r-5 m-l-5 ld-btn-icon"></i> Settings </a>
                                     <a class="dropdown-item logout-btn" href="javascript:void(0)">
-                                        <i class="fa fa-power-off m-r-5 m-l-5"></i> Logout </a>
+                                        <i class="fa fa-power-off m-r-5 m-l-5 ld-btn-icon"></i> Logout </a>
                                 </div>
                             </div>
                         </li>
