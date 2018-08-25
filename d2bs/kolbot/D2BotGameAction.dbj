@@ -313,11 +313,15 @@ MainSwitch:
 			case getLocaleString(5207):
 				D2Bot.updateStatus("Invalid Password");
 				D2Bot.printToConsole("Invalid Password");
+				GameAction.update("done", "GameAction has failed due to invalid login, location 10");
+				D2Bot.stop();
 
 				break;
 			case getLocaleString(5208):
 				D2Bot.updateStatus("Invalid Account");
 				D2Bot.printToConsole("Invalid Account");
+				GameAction.update("done", "GameAction has failed due to invalid login, location 10");
+				D2Bot.stop();
 
 				break;
 			case getLocaleString(5202): // cd key intended for another product
