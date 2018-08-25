@@ -184,6 +184,13 @@ var Config = {
 	ItemInfo: false,
 	ItemInfoQuality: [],
 
+	ShowLowRunes: false,
+	ShowMiddleRunes: false,
+	ShowHighRunes: true,
+	ShowLowGems: false,
+	ShowHighGems: false,
+	ShowCubingInfo: true,
+
 	Cubing: false,
 	CubeRepair: false,
 	RepairPercent: 40,

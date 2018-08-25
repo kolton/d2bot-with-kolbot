@@ -25,7 +25,7 @@ var Container = function (name, width, height, location) {
 	}
 
 	/* Container.Mark(item)
-	 *	Marks the item in the buffer, and adds it to the item list. 
+	 *	Marks the item in the buffer, and adds it to the item list.
 	 */
 	this.Mark = function (item) {
 		var x, y;
@@ -175,10 +175,10 @@ Loop:
 				return false;
 			}
 
-            //Failed to open proper buffer
-            if (!Town.openStash() || (item.location === 6 && !Cubing.openCube())) {
-                return false;
-            }
+			//Make sure stash is open
+			if (this.location === 7 && !Town.openStash()) {
+				return false;
+			}
 
 			//Pick to cursor if not already.
 			if (!item.toCursor()) {
@@ -190,7 +190,7 @@ Loop:
 				if (this.location === 6) { // place item into cube
 					cItem = getUnit(100);
 					cube = me.getItem(549);
-					
+
 					if (cItem !== null && cube !== null) {
 						sendPacket(1, 0x2a, 4, cItem.gid, 4, cube.gid);
 					}

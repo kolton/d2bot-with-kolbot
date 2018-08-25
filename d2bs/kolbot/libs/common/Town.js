@@ -1581,14 +1581,27 @@ MainLoop:
 	},
 
 	openStash: function () {
+		var i, tick, stash;
+
+		if (getUIFlag(0x1a) && !Cubing.closeCube()) {
+			return false;
+		}
+
 		if (getUIFlag(0x19)) {
 			return true;
 		}
 
-		var i, tick, stash;
+		for (i = 0; i < 5; i += 1) {
+			me.cancel();
+
+			if (this.move("stash")) {
+				break;
+			}
+
+			delay(100 + me.ping * 2);
+		}
 
 		for (i = 0; i < 5; i += 1) {
-			this.move("stash");
 			stash = getUnit(2, 267);
 
 			if (stash) {
@@ -1597,26 +1610,18 @@ MainLoop:
 
 				tick = getTickCount();
 
-				while (getTickCount() - tick < 10000) {
+				while (getTickCount() - tick < 5000) {
 					if (getUIFlag(0x19)) {
 						delay(100 + me.ping * 2); // allow UI to initialize
 
 						return true;
 					}
 
-					delay(10);
+					delay(100);
 				}
 			}
 
-			if (i > 1) {
-				Packet.flash(me.gid);
-
-				if (stash) {
-					Pather.moveToUnit(stash);
-				} else {
-					this.move("stash");
-				}
-			}
+			delay(100);
 		}
 
 		return false;
