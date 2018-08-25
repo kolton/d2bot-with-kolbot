@@ -225,7 +225,7 @@ function LoadConfig() {
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
 	Config.HealMP = 0; // Go to a healer if under designated percent of mana.
-	Config.HealStatus = false; // Go to a healer if poisoned or cursed	
+	Config.HealStatus = false; // Go to a healer if poisoned or cursed
 	Config.UseMerc = true; // Use merc. This is ignored and always false in d2classic.
 	Config.MercWatch = false; // Instant merc revive during battle.
 
@@ -294,6 +294,14 @@ function LoadConfig() {
 	Config.FieldID = false; // Identify items in the field instead of going to town.
 	Config.DroppedItemsAnnounce.Enable = false;	// Announce Dropped Items to in-game newbs
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
+
+	// Manager Item Log Screen
+	Config.ShowLowRunes = false; // show/hide low runes (El ÷ Dol) on the item log screen
+	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel ÷ Mal) on the item log screen
+	Config.ShowHighRunes = true; // show/hide high runes (Ist ÷ Zod) on the item log screen
+	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
+	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
+	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen
 
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
@@ -414,7 +422,7 @@ function LoadConfig() {
 	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
 	Config.PacketCasting = 0; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
 	Config.WaypointMenu = true;
-	
+
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile

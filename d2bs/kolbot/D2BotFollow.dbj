@@ -237,7 +237,7 @@ function main() {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				if (!ingame) {
-					print("ÿc4Updating Status");
+					print("\xFFc4Updating Status");
 					//D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";

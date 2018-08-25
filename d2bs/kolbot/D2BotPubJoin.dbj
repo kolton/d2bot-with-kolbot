@@ -469,7 +469,7 @@ MainSwitch:
 
 			for (i = 0; i < gameList.length; i += 1) {
 				if (doneGames.indexOf(gameList[i].gameName) === -1 && includeCheck(gameList[i].gameName) && excludeCheck(gameList[i].gameName)) {
-					print("ÿc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
+					print("\xFFc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
 
 					gameToJoin = gameList[i].gameName;
 
