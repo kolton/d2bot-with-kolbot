@@ -1,3 +1,11 @@
+# LimeDrop Web Based Item Manager and Dropper
+## Setup
+- [LimeDrop Install](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Install)
+- [LimeDrop Usage](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Use)
+
+
+![](https://i.imgur.com/yUL2KMW.png)
+
 # D2BS IS NOT SAFE FROM DETECTION!
 
 ## Discord Channel
