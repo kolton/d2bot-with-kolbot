@@ -72,7 +72,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                         start(loggedin);
                     });
                 } else {
-                    start(true);
+                    start(cookie.data.loggedin);
                 }
             });
         } else {
@@ -80,6 +80,8 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 start(loggedin);
             });
         }
+
+        refreshList();
     }
 
     function login(username, password, callback)
@@ -284,6 +286,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 charListid = charListid + 1;
                 doQuery(acc, char, window.loadMoreItem);
             };
+            window.loadMoreItem();
         }
         else if (character == "Show All" && account != "Show All") {
             var charList = [];
@@ -304,6 +307,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 charListid = charListid + 1;
                 doQuery($("#account-select").val(), char, window.loadMoreItem);
             };
+            window.loadMoreItem();
         }
         else doQuery($("#account-select").val(), character);
     }
@@ -591,8 +595,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
         $(".logout-btn").click(function () {
             $(".logged-in-out").fadeToggle("hide");
             login("public", "public", function(loggedin){});
-        })
-
+        });
     }
 
     $(".add-acc-btn").click(function () {
