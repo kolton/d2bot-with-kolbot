@@ -94,7 +94,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
             cookie.data.session = result;
             cookie.data.loggedin = (username !== "public") ? true : false;
             cookie.save();
-            showNotificaiton("Now logged in as " + username, false);
+            showNotification("Notification", "Now logged in as " + username, false);
             callback(cookie.data.loggedin);
         });        
     }
@@ -105,7 +105,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     var CurrentGameClass;
     var AccountsMap = {};
 
-    function showNotificaiton(text, perm)
+    function showNotification(head, text, perm)
     {
         var template = `<a class="` + (perm ? `always-there ` : "") + `ld-notify-card link border-top">
         <div class="d-flex no-block align-items-center p-10">
@@ -113,7 +113,7 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 <i class="ti-calendar"></i>
             </span>
             <div class="m-l-10">
-                <h5 class="m-b-0">Notification</h5>
+                <h5 class="m-b-0">` + head + `</h5>
                 <span class="mail-desc">` + text + `</span>
             </div>
         </div>
@@ -478,6 +478,19 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
                 if (pos == "see") {
                     if (window.loadMoreItem) window.loadMoreItem();
                 }
+
+                API.emit("poll", function (err, msg) {
+                    if (msg.body === "empty") {
+                        return;
+                    }
+
+                    msg.body = JSON.parse(msg.body);
+
+                    for (var i = 0; i < msg.body.length; i++) {
+                        var data = JSON.parse(msg.body[i].body);
+                        showNotification("Game Action", data.data, false);
+                    }
+                });
             }, 500);
         })
 
@@ -602,5 +615,6 @@ require(["libs/D2Bot"], function (D2BOTAPI) {
     })
 
     initialize();
-    showNotificaiton("Welcome to Lime Drop!", true);
+    showNotification("Notification", "Welcome to Lime Drop!", true);
+    API.emit("poll", function() {});
 });
