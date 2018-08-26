@@ -1,0 +1,193 @@
+/* Color Codes class */
+.colorb {color: Black;}
+.color0 {color: #C4C4C4;}       /* WHITE */
+.color1 {color: #B04434;}       /* RED */
+.color2 {color: #18FC00;}       /* SET */
+.color3 {color: #787CE7;}       /* MAGIC */
+.color4 {color: #948064;}       /* UNIQUE */
+.color5 {color: #505050;}       /* DARK GRAY */
+.color6 {color: WhiteSmoke;}
+.color7 {color: WhiteSmoke;}
+.color8 {color: #D08420;}       /* CRAFT */
+.color9 {color: #D8B864;}       /* RARE */
+
+.ld-select-add {
+    width: 100% !important;
+    height: 27px !important;
+}
+
+.ld-input-add {
+    padding-left: 3px !important;
+    width: 100% !important;
+}
+
+.ld-input-api {
+    padding-left: 3px !important;
+    height: 35px !important;
+}
+
+.ld-modal {
+    /* new custom width */
+    width: 992px !important;
+    margin: auto;
+}
+
+.ld-modal-col0 {
+    max-width: 40px !important;
+}
+
+.ld-modal-col1 {  
+    max-width: 80px !important;
+}
+
+.ld-modal-col2 {
+    max-width: 80px !important;
+}
+
+.ld-modal-col3 {
+    min-width: 100% !important;
+}
+
+#main-wrapper .page-wrapper .container-fluid {
+    min-height: 100vh;
+}
+
+th {
+    padding: 5px !important;
+}
+
+td {
+    padding: 0px !important;
+}
+
+.sidebar-link {
+    opacity: 0.8 !important;
+}
+
+@media (max-width: 992px){
+    .row{
+        flex-direction: column-reverse; /*column & reverse*/
+    } 
+}
+
+.comment-widgets .comment-row:hover, .comment-widgets .comment-row.active {
+    background: #141619;
+    color:white;
+}
+
+.comment-widgets .comment-row.selected {
+    background: #1f262d70;;
+    color:white;
+}
+
+.comment-widgets{
+    font-size: 10px;
+}
+
+.card {
+    background-color: #191919;
+}
+
+.footer {
+    background-color: #141619;
+}
+
+.container-fluid {
+    background-color: #2c2c2e;
+    /*background-color: #625F63;*/
+}
+
+.comment-text {
+    padding-left: 0px;
+}
+
+.shadow-filter {
+    -webkit-filter: drop-shadow(0px 0px 20px black);
+    filter: drop-shadow(0px 0px 20px black);
+    image-rendering: crisp-edges;
+}
+
+.current-user-btn
+{
+    padding-right: 23px;
+    font-size: 22px;
+}
+
+.ld-input-icon {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 15px;
+}
+
+.ld-btn-icon {
+    padding-right: 20px;
+}
+
+.ld-item {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.ld-img-col {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+    margin-left: 2px !important;
+}
+
+.ld-pad-top {
+    padding: 12px 15px 0px 15px !important;
+}
+
+.ld-sidebar-link {
+    padding: 10px 15px 0px 15px !important;
+}
+
+.ld-title-indent {
+    height: 35px !important;
+    opacity: 0.8 !important;
+    padding: 7px 0px 8px 10px !important;
+    margin: 0px !important;
+    background-color: #53a53a;
+    color: white;
+}
+
+.ld-label-side {
+    padding-left: 3px;
+    display: inline-block;
+    width: 80px;
+    text-align: left;
+}
+
+.btn {
+    border-radius: 0 !important;
+}
+
+.btn-success {
+    background: #53a53a;
+    border-color: #53a53a;
+}
+
+.ld-btn-side {
+    width: 108px !important;
+    font-weight: 600 !important;
+}
+
+.ld-btn-wide {
+    width: 216px !important;
+    font-weight: 600 !important;
+}
+
+.ld-input-side {
+    display: inline-block;
+    width: 132px;
+    height: 23px;
+    text-align: left;    
+}
+
+.ld-select {
+    display: inline-block;
+    width: 132px;
+    text-align: left;
+}
