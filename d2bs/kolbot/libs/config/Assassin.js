@@ -12,7 +12,7 @@ function LoadConfig() {
 	 * Set to true if you want to run it, set to false if not.
 	 * If you want to change the order of the scripts, just change the order of their lines by using cut and paste.
 	 */
-	 
+
 	// User addon script. Read the description in libs/bots/UserAddon.js
 	Scripts.UserAddon = true; // !!!YOU MUST SET THIS TO FALSE IF YOU WANT TO RUN BOSS/AREA SCRIPTS!!!
 
@@ -491,11 +491,11 @@ function LoadConfig() {
 	Config.UseVenom = false; // Set to true to use Venom prebuff. Set to false if you don't have the skill and have Arachnid Mesh - it will cause connection drop otherwise.
 	Config.UseCloakofShadows = true; // Set to true to use Cloak of Shadows while fighting. Useful for blinding regular monsters/minions.
 	Config.AggressiveCloak = false; // Move into Cloak range or cast if already close
-	
-	
+
+
 	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
 	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system
-	
+
 	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing 
 												//	template filename located in libs/config/Builds/
 
