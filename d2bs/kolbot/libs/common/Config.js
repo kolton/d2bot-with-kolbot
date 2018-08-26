@@ -247,6 +247,7 @@ var Config = {
 	ClearType: false,
 	ClearPath: false,
 	BossPriority: false,
+	MandatoryBosses: [],
 
 	// Amazon specific
 	LightningFuryDelay: 0,
