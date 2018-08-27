@@ -2439,3 +2439,84 @@ var Events = {
 		return false;
 	}
 };
+
+const Colors = {
+	Red: 0x62,
+	Orange: 0x68,
+	Gold: 0x69,
+	Green: 0x7D,
+	Blue: 0x99,
+	Yellow: 0xA8,
+}
+
+const PartyInfo = new function() {
+	const expCurve = [13,16,110,159,207,255,255,255,255,255,255,255,255,255,255,255,225,174,92,38,5];
+	const expPenalty = [1024,976,928,880,832,784,736,688,640,592,544,496,448,400,352,304,256,192,144,108,81,61,46,35,26,20,15,11,8,6,5];
+	let lastUpdate=0, partyArr=[], tc=0, p, count=0, total=0;
+	const playerLocCheck = (func, everyoneDefault)=>(area = me.area, everyone = everyoneDefault)=>{
+		let party = getParty(me), members = [];
+		while (party.getNext())
+			if (party.area > 0)
+				members.push(func(party.area, area));
+		if (members)
+			return everyone ? members.every(Boolean) : members.some(Boolean);
+		return true;
+	}
+	const waitForLocState = (stateCheck, timeoutDefault)=>(timeout = timeoutDefault, area = me.area)=>{
+		let start = getTickCount();
+		while (getTickCount() - start < timeout) {
+			if (stateCheck(area))
+				return true;
+			delay(250);
+		}
+		return false;
+	}
+	const updateParty = ()=>{
+		tc = getTickCount();
+		if (tc-lastUpdate > 40) {
+			p = getParty(me);
+			lastUpdate = tc;
+			total = 0;
+			count = 0;
+			if (p) {
+				partyArr = [copyUnit(p)];
+				count++;
+				total++;
+				while (p.getNext()) {
+					if (p.area > 0) { // only party members that match partyid can show areas, this is easier
+						partyArr.push(Object.assign({}, p));
+						count++;
+					}
+					total++;
+				}
+				print("Party size: " + partyArr.length + "(" + count + ")");
+			} else {
+				partyArr = null;
+			}
+		}
+	};
+	this.members = ()=>{
+		updateParty();
+		return partyArr;
+	};
+	this.count = ()=>{
+		updateParty();
+		return count;
+	};
+	this.playersInGame = ()=>{
+		updateParty();
+		return total;
+	};
+	this.experienceModifier = (clvl ,mlvl)=>{
+		let bonus;
+		if(clvl < 25 || mlvl < clvl)
+			bonus = expCurve[Math.min(20, Math.max(0, Math.floor(mlvl - clvl + 10)))] / 255;
+		else
+			bonus = clvl / mlvl;
+		return bonus * expPenalty[Math.min(30, Math.max(0, Math.round(clvl - 69)))] / 1024;
+	};
+	this.playerIn = playerLocCheck((areaA, areaB)=>areaA == areaB, false);
+	this.playerOut = playerLocCheck((areaA, areaB)=>areaA != areaB, true);
+	this.waitForArrival = waitForLocState(this.playerIn, 45000);
+	this.waitForDeparture = waitForLocState(this.playerOut, 15000);
+};
