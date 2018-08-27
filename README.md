@@ -4,7 +4,7 @@
 - [LimeDrop Usage](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Use)
 
 
-![](https://i.imgur.com/2qDG52M.png)
+![](https://i.imgur.com/bsmEv3j.png)
 
 # D2BS IS NOT SAFE FROM DETECTION!
 
