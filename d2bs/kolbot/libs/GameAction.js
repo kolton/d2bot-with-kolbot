@@ -184,8 +184,8 @@ var GameAction = {
 		if (!FileTools.exists(filename)) {
 			this.update("done", "File " + filename + " does not exist!");
 			D2Bot.stop();
-			delay(500);
-			return;
+			delay(5000);
+			quitGame();
 		}
 
 		return FileTools.readText(filename);
