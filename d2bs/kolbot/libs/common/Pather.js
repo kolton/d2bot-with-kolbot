@@ -719,13 +719,13 @@ ModeLoop:
 			if (me.area === 101) {
 				break;
 			}
-			
+
 			return this.useUnit(2, 386, targetArea);
 		case 128:
 			if (me.area === 129) {
 				break;
 			}
-			
+
 			return this.useUnit(2, 547, targetArea);
 		}
 
@@ -1694,3 +1694,90 @@ MainLoop:
 		return areas[area];
 	}
 };
+
+function AreaProgress(startAreaID) {
+	this.rooms = [];
+	this.totalRoomCount = 0;
+	this.addArea = (areaID = me.area)=>{
+		let currentroom = getRoom(areaID);
+		if (currentroom) {
+			do {
+				let telePoint = CollMap.getTelePoint(currentroom);
+				if (telePoint) {
+					delete telePoint.distance;
+					this.rooms.push(telePoint);
+					this.totalRoomCount++;
+				}
+			} while (currentroom.getNext());
+			return true;
+		}
+		return false;
+	}
+	if (startAreaID)
+		this.addArea(startAreaID);
+}
+
+(()=>{ // scoped block, static hidden members yay!
+	function updateDistance(unit) {
+		unit.distance = getDistance(me.x, me.y, unit.x, unit.y);
+	}
+
+	function updatePartyDistance(unit) {
+		let source, m;
+		if (PartyInfo.count()) {
+			unit.distance = 999999;
+			unit.nearestPoint = null;
+			m = PartyInfo.members();
+			for (let c = 1; c < m.length; c++){
+				source=getUnit(null, null, null, m[c].gid);
+				if (!source)
+					source = m[c];
+				if (source.x && source.y) {
+					let d = getDistance(source.x, source.y, unit.x, unit.y);
+					if (d < unit.distance) {
+						unit.distance = d;
+						unit.nearestPoint = {x: source.x, y: source.y};
+					}
+				}
+			}
+		}
+	}
+
+	function compareDistance(a, b) {
+		return (a.distance < b.distance ? -1 : (a.distance > b.distance ? 1 : 0));
+	}
+
+	AreaProgress.prototype.touchArea = function(radius = 30, x = me.x, y = me.y) {
+		if (!this.rooms.length)
+			return null;
+		this.rooms.forEach(unit=>{
+			unit.distance = getDistance(x, y, unit.x, unit.y);
+		});
+		for (let c = 0; c < this.rooms.length; c++) {
+			if (this.rooms[c].distance <= radius)
+				delete this.rooms[c];
+		}
+		this.rooms = this.rooms.filter(Boolean);
+		return this.rooms.length;
+	};
+	AreaProgress.prototype.nearestRoom = function(updateDistances = false) {
+		if (!this.rooms.length)
+			return null;
+		if (updateDistances)
+			this.rooms.forEach(updateDistance);
+		this.rooms.sort(compareDistance);
+		return this.rooms[0];
+	};
+	AreaProgress.prototype.nearestRoomToParty = function(updateDistances = false) {
+		if(!this.rooms.length)
+			return null;
+		if(PartyInfo.count() < 2)
+			return this.nearestRoom(updateDistance);
+		if(updateDistances)
+			this.rooms.forEach(updatePartyDistance);
+		this.rooms.sort(compareDistance);
+		if(this.rooms[0].nearestPoint)
+			return this.rooms[0];
+		return this.nearestRoom(updateDistance);
+	};
+})();

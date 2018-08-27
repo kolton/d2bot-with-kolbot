@@ -134,4 +134,35 @@ var CollMap = new function () {
 
 		return false;
 	};
+
+	this.getTelePoint = function (room) {
+		if (!room) {
+			throw new Error("Invalid room passed to getTelePoint");
+		}
+		let roomx = room.x * 5, roomy = room.y * 5;
+		if (getCollision(room.area, roomx, roomy) & 1) {
+			let collision = room.getCollision();
+			let aMid = Math.round(collision.length / 2), bMid = Math.round(collision[0].length / 2);
+			let validTiles = [];
+			for (let a = 0; a < collision.length; a++) {
+				for (let b = 0; b<collision[a].length; b++){
+					if (!(collision[a][b] & 1)) {
+						validTiles.push({x: roomx + b - bMid, y: roomy + a - aMid, distance: getDistance(0, 0, a - aMid, b - bMid)});
+					}
+				}
+			}
+			if (validTiles.length){
+				validTiles.sort((a, b)=>{
+					if (a.distance < b.distance)
+						return -1;
+					if (a.distance > b.distance)
+						return 1;
+					return 0;
+				});
+				return validTiles[0];
+			}
+			return null;
+		}
+		return {x: roomx, y: roomy, distance: 0};
+	};
 };
