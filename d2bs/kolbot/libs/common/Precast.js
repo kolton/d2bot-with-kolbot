@@ -8,7 +8,7 @@ var Precast = new function () {
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;
-	var bestSlot = [];
+	this.bestSlot = [];
 
 	this.weaponSwitch = function (slot) {
 		if (me.gametype === 0) {
@@ -153,24 +153,21 @@ var Precast = new function () {
 	};
 
 	this.precastSkill = function (skillId) {
-		var swapped, slot;
+		var swapped;
 
-		if (bestSlot.indexOf(skillId) === -1) {
-			slot = this.getBetterSlot(skillId);
-			bestSlot.push(skillId, slot);
-		} else {
-			slot = bestSlot[bestSlot.indexOf(skillId) + 1];
+		if (this.bestSlot.indexOf(skillId) === -1) {
+			this.bestSlot.push(skillId, this.getBetterSlot(skillId));
 		}
 
-		if (slot !== me.weaponswitch) {
+		if (this.bestSlot[this.bestSlot.indexOf(skillId) + 1] !== me.weaponswitch) {
 			swapped = true;
 		}
 
-		this.weaponSwitch(slot);
+		this.weaponSwitch(this.bestSlot[this.bestSlot.indexOf(skillId) + 1]);
 		Skill.cast(skillId, 0);
 
 		if (swapped) {
-			this.weaponSwitch(Math.abs(slot - 1));
+			this.weaponSwitch(Math.abs(this.bestSlot[this.bestSlot.indexOf(skillId) + 1] - 1));
 		}
 
 		return true;
