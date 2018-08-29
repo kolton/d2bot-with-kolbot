@@ -337,6 +337,7 @@ function updateCount() {
 		password: muleObj.accountPassword
 	};
 
+	MuleLogger.save(md5(info.realm.toLowerCase() + info.account.toLowerCase()), info.password);
 	ControlAction.loginAccount(info);
 	delay(1000);
 	ControlAction.click(6, 33, 572, 128, 35);
@@ -638,6 +639,7 @@ MainSwitch:
 			break;
 		}
 
+		MuleLogger.save(md5(info.realm.toLowerCase() + info.account.toLowerCase()), info.password);
 		ControlAction.loginAccount(info);
 
 		break;
