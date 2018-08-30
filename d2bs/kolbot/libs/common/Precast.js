@@ -8,7 +8,7 @@ var Precast = new function () {
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;
-	this.bestSlot = {};
+	this.bestSlot = [];
 
 	this.weaponSwitch = function (slot) {
 		if (me.gametype === 0) {
@@ -153,21 +153,20 @@ var Precast = new function () {
 	};
 
 	this.precastSkill = function (skillId) {
-		var swapped;
+		var slot, swapped;
 
-		if (this.bestSlot[skillId] === undefined) {
-			this.bestSlot[skillId] = this.getBetterSlot(skillId);
+		if (this.bestSlot.indexOf(skillId) === -1) {
+			this.bestSlot.push(skillId, this.getBetterSlot(skillId));
 		}
 
-		if (this.bestSlot[skillId] !== me.weaponswitch) {
-			swapped = true;
-		}
+		slot = this.bestSlot[this.bestSlot.indexOf(skillId) + 1];
+		swapped = (slot !== me.weaponswitch);
 
-		this.weaponSwitch(this.bestSlot[skillId]);
+		this.weaponSwitch(slot);
 		Skill.cast(skillId, 0);
 
 		if (swapped) {
-			this.weaponSwitch(Math.abs(this.bestSlot[skillId] - 1));
+			this.weaponSwitch(slot ^ 1);
 		}
 
 		return true;
@@ -246,16 +245,29 @@ var Precast = new function () {
 			break;
 		case 4: // Barbarian - TODO: BO duration
 			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
+				var swapped;
+
+				if (this.bestSlot[0] === undefined) {
+					this.bestSlot.push(149, this.getBetterSlot(149));
+				}
+
+				swapped = (this.bestSlot[1] !== me.weaponswitch);
+				this.weaponSwitch(this.bestSlot[1]);
+
 				if (!me.getState(51) || force) {
-					this.precastSkill(155); // Battle Command
+					Skill.cast(155, 0); // Battle Command
 				}
 
 				if (!me.getState(32) || force) {
-					this.precastSkill(149); // Battle Orders
+					Skill.cast(149, 0); // Battle Orders
 				}
 
 				if (!me.getState(26) || force) {
-					this.precastSkill(138); // Shout
+					Skill.cast(138, 0); // Shout
+				}
+
+				if (swapped) {
+					this.weaponSwitch(this.bestSlot[1] ^ 1);
 				}
 			}
 
