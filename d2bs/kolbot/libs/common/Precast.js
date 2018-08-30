@@ -1,6 +1,6 @@
 /**
 *	@filename	Precast.js
-*	@author		D3STROY3R, kolton
+*	@author		noah-, kolton
 *	@desc		handle player prebuff sequence
 */
 
@@ -8,24 +8,17 @@ var Precast = new function () {
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;
+	this.bestSlot = {};
 
 	this.weaponSwitch = function (slot) {
-		if (me.gametype === 0) {
+		if (me.gametype === 0 || me.weaponswitch === slot) {
 			return true;
-		}
-
-		if (slot === -1) {
-			this.BOSwitch();
-
-			slot = this.haveCTA;
 		}
 
 		var i, tick;
 
 		if (slot === undefined) {
-			slot = me.weaponswitch === 0 ? 1 : 0;
-		} else if (me.weaponswitch === slot) {
-			return true;
+			slot = me.weaponswitch ^ 1;
 		}
 
 		delay(500);
@@ -58,14 +51,17 @@ var Precast = new function () {
 			return false;
 		}
 
-		if (this.BOSwitch()) {
+		if (this.checkCTA()) {
+			var slot = me.weaponswitch;
+
+			this.weaponSwitch(this.haveCTA);
 			Skill.cast(155, 0); // Battle Command
 			Skill.cast(149, 0); // Battle Orders
 
 			this.BODuration = (20 + me.getSkill(149, 1) * 10 + (me.getSkill(138, 0) + me.getSkill(155, 0)) * 5) * 1000;
 			this.BOTick = getTickCount();
 
-			this.weaponSwitch(Math.abs(this.haveCTA - 1));
+			this.weaponSwitch(slot);
 
 			return true;
 		}
@@ -74,6 +70,10 @@ var Precast = new function () {
 	};
 
 	this.getBetterSlot = function (skillId) {
+		if (this.bestSlot[skillId] !== undefined) {
+			return this.bestSlot[skillId];
+		}
+
 		var item, classid, skillTab,
 			sumCurr = 0,
 			sumSwap = 0;
@@ -81,7 +81,7 @@ var Precast = new function () {
 		switch (skillId) {
 		case 40: // Frozen Armor
 		case 50: // Shiver Armor
-		case 60: // Chilling Armor		
+		case 60: // Chilling Armor
 			classid = 1;
 			skillTab = 10;
 
@@ -133,7 +133,7 @@ var Precast = new function () {
 		default:
 			return me.weaponswitch;
 		}
-    
+
 		item = me.getItem();
 
 		if (item) {
@@ -148,23 +148,16 @@ var Precast = new function () {
 			} while (item.getNext());
 		}
 
-		return sumSwap > sumCurr ? Math.abs(me.weaponswitch - 1) : me.weaponswitch;
+		this.bestSlot[skillId] = (sumSwap > sumCurr) ? me.weaponswitch ^ 1 : me.weaponswitch;
+		return this.bestSlot[skillId];
 	};
 
 	this.precastSkill = function (skillId) {
-		var swapped,
-			slot = this.getBetterSlot(skillId);
+		var swap = me.weaponswitch;
 
-		if (slot !== me.weaponswitch) {
-			swapped = true;
-		}
-
-		this.weaponSwitch(slot);
+		this.weaponSwitch(this.getBetterSlot(skillId));
 		Skill.cast(skillId, 0);
-
-		if (swapped) {
-			this.weaponSwitch(Math.abs(slot - 1));
-		}
+		this.weaponSwitch(swap);
 
 		return true;
 	};
@@ -242,17 +235,23 @@ var Precast = new function () {
 			break;
 		case 4: // Barbarian - TODO: BO duration
 			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
+				var swap = me.weaponswitch;
+
+				this.weaponSwitch(this.getBetterSlot(149));
+
 				if (!me.getState(51) || force) {
-					this.precastSkill(155); // Battle Command
+					Skill.cast(155, 0); // Battle Command
 				}
 
 				if (!me.getState(32) || force) {
-					this.precastSkill(149); // Battle Orders
+					Skill.cast(149, 0); // Battle Orders
 				}
 
 				if (!me.getState(26) || force) {
-					this.precastSkill(138); // Shout
+					Skill.cast(138, 0); // Shout
 				}
+
+				this.weaponSwitch(swap);
 			}
 
 			break;
@@ -342,7 +341,7 @@ var Precast = new function () {
 			}
 
 			if (me.getSkill(277, 0) && (!me.getState(158) || force)) {
-				this.precastSkill(277); // Blade Shield	
+				this.precastSkill(277); // Blade Shield
 			}
 
 			if (me.getSkill(258, 0) && !Config.UseFade && Config.UseBoS && (!me.getState(157) || force)) {
@@ -364,35 +363,32 @@ var Precast = new function () {
 		}
 	};
 
-	this.BOSwitch = function () {
+	this.checkCTA = function () {
 		var item;
 
-		if (this.haveCTA < 0) {
-			item = me.getItem(-1, 1);
-
-			if (item) {
-MainLoop:
-				do {
-					if (item.getPrefix(20519)) { // Call to Arms
-						switch (item.bodylocation) {
-						case 4:
-						case 5:
-							this.haveCTA = me.weaponswitch;
-
-							break MainLoop;
-						case 11:
-						case 12:
-							this.haveCTA = Math.abs(me.weaponswitch - 1);
-
-							break MainLoop;
-						}
-					}
-				} while (item.getNext());
-			}
+		if (this.haveCTA > -1) {
+			return true;
 		}
 
-		if (this.haveCTA > -1) {
-			return this.weaponSwitch(this.haveCTA);
+		item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				if (item.getPrefix(20519)) { // Call to Arms
+					switch (item.bodylocation) {
+					case 4:
+					case 5:
+						this.haveCTA = me.weaponswitch;
+
+						return true;
+					case 11:
+					case 12:
+						this.haveCTA = me.weaponswitch ^ 1;
+
+						return true;
+					}
+				}
+			} while (item.getNext());
 		}
 
 		return false;
@@ -466,15 +462,9 @@ MainLoop:
 	};
 
 	this.enchant = function () {
-		var unit, swapped,
-			slot = this.getBetterSlot(52),
-			chanted = [];
+		var unit, slot = me.weaponswitch, chanted = [];
 
-		if (slot !== me.weaponswitch) {
-			swapped = true;
-		}
-
-		this.weaponSwitch(slot);
+		this.weaponSwitch(this.getBetterSlot(52));
 
 		// Player
 		unit = getUnit(0);
@@ -499,9 +489,7 @@ MainLoop:
 			} while (unit.getNext());
 		}
 
-		if (swapped) {
-			this.weaponSwitch(Math.abs(slot - 1));
-		}
+		this.weaponSwitch(slot);
 
 		return true;
 	};
