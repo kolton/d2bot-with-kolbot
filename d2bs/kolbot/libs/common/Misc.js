@@ -1938,6 +1938,16 @@ MainLoop:
 		}
 
 		return obj;
+	},
+
+	poll: function (testFunc, timeOut = 6000, pollDelay = 40) {
+		let startTime = getTickCount(), ret;
+		while (getTickCount() - startTime <= timeOut) {
+			if ((ret = testFunc()))
+				return ret;
+			delay(pollDelay);
+		}
+		return false;
 	}
 };
 
@@ -2344,7 +2354,17 @@ CursorLoop:
 		if (value > 0) {
 			getPacket(1, 0x1d, 1, stat, 1, value);
 		}
-	}
+	},
+
+	addListener: function (packetType, callbackFunc) { // more specialized wrapper for addEventListener
+		if (typeof packetType == 'number')
+			packetType = [packetType];
+		if (typeof packetType == 'object' && packetType.length)
+			return addEventListener('gamepacket', packet=>(packetType.indexOf(packet[0]) > -1 ? callbackFunc(packet) : false));
+		return null;
+	},
+
+	removeListener: removeEventListener, // just a wrapper
 };
 
 var Messaging = {
