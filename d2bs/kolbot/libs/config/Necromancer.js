@@ -12,7 +12,7 @@ function LoadConfig() {
 	 * Set to true if you want to run it, set to false if not.
 	 * If you want to change the order of the scripts, just change the order of their lines by using cut and paste.
 	 */
-	 
+
 	// User addon script. Read the description in libs/bots/UserAddon.js
 	Scripts.UserAddon = true; // !!!YOU MUST SET THIS TO FALSE IF YOU WANT TO RUN BOSS/AREA SCRIPTS!!!
 
@@ -493,11 +493,11 @@ function LoadConfig() {
 	Config.ActiveSummon = false; // Raise dead between each attack. If false, it will raise after clearing a spot.
 	Config.ReviveUnstackable = true; // Revive monsters that can move freely after you teleport.
 	Config.IronGolemChicken = 30; // Exit game if Iron Golem's life is less or equal to designated percent.
-	
-	
+
+
 	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
 	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system
-	
+
 	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing 
 												//	template filename located in libs/config/Builds/
 
