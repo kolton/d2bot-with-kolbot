@@ -1940,14 +1940,14 @@ MainLoop:
 		return obj;
 	},
 
-	poll: function (testFunc, timeOut = 6000, pollDelay = 40) {
-		let ret, startTime = getTickCount();
+	poll: function (check, timeout = 6000, sleep = 40) {
+		let ret, start = getTickCount();
 
-		while (getTickCount() - startTime <= timeOut) {
-			if ((ret = testFunc()))
+		while (getTickCount() - start <= timeout) {
+			if ((ret = check()))
 				return ret;
 
-			delay(pollDelay);
+			delay(sleep);
 		}
 
 		return false;
@@ -2359,17 +2359,20 @@ CursorLoop:
 		}
 	},
 
-	addListener: function (packetType, callbackFunc) { // specialized wrapper for addEventListener
-		if (typeof packetType == 'number')
+	addListener: function (packetType, callback) { // specialized wrapper for addEventListener
+		if (typeof packetType === 'number')
 			packetType = [packetType];
 
-		if (typeof packetType == 'object' && packetType.length)
-			return addEventListener('gamepacket', packet=>(packetType.indexOf(packet[0]) > -1 ? callbackFunc(packet) : false));
+		if (typeof packetType === 'object' && packetType.length) {
+			addEventListener('gamepacket', packet => (packetType.indexOf(packet[0]) > -1 ? callback(packet) : false));
+
+			return callback;
+		}
 
 		return null;
 	},
 
-	removeListener: removeEventListener, // just an alias
+	removeListener: callback => removeEventListener('gamepacket', callback), // just a wrapper
 };
 
 var Messaging = {
