@@ -1938,6 +1938,19 @@ MainLoop:
 		}
 
 		return obj;
+	},
+
+	poll: function (check, timeout = 6000, sleep = 40) {
+		let ret, start = getTickCount();
+
+		while (getTickCount() - start <= timeout) {
+			if ((ret = check()))
+				return ret;
+
+			delay(sleep);
+		}
+
+		return false;
 	}
 };
 
@@ -2344,7 +2357,22 @@ CursorLoop:
 		if (value > 0) {
 			getPacket(1, 0x1d, 1, stat, 1, value);
 		}
-	}
+	},
+
+	addListener: function (packetType, callback) { // specialized wrapper for addEventListener
+		if (typeof packetType === 'number')
+			packetType = [packetType];
+
+		if (typeof packetType === 'object' && packetType.length) {
+			addEventListener('gamepacket', packet => (packetType.indexOf(packet[0]) > -1 ? callback(packet) : false));
+
+			return callback;
+		}
+
+		return null;
+	},
+
+	removeListener: callback => removeEventListener('gamepacket', callback), // just a wrapper
 };
 
 var Messaging = {
