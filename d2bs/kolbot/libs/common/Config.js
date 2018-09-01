@@ -178,6 +178,7 @@ var Config = {
 	SkipEnchant: [],
 	SkipImmune: [],
 	SkipAura: [],
+	SkipException: [],
 	ScanShrines: [],
 	Debug: false,
 
@@ -247,7 +248,6 @@ var Config = {
 	ClearType: false,
 	ClearPath: false,
 	BossPriority: false,
-	SkipException: [],
 
 	// Amazon specific
 	LightningFuryDelay: 0,

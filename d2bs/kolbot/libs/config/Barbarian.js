@@ -446,7 +446,7 @@ function LoadConfig() {
 	// Skip monsters with auras. Possible options: "fanaticism", "might", "holy fire", "blessed aim", "holy freeze", "holy shock". Conviction is bugged, don't use it.
 	Config.SkipAura = [];
 	// Uncomment the following line to always attempt to kill these bosses despite immunities and mods
-	//Config.SkipException = [getLocaleString(2851),getLocaleString(2852),getLocaleString(2853)]; // vizier, de seis, infector
+	//Config.SkipException = [getLocaleString(2851), getLocaleString(2852), getLocaleString(2853)]; // vizier, de seis, infector
 
 	/* Attack config
 	 * To disable an attack, set it to -1
