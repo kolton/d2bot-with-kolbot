@@ -1113,6 +1113,11 @@ var Attack = {
 			return true;
 		}
 
+		if ((unit.spectype & 0x7) && Config.SkipException && Config.SkipException.indexOf(unit.name) > -1) {
+			print("\xFFc1Skip Exception: " + unit.name);
+			return true;
+		}
+
 		var i, j, rval,
 			tempArray = [];
 
@@ -1284,6 +1289,10 @@ AuraLoop: // Skip monsters with auras
 
 	// Get a monster's resistance to specified element
 	getResist: function (unit, type) {
+		if (!unit || !unit.getStat) {	// some scripts pass empty units in throne room
+			return 100;
+		}
+
 		if (unit.type === 0) { // player
 			return 0;
 		}
@@ -1332,7 +1341,7 @@ AuraLoop: // Skip monsters with auras
 			return (unit.hp * 100 / 128) > Config.CastStatic;
 		}
 
-		if (this.infinity && ["fire", "lightning", "cold"].indexOf(damageType) > -1) {
+		if (this.infinity && ["fire", "lightning", "cold"].indexOf(damageType) > -1 && unit.getState) { // baal in throne room doesn't have getState
 			if (!unit.getState(28)) {
 				return this.getResist(unit, damageType) < 117;
 			}
