@@ -12,7 +12,7 @@ function LoadConfig() {
 	 * Set to true if you want to run it, set to false if not.
 	 * If you want to change the order of the scripts, just change the order of their lines by using cut and paste.
 	 */
-	 
+
 	// User addon script. Read the description in libs/bots/UserAddon.js
 	Scripts.UserAddon = true; // !!!YOU MUST SET THIS TO FALSE IF YOU WANT TO RUN BOSS/AREA SCRIPTS!!!
 
@@ -422,7 +422,7 @@ function LoadConfig() {
 	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
 	Config.PacketCasting = 0; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
 	Config.WaypointMenu = true;
-	
+
 	// Anti-hostile config
 	Config.AntiHostile = false; // Enable anti-hostile
 	Config.HostileAction = 0; // 0 - quit immediately, 1 - quit when hostile player is sighted, 2 - attack hostile
@@ -482,11 +482,11 @@ function LoadConfig() {
 	Config.SummonAnimal = "Grizzly"; // 0 = disabled, 1 or "Spirit Wolf" = summon spirit wolf, 2 or "Dire Wolf" = summon dire wolf, 3 or "Grizzly" = summon grizzly
 	Config.SummonSpirit = "Oak Sage"; // 0 = disabled, 1 / "Oak Sage", 2 / "Heart of Wolverine", 3 / "Spirit of Barbs"
 	Config.SummonVine = "Poison Creeper"; // 0 = disabled, 1 / "Poison Creeper", 2 / "Carrion Vine", 3 / "Solar Creeper"
-	
-	
+
+
 	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
 	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system
-	
+
 	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing 
 												//	template filename located in libs/config/Builds/
 

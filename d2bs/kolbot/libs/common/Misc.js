@@ -72,7 +72,6 @@ var Skill = {
 		case 132: // Leap
 		case 225: // Firestorm
 		case 229: // Molten Boulder
-		case 230: // Arctic Blast
 		case 243: // Shock Wave
 			return 10;
 		case 8: // Inner Sight
@@ -109,6 +108,10 @@ var Skill = {
 			var leap = [4, 7, 8, 10, 11, 12, 12, 13, 14, 14, 14, 14, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 17];
 
 			return leap[Math.min(me.getSkill(132, 1) - 1, 24)];
+		case 230: // Arctic Blast
+			var arctic = [5, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9, 10, 10, 10, 10, 11, 11, 12]; 
+
+			return arctic[Math.min(me.getSkill(230, 1) - 1, 19)];
 		case 49: // Lightning
 		case 84: // Bone Spear
 		case 93: // Bone Spirit
