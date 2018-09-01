@@ -1113,7 +1113,7 @@ var Attack = {
 			return true;
 		}
 
-		if ((unit.spectype & 0x7) && Config.MandatoryBosses && Config.MandatoryBosses.indexOf(unit.name) > -1) {
+		if ((unit.spectype & 0x7) && Config.SkipException && Config.SkipException.indexOf(unit.name) > -1) {
 			print("\xFFc1Mandatory Boss: " + unit.name);
 			return true;
 		}
