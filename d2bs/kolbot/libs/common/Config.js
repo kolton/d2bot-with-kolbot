@@ -178,6 +178,7 @@ var Config = {
 	SkipEnchant: [],
 	SkipImmune: [],
 	SkipAura: [],
+	SkipException: [],
 	ScanShrines: [],
 	Debug: false,
 
