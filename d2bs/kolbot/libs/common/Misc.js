@@ -1941,12 +1941,15 @@ MainLoop:
 	},
 
 	poll: function (testFunc, timeOut = 6000, pollDelay = 40) {
-		let startTime = getTickCount(), ret;
+		let ret, startTime = getTickCount();
+
 		while (getTickCount() - startTime <= timeOut) {
 			if ((ret = testFunc()))
 				return ret;
+
 			delay(pollDelay);
 		}
+
 		return false;
 	}
 };
@@ -2356,15 +2359,17 @@ CursorLoop:
 		}
 	},
 
-	addListener: function (packetType, callbackFunc) { // more specialized wrapper for addEventListener
+	addListener: function (packetType, callbackFunc) { // specialized wrapper for addEventListener
 		if (typeof packetType == 'number')
 			packetType = [packetType];
+
 		if (typeof packetType == 'object' && packetType.length)
 			return addEventListener('gamepacket', packet=>(packetType.indexOf(packet[0]) > -1 ? callbackFunc(packet) : false));
+
 		return null;
 	},
 
-	removeListener: removeEventListener, // just a wrapper
+	removeListener: removeEventListener, // just an alias
 };
 
 var Messaging = {
