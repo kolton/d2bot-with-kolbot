@@ -29,7 +29,7 @@ Array.prototype.shuffle = function () {
 
 // Trim String
 String.prototype.trim = function () {
-	return this.replace(/^\s+|\s+$/g, "");
+	return this.replace(/^ $/g, "");
 };
 
 // Check if unit is idle
