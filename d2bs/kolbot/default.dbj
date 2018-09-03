@@ -164,7 +164,7 @@ function main() {
 	}
 
 	if (Config.FastPick) {
-		print("\xFFc2Fast pickit active.");
+		print("ÿc2Fast pickit active.");
 		addEventListener("itemaction", this.itemEvent);
 	}
 
