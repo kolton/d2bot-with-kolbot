@@ -128,14 +128,14 @@ var GameAction = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|ÿ)c/)) {
+				if (desc[i].match(/^(y|Ã¿)c/)) {
 					stringColor = desc[i].substring(0, 3);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2").replace("\xFF", "\\xff", "g");
+			desc[i] = desc[i].replace(/(y|Ã¿)c([0-9!"+<;.*])/g, "\\xffc$2").replace("Ã¿", "\\xff", "g");
 		}
 
 		if (logIlvl && desc[desc.length - 1]) {
@@ -247,9 +247,9 @@ var GameAction = {
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]|\/|\\/, "").trim();
+			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|Ã¿)c[0-9!"+<;.*]|\/|\\/, "").trim();
 
-		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid + ":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y;
+		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid + ":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y + (unit.getFlag(0x400000) ? ":eth" : "");
 		color = unit.getColor();
 
 		switch (unit.quality) {

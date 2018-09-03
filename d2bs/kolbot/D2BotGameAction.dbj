@@ -443,7 +443,7 @@ MainSwitch:
 
 		currChar = charList.shift();
 
-		print("ÿc4Game Actionÿc2: Login character: " + currChar);
+		print("Ã¿c4Game ActionÃ¿c2: Login character: " + currChar);
 		ControlAction.loginCharacter({charName: currChar});
 
 		break;
