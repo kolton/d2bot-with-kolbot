@@ -115,7 +115,7 @@ var MuleLogger = {
 			color = -1,
 			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|\xFF)c[0-9!"+<;.*]|\/|\\/, "").trim();
 
-		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid + ":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y;
+		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid + ":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y + (unit.getFlag(0x400000) ? ":eth" : "");
 		color = unit.getColor();
 
 		switch (unit.quality) {
