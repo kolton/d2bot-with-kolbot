@@ -1503,6 +1503,8 @@ var Misc = {
 			desc += ("\n\\xffc0Line: " + keptLine);
 		}
 
+		desc += "$" + (unit.getFlag(0x400000) ? ":eth" : "");
+
 		itemObj = {
 			title: action + " " + name,
 			description: desc,
