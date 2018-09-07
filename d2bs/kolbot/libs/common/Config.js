@@ -237,6 +237,9 @@ var Config = {
 	FastParty: false,
 	AutoEquip: false,
 
+	// GameData
+	ChampionBias: 60,
+
 	// Attack specific
 	Dodge: false,
 	DodgeRange: 15,
