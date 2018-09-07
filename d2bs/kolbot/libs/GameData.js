@@ -4,42 +4,41 @@
 *	@desc      game data library
 */
 
-/* globals areaData, monsterData, expCurve, expPenalty, monsterExp */
+/* globals AreaData, MonsterData, ExpCurve, ExpPenalty, MonsterExp */
 
 include ('AreaData.js');
 include ('MonsterData.js');
 include ('ExpData.js');
-include ("common/Config.js");
 
-const GameData = {
+var GameData = {
 	townAreas: [0, 1, 40, 75, 103, 109],
 	monsters: function (areaID) {
-		return areaData[areaID].Monsters[me.diff && 1]; // index 0 is normal, index 1 is nm/hell, index 2 is uniques in normal
+		return AreaData[areaID].Monsters[me.diff && 1]; // index 0 is normal, index 1 is nm/hell, index 2 is uniques in normal
 	},
 	monsterLevel: function (monsterID, areaID) {
 		if (me.diff) { // levels on nm/hell are determined by area, not by monster data
-			return areaData[areaID].LevelEx[me.diff];
+			return AreaData[areaID].LevelEx[me.diff];
 		}
 
-		return monsterData[monsterID].Level[me.diff];
+		return MonsterData[monsterID].Level[me.diff];
 	},
-	monsterExp: function (monsterID, areaID) {
+	MonsterExp: function (monsterID, areaID) {
 		if (me.diff) {
-			return monsterExp[areaData[areaID].LevelEx[me.diff]][me.diff];
+			return MonsterExp[AreaData[areaID].LevelEx[me.diff]][me.diff];
 		}
 
-		return monsterData[monsterID].Exp[me.diff];
+		return MonsterData[monsterID].Exp[me.diff];
 	},
 	areaLevel: function (areaID) {
 		let levels = 0, total = 0;
 
-		if (me.diff) {// levels on nm/hell are determined by area, not by monster data
-			return areaData[areaID].Level[me.diff];
+		if (me.diff) { // levels on nm/hell are determined by area, not by monster data
+			return AreaData[areaID].Level[me.diff];
 		}
 
-		areaData[areaID].Monsters[me.diff].forEach(mon => {
-			levels += monsterData[mon].Level[me.diff] * monsterData[mon].Rarity;
-			total += monsterData[mon].Rarity;
+		AreaData[areaID].Monsters[me.diff].forEach(mon => {
+			levels += MonsterData[mon].Level[me.diff] * MonsterData[mon].Rarity;
+			total += MonsterData[mon].Rarity;
 		});
 
 		return Math.round(levels / total);
@@ -49,13 +48,13 @@ const GameData = {
 
 		function checkmon (monID) {
 			for (let k in resists) {
-				resists[k] = Math.max(resists[k], monsterData[monID][k][me.diff]);
+				resists[k] = Math.max(resists[k], MonsterData[monID][k][me.diff]);
 			}
 		}
 
-		areaData[areaID].Monsters[me.diff].forEach(mon => {
+		AreaData[areaID].Monsters[me.diff].forEach(mon => {
 			checkmon(mon);
-			monsterData[mon].minions.forEach(checkmon);
+			MonsterData[mon].minions.forEach(checkmon);
 		});
 
 		return Object.keys(resists).filter(key => resists[key] >= 100);
@@ -64,12 +63,12 @@ const GameData = {
 		let bonus;
 
 		if (clvl < 25 || mlvl < clvl) {
-			bonus = expCurve[Math.min(20, Math.max(0, Math.floor(mlvl - clvl + 10)))] / 255;
+			bonus = ExpCurve[Math.min(20, Math.max(0, Math.floor(mlvl - clvl + 10)))] / 255;
 		} else {
 			bonus = clvl / mlvl;
 		}
 
-		return bonus * expPenalty[Math.min(30, Math.max(0, Math.round(clvl - 69)))] / 1024;
+		return bonus * ExpPenalty[Math.min(30, Math.max(0, Math.round(clvl - 69)))] / 1024;
 	},
 	multiplayerModifier: function (count) {
 		if (!count) {
@@ -110,7 +109,7 @@ const GameData = {
 		return level / total;
 	},
 	killExp: function (playerID, monsterID, areaID) {
-		let exp = this.monsterExp(monsterID, areaID), party = getParty(me), partyid = -1, level = 0, total = 0, gamesize = 0;
+		let exp = this.MonsterExp(monsterID, areaID), party = getParty(me), partyid = -1, level = 0, total = 0, gamesize = 0;
 
 		if (!party) {
 			return 0;
@@ -140,7 +139,7 @@ const GameData = {
 		}
 
 		// very rough approximation of unique population ratio, could be approved but this works well enough
-		let uniqueratio = parseFloat(Config.ChampionBias) * (areaData[areaID].MonUMin[me.diff] + areaData[areaID].MonUMax[me.diff] + areaData[areaID].super * 2) / (areaData[areaID].Size[me.diff].x * areaData[areaID].Size[me.diff].y);
+		let uniqueratio = parseFloat(Config.ChampionBias) * (AreaData[areaID].MonUMin[me.diff] + AreaData[areaID].MonUMax[me.diff] + AreaData[areaID].super * 2) / (AreaData[areaID].Size[me.diff].x * AreaData[areaID].Size[me.diff].y);
 
 		partyid = party.partyid;
 
@@ -155,10 +154,10 @@ const GameData = {
 				this.monsters(areaID).forEach(mon => {
 					print(mon);
 
-					if (monsterData[mon].Rarity > 0) {
-						playerexp += (1 - uniqueratio) * this.monsterExp(mon, areaID) * this.levelModifier(party.level, this.monsterLevel(mon, areaID)) * monsterData[mon].Rarity;
-						playerexp += 3 * uniqueratio * this.monsterExp(mon, areaID) * this.levelModifier(party.level, this.monsterLevel(mon, areaID)) * monsterData[mon].Rarity;
-						poolsize += monsterData[mon].Rarity;
+					if (MonsterData[mon].Rarity > 0) {
+						playerexp += (1 - uniqueratio) * this.MonsterExp(mon, areaID) * this.levelModifier(party.level, this.monsterLevel(mon, areaID)) * MonsterData[mon].Rarity;
+						playerexp += 3 * uniqueratio * this.MonsterExp(mon, areaID) * this.levelModifier(party.level, this.monsterLevel(mon, areaID)) * MonsterData[mon].Rarity;
+						poolsize += MonsterData[mon].Rarity;
 					}
 				});
 
@@ -168,10 +167,6 @@ const GameData = {
 			}
 		} while (party.getNext());
 
-		if (partylevels) {
-			return exp * this.multiplayerModifier(gamesize) / partylevels;
-		} else {
-			return 0;
-		}
+		return (partylevels ? exp * this.multiplayerModifier(gamesize) / partylevels : 0);
 	}
 };

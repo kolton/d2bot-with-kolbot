@@ -4,7 +4,7 @@
 *	@desc      locale string indexes from NameStr ids
 */
 
-var localeStringID = {
+var LocaleStringID = {
 	"WarrivAct1IntroGossip1": 0,
 	"WarrivAct1IntroPalGossip1": 1,
 	"WarrivGossip1": 2,
