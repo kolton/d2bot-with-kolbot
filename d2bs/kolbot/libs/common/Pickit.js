@@ -132,7 +132,7 @@ var Pickit = {
 					if (!canFit) {
 						// Check if any of the current inventory items can be stashed or need to be identified and eventually sold to make room
 						if (this.canMakeRoom()) {
-							print("\xFFc7Trying to make room for " + this.itemColor(pickList[0]) + pickList[0].name);
+							print("ÿc7Trying to make room for " + this.itemColor(pickList[0]) + pickList[0].name);
 
 							// Go to town and do town chores
 							if (Town.visitTown()) {
@@ -143,14 +143,14 @@ var Pickit = {
 							}
 
 							// Town visit failed - abort
-							print("\xFFc7Not enough room for " + this.itemColor(pickList[0]) + pickList[0].name);
+							print("ÿc7Not enough room for " + this.itemColor(pickList[0]) + pickList[0].name);
 
 							return false;
 						}
 
 						// Can't make room - trigger automule
 						Misc.itemLogger("No room for", pickList[0]);
-						print("\xFFc7Not enough room for " + this.itemColor(pickList[0]) + pickList[0].name);
+						print("ÿc7Not enough room for " + this.itemColor(pickList[0]) + pickList[0].name);
 
 						needMule = true;
 					}
@@ -278,7 +278,7 @@ MainLoop:
 
 				if (stats.classid === 523) {
 					if (!item.getStat(14) || item.getStat(14) < stats.gold) {
-						print("\xFFc7Picked up " + stats.color + (item.getStat(14) ? (item.getStat(14) - stats.gold) : stats.gold) + " " + stats.name);
+						print("ÿc7Picked up " + stats.color + (item.getStat(14) ? (item.getStat(14) - stats.gold) : stats.gold) + " " + stats.name);
 
 						return true;
 					}
@@ -287,12 +287,12 @@ MainLoop:
 				if (item.mode !== 3 && item.mode !== 5) {
 					switch (stats.classid) {
 					case 543: // Key
-						print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc7(" + Town.checkKeys() + "/12)");
+						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkKeys() + "/12)");
 
 						return true;
 					case 529: // Scroll of Town Portal
 					case 530: // Scroll of Identify
-						print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc7(" + Town.checkScrolls(stats.classid === 529 ? "tbk" : "ibk") + "/20)");
+						print("ÿc7Picked up " + stats.color + stats.name + " ÿc7(" + Town.checkScrolls(stats.classid === 529 ? "tbk" : "ibk") + "/20)");
 
 						return true;
 					}
@@ -316,7 +316,7 @@ MainLoop:
 
 			switch (status) {
 			case 1:
-				print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc0(ilvl " + stats.ilvl + (keptLine ? ") (" + keptLine + ")" : ")"));
+				print("ÿc7Picked up " + stats.color + stats.name + " ÿc0(ilvl " + stats.ilvl + (keptLine ? ") (" + keptLine + ")" : ")"));
 
 				if (this.ignoreLog.indexOf(stats.type) === -1) {
 					Misc.itemLogger("Kept", item);
@@ -354,24 +354,24 @@ MainLoop:
 
 				break;
 			case 2:
-				print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc0(ilvl " + stats.ilvl + ")" + " (Cubing)");
+				print("ÿc7Picked up " + stats.color + stats.name + " ÿc0(ilvl " + stats.ilvl + ")" + " (Cubing)");
 				Misc.itemLogger("Kept", item, "Cubing " + me.findItems(item.classid).length);
 				Cubing.update();
 
 				break;
 			case 3:
-				print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc0(ilvl " + stats.ilvl + ")" + " (Runewords)");
+				print("ÿc7Picked up " + stats.color + stats.name + " ÿc0(ilvl " + stats.ilvl + ")" + " (Runewords)");
 				Misc.itemLogger("Kept", item, "Runewords");
 				Runewords.update(stats.classid, gid);
 
 				break;
 			case 5: // Crafting System
-				print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc0(ilvl " + stats.ilvl + ")" + " (Crafting System)");
+				print("ÿc7Picked up " + stats.color + stats.name + " ÿc0(ilvl " + stats.ilvl + ")" + " (Crafting System)");
 				CraftingSystem.update(item);
 
 				break;
 			default:
-				print("\xFFc7Picked up " + stats.color + stats.name + " \xFFc0(ilvl " + stats.ilvl + (keptLine ? ") (" + keptLine + ")" : ")"));
+				print("ÿc7Picked up " + stats.color + stats.name + " ÿc0(ilvl " + stats.ilvl + (keptLine ? ") (" + keptLine + ")" : ")"));
 
 				break;
 			}
@@ -394,32 +394,32 @@ MainLoop:
 		if (type) {
 			switch (unit.itemType) {
 			case 4: // gold
-				return "\xFFc4";
+				return "ÿc4";
 			case 74: // runes
-				return "\xFFc8";
+				return "ÿc8";
 			case 76: // healing potions
-				return "\xFFc1";
+				return "ÿc1";
 			case 77: // mana potions
-				return "\xFFc3";
+				return "ÿc3";
 			case 78: // juvs
-				return "\xFFc;";
+				return "ÿc;";
 			}
 		}
 
 		switch (unit.quality) {
 		case 4: // magic
-			return "\xFFc3";
+			return "ÿc3";
 		case 5: // set
-			return "\xFFc2";
+			return "ÿc2";
 		case 6: // rare
-			return "\xFFc9";
+			return "ÿc9";
 		case 7: // unique
-			return "\xFFc4";
+			return "ÿc4";
 		case 8: // crafted
-			return "\xFFc8";
+			return "ÿc8";
 		}
 
-		return "\xFFc0";
+		return "ÿc0";
 	},
 
 	canPick: function (unit) {

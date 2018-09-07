@@ -112,19 +112,19 @@ var Loader = {
 									}
 
 									if (townCheck) {
-										print("\xFFc2Starting script: \xFFc9" + i);
+										print("ÿc2Starting script: ÿc9" + i);
 										//scriptBroadcast(JSON.stringify({currScript: i}));
 										Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: i}));
 
 										if (reconfiguration) {
-											print("\xFFc2Copying Config properties from " + i + " object.");
+											print("ÿc2Copying Config properties from " + i + " object.");
 											this.copy(Scripts[i], Config);
 										}
 
 										global[i]();
 
 										if (reconfiguration) {
-											print("\xFFc2Reverting back unmodified config properties.");
+											print("ÿc2Reverting back unmodified config properties.");
 											this.copy(unmodifiedConfig, Config);
 										}
 									}
@@ -137,7 +137,7 @@ var Loader = {
 						}
 					}
 				} else {
-					Misc.errorReport("\xFFc1Script " + i + " doesn't exist.");
+					Misc.errorReport("ÿc1Script " + i + " doesn't exist.");
 				}
 			}
 		}

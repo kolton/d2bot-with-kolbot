@@ -29,7 +29,7 @@ Array.prototype.shuffle = function () {
 
 // Trim String
 String.prototype.trim = function () {
-	return this.replace(/^\s+|\s+$/g, "");
+	return this.replace(/^[ \t\uFEFF]+|[ \t\uFEFF]+$/g, '');
 };
 
 // Check if unit is idle
@@ -685,7 +685,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i].replace(/\xFFc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -764,7 +764,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return parseInt(temp[i].replace(/\xFFc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -782,7 +782,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return parseInt(temp[i].replace(/\xFFc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -1041,3 +1041,69 @@ Unit.prototype.getColor = function () {
 
 	return -1;
 };
+
+// Object.assign polyfill from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+if (typeof Object.assign !== 'function') {
+	Object.defineProperty(Object, "assign", {
+		value: function assign (target) {
+			if (target === null) {
+				throw new TypeError('Cannot convert undefined or null to object');
+			}
+
+			var to = Object(target);
+
+			for (var index = 1; index < arguments.length; index++) {
+				var nextSource = arguments[index];
+
+				if (nextSource !== null) {
+					for (var nextKey in nextSource) {
+						if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+							to[nextKey] = nextSource[nextKey];
+						}
+					}
+				}
+			}
+
+			return to;
+		},
+		writable: true,
+		configurable: true
+	});
+}
+
+// Array.find polyfill from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+	Object.defineProperty(Array.prototype, 'find', {
+		value: function (predicate) {
+			if (this === null) {
+				throw new TypeError('"this" is null or not defined');
+			}
+
+			var o = Object(this);
+
+			var len = o.length >>> 0;
+
+			if (typeof predicate !== 'function') {
+				throw new TypeError('predicate must be a function');
+			}
+
+			var thisArg = arguments[1];
+
+			var k = 0;
+
+			while (k < len) {
+				var kValue = o[k];
+
+				if (predicate.call(thisArg, kValue, k, o)) {
+					return kValue;
+				}
+
+				k++;
+			}
+
+			return undefined;
+		},
+		configurable: true,
+		writable: true
+	});
+}

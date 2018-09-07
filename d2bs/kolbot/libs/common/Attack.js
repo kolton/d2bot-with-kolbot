@@ -18,7 +18,7 @@ var Attack = {
 
 		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
 			showConsole();
-			print("\xFFc1Bad attack config. Don't expect your bot to attack.");
+			print("ÿc1Bad attack config. Don't expect your bot to attack.");
 		}
 
 		if (me.gametype === 1) {
@@ -425,7 +425,7 @@ var Attack = {
 
 					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
 					if (me.area !== 131 && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
-						print("\xFFc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
+						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 						monsterList.shift();
 					}
 
@@ -579,7 +579,7 @@ var Attack = {
 
 					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
 					if (me.area !== 131 && !(target.spectype & 0x7) && gidAttack[i].attacks > 15) {
-						print("\xFFc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
+						print("ÿc1Skipping " + target.name + " " + target.gid + " " + gidAttack[i].attacks);
 						monsterList.shift();
 					}
 
@@ -1062,6 +1062,10 @@ var Attack = {
 			return false;
 		}
 
+		if (unit.charlvl < 1) { // catapults were returning a level of 0 and hanging up clear scripts
+			return false;
+		}
+
 		if (getBaseStat("monstats", unit.classid, "neverCount")) { // neverCount base stat - hydras, traps etc.
 			return false;
 		}
@@ -1114,7 +1118,7 @@ var Attack = {
 		}
 
 		if ((unit.spectype & 0x7) && Config.SkipException && Config.SkipException.indexOf(unit.name) > -1) {
-			print("\xFFc1Skip Exception: " + unit.name);
+			print("ÿc1Skip Exception: " + unit.name);
 			return true;
 		}
 
@@ -1443,7 +1447,7 @@ AuraLoop: // Skip monsters with auras
 				}
 			}
 
-			//print("\xFFc9potential spots: \xFFc2" + coords.length);
+			//print("ÿc9potential spots: ÿc2" + coords.length);
 
 			if (coords.length > 0) {
 				coords.sort(Sort.units);
@@ -1451,7 +1455,7 @@ AuraLoop: // Skip monsters with auras
 				for (i = 0; i < coords.length; i += 1) {
 					// Valid position found
 					if (!CollMap.checkColl({x: coords[i].x, y: coords[i].y}, unit, coll, 1)) {
-						//print("\xFFc9optimal pos build time: \xFFc2" + (getTickCount() - t) + " \xFFc9distance from target: \xFFc2" + getDistance(cx, cy, unit.x, unit.y));
+						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						switch (walk) {
 						case 1:
@@ -1479,7 +1483,7 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		if (name) {
-			print("\xFFc4Attack\xFFc0: No valid positions for: " + name);
+			print("ÿc4Attackÿc0: No valid positions for: " + name);
 		}
 
 		return false;
