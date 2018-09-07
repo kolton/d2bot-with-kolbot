@@ -1062,6 +1062,10 @@ var Attack = {
 			return false;
 		}
 
+		if (unit.charlvl < 1) { // catapults were returning a level of 0 and hanging up clear scripts
+			return false;
+		}
+
 		if (getBaseStat("monstats", unit.classid, "neverCount")) { // neverCount base stat - hydras, traps etc.
 			return false;
 		}
