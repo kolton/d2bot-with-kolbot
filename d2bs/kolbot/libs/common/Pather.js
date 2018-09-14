@@ -167,6 +167,7 @@ var Pather = {
 		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
 							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
+		/* Disabling getPath optimizations, they are causing desync -- noah
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
 			//Misc.townCheck();
@@ -178,6 +179,7 @@ var Pather = {
 		if (!this.useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
 			return this.walkTo(x, y);
 		}
+		*/
 
 		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
@@ -719,13 +721,13 @@ ModeLoop:
 			if (me.area === 101) {
 				break;
 			}
-			
+
 			return this.useUnit(2, 386, targetArea);
 		case 128:
 			if (me.area === 129) {
 				break;
 			}
-			
+
 			return this.useUnit(2, 547, targetArea);
 		}
 
