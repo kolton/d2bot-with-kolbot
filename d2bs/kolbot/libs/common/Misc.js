@@ -109,7 +109,7 @@ var Skill = {
 
 			return leap[Math.min(me.getSkill(132, 1) - 1, 24)];
 		case 230: // Arctic Blast
-			var arctic = [5, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9, 10, 10, 10, 10, 11, 11, 12]; 
+			var arctic = [5, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9, 10, 10, 10, 10, 11, 11, 12];
 
 			return arctic[Math.min(me.getSkill(230, 1) - 1, 19)];
 		case 49: // Lightning
@@ -2070,36 +2070,30 @@ var Packet = {
 			return true;
 		}
 
-		var i, j;
+		var i, tick;
 
 		for (i = 0; i < 5; i += 1) {
-			if (getDistance(me, unit) > 5) {
+			if (getDistance(me, unit) > 4) {
 				Pather.moveToUnit(unit);
 			}
 
-			if (i > 0) {
-				Packet.flash(me.gid);
-			}
+			sendPacket(1, 0x13, 4, 1, 4, unit.gid);
+			tick = getTickCount();
 
-			if (!getUIFlag(0x08)) {
-				sendPacket(1, 0x13, 4, 1, 4, unit.gid);
-			}
-
-			for (j = 0; j < 40; j += 1) {
-				if (j > 0 && j % 8 === 0 && !getUIFlag(0x08)) {
-					me.cancel();
-					delay(300);
-					sendPacket(1, 0x13, 4, 1, 4, unit.gid);
-				}
-
+			while (getTickCount() - tick < 5000) {
 				if (getUIFlag(0x08)) {
 					delay(Math.max(500, me.ping * 2));
 
 					return true;
 				}
 
-				delay(25);
+				delay(100);
 			}
+
+			sendPacket(1, 0x2f, 4, 1, 4, unit.gid);
+			delay(me.ping * 2);
+			sendPacket(1, 0x30, 4, 1, 4, unit.gid);
+			delay(me.ping * 2);
 		}
 
 		return false;

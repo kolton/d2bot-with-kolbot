@@ -103,38 +103,30 @@ Unit.prototype.openMenu = function (addDelay) {
 		return true;
 	}
 
-	var i, j;
+	var i, tick;
 
 	for (i = 0; i < 5; i += 1) {
 		if (getDistance(me, this) > 4) {
 			Pather.moveToUnit(this);
 		}
 
-		if (i > 0) {
-			Packet.flash(me.gid);
-			// delay?
-		}
+		Misc.click(0, 0, this);
+		tick = getTickCount();
 
-		if (!getUIFlag(0x08)) {
-			delay(100);
-			this.interact();
-		}
-
-		for (j = 0; j < 40; j += 1) {
-			if (j > 0 && j % 10 === 0 && !getUIFlag(0x08)) {
-				me.cancel();
-				delay(400);
-				this.interact();
-			}
-
+		while (getTickCount() - tick < 5000) {
 			if (getUIFlag(0x08)) {
 				delay(Math.max(700 + me.ping, 500 + me.ping * 2 + addDelay * 500));
 
 				return true;
 			}
 
-			delay(25);
+			delay(100);
 		}
+
+		sendPacket(1, 0x2f, 4, 1, 4, this.gid);
+		delay(me.ping * 2);
+		sendPacket(1, 0x30, 4, 1, 4, this.gid);
+		delay(me.ping * 2);
 	}
 
 	return false;
