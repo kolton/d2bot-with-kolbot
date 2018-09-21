@@ -389,7 +389,8 @@ var Config = {
 		SealWarning: "Leave the seals alone!",
 		EntranceTP: "Entrance TP up",
 		StarTP: "Star TP up",
-		DiabloMsg: "Diablo"
+		DiabloMsg: "Diablo",
+		StartWalking: false
 	},
 	DiabloHelper: {
 		Wait: 120,
@@ -457,7 +458,8 @@ var Config = {
 		Wait: 120
 	},
 	Tristram: {
-		PortalLeech: false
+		PortalLeech: false,
+		StartWalking: false
 	},
 	Travincal: {
 		PortalLeech: false
