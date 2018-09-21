@@ -621,13 +621,9 @@ MainSwitch:
 		}
 
 		if (!locationTimeout(5000, location)) {
-			ControlAction.click(6, 33, 572, 128, 35);
+			GameAction.update("done", "Account has no chars! location 42");
+			D2Bot.stop();
 		}
-
-		GameAction.update("done", "Account has no chars! location 42");
-		D2Bot.stop();
-		delay(5000);
-		break;
 
 		break;
 	default:
