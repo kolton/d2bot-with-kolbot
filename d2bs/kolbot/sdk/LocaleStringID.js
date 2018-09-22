@@ -7427,7 +7427,7 @@ var LocaleStringID = {
 	"Barricade Wall Left": 22432,
 	"Barricade Door": 22433,
 	"Barricade Tower": 22434,
-	"Siege Boss": 22435,
+	"Siege Boss": 22435,	// shenk the overseer
 	"Evil hut": 22436,
 	"Death Mauler1": 22437,
 	"Death Mauler2": 22438,
@@ -7492,7 +7492,7 @@ var LocaleStringID = {
 	"Pindleskin": 22497,
 	"Threash Socket": 22498,
 	"Eyeback Unleashed": 22499,
-	"Megaflow Rectifier": 22500,
+	"Megaflow Rectifier": 22500,	// eldritch the rectifier
 	"Dac Farren": 22501,
 	"Bonesaw Breaker": 22502,
 	"Axe Dweller": 22503,
