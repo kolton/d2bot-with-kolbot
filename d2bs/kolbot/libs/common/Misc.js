@@ -529,9 +529,9 @@ var Item = {
 
 						cursorItem = getUnit(100);
 
-						if (cursorItem && Pickit.checkItem(cursorItem).result > 0 && (NTIP.GetTier(cursorItem) < 1 || NTIP.GetTier(cursorItem) > 99)) {
-							if (Storage.Inventory.CanFit(cursorItem)) {
-								Storage.Inventory.MoveTo(cursorItem);
+						if (cursorItem) {
+							if (!Storage.Inventory.CanFit(cursorItem) || !Storage.Inventory.MoveTo(cursorItem)) {
+								cursorItem.drop();
 							}
 						}
 					}
