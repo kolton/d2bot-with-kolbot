@@ -322,8 +322,16 @@ var Precast = new function () {
 				Skill.cast(250, 0); // Hurricane
 			}
 
-			if (me.getSkill(226, 1) && (!me.getState(149) || force)) {
+			if (Config.SummonSpirit === 1 && me.getSkill(226, 1) && (!me.getState(149) || force)) {
 				Skill.cast(226, 0); // Oak Sage
+			}
+
+			if (Config.SummonSpirit === 2 && me.getSkill(236, 1) && (!me.getState(148) || force)) {
+				Skill.cast(236, 0); // Heart of Wolverine
+			}
+
+			if (Config.SummonSpirit === 3 && me.getSkill(246, 1) && (!me.getState(147) || force)) {
+				Skill.cast(246, 0); // Spirit of Barbs
 			}
 
 			if (buffSummons) {
