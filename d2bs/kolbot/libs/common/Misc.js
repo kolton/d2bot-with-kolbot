@@ -2413,49 +2413,52 @@ CursorLoop:
 
 /*
 
-Packet.new - create new packet object
+new PacketBuilder() - create new packet object
 
 Example (Spoof 'reassign player' packet to client):
-	Packet.new.byte(0x15).byte(0).dword(me.gid).word(x).word(y).byte(1).get();
+    new PacketBuilder().byte(0x15).byte(0).dword(me.gid).word(x).word(y).byte(1).get();
 
 Example (Spoof 'player move' packet to server):
-    Packet.new.byte(0x3).word(x).word(y).send();
+    new PacketBuilder().byte(0x3).word(x).word(y).send();
 */
-Object.defineProperty(Packet, 'new', {
-	get: function () {
-		/* globals ArrayBuffer, DataView */
-		let pdata = [], dsize = 0, builder;
 
-		return builder = {
-			float: (data) => (dsize += 4, pdata.push({type: "Float32", size: 4, data: data}), builder),
-			dword: (data) => (dsize += 4, pdata.push({type: "Uint32", size: 4, data: data}), builder),
-			word: (data) => (dsize += 2, pdata.push({type: "Uint16", size: 2, data: data}), builder),
-			byte: (data) => (dsize += 1, pdata.push({type: "Uint8", size: 1, data: data}), builder),
-			string: (data, nullTerminate = true) => (dsize += (data.length + (nullTerminate ? 1 : 0)), pdata.push({type: "String", data: data, nullTerminate: nullTerminate}), builder),
-			buildDataView: () => {
-				let dv = new DataView(new ArrayBuffer(dsize)), i = 0;
-				pdata.forEach(data => {
-					if (data.type === "String") {
-						for (let l = 0; l < data.data.length; l++) {
-							dv.setUint8(i++, data.data.charCodeAt(l), true);
-						}
-
-						if (data.nullTerminate) {
-							dv.setUint8(i++, 0, true);
-						}
-					} else {
-						dv['set' + data.type](i, data.data, true);
-						i += data.size;
-					}
-				});
-
-				return dv;
-			},
-			send: () => (sendPacket(builder.buildDataView().buffer), builder),
-			get: () => (getPacket(builder.buildDataView().buffer), builder),
-		};
+function PacketBuilder () {
+	/* globals DataView ArrayBuffer */
+	if (this.__proto__.constructor !== PacketBuilder) {
+		throw new Error("PacketBuilder must be called with 'new' operator!");
 	}
-});
+
+	let pdata = [], dsize = 0;
+
+	this.float = (data) => (dsize += 4, pdata.push({type: "Float32", size: 4, data: data}), this);
+	this.dword = (data) => (dsize += 4, pdata.push({type: "Uint32", size: 4, data: data}), this);
+	this.word = (data) => (dsize += 2, pdata.push({type: "Uint16", size: 2, data: data}), this);
+	this.byte = (data) => (dsize += 1, pdata.push({type: "Uint8", size: 1, data: data}), this);
+	this.string = (data, nullTerminate = true) => (dsize += (data.length + (nullTerminate ? 1 : 0)), pdata.push({type: "String", data: data, nullTerminate: nullTerminate}), this);
+
+	this.buildDataView = () => {
+		let dv = new DataView(new ArrayBuffer(dsize)), i = 0;
+		pdata.forEach(data => {
+			if (data.type === "String") {
+				for (let l = 0; l < data.data.length; l++) {
+					dv.setUint8(i++, data.data.charCodeAt(l), true);
+				}
+
+				if (data.nullTerminate) {
+					dv.setUint8(i++, 0, true);
+				}
+			} else {
+				dv['set' + data.type](i, data.data, true);
+				i += data.size;
+			}
+		});
+
+		return dv;
+	};
+
+	this.send = () => (sendPacket(this.buildDataView().buffer), this);
+	this.get = () => (getPacket(this.buildDataView().buffer), this);
+}
 
 var Messaging = {
 	sendToScript: function (name, msg) {
