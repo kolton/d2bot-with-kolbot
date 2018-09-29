@@ -2102,6 +2102,10 @@ var Packet = {
 					return true;
 				}
 
+				if (getInteractedNPC()) {
+					me.cancel();
+				}
+
 				delay(100);
 			}
 
