@@ -120,6 +120,10 @@ Unit.prototype.openMenu = function (addDelay) {
 				return true;
 			}
 
+			if (getInteractedNPC()) {
+				me.cancel();
+			}
+
 			delay(100);
 		}
 
