@@ -390,7 +390,7 @@ var Config = {
 		EntranceTP: "Entrance TP up",
 		StarTP: "Star TP up",
 		DiabloMsg: "Diablo",
-		StartWalking: false
+		WalkClear: false
 	},
 	DiabloHelper: {
 		Wait: 120,
@@ -459,7 +459,7 @@ var Config = {
 	},
 	Tristram: {
 		PortalLeech: false,
-		StartWalking: false
+		WalkClear: false
 	},
 	Travincal: {
 		PortalLeech: false

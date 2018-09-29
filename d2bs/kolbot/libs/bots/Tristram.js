@@ -38,7 +38,7 @@ function Tristram() {
 		me.cancel();
 	}
 
-	this.OriginalTeleport = Pather.teleport;
+	Pather._teleport = Pather.teleport;
 	
 	Town.doChores();
 	Pather.useWaypoint(4);
@@ -72,9 +72,7 @@ function Tristram() {
 	if (Config.Tristram.PortalLeech) {
 		Pather.makePortal();
 		delay(1000);
-		if (Config.Tristram.StartWalking) {
-			Pather.teleport = false;
-		}
+		Pather.teleport = !Config.Tristram.WalkClear && Pather._teleport;
 	}
 
 	gibbet = getUnit(2, 26);
@@ -93,7 +91,7 @@ function Tristram() {
 		Attack.clearLevel(Config.ClearType);
 	}
 	
-	Pather.teleport = this.OriginalTeleport;
+	Pather.teleport = Pather._teleport;
 
 	return true;
 }
