@@ -118,6 +118,10 @@ function LoadConfig() {
 		Config.Baal.DollQuit = false; // End script if Dolls (Undead Stigyan Dolls) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
 
+    // Optimized baalscript for fast baalruns. Not an mf script.
+    Scripts.SpeedBaal = false;
+    Config.SpeedBaal.Follower = false; // Set on true if it needs to take the portal to throne, false if it needs to teleport on it's own
+
 	/* ### leeching section ###
 	* Unless stated otherwise, leader's character name isn't needed on order to run.
 	* Don't use more scripts of the same type! (Run AutoBaal OR BaalHelper, not both)
@@ -296,9 +300,9 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
 	// Manager Item Log Screen
-	Config.ShowLowRunes = false; // show/hide low runes (El ÷ Dol) on the item log screen
-	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel ÷ Mal) on the item log screen
-	Config.ShowHighRunes = true; // show/hide high runes (Ist ÷ Zod) on the item log screen
+	Config.ShowLowRunes = false; // show/hide low runes (El ï¿½ Dol) on the item log screen
+	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel ï¿½ Mal) on the item log screen
+	Config.ShowHighRunes = true; // show/hide high runes (Ist ï¿½ Zod) on the item log screen
 	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
 	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
 	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen

@@ -493,5 +493,8 @@ var Config = {
 		Template: "",
 		Verbose: false,
 		DebugMode: false
-	}
+	},
+    SpeedBaal: {
+        Follower: false,
+    }
 };
