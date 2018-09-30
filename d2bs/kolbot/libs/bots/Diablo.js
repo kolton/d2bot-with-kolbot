@@ -420,7 +420,8 @@ function Diablo() {
 	this.starToSeisB = [7781, 5259, 7805, 5258, 7802, 5237, 7776, 5228, 7811, 5218, 7807, 5194, 7779, 5193, 7774, 5160, 7803, 5154];
 	this.starToInfA = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5295, 7919, 5290];
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
-
+	Pather._teleport = Pather.teleport;
+	
 	// start
 	Town.doChores();
 	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
@@ -443,6 +444,7 @@ function Diablo() {
 		if (Config.PublicMode) {
 			Pather.makePortal();
 			say(Config.Diablo.EntranceTP);
+			Pather.teleport = !Config.Diablo.WalkClear && Pather._teleport;
 		}
 
 		Pather.moveTo(7790, 5544);
@@ -459,6 +461,7 @@ function Diablo() {
 	if (Config.PublicMode) {
 		Pather.makePortal();
 		say(Config.Diablo.StarTP);
+		Pather.teleport = !Config.Diablo.WalkClear && Pather._teleport;
 	}
 
 	Attack.clear(30, 0, false, this.sort);
@@ -487,5 +490,7 @@ function Diablo() {
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();
 
+	Pather.teleport = Pather._teleport;
+	
 	return true;
 }
