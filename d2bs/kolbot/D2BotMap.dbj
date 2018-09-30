@@ -1,4 +1,4 @@
-function main() {
+function main () {
 	include("json2.js");
 	include("OOG.js");
 	include("common/misc.js");
@@ -6,7 +6,7 @@ function main() {
 	var handle,
 		isUp = "no";
 
-	function copyDataEvent(mode, msg) {
+	function copyDataEvent (mode, msg) {
 		switch (msg) {
 		case "Handle":
 			handle = mode;

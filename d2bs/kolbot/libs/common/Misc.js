@@ -2416,10 +2416,10 @@ CursorLoop:
 new PacketBuilder() - create new packet object
 
 Example (Spoof 'reassign player' packet to client):
-    new PacketBuilder().byte(0x15).byte(0).dword(me.gid).word(x).word(y).byte(1).get();
+	new PacketBuilder().byte(0x15).byte(0).dword(me.gid).word(x).word(y).byte(1).get();
 
 Example (Spoof 'player move' packet to server):
-    new PacketBuilder().byte(0x3).word(x).word(y).send();
+	new PacketBuilder().byte(0x3).word(x).word(y).send();
 */
 
 function PacketBuilder () {
@@ -2471,7 +2471,58 @@ function PacketBuilder () {
 	this.send = () => (sendPacket(this.buildDataView().buffer), this);
 	this.spoof = () => (getPacket(this.buildDataView().buffer), this);
 	this.get = this.spoof; // same thing but spoof has clearer intent than get
-}
+};
+
+var LocalChat = new function () {
+	const LOCAL_CHAT_ID = 0xd2baaaa;
+	let _init = false;
+	let _say = say;
+
+	let _chat = (speaker, msg) => {
+		new PacketBuilder().byte(0x26, 1, 0, 2, 0, 0, 0, 0, 0, 0x60).string(speaker, msg).get();
+	};
+
+	let _callback = (mode, msg) => {
+		if (mode !== LOCAL_CHAT_ID) {
+			return;
+		}
+
+		msg = JSON.parse(msg);
+
+		if (me.gamename === msg.gamename && me.realm === msg.realm) {
+			_chat(msg.charname, msg.msg);
+		}
+	};
+
+	this.init = () => {
+		_init = this.init;
+		this.init = () => {};
+
+		say = (msg, force = false) => {
+			if (force || !me.ingame || !me.gameReady) {
+				_say(msg);
+
+				return;
+			}
+
+			D2Bot.shoutGlobal(JSON.stringify({ msg: msg, realm: me.realm, charname: me.charname, gamename: me.gamename }), LOCAL_CHAT_ID);
+		};
+
+		if (getScript(true).name.toLowerCase() === "default.dbj") {
+			addEventListener("copydata", _callback);
+		}
+	};
+
+	this.remove = () => {
+		this.init();
+		this.init = _init;
+		say = _say;
+
+		if (getScript(true).name.toLowerCase() === "default.dbj") {
+			removeEventListener("copydata", _callback);
+		}
+	};
+};
 
 var Messaging = {
 	sendToScript: function (name, msg) {
