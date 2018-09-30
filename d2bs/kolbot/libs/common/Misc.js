@@ -2431,25 +2431,15 @@ function PacketBuilder () {
 	let pdata = [], dsize = 0;
 
 	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
-		let nullTerm = 0;
-		let isString = false;
+		let strType;
 
-		if (type === "StringZ") {
-			isString = true;
-			nullTerm = 1;
-			type = "String";
-		} else if (type === "String") {
-			isString = true;
-		}
+		[strType, type] = type === "StringZ" ? [2, "String"] : [type === "String" ? 1 : 0, type];
 
-		for (let c = 0; c < args.length; c++) {
-			if (isString) {
-				size = args[c].length + nullTerm; // ArrayBuffers are initialized to 0, so just add 1 for null terminate
-			}
-
+		args.forEach(arg => {
+			strType && (size = arg.length + strType - 1); // string length adjustment for null termination
 			dsize += size;
-			pdata.push({type: type, size: size, data: args[c]});
-		}
+			pdata.push({type: type, size: size, data: arg});
+		});
 
 		return this;
 	};
