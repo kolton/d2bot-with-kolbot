@@ -270,7 +270,7 @@ var D2Bot = {
 		};
 
 		//print("ÿc1Heart beat " + this.handle);
-		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+		sendCopyData(null, this.handle, 0xbbbb, JSON.stringify(obj));
 	},
 
 	sendWinMsg: function (wparam, lparam) {

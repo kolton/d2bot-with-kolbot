@@ -1,6 +1,7 @@
-function main() {
-	print('ÿc2D2BSÿc0 :: Started Console Script'); 
+function main () {
+	print('ÿc2D2BSÿc0 :: Started Console Script');
 
-	while (true)
+	while (true) {
 		delay(10000);
-}  
+	}
+}

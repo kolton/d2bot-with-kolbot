@@ -216,7 +216,7 @@ function LoadConfig() {
 		Config.BaalAssistant.WaitForSafeTP = false; // Set to true to wait for a safe TP message (defined in SafeTPMessage)
 		Config.BaalAssistant.DollQuit = false; // Quit on dolls. (Hardcore players?)
 		Config.BaalAssistant.SoulQuit = false; // Quit on Souls. (Hardcore players?)
-		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely. 
+		Config.BaalAssistant.KillBaal = true; // Set to true to kill baal, if you set to false you MUST configure Config.QuitList or Config.BaalAssistant.NextGameMessage or the bot will wait indefinitely.
 		Config.BaalAssistant.HotTPMessage = ["Hot"]; // Configure safe TP messages.
 		Config.BaalAssistant.SafeTPMessage = ["Safe", "Clear"]; // Configure safe TP messages.
 		Config.BaalAssistant.BaalMessage = ["Baal"]; // Configure baal messages, this is a precautionary measure.
@@ -384,6 +384,11 @@ function LoadConfig() {
 
 	// Public game options
 
+	// If Config.LocalChat is set, 'say' is overridden to transport chat over 'sendCopyData' instead of BNET
+	// To force 'say' to use BNET, use 'say("msg", true)' - the 2nd parameter will force BNET
+	// Chat messages will only be visible on clients running on the same PC
+	// Chat messages typed in game are not captured
+	Config.LocalChat = false;
 	// If Config.Leader is set, the bot will only accept invites from leader. If Config.PublicMode is not 0, Baal and Diablo script will open Town Portals.
 	Config.PublicMode = 0; // 1 = invite and accept, 2 = accept only, 3 = invite only, 0 = disable
 	// Party message settings. Each setting represents an array of messages that will be randomly chosen.
@@ -416,10 +421,10 @@ function LoadConfig() {
 	Config.MFSwitch = 0; // MF weapon slot: 0 = slot I, 1 = slot II
 
 	// Fastmod config
-	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of faster cast rate 
-	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery 
-	Config.FBR = 0; // 0 - disable, 1 to 255 - set value of faster block recovery 
-	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed 
+	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of faster cast rate
+	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of faster hit recovery
+	Config.FBR = 0; // 0 - disable, 1 to 255 - set value of faster block recovery
+	Config.IAS = 0; // 0 - disable, 1 to 255 - set value of increased attack speed
 	Config.PacketCasting = 0; // 0 = disable, 1 = packet teleport, 2 = full packet casting.
 	Config.WaypointMenu = true;
 
@@ -498,11 +503,11 @@ function LoadConfig() {
 	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
 	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system
 
-	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing 
+	Config.AutoBuild.Template = "BuildName";	//	The name of the build associated with an existing
 												//	template filename located in libs/config/Builds/
 
 	Config.AutoBuild.Verbose = true;			//	Allows script to print messages in console
-	Config.AutoBuild.DebugMode = true;			//	Debug mode prints a little more information to console and 
+	Config.AutoBuild.DebugMode = true;			//	Debug mode prints a little more information to console and
 												//	logs activity to /logs/AutoBuild.CharacterName._MM_DD_YYYY.log
 												//	It automatically enables Config.AutoBuild.Verbose
 }
