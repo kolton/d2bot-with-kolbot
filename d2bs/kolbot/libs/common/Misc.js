@@ -1951,6 +1951,27 @@ MainLoop:
 		}
 
 		return false;
+	},
+
+	getUIFlags: function (excluded = []) { // returns array of UI flags that are set, or null if none are set
+		if (!me.gameReady) {
+			return null;
+		}
+
+		const MAX_FLAG = 37;
+		let flags = [];
+
+		if (typeof excluded !== 'object' || excluded.length === undefined) {
+			excluded = [excluded]; // not an array-like object, make it an array
+		}
+
+		for (let c = 1; c <= MAX_FLAG; c++) { // anything over 37 crashes
+			if (c !== 0x23 && excluded.indexOf(c) === -1 && getUIFlag(c)) { // 0x23 is always set in-game
+				flags.push(c);
+			}
+		}
+
+		return flags.length ? flags : null;
 	}
 };
 
@@ -2389,6 +2410,68 @@ CursorLoop:
 
 	removeListener: callback => removeEventListener('gamepacket', callback), // just a wrapper
 };
+
+/*
+
+new PacketBuilder() - create new packet object
+
+Example (Spoof 'reassign player' packet to client):
+    new PacketBuilder().byte(0x15).byte(0).dword(me.gid).word(x).word(y).byte(1).get();
+
+Example (Spoof 'player move' packet to server):
+    new PacketBuilder().byte(0x3).word(x).word(y).send();
+*/
+
+function PacketBuilder () {
+	/* globals DataView ArrayBuffer */
+	if (this.__proto__.constructor !== PacketBuilder) {
+		throw new Error("PacketBuilder must be called with 'new' operator!");
+	}
+
+	let pdata = [], dsize = 0;
+
+	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
+		let strType;
+
+		[strType, type] = type === "StringZ" ? [2, "String"] : [type === "String" ? 1 : 0, type];
+
+		args.forEach(arg => {
+			strType && (size = arg.length + strType - 1); // string length adjustment for null termination
+			dsize += size;
+			pdata.push({type: type, size: size, data: arg});
+		});
+
+		return this;
+	};
+
+	this.float = storeFields("Float32", 4);
+	this.dword = storeFields("Uint32", 4);
+	this.word = storeFields("Uint16", 2);
+	this.byte = storeFields("Uint8", 1);
+	this.string = storeFields("StringZ");
+
+	this.buildDataView = () => {
+		let dv = new DataView(new ArrayBuffer(dsize)), i = 0;
+		pdata.forEach(data => {
+			if (data.type === "String") {
+				for (let l = 0; l < data.data.length; l++) {
+					dv.setUint8(i++, data.data.charCodeAt(l), true);
+				}
+
+				i += data.size - data.data.length; // fix index for data.size !== data.data.length
+			} else {
+				dv['set' + data.type](i, data.data, true);
+				i += data.size;
+			}
+		});
+
+		return dv;
+	};
+
+	this.send = () => (sendPacket(this.buildDataView().buffer), this);
+	this.spoof = () => (getPacket(this.buildDataView().buffer), this);
+	this.get = this.spoof; // same thing but spoof has clearer intent than get
+}
 
 var Messaging = {
 	sendToScript: function (name, msg) {
