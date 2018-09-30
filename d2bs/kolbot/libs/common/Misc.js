@@ -2430,11 +2430,35 @@ function PacketBuilder () {
 
 	let pdata = [], dsize = 0;
 
-	this.float = (data) => (dsize += 4, pdata.push({type: "Float32", size: 4, data: data}), this);
-	this.dword = (data) => (dsize += 4, pdata.push({type: "Uint32", size: 4, data: data}), this);
-	this.word = (data) => (dsize += 2, pdata.push({type: "Uint16", size: 2, data: data}), this);
-	this.byte = (data) => (dsize += 1, pdata.push({type: "Uint8", size: 1, data: data}), this);
-	this.string = (data, nullTerminate = true) => (dsize += (data.length + (nullTerminate ? 1 : 0)), pdata.push({type: "String", data: data, nullTerminate: nullTerminate}), this);
+	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
+		let nullTerm = 0;
+		let isString = false;
+
+		if (type === "StringZ") {
+			isString = true;
+			nullTerm = 1;
+			type = "String";
+		} else if (type === "String") {
+			isString = true;
+		}
+
+		for (let c = 0; c < args.length; c++) {
+			if (isString) {
+				size = args[c].length + nullTerm; // ArrayBuffers are initialized to 0, so just add 1 for null terminate
+			}
+
+			dsize += size;
+			pdata.push({type: type, size: size, data: args[c]});
+		}
+
+		return this;
+	};
+
+	this.float = storeFields("Float32", 4);
+	this.dword = storeFields("Uint32", 4);
+	this.word = storeFields("Uint16", 2);
+	this.byte = storeFields("Uint8", 1);
+	this.string = storeFields("StringZ");
 
 	this.buildDataView = () => {
 		let dv = new DataView(new ArrayBuffer(dsize)), i = 0;
@@ -2444,9 +2468,7 @@ function PacketBuilder () {
 					dv.setUint8(i++, data.data.charCodeAt(l), true);
 				}
 
-				if (data.nullTerminate) {
-					dv.setUint8(i++, 0, true);
-				}
+				i += data.size - data.data.length; // fix index for data.size !== data.data.length
 			} else {
 				dv['set' + data.type](i, data.data, true);
 				i += data.size;
@@ -2457,7 +2479,8 @@ function PacketBuilder () {
 	};
 
 	this.send = () => (sendPacket(this.buildDataView().buffer), this);
-	this.get = () => (getPacket(this.buildDataView().buffer), this);
+	this.spoof = () => (getPacket(this.buildDataView().buffer), this);
+	this.get = this.spoof; // same thing but spoof has clearer intent than get
 }
 
 var Messaging = {
