@@ -405,7 +405,13 @@ function main() {
 	}
 
 	D2Bot.updateRuns(); // we need the mule to swap keys somehow after all
-	delay(1000);
+
+	if (me.act !== 1) {
+		Town.goToTown(1);
+		Town.move("stash");
+	} else {
+		delay(1000);
+	}
 
 	// Wait for master before login = give room to determine muling mode (normal or torch)
 	while (!master) {
