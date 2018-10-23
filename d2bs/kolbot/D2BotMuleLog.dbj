@@ -1,16 +1,16 @@
 var StarterConfig = {
-	MinGameTime: 0, // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
-	CreateGameDelay: 5, // Seconds to wait before creating a new game
+	MinGameTime: rand(150, 180), // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
+	CreateGameDelay: rand(5, 15), // Seconds to wait before creating a new game
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 
-	CrashDelay: 60, // Seconds to wait after a d2 window crash
-	RealmDownDelay: 2, // Minutes to wait after getting Realm Down message
-	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
-	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
-	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
-	PleaseWaitTimeout: 10, // Seconds to wait before cancelling the 'Please Wait...' screen
-	WaitInLineTimeout: 60 // Seconds to wait before cancelling the 'Waiting in Line...' screen
+	CrashDelay: rand(60, 120), // Seconds to wait after a d2 window crash
+	RealmDownDelay: rand(3, 6), // Minutes to wait after getting Realm Down message
+	UnableToConnectDelay: rand(5, 8), // Minutes to wait after Unable To Connect message
+	CDKeyInUseDelay: rand(5, 8), // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
+	ConnectingTimeout: rand(20, 30), // Seconds to wait before cancelling the 'Connecting...' screen
+	PleaseWaitTimeout: rand(10, 20), // Seconds to wait before cancelling the 'Please Wait...' screen
+	WaitInLineTimeout: rand(30, 60) // Seconds to wait before cancelling the 'Waiting in Line...' screen
 };
 
 
@@ -102,6 +102,30 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
+function timer(tick) {
+	if (!tick) {
+		return "";
+	}
+
+	var hour, min, sec;
+
+	hour = Math.floor((getTickCount() - tick) / 3600000).toString();
+
+	min = (Math.floor((getTickCount() - tick) / 60000) % 60).toString();
+
+	if (min <= 9) {
+		min = "0" + min;
+	}
+
+	sec = (Math.floor((getTickCount() - tick) / 1000) % 60).toString();
+
+	if (sec <= 9) {
+		sec = "0" + sec;
+	}
+
+	return " (" + hour + ":" + min + ":" + sec + ")";
+}
+
 function main() {
 	addEventListener('copydata', ReceiveCopyData);
 
@@ -153,6 +177,8 @@ function main() {
 
 					DataFile.updateStats("runs", gameCount);
 				}
+
+				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);

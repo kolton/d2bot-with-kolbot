@@ -1,7 +1,7 @@
 /**
 *	@filename	MuleLogger.js
 *	@author		kolton
-*	@desc		Log items on configurable accounts/characters
+*	@desc		Log items and perm configurable accounts/characters
 */
 
 var MuleLogger = {
@@ -11,7 +11,7 @@ var MuleLogger = {
 			"account2/password2/realm": ["charnameX", "charnameY etc"],
 			"account3/password3/realm": ["all"]
 
-			To log a full account, put "accountname/password/realm": ["all"]
+			To log a full account, put "account/password/realm": ["all"]
 
 			realm = useast, uswest, europe or asia
 
@@ -27,7 +27,7 @@ var MuleLogger = {
 	LogEquipped: false, // include equipped items
 	LogMerc: false, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
-	IngameTime: 20, // Time to wait after leaving game
+	IngameTime: rand(180, 210), // (180, 210) to avoid RD, increase it to (7230, 7290) for mule perming
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
@@ -67,17 +67,26 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
+		var tick = rand(1500, 1750);
+
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("ÿc4MuleLoggerÿc0: Logging items on " + me.name + ".");
-			D2Bot.printToConsole("MuleLogger: Logging items on " + me.name + ".", 7);
+			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
+			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
+			print("ÿc2IngameTime ÿc0is set to: ÿc2" + this.IngameTime + "ÿc0 sec");
 
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
+				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + Math.floor(this.IngameTime - (getTickCount() - me.gamestarttime) / 1000) + " sec");
+
 				delay(1000);
+
+				if ((getTickCount() - me.gamestarttime) >= tick * 1000) {
+					sendPacket(1, 0x40); // quest status refresh, working as anti-idle
+					tick = tick + rand(1500, 1750); // idle trigger 30 minutes
+				}
 			}
 
 			quit();
-			//delay(10000);
 
 			return true;
 		}
@@ -328,6 +337,10 @@ var MuleLogger = {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
+				if (this.skipItem(items[i].classid)) {
+					continue;
+				}
+
 				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image
@@ -387,5 +400,41 @@ var MuleLogger = {
 		// sen = softcore expan nonladder								
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + "." + ( me.playertype ? "h" : "s" ) + (me.gametype ? "e" : "c" ) + ( me.ladder > 0 ? "l" : "n" ) + ".txt", finalString);
 		print("Item logging done.");
+	},
+
+	skipItem: function (id) {
+		switch(id) {
+		//case 549: // horadric cube
+		case   0: // hand axe
+		case  10: // wand
+		case  14: // club
+		case  25: // shortsword
+		case  47: // javelin
+		case  63: // shortstaff
+		case 175: // katar
+		case 328: // buckler
+		case 513: // stamina potion
+		case 514: // antidote potion
+		case 515: // rejuvenationpotion
+		case 516: // fullrejuvenationpotion
+		case 517: // thawing potion
+		case 518: // tomeoftownportal
+		case 519: // tomeofidentify
+		case 529: // scrolloftownportal
+		case 530: // scrollofidentify
+		case 543: // key
+		case 587: // minorhealingpotion
+		case 588: // lighthealingpotion
+		case 589: // healingpotion
+		case 590: // greathealingpotion
+		case 591: // superhealingpotion
+		case 592: // minormanapotion
+		case 593: // lightmanapotion
+		case 594: // manapotion
+		case 595: // greatermanapotion
+		case 596: // supermanapotion
+			return true;
+		}
+		return false;
 	}
 };
