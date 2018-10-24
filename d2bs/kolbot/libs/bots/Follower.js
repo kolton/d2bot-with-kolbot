@@ -204,7 +204,7 @@ function Follower() {
 
 			break;
 		case 5:
-			names = [NPC.Larzuk, NPC.Malah, NPC["Qual-Kehk"], NPC.Anya, NPC.Nihlathak, NPC.Cain];
+			names = [NPC.Larzuk, NPC.Malah, NPC.Qual_Kehk, NPC.Anya, NPC.Nihlathak, NPC.Cain];
 
 			break;
 		}

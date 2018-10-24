@@ -32,7 +32,7 @@ var NPC = {
 	Malah: getLocaleString(22478).toLowerCase(),
 	Anya: getLocaleString(22477).toLowerCase(),
 	Larzuk: getLocaleString(22476).toLowerCase(),
-	"Qual-Kehk": getLocaleString(22480).toLowerCase(),
+	Qual_Kehk: getLocaleString(22480).toLowerCase(),
 	Nihlathak: getLocaleString(22483).toLowerCase(),
 
 	Cain: getLocaleString(2890).toLowerCase()
@@ -47,7 +47,7 @@ var Town = {
 		{Heal: NPC.Fara, Shop: NPC.Drognan, Gamble: NPC.Elzix, Repair: NPC.Fara, Merc: NPC.Greiz, Key: NPC.Lysander, CainID: NPC.Cain},
 		{Heal: NPC.Ormus, Shop: NPC.Ormus, Gamble: NPC.Alkor, Repair: NPC.Hratli, Merc: NPC.Asheara, Key: NPC.Hratli, CainID: NPC.Cain},
 		{Heal: NPC.Jamella, Shop: NPC.Jamella, Gamble: NPC.Jamella, Repair: NPC.Halbu, Merc: NPC.Tyrael, Key: NPC.Jamella, CainID: NPC.Cain},
-		{Heal: NPC.Malah, Shop: NPC.Malah, Gamble: NPC.Anya, Repair: NPC.Larzuk, Merc: NPC["Qual-Kehk"], Key: NPC.Malah, CainID: NPC.Cain}
+		{Heal: NPC.Malah, Shop: NPC.Malah, Gamble: NPC.Anya, Repair: NPC.Larzuk, Merc: NPC.Qual_Kehk, Key: NPC.Malah, CainID: NPC.Cain}
 	],
 
 	ignoredItemTypes: [ // Items that won't be stashed
@@ -2038,7 +2038,7 @@ MainLoop:
 			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
 			this.act[4].spot[NPC.Malah] = [5078, 5029];
 			this.act[4].spot[NPC.Cain] = [5119, 5061];
-			this.act[4].spot[NPC["Qual-Kehk"]] = [5066, 5083];
+			this.act[4].spot[NPC.Qual_Kehk] = [5066, 5083];
 			this.act[4].spot[NPC.Anya] = [5112, 5120];
 			this.act[4].spot.portal = [5118, 5120];
 			this.act[4].spot.waypoint = [5113, 5068];
