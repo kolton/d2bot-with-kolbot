@@ -60,7 +60,7 @@ for (let i = 0; i < MonsterData.length; i++) {
 		NPC: {get: () => getBaseStat('monstats', index, 'npc'), enumerable: true},
 		Demon: {get: () => getBaseStat('monstats', index, 'demon'), enumerable: true},
 		Flying: {get: () => getBaseStat('monstats', index, 'flying'), enumerable: true},
-		Boss: {get: () => getBaseStat('monstats', index, 'demon'), enumerable: true},
+		Boss: {get: () => getBaseStat('monstats', index, 'boss'), enumerable: true},
 		ActBoss: {get: () => getBaseStat('monstats', index, 'primeevil'), enumerable: true},
 		Killable: {get: () => getBaseStat('monstats', index, 'killable'), enumerable: true},
 		Convertable: {get: () => getBaseStat('monstats', index, 'switchai'), enumerable: true},
@@ -113,12 +113,12 @@ for (let i = 0; i < AreaData.length; i++) {
 		Waypoint: {get: () => getBaseStat('levels', index, 'Waypoint'), enumerable: true},
 		Level: {get: () => getBaseStat('levels', index, ['MonLvl1Ex', 'MonLvl2Ex', 'MonLvl3Ex'][me.diff]), enumerable: true},
 		Size: {get: () => {
-			if (index === 111) { // bloody foothills doesn't specify size, manual measurement
-				return {x: 1120, y: 150};
+			if (index === 111) { // frigid highlands doesn't specify size, manual measurement
+				return {x: 210, y: 710};
 			}
 
-			if (index === 112) {
-				return {x: 210, y: 710};
+			if (index === 112) { // arreat plateau doesn't specify size, manual measurement
+				return {x: 690, y: 230};
 			}
 
 			return {
