@@ -67,7 +67,7 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		var tick = rand(1500, 1750);
+		var tick = getTickCount() + rand(1500, 1750)*1000; // for idle trigger 30 minutes
 
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
@@ -80,9 +80,9 @@ var MuleLogger = {
 
 				delay(1000);
 
-				if ((getTickCount() - me.gamestarttime) >= tick * 1000) {
+				if ((getTickCount() - tick) > 0) {
 					sendPacket(1, 0x40); // quest status refresh, working as anti-idle
-					tick = tick + rand(1500, 1750); // idle trigger 30 minutes
+					tick += rand(1500, 1750)*1000;
 				}
 			}
 
