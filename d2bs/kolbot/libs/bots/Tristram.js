@@ -30,9 +30,9 @@ function Tristram() {
 		}
 
 		// print("We need Key to the Cairn Stones");
-		Town.move("akara");
+		Town.move(NPC.Akara);
 
-		akara = getUnit(1, "akara");
+		akara = getUnit(1, NPC.Akara);
 
 		akara.openMenu();
 		me.cancel();

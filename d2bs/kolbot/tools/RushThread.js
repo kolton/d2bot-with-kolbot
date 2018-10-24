@@ -438,7 +438,7 @@ function main() {
 		Pather.moveTo(17591, 8070);
 		Attack.securePosition(me.x, me.y, 40, 3000);
 
-		hydra = getUnit(1, "hydra");
+		hydra = getUnit(1, getLocaleString(3325));
 
 		if (hydra) {
 			do {
@@ -861,7 +861,7 @@ function main() {
 		};
 
 		this.checkHydra = function () {
-			var monster = getUnit(1, "hydra");
+			var monster = getUnit(1, getLocaleString(3325));
 
 			if (monster) {
 				do {

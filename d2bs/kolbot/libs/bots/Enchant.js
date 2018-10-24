@@ -203,7 +203,7 @@ function Enchant() {
 			} while (tome.getNext());
 		}
 
-		Town.move("akara");
+		Town.move(NPC.Akara);
 
 		akara = getUnit(1, NPC.Akara);
 

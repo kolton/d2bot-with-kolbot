@@ -9,12 +9,16 @@ var NPC = {
 	Gheed: getLocaleString(2891).toLowerCase(),
 	Charsi: getLocaleString(2894).toLowerCase(),
 	Kashya: getLocaleString(2893).toLowerCase(),
+	Warriv: getLocaleString(2895).toLowerCase(),
 
 	Fara: getLocaleString(3025).toLowerCase(),
 	Drognan: getLocaleString(3023).toLowerCase(),
 	Elzix: getLocaleString(3030).toLowerCase(),
 	Greiz: getLocaleString(3031).toLowerCase(),
 	Lysander: getLocaleString(3026).toLowerCase(),
+	Jerhyn: getLocaleString(3027).toLowerCase(),
+	Meshif: getLocaleString(3032).toLowerCase(),
+	Atma: getLocaleString(3024).toLowerCase(),
 
 	Ormus: getLocaleString(1011).toLowerCase(),
 	Alkor: getLocaleString(1010).toLowerCase(),
@@ -29,6 +33,7 @@ var NPC = {
 	Anya: getLocaleString(22477).toLowerCase(),
 	Larzuk: getLocaleString(22476).toLowerCase(),
 	"Qual-Kehk": getLocaleString(22480).toLowerCase(),
+	Nihlathak: getLocaleString(22483).toLowerCase(),
 
 	Cain: getLocaleString(2890).toLowerCase()
 };
@@ -122,9 +127,9 @@ var Town = {
 		// golden bird stuff
 		if (me.getItem(546)) {
 			this.goToTown(3);
-			this.move("meshif");
+			this.move(NPC.Meshif);
 
-			npc = getUnit(1, "meshif");
+			npc = getUnit(1, NPC.Meshif);
 
 			if (npc) {
 				npc.openMenu();
@@ -134,9 +139,9 @@ var Town = {
 
 		if (me.getItem(547)) {
 			this.goToTown(3);
-			this.move("alkor");
+			this.move(NPC.Alkor);
 
-			npc = getUnit(1, "alkor");
+			npc = getUnit(1, NPC.Alkor);
 
 			if (npc) {
 				for (i = 0; i < 2; i += 1) {
@@ -1970,8 +1975,8 @@ MainLoop:
 
 			this.act[0].spot = {};
 			this.act[0].spot.stash = [fire[0] - 7, fire[1] - 12];
-			this.act[0].spot.warriv = [fire[0] - 5, fire[1] - 2];
-			this.act[0].spot.cain = [fire[0] + 6, fire[1] - 5];
+			this.act[0].spot[NPC.Warriv] = [fire[0] - 5, fire[1] - 2];
+			this.act[0].spot[NPC.Cain] = [fire[0] + 6, fire[1] - 5];
 			this.act[0].spot[NPC.Kashya] = [fire[0] + 14, fire[1] - 4];
 			this.act[0].spot[NPC.Akara] = [fire[0] + 56, fire[1] - 30];
 			this.act[0].spot[NPC.Charsi] = [fire[0] - 39, fire[1] - 25];
@@ -1984,16 +1989,16 @@ MainLoop:
 		case 2:
 			this.act[1].spot = {};
 			this.act[1].spot[NPC.Fara] = [5124, 5082];
-			this.act[1].spot.cain = [5124, 5082];
+			this.act[1].spot[NPC.Cain] = [5124, 5082];
 			this.act[1].spot[NPC.Lysander] = [5118, 5104];
 			this.act[1].spot[NPC.Greiz] = [5033, 5053];
 			this.act[1].spot[NPC.Elzix] = [5032, 5102];
 			this.act[1].spot.palace = [5088, 5153];
 			this.act[1].spot.sewers = [5221, 5181];
-			this.act[1].spot.meshif = [5205, 5058];
+			this.act[1].spot[NPC.Meshif] = [5205, 5058];
 			this.act[1].spot[NPC.Drognan] = [5097, 5035];
-			this.act[1].spot.atma = [5137, 5060];
-			this.act[1].spot.warriv = [5152, 5201];
+			this.act[1].spot[NPC.Atma] = [5137, 5060];
+			this.act[1].spot[NPC.Warriv] = [5152, 5201];
 			this.act[1].spot.portalspot = [5168, 5060];
 			this.act[1].spot.stash = [5124, 5076];
 			this.act[1].spot.waypoint = [5070, 5083];
@@ -2002,12 +2007,12 @@ MainLoop:
 			break;
 		case 3:
 			this.act[2].spot = {};
-			this.act[2].spot.meshif = [5118, 5168];
+			this.act[2].spot[NPC.Meshif] = [5118, 5168];
 			this.act[2].spot[NPC.Hratli] = [5223, 5048, 5127, 5172];
 			this.act[2].spot[NPC.Ormus] = [5129, 5093];
 			this.act[2].spot[NPC.Asheara] = [5043, 5093];
 			this.act[2].spot[NPC.Alkor] = [5083, 5016];
-			this.act[2].spot.cain = [5148, 5066];
+			this.act[2].spot[NPC.Cain] = [5148, 5066];
 			this.act[2].spot.stash = [5144, 5059];
 			this.act[2].spot.portalspot = [5150, 5063];
 			this.act[2].spot.waypoint = [5158, 5050];
@@ -2016,7 +2021,7 @@ MainLoop:
 			break;
 		case 4:
 			this.act[3].spot = {};
-			this.act[3].spot.cain = [5027, 5027];
+			this.act[3].spot[NPC.Cain] = [5027, 5027];
 			this.act[3].spot[NPC.Halbu] = [5089, 5031];
 			this.act[3].spot[NPC.Tyrael] = [5027, 5027];
 			this.act[3].spot[NPC.Jamella] = [5088, 5054];
@@ -2032,12 +2037,12 @@ MainLoop:
 			this.act[4].spot.stash = [5129, 5061];
 			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
 			this.act[4].spot[NPC.Malah] = [5078, 5029];
-			this.act[4].spot.cain = [5119, 5061];
+			this.act[4].spot[NPC.Cain] = [5119, 5061];
 			this.act[4].spot[NPC["Qual-Kehk"]] = [5066, 5083];
 			this.act[4].spot[NPC.Anya] = [5112, 5120];
 			this.act[4].spot.portal = [5118, 5120];
 			this.act[4].spot.waypoint = [5113, 5068];
-			this.act[4].spot.nihlathak = [5071, 5111];
+			this.act[4].spot[NPC.Nihlathak] = [5071, 5111];
 			this.act[4].initialized = true;
 
 			break;
@@ -2115,14 +2120,8 @@ MainLoop:
 				}
 
 				break;
-			case "cain":
-				if (!!getUnit(1, NPC.Cain)) {
-					return true;
-				}
-
-				break;
 			case "palace":
-				if (!!getUnit(1, "jerhyn")) {
+				if (!!getUnit(1, NPC.Jerhyn)) {
 					return true;
 				}
 

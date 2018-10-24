@@ -123,7 +123,7 @@ function BaalHelper() { // experi-mental
 	};
 
 	this.checkHydra = function () {
-		var monster = getUnit(1, "hydra");
+		var monster = getUnit(1, getLocaleString(3325));
 
 		if (monster) {
 			do {

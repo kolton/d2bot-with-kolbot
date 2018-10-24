@@ -188,23 +188,23 @@ function Follower() {
 
 		switch (me.act) {
 		case 1:
-			names = ["gheed", "charsi", "akara", "kashya", "cain", "warriv"];
+			names = [NPC.Gheed, NPC.Charsi, NPC.Akara, NPC.Kashya, NPC.Cain, NPC.Warriv];
 
 			break;
 		case 2:
-			names = ["fara", "lysander", "greiz", "elzix", "jerhyn", "meshif", "drognan", "atma", "cain"];
+			names = [NPC.Fara, NPC.Lysander, NPC.Greiz, NPC.Elzix, NPC.Jerhyn, NPC.Meshif, NPC.Drognan, NPC.Atma, NPC.Cain];
 
 			break;
 		case 3:
-			names = ["alkor", "asheara", "ormus", "hratli", "cain"];
+			names = [NPC.Alkor, NPC.Asheara, NPC.Ormus, NPC.Hratli, NPC.Cain];
 
 			break;
 		case 4:
-			names = ["halbu", "tyrael", "jamella", "cain"];
+			names = [NPC.Halbu, NPC.Tyrael, NPC.Jamella, NPC.Cain];
 
 			break;
 		case 5:
-			names = ["larzuk", "malah", "qual-kehk", "anya", "nihlathak", "cain"];
+			names = [NPC.Larzuk, NPC.Malah, NPC["Qual-Kehk"], NPC.Anya, NPC.Nihlathak, NPC.Cain];
 
 			break;
 		}
@@ -215,7 +215,7 @@ function Follower() {
 			return false;
 		}
 
-		if (!Town.move(name === "jerhyn" ? "palace" : name)) {
+		if (!Town.move(name === NPC.Jerhyn ? "palace" : name)) {
 			Town.move("portalspot");
 			say("Failed to move to town spot.");
 
@@ -255,7 +255,7 @@ function Follower() {
 				break;
 			}
 
-			Town.move("warriv");
+			Town.move(NPC.Warriv);
 
 			npc = getUnit(1, 155);
 
@@ -279,7 +279,7 @@ function Follower() {
 				me.cancel();
 			}
 
-			Town.move("meshif");
+			Town.move(NPC.Meshif);
 
 			npc = getUnit(1, 210);
 
@@ -295,7 +295,7 @@ function Follower() {
 			}
 
 			if (me.inTown) {
-				Town.move("cain");
+				Town.move(NPC.Cain);
 
 				npc = getUnit(1, 245);
 
@@ -324,9 +324,9 @@ function Follower() {
 				break;
 			}
 
-			Town.move("tyrael");
+			Town.move(NPC.Tyrael);
 
-			npc = getUnit(1, "tyrael");
+			npc = getUnit(1, NPC.Tyrael);
 
 			if (npc) {
 				npc.openMenu();

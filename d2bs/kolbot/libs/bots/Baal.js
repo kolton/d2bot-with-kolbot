@@ -125,7 +125,7 @@ function Baal() {
 	};
 
 	this.checkHydra = function () {
-		var monster = getUnit(1, "hydra");
+		var monster = getUnit(1, getLocaleString(3325));
 		if (monster) {
 			do {
 				if (monster.mode !== 12 && monster.getStat(172) !== 2) {

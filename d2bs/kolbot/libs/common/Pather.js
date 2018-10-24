@@ -1432,7 +1432,7 @@ MainLoop:
 				this.moveTo(10073, 8670);
 				this.usePortal(null);
 			} else if (me.area === 109 && target.course[0] === 121) { // Harrogath -> Nihlathak's Temple
-				Town.move("anya");
+				Town.move(NPC.Anya);
 				this.usePortal(121);
 			} else if (me.area === 111 && target.course[0] === 125) { // Abaddon
 				this.moveToPreset(111, 2, 60);
