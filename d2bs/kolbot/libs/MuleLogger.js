@@ -27,7 +27,8 @@ var MuleLogger = {
 	LogEquipped: false, // include equipped items
 	LogMerc: false, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
-	IngameTime: rand(180, 210), // (180, 210) to avoid RD, increase it to (7230, 7290) for mule perming
+	MulePerm: false, // perming the new created mule chars
+	IngameTime: this.MulePerm ? rand(7230, 7290) : rand(180, 210), // gametime 180-210s to avoid RD, 7230-7290s for mule perming
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
