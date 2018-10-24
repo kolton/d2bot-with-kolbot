@@ -27,8 +27,7 @@ var MuleLogger = {
 	LogEquipped: false, // include equipped items
 	LogMerc: false, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
-	MulePerm: false, // perming the new created mule chars
-	IngameTime: this.MulePerm ? rand(7230, 7290) : rand(180, 210), // gametime 180-210s to avoid RD, 7230-7290s for mule perming
+	MulePerm: false, // perming the new created mule chars 2h in game
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
@@ -68,16 +67,17 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		var tick = rand(1500, 1750);
+		var tick = rand(1500, 1750),
+			inGameTime = this.MulePerm ? rand(7230, 7290) : rand(180, 210); // gametime 180-210s to avoid RD, 7230-7290s for mule perming
 
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
-			print("ÿc2IngameTime ÿc0is set to: ÿc2" + this.IngameTime + "ÿc0 sec");
+			print("ÿc2inGameTime ÿc0is set to: ÿc2" + inGameTime + "ÿc0 sec");
 
-			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
-				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + Math.floor(this.IngameTime - (getTickCount() - me.gamestarttime) / 1000) + " sec");
+			while ((getTickCount() - me.gamestarttime) < inGameTime * 1000) {
+				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + Math.floor(inGameTime - (getTickCount() - me.gamestarttime) / 1000) + " sec");
 
 				delay(1000);
 
