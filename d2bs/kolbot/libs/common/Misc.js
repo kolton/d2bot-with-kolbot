@@ -1518,6 +1518,44 @@ var Misc = {
 		return true;
 	},
 
+	// skip low items: MuleLogger
+	skipItem: function (id) {
+		switch (id) {
+		//case 549: // horadric cube
+		case   0: // hand axe
+		case  10: // wand
+		case  14: // club
+		case  25: // shortsword
+		case  47: // javelin
+		case  63: // shortstaff
+		case 175: // katar
+		case 328: // buckler
+		case 513: // stamina potion
+		case 514: // antidote potion
+		case 515: // rejuvenationpotion
+		case 516: // fullrejuvenationpotion
+		case 517: // thawing potion
+		case 518: // tomeoftownportal
+		case 519: // tomeofidentify
+		case 529: // scrolloftownportal
+		case 530: // scrollofidentify
+		case 543: // key
+		case 587: // minorhealingpotion
+		case 588: // lighthealingpotion
+		case 589: // healingpotion
+		case 590: // greathealingpotion
+		case 591: // superhealingpotion
+		case 592: // minormanapotion
+		case 593: // lightmanapotion
+		case 594: // manapotion
+		case 595: // greatermanapotion
+		case 596: // supermanapotion
+			return true;
+		}
+
+		return false;
+	},
+
 	// Change into werewolf or werebear
 	shapeShift: function (mode) {
 		var i, tick, skill, state;
@@ -2619,39 +2657,3 @@ var Events = {
 		return false;
 	}
 };
-
-function skipItem (id) { // MuleLogger skip LogEquipped low items
-	switch (id) {
-	//case 549: // horadric cube
-	case   0: // hand axe
-	case  10: // wand
-	case  14: // club
-	case  25: // shortsword
-	case  47: // javelin
-	case  63: // shortstaff
-	case 175: // katar
-	case 328: // buckler
-	case 513: // stamina potion
-	case 514: // antidote potion
-	case 515: // rejuvenationpotion
-	case 516: // fullrejuvenationpotion
-	case 517: // thawing potion
-	case 518: // tomeoftownportal
-	case 519: // tomeofidentify
-	case 529: // scrolloftownportal
-	case 530: // scrollofidentify
-	case 543: // key
-	case 587: // minorhealingpotion
-	case 588: // lighthealingpotion
-	case 589: // healingpotion
-	case 590: // greathealingpotion
-	case 591: // superhealingpotion
-	case 592: // minormanapotion
-	case 593: // lightmanapotion
-	case 594: // manapotion
-	case 595: // greatermanapotion
-	case 596: // supermanapotion
-		return true;
-	}
-	return false;
-}

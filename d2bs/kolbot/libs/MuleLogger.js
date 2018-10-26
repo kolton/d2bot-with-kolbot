@@ -67,13 +67,13 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
-		var tick = getTickCount() + rand(1500, 1750)*1000; // for idle trigger 30 minutes
+		var tick;
 
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
 			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
 			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
-			print("ÿc2IngameTime ÿc0is set to: ÿc2" + this.IngameTime + "ÿc0 sec");
+			tick = getTickCount() + rand(1500, 1750) * 1000; // trigger anti-idle every ~30 minutes
 
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
 				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + Math.floor(this.IngameTime - (getTickCount() - me.gamestarttime) / 1000) + " sec");
@@ -82,7 +82,7 @@ var MuleLogger = {
 
 				if ((getTickCount() - tick) > 0) {
 					sendPacket(1, 0x40); // quest status refresh, working as anti-idle
-					tick += rand(1500, 1750)*1000;
+					tick += rand(1500, 1750) * 1000;
 				}
 			}
 
@@ -336,11 +336,7 @@ var MuleLogger = {
 		items.sort(itemSort);
 
 		for (i = 0; i < items.length; i += 1) {
-			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
-				if (Misc.skipItem(items[i].classid)) {
-					continue;
-				}
-
+			if ((this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) && !Misc.skipItem(items[i].classid)) {
 				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image

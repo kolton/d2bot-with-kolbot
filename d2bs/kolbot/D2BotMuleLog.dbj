@@ -102,28 +102,8 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
-function timer(tick) {
-	if (!tick) {
-		return "";
-	}
-
-	var hour, min, sec;
-
-	hour = Math.floor((getTickCount() - tick) / 3600000).toString();
-
-	min = (Math.floor((getTickCount() - tick) / 60000) % 60).toString();
-
-	if (min <= 9) {
-		min = "0" + min;
-	}
-
-	sec = (Math.floor((getTickCount() - tick) / 1000) % 60).toString();
-
-	if (sec <= 9) {
-		sec = "0" + sec;
-	}
-
-	return " (" + hour + ":" + min + ":" + sec + ")";
+function timer (tick) {
+	return " (" + new Date(getTickCount() - tick).toISOString().slice(11, -5) + ")";
 }
 
 function main() {
