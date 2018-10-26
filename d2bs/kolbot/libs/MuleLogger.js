@@ -336,7 +336,7 @@ var MuleLogger = {
 		items.sort(itemSort);
 
 		for (i = 0; i < items.length; i += 1) {
-			if ((this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) && !Misc.skipItem(items[i].classid)) {
+			if ((this.LogEquipped || items[i].mode === 0) && !Misc.skipItem(items[i].classid)) {
 				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image
