@@ -458,7 +458,7 @@ MainLoop:
 	// get a list of items to mule
 	getMuleItems: function (forceCheck) {
 		var item, items, info;
-		
+
 		if (forceCheck === undefined) {
 			forceCheck = false;
 		}

@@ -36,7 +36,7 @@ function buildTileList() {
    tilelist[24][25]=9; // Tower Level 4 - Tower Level 5
    tilelist[25][24]=8; // Tower Level 5 - Tower Level 4
    tilelist[7][12]=2; // Tamoe - Pit
-   tilelist[7][120]=3; // Tamoe - Pit    - Darien variation 1  
+   tilelist[7][120]=3; // Tamoe - Pit    - Darien variation 1
    tilelist[12][7]=4; // Pit - Tamoe
    tilelist[12][16]=5; // Pit - Pit level 2
    tilelist[16][12]=4; // Pit Level 2 - Pit
@@ -56,7 +56,7 @@ function buildTileList() {
    tilelist[36][35]=17; // Cat Level 3 - Cat Level 2
    tilelist[36][37]=18; // Cat Level 3 - Cat Level 4
    tilelist[37][36]=17; // Cat Level 4 - Cat Level 3
-   
+
    // Act2
    tilelist[40][47]=19; // Lut - Sewers Level 1 (trap door)
    //tilelist[40][47]=20; // Lut - Sewers Level 1 (seaside)
@@ -114,15 +114,15 @@ function buildTileList() {
    tilelist[70][46]=45; // Tomb 5 - Canyon
    tilelist[71][46]=45; // Tomb 6 - Canyon
    tilelist[72][46]=45; // Tomb 7 - Canyon
-   
+
    //Act3
    tilelist[101][102]=67; // Durance 3
-   tilelist[101][1021]=68; // Durance 3 - Darien variation 1 
+   tilelist[101][1021]=68; // Durance 3 - Darien variation 1
 
    //Act4 (Complete)
    tilelist[106][107]=69; // City of the Damned - River of Flame
    tilelist[107][106]=70; // River - City
-   
+
    //Act5 (NOT Complete)
    tilelist[112][113]=71; // Arreat Plateau - Crystaline Passage
    tilelist[113][112]=73; // Crystaline - Arreat Plateau
@@ -168,9 +168,9 @@ function getTile(n) {
    var oldarea=me.area;
    var tile=getUnit(5);
    if(tile) do {
-      
-    	if(tile.classid==tilelist[me.area][n]) { 
-		print(tile.name); 
+
+    	if(tile.classid==tilelist[me.area][n]) {
+		print(tile.name);
 		print("Tile " + tile.classid + " at "+tile.x+ ", "+tile.y);
 		return tile;
 	}
@@ -192,6 +192,6 @@ function tileInteract(o) {
       		o.interact();
       		delay(100);
       		intercount++;
-	}  
-	if(me.area == oldarea) print("Failed to interact with tile"); 	
+	}
+	if(me.area == oldarea) print("Failed to interact with tile");
 }

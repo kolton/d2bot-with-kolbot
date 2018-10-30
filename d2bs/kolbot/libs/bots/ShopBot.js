@@ -232,7 +232,6 @@ function ShopBot() {
 			this.npcs[name] = copyUnit(npc);
 		}
 
-		
 		if (Config.ShopBot.CycleDelay) {
 			delay(Config.ShopBot.CycleDelay);
 		}
@@ -295,7 +294,7 @@ function ShopBot() {
 				exit = area.exits[0];
 
 			for (i = 1; i < area.exits.length; i++) {
-				if (getDistance(me, exit) > getDistance(me, area.exits[i])) { 
+				if (getDistance(me, exit) > getDistance(me, area.exits[i])) {
 					exit = area.exits[i];
 				}
 			}

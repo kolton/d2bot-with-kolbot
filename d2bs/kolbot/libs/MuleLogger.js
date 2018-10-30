@@ -6,7 +6,7 @@
 
 var MuleLogger = {
 	LogAccounts: {
-		/* Format: 
+		/* Format:
 			"account1/password1/realm": ["charname1", "charname2 etc"],
 			"account2/password2/realm": ["charnameX", "charnameY etc"],
 			"account3/password3/realm": ["all"]
@@ -393,7 +393,7 @@ var MuleLogger = {
 		}
 
 		// hcl = hardcore class ladder
-		// sen = softcore expan nonladder								
+		// sen = softcore expan nonladder
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + "." + ( me.playertype ? "h" : "s" ) + (me.gametype ? "e" : "c" ) + ( me.ladder > 0 ? "l" : "n" ) + ".txt", finalString);
 		print("Item logging done.");
 	}

@@ -37,7 +37,7 @@ var StarterConfig = {
 	Similar rules apply to ExcludeFilter:
 
 	["somebaal", "-"] ignores games with "somebaal" and "-" in the game name
-	
+
 	["somebaal"],
 	["somediablo"]
 	this will ignore all games with "somebaal" or "somediablo" in their names

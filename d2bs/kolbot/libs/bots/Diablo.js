@@ -106,13 +106,13 @@ function Diablo() {
 			}
 
 			warn = false;
-			
+
 			if (classid === 394) {
 				Misc.click(0, 0, seal);
 			} else {
 				seal.interact();
 			}
-			
+
 			delay(classid === 394 ? 1000 : 500);
 
 			if (!seal.mode) {
@@ -421,7 +421,7 @@ function Diablo() {
 	this.starToInfA = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5295, 7919, 5290];
 	this.starToInfB = [7809, 5268, 7834, 5306, 7852, 5280, 7852, 5310, 7869, 5294, 7895, 5274, 7927, 5275, 7932, 5297, 7923, 5313];
 	Pather._teleport = Pather.teleport;
-	
+
 	// start
 	Town.doChores();
 	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
@@ -491,6 +491,6 @@ function Diablo() {
 	Pickit.pickItems();
 
 	Pather.teleport = Pather._teleport;
-	
+
 	return true;
 }

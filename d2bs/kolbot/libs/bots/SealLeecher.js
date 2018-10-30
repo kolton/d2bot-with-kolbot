@@ -49,7 +49,7 @@ function SealLeecher() {
 				commands.shift();
 
 				break;
-			case "done": 
+			case "done":
 				if (!me.inTown) {
 					Pather.usePortal(103, Config.Leader);
 				}
