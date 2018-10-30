@@ -285,6 +285,25 @@ function LoadConfig() {
 	Config.PickRange = 40; // Pick radius
 	Config.FastPick = false; // Check and pick items between attacks
 
+	/* Advanced automule settings
+	 * Trigger - Having an item that is on the list will initiate muling. Useful if you want to mule something immediately upon finding.
+	 *  	If you want to trigger and mule an ingredient, entry should be made into both Trigger and Force list.
+	 * Force - Items listed here will be muled even if they are ingredients for cubing. However, just having these ingredients here will not trigger muling.
+	 * Deny - Items listed here will be ignored and will not be muled. If item is on both Trigger/Force and Deny list, it will not be triggered or muled.
+	 *
+	 * List can either be set as string in pickit format and/or as number referring to item classids. Each entries are separated by commas.
+	 * Example :
+	 *  Config.AutoMule.Trigger = [639, 640, "[type] == ring && [quality] == unique # [maxmana] == 20"];
+	 *  	This will initiate muling when your character finds Ber, Jah, or SOJ.
+	 *  Config.AutoMule.Force = [561, 566, 571, 576, 581, 586, 601];
+	 *  	This will mule perfect gems/skull during muling.
+	 *  Config.AutoMule.Deny = ["[name] >= 654 && [name] <= 657"];
+	 *  	This will deny muling of any essences.
+	 */
+	Config.AutoMule.Trigger = [];
+	Config.AutoMule.Force = [];
+	Config.AutoMule.Deny = [];
+
 	// Additional item info log settings. All info goes to \logs\ItemLog.txt
 	Config.ItemInfo = false; // Log stashed, skipped (due to no space) or sold items.
 	Config.ItemInfoQuality = []; // The quality of sold items to log. See NTItemAlias.dbl for values. Example: Config.ItemInfoQuality = [6, 7, 8];

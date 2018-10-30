@@ -192,6 +192,12 @@ var Config = {
 	ScanShrines: [],
 	Debug: false,
 
+	AutoMule: {
+		Trigger: [],
+		Force: [],
+		Deny: []
+	},
+
 	ItemInfo: false,
 	ItemInfoQuality: [],
 

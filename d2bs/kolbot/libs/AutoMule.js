@@ -100,14 +100,27 @@ var AutoMule = {
 	},
 
 	muleCheck: function () {
-		var info = this.getInfo();
+		var i, items,
+			info = this.getInfo();
 
-		if (info && info.hasOwnProperty("muleInfo") && info.muleInfo.hasOwnProperty("usedStashTrigger") && info.muleInfo.hasOwnProperty("usedInventoryTrigger") &&
-				Storage.Inventory.UsedSpacePercent() >= info.muleInfo.usedInventoryTrigger && Storage.Stash.UsedSpacePercent() >= info.muleInfo.usedStashTrigger &&
-					this.getMuleItems().length > 0) {
-			D2Bot.printToConsole("MuleCheck triggered!", 7);
+		if (info && info.hasOwnProperty("muleInfo")) {
+			if (info.muleInfo.hasOwnProperty("usedStashTrigger") && info.muleInfo.hasOwnProperty("usedInventoryTrigger") &&
+					Storage.Inventory.UsedSpacePercent() >= info.muleInfo.usedInventoryTrigger && Storage.Stash.UsedSpacePercent() >= info.muleInfo.usedStashTrigger &&
+						this.getMuleItems().length > 0) {
+				D2Bot.printToConsole("MuleCheck triggered!", 7);
 
-			return true;
+				return true;
+			}
+
+			items = this.getMuleItems(true); // set force check so we don't trigger mule without having actual item to mule
+
+			for (i = 0; i < items.length; i += 1) {
+				if (this.matchItem(items[i], Config.AutoMule.Trigger)) {
+					D2Bot.printToConsole("MuleCheck triggered!", 7);
+
+					return true;
+				}
+			}
 		}
 
 		return false;
@@ -414,14 +427,50 @@ MainLoop:
 		return true;
 	},
 
+	matchItem: function (item, list) {
+		var i, info, parsedLine,
+			parsedPickit = [], classIDs = [];
+
+		for (i = 0; i < list.length; i += 1) {
+			info = {
+				file: "Character Config",
+				line: list[i]
+			};
+
+			if (typeof list[i] === "number") { // classids
+				classIDs.push(list[i]);
+			} else if (typeof list[i] === "string") { // pickit entries
+				parsedLine = NTIP.ParseLineInt(list[i], info);
+
+				if (parsedLine) {
+					parsedPickit.push(NTIP.ParseLineInt(list[i], info));
+				}
+			}
+		}
+
+		if (classIDs.indexOf(item.classid) > -1 || NTIP.CheckItem(item, parsedPickit)) {
+			return true;
+		}
+
+		return false;
+	},
+
 	// get a list of items to mule
-	getMuleItems: function () {
+	getMuleItems: function (forceCheck) {
 		var item, items, info;
+		
+		if (forceCheck === undefined) {
+			forceCheck = false;
+		}
 
 		info = this.getInfo();
 
 		if (!info || !info.hasOwnProperty("muleInfo")) {
 			return false;
+		}
+
+		if (me.gamename.toLowerCase() === info.muleInfo.muleGameName[0].toLowerCase()) {
+			forceCheck = true; // set force check when we are in mule game for ingredient muling
 		}
 
 		item = me.getItem(-1, 0);
@@ -436,7 +485,8 @@ MainLoop:
 						(item.classid !== 604 || item.quality !== 7) && // Don't drop Hellfire Torch
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
-						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) { // Don't drop Runeword/Cubing/CraftingSystem ingredients
+						((forceCheck && this.matchItem(item, Config.AutoMule.Force)) || (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item))) && // Don't drop Runeword/Cubing/CraftingSystem ingredients unless on forced list
+						!this.matchItem(item, Config.AutoMule.Deny)) { // Don't drop items on deny list
 					items.push(copyUnit(item));
 				}
 			} while (item.getNext());
