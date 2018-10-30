@@ -117,7 +117,6 @@ var AutoMule = {
 			for (i = 0; i < items.length; i += 1) {
 				if (this.matchItem(items[i], Config.AutoMule.Trigger)) {
 					D2Bot.printToConsole("MuleCheck triggered!", 7);
-
 					return true;
 				}
 			}
@@ -443,27 +442,18 @@ MainLoop:
 				parsedLine = NTIP.ParseLineInt(list[i], info);
 
 				if (parsedLine) {
-					parsedPickit.push(NTIP.ParseLineInt(list[i], info));
+					parsedPickit.push(parsedLine);
 				}
 			}
 		}
 
-		if (classIDs.indexOf(item.classid) > -1 || NTIP.CheckItem(item, parsedPickit)) {
-			return true;
-		}
-
-		return false;
+		return (classIDs.indexOf(item.classid) > -1 || NTIP.CheckItem(item, parsedPickit));
 	},
 
 	// get a list of items to mule
-	getMuleItems: function (forceCheck) {
-		var item, items, info;
-
-		if (forceCheck === undefined) {
-			forceCheck = false;
-		}
-
-		info = this.getInfo();
+	getMuleItems: function (forceCheck = false) {
+		var item, items,
+			info = this.getInfo();
 
 		if (!info || !info.hasOwnProperty("muleInfo")) {
 			return false;
@@ -486,7 +476,7 @@ MainLoop:
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
 						((forceCheck && this.matchItem(item, Config.AutoMule.Force)) || (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item))) && // Don't drop Runeword/Cubing/CraftingSystem ingredients unless on forced list
-						!this.matchItem(item, Config.AutoMule.Deny)) { // Don't drop items on deny list
+						!this.matchItem(item, Config.AutoMule.Exclude)) { // Don't drop items on exclude list
 					items.push(copyUnit(item));
 				}
 			} while (item.getNext());

@@ -485,10 +485,8 @@ function main() {
 
 					obj = MuleData.read();
 
-					if (checkAnniTorch()) {
-						if (obj.torchChars.indexOf(me.name) === -1) {
-							obj.torchChars.push(me.name);
-						}
+					if (checkAnniTorch() && obj.torchChars.indexOf(me.name) === -1) {
+						obj.torchChars.push(me.name);
 					}
 
 					MuleData.write(obj);
@@ -506,10 +504,8 @@ function main() {
 					makeNext = true;
 					obj = MuleData.read();
 
-					if (checkAnniTorch()) {
-						if (obj.torchChars.indexOf(me.name) === -1) {
-							obj.torchChars.push(me.name);
-						}
+					if (checkAnniTorch() && obj.torchChars.indexOf(me.name) === -1) {
+						obj.torchChars.push(me.name);
 					}
 
 					obj.fullChars.push(me.name);

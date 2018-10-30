@@ -195,7 +195,7 @@ var Config = {
 	AutoMule: {
 		Trigger: [],
 		Force: [],
-		Deny: []
+		Exclude: []
 	},
 
 	ItemInfo: false,
