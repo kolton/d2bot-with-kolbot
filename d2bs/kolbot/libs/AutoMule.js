@@ -452,7 +452,7 @@ MainLoop:
 
 	// get a list of items to mule
 	getMuleItems: function (forceCheck = false) {
-		var item, items,
+		var item, items, forced,
 			info = this.getInfo();
 
 		if (!info || !info.hasOwnProperty("muleInfo")) {
@@ -474,10 +474,14 @@ MainLoop:
 						(item.classid !== 603 || item.quality !== 7) && // Don't drop Annihilus
 						(item.classid !== 604 || item.quality !== 7) && // Don't drop Hellfire Torch
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
-						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
-						((forceCheck && this.matchItem(item, Config.AutoMule.Force)) || (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item))) && // Don't drop Runeword/Cubing/CraftingSystem ingredients unless on forced list
-						!this.matchItem(item, Config.AutoMule.Exclude)) { // Don't drop items on exclude list
-					items.push(copyUnit(item));
+						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1)) { // Don't drop Keys if part of TorchSystem
+					forced = this.matchItem(item, Config.AutoMule.Force.concat(Config.AutoMule.Trigger));
+
+					if ((forceCheck && forced) || (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item))) { // Don't drop Runeword/Cubing/CraftingSystem ingredients unless on forced list
+						if (!this.matchItem(item, Config.AutoMule.Exclude) || forced) {
+							items.push(copyUnit(item));
+						}
+					}
 				}
 			} while (item.getNext());
 		}
