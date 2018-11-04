@@ -287,8 +287,9 @@ function LoadConfig() {
 
 	/* Advanced automule settings
 	 * Trigger - Having an item that is on the list will initiate muling. Useful if you want to mule something immediately upon finding.
+	 *  	If you want to trigger and mule an ingredient, entry should be made into both Trigger and Force list.
 	 * Force - Items listed here will be muled even if they are ingredients for cubing. However, just having these ingredients here will not trigger muling.
-	 * Exclude - Items listed here will be ignored and will not be muled. Items on Trigger or Force lists are prioritized over this list.
+	 * Exclude - Items listed here will be ignored and will not be muled. If item is on both Trigger/Force and Exclude list, it will not be triggered or muled.
 	 *
 	 * List can either be set as string in pickit format and/or as number referring to item classids. Each entries are separated by commas.
 	 * Example :
@@ -296,8 +297,8 @@ function LoadConfig() {
 	 *  	This will initiate muling when your character finds Ber, Jah, or SOJ.
 	 *  Config.AutoMule.Force = [561, 566, 571, 576, 581, 586, 601];
 	 *  	This will mule perfect gems/skull during muling.
-	 *  Config.AutoMule.Exclude = ["[name] >= talrune && [name] <= solrune", "[name] >= 654 && [name] <= 657"];
-	 *  	This will exclude muling of runes from tal through sol, and any essences.
+	 *  Config.AutoMule.Exclude = ["[name] >= 654 && [name] <= 657"];
+	 *  	This will exclude muling of any essences.
 	 */
 	Config.AutoMule.Trigger = [];
 	Config.AutoMule.Force = [];
@@ -392,13 +393,13 @@ function LoadConfig() {
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
 
-	//Config.Runewords.push([Runeword.Insight, "Thresher"]); // Make Insight Thresher
-	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe"]); // Make Insight Cryptic Axe
+	//Config.Runewords.push([Runeword.Insight, "Thresher", Roll.Eth]); // Make Insight Thresher
+	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe", Roll.Eth]); // Make Insight Cryptic Axe
 
 	//Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
 
-	//Config.Runewords.push([Runeword.Spirit, "Monarch"]); // Make Spirit Monarch
-	//Config.Runewords.push([Runeword.Spirit, "Sacred Targe"]); // Make Spirit Sacred Targe
+	//Config.Runewords.push([Runeword.Spirit, "Monarch", Roll.NonEth]); // Make Spirit Monarch
+	//Config.Runewords.push([Runeword.Spirit, "Sacred Targe", Roll.NonEth]); // Make Spirit Sacred Targe
 
 	//Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 
@@ -427,7 +428,7 @@ function LoadConfig() {
 	Config.TeleSwitch = false; // Switch to slot II when teleporting more than 1 node.
 	Config.OpenChests = false; // Open chests. Controls key buying.
 	Config.MiniShopBot = true; // Scan items in NPC shops.
-	Config.PacketShopping = true; // Use packets to shop. Improves shopping speed.
+	Config.PacketShopping = false; // Use packets to shop. Improves shopping speed.
 	Config.TownCheck = false; // Go to town if out of potions
 	Config.LogExperience = false; // Print experience statistics in the manager.
 	Config.PingQuit = [{Ping: 0, Duration: 0}]; // Quit if ping is over the given value for over the given time period in seconds.
