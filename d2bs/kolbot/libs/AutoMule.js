@@ -104,15 +104,15 @@ var AutoMule = {
 			info = this.getInfo();
 
 		if (info && info.hasOwnProperty("muleInfo")) {
+			items = this.getMuleItems();
+
 			if (info.muleInfo.hasOwnProperty("usedStashTrigger") && info.muleInfo.hasOwnProperty("usedInventoryTrigger") &&
 					Storage.Inventory.UsedSpacePercent() >= info.muleInfo.usedInventoryTrigger && Storage.Stash.UsedSpacePercent() >= info.muleInfo.usedStashTrigger &&
-						this.getMuleItems().length > 0) {
+						items.length > 0) {
 				D2Bot.printToConsole("MuleCheck triggered!", 7);
 
 				return true;
 			}
-
-			items = this.getMuleItems(true); // set force check so we don't trigger mule without having actual item to mule
 
 			for (i = 0; i < items.length; i += 1) {
 				if (this.matchItem(items[i], Config.AutoMule.Trigger)) {
@@ -451,16 +451,13 @@ MainLoop:
 	},
 
 	// get a list of items to mule
-	getMuleItems: function (forceCheck = false) {
-		var item, items, forced,
-			info = this.getInfo();
+	getMuleItems: function () {
+		var item, items, info;
+
+		info = this.getInfo();
 
 		if (!info || !info.hasOwnProperty("muleInfo")) {
 			return false;
-		}
-
-		if (me.gamename.toLowerCase() === info.muleInfo.muleGameName[0].toLowerCase()) {
-			forceCheck = true; // set force check when we are in mule game for ingredient muling
 		}
 
 		item = me.getItem(-1, 0);
@@ -475,12 +472,9 @@ MainLoop:
 						(item.classid !== 604 || item.quality !== 7) && // Don't drop Hellfire Torch
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
 						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1)) { // Don't drop Keys if part of TorchSystem
-					forced = this.matchItem(item, Config.AutoMule.Force.concat(Config.AutoMule.Trigger));
-
-					if ((forceCheck && forced) || (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item))) { // Don't drop Runeword/Cubing/CraftingSystem ingredients unless on forced list
-						if (!this.matchItem(item, Config.AutoMule.Exclude) || forced) {
-							items.push(copyUnit(item));
-						}
+					if (this.matchItem(item, Config.AutoMule.Force.concat(Config.AutoMule.Trigger)) || // Always drop items on Force or Trigger list
+						(!this.matchItem(item, Config.AutoMule.Exclude) && (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)))) { // Don't drop Excluded items or Runeword/Cubing/CraftingSystem ingredients
+						items.push(copyUnit(item));
 					}
 				}
 			} while (item.getNext());

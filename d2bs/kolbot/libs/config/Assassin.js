@@ -287,7 +287,7 @@ function LoadConfig() {
 
 	/* Advanced automule settings
 	 * Trigger - Having an item that is on the list will initiate muling. Useful if you want to mule something immediately upon finding.
-	 * Force - Items listed here will be muled even if they are ingredients for cubing. However, just having these ingredients here will not trigger muling.
+	 * Force - Items listed here will be muled even if they are ingredients for cubing.
 	 * Exclude - Items listed here will be ignored and will not be muled. Items on Trigger or Force lists are prioritized over this list.
 	 *
 	 * List can either be set as string in pickit format and/or as number referring to item classids. Each entries are separated by commas.
