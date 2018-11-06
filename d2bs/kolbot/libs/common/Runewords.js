@@ -293,22 +293,8 @@ RuneLoop:
 						better check than getFlag(0x4000000) because randomly socketed items return false for it
 					*/
 
-					if (reroll && item.getItem() && !NTIP.CheckItem(item, this.pickitEntries)) {
-						if (ethFlag) {
-							if ((ethFlag === 1 && item.getFlag(0x400000)) || (ethFlag === 2 && !item.getFlag(0x400000))) {
-								return copyUnit(item);
-							}
-						} else {
-							return copyUnit(item);
-						}
-					}
-
-					if (!reroll && !item.getItem()) {
-						if (ethFlag) {
-							if ((ethFlag === 1 && item.getFlag(0x400000)) || (ethFlag === 2 && !item.getFlag(0x400000))) {
-								return copyUnit(item);
-							}
-						} else {
+					if ((!reroll && !item.getItem()) || (reroll && item.getItem() && !NTIP.CheckItem(item, this.pickitEntries))) {
+						if (!ethFlag || (ethFlag === 1 && item.getFlag(0x400000)) || (ethFlag === 2 && !item.getFlag(0x400000))) {
 							return copyUnit(item);
 						}
 					}
