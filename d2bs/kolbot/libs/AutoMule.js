@@ -452,9 +452,8 @@ MainLoop:
 
 	// get a list of items to mule
 	getMuleItems: function () {
-		var item, items, info;
-
-		info = this.getInfo();
+		var item, items,
+			info = this.getInfo();
 
 		if (!info || !info.hasOwnProperty("muleInfo")) {
 			return false;
