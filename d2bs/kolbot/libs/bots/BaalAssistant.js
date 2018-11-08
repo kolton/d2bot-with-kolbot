@@ -3,9 +3,9 @@
  *	@author		kolton, modified by YGM
  *	@desc		Help or Leech Baal Runs.
  */
- 
+
 function BaalAssistant() {
-	
+
 	var Leader = Config.Leader, // Not entriely needed in the configs.
 		KillNihlathak = Config.BaalAssistant.KillNihlathak,
 		FastChaos = Config.BaalAssistant.FastChaos,
@@ -18,7 +18,7 @@ function BaalAssistant() {
 		WaitForSafeTP = Config.BaalAssistant.WaitForSafeTP,
 		DollQuit = Config.BaalAssistant.DollQuit,
 		SoulQuit = Config.BaalAssistant.SoulQuit,
-		KillBaal = Config.BaalAssistant.KillBaal, 
+		KillBaal = Config.BaalAssistant.KillBaal,
 		hotTPMessage = Config.BaalAssistant.HotTPMessage, // Not entriely needed in the configs.
 		safeTPMessage = Config.BaalAssistant.SafeTPMessage, // Not entriely needed in the configs.
 		baalMessage = Config.BaalAssistant.BaalMessage, // Doesn't need to be in configs.

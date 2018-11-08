@@ -358,18 +358,18 @@ function main() {
 			var realFCR = me.getStat(105) - Config.FCR;
 			var realIAS = me.getStat(93) - Config.IAS;
 			var realFBR = me.getStat(102) - Config.FBR;
-			var realFHR = me.getStat(99) - Config.FHR;	
+			var realFHR = me.getStat(99) - Config.FHR;
 
 			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39) +
-				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45) + 
-				"\n" + 
-				"FCR: " + realFCR + " IAS: " + realIAS + " FBR: " + realFBR + 
-				" FHR: " + realFHR + " FRW: " + me.getStat(96) + 
+				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45) +
 				"\n" +
-				"CB: " + me.getStat(136) + " DS: " + me.getStat(141) + " OW: " + me.getStat(135) + 
-				" ÿc1LL: ÿc0" + me.getStat(60) + " ÿc3ML: ÿc0" + me.getStat(62) + 
-				" DR: " + me.getStat(36) + "% + " + me.getStat(34) + " MDR: " + me.getStat(37) + "% + " + me.getStat(35) + 
-				"\n" + 
+				"FCR: " + realFCR + " IAS: " + realIAS + " FBR: " + realFBR +
+				" FHR: " + realFHR + " FRW: " + me.getStat(96) +
+				"\n" +
+				"CB: " + me.getStat(136) + " DS: " + me.getStat(141) + " OW: " + me.getStat(135) +
+				" ÿc1LL: ÿc0" + me.getStat(60) + " ÿc3ML: ÿc0" + me.getStat(62) +
+				" DR: " + me.getStat(36) + "% + " + me.getStat(34) + " MDR: " + me.getStat(37) + "% + " + me.getStat(35) +
+				"\n" +
 				(me.getStat(153) > 0 ? "ÿc3Cannot be Frozenÿc1" : "" ));
 
 			break;
@@ -428,7 +428,7 @@ function main() {
 			}
 
 			break;
-		case 0x06: // "%Name1 was Slain by %Name2" 
+		case 0x06: // "%Name1 was Slain by %Name2"
 			if (Config.AntiHostile && param2 === 0x00 && name2 === me.name) {
 				scriptBroadcast("mugshot " + name1);
 			}

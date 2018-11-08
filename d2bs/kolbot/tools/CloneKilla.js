@@ -37,7 +37,7 @@ function main() {
 	Runewords.init();
 	Cubing.init();
 	include("bots/KillDclone.js");
-	
+
 	if (typeof KillDclone === "function") {
 		try {
 			D2Bot.printToConsole("Trying to kill DClone.", 7);

@@ -39,7 +39,7 @@ function Tristram() {
 	}
 
 	Pather._teleport = Pather.teleport;
-	
+
 	Town.doChores();
 	Pather.useWaypoint(4);
 	Precast.doPrecast(true);
@@ -90,7 +90,7 @@ function Tristram() {
 	} else {
 		Attack.clearLevel(Config.ClearType);
 	}
-	
+
 	Pather.teleport = Pather._teleport;
 
 	return true;

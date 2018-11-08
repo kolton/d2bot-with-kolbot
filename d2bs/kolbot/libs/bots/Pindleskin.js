@@ -56,7 +56,7 @@ function Pindleskin() {
 
 			return true;
 		}
-		
+
 		if (Config.Pindleskin.ClearVipers) {
 			Attack.clearList(Attack.getMob(597, 0, 20));
 		}

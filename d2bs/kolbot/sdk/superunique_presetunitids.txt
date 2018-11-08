@@ -79,7 +79,7 @@ Id	Name
 774 Flavie
 775 Blood Raven
 778 maggot queen (broken?)
-780,781 tenticles  
+780,781 tenticles
 787 flayers
 788 flayer+shaman
 792 ratmen
@@ -90,4 +90,4 @@ Id	Name
 799 dead enslaved
 800 dead demonimp
 801 dead barb
-802 dead prowlingdead  
+802 dead prowlingdead
