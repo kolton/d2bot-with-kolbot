@@ -195,7 +195,7 @@
 [name] == barbedshield && [quality] == rare # [fbr] == 30 && [sockets] == 2 && [fhr] == 17 && [itemlevelreq] <= 30
 [name] == boneshield && [quality] == rare # [fbr] == 30 && [sockets] == 2 && [fhr] == 17 && [itemlevelreq] <= 30
 [name] == grimshield && [quality] == rare # [fbr] == 30 && [sockets] == 2 && [fhr] == 17 && [itemlevelreq] <= 30
-[name] == barbedshield && [quality] == rare && [flag] == ethereal # [fbr] == 30 && [enhanceddefense] >= 100 && [itemreplenishdurability] > 0 && [itemlevelreq] <= 30 
+[name] == barbedshield && [quality] == rare && [flag] == ethereal # [fbr] == 30 && [enhanceddefense] >= 100 && [itemreplenishdurability] > 0 && [itemlevelreq] <= 30
 [name] == grimshield && [quality] == rare && [flag] == ethereal # [fbr] == 30 && [enhanceddefense] >= 100 && [itemreplenishdurability] > 0 && [itemlevelreq] <= 30
 
 //[name] == spikedshield && [quality] == unique && [flag] != ethereal # [enhanceddefense] == 60 // Swordback Hold
@@ -240,7 +240,7 @@
 //=== BOOTS =======================================================================================================================================================================
 //=================================================================================================================================================================================
 
-//[name] == heavyboots && [quality] == set # [defense] == 6 // Sander's Riprap 
+//[name] == heavyboots && [quality] == set # [defense] == 6 // Sander's Riprap
 [name] == heavyboots && [quality] == set # [defense] >= 7 // Cow King's Hooves
 [name] == meshboots && [quality] == set # [defense] == 169 && [coldresist] == 25 && [lightresist] == 25 // Natalya's Soul, perfect
 
@@ -336,7 +336,7 @@
 //---ASSASSIN----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 [name] == handscythe && [quality] <= superior # [sockets] != 1 && ([skilllightningsentry] == 3)+([skillmindblast] >= 3)+([skilldragonflight] >= 3)+([skillweaponblock] >= 3)+([skillshadowmaster] >= 3)+([skillbladeshield] >= 3) == 3
-[name] == handscythe && [quality] <= rare # ([trapsskilltab] == 2 || [assassinskills] == 1) && ([skilllightningsentry] >= 3 || [skillwakeoffire] >= 3) && [itemlevelreq] <= 30 
+[name] == handscythe && [quality] <= rare # ([trapsskilltab] == 2 || [assassinskills] == 1) && ([skilllightningsentry] >= 3 || [skillwakeoffire] >= 3) && [itemlevelreq] <= 30
 
 //---vlld-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

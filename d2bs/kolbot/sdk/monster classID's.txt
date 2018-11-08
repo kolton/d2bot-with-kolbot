@@ -108,7 +108,7 @@ unraveler5          105     unraveler1          unraveler6         4         Baa
 chaoshorde1         106     chaoshorde1         chaoshorde2        0         unused
 chaoshorde2         107     chaoshorde1         chaoshorde3        1         unused
 chaoshorde3         108     chaoshorde1         chaoshorde4        2         unused
-chaoshorde4         109     chaoshorde1         a  3               unused   
+chaoshorde4         109     chaoshorde1                            3         unused
 vulture1            110     vulture1            vulture2           0         CarrionBird
 vulture2            111     vulture1            vulture3           1         UndeadScavenger
 vulture3            112     vulture1            vulture4           2         HellBuzzard
