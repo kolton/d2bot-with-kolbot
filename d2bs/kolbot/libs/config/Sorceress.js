@@ -316,9 +316,9 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
 	// Manager Item Log Screen
-	Config.ShowLowRunes = false; // show/hide low runes (El ÷ Dol) on the item log screen
-	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel ÷ Mal) on the item log screen
-	Config.ShowHighRunes = true; // show/hide high runes (Ist ÷ Zod) on the item log screen
+	Config.ShowLowRunes = false; // show/hide low runes (El - Dol) on the item log screen
+	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel - Mal) on the item log screen
+	Config.ShowHighRunes = true; // show/hide high runes (Ist - Zod) on the item log screen
 	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
 	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
 	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen
