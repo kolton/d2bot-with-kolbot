@@ -13,6 +13,7 @@ function main() {
 	include("common/Misc.js");
 	include("common/Prototypes.js");
 	include("common/Town.js");
+
 	Config.init();
 
 	var i, myPartyId, player, otherParty, shitList, currScript, scriptList,
