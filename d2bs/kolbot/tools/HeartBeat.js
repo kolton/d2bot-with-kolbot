@@ -11,6 +11,8 @@ function main() {
 	D2Bot.init();
 	print("Heartbeat loaded");
 
+	var counter = 0;
+
 	function togglePause() {
 		var script = getScript();
 
@@ -49,6 +51,17 @@ function main() {
 
 	while (true) {
 		D2Bot.heartBeat();
+
+		if (me.ingame && me.gameReady && !getScript("default.dbj")) {
+			counter++;
+
+			if (counter > 10) {
+				print("Stuck on title screen");
+				sendKey(0);
+				counter = 0;
+			}
+		}
+
 		delay(1000);
 	}
 }
