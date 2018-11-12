@@ -1,0 +1,13 @@
+//This Pickit is strickly runeword bases for Turtle system.
+
+	//Spirit Sword
+([Name] == CrystalSword || [Name] == BroadSword || [Name] == LongSword) && [Quality] <= Superior && [Flag] != Ethereal # [Sockets] == 4 # [MaxQuantity] == 1
+
+	//Ancients Pledge
+([Name] == LargeShield || [Name] == KiteShield || [Name] == GothicShield) && [Quality] <= Superior && [Flag] != Ethereal # [Sockets] == 3 # [MaxQuantity] == 1
+
+	//Lore
+([Name] == FullHelm || [Name] == Crown || [Name] == BoneHelm || [Name] == WarHat || [Name] == Sallet || [Name] == Casque || [Name] == DeathMask || [Name] == GrimHelm || [Name] == Shako || [Name] == Hydraskull) && [Flag] != Ethereal # [Sockets] == 2 # [MaxQuantity] == 1
+	
+	//Smoke
+([Name] == GhostArmor || [Name] == Serpentskinarmor || [Name] == DemonhideArmor || [Name] == TrellisedArmor || [Name] == MagePlate || [Name] == DuskShroud) && [Flag] != Ethereal # [Sockets] == 2 # [MaxQuantity] == 1
