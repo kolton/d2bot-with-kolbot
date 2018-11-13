@@ -2428,7 +2428,7 @@ function PacketBuilder () {
 		throw new Error("PacketBuilder must be called with 'new' operator!");
 	}
 
-	let pdata = [], dsize = 0;
+	let queue = [], plen = 0;
 
 	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
 		let strType;
@@ -2437,31 +2437,33 @@ function PacketBuilder () {
 
 		args.forEach(arg => {
 			strType && (size = arg.length + strType - 1); // string length adjustment for null termination
-			dsize += size;
-			pdata.push({type: type, size: size, data: arg});
+			plen += size;
+			queue.push({type: type, size: size, data: arg});
 		});
 
 		return this;
 	};
 
-	this.float = storeFields("Float32", 4);
-	this.dword = storeFields("Uint32", 4);
-	this.word = storeFields("Uint16", 2);
 	this.byte = storeFields("Uint8", 1);
+	this.word = storeFields("Uint16", 2);
+	this.dword = storeFields("Uint32", 4);
+	this.float = storeFields("Float32", 4);
 	this.string = storeFields("StringZ");
 
 	this.buildDataView = () => {
-		let dv = new DataView(new ArrayBuffer(dsize)), i = 0;
-		pdata.forEach(data => {
-			if (data.type === "String") {
-				for (let l = 0; l < data.data.length; l++) {
-					dv.setUint8(i++, data.data.charCodeAt(l), true);
+		let dv = new DataView(new ArrayBuffer(plen)), i = 0;
+		queue.forEach(field => {
+			if (field.type === "String") {
+				field.data = utf8ToEuc(field.data);
+
+				for (let l = 0; l < field.data.length; l++) {
+					dv.setUint8(i++, field.data.charCodeAt(l), true);
 				}
 
-				i += data.size - data.data.length; // fix index for data.size !== data.data.length
+				i += field.size - field.data.length; // fix index for field.size !== field.data.length
 			} else {
-				dv['set' + data.type](i, data.data, true);
-				i += data.size;
+				dv['set' + field.type](i, field.data, true);
+				i += field.size;
 			}
 		});
 
@@ -2474,15 +2476,17 @@ function PacketBuilder () {
 };
 
 var LocalChat = new function () {
-	const LOCAL_CHAT_ID = 0xd2baaaa;
-	let _init = false;
-	let _say = say;
+	const LOCAL_CHAT_ID = 0xD2BAAAA;
+	let toggle, proxy = say;
 
-	let _chat = (speaker, msg) => {
-		new PacketBuilder().byte(0x26, 1, 0, 2, 0, 0, 0, 0, 0, 0x60).string(speaker, msg).get();
+	let relay = (msg) => D2Bot.shoutGlobal(JSON.stringify({ msg: msg, realm: me.realm, charname: me.charname, gamename: me.gamename }), LOCAL_CHAT_ID);
+
+	let onChatInput = (speaker, msg) => {
+		relay(msg);
+		return true;
 	};
 
-	let _callback = (mode, msg) => {
+	let onChatRecv = (mode, msg) => {
 		if (mode !== LOCAL_CHAT_ID) {
 			return;
 		}
@@ -2490,36 +2494,44 @@ var LocalChat = new function () {
 		msg = JSON.parse(msg);
 
 		if (me.gamename === msg.gamename && me.realm === msg.realm) {
-			_chat(msg.charname, msg.msg);
+			new PacketBuilder().byte(38).word(1, 2, 0, 0).byte(90).string(msg.charname, msg.msg).get();
 		}
 	};
 
-	this.init = () => {
-		_init = this.init;
-		this.init = () => {};
-
-		say = (msg, force = false) => {
-			if (force || !me.ingame || !me.gameReady) {
-				_say(msg);
-
-				return;
-			}
-
-			D2Bot.shoutGlobal(JSON.stringify({ msg: msg, realm: me.realm, charname: me.charname, gamename: me.gamename }), LOCAL_CHAT_ID);
-		};
-
-		if (getScript(true).name.toLowerCase() === "default.dbj") {
-			addEventListener("copydata", _callback);
+	let onKeyEvent = (key) => {
+		if (toggle === key) {
+			this.init(true);
 		}
 	};
 
-	this.remove = () => {
-		this.init();
-		this.init = _init;
-		say = _say;
+	this.init = (cycle = false) => {
+		if (!Config.LocalChat.Enabled) {
+			return;
+		}
 
-		if (getScript(true).name.toLowerCase() === "default.dbj") {
-			removeEventListener("copydata", _callback);
+		Config.LocalChat.Mode = (Config.LocalChat.Mode + cycle) % 3;
+		print("ÿc2LocalChat enabled. Mode: " + Config.LocalChat.Mode);
+
+		switch (Config.LocalChat.Mode) {
+		case 2:
+			removeEventListener("chatinputblocker", onChatInput);
+			addEventListener("chatinputblocker", onChatInput);
+		case 1:
+			removeEventListener("copydata", onChatRecv);
+			addEventListener("copydata", onChatRecv);
+			say = (msg, force = false) => force ? proxy(msg) : relay(msg);
+			break;
+		case 0:
+			removeEventListener("chatinputblocker", onChatInput);
+			removeEventListener("copydata", onChatRecv);
+			say = proxy;
+			break;
+		}
+
+		if (Config.LocalChat.Toggle) {
+			toggle = typeof Config.LocalChat.Toggle === 'string' ? Config.LocalChat.Toggle.charCodeAt(0) : Config.LocalChat.Toggle;
+			Config.LocalChat.Toggle = false;
+			addEventListener("keyup", onKeyEvent);
 		}
 	};
 };

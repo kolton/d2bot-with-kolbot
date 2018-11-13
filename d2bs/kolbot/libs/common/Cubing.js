@@ -919,6 +919,7 @@ IngredientLoop:
 
 		var i, j, items, string, result, tempArray;
 
+		this.update();
 		// Randomize the recipe array to prevent recipe blocking (multiple caster items etc.)
 		tempArray = this.recipes.slice().shuffle();
 

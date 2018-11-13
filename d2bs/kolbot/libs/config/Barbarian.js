@@ -386,11 +386,12 @@ function LoadConfig() {
 
 	// Public game options
 
-	// If Config.LocalChat is set, 'say' is overridden to transport chat over 'sendCopyData' instead of BNET
-	// To force 'say' to use BNET, use 'say("msg", true)' - the 2nd parameter will force BNET
-	// Chat messages will only be visible on clients running on the same PC
-	// Chat messages typed in game are not captured
-	Config.LocalChat = false;
+	// If LocalChat is enabled, chat can be sent via 'sendCopyData' instead of BNET
+	// To allow 'say' to use BNET, use 'say("msg", true)', the 2nd parameter will force BNET
+	// LocalChat messages will only be visible on clients running on the same PC
+	Config.LocalChat.Enabled = false; // enable the LocalChat system
+	Config.LocalChat.Toggle = false; // optional, set to KEY value to toggle through modes 0, 1, 2
+	Config.LocalChat.Mode = 0; // 0 = disabled, 1 = chat from 'say' (recommended), 2 = all chat (for manual play)
 	// If Config.Leader is set, the bot will only accept invites from leader. If Config.PublicMode is not 0, Baal and Diablo script will open Town Portals.
 	Config.PublicMode = 0; // 1 = invite and accept, 2 = accept only, 3 = invite only, 0 = disable
 	// Party message settings. Each setting represents an array of messages that will be randomly chosen.
