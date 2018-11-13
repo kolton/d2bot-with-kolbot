@@ -104,15 +104,6 @@ var Config = {
 			print("ÿc8Error in libs/common/AutoBuild.js (AutoBuild system is not active!)");
 			print(e3.toSource());
 		}
-
-		try {
-			if (Config.LocalChat === true) {
-				LocalChat.init();
-			}
-		} catch (e4) {
-			print("ÿc8Error in libs/common/Misc.js (LocalChat is not active!)");
-			print(e4.toSource());
-		}
 	},
 
 	// Time
@@ -164,7 +155,11 @@ var Config = {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	],
-	LocalChat: false,
+	LocalChat: {
+		Enabled: false,
+		Toggle: false,
+		Mode: 0
+	},
 	PublicMode: false,
 	PartyAfterScript: false,
 	Greetings: [],

@@ -104,6 +104,7 @@ function main() {
 	CraftingSystem.buildLists();
 	Runewords.init();
 	Cubing.init();
+	LocalChat.init();
 
 	// Load events
 	addEventListener("scriptmsg", this.scriptEvent);
