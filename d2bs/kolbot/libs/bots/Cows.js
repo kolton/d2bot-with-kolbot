@@ -77,7 +77,7 @@ function Cows() {
 
 		return true;
 	};
-	
+
 	this.getLeg = function () {
 		var i, portal, wirt, leg, gid;
 
@@ -127,7 +127,7 @@ function Cows() {
 
 		throw new Error("Failed to get the leg");
 	};
-	
+
 	this.getTome = function () {
 		var tome,
 			myTome = me.findItem("tbk", 0, 3),
@@ -142,7 +142,7 @@ function Cows() {
 				}
 			} while (tome.getNext());
 		}
-		
+
 		if (!akara) {
 			throw new Error("Failed to buy tome");
 		}
@@ -151,7 +151,7 @@ function Cows() {
 
 		if (tome.buy()) {
 			tome = me.getItem("tbk");
-			
+
 			if (tome) {
 				do {
 					if (!myTome || tome.gid !== myTome.gid) {

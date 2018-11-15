@@ -12,6 +12,8 @@ function main() {
 	include("common/Runewords.js");
 	include("common/Misc.js");
 	include("common/Prototypes.js");
+	include("common/Town.js");
+
 	Config.init();
 
 	var i, myPartyId, player, otherParty, shitList, currScript, scriptList,
@@ -38,7 +40,7 @@ function main() {
 				}
 
 				break;
-			case 0x06: // "%Name1 was Slain by %Name2" 
+			case 0x06: // "%Name1 was Slain by %Name2"
 				if (Config.DeathMessages.length > 0) {
 					try {
 						player = getParty(name1);

@@ -125,21 +125,21 @@ function Baal() {
 	};
 
 	this.checkHydra = function () {
-		var monster = getUnit(1, "hydra");
-		if (monster) {
+		var hydra = getUnit(1, getLocaleString(3325));
+		if (hydra) {
 			do {
-				if (monster.mode !== 12 && monster.getStat(172) !== 2) {
+				if (hydra.mode !== 12 && hydra.getStat(172) !== 2) {
 					Pather.moveTo(15072, 5002);
-					while (monster.mode !== 12) {
+					while (hydra.mode !== 12) {
 						delay(500);
-						if (!copyUnit(monster).x) {
+						if (!copyUnit(hydra).x) {
 							break;
 						}
 					}
 
 					break;
 				}
-			} while (monster.getNext());
+			} while (hydra.getNext());
 		}
 
 		return true;

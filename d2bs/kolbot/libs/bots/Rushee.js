@@ -109,7 +109,7 @@ function Rushee() {
 
 	this.tyraelTalk = function () {
 		var i,
-			npc = getUnit(1, "tyrael");
+			npc = getUnit(1, NPC.Tyrael);
 
 		if (!npc) {
 			return false;
@@ -148,13 +148,13 @@ function Rushee() {
 		print("making staff");
 		transmute();
 		delay(750 + me.ping);
-		
+
 		staff = me.getItem(91);
-		
+
 		if (!staff) {
 			return false;
 		}
-		
+
 		Storage.Inventory.MoveTo(staff);
 		me.cancel();
 
@@ -219,9 +219,9 @@ function Rushee() {
 					break;
 				}
 
-				Town.move("warriv");
+				Town.move(NPC.Warriv);
 
-				npc = getUnit(1, "warriv");
+				npc = getUnit(1, NPC.Warriv);
 
 				if (!npc || !npc.openMenu()) {
 					return false;
@@ -238,7 +238,7 @@ function Rushee() {
 				Pather.usePortal(50, Config.Leader);
 				Pather.moveToExit(40, true);
 
-				npc = getUnit(1, "jerhyn");
+				npc = getUnit(1, NPC.Jerhyn);
 
 				if (!npc || !npc.openMenu()) {
 					Pather.moveTo(5166, 5206);
@@ -249,9 +249,9 @@ function Rushee() {
 				me.cancel();
 				Pather.moveToExit(50, true);
 				Pather.usePortal(40, Config.Leader);
-				Town.move("meshif");
+				Town.move(NPC.Meshif);
 
-				npc = getUnit(1, "meshif");
+				npc = getUnit(1, NPC.Meshif);
 
 				if (!npc || !npc.openMenu()) {
 					return false;
@@ -266,9 +266,9 @@ function Rushee() {
 				}
 
 				if (me.inTown) {
-					Town.move("cain");
+					Town.move(NPC.Cain);
 
-					npc = getUnit(1, "deckard cain");
+					npc = getUnit(1, NPC.Cain);
 
 					if (!npc || !npc.openMenu()) {
 						return false;
@@ -289,9 +289,9 @@ function Rushee() {
 					break;
 				}
 
-				Town.move("tyrael");
+				Town.move(NPC.Tyrael);
 
-				npc = getUnit(1, "tyrael");
+				npc = getUnit(1, NPC.Tyrael);
 
 				if (!npc || !npc.openMenu()) {
 					return false;
@@ -445,9 +445,9 @@ function Rushee() {
 						Pather.usePortal(61, Config.Leader);
 						this.getQuestItem(521, 149);
 						Pather.usePortal(40, Config.Leader);
-						Town.move("drognan");
+						Town.move(NPC.Drognan);
 
-						target = getUnit(1, "drognan");
+						target = getUnit(1, NPC.Drognan);
 
 						if (target && target.openMenu()) {
 							actions.shift();
@@ -522,9 +522,9 @@ function Rushee() {
 
 						Pickit.pickItem(target);
 						Pather.usePortal(75, Config.Leader);
-						Town.move("alkor");
+						Town.move(NPC.Alkor);
 
-						target = getUnit(1, "alkor");
+						target = getUnit(1, NPC.Alkor);
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -572,9 +572,9 @@ function Rushee() {
 
 						break;
 					case 114: // Frozen River
-						Town.move("malah");
+						Town.move(NPC.Malah);
 
-						target = getUnit(1, "malah");
+						target = getUnit(1, NPC.Malah);
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -608,9 +608,9 @@ function Rushee() {
 						// Non-questers can piggyback off quester out messages
 						case 110: // Shenk
 							if (me.act === 5) {
-								Town.move("larzuk");
+								Town.move(NPC.Larzuk);
 
-								target = getUnit(1, "larzuk");
+								target = getUnit(1, NPC.Larzuk);
 
 								if (target && target.openMenu()) {
 									me.cancel();
@@ -620,9 +620,9 @@ function Rushee() {
 							break;
 						case 114: // Anya
 							if (me.act === 5) {
-								Town.move("malah");
+								Town.move(NPC.Malah);
 
-								target = getUnit(1, "malah");
+								target = getUnit(1, NPC.Malah);
 
 								if (target && target.openMenu()) {
 									me.cancel();
@@ -640,7 +640,7 @@ function Rushee() {
 							if (me.act === 4 && this.checkQuest(25, 1)) {
 								Town.move(NPC.Tyrael);
 
-								target = getUnit(1, "tyrael");
+								target = getUnit(1, NPC.Tyrael);
 
 								if (target && target.openMenu()) {
 									me.cancel();
@@ -689,7 +689,7 @@ function Rushee() {
 							break;
 						}
 
-						Town.move("atma");
+						Town.move(NPC.Atma);
 
 						target = getUnit(1, 176); // Atma
 
@@ -715,7 +715,7 @@ function Rushee() {
 							break;
 						}
 
-						Town.move("cain");
+						Town.move(NPC.Cain);
 
 						target = getUnit(1, NPC.Cain);
 
@@ -755,7 +755,7 @@ function Rushee() {
 						if (this.checkQuest(25, 1)) {
 							Town.move(NPC.Tyrael);
 
-							target = getUnit(1, "tyrael");
+							target = getUnit(1, NPC.Tyrael);
 
 							if (target && target.openMenu()) {
 								me.cancel();
@@ -790,9 +790,9 @@ function Rushee() {
 							break;
 						}
 
-						Town.move("larzuk");
+						Town.move(NPC.Larzuk);
 
-						target = getUnit(1, "larzuk");
+						target = getUnit(1, NPC.Larzuk);
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -809,9 +809,9 @@ function Rushee() {
 							break;
 						}
 
-						Town.move("malah");
+						Town.move(NPC.Malah);
 
-						target = getUnit(1, "malah");
+						target = getUnit(1, NPC.Malah);
 
 						if (target && target.openMenu()) {
 							me.cancel();
@@ -900,7 +900,7 @@ function Rushee() {
 						break;
 					}
 
-					target = getUnit(1, "jerhyn");
+					target = getUnit(1, NPC.Jerhyn);
 
 					if (target) {
 						target.openMenu();

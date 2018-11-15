@@ -1,17 +1,17 @@
 /**
 *	@filename	MuleLogger.js
 *	@author		kolton
-*	@desc		Log items on configurable accounts/characters
+*	@desc		Log items and perm configurable accounts/characters
 */
 
 var MuleLogger = {
 	LogAccounts: {
-		/* Format: 
+		/* Format:
 			"account1/password1/realm": ["charname1", "charname2 etc"],
 			"account2/password2/realm": ["charnameX", "charnameY etc"],
 			"account3/password3/realm": ["all"]
 
-			To log a full account, put "accountname/password/realm": ["all"]
+			To log a full account, put "account/password/realm": ["all"]
 
 			realm = useast, uswest, europe or asia
 
@@ -27,7 +27,7 @@ var MuleLogger = {
 	LogEquipped: false, // include equipped items
 	LogMerc: false, // include items merc has equipped (if alive)
 	SaveScreenShot: false, // Save pictures in jpg format (saved in 'Images' folder)
-	IngameTime: 20, // Time to wait after leaving game
+	IngameTime: rand(180, 210), // (180, 210) to avoid RD, increase it to (7230, 7290) for mule perming
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
@@ -67,17 +67,26 @@ var MuleLogger = {
 	},
 
 	inGameCheck: function () {
+		var tick;
+
 		if (getScript("D2BotMuleLog.dbj") && this.LogGame[0] && me.gamename.match(this.LogGame[0], "i")) {
-			print("ÿc4MuleLoggerÿc0: Logging items on " + me.name + ".");
-			D2Bot.printToConsole("MuleLogger: Logging items on " + me.name + ".", 7);
+			print("ÿc4MuleLoggerÿc0: Logging items on " + me.account + " - " + me.name + ".");
+			D2Bot.printToConsole("MuleLogger: Logging items on " + me.account + " - " + me.name + ".", 7);
 			this.logChar();
+			tick = getTickCount() + rand(1500, 1750) * 1000; // trigger anti-idle every ~30 minutes
 
 			while ((getTickCount() - me.gamestarttime) < this.IngameTime * 1000) {
+				me.overhead("ÿc2Log items done. ÿc4Stay in " + "ÿc4game more:ÿc0 " + Math.floor(this.IngameTime - (getTickCount() - me.gamestarttime) / 1000) + " sec");
+
 				delay(1000);
+
+				if ((getTickCount() - tick) > 0) {
+					sendPacket(1, 0x40); // quest status refresh, working as anti-idle
+					tick += rand(1500, 1750) * 1000;
+				}
 			}
 
 			quit();
-			//delay(10000);
 
 			return true;
 		}
@@ -327,7 +336,7 @@ var MuleLogger = {
 		items.sort(itemSort);
 
 		for (i = 0; i < items.length; i += 1) {
-			if (this.LogEquipped || (!this.LogEquipped && items[i].mode === 0)) {
+			if ((this.LogEquipped || items[i].mode === 0) && !Misc.skipItem(items[i].classid)) {
 				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image
@@ -384,7 +393,7 @@ var MuleLogger = {
 		}
 
 		// hcl = hardcore class ladder
-		// sen = softcore expan nonladder								
+		// sen = softcore expan nonladder
 		FileTools.writeText("mules/" + realm + "/" + me.account + "/" + me.name + "." + ( me.playertype ? "h" : "s" ) + (me.gametype ? "e" : "c" ) + ( me.ladder > 0 ? "l" : "n" ) + ".txt", finalString);
 		print("Item logging done.");
 	}

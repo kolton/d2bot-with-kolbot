@@ -3,9 +3,9 @@
  *	@author		kolton, modified by YGM
  *	@desc		Help or Leech Baal Runs.
  */
- 
+
 function BaalAssistant() {
-	
+
 	var Leader = Config.Leader, // Not entriely needed in the configs.
 		KillNihlathak = Config.BaalAssistant.KillNihlathak,
 		FastChaos = Config.BaalAssistant.FastChaos,
@@ -18,7 +18,7 @@ function BaalAssistant() {
 		WaitForSafeTP = Config.BaalAssistant.WaitForSafeTP,
 		DollQuit = Config.BaalAssistant.DollQuit,
 		SoulQuit = Config.BaalAssistant.SoulQuit,
-		KillBaal = Config.BaalAssistant.KillBaal, 
+		KillBaal = Config.BaalAssistant.KillBaal,
 		hotTPMessage = Config.BaalAssistant.HotTPMessage, // Not entriely needed in the configs.
 		safeTPMessage = Config.BaalAssistant.SafeTPMessage, // Not entriely needed in the configs.
 		baalMessage = Config.BaalAssistant.BaalMessage, // Doesn't need to be in configs.
@@ -231,20 +231,20 @@ function BaalAssistant() {
 	};
 
 	this.checkHydra = function () {
-		var monster = getUnit(1, "hydra");
-		if (monster) {
+		var hydra = getUnit(1, getLocaleString(3325));
+		if (hydra) {
 			do {
-				if (monster.mode !== 12 && monster.getStat(172) !== 2) {
+				if (hydra.mode !== 12 && hydra.getStat(172) !== 2) {
 					Pather.moveTo(15072, 5002);
-					while (monster.mode !== 12) {
+					while (hydra.mode !== 12) {
 						delay(500);
-						if (!copyUnit(monster).x) {
+						if (!copyUnit(hydra).x) {
 							break;
 						}
 					}
 					break;
 				}
-			} while (monster.getNext());
+			} while (hydra.getNext());
 		}
 		return true;
 	};

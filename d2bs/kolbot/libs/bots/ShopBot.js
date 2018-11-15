@@ -175,37 +175,37 @@ function ShopBot() {
 			menuId = "Shop";
 
 		switch (name) {
-		case "charsi":
+		case NPC.Charsi:
 			menuId = "Repair";
-		case "akara":
-		case "gheed":
+		case NPC.Akara:
+		case NPC.Gheed:
 			wp = 1;
 
 			break;
-		case "fara":
+		case NPC.Fara:
 			menuId = "Repair";
-		case "elzix":
-		case "drognan":
+		case NPC.Elzix:
+		case NPC.Drognan:
 			wp = 40;
 
 			break;
-		case "hratli":
+		case NPC.Hratli:
 			menuId = "Repair";
-		case "asheara":
-		case "ormus":
+		case NPC.Asheara:
+		case NPC.Ormus:
 			wp = 75;
 
 			break;
-		case "halbu":
+		case NPC.Halbu:
 			menuId = "Repair";
-		case "jamella":
+		case NPC.Jamella:
 			wp = 103;
 
 			break;
-		case "larzuk":
+		case NPC.Larzuk:
 			menuId = "Repair";
-		case "malah":
-		case "anya":
+		case NPC.Malah:
+		case NPC.Anya:
 			wp = 109;
 
 			break;
@@ -232,7 +232,6 @@ function ShopBot() {
 			this.npcs[name] = copyUnit(npc);
 		}
 
-		
 		if (Config.ShopBot.CycleDelay) {
 			delay(Config.ShopBot.CycleDelay);
 		}
@@ -295,7 +294,7 @@ function ShopBot() {
 				exit = area.exits[0];
 
 			for (i = 1; i < area.exits.length; i++) {
-				if (getDistance(me, exit) > getDistance(me, area.exits[i])) { 
+				if (getDistance(me, exit) > getDistance(me, area.exits[i])) {
 					exit = area.exits[i];
 				}
 			}

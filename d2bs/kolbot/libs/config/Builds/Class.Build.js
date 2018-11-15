@@ -22,7 +22,7 @@ if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
 
 var AutoBuildTemplate = {
 
-	1:	{	
+	1:	{
 			//SkillPoints: [-1],								// This doesn't matter. We don't have skill points to spend at lvl 1
 			//StatPoints: [-1,-1,-1,-1,-1],						// This doesn't matter. We don't have stat points to spend at lvl 1
 			Update: function () {
@@ -31,7 +31,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	2:	{	
+	2:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -112,7 +112,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	11:	{	
+	11:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -202,7 +202,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	21:	{	
+	21:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -292,7 +292,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	31:	{	
+	31:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -382,7 +382,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	41:	{	
+	41:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -472,7 +472,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	51:	{	
+	51:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -562,7 +562,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	61:	{	
+	61:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -652,7 +652,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	71:	{	
+	71:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -742,7 +742,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	81:	{	
+	81:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -832,7 +832,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	91:	{	
+	91:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
