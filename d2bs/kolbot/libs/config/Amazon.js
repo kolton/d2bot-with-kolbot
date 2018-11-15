@@ -188,9 +188,9 @@ function LoadConfig() {
 		Config.IPHunter.GameLength = 3; // Number of minutes to stay in game if ip wasn't found
 	Scripts.KillDclone = false; // Kill Diablo Clone by using Arcane Sanctuary waypoint. Diablo needs to walk the Earth in the game.
 	Scripts.ShopBot = false; // Shopbot script. Automatically uses shopbot.nip and ignores other pickits.
-		// Supported NPCs: Akara, Charsi, Gheed, Elzix, Fara, Drognan, Ormus, Asheara, Hratli, Jamella, Halbu, Anya. Multiple NPCs are also supported, example: ["Elzix", "Fara"]
+		// Supported NPCs: Akara, Charsi, Gheed, Elzix, Fara, Drognan, Ormus, Asheara, Hratli, Jamella, Halbu, Anya. Multiple NPCs are also supported, example: [NPC.Elzix, NPC.Fara]
 		// Use common sense when combining NPCs. Shopping in different acts will probably lead to bugs.
-		Config.ShopBot.ShopNPC = "Anya";
+		Config.ShopBot.ShopNPC = NPC.Anya;
 		// Put item classid numbers or names to scan (remember to put quotes around names). Leave blank to scan ALL items. See libs/config/templates/ShopBot.txt
 		Config.ShopBot.ScanIDs = [];
 		Config.ShopBot.CycleDelay = 0; // Delay between shopping cycles in milliseconds, might help with crashes.
@@ -285,6 +285,24 @@ function LoadConfig() {
 	Config.PickRange = 40; // Pick radius
 	Config.FastPick = false; // Check and pick items between attacks
 
+	/* Advanced automule settings
+	 * Trigger - Having an item that is on the list will initiate muling. Useful if you want to mule something immediately upon finding.
+	 * Force - Items listed here will be muled even if they are ingredients for cubing.
+	 * Exclude - Items listed here will be ignored and will not be muled. Items on Trigger or Force lists are prioritized over this list.
+	 *
+	 * List can either be set as string in pickit format and/or as number referring to item classids. Each entries are separated by commas.
+	 * Example :
+	 *  Config.AutoMule.Trigger = [639, 640, "[type] == ring && [quality] == unique # [maxmana] == 20"];
+	 *  	This will initiate muling when your character finds Ber, Jah, or SOJ.
+	 *  Config.AutoMule.Force = [561, 566, 571, 576, 581, 586, 601];
+	 *  	This will mule perfect gems/skull during muling.
+	 *  Config.AutoMule.Exclude = ["[name] >= talrune && [name] <= solrune", "[name] >= 654 && [name] <= 657"];
+	 *  	This will exclude muling of runes from tal through sol, and any essences.
+	 */
+	Config.AutoMule.Trigger = [];
+	Config.AutoMule.Force = [];
+	Config.AutoMule.Exclude = [];
+
 	// Additional item info log settings. All info goes to \logs\ItemLog.txt
 	Config.ItemInfo = false; // Log stashed, skipped (due to no space) or sold items.
 	Config.ItemInfoQuality = []; // The quality of sold items to log. See NTItemAlias.dbl for values. Example: Config.ItemInfoQuality = [6, 7, 8];
@@ -298,9 +316,9 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
 	// Manager Item Log Screen
-	Config.ShowLowRunes = false; // show/hide low runes (El รท Dol) on the item log screen
-	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel รท Mal) on the item log screen
-	Config.ShowHighRunes = true; // show/hide high runes (Ist รท Zod) on the item log screen
+	Config.ShowLowRunes = false; // show/hide low runes (El - Dol) on the item log screen
+	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel - Mal) on the item log screen
+	Config.ShowHighRunes = true; // show/hide high runes (Ist - Zod) on the item log screen
 	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
 	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
 	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen
@@ -374,13 +392,13 @@ function LoadConfig() {
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
 
-	//Config.Runewords.push([Runeword.Insight, "Thresher"]); // Make Insight Thresher
-	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe"]); // Make Insight Cryptic Axe
+	//Config.Runewords.push([Runeword.Insight, "Thresher", Roll.Eth]); // Make Insight Thresher
+	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe", Roll.Eth]); // Make Insight Cryptic Axe
 
 	//Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
 
-	//Config.Runewords.push([Runeword.Spirit, "Monarch"]); // Make Spirit Monarch
-	//Config.Runewords.push([Runeword.Spirit, "Sacred Targe"]); // Make Spirit Sacred Targe
+	//Config.Runewords.push([Runeword.Spirit, "Monarch", Roll.NonEth]); // Make Spirit Monarch
+	//Config.Runewords.push([Runeword.Spirit, "Sacred Targe", Roll.NonEth]); // Make Spirit Sacred Targe
 
 	//Config.KeepRunewords.push("[type] == shield || [type] == auricshields # [fcr] == 35");
 

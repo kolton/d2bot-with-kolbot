@@ -352,7 +352,7 @@ if (!JSON) {
             gap = mind;
             return v;
         }
-		
+
 		return 'null';
     }
 

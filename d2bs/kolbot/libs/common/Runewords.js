@@ -161,10 +161,10 @@ var Runewords = {
 
 		for (i = 0; i < Config.Runewords.length; i += 1) {
 			if (!baseCheck) {
-				baseCheck = this.getBase(Config.Runewords[i][0], Config.Runewords[i][1]) || this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], true);
+				baseCheck = this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0)) || this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0), true);
 			}
 
-			if (this.getBase(Config.Runewords[i][0], Config.Runewords[i][1])) {
+			if (this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0))) {
 RuneLoop:
 				for (j = 0; j < Config.Runewords[i][0].length; j += 1) {
 					for (k = 0; k < items.length; k += 1) {
@@ -225,7 +225,7 @@ RuneLoop:
 
 		for (i = 0; i < Config.Runewords.length; i += 1) {
 			itemList = []; // reset item list
-			base = this.getBase(Config.Runewords[i][0], Config.Runewords[i][1]); // check base
+			base = this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0)); // check base
 
 			if (base) {
 				itemList.push(base); // push the base
@@ -277,7 +277,7 @@ RuneLoop:
 		optional reroll argument = gets a runeword that needs rerolling
 		rigged to accept item or classid as 2nd arg
 	*/
-	getBase: function (runeword, base, reroll) {
+	getBase: function (runeword, base, ethFlag, reroll) {
 		var item;
 
 		if (typeof base === "object") {
@@ -293,12 +293,10 @@ RuneLoop:
 						better check than getFlag(0x4000000) because randomly socketed items return false for it
 					*/
 
-					if (reroll && item.getItem() && !NTIP.CheckItem(item, this.pickitEntries)) {
-						return copyUnit(item);
-					}
-
-					if (!reroll && !item.getItem()) {
-						return copyUnit(item);
+					if ((!reroll && !item.getItem()) || (reroll && item.getItem() && !NTIP.CheckItem(item, this.pickitEntries))) {
+						if (!ethFlag || (ethFlag === 1 && item.getFlag(0x400000)) || (ethFlag === 2 && !item.getFlag(0x400000))) {
+							return copyUnit(item);
+						}
 					}
 				}
 			} while (typeof base !== "object" && item.getNext());
@@ -415,7 +413,7 @@ RuneLoop:
 				return false;
 			}
 
-			base = this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], true); // get a bad runeword
+			base = this.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0), true); // get a bad runeword
 
 			if (base) {
 				scroll = this.getScroll();
