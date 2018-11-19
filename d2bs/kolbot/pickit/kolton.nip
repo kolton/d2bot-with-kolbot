@@ -634,6 +634,9 @@
 //[name] == korune # # [MaxQuantity] == 1
 //[name] == falrune
 //[name] == lemrune # # [MaxQuantity] == 1
+//[name] == pulrune # # [MaxQuantity] == 1
+//[name] == umrune # # [MaxQuantity] == 1
+//[name] == malrune # # [MaxQuantity] == 1
 
 [name] >= istrune && [name] <= zodrune
 
