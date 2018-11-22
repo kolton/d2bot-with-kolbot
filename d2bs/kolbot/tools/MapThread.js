@@ -393,6 +393,11 @@ var Hooks = {
 				name = "Hell Entrance";
 
 				break;
+			case 114: // Frozen River
+				unit = getPresetUnit(me.area, 2, 460);
+				name = "Frozen Anya";
+				
+				break;
 			case 124: // Halls of Vaught
 				unit = getPresetUnit(me.area, 2, 462);
 				name = "Nihlathak";
@@ -518,6 +523,14 @@ var Hooks = {
 				});
 
 				break;
+			case 6: // Black Marsh
+				this.hooks.push({
+					name: "Side Area",
+					destination: 20,
+					hook: new Text("Num 4: " + Pather.getAreaName(20), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
 			case 43: // Far Oasis
 				this.hooks.push({
 					name: "Side Area",
@@ -526,7 +539,7 @@ var Hooks = {
 				});
 
 				break;
-			case 76:
+			case 76: // Spider Forest
 				this.hooks.push({
 					name: "Side Area",
 					destination: 85,
@@ -534,7 +547,7 @@ var Hooks = {
 				});
 
 				break;
-			case 78:
+			case 78: // Flayer Jungle
 				this.hooks.push({
 					name: "Side Area",
 					destination: 88,
@@ -542,7 +555,7 @@ var Hooks = {
 				});
 
 				break;
-			case 80:
+			case 80: // Kurast Bazaar
 				this.hooks.push({
 					name: "Side Area",
 					destination: 94,
@@ -550,7 +563,7 @@ var Hooks = {
 				});
 
 				break;
-			case 81:
+			case 81: // Upper Kurast
 				this.hooks.push({
 					name: "Side Area",
 					destination: 92,
@@ -558,7 +571,7 @@ var Hooks = {
 				});
 
 				break;
-			case 113:
+			case 113: // Crystalline Passage
 				this.hooks.push({
 					name: "Side Area",
 					destination: 114,

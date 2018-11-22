@@ -2532,7 +2532,7 @@ var LocalChat = new function () {
 		msg = JSON.parse(msg);
 
 		if (me.gamename === msg.gamename && me.realm === msg.realm) {
-			new PacketBuilder().byte(38).word(1, 2, 0, 0).byte(90).string(msg.charname, msg.msg).get();
+			new PacketBuilder().byte(38).byte(1, me.locale).word(2, 0, 0).byte(90).string(msg.charname, msg.msg).get();
 		}
 	};
 
