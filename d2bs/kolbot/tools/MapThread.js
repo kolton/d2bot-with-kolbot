@@ -396,7 +396,7 @@ var Hooks = {
 			case 114: // Frozen River
 				unit = getPresetUnit(me.area, 2, 460);
 				name = "Frozen Anya";
-				
+
 				break;
 			case 124: // Halls of Vaught
 				unit = getPresetUnit(me.area, 2, 462);
