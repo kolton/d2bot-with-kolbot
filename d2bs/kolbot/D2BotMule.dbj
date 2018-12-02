@@ -405,8 +405,6 @@ function main() {
 	}
 
 	D2Bot.updateRuns(); // we need the mule to swap keys somehow after all
-	Town.goToTown(1);
-	Town.move("stash");
 	delay(1000);
 
 	// Wait for master before login = give room to determine muling mode (normal or torch)
@@ -457,6 +455,8 @@ function main() {
 					D2Bot.updateStatus("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.");
 					D2Bot.printToConsole("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.", 7);
 					Storage.Init();
+					Town.goToTown(1);
+					Town.move("stash");
 
 					inGame = true;
 				}
