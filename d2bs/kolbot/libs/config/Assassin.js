@@ -520,32 +520,31 @@ function LoadConfig() {
 	Config.UseCloakofShadows = true; // Set to true to use Cloak of Shadows while fighting. Useful for blinding regular monsters/minions.
 	Config.AggressiveCloak = false; // Move into Cloak range or cast if already close
 
-	/*	AutoStat and AutoSkill system builds character based on array defined by the user
-		When enabled, this system will replace AutoBuild's skill/stat system respectively. So please make sure to configure Build array.
-
-		***AutoSkill will automatically spend skill points and it can also allocate any prerequisite skills as required.
-
-		Format: Config.AutoSkill.Build = [[skillID, count, satisfy], [skillID, count, satisfy], ... [skillID, count, satisfy]];
-		 skill - skill id number (see /sdk/skills.txt)
-		 count - maximum number of skill points to allocate for that skill
-		 satisfy - boolean value to stop(true) or continue(false) further allocation until count is met. Defaults to true if not specified.
-
-		 See Templates/AutoSkillExampleBuilds.txt for Config.AutoSkill.Build examples.
-
-		***AutoStat will stat in the order of precedence. You may want to stat strength or dexterity first to meet item requirements.
-
-		Format: Config.AutoStat.Build = [[statType, stat], [statType, stat], ... [statType, stat]];
-		 statType - defined as string, or as corresponding stat integer. "strength" or 0, "dexterity" or 2, "vitality" or 3, "energy" or 1
-		 stat - set to an integer value, and it will spend stat points until it reaches desired *hard stat value (*+stats from items are ignored).
-		 You can also set stat to string value "all", and it will spend all the remaining points.
-		 Dexterity can be set to "block" and it will stat dexterity up the the desired block value specified in arguemnt (ignored in classic).
-
-		 See Templates/AutoStatExampleBuilds.txt for Config.AutoStat.Build examples. 
-	*/
+	/* AutoSkill builds character based on array defined by the user and it replaces AutoBuild's skill system.
+	 * AutoSkill will automatically spend skill points and it can also allocate any prerequisite skills as required.
+     *
+	 * Format: Config.AutoSkill.Build = [[skillID, count, satisfy], [skillID, count, satisfy], ... [skillID, count, satisfy]];
+	 *	skill - skill id number (see /sdk/skills.txt)
+	 *	count - maximum number of skill points to allocate for that skill
+	 *	satisfy - boolean value to stop(true) or continue(false) further allocation until count is met. Defaults to true if not specified.
+     *
+	 *	See libs/config/Templates/AutoSkillExampleBuilds.txt for Config.AutoSkill.Build examples.
+	 */
 	Config.AutoSkill.Enabled = false; // Enable or disable AutoSkill system
 	Config.AutoSkill.Save = 0; // Number of skill points that will not be spent and saved
 	Config.AutoSkill.Build = [];
 
+	/* AutoStat builds character based on array defined by the user and this will replace AutoBuild's stat system.
+	 * AutoStat will stat Build array order. You may want to stat strength or dexterity first to meet item requirements.
+     *
+	 * Format: Config.AutoStat.Build = [[statType, stat], [statType, stat], ... [statType, stat]];
+	 *	statType - defined as string, or as corresponding stat integer. "strength" or 0, "dexterity" or 2, "vitality" or 3, "energy" or 1
+	 *	stat - set to an integer value, and it will spend stat points until it reaches desired *hard stat value (*+stats from items are ignored).
+	 *	You can also set stat to string value "all", and it will spend all the remaining points.
+	 *	Dexterity can be set to "block" and it will stat dexterity up the the desired block value specified in arguemnt (ignored in classic).
+     *
+	 *	See libs/config/Templates/AutoStatExampleBuilds.txt for Config.AutoStat.Build examples. 
+	 */
 	Config.AutoStat.Enabled = false; // Enable or disable AutoStat system
 	Config.AutoStat.Save = 0; // Number stat points that will not be spent and saved.
 	Config.AutoStat.BlockChance = 0; // An integer value set to desired block chance. This is ignored in classic.
