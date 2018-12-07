@@ -1,0 +1,35 @@
+Refer to sdk/skills.txt for skill id index
+
+Example: Blizzard Sorceress
+
+Config.AutoSkill.Build  = [
+	[37, 1, true], [42, 1, true], [54, 1, true],  // spend points in warmth, static, teleport (prerequisite to teleport: telekenesis will be learned automatically)
+	[59, 1, false], [55, 7, true], [45, 13, true], // learn blizzard if possible, and move on to glacial spike, and ice blast
+												   // if satisfy boolean was defined for blizzard as [59, 1, true] and character was under level 24, AutoSkill will stop at this point
+	[59, 7, false], [65, 1, true], // get blizzard skill level up to 7 and learn cold mastery
+	[59, 20, false], [65, 20, true], // max blizzard, max cold mastery
+	[55, 20, true], [45, 20, true], // max glacial spike, max ice blast
+];
+
+
+Example: Fire Sorceress
+
+Config.AutoSkill.Build  = [
+	[36, 4, false], [40, 1, false], // learn fire bolt until skill level 4, learn frozen armor
+	[36, 8, false], [37, 1, false], [42, 1, false], // learn fire bolt until skill level 7, learn warmth, learn static field
+	[47, 6, false], [54, 1, true], // learn fire ball until skill level 7, learn teleport
+	[61, 1, false], [47, 20, false], // learn fire mastery when available, max fire ball
+	[36, 12, false], [61, 2, false], // leran fire bolt until 14 and skill extra point in fire mastery
+	[36, 14, false], [61, 5, false], // continue leveling up fire bolt and fire mastery
+	[36, 16, false], [61, 6, false], // continue leveling up fire bolt and fire mastery
+	[36, 17, false], [61, 7, false], // continue leveling up fire bolt and fire mastery
+	[36, 18, false], [61, 8, false], // continue leveling up fire bolt and fire mastery
+	[36, 19, false], [61, 9, false], // continue leveling up fire bolt and fire mastery
+	[36, 20, true], [61, 10, false], // max fire bolt and continue leveling fire mastery
+	[56, 5, true], [61, 15, false], // learn up to 5 meteor first, and fire mastery
+	[56, 7, false], [61, 16, false], // continue leveling up meteor and fire mastery
+	[56, 8, false], [61, 17, false], // continue leveling up meteor and fire mastery
+	[56, 9, false], [61, 18, false], // continue leveling up meteor and fire mastery
+	[56, 10, false], [61, 20, false], // continue leveling up meteor and  max fire mastery
+	[56, 20, false], [41, 20, false] // max meteor, max inferno
+];
