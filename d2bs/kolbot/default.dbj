@@ -23,6 +23,8 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+include("common/AutoSkill.js");
+include("common/AutoStat.js");
 
 function main() {
 	D2Bot.init(); // Get D2Bot# handle
@@ -182,6 +184,15 @@ function main() {
 	// Next game = drop keys
 	if (TorchSystem.keyCheck()) {
 		scriptBroadcast("torch");
+	}
+
+	// Auto skill and stat
+	if (Config.AutoSkill.Enabled) {
+		AutoSkill.init(Config.AutoSkill.Build, Config.AutoSkill.Save);
+	}
+
+	if (Config.AutoStat.Enabled) {
+		AutoStat.init(Config.AutoStat.Build, Config.AutoStat.Save, Config.AutoStat.BlockChance, Config.AutoStat.UseBulk);
 	}
 
 	// Go

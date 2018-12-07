@@ -505,6 +505,37 @@ function LoadConfig() {
 	Config.FindItem = false; // Use Find Item skill on corpses after clearing.
 	Config.FindItemSwitch = 0; // Find Item weapon slot - 0 = slot I, 1 = slot II
 
+	/*	AutoStat and AutoSkill system builds character based on array defined by the user
+		When enabled, this system will replace AutoBuild's skill/stat system respectively. So please make sure to configure Build array.
+
+		***AutoSkill will automatically spend skill points and it can also allocate any prerequisite skills as required.
+
+		Format: Config.AutoSkill.Build = [[skillID, count, satisfy], [skillID, count, satisfy], ... [skillID, count, satisfy]];
+		 skill - skill id number (see /sdk/skills.txt)
+		 count - maximum number of skill points to allocate for that skill
+		 satisfy - boolean value to stop(true) or continue(false) further allocation until count is met. Defaults to true if not specified.
+
+		 See Templates/AutoSkillExampleBuilds.txt for Config.AutoSkill.Build examples.
+
+		***AutoStat will stat in the order of precedence. You may want to stat strength or dexterity first to meet item requirements.
+
+		Format: Config.AutoStat.Build = [[statType, stat], [statType, stat], ... [statType, stat]];
+		 statType - defined as string, or as corresponding stat integer. "strength" or 0, "dexterity" or 2, "vitality" or 3, "energy" or 1
+		 stat - set to an integer value, and it will spend stat points until it reaches desired *hard stat value (*+stats from items are ignored).
+		 You can also set stat to string value "all", and it will spend all the remaining points.
+		 Dexterity can be set to "block" and it will stat dexterity up the the desired block value specified in arguemnt (ignored in classic).
+
+		 See Templates/AutoStatExampleBuilds.txt for Config.AutoStat.Build examples. 
+	*/
+	Config.AutoSkill.Enabled = false; // Enable or disable AutoSkill system
+	Config.AutoSkill.Save = 0; // Number of skill points that will not be spent and saved
+	Config.AutoSkill.Build = [];
+
+	Config.AutoStat.Enabled = false; // Enable or disable AutoStat system
+	Config.AutoStat.Save = 0; // Number stat points that will not be spent and saved.
+	Config.AutoStat.BlockChance = 0; // An integer value set to desired block chance. This is ignored in classic.
+	Config.AutoStat.UseBulk = true; // Set true to spend multiple stat points at once (up to 100), or false to spend singe point at a time.
+	Config.AutoStat.Build = [];
 
 	// AutoBuild System ( See /d2bs/kolbot/libs/config/Builds/README.txt for instructions )
 	Config.AutoBuild.Enabled = false;			//	This will enable or disable the AutoBuild system

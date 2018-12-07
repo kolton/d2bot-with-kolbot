@@ -10,6 +10,8 @@
 
 js_strict(true);
 
+if (!isIncluded("common/AutoSkill.js")) { include("common/AutoSkill.js"); };
+if (!isIncluded("common/AutoStat.js")) { include("common/AutoStat.js"); };
 if (!isIncluded("common/Config.js")) { include("common/Config.js"); };
 if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
 if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
@@ -79,6 +81,10 @@ function spendStatPoints () {
 	var spentEveryPoint = true;
 	var unusedStatPoints = me.getStat(4);
 	var len = stats.length;
+
+	if (Config.AutoStat.Enabled) {
+		return spentEveryPoint;
+	}
 
 	if (len > unusedStatPoints) {
 		len = unusedStatPoints;
@@ -173,6 +179,10 @@ function spendSkillPoints () {
 	var unusedSkillPoints = me.getStat(5);
 	var len = skills.length;
 
+	if (Config.AutoSkill.Enabled) {
+		return spentEveryPoint;
+	}
+
 	if (len > unusedSkillPoints) {
 		len = unusedSkillPoints;
 		AutoBuild.print("Warning: Number of skills specified in your build template at level "+me.charlvl+" exceeds the available unused skill points"+
@@ -232,7 +242,7 @@ function main () {
 		while (true) {
 			var levels = gainedLevels();
 
-			if (levels > 0 && canSpendPoints()) {
+			if (levels > 0 && (canSpendPoints() || Config.AutoSkill.Enabled || Config.AutoStat.Enabled)) {
 				scriptBroadcast("toggleQuitlist");
 				AutoBuild.print("Level up detected (", prevLevel, "-->", me.charlvl, ")");
 				spendSkillPoints();
@@ -242,6 +252,14 @@ function main () {
 
 				if (debug) {
 					AutoBuild.print("Incrementing cached character level to", prevLevel + 1);
+				}
+
+				if (Config.AutoSkill.Enabled) {
+					AutoSkill.init(Config.AutoSkill.Build, Config.AutoSkill.Save);
+				}
+
+				if (Config.AutoStat.Enabled) {
+					AutoStat.init(Config.AutoStat.Build, Config.AutoStat.Save, Config.AutoStat.BlockChance, Config.AutoStat.UseBulk);
 				}
 
 				// prevLevel doesn't get set to me.charlvl because

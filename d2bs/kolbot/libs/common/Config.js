@@ -504,6 +504,18 @@ var Config = {
 		Quester: false,
 		Bumper: false
 	},
+	AutoSkill: {
+		Enabled: false,
+		Build: [],
+		Save: 0
+	},
+	AutoStat: {
+		Enabled: false,
+		Build: [],
+		Save: 0,
+		BlockChance: 0,
+		UseBulk: true
+	},
 	AutoBuild: {
 		Enabled: false,
 		Template: "",
