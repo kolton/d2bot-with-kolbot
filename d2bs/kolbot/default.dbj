@@ -184,6 +184,15 @@ function main() {
 		scriptBroadcast("torch");
 	}
 
+	// Auto skill and stat
+	if (Config.AutoSkill.Enabled && include("common/AutoSkill.js")) {
+		AutoSkill.init(Config.AutoSkill.Build, Config.AutoSkill.Save);
+	}
+
+	if (Config.AutoStat.Enabled && include("common/AutoStat.js")) {
+		AutoStat.init(Config.AutoStat.Build, Config.AutoStat.Save, Config.AutoStat.BlockChance, Config.AutoStat.UseBulk);
+	}
+
 	// Go
 	Loader.init();
 
