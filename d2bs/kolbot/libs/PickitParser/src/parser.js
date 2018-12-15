@@ -1,7 +1,9 @@
 include('PickitParser/src/constants.js')
-include('PickitParser/src/pickitLogger.js')
+include('PickitParser/src/logger.js')
+include('PickitParser/src/utils.js')
+include('PickitParser/src/checkerKolbot.js')
 
-const PickitParser = ((logger) => {
+const PickitParser = ((logger, checker) => {
   let pickitList = []
   const CONFIG_FILE = 'libs/PickitParser/pickit.json'
 
@@ -52,9 +54,22 @@ const PickitParser = ((logger) => {
     return true
   }
 
+  const checkProps = (item, entry) => {
+
+  }
+
+  const checkMods = (item, mods) => {
+
+  }
+
+  const checkItem = (item, entries=pickitList) => {
+    return checker.checkItem(item, entries)
+  }
+
   return {
     init: init,
+    checkItem: checkItem,
   }
-})(pickitLogger)
+})(pickitLogger, checkerKolbot)
 
 PickitParser.init('test', 'hi')
