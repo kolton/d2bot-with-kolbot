@@ -5,7 +5,7 @@
 const checkerKolbot = {
   checkItem(item, entries) {
     for (const entry of entries) {
-      
+      print(entry)
     }
 
     return {

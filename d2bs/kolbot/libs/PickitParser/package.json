@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "TODO",
   "scripts": {
-    "build": "npx babel src/constants.js src/logger.js src/checkerKolbot.js src/utils.js src/parser.js --out-file PickitParser.js"
+    "build": "npx babel src/constants.js src/logger.js src/checkerKolbot.js src/utils.js src/parser.js --out-file PickitParser.js",
+    "lint": "npx eslint --ext .js --color ./src"
   },
   "author": "ross-weir",
   "license": "MIT",
@@ -19,6 +20,7 @@
     "@babel/preset-env": "^7.2.0",
     "@babel/register": "^7.0.0",
     "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
     "eslint": "^5.10.0"
   }
 }

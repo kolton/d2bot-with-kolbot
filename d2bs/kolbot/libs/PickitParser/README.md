@@ -13,8 +13,16 @@ TODO
 Linting
 
 ```
-$ eslint --ext .js --color . ./src
+$ npm run lint
 ```
+
+Transpile into single `PickitParser.js` file
+
+```
+$ npm run build
+```
+
+_note:_ The definition of this command requires that the files be in the order in which they are used
 
 <a name="data-structures"></a>
 ## Data Structures

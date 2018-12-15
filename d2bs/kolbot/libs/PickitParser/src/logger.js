@@ -8,7 +8,7 @@ const pickitLogger = (() => {
   }
 
   const log = (msg, logColor, overrideConfig) => {
-    const config = overrideConfig ? {...baseConfig, ...overrideConfig} : baseConfig
+    const config = overrideConfig ? {...baseConfig, ...overrideConfig,} : baseConfig
     const {
       prefix,
       colorPrefix,
