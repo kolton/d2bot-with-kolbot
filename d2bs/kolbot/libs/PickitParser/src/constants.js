@@ -1,4 +1,3 @@
-
 // Don't use the global scope
 const PickitEnum = PickitEnum || Object.create(null)
 

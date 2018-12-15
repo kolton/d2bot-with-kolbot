@@ -1,4 +1,4 @@
-include('PickitParser/constants.js')
+include('PickitParser/src/constants.js')
 
 const PickitParser = (() => {
   let pickitList = []
@@ -8,16 +8,16 @@ const PickitParser = (() => {
     displayConsole: true,
     outputD2bot: true,
     outputScriptErr: false,
-    color: 'ÿc8'
+    color: 'ÿc8',
   }
 
-  const logger = (message) => {
+  const logger = message => {
     const {
       color,
       prefix,
       displayConsole,
       outputD2bot,
-      outputScriptErr
+      outputScriptErr,
     } = logConfig
 
     if (displayConsole) {
@@ -35,7 +35,7 @@ const PickitParser = (() => {
     print(color + prefix + 'ÿc0' + message)
   }
 
-  const validateConfig = (configs) => {
+  const validateConfig = configs => {
     if (!configs.length) {
       logger('No configurations set')
 
@@ -51,22 +51,31 @@ const PickitParser = (() => {
     return true
   }
 
+  const buildPickitList = (configs, parsedConfigFile) => (
+    configs.reduce((acc, _, idx) => {
+      const config = configs[idx]
+
+      if (parsedConfigFile.hasOwnProperty(config)) {
+        const filterEnabled = parsedConfigFile[config].filter(
+          ({enabled,}) => enabled
+        )
+
+        return [...acc, ...filterEnabled]
+      }
+
+      return acc
+    }, [])
+  )
+
   const init = (...configs) => {
     if (!validateConfig(configs)) {
       return false
     }
 
-    const parsedConfigFile = JSON.parse(FileTools.readText(CONFIG_FILE))
-
-    pickitList = configs.reduce((_, acc, idx) => {
-      const config = configs[idx]
-
-      if (parsedConfigFile.hasOwnProperty(config)) {
-        return acc.concat(parsedConfigFile[config])
-      }
-
-      return acc
-    }, [])
+    pickitList = buildPickitList(
+      configs,
+      JSON.parse(FileTools.readText(CONFIG_FILE))
+    )
 
     logger('Loaded ' + pickitList.length + ' pickit entries')
 
@@ -76,7 +85,7 @@ const PickitParser = (() => {
   return {
     init: init,
     logConfig: logConfig,
-    logger: logger
+    logger: logger,
   }
 })()
 
