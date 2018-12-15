@@ -11,7 +11,7 @@ const PickitParser = (() => {
     color: 'ÿc8',
   }
 
-  const logger = message => {
+  const logger = (message) => {
     const {
       color,
       prefix,
@@ -35,7 +35,7 @@ const PickitParser = (() => {
     print(color + prefix + 'ÿc0' + message)
   }
 
-  const validateConfig = configs => {
+  const validateConfig = (configs) => {
     if (!configs.length) {
       logger('No configurations set')
 
@@ -57,7 +57,7 @@ const PickitParser = (() => {
 
       if (parsedConfigFile.hasOwnProperty(config)) {
         const filterEnabled = parsedConfigFile[config].filter(
-          ({enabled,}) => enabled
+          pickitEntry => pickitEntry.enabled
         )
 
         return [...acc, ...filterEnabled]
