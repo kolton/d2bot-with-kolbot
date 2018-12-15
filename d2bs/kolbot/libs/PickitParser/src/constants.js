@@ -32,3 +32,10 @@ PickitEnum.DARK_RED = 8
 PickitEnum.DARK_GOLD = 16
 PickitEnum.DARK_GREEN = 11
 PickitEnum.DARK_BLUE = 5
+
+/**
+ * 
+ */
+PickitEnum.LOG_LEVEL_INFO_COLOR = 0
+PickitEnum.LOG_LEVEL_WARN_COLOR = 9
+PickitEnum.LOG_LEVEL_ERROR_COLOR = 1
