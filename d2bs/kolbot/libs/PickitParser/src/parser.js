@@ -20,11 +20,11 @@ const PickitParser = ((logger, checker) => {
 
   const buildPickitList = (configs, parsedConfigFile) => (
     configs.forEach((config) => {
-      if (parsedConfigFile.hasOwnProperty(config)) {
+      if (parsedConfigFile?.[config]) {
         const filterEnabled = parsedConfigFile[config].filter(
           pickitEntry => pickitEntry.enabled
         )
-
+  
         pickitList.push(...filterEnabled)
       }
     })
@@ -49,9 +49,9 @@ const PickitParser = ((logger, checker) => {
 
   }
 
-  const checkItem = (item, entries=pickitList) => {
-    return checker.checkItem(item, entries)
-  }
+  const checkItem = (item, entries=pickitList) => (
+    checker.checkItem(item, entries)
+  )
 
   return {
     init,
@@ -59,4 +59,4 @@ const PickitParser = ((logger, checker) => {
   }
 })(pickitLogger, checkerKolbot)
 
-PickitParser.init('test', 'hi')
+PickitParser.init('test', 'hi', 'noexist')

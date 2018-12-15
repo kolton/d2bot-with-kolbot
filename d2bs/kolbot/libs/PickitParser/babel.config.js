@@ -6,6 +6,7 @@ const config = {
     '@babel/plugin-transform-destructuring',
     '@babel/plugin-transform-shorthand-properties',
     '@babel/plugin-transform-template-literals',
+    '@babel/plugin-proposal-optional-chaining',
   ],
   presets: ['@babel/env'],
 }
