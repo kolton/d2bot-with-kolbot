@@ -41,14 +41,6 @@ const PickitParser = ((logger, checker) => {
     return true
   }
 
-  const checkProps = (item, entry) => {
-
-  }
-
-  const checkMods = (item, mods) => {
-
-  }
-
   const checkItem = (item, entries=pickitList) => (
     checker.checkItem(item, entries)
   )

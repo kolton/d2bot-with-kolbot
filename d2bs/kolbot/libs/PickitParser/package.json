@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TODO",
   "scripts": {
-    "build": "npx babel src/constants.js src/logger.js src/checkerKolbot.js src/utils.js src/parser.js --out-file PickitParser.js",
+    "build": "npx babel src/constants.js src/logger.js src/checker.kolbot.js src/utils.js src/parser.js --out-file PickitParser.js",
     "lint": "npx eslint --ext .js --color ./src"
   },
   "author": "ross-weir",

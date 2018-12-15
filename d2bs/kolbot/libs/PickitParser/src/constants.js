@@ -1,6 +1,12 @@
 // Don't use the global scope
 const PickitEnum = PickitEnum || Object.create(null)
 
+PickitEnum.COMPARE_GT = 'gt'
+PickitEnum.COMPARE_GTE = 'gte'
+PickitEnum.COMPARE_LT = 'lt'
+PickitEnum.COMPARE_LTE = 'lte'
+PickitEnum.COMPARE_EQ = 'eq'
+
 /**
  * Result of PickitEnum item check
  * Kolbot currently relies on these numbers
