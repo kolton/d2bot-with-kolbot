@@ -1,10 +1,5 @@
-include('PickitParser/src/constants.js')
-include('PickitParser/src/logger.js')
-include('PickitParser/src/utils.js')
-include('PickitParser/src/checkerKolbot.js')
-
 const PickitParser = ((logger, checker) => {
-  let pickitList = []
+  const pickitList = []
   const CONFIG_FILE = 'libs/PickitParser/pickit.json'
 
   const validateConfig = (configs) => {
@@ -15,7 +10,7 @@ const PickitParser = ((logger, checker) => {
     }
 
     if (!FileTools.exists(CONFIG_FILE)) {
-      logger.warn('Pickit config doesn\'t exist: ' + CONFIG_FILE)
+      logger.warn(`Pickit config doesn't exist: ${CONFIG_FILE}`)
 
       return false
     }
@@ -24,19 +19,15 @@ const PickitParser = ((logger, checker) => {
   }
 
   const buildPickitList = (configs, parsedConfigFile) => (
-    configs.reduce((acc, _, idx) => {
-      const config = configs[idx]
-
+    configs.forEach((config) => {
       if (parsedConfigFile.hasOwnProperty(config)) {
         const filterEnabled = parsedConfigFile[config].filter(
           pickitEntry => pickitEntry.enabled
         )
 
-        return [...acc, ...filterEnabled]
+        pickitList.push(...filterEnabled)
       }
-
-      return acc
-    }, [])
+    })
   )
 
   const init = (...configs) => {
@@ -44,12 +35,8 @@ const PickitParser = ((logger, checker) => {
       return false
     }
 
-    pickitList = buildPickitList(
-      configs,
-      JSON.parse(FileTools.readText(CONFIG_FILE))
-    )
-
-    logger.info('Loaded ' + pickitList.length + ' pickit entries')
+    buildPickitList(configs, JSON.parse(FileTools.readText(CONFIG_FILE)))
+    logger.info(`Loaded ${pickitList.length} pickit entries`)
 
     return true
   }
@@ -67,8 +54,8 @@ const PickitParser = ((logger, checker) => {
   }
 
   return {
-    init: init,
-    checkItem: checkItem,
+    init,
+    checkItem,
   }
 })(pickitLogger, checkerKolbot)
 

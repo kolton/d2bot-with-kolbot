@@ -7,8 +7,8 @@ const pickitLogger = (() => {
     colorPrefix: 'ÿc8',
   }
 
-  const log = (msg, logColor, overrideConfig={}) => {
-    const config = Object.assign({}, baseConfig, overrideConfig)
+  const log = (msg, logColor, overrideConfig) => {
+    const config = overrideConfig ? {...baseConfig, ...overrideConfig} : baseConfig
     const {
       prefix,
       colorPrefix,
@@ -22,19 +22,20 @@ const pickitLogger = (() => {
     }
 
     if (outputD2bot) {
-      D2Bot.printToConsole(prefix + msg)
+      D2Bot.printToConsole(`${prefix} ${msg}`)
     }
 
     if (outputScriptErr) {
-      Misc.errorReport(prefix + msg)
+      Misc.errorReport(`${prefix} ${msg}`)
     }
 
+    // Babel string transform doesn't handle 'ÿ'
     print(colorPrefix + prefix + 'ÿc' + logColor + ' ' + msg)
   }
 
   const info = msg => log(msg, PickitEnum.LOG_LEVEL_INFO_COLOR)
 
-  const warn = (msg) => log(
+  const warn = msg => log(
     msg,
     PickitEnum.LOG_LEVEL_WARN_COLOR,
     {
@@ -53,8 +54,8 @@ const pickitLogger = (() => {
   )
 
   return {
-    info: info,
-    warn: warn,
-    error: error,
+    info,
+    warn,
+    error,
   }
 })()
