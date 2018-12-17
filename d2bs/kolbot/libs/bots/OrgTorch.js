@@ -101,7 +101,7 @@ function OrgTorch() {
 				print("Getting Fade");
 				Pather.useWaypoint(107);
 				Precast.doPrecast(true);
-				Pather.moveTo(7811, 5872);
+				Pather.moveTo(7812, 5873);
 
 				if (me.classid === 3 && me.getSkill(125, 1)) {
 					Skill.setSkill(125, 0);
