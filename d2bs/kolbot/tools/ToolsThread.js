@@ -197,8 +197,13 @@ function main() {
 
 			break;
 		case 2:
-		case 4:
 			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 300)) { // small delay for juvs just to prevent using more at once
+				return false;
+			}
+
+			break;
+		case 4:
+			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 2000)) { // larger delay for juvs just to prevent using more at once, considering merc update rate
 				return false;
 			}
 
