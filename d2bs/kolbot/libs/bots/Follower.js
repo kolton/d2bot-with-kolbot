@@ -47,7 +47,7 @@
 */
 
 function Follower() {
-	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit, player,
+	var i, j, stop, leader, leaderUnit, charClass, piece, skill, result, unit, player, coord,
 		commanders = [Config.Leader],
 		attack = true,
 		openContainers = true,
@@ -734,7 +734,8 @@ function Follower() {
 
 			break;
 		case "move":
-			Pather.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
+			coord = CollMap.getRandCoordinate(me.x, -5, 5, me.y, -5, 5);
+			Pather.moveTo(coord.x, coord.y);
 
 			break;
 		case "wp":

@@ -740,7 +740,7 @@ ModeLoop:
 		id - id of the unit to open
 	*/
 	openUnit: function (type, id) {
-		var i, tick, unit;
+		var i, tick, unit, coord;
 
 		for (i = 0; i < 5; i += 1) {
 			unit = getUnit(type, id);
@@ -780,7 +780,8 @@ ModeLoop:
 				delay(10);
 			}
 
-			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
+			coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 3);
+			this.moveTo(coord.x, coord.y);
 		}
 
 		return false;
@@ -793,7 +794,7 @@ ModeLoop:
 		targetArea - area id of where the unit leads to
 	*/
 	useUnit: function (type, id, targetArea) {
-		var i, tick, unit,
+		var i, tick, unit, coord,
 			preArea = me.area;
 
 		for (i = 0; i < 5; i += 1) {
@@ -847,7 +848,8 @@ ModeLoop:
 				delay(10);
 			}
 
-			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
+			coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 3);
+			this.moveTo(coord.x, coord.y);
 		}
 
 		return targetArea ? me.area === targetArea : me.area !== preArea;
@@ -879,7 +881,7 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp;
+		var i, tick, wp, coord, retry;
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -949,7 +951,11 @@ ModeLoop:
 
 					if (!getUIFlag(0x14)) {
 						print("waypoint retry " + (i + 1));
-						this.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
+						retry = Math.min(i + 1, 5)
+						coord = CollMap.getRandCoordinate(me.x, -5 * retry, 5 * retry, me.y, -5 * retry, 5 * retry);
+						this.moveTo(coord.x, coord.y);
+						delay(200 + me.ping);
+
 						Packet.flash(me.gid);
 
 						continue;
