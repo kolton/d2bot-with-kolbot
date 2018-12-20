@@ -448,15 +448,16 @@ function main() {
 		try {
 			if (me.ingame && me.gameReady) {
 				if (!inGame) {
-					Town.goToTown(1);
-					Town.move("stash");
-
 					if (status !== "begin") {
 						status = "ready";
 					}
 
 					D2Bot.updateStatus("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.");
 					D2Bot.printToConsole("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.", 7);
+					delay(500);
+
+					Town.goToTown(1);
+					Town.move("stash");
 					Storage.Init();
 
 					inGame = true;

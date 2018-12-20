@@ -170,4 +170,33 @@ var CollMap = new function () {
 
 		return {x: roomx, y: roomy, distance: 0};
 	};
+
+	this.getRandCoordinate = function (cX, xmin, xmax, cY, ymin, ymax, factor = 1) {
+		// returns randomized {x, y} object with valid coordinates 
+		var coordX, coordY,
+			retry = 0;
+
+		do {
+			if (retry > 30) {
+				print("failed to get valid coordinate");
+				coordX = cX;
+				coordY = cY;
+
+				break;
+			}
+
+			coordX = cX + factor * rand(xmin, xmax);
+			coordY = cY + factor * rand(ymin, ymax);
+
+			if (cX === coordX && cY === coordY) { // recalculate if same coordiante
+				coordX = 0;
+				continue;
+			}
+
+			retry++;
+		} while (getCollision(me.area, coordX, coordY) & 1);
+
+		// print("Move " + retry + " from (" + cX + ", " + cY + ") to (" + coordX + ", " + coordY + ")");
+		return {x:coordX, y:coordY};
+	};
 };

@@ -316,7 +316,7 @@ var Attack = {
 			throw new Error("Attack.clear: range must be a number.");
 		}
 
-		var i, boss, orgx, orgy, target, result, monsterList, start,
+		var i, boss, orgx, orgy, target, result, monsterList, start, coord,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -410,7 +410,8 @@ var Attack = {
 						// Tele in random direction with Blessed Hammer
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
 							//print("random move m8");
-							Pather.moveTo(me.x + rand(-1, 1) * 5, me.y + rand(-1, 1) * 5);
+							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 5);
+							Pather.moveTo(coord.x, coord.y);
 						}
 
 						break;
@@ -500,7 +501,7 @@ var Attack = {
 
 	// Clear an already formed array of monstas
 	clearList: function (mainArg, sortFunc, refresh) {
-		var i, target, result, monsterList,
+		var i, target, result, monsterList, coord,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -564,7 +565,8 @@ var Attack = {
 					case 112:
 						// Tele in random direction with Blessed Hammer
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
-							Pather.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4);
+							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
+							Pather.moveTo(coord.x, coord.y);
 						}
 
 						break;

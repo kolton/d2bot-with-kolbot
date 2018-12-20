@@ -1633,7 +1633,7 @@ MainLoop:
 	},
 
 	getCorpse: function () {
-		var i, corpse, gid,
+		var i, corpse, gid, coord,
 			corpseList = [],
 			timer = getTickCount();
 
@@ -1674,7 +1674,8 @@ MainLoop:
 			delay(500);
 
 			if (getTickCount() - timer > 3000) {
-				Pather.moveTo(me.x + rand(-1, 1) * 4, me.y + rand(-1, 1) * 4);
+				coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
+				Pather.moveTo(coord.x, coord.y);
 			}
 
 			if (getTickCount() - timer > 30000) {
