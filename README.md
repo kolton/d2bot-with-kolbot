@@ -1,7 +1,13 @@
 # D2BS IS NOT SAFE FROM DETECTION!
 
+## (New) Discourse Forum
+[Click Here!](https://d2bot.discourse.group/)
+
 ## Discord Channel
 [Click Here!](https://discord.gg/FuBG8N2)
+
+## Documentation Repo
+[Click Here!](https://github.com/blizzhackers/documentation)
 
 ## Install Dependencies - DO THIS FIRST!
 - [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)
