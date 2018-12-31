@@ -736,7 +736,7 @@ var Attack = {
 			say("clearlevel " + getArea().name);
 		}
 
-		var room, result, rooms, myRoom;
+		var room, result, rooms, myRoom, currentArea, stuckCounter, previous;
 
 		function RoomSort(a, b) {
 			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
@@ -754,12 +754,24 @@ var Attack = {
 
 		rooms = [];
 
+		currentArea = getArea().id;
+		stuckCounter = 0;
+
 		do {
 			rooms.push([room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2]);
 		} while (room.getNext());
 
 		while (rooms.length > 0) {
 			// get the first room + initialize myRoom var
+			
+			if (stuckCounter > 5)
+				return true;
+			
+			if (currentArea != getArea().id) {
+				++stuckCounter;
+				Pather.moveTo(previous[0], previous[1], 3, spectype);
+			}
+			
 			if (!myRoom) {
 				room = getRoom(me.x, me.y);
 			}
@@ -776,6 +788,8 @@ var Attack = {
 			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
+			
+			previous = result;
 
 			if (result) {
 				Pather.moveTo(result[0], result[1], 3, spectype);
