@@ -762,16 +762,14 @@ var Attack = {
 		} while (room.getNext());
 
 		while (rooms.length > 0) {
-			// get the first room + initialize myRoom var
-			
-			if (stuckCounter > 5)
-				return true;
-			
+			// Make sure bot does not get stuck in different area.
 			if (currentArea != getArea().id) {
-				++stuckCounter;
+				if (stuckCounter > 5)
+					return true;
 				Pather.moveTo(previous[0], previous[1], 3, spectype);
+				++stuckCounter;
 			}
-			
+			// get the first room + initialize myRoom var
 			if (!myRoom) {
 				room = getRoom(me.x, me.y);
 			}
