@@ -1,11 +1,3 @@
-# LimeDrop Web Based Item Manager and Dropper
-## Setup - Note it will say "UPDATE AVAILABLE" DO NOT UPDATE via GUI if you use this branch!
-- [LimeDrop Install](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Install)
-- [LimeDrop Usage](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Use)
-
-
-![](https://i.imgur.com/bsmEv3j.png)
-
 # D2BS IS NOT SAFE FROM DETECTION!
 
 ## (New) Discourse Forum
@@ -45,3 +37,10 @@ If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask ar
 - [Kolbot Leader config](https://github.com/kolton/d2bot-with-kolbot/wiki/Kolbot-Leader-config)
 - [Kolbot Leecher config](https://github.com/kolton/d2bot-with-kolbot/wiki/Kolbot-Leecher-Starter)
 - [Kolbot Character config](https://github.com/kolton/d2bot-with-kolbot/wiki/Kolbot-Character-config)
+
+# LimeDrop Web Based Item Manager and Dropper
+## Setup
+- [LimeDrop Install](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Install)
+- [LimeDrop Usage](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Use)
+
+![](https://i.imgur.com/bsmEv3j.png)
