@@ -1,5 +1,5 @@
 var answer = false,
-	request = false,	
+	request = false,
 
 	AutoAssign = {
 		recursion: true,
@@ -14,9 +14,9 @@ var answer = false,
 		},
 	init: function () {
 		AutoAssign.updateNames(); //initiates all scripts
-		
+
 		//Do something else? What else do we need to do...
-		
+
 		return true;
 	},
 
@@ -43,11 +43,11 @@ var answer = false,
         switch (mode) {
         case 0x00: //Left game due to time-out
 			AutoAssign.updateNames(name1);
-			
+
 			break;
 		case 0x02: //Joined game
-			AutoAssign.updateNames();		
-			
+			AutoAssign.updateNames();
+
 			break;
         case 0x03://left game
 			AutoAssign.updateNames(name1);
@@ -56,23 +56,23 @@ var answer = false,
 		}
 		delay (250);
     },
-	
+
 	getJobs: function () {
 
 		var i, y, current, quitCheck,
 			array = [this.Barbs, this.Pallys, this.Sorcs];
-			
+
 		for (i = 0; i < array.length; i++) {
 			current = array[i];
 
 			switch (i) {
 			case 0:
 				quitCheck = getParty(this.Jobs.Barb);
-				
+
 				if (!quitCheck) {
 					this.Jobs.Barb = "";
 				}
-				
+
 				if (current.length > 0) {
 					this.Jobs.Barb = current[0].name;
 					//print ("setting leader Barb to: " + AutoAssign.Jobs.Barb);
@@ -80,11 +80,11 @@ var answer = false,
 				break;
 			case 1:
 				quitCheck = getParty(this.Jobs.Pally);
-				
+
 				if (!quitCheck) {
 					this.Jobs.Pally = "";
 				}
-				
+
 				if (current.length > 0) {
 					this.Jobs.Pally = current[0].name;
 					//print ("setting leader Pally to: " + AutoAssign.Jobs.Pally);
@@ -92,11 +92,11 @@ var answer = false,
 				break;
 			case 2:
 				quitCheck = getParty(this.Jobs.Sorc);
-				
+
 				if (!quitCheck) {
 					this.Jobs.Sorc = "";
 				}
-				
+
 				if (current.length > 0) {
 					this.Jobs.Sorc = current[0].name;
 					//print ("setting leader Sorc to: " + AutoAssign.Jobs.Sorc);
@@ -111,12 +111,12 @@ var answer = false,
 			}
 		}
 		return true;
-	},		
-	
+	},
+
 	pushNames: function (name, level, classid) {
-	
+
 		var obj = {name : name, level : level};
-		
+
 			switch (classid) {
 				case 1:
 					this.Sorcs.push(obj);
@@ -130,31 +130,31 @@ var answer = false,
 			}
 		return true;
 	},
-	
+
 	checkNames: function (name, type) {
-	var	tick, i, 
-		timeout = 1000;	
-	
+	var	tick, i,
+		timeout = 1000;
+
 		for (i = 0; i < type.length; i++) {
 			if (type[i].name === name) {
 				break;
 			}
 		}
-		
+
 		if (i == type.length) {
 
 			D2Bot.shoutGlobal(name, 69);
 			tick = getTickCount();
 			request = true;
-			
-			while (!answer) {			
+
+			while (!answer) {
 				if (getTickCount() - tick > timeout) {
 					break;
 				}
 				delay (100);
 			}
 		}
-		
+
 		if (answer) {
 			answer = false;
 			request = false;
@@ -164,14 +164,14 @@ var answer = false,
 
 		answer = false;
 		request = false;
-		
-		return false;		
+
+		return false;
 	},
 
 	sortNames: function () {
 		var i, type,
 			arrays = [this.Barbs, this.Pallys, this.Sorcs];
-			
+
 		for (i = 0; i < arrays.length; i++) {
 			type = arrays[i];
 
@@ -182,7 +182,7 @@ var answer = false,
 					return -1;
 				return 0;
 			});
-			
+
 			type.sort(function (a, b) {
 				return b.level - a.level;
 			});
@@ -190,12 +190,12 @@ var answer = false,
 		}
 		return true;
 	},
-	
+
 	removeNames: function (quitter) {
 		print (quitter + " has left. updating..");
 		var i, y, currentClass,
 			arrays = [this.Barbs, this.Pallys, this.Sorcs];
-		
+
 		for (i = 0; i < arrays.length; i++) {
 			currentClass = arrays[i];
 
@@ -210,7 +210,7 @@ var answer = false,
 
 	getNames: function () {
 		print ("Updating names.");
-		
+
 		for (var i = 0; i < 3; i++) {
 			var party = getParty();
 
@@ -221,23 +221,23 @@ var answer = false,
 								if (this.checkNames(party.name, this.Sorcs)) {
 									this.pushNames(party.name, party.level, party.classid);
 								}
-							
+
 							break;
 							case 3:
 								if (this.checkNames(party.name, this.Pallys)) {
 									this.pushNames(party.name, party.level, party.classid);
-								}												
-								
+								}
+
 							break;
 							case 4:
 								if (this.checkNames(party.name, this.Barbs)) {
 									this.pushNames(party.name, party.level, party.classid);
-								}					
-								
-							break; 
+								}
+
+							break;
 							default:
-							break;			
-						}					
+							break;
+						}
 					} while (party.getNext());
 				}
 		}
@@ -247,17 +247,17 @@ var answer = false,
 
 		return this.Jobs;
 	},
-	
+
 	updateNames: function (quitter) {
 		if (this.recursion) {
 			this.recursion = false;
-			
+
 			if (quitter) {
 				this.removeNames(quitter);
 			}
-			
+
 			this.getNames();
-			
+
 		this.recursion = true;
 		}
 		return true;

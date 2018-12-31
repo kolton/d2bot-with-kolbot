@@ -37,7 +37,7 @@ var StarterConfig = {
 	Similar rules apply to ExcludeFilter:
 
 	["somebaal", "-"] ignores games with "somebaal" and "-" in the game name
-	
+
 	["somebaal"],
 	["somediablo"]
 	this will ignore all games with "somebaal" or "somediablo" in their names
@@ -469,7 +469,7 @@ MainSwitch:
 
 			for (i = 0; i < gameList.length; i += 1) {
 				if (doneGames.indexOf(gameList[i].gameName) === -1 && includeCheck(gameList[i].gameName) && excludeCheck(gameList[i].gameName)) {
-					print("\xFFc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
+					print("ÿc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
 
 					gameToJoin = gameList[i].gameName;
 

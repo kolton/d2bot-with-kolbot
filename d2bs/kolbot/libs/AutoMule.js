@@ -100,14 +100,26 @@ var AutoMule = {
 	},
 
 	muleCheck: function () {
-		var info = this.getInfo();
+		var i, items,
+			info = this.getInfo();
 
-		if (info && info.hasOwnProperty("muleInfo") && info.muleInfo.hasOwnProperty("usedStashTrigger") && info.muleInfo.hasOwnProperty("usedInventoryTrigger") &&
-				Storage.Inventory.UsedSpacePercent() >= info.muleInfo.usedInventoryTrigger && Storage.Stash.UsedSpacePercent() >= info.muleInfo.usedStashTrigger &&
-					this.getMuleItems().length > 0) {
-			D2Bot.printToConsole("MuleCheck triggered!", 7);
+		if (info && info.hasOwnProperty("muleInfo")) {
+			items = this.getMuleItems();
 
-			return true;
+			if (info.muleInfo.hasOwnProperty("usedStashTrigger") && info.muleInfo.hasOwnProperty("usedInventoryTrigger") &&
+					Storage.Inventory.UsedSpacePercent() >= info.muleInfo.usedInventoryTrigger && Storage.Stash.UsedSpacePercent() >= info.muleInfo.usedStashTrigger &&
+						items.length > 0) {
+				D2Bot.printToConsole("MuleCheck triggered!", 7);
+
+				return true;
+			}
+
+			for (i = 0; i < items.length; i += 1) {
+				if (this.matchItem(items[i], Config.AutoMule.Trigger)) {
+					D2Bot.printToConsole("MuleCheck triggered!", 7);
+					return true;
+				}
+			}
 		}
 
 		return false;
@@ -337,15 +349,15 @@ MainLoop:
 		sendCopyData(null, muleObj.muleProfile, 11, "begin");
 
 		if (this.torchAnniCheck === 2) {
-			print("\xFFc4AutoMule\xFFc0: In anni mule game.");
+			print("ÿc4AutoMuleÿc0: In anni mule game.");
 			D2Bot.updateStatus("AutoMule: In game.");
 			this.dropCharm(true);
 		} else if (this.torchAnniCheck === 1) {
-			print("\xFFc4AutoMule\xFFc0: In torch mule game.");
+			print("ÿc4AutoMuleÿc0: In torch mule game.");
 			D2Bot.updateStatus("AutoMule: In game.");
 			this.dropCharm(false);
 		} else {
-			print("\xFFc4AutoMule\xFFc0: In mule game.");
+			print("ÿc4AutoMuleÿc0: In mule game.");
 			D2Bot.updateStatus("AutoMule: In game.");
 			this.dropStuff();
 		}
@@ -414,11 +426,34 @@ MainLoop:
 		return true;
 	},
 
+	matchItem: function (item, list) {
+		var i, info, parsedLine,
+			parsedPickit = [], classIDs = [];
+
+		for (i = 0; i < list.length; i += 1) {
+			info = {
+				file: "Character Config",
+				line: list[i]
+			};
+
+			if (typeof list[i] === "number") { // classids
+				classIDs.push(list[i]);
+			} else if (typeof list[i] === "string") { // pickit entries
+				parsedLine = NTIP.ParseLineInt(list[i], info);
+
+				if (parsedLine) {
+					parsedPickit.push(parsedLine);
+				}
+			}
+		}
+
+		return (classIDs.indexOf(item.classid) > -1 || NTIP.CheckItem(item, parsedPickit));
+	},
+
 	// get a list of items to mule
 	getMuleItems: function () {
-		var item, items, info;
-
-		info = this.getInfo();
+		var item, items,
+			info = this.getInfo();
 
 		if (!info || !info.hasOwnProperty("muleInfo")) {
 			return false;
@@ -435,9 +470,11 @@ MainLoop:
 						(item.classid !== 603 || item.quality !== 7) && // Don't drop Annihilus
 						(item.classid !== 604 || item.quality !== 7) && // Don't drop Hellfire Torch
 						(item.location === 7 || (item.location === 3 && !Storage.Inventory.IsLocked(item, Config.Inventory))) && // Don't drop items in locked slots
-						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1) && // Don't drop Keys if part of TorchSystem
-						!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)) { // Don't drop Runeword/Cubing/CraftingSystem ingredients
-					items.push(copyUnit(item));
+						((!TorchSystem.getFarmers() && !TorchSystem.isFarmer()) || [647, 648, 649].indexOf(item.classid) === -1)) { // Don't drop Keys if part of TorchSystem
+					if (this.matchItem(item, Config.AutoMule.Force.concat(Config.AutoMule.Trigger)) || // Always drop items on Force or Trigger list
+						(!this.matchItem(item, Config.AutoMule.Exclude) && (!this.cubingIngredient(item) && !this.runewordIngredient(item) && !this.utilityIngredient(item)))) { // Don't drop Excluded items or Runeword/Cubing/CraftingSystem ingredients
+						items.push(copyUnit(item));
+					}
 				}
 			} while (item.getNext());
 		}

@@ -37,7 +37,7 @@ function main() {
 		canQuit = true,
 		timerLastDrink = [];
 
-	print("ÿc3Start ToolsThread script");
+	print("Ã¿c3Start ToolsThread script");
 	D2Bot.init();
 	Config.init(false);
 	Pickit.init(false);
@@ -126,7 +126,7 @@ function main() {
 
 		for (i = 0; i < items.length; i += 1) {
 			if (type < 3 && items[i].mode === 0 && items[i].location === 3 && items[i].itemType === pottype) {
-				print("ÿc2Drinking potion from inventory.");
+				print("Ã¿c2Drinking potion from inventory.");
 
 				return copyUnit(items[i]);
 			}
@@ -149,7 +149,7 @@ function main() {
 			if (script) {
 				if (script.running) {
 					if (i === 0) { // default.dbj
-						print("ÿc1Pausing.");
+						print("Ã¿c1Pausing.");
 					}
 
 					// don't pause townchicken during clone walk
@@ -158,7 +158,7 @@ function main() {
 					}
 				} else {
 					if (i === 0) { // default.dbj
-						print("ÿc2Resuming.");
+						print("Ã¿c2Resuming.");
 					}
 
 					script.resume();
@@ -197,8 +197,13 @@ function main() {
 
 			break;
 		case 2:
-		case 4:
 			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 300)) { // small delay for juvs just to prevent using more at once
+				return false;
+			}
+
+			break;
+		case 4:
+			if (timerLastDrink[type] && (tNow - timerLastDrink[type] < 2000)) { // larger delay for juvs just to prevent using more at once, considering merc update rate
 				return false;
 			}
 
@@ -358,25 +363,25 @@ function main() {
 			var realFCR = me.getStat(105) - Config.FCR;
 			var realIAS = me.getStat(93) - Config.IAS;
 			var realFBR = me.getStat(102) - Config.FBR;
-			var realFHR = me.getStat(99) - Config.FHR;	
+			var realFHR = me.getStat(99) - Config.FHR;
 
-			print("ÿc4MF: ÿc0" + me.getStat(80) + " ÿc4GF: ÿc0" + me.getStat(79) + " ÿc1FR: ÿc0" + me.getStat(39) +
-				" ÿc3CR: ÿc0" + me.getStat(43) + " ÿc9LR: ÿc0" + me.getStat(41) + " ÿc2PR: ÿc0" + me.getStat(45) + 
-				"\n" + 
-				"FCR: " + realFCR + " IAS: " + realIAS + " FBR: " + realFBR + 
-				" FHR: " + realFHR + " FRW: " + me.getStat(96) + 
+			print("Ã¿c4MF: Ã¿c0" + me.getStat(80) + " Ã¿c4GF: Ã¿c0" + me.getStat(79) + " Ã¿c1FR: Ã¿c0" + me.getStat(39) +
+				" Ã¿c3CR: Ã¿c0" + me.getStat(43) + " Ã¿c9LR: Ã¿c0" + me.getStat(41) + " Ã¿c2PR: Ã¿c0" + me.getStat(45) +
 				"\n" +
-				"CB: " + me.getStat(136) + " DS: " + me.getStat(141) + " OW: " + me.getStat(135) + 
-				" ÿc1LL: ÿc0" + me.getStat(60) + " ÿc3ML: ÿc0" + me.getStat(62) + 
-				" DR: " + me.getStat(36) + "% + " + me.getStat(34) + " MDR: " + me.getStat(37) + "% + " + me.getStat(35) + 
-				"\n" + 
-				(me.getStat(153) > 0 ? "ÿc3Cannot be Frozenÿc1" : "" ));
+				"FCR: " + realFCR + " IAS: " + realIAS + " FBR: " + realFBR +
+				" FHR: " + realFHR + " FRW: " + me.getStat(96) +
+				"\n" +
+				"CB: " + me.getStat(136) + " DS: " + me.getStat(141) + " OW: " + me.getStat(135) +
+				" Ã¿c1LL: Ã¿c0" + me.getStat(60) + " Ã¿c3ML: Ã¿c0" + me.getStat(62) +
+				" DR: " + me.getStat(36) + "% + " + me.getStat(34) + " MDR: " + me.getStat(37) + "% + " + me.getStat(35) +
+				"\n" +
+				(me.getStat(153) > 0 ? "Ã¿c3Cannot be FrozenÃ¿c1" : "" ));
 
 			break;
 		case 101: // numpad 5
 			if (AutoMule.getInfo() && AutoMule.getInfo().hasOwnProperty("muleInfo")) {
 				if (AutoMule.getMuleItems().length > 0) {
-					print("ÿc2Mule triggered");
+					print("Ã¿c2Mule triggered");
 					scriptBroadcast("mule");
 					this.exit();
 				} else {
@@ -428,7 +433,7 @@ function main() {
 			}
 
 			break;
-		case 0x06: // "%Name1 was Slain by %Name2" 
+		case 0x06: // "%Name1 was Slain by %Name2"
 			if (Config.AntiHostile && param2 === 0x00 && name2 === me.name) {
 				scriptBroadcast("mugshot " + name1);
 			}
@@ -472,7 +477,7 @@ function main() {
 				this.togglePause();
 				Town.goToTown();
 				showConsole();
-				print("ÿc4Diablo Walks the Earth");
+				print("Ã¿c4Diablo Walks the Earth");
 
 				me.maxgametime = 0;
 
@@ -636,7 +641,7 @@ function main() {
 		}
 
 		if (quitFlag && canQuit) {
-			print("ÿc8Run duration ÿc2" + ((getTickCount() - me.gamestarttime) / 1000));
+			print("Ã¿c8Run duration Ã¿c2" + ((getTickCount() - me.gamestarttime) / 1000));
 
 			if (Config.LogExperience) {
 				Experience.log();

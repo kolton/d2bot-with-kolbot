@@ -111,7 +111,7 @@ var PathDebug = {
 
 var Pather = {
 	teleport: true,
-	walkDistance: 10,
+	walkDistance: 5,
 	teleDistance: 40,
 	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17, 0x19, 0x1A],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
@@ -167,6 +167,7 @@ var Pather = {
 		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
 							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 
+		/* Disabling getPath optimizations, they are causing desync -- noah
 		// Teleport without calling getPath if the spot is close enough
 		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
 			//Misc.townCheck();
@@ -178,6 +179,7 @@ var Pather = {
 		if (!this.useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
 			return this.walkTo(x, y);
 		}
+		*/
 
 		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
@@ -719,13 +721,13 @@ ModeLoop:
 			if (me.area === 101) {
 				break;
 			}
-			
+
 			return this.useUnit(2, 386, targetArea);
 		case 128:
 			if (me.area === 129) {
 				break;
 			}
-			
+
 			return this.useUnit(2, 547, targetArea);
 		}
 
@@ -738,7 +740,7 @@ ModeLoop:
 		id - id of the unit to open
 	*/
 	openUnit: function (type, id) {
-		var i, tick, unit;
+		var i, tick, unit, coord;
 
 		for (i = 0; i < 5; i += 1) {
 			unit = getUnit(type, id);
@@ -778,7 +780,8 @@ ModeLoop:
 				delay(10);
 			}
 
-			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
+			coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 3);
+			this.moveTo(coord.x, coord.y);
 		}
 
 		return false;
@@ -791,7 +794,7 @@ ModeLoop:
 		targetArea - area id of where the unit leads to
 	*/
 	useUnit: function (type, id, targetArea) {
-		var i, tick, unit,
+		var i, tick, unit, coord,
 			preArea = me.area;
 
 		for (i = 0; i < 5; i += 1) {
@@ -845,7 +848,8 @@ ModeLoop:
 				delay(10);
 			}
 
-			this.moveTo(me.x + 3 * rand(-1, 1), me.y + 3 * rand(-1, 1));
+			coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 3);
+			this.moveTo(coord.x, coord.y);
 		}
 
 		return targetArea ? me.area === targetArea : me.area !== preArea;
@@ -877,7 +881,7 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp;
+		var i, tick, wp, coord, retry;
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -947,7 +951,11 @@ ModeLoop:
 
 					if (!getUIFlag(0x14)) {
 						print("waypoint retry " + (i + 1));
-						this.moveTo(me.x + rand(-5, 5), me.y + rand(-5, 5));
+						retry = Math.min(i + 1, 5)
+						coord = CollMap.getRandCoordinate(me.x, -5 * retry, 5 * retry, me.y, -5 * retry, 5 * retry);
+						this.moveTo(coord.x, coord.y);
+						delay(200 + me.ping);
+
 						Packet.flash(me.gid);
 
 						continue;
@@ -1430,7 +1438,7 @@ MainLoop:
 				this.moveTo(10073, 8670);
 				this.usePortal(null);
 			} else if (me.area === 109 && target.course[0] === 121) { // Harrogath -> Nihlathak's Temple
-				Town.move("anya");
+				Town.move(NPC.Anya);
 				this.usePortal(121);
 			} else if (me.area === 111 && target.course[0] === 125) { // Abaddon
 				this.moveToPreset(111, 2, 60);

@@ -19,31 +19,32 @@ js_strict(true);
 if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
 if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
 if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
+if (!isIncluded("common/Town.js")) { include("common/Town.js"); };
 
 var AutoBuildTemplate = {
 
-	1:	{	
+	1:	{
 			//SkillPoints: [-1],											// This doesn't matter. We don't have skill points to spend at lvl 1
 			//StatPoints: [-1,-1,-1,-1,-1],								// This doesn't matter. We don't have stat points to spend at lvl 1
 			Update: function () {
-			
+
 				Scripts.ClearAnyArea = true;							// We are only level 1 so we will start by clearing Blood Moor
 					Config.ClearAnyArea.AreaList = [2];
 				Config.ClearType = 0; 									// Monster spectype to kill in level clear scripts (0 = all)
-				
+
 				// Config.PickitFiles.push("level/1.nip");				// File "level/1.nip" is not included, it's just an example.
-				
+
 				Config.OpenChests		= true; 						// Open chests. Controls key buying.
 				Config.LogExperience	= false; 						// Print experience statistics in the manager.
 				Config.StashGold 		= 200;							// Minimum amount of gold to stash.
 				Config.AttackSkill		= [0, 36, -1, 36, 36, 0, 0];	// At level 1 we start with a +1 Fire Bolt staff
 				Config.LowManaSkill		= [0, 0];
 				Config.PublicMode		= 1;
-				Config.ScanShrines		= [15, 13, 12, 14, 7, 6, 2];	
+				Config.ScanShrines		= [15, 13, 12, 14, 7, 6, 2];
 				Config.BeltColumn		= ["hp", "hp", "hp", "mp"];		// Keep tons of health potions!
 			}
 		},
-		
+
 	2:	{
 			SkillPoints: [36], 											// Fire Bolt + 1
 			StatPoints: [0, 3, 3, 3, 3],								// Strength + 1 , Vitality + 4
@@ -54,7 +55,7 @@ var AutoBuildTemplate = {
 				Config.MinColumn = [1, 1, 1, 1];
 			}
 		},
-		
+
 	3:	{
 			SkillPoints: [39], 										// Ice Bolt + 1
 			StatPoints: [0, 0, 3, 3, 3],							// Strength + 2 , Vitality + 3
@@ -62,17 +63,17 @@ var AutoBuildTemplate = {
 				Config.AttackSkill = [39, 36, -1, 36, 0, 0, 0];		// Ice Bolt and Fire Bolt
 			}
 		},
-		
+
 	4:	{
 			SkillPoints: [37],											// Warmth + 1
 			StatPoints: [0, 0, 0, 3, 3],							// Strength + 3 , Vitality + 2
 			Update: function () {
 				Scripts.Corpsefire = true;							// Lets try Corpsefire now that we're level 4
 					Config.Corpsefire.ClearDen = true;
-				
+
 				Scripts.ClearAnyArea = false;						// Don't want to clear Blood Moor anymore (See lvl 1 above)
 					Config.ClearAnyArea.AreaList = [];
-				
+
 				Config.BeltColumn = ["hp", "hp", "mp", "rv"]; 		// Start keeping rejuvs since we have +1 Warmth
 				Config.MinColumn	= [1, 1, 1, 0];
 			}
@@ -82,10 +83,10 @@ var AutoBuildTemplate = {
 			SkillPoints: [38],											// Charged Bolt + 1
 			StatPoints: [0, 0, 0, 0, 3],							// Strength + 4 , Vitality + 1
 			Update: function () {
-				
+
 				Scripts.ClearAnyArea = true;						// Now we'll try enabling it again Cold Plains and Stony Field
-					Config.ClearAnyArea.AreaList = [3, 4]; 				
-				
+					Config.ClearAnyArea.AreaList = [3, 4];
+
 				Config.ScanShrines	= [15, 13, 12];
 				Config.AttackSkill 	= [39, 36, -1, 38, 0, 39, 0];	// All the bolts!
 			}
@@ -135,7 +136,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	11:	{	
+	11:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -225,7 +226,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	21:	{	
+	21:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -315,7 +316,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	31:	{	
+	31:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -405,7 +406,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	41:	{	
+	41:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -495,7 +496,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	51:	{	
+	51:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -585,7 +586,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	61:	{	
+	61:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -675,7 +676,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	71:	{	
+	71:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -765,7 +766,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	81:	{	
+	81:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {
@@ -855,7 +856,7 @@ var AutoBuildTemplate = {
 			}
 		},
 
-	91:	{	
+	91:	{
 			SkillPoints: [-1],
 			StatPoints: [-1,-1,-1,-1,-1],
 			Update: function () {

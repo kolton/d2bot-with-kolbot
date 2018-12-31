@@ -337,6 +337,7 @@ function updateCount() {
 		password: muleObj.accountPassword
 	};
 
+	MuleLogger.save(md5(info.realm.toLowerCase() + info.account.toLowerCase()), info.password);
 	ControlAction.loginAccount(info);
 	delay(1000);
 	ControlAction.click(6, 33, 572, 128, 35);
@@ -453,6 +454,10 @@ function main() {
 
 					D2Bot.updateStatus("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.");
 					D2Bot.printToConsole("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.", 7);
+					delay(500);
+
+					Town.goToTown(1);
+					Town.move("stash");
 					Storage.Init();
 
 					inGame = true;
@@ -484,7 +489,7 @@ function main() {
 
 					obj = MuleData.read();
 
-					if (checkAnniTorch()) {
+					if (checkAnniTorch() && obj.torchChars.indexOf(me.name) === -1) {
 						obj.torchChars.push(me.name);
 					}
 
@@ -503,7 +508,7 @@ function main() {
 					makeNext = true;
 					obj = MuleData.read();
 
-					if (checkAnniTorch()) {
+					if (checkAnniTorch() && obj.torchChars.indexOf(me.name) === -1) {
 						obj.torchChars.push(me.name);
 					}
 
@@ -638,6 +643,7 @@ MainSwitch:
 			break;
 		}
 
+		MuleLogger.save(md5(info.realm.toLowerCase() + info.account.toLowerCase()), info.password);
 		ControlAction.loginAccount(info);
 
 		break;

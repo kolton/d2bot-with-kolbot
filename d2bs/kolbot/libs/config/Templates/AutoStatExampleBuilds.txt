@@ -1,0 +1,51 @@
+You may input stat types as an integer, or as string type defined as below.
+Make sure string types are defined in lowercase.
+
+0, "strength", "str", "s"
+1, "energy", "enr", "e"
+2, "dexterity", "dex", "d"
+3, "vitality", "vit", "v"
+
+
+Example:
+
+Config.AutoStat.Build = [
+	["strength", 35], // spend points in strength until it reaches 35 strength (all +stats from items are ingnored!)
+	["vitality", 50], // spend points in vitality until it reaches 50.
+	["dexterity", "block"], // spend points in dexterity until it reaches desired block chance defined in Config.AutoStat.BlockChance (+dexterity items are taken into account for "block" option)
+							// when more stat points are available after leveling, AutoStat will go through the array again and it will continue to stat dexterity as needed.
+							// if paladin has holy shield skill available and if it's not active, it'll attemp to cast holy shield first
+	["strength", 55], // spend points on strength until it reaches 55
+	["vitality", "all"] // all remaining points will be spent in vitality.
+];
+
+
+If you are allocating stats points for high level character and you know your strength/dex requirements,
+you may simply specify strength and dexterity value to what you want and put rest into vitality
+
+Config.AutoStat.Build = [
+	["strength", 55], // spend points in strength until it reaches 35
+	["dexterity", 150], // spend points in dexterity until it reaches 150
+	["vitality", "all"] // spend all remaining points in vitality
+];
+
+
+If you are building a character from scratch along with AutoBuild system, you want to be more specific about order of stat allocation.
+
+Config.AutoStat.Build = [
+	["strength", 12], // stat strength for quilt armor
+	["vitality", 28], // spend in vitality until it reaches 28 (level 5)
+	["energy", 50], // spend in energy until 50 (level 8)
+	["vitality", 50], // spend more in vitality
+	["strength", 15], // get up to 15 strength (level 13)
+	["vitality", 65], // spend in vitality (level 18)
+	["strength", 35], // get up to 25 strength (level 20)
+	["energy", 75], // spend in energy (level 25)
+	["v", 75], // level 27
+	["s", 55], // level 31
+	["v", 100], // level 36
+	["s", 80], // level 41
+	["v", 125], // level 46
+	["s", 95], // level 49 (less if done stat quests)
+	["v", "all"], // put rest of the points in vitality
+];

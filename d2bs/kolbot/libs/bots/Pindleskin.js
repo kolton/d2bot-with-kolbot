@@ -18,7 +18,7 @@ function Pindleskin() {
 			throw new Error("Failed to move to Nihlahak's Temple");
 		}
 	} else {
-		Town.move("anya");
+		Town.move(NPC.Anya);
 
 		if (!Pather.getPortal(121) && me.getQuest(37, 1)) {
 			anya = getUnit(1, NPC.Anya);
@@ -56,7 +56,7 @@ function Pindleskin() {
 
 			return true;
 		}
-		
+
 		if (Config.Pindleskin.ClearVipers) {
 			Attack.clearList(Attack.getMob(597, 0, 20));
 		}

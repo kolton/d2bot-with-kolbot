@@ -29,7 +29,7 @@ Array.prototype.shuffle = function () {
 
 // Trim String
 String.prototype.trim = function () {
-	return this.replace(/^\s+|\s+$/g, "");
+	return this.replace(/^[ \t\uFEFF]+|[ \t\uFEFF]+$/g, '');
 };
 
 // Check if unit is idle
@@ -103,38 +103,34 @@ Unit.prototype.openMenu = function (addDelay) {
 		return true;
 	}
 
-	var i, j;
+	var i, tick;
 
 	for (i = 0; i < 5; i += 1) {
 		if (getDistance(me, this) > 4) {
 			Pather.moveToUnit(this);
 		}
 
-		if (i > 0) {
-			Packet.flash(me.gid);
-			// delay?
-		}
+		Misc.click(0, 0, this);
+		tick = getTickCount();
 
-		if (!getUIFlag(0x08)) {
-			delay(100);
-			this.interact();
-		}
-
-		for (j = 0; j < 40; j += 1) {
-			if (j > 0 && j % 10 === 0 && !getUIFlag(0x08)) {
-				me.cancel();
-				delay(400);
-				this.interact();
-			}
-
+		while (getTickCount() - tick < 5000) {
 			if (getUIFlag(0x08)) {
 				delay(Math.max(700 + me.ping, 500 + me.ping * 2 + addDelay * 500));
 
 				return true;
 			}
 
-			delay(25);
+			if (getInteractedNPC()) {
+				me.cancel();
+			}
+
+			delay(100);
 		}
+
+		sendPacket(1, 0x2f, 4, 1, 4, this.gid);
+		delay(me.ping * 2);
+		sendPacket(1, 0x30, 4, 1, 4, this.gid);
+		delay(me.ping * 2);
 	}
 
 	return false;
@@ -685,7 +681,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(regex, "i")) {
-					return parseInt(temp[i].replace(/\xFFc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -764,7 +760,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(3520), "i")) {
-					return parseInt(temp[i].replace(/\xFFc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -782,7 +778,7 @@ Unit.prototype.getStatEx = function (id, subid) {
 
 			for (i = 0; i < temp.length; i += 1) {
 				if (temp[i].match(getLocaleString(10038), "i")) {
-					return parseInt(temp[i].replace(/\xFFc[0-9!"+<;.*]/, ""), 10);
+					return parseInt(temp[i].replace(/ÿc[0-9!"+<;.*]/, ""), 10);
 				}
 			}
 
@@ -1041,3 +1037,69 @@ Unit.prototype.getColor = function () {
 
 	return -1;
 };
+
+// Object.assign polyfill from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+if (typeof Object.assign !== 'function') {
+	Object.defineProperty(Object, "assign", {
+		value: function assign (target) {
+			if (target === null) {
+				throw new TypeError('Cannot convert undefined or null to object');
+			}
+
+			var to = Object(target);
+
+			for (var index = 1; index < arguments.length; index++) {
+				var nextSource = arguments[index];
+
+				if (nextSource !== null) {
+					for (var nextKey in nextSource) {
+						if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+							to[nextKey] = nextSource[nextKey];
+						}
+					}
+				}
+			}
+
+			return to;
+		},
+		writable: true,
+		configurable: true
+	});
+}
+
+// Array.find polyfill from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+	Object.defineProperty(Array.prototype, 'find', {
+		value: function (predicate) {
+			if (this === null) {
+				throw new TypeError('"this" is null or not defined');
+			}
+
+			var o = Object(this);
+
+			var len = o.length >>> 0;
+
+			if (typeof predicate !== 'function') {
+				throw new TypeError('predicate must be a function');
+			}
+
+			var thisArg = arguments[1];
+
+			var k = 0;
+
+			while (k < len) {
+				var kValue = o[k];
+
+				if (predicate.call(thisArg, kValue, k, o)) {
+					return kValue;
+				}
+
+				k++;
+			}
+
+			return undefined;
+		},
+		configurable: true,
+		writable: true
+	});
+}
