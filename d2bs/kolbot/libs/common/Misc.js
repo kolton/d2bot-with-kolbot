@@ -1190,7 +1190,7 @@ var Misc = {
 				i -= 1;
 			} else {
 				if (desc[i].match(/^(y|ÿ)c/)) {
-					stringColor = desc[i].substring(0, 4);
+					stringColor = desc[i].substring(0, "ÿ".length + 2);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
@@ -2465,34 +2465,32 @@ function PacketBuilder () {
 		throw new Error("PacketBuilder must be called with 'new' operator!");
 	}
 
-	let queue = [], plen = 0;
+	let queue = [], count = 0;
 
-	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
-		let strType;
-
-		[strType, type] = type === "StringZ" ? [2, "String"] : [type === "String" ? 1 : 0, type];
-
+	let enqueue = (type, size) => (...args) => { // accepts any number of arguments
 		args.forEach(arg => {
-			strType && (size = arg.length + strType - 1); // string length adjustment for null termination
-			plen += size;
+			if (type === 'String') {
+				arg = stringToEUC(arg);
+				size = arg.length + 1;
+			}
+
 			queue.push({type: type, size: size, data: arg});
+			count += size;
 		});
 
 		return this;
 	};
 
-	this.byte = storeFields("Uint8", 1);
-	this.word = storeFields("Uint16", 2);
-	this.dword = storeFields("Uint32", 4);
-	this.float = storeFields("Float32", 4);
-	this.string = storeFields("StringZ");
+	this.float = enqueue("Float32", 4);
+	this.dword = enqueue("Uint32", 4);
+	this.word = enqueue("Uint16", 2);
+	this.byte = enqueue("Uint8", 1);
+	this.string = enqueue("String");
 
 	this.buildDataView = () => {
-		let dv = new DataView(new ArrayBuffer(plen)), i = 0;
+		let dv = new DataView(new ArrayBuffer(count)), i = 0;
 		queue.forEach(field => {
 			if (field.type === "String") {
-				field.data = utf8ToEuc(field.data);
-
 				for (let l = 0; l < field.data.length; l++) {
 					dv.setUint8(i++, field.data.charCodeAt(l), true);
 				}

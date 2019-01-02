@@ -48,7 +48,7 @@ var MuleLogger = {
 				i -= 1;
 			} else {
 				if (desc[i].match(/^(y|ÿ)c/)) {
-					stringColor = desc[i].substring(0, 4);
+					stringColor = desc[i].substring(0, "ÿ".length + 2);
 				} else {
 					desc[i] = stringColor + desc[i];
 				}
