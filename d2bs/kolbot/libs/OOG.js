@@ -888,7 +888,8 @@ MainLoop:
 	},
 
 	findCharacter: function (info) {
-		var control, text, tick;
+		var control, text, tick,
+			count = 0;
 
 		tick = getTickCount();
 
@@ -900,18 +901,49 @@ MainLoop:
 			delay(25);
 		}
 
-		if (getLocation() === 12) {
+		// start from beginning of the char list
+		sendKey(0x24);
+
+		while (getLocation() === 12 && count < 24) {
 			control = getControl(4, 37, 178, 200, 92);
 
 			if (control) {
 				do {
 					text = control.getText();
 
-					if (text instanceof Array && typeof text[1] === "string" && text[1] === info.charName) {
-						return true;
+					if (text instanceof Array && typeof text[1] === "string") {
+						count++;
+
+						if (text[1] === info.charName) {
+							return true;
+						}
+
+						if (count >= 24) {
+							break;
+						}
 					}
 				} while (control.getNext());
 			}
+
+			if (count === 8 || count === 16) { // check for additional characters up to 24
+				control = getControl(4, 237, 457, 72, 93);
+
+				if (control) {
+					me.blockMouse = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+
+					continue;
+				}
+			}
+
+			delay(100);
 		}
 
 		return false;
@@ -920,9 +952,13 @@ MainLoop:
 	// get all characters
 	getCharacters: function () {
 		var control, text,
+			count = 0,
 			list = [];
 
-		if (getLocation() === 12) {
+		// start from beginning of the char list
+		sendKey(0x24);
+
+		while (getLocation() === 12 && count < 24) {
 			control = getControl(4, 37, 178, 200, 92);
 
 			if (control) {
@@ -930,11 +966,40 @@ MainLoop:
 					text = control.getText();
 
 					if (text instanceof Array && typeof text[1] === "string") {
-						list.push(text[1]);
+						count++;
+
+						if (list.indexOf(text[1]) === -1) {
+							list.push(text[1]);
+						}
+
+						if (count >= 24) {
+							break;
+						}
 					}
 				} while (control.getNext());
 			}
+
+			if (count === 8 || count === 16) { // check for additional characters up to 24
+				control = getControl(4, 237, 457, 72, 93);
+
+				if (control) {
+					me.blockMouse = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+
+					continue;
+				}
+			}
 		}
+
+		// back to beginning of the char list
+		sendKey(0x24);
 
 		return list;
 	},
@@ -964,7 +1029,8 @@ MainLoop:
 	loginCharacter: function (info) {
 		me.blockMouse = true;
 
-		var control, text;
+		var control, text,
+			count = 0;
 
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
@@ -975,13 +1041,31 @@ MainLoop:
 					do {
 						text = control.getText();
 
-						if (text instanceof Array && typeof text[1] === "string" && text[1].toLowerCase() === info.charName.toLowerCase()) {
-							control.click();
-							this.click(6, 627, 572, 128, 35);
+						if (text instanceof Array && typeof text[1] === "string") {
+							count++;
 
-							break;
+							if (text[1].toLowerCase() === info.charName.toLowerCase()) {
+								control.click();
+								this.click(6, 627, 572, 128, 35);
+
+								break;
+							}
 						}
 					} while (control.getNext());
+				}
+
+				if (count === 8 || count === 16) { // check for additional characters up to 24
+					control = getControl(4, 237, 457, 72, 93);
+
+					if (control) {
+						control.click();
+						sendKey(0x28);
+						sendKey(0x28);
+						sendKey(0x28);
+						sendKey(0x28);
+
+						continue;
+					}
 				}
 
 				break;
