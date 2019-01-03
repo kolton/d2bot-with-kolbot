@@ -914,15 +914,11 @@ MainLoop:
 					if (text instanceof Array && typeof text[1] === "string") {
 						count++;
 
-						if (text[1] === info.charName) {
+						if (text[1].toLowerCase() === info.charName.toLowerCase()) {
 							return true;
 						}
-
-						if (count >= 24) {
-							break;
-						}
 					}
-				} while (control.getNext());
+				} while (count < 24 && control.getNext());
 			}
 
 			if (count === 8 || count === 16) { // check for additional characters up to 24
@@ -938,12 +934,8 @@ MainLoop:
 					sendKey(0x28);
 
 					me.blockMouse = false;
-
-					continue;
 				}
 			}
-
-			delay(100);
 		}
 
 		return false;
@@ -971,12 +963,8 @@ MainLoop:
 						if (list.indexOf(text[1]) === -1) {
 							list.push(text[1]);
 						}
-
-						if (count >= 24) {
-							break;
-						}
 					}
-				} while (control.getNext());
+				} while (count < 24 && control.getNext());
 			}
 
 			if (count === 8 || count === 16) { // check for additional characters up to 24
@@ -992,8 +980,6 @@ MainLoop:
 					sendKey(0x28);
 
 					me.blockMouse = false;
-
-					continue;
 				}
 			}
 		}
@@ -1032,6 +1018,7 @@ MainLoop:
 		var control, text,
 			count = 0;
 
+MainLoop:
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
 			case 12: // character select
@@ -1048,7 +1035,7 @@ MainLoop:
 								control.click();
 								this.click(6, 627, 572, 128, 35);
 
-								break;
+								break MainLoop;
 							}
 						}
 					} while (control.getNext());
@@ -1063,8 +1050,6 @@ MainLoop:
 						sendKey(0x28);
 						sendKey(0x28);
 						sendKey(0x28);
-
-						continue;
 					}
 				}
 
