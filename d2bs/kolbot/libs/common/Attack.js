@@ -755,7 +755,6 @@ var Attack = {
 		rooms = [];
 
 		currentArea = getArea().id;
-		stuckCounter = 0;
 
 		do {
 			rooms.push([room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2]);
