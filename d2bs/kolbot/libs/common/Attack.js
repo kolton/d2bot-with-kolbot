@@ -736,7 +736,7 @@ var Attack = {
 			say("clearlevel " + getArea().name);
 		}
 
-		var room, result, rooms, myRoom, currentArea, stuckCounter, previous;
+		var room, result, rooms, myRoom, currentArea, previous;
 
 		function RoomSort(a, b) {
 			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
@@ -764,10 +764,7 @@ var Attack = {
 		while (rooms.length > 0) {
 			// Make sure bot does not get stuck in different area.
 			if (currentArea != getArea().id) {
-				if (stuckCounter > 5)
-					return true;
 				Pather.moveTo(previous[0], previous[1], 3, spectype);
-				++stuckCounter;
 			}
 			// get the first room + initialize myRoom var
 			if (!myRoom) {
