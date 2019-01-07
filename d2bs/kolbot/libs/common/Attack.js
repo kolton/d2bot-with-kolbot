@@ -761,10 +761,6 @@ var Attack = {
 		} while (room.getNext());
 
 		while (rooms.length > 0) {
-			// Make sure bot does not get stuck in different area.
-			if (currentArea != getArea().id) {
-				Pather.moveTo(previous[0], previous[1], 3, spectype);
-			}
 			// get the first room + initialize myRoom var
 			if (!myRoom) {
 				room = getRoom(me.x, me.y);
@@ -782,16 +778,19 @@ var Attack = {
 			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
-			
-			previous = result;
 
 			if (result) {
 				Pather.moveTo(result[0], result[1], 3, spectype);
+				previous = result;
 				//this.countUniques();
 
 				if (!this.clear(40, spectype)) {
 					break;
 				}
+			}
+			// Make sure bot does not get stuck in different area.
+			else if (currentArea !== getArea().id) {
+				Pather.moveTo(previous[0], previous[1], 3, spectype);
 			}
 		}
 
