@@ -51,6 +51,10 @@ var ExcludeFilter = [
 	[""]
 ];
 
+// If game elapsed time is more than this value, bot won't join.
+// Set to -1 to not check elapsed time.
+var maxElapsedTime = 90;
+
 // ###############################################################################
 
 function includeCheck(game) {
@@ -473,13 +477,22 @@ MainSwitch:
 				return b.players - a.players;
 			});
 
-			for (i = 0; i < gameList.length; i += 1) {
+			for (i = 0; i < gameList.length && !gameToJoin; i += 1) {
 				if (doneGames.indexOf(gameList[i].gameName) === -1 && includeCheck(gameList[i].gameName) && excludeCheck(gameList[i].gameName)) {
-					print("ÿc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
-
-					gameToJoin = gameList[i].gameName;
-
-					break;
+					if (maxElapsedTime > 0) {
+						var elapsedTime = ControlAction.getGameElapsedTime(gameList[i].gameName);
+						if (elapsedTime > -1 && elapsedTime < maxElapsedTime) {
+							print("ÿc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players + ", Elapsed Time: " + elapsedTime + "sec");
+							gameToJoin = gameList[i].gameName;
+						}
+						else {
+							delay(rand(200,1000));
+						}
+					}
+					else {
+						print("ÿc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
+						gameToJoin = gameList[i].gameName;
+					}
 				}
 			}
 
