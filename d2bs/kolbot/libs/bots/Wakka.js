@@ -27,7 +27,7 @@ function Wakka() {
 					solofail += 1;
 				}
 
-				if (suspect.area === destination) { // first player in our party found in destination area...
+				if (suspect.area === destination && !getPlayerFlag(me.gid, suspect.gid, 8)) { // first player not hostile found in destination area...
 					leader = suspect.name; // ... is our leader
 
 					if (suspect.area === 131) {
