@@ -2179,7 +2179,6 @@ var Packet = {
 			sendPacket(1, 0x30, 4, 1, 4, unit.gid);
 			delay(me.ping * 2);
 			this.flash(me.gid);
-			delay(500 + me.ping);
 		}
 
 		return false;
@@ -2430,8 +2429,12 @@ CursorLoop:
 		return false;
 	},
 
-	flash: function (gid) {
+	flash: function (gid, wait = 300 + 2 * me.ping) {
 		sendPacket(1, 0x4b, 4, 0, 4, gid);
+
+		if (wait > 0) {
+			delay(wait);
+		}	
 	},
 
 	changeStat: function (stat, value) {
