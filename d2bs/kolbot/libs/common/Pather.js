@@ -274,6 +274,9 @@ var Pather = {
 					print("move retry " + fail);
 
 					if (fail > 0 && fail >= retry) {
+						Packet.flash(me.gid);
+						delay(500);
+
 						break;
 					}
 				}
@@ -957,6 +960,7 @@ ModeLoop:
 						delay(200 + me.ping);
 
 						Packet.flash(me.gid);
+						delay(500);
 
 						continue;
 					}

@@ -131,6 +131,8 @@ Unit.prototype.openMenu = function (addDelay) {
 		delay(me.ping * 2);
 		sendPacket(1, 0x30, 4, 1, 4, this.gid);
 		delay(me.ping * 2);
+		Packet.flash(me.gid);
+		delay(500 + me.ping);
 	}
 
 	return false;
