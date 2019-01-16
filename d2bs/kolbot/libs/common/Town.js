@@ -1600,33 +1600,28 @@ MainLoop:
 			me.cancel();
 
 			if (this.move("stash")) {
-				break;
-			}
+				stash = getUnit(2, 267);
 
-			delay(100 + me.ping * 2);
-		}
+				if (stash) {
+					Misc.click(0, 0, stash);
+					//stash.interact();
 
-		for (i = 0; i < 5; i += 1) {
-			stash = getUnit(2, 267);
+					tick = getTickCount();
 
-			if (stash) {
-				Misc.click(0, 0, stash);
-				//stash.interact();
+					while (getTickCount() - tick < 5000) {
+						if (getUIFlag(0x19)) {
+							delay(100 + me.ping * 2); // allow UI to initialize
 
-				tick = getTickCount();
+							return true;
+						}
 
-				while (getTickCount() - tick < 5000) {
-					if (getUIFlag(0x19)) {
-						delay(100 + me.ping * 2); // allow UI to initialize
-
-						return true;
+						delay(100);
 					}
-
-					delay(100);
 				}
 			}
 
-			delay(100);
+			Packet.flash(me.gid);
+			delay(500 + me.ping);
 		}
 
 		return false;
@@ -2080,6 +2075,7 @@ MainLoop:
 			}
 
 			Packet.flash(me.gid);
+			delay(500);
 		}
 
 		return false;

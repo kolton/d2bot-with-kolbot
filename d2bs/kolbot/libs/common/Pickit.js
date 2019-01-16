@@ -222,6 +222,7 @@ var Pickit = {
 		}
 
 		var i, item, tick, gid, stats,
+			cancelFlags = [0x01, 0x08, 0x14, 0x0c, 0x19, 0x1a],
 			itemCount = me.itemcount;
 
 		if (unit.gid) {
@@ -231,6 +232,15 @@ var Pickit = {
 
 		if (!item) {
 			return false;
+		}
+
+		for (i = 0; i < cancelFlags.length; i += 1) {
+			if (getUIFlag(cancelFlags[i])) {
+				delay(500);
+				me.cancel(0);
+
+				break;
+			}
 		}
 
 		stats = new ItemStats(item);
