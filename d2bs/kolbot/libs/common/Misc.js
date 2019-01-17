@@ -1189,14 +1189,20 @@ var Misc = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|ÿ)c/)) {
-					stringColor = desc[i].substring(0, 4);
-				} else {
+				// Add color info
+				if (!desc[i].match(/^(y|ÿ)c/)) {
 					desc[i] = stringColor + desc[i];
+				}
+
+				// Find and store new color info
+				index = desc[i].lastIndexOf("ÿc");
+
+				if (index > -1) {
+					stringColor = desc[i].substring(index, index + "ÿ".length + 2);
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2");
+			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<:;.*])/g, "\\xffc$2");
 		}
 
 		if (desc[desc.length - 1]) {
@@ -1295,7 +1301,7 @@ var Misc = {
 				return false;
 			}
 
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<:;.*]/gi, "").trim();
 
 			break;
 		case "Kept":
@@ -1305,7 +1311,7 @@ var Misc = {
 		case "Shopped":
 		case "Gambled":
 		case "Dropped":
-			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
+			desc = this.getItemDesc(unit).split("\n").join(" | ").replace(/(\\xff|ÿ)c[0-9!"+<:;.*]|\/|\\/gi, "").trim();
 
 			break;
 		case "No room for":
@@ -1313,7 +1319,7 @@ var Misc = {
 
 			break;
 		default:
-			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<;.*]|\/|\\/gi, "").trim();
+			desc = unit.fname.split("\n").reverse().join(" ").replace(/(\\xff|ÿ)c[0-9!"+<:;.*]|\/|\\/gi, "").trim();
 
 			break;
 		}
@@ -1329,7 +1335,7 @@ var Misc = {
 
 		var i, lastArea, code, desc, sock, itemObj,
 			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|\/|\\/, "").trim();
+			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<:;.*]|\/|\\/g, "").trim();
 
 		desc = this.getItemDesc(unit);
 		color = unit.getColor();
@@ -1824,13 +1830,13 @@ MainLoop:
 
 		if (typeof error === "string") {
 			msg = error;
-			oogmsg = error.replace(/ÿc[0-9!"+<;.*]/gi, "");
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+			oogmsg = error.replace(/ÿc[0-9!"+<:;.*]/gi, "");
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
 		} else {
 			source = error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length);
 			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
 			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<;.*]/gi, "") + "\n";
+			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
 
 			if (error.hasOwnProperty("stack")) {
 				stack = error.stack;
@@ -2172,6 +2178,7 @@ var Packet = {
 			delay(me.ping * 2);
 			sendPacket(1, 0x30, 4, 1, 4, unit.gid);
 			delay(me.ping * 2);
+			this.flash(me.gid);
 		}
 
 		return false;
@@ -2422,8 +2429,12 @@ CursorLoop:
 		return false;
 	},
 
-	flash: function (gid) {
+	flash: function (gid, wait = 300 + 2 * me.ping) {
 		sendPacket(1, 0x4b, 4, 0, 4, gid);
+
+		if (wait > 0) {
+			delay(wait);
+		}	
 	},
 
 	changeStat: function (stat, value) {
