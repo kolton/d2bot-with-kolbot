@@ -1621,7 +1621,6 @@ MainLoop:
 			}
 
 			Packet.flash(me.gid);
-			delay(500 + me.ping);
 		}
 
 		return false;
@@ -2075,7 +2074,6 @@ MainLoop:
 			}
 
 			Packet.flash(me.gid);
-			delay(500);
 		}
 
 		return false;
