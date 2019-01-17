@@ -47,14 +47,20 @@ var MuleLogger = {
 
 				i -= 1;
 			} else {
-				if (desc[i].match(/^(y|ÿ)c/)) {
-					stringColor = desc[i].substring(0, 4);
-				} else {
+				// Add color info
+				if (!desc[i].match(/^(y|ÿ)c/)) {
 					desc[i] = stringColor + desc[i];
+				}
+
+				// Find and store new color info
+				index = desc[i].lastIndexOf("ÿc");
+
+				if (index > -1) {
+					stringColor = desc[i].substring(index, index + "ÿ".length + 2);
 				}
 			}
 
-			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<;.*])/g, "\\xffc$2").replace("ÿ", "\\xff", "g");
+			desc[i] = desc[i].replace(/(y|ÿ)c([0-9!"+<:;.*])/g, "\\xffc$2").replace("ÿ", "\\xff", "g");
 		}
 
 		if (logIlvl && desc[desc.length - 1]) {
@@ -122,7 +128,7 @@ var MuleLogger = {
 		var i, code, desc, sock,
 			header = "",
 			color = -1,
-			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<;.*]|\/|\\/, "").trim();
+			name = unit.itemType + "_" + unit.fname.split("\n").reverse().join(" ").replace(/(y|ÿ)c[0-9!"+<:;.*]|\/|\\/g, "").trim();
 
 		desc = this.getItemDesc(unit, logIlvl) + "$" + unit.gid + ":" + unit.classid + ":" + unit.location + ":" + unit.x + ":" + unit.y + (unit.getFlag(0x400000) ? ":eth" : "");
 		color = unit.getColor();

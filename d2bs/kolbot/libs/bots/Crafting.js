@@ -257,7 +257,7 @@ function runewordIngredient(item) {
 	baseGids = [];
 
 	for (i = 0; i < Config.Runewords.length; i += 1) {
-		base = Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1]) || Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1], true);
+		base = Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0)) || Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0), true);
 
 		if (base) {
 			baseGids.push(base.gid);

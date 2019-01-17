@@ -62,6 +62,7 @@ include("common/misc.js");
 var i, j, gameInfo, joinInfo, gameStart, ingame, handle,
 	firstLogin, chatActionsDone, lastGameTick, connectFail,
 	gameCount = DataFile.getStats().runs + 1,
+	loginRetry = 0,
 	lastGameStatus = "ready",
 	leader = "",
 	lastGame = [];
@@ -278,16 +279,21 @@ function locationAction () {
 		return;
 	}
 
-	var i, string, text, location;
+	var i, string, control, text, location;
 
 	location = getLocation();
 
 MainSwitch:
 	switch (location) {
 	case 0:
+		ControlAction.click();
+
 		break;
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
+
+		me.blockKeys = false;
+		loginRetry = 0;
 
 		if (!firstLogin) {
 			firstLogin = true;
@@ -490,7 +496,32 @@ JoinLoop2:
 		try {
 			login(me.profile);
 		} catch (e) {
-			print(e + " " + getLocation());
+			if (getLocation() === 12 && loginRetry < 2) {
+				if (loginRetry === 0) {
+					// start from beginning of the char list
+					sendKey(0x24);
+				}
+
+				control = getControl(4, 237, 457, 72, 93); // char on 1st column, 4th row
+
+				if (control) {
+					me.blockMouse = true;
+					me.blockKeys = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+				}
+
+				loginRetry++;
+			} else {
+				me.blockKeys = false;
+				print(e + " " + getLocation());
+			}
 		}
 
 		break;

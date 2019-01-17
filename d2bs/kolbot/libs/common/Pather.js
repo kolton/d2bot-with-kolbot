@@ -273,8 +273,12 @@ var Pather = {
 
 					print("move retry " + fail);
 
-					if (fail > 0 && fail >= retry) {
-						break;
+					if (fail > 0) {
+						Packet.flash(me.gid);
+
+						if (fail >= retry) {
+							break;
+						}
 					}
 				}
 			}
@@ -1066,7 +1070,6 @@ MainLoop:
 			}
 
 			Packet.flash(me.gid);
-			delay(200 + me.ping);
 		}
 
 		return false;
