@@ -738,7 +738,7 @@ var Attack = {
 			say("clearlevel " + getArea().name);
 		}
 
-		var room, result, rooms, myRoom;
+		var room, result, rooms, myRoom, currentArea, previousArea;
 
 		function RoomSort(a, b) {
 			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
@@ -755,6 +755,8 @@ var Attack = {
 		}
 
 		rooms = [];
+
+		currentArea = getArea().id;
 
 		do {
 			rooms.push([room.x * 5 + room.xsize / 2, room.y * 5 + room.ysize / 2]);
@@ -775,17 +777,22 @@ var Attack = {
 			}
 
 			rooms.sort(RoomSort);
-			room = rooms.shift();
+			room = rooms.shift(); 
 
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
 			if (result) {
 				Pather.moveTo(result[0], result[1], 3, spectype);
+				previousArea = result;
 				//this.countUniques();
 
 				if (!this.clear(40, spectype)) {
 					break;
 				}
+			}
+			// Make sure bot does not get stuck in different area.
+			else if (currentArea !== getArea().id) {
+				Pather.moveTo(previousArea[0], previousArea[1], 3, spectype);
 			}
 		}
 
