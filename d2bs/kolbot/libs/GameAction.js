@@ -112,7 +112,7 @@ var GameAction = {
 	},
 
 	getItemDesc: function (unit, logIlvl) {
-		var i, desc,
+		var i, desc, index,
 			stringColor = "";
 
 		if (logIlvl === undefined) {
