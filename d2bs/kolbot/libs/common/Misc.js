@@ -1171,7 +1171,7 @@ var Misc = {
 	},
 
 	getItemDesc: function (unit) {
-		var i, desc,
+		var i, desc, index,
 			stringColor = "";
 
 		desc = unit.description;

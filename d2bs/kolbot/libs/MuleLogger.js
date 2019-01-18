@@ -31,7 +31,7 @@ var MuleLogger = {
 
 	// don't edit
 	getItemDesc: function (unit, logIlvl) {
-		var i, desc,
+		var i, desc, index,
 			stringColor = "";
 
 		if (logIlvl === undefined) {
