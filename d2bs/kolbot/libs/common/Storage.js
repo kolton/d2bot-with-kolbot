@@ -63,7 +63,7 @@ var Container = function (name, width, height, location) {
 		}
 
 		// Make sure the item is ours
-		if (!item.getParent() || item.getParent().gid !== me.gid) {
+		if (!item.getParent() || item.getParent().type !== me.type || item.getParent().gid !== me.gid) {
 			return false;
 		}
 
