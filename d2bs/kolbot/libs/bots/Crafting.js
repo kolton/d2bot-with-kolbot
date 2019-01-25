@@ -26,14 +26,14 @@ function Crafting() {
 	addEventListener('copydata',
 		function (mode, msg) {
 			var i, obj, rval;
-			
+
 			if (mode === 0) {
 				try {
 					obj = JSON.parse(msg);
 				} catch (e) {
 					return false;
 				}
-				
+
 				if (obj) {
 					switch (obj.name) {
 					case "GetGame":
@@ -54,7 +54,7 @@ function Crafting() {
 							for (i = 0; i < info.Sets.length; i += 1) {
 								rval.push(info.Sets[i].Enabled ? 1 : 0);
 							}
-							
+
 							print(rval);
 
 							sendCopyData(null, obj.profile, 4, JSON.stringify({name: "SetInfo", value: rval}));
@@ -257,7 +257,7 @@ function runewordIngredient(item) {
 	baseGids = [];
 
 	for (i = 0; i < Config.Runewords.length; i += 1) {
-		base = Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1]) || Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1], true);
+		base = Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0)) || Runewords.getBase(Config.Runewords[i][0], Config.Runewords[i][1], (Config.Runewords[i][2]||0), true);
 
 		if (base) {
 			baseGids.push(base.gid);

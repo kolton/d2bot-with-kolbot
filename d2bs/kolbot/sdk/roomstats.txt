@@ -22,6 +22,6 @@ From dlrgcoll:
 12	nSizeGameY
 13	nPosRoomX
 14	nPosRoomY
-15	nSizeRoomX 
+15	nSizeRoomX
 16	nSizeRoomY
 

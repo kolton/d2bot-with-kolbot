@@ -37,7 +37,7 @@ var StarterConfig = {
 	Similar rules apply to ExcludeFilter:
 
 	["somebaal", "-"] ignores games with "somebaal" and "-" in the game name
-	
+
 	["somebaal"],
 	["somediablo"]
 	this will ignore all games with "somebaal" or "somediablo" in their names
@@ -120,6 +120,7 @@ var gameInfo, gameStart, ingame, chatActionsDone, pingQuit,
 	handle, useChat, firstLogin, connectFail, lastGameTick,
 	gameCount = DataFile.getStats().runs + 1,
 	lastGameStatus = "ready",
+	loginRetry = 0,
 	loginFail = 0,
 	isUp = "no",
 	chanInfo = {
@@ -357,14 +358,19 @@ function main() {
 }
 
 function locationAction(location) {
-	var i, string, text, gameToJoin, doneGames, gameList;
+	var i, string, control, text, gameToJoin, doneGames, gameList;
 
 MainSwitch:
 	switch (location) {
 	case 0:
+		ControlAction.click();
+
 		break;
 	case 1: // Lobby
 		D2Bot.updateStatus("Lobby");
+
+		me.blockKeys = false;
+		loginRetry = 0;
 
 		if (!firstLogin) {
 			firstLogin = true;
@@ -469,7 +475,7 @@ MainSwitch:
 
 			for (i = 0; i < gameList.length; i += 1) {
 				if (doneGames.indexOf(gameList[i].gameName) === -1 && includeCheck(gameList[i].gameName) && excludeCheck(gameList[i].gameName)) {
-					print("\xFFc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
+					print("ÿc7Game: " + gameList[i].gameName + ", Players: " + gameList[i].players);
 
 					gameToJoin = gameList[i].gameName;
 
@@ -524,7 +530,32 @@ MainSwitch:
 		try {
 			login(me.profile);
 		} catch (e) {
-			print(e + " " + getLocation());
+			if (getLocation() === 12 && loginRetry < 2) {
+				if (loginRetry === 0) {
+					// start from beginning of the char list
+					sendKey(0x24);
+				}
+
+				control = getControl(4, 237, 457, 72, 93); // char on 1st column, 4th row
+
+				if (control) {
+					me.blockMouse = true;
+					me.blockKeys = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+				}
+
+				loginRetry++;
+			} else {
+				me.blockKeys = false;
+				print(e + " " + getLocation());
+			}
 		}
 
 		break;

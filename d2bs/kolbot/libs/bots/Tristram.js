@@ -30,13 +30,15 @@ function Tristram() {
 		}
 
 		// print("We need Key to the Cairn Stones");
-		Town.move("akara");
+		Town.move(NPC.Akara);
 
-		akara = getUnit(1, "akara");
+		akara = getUnit(1, NPC.Akara);
 
 		akara.openMenu();
 		me.cancel();
 	}
+
+	Pather._teleport = Pather.teleport;
 
 	Town.doChores();
 	Pather.useWaypoint(4);
@@ -70,6 +72,7 @@ function Tristram() {
 	if (Config.Tristram.PortalLeech) {
 		Pather.makePortal();
 		delay(1000);
+		Pather.teleport = !Config.Tristram.WalkClear && Pather._teleport;
 	}
 
 	gibbet = getUnit(2, 26);
@@ -87,6 +90,8 @@ function Tristram() {
 	} else {
 		Attack.clearLevel(Config.ClearType);
 	}
+
+	Pather.teleport = Pather._teleport;
 
 	return true;
 }

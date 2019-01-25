@@ -62,6 +62,7 @@ include("common/misc.js");
 var i, j, gameInfo, joinInfo, gameStart, ingame, handle,
 	firstLogin, chatActionsDone, lastGameTick, connectFail,
 	gameCount = DataFile.getStats().runs + 1,
+	loginRetry = 0,
 	lastGameStatus = "ready",
 	leader = "",
 	lastGame = [];
@@ -70,7 +71,7 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-function locationTimeout(time, location) {
+function locationTimeout (time, location) {
 	var endtime = getTickCount() + time;
 
 	while (!me.ingame && getLocation() === location && endtime > getTickCount()) {
@@ -80,7 +81,7 @@ function locationTimeout(time, location) {
 	return (getLocation() !== location);
 }
 
-function updateCount() {
+function updateCount () {
 	D2Bot.updateCount();
 	delay(1000);
 	ControlAction.click(6, 264, 366, 272, 35);
@@ -95,7 +96,7 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
-function ScriptMsgEvent(msg) {
+function ScriptMsgEvent (msg) {
 	switch (msg) {
 	case "mule":
 		AutoMule.check = true;
@@ -126,7 +127,7 @@ function ScriptMsgEvent(msg) {
 	}
 }
 
-function ReceiveCopyData(mode, msg) {
+function ReceiveCopyData (mode, msg) {
 	var obj;
 
 	switch (msg) {
@@ -172,7 +173,7 @@ function ReceiveCopyData(mode, msg) {
 	}
 }
 
-function timer(tick) {
+function timer (tick) {
 	if (!tick) {
 		return "";
 	}
@@ -194,7 +195,7 @@ function timer(tick) {
 	return " (" + min + ":" + sec + ")";
 }
 
-function main() {
+function main () {
 	debugLog(me.profile);
 	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
@@ -237,7 +238,7 @@ function main() {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				if (!ingame) {
-					print("\xFFc4Updating Status");
+					print("ÿc4Updating Status");
 					//D2Bot.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
@@ -258,7 +259,7 @@ function main() {
 	}
 }
 
-function joinCheck(leader) {
+function joinCheck (leader) {
 	D2Bot.requestGame(leader);
 	delay(500);
 
@@ -273,21 +274,26 @@ function joinCheck(leader) {
 	return false;
 }
 
-function locationAction() {
+function locationAction () {
 	if (me.ingame) {
 		return;
 	}
 
-	var i, string, text, location;
+	var i, string, control, text, location;
 
 	location = getLocation();
 
 MainSwitch:
 	switch (location) {
 	case 0:
+		ControlAction.click();
+
 		break;
 	case 1:	// Lobby
 		D2Bot.updateStatus("Lobby");
+
+		me.blockKeys = false;
+		loginRetry = 0;
 
 		if (!firstLogin) {
 			firstLogin = true;
@@ -490,7 +496,32 @@ JoinLoop2:
 		try {
 			login(me.profile);
 		} catch (e) {
-			print(e + " " + getLocation());
+			if (getLocation() === 12 && loginRetry < 2) {
+				if (loginRetry === 0) {
+					// start from beginning of the char list
+					sendKey(0x24);
+				}
+
+				control = getControl(4, 237, 457, 72, 93); // char on 1st column, 4th row
+
+				if (control) {
+					me.blockMouse = true;
+					me.blockKeys = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+				}
+
+				loginRetry++;
+			} else {
+				me.blockKeys = false;
+				print(e + " " + getLocation());
+			}
 		}
 
 		break;

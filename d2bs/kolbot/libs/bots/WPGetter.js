@@ -17,7 +17,7 @@ function WPGetter() {
 		} else if (Pather.wpAreas[i] >= 109) {
 			access = Pather.accessToAct(5);
 		}
-		
+
 		if (access && !getWaypoint(i) && Pather.wpAreas[i] !== 123) {
 			Pather.getWP(Pather.wpAreas[i]);
 		}

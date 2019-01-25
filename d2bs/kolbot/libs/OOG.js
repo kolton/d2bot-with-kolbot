@@ -269,8 +269,8 @@ var D2Bot = {
 			args: []
 		};
 
-		//print("\xFFc1Heart beat " + this.handle);
-		sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+		//print("ÿc1Heart beat " + this.handle);
+		sendCopyData(null, this.handle, 0xbbbb, JSON.stringify(obj));
 	},
 
 	sendWinMsg: function (wparam, lparam) {
@@ -315,7 +315,7 @@ var D2Bot = {
 			args: []
 		};
 
-        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+        sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
 	setProfile: function (account, password, character, difficulty, realm, infoTag, gamePath) {
@@ -325,7 +325,17 @@ var D2Bot = {
 			args: [account, password, character, difficulty, realm, infoTag, gamePath]
 		};
 
-        	sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+        sendCopyData(null, this.handle, 0, JSON.stringify(obj));
+	},
+
+	setTag: function (tag) {
+		var obj = {
+			profile: me.profile,
+			func: "setTag",
+			args: [JSON.stringify(tag)]
+		};
+
+        sendCopyData(null, this.handle, 0, JSON.stringify(obj));
 	},
 
 	// Store info in d2bot# cache
@@ -878,7 +888,8 @@ MainLoop:
 	},
 
 	findCharacter: function (info) {
-		var control, text, tick;
+		var control, text, tick,
+			count = 0;
 
 		tick = getTickCount();
 
@@ -890,17 +901,40 @@ MainLoop:
 			delay(25);
 		}
 
-		if (getLocation() === 12) {
+		// start from beginning of the char list
+		sendKey(0x24);
+
+		while (getLocation() === 12 && count < 24) {
 			control = getControl(4, 37, 178, 200, 92);
 
 			if (control) {
 				do {
 					text = control.getText();
 
-					if (text instanceof Array && typeof text[1] === "string" && text[1] === info.charName) {
-						return true;
+					if (text instanceof Array && typeof text[1] === "string") {
+						count++;
+
+						if (text[1].toLowerCase() === info.charName.toLowerCase()) {
+							return true;
+						}
 					}
-				} while (control.getNext());
+				} while (count < 24 && control.getNext());
+			}
+
+			if (count === 8 || count === 16) { // check for additional characters up to 24
+				control = getControl(4, 237, 457, 72, 93);
+
+				if (control) {
+					me.blockMouse = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+				}
 			}
 		}
 
@@ -910,9 +944,13 @@ MainLoop:
 	// get all characters
 	getCharacters: function () {
 		var control, text,
+			count = 0,
 			list = [];
 
-		if (getLocation() === 12) {
+		// start from beginning of the char list
+		sendKey(0x24);
+
+		while (getLocation() === 12 && count < 24) {
 			control = getControl(4, 37, 178, 200, 92);
 
 			if (control) {
@@ -920,11 +958,34 @@ MainLoop:
 					text = control.getText();
 
 					if (text instanceof Array && typeof text[1] === "string") {
-						list.push(text[1]);
+						count++;
+
+						if (list.indexOf(text[1]) === -1) {
+							list.push(text[1]);
+						}
 					}
-				} while (control.getNext());
+				} while (count < 24 && control.getNext());
+			}
+
+			if (count === 8 || count === 16) { // check for additional characters up to 24
+				control = getControl(4, 237, 457, 72, 93);
+
+				if (control) {
+					me.blockMouse = true;
+
+					control.click();
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+					sendKey(0x28);
+
+					me.blockMouse = false;
+				}
 			}
 		}
+
+		// back to beginning of the char list
+		sendKey(0x24);
 
 		return list;
 	},
@@ -954,8 +1015,10 @@ MainLoop:
 	loginCharacter: function (info) {
 		me.blockMouse = true;
 
-		var control, text;
+		var control, text,
+			count = 0;
 
+MainLoop:
 		while (getLocation() !== 1) { // cycle until in lobby
 			switch (getLocation()) {
 			case 12: // character select
@@ -965,13 +1028,29 @@ MainLoop:
 					do {
 						text = control.getText();
 
-						if (text instanceof Array && typeof text[1] === "string" && text[1].toLowerCase() === info.charName.toLowerCase()) {
-							control.click();
-							this.click(6, 627, 572, 128, 35);
+						if (text instanceof Array && typeof text[1] === "string") {
+							count++;
 
-							break;
+							if (text[1].toLowerCase() === info.charName.toLowerCase()) {
+								control.click();
+								this.click(6, 627, 572, 128, 35);
+
+								break MainLoop;
+							}
 						}
 					} while (control.getNext());
+				}
+
+				if (count === 8 || count === 16) { // check for additional characters up to 24
+					control = getControl(4, 237, 457, 72, 93);
+
+					if (control) {
+						control.click();
+						sendKey(0x28);
+						sendKey(0x28);
+						sendKey(0x28);
+						sendKey(0x28);
+					}
 				}
 
 				break;

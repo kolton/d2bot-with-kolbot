@@ -122,7 +122,7 @@ function Enchant() {
 
 			if (leg) {
 				do {
-					if (leg.name.indexOf("ÿc1") > -1) {
+					if (leg.name.indexOf("Ã¿c1") > -1) {
 						wrongLeg = true;
 					} else if (getDistance(me, leg) <= 15) {
 						gid = leg.gid;
@@ -203,7 +203,7 @@ function Enchant() {
 			} while (tome.getNext());
 		}
 
-		Town.move("akara");
+		Town.move(NPC.Akara);
 
 		akara = getUnit(1, NPC.Akara);
 

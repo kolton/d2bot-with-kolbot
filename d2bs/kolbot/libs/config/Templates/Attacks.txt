@@ -67,7 +67,7 @@
 	Config.AttackSkill[6] = 48; // Secondary untimed skill if monster is immune to primary untimed.
 
 *** Tri-element - frozen orb with nova, fire wall on cold immune, glacial spike on lightning immune
-	
+
 	Config.AttackSkill[0] = -1; // Preattack skill. Not implemented yet.
 	Config.AttackSkill[1] = 64; // Primary skill to bosses.
 	Config.AttackSkill[2] = 48; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[1] is untimed skill.
@@ -89,17 +89,17 @@
 	Config.AttackSkill[4] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[3] is untimed skill.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
-	
+
 	{skipped code}
-	
+
 	// Class specific config
 	Config.Curse[0] = 91; // Boss curse. Use skill number or set to 0 to disable.
 	Config.Curse[1] = 91; // Other monsters curse. Use skill number or set to 0 to disable.
 
 	Config.ExplodeCorpses = 74; // Explode corpses. Use skill number or 0 to disable. 74 = Corpse Explosion, 83 = Poison Explosion
-	
+
 	{skipped code}
-	
+
 	Config.PoisonNovaDelay = 2000; // Delay between two Poison Novas
 
 *** Summoner with corpse explosion, amplify damage on non-bosses and decrepify on bosses
@@ -111,9 +111,9 @@
 	Config.AttackSkill[4] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[3] is untimed skill.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
-	
+
 	{skipped code}
-	
+
 	// Class specific config
 	Config.Curse[0] = 87; // Boss curse. Use skill number or set to 0 to disable.
 	Config.Curse[1] = 66; // Other monsters curse. Use skill number or set to 0 to disable.
@@ -129,9 +129,9 @@
 	Config.AttackSkill[4] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[3] is untimed skill.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
-	
+
 	{skipped code}
-	
+
 	// Class specific config
 	Config.Curse[0] = 87; // Boss curse. Use skill number or set to 0 to disable.
 	Config.Curse[1] = 87; // Other monsters curse. Use skill number or set to 0 to disable.
@@ -177,7 +177,7 @@
 	Config.AttackSkill[4] = -1; // Primary untimed skill to bosses. Keep at -1 if Config.AttackSkill[3] is untimed skill.
 	Config.AttackSkill[5] = -1; // Secondary skill if monster is immune to primary.
 	Config.AttackSkill[6] = -1; // Secondary untimed skill if monster is immune to primary untimed.
-	
+
 ##################
 #### ASSASSIN ####
 ##################

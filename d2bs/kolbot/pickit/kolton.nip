@@ -125,7 +125,7 @@
 
 //          ==white==
 ([name] == demonhead || [name] == bonevisage || [name] == diadem) && [quality] <= superior && [flag] != ethereal # [enhanceddefense] == 15 && ([itemmaxdurabilitypercent] == 0 || [itemmaxdurabilitypercent] == 15) && [sockets] == 3
-//([name] == demonhead || [name] == bonevisage) && [quality] == normal && [flag] == ethereal # [sockets] == 0 
+//([name] == demonhead || [name] == bonevisage) && [quality] == normal && [flag] == ethereal # [sockets] == 0
 
 //          ==unique==
 //[name] == sallet && [quality] == unique && [flag] == ethereal # [enhanceddefense] >= 210 // rockstopper
@@ -634,6 +634,9 @@
 //[name] == korune # # [MaxQuantity] == 1
 //[name] == falrune
 //[name] == lemrune # # [MaxQuantity] == 1
+//[name] == pulrune # # [MaxQuantity] == 1
+//[name] == umrune # # [MaxQuantity] == 1
+//[name] == malrune # # [MaxQuantity] == 1
 
 [name] >= istrune && [name] <= zodrune
 
@@ -737,28 +740,28 @@
 
 // crafted
 
-// Helms 
+// Helms
 [type] == helm && [quality] == crafted # [itemtohitpercentperlevel] >= 1 && ([enhanceddefense] >= 150 || [sockets] == 2)
 
 // Armor
 
-// Shields 
+// Shields
 
-//  Gloves 
+//  Gloves
 [type] == gloves && [quality] == crafted # [ias] >= 20 && [strength]+[dexterity] >= 15
 
-// Boots 
+// Boots
 [type] == boots && [quality] == crafted # [itemmaxmanapercent] >= 4 && [maxmana] >= 40
 
-// Belts 
+// Belts
 [type] == belt && [class] >= exceptional && [quality] == crafted # [maxhp] >= 50 && [strength] >= 15
 [type] == belt && [class] >= exceptional && [quality] == crafted # [fhr] == 24 && [fcr] == 10
 
-//  Rings 
+//  Rings
 [type] == ring && [quality] == crafted # [strength]+[dexterity] >= 25 && [maxhp] >= 30
 [type] == ring && [quality] == crafted # [fcr] == 10 && ([maxhp] >= 40 || [maxhp]+[maxmana] >= 80 || [strength]+[dexterity] >= 25)
- 
-// Amulets 
+
+// Amulets
 
 [type] == amulet && [quality] == crafted # [assassinskills] == 2 && [fcr] >= 15
 [type] == amulet && [quality] == crafted # [druidskills] == 2 && [fcr] >= 18
