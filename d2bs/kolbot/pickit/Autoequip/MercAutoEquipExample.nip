@@ -1,0 +1,11 @@
+//MERC weapon
+[Type] == Polearm && [Flag] == Ethereal && [Flag] == Runeword # [MeditationAura] >= 12 # [MercTier] == 93
+[Type] == Polearm && [Flag] == Ethereal && [Flag] == Runeword # [MeditationAura] >= 15 # [MercTier] == 94
+[Type] == Polearm && [Flag] == Ethereal && [Flag] == Runeword # [MeditationAura] == 17 # [MercTier] == 95
+[Type] == Helm && ([Quality] == Unique||[Quality] == Set) # [LifeLeech] >= 5 && ([IAS] >= 10 || [MaxHP] >= 50 || [NormalDamageReduction] >= 15) # [MercTier] == 95
+[Type] == Polearm && [Flag] == Ethereal && [Flag] == Runeword && [Class] == Elite # [MeditationAura] == 17 || [ConvictionAura] >= 10 # [MercTier] == 99
+//Merc armor & helm
+([Name] == Cuirass || [Name] == MeshArmor) && [Quality] == Unique # # [MercTier] == 95
+[Type] == Armor && [Flag] == Ethereal && [Flag] == Runeword && [Class] == Elite # [EnhancedDamage] == 300 # [MercTier] == 99
+[Type] == Helm && ([Quality] == Unique||[Quality] == Set) # [LifeLeech] >= 5 && ([IAS] >= 10 || [MaxHP] >= 50 || [NormalDamageReduction] >= 15) # [MercTier] == 95
+[Name] == DemonHead && [Flag] == Ethereal && [Quality] == Unique # # [MercTier] == 99
