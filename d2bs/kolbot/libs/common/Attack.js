@@ -140,6 +140,7 @@ var Attack = {
 		}
 
 		var i, target, gid,
+			retry = 0,
 			errorInfo = "",
 			attackCount = 0;
 
@@ -188,9 +189,15 @@ var Attack = {
 			}
 
 			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
-				errorInfo = " (doAttack failed)";
+				if (retry++ > 3) {
+					errorInfo = " (doAttack failed)";
 
-				break;
+					break;
+				}
+
+				Packet.flash(me.gid);
+			} else {
+				retry = 0;
 			}
 
 			attackCount += 1;
@@ -219,6 +226,7 @@ var Attack = {
 
 	hurt: function (classId, percent) {
 		var i, target,
+			retry = 0,
 			attackCount = 0;
 
 		for (i = 0; i < 5; i += 1) {
@@ -233,7 +241,13 @@ var Attack = {
 
 		while (attackCount < 300 && Attack.checkMonster(target) && Attack.skipCheck(target)) {
 			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
-				break;
+				if (retry++ > 3) {
+					break;
+				}
+
+				Packet.flash(me.gid);
+			} else {
+				retry = 0;
 			}
 
 			if (!copyUnit(target).x) {
@@ -317,6 +331,7 @@ var Attack = {
 		}
 
 		var i, boss, orgx, orgy, target, result, monsterList, start, coord,
+			retry = 0,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -389,6 +404,8 @@ var Attack = {
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				if (result) {
+					retry = 0;
+
 					for (i = 0; i < gidAttack.length; i += 1) {
 						if (gidAttack[i].gid === target.gid) {
 							break;
@@ -434,7 +451,12 @@ var Attack = {
 						Pickit.fastPick();
 					}
 				} else {
-					monsterList.shift();
+					if (retry++ > 3) {
+						monsterList.shift();
+						retry = 0;
+					}
+
+					Packet.flash(me.gid);
 				}
 			} else {
 				monsterList.shift();
@@ -502,6 +524,7 @@ var Attack = {
 	// Clear an already formed array of monstas
 	clearList: function (mainArg, sortFunc, refresh) {
 		var i, target, result, monsterList, coord,
+			retry = 0,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -548,6 +571,8 @@ var Attack = {
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				if (result) {
+					retry = 0;
+
 					for (i = 0; i < gidAttack.length; i += 1) {
 						if (gidAttack[i].gid === target.gid) {
 							break;
@@ -591,7 +616,12 @@ var Attack = {
 						Pickit.fastPick();
 					}
 				} else {
-					monsterList.shift();
+					if (retry++ > 3) {
+						monsterList.shift();
+						retry = 0;
+					}
+
+					Packet.flash(me.gid);
 				}
 			} else {
 				monsterList.shift();
@@ -777,7 +807,7 @@ var Attack = {
 			}
 
 			rooms.sort(RoomSort);
-			room = rooms.shift(); 
+			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
