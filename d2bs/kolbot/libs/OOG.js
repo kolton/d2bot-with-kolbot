@@ -935,6 +935,8 @@ MainLoop:
 
 					me.blockMouse = false;
 				}
+			} else { // no further check necessary
+				break;
 			}
 		}
 
@@ -981,6 +983,8 @@ MainLoop:
 
 					me.blockMouse = false;
 				}
+			} else { // no further check necessary
+				break;
 			}
 		}
 
@@ -1012,11 +1016,15 @@ MainLoop:
 		return position;
 	},
 
-	loginCharacter: function (info) {
+	loginCharacter: function (info, startFromTop = true) {
 		me.blockMouse = true;
 
 		var control, text,
 			count = 0;
+
+		if (startFromTop) { // start from beginning of the char list
+			sendKey(0x24);
+		}
 
 MainLoop:
 		while (getLocation() !== 1) { // cycle until in lobby
@@ -1034,8 +1042,9 @@ MainLoop:
 							if (text[1].toLowerCase() === info.charName.toLowerCase()) {
 								control.click();
 								this.click(6, 627, 572, 128, 35);
+								me.blockMouse = false;
 
-								break MainLoop;
+								return true;
 							}
 						}
 					} while (control.getNext());
@@ -1051,6 +1060,8 @@ MainLoop:
 						sendKey(0x28);
 						sendKey(0x28);
 					}
+				} else { // no further check necessary
+					break MainLoop;
 				}
 
 				break;
@@ -1060,9 +1071,7 @@ MainLoop:
 				break;
 			case 14: // disconnected?
 			case 30: // player not found?
-				me.blockMouse = false;
-
-				return false;
+				break MainLoop;
 			default:
 				break;
 			}
@@ -1072,7 +1081,7 @@ MainLoop:
 
 		me.blockMouse = false;
 
-		return true;
+		return false;
 	},
 
 	makeCharacter: function (info) {
