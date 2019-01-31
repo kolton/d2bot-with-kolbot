@@ -841,7 +841,7 @@ var Item = {
                 delay(me.ping * 2 + 500);
 
                 if (item.bodylocation === bodyLoc) {
-                    //Misc.logItem("Equipped Merc", getUnit(4, -1, -1, gid));
+                    Misc.logItem("Equipped Merc", getUnit(4, -1, -1, gid));
                     if (getCursorType() === 3) {
                         //Misc.click(0, 0, me);
 
@@ -853,6 +853,7 @@ var Item = {
                             }
                         }
                     }
+
                     return true;
                 }
             }
@@ -983,7 +984,7 @@ var Item = {
                         classid = items[0].classid;
 
                         if (this.equipMerc(items[0], bodyLoc[j])) {
-							Misc.logItem("Equipped Merc", me.getItem(-1, -1, gid));
+			   Misc.logItem("Equipped Merc", me.getItem(-1, -1, gid));
                         }
 
                         break;
