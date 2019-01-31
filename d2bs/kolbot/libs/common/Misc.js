@@ -581,8 +581,7 @@ var Item = {
 			bodyLocMerc = 3;
 
 			break;
-
-		case 37: // Helm
+                case 37: // Helm
 		case 75: // Circlet
 			bodyLocMerc = 1;
 
