@@ -1333,7 +1333,49 @@ var Misc = {
 			return false;
 		}
 
-		var i, lastArea, code, desc, sock, itemObj,
+		var i;
+
+		if (["pk1", "pk2", "pk3"].indexOf(unit.code) > -1 && !Config.LogKeys) {
+			return false;
+		}
+
+		if (["dhn", "bey", "mbr"].indexOf(unit.code) > -1 && !Config.LogOrgans) {
+			return false;
+		}
+
+		if (["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(unit.code) > -1 && !Config.LogLowRunes) {
+			return false;
+		}
+
+		if (["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(unit.code) > -1 && !Config.LogMiddleRunes) {
+			return false;
+		}
+
+		if (["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(unit.code) > -1 && !Config.LogHighRunes) {
+			return false;
+		}
+
+		if (["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(unit.code) > -1 && !Config.LogLowGems) {
+			return false;
+		}
+
+		if (["glv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(unit.code) > -1 && !Config.LogHighGems) {
+			return false;
+		}
+
+		for (i = 0; i < Config.SkipLogging.length; i++) {
+			if (typeof Config.SkipLogging[i] === "number") {
+				if (Config.SkipLogging[i] === unit.classid) {
+					return false;
+				}
+			} else if (typeof Config.SkipLogging[i] === "string") {
+				if (Config.SkipLogging[i] === unit.code) {
+					return false;
+				}
+			}
+		}
+
+		var lastArea, code, desc, sock, itemObj,
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<:;.*]|\/|\\/g, "").trim();
 

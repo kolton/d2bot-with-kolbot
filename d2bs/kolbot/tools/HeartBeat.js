@@ -16,7 +16,7 @@ function main() {
 
 		if (script) {
 			do {
-				if (script.name.indexOf(".dbj") > -1) {
+				if (script.name.indexOf(".dbj") > -1 && script.name !== "console.dbj") {
 					if (script.running) {
 						print("ÿc1Pausing ÿc0" + script.name);
 						script.pause();

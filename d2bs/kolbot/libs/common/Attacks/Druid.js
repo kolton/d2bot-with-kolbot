@@ -31,6 +31,7 @@ var ClassAttack = {
 		}
 
 		var index, checkSkill,
+			mercRevive = 0,
 			timedSkill = -1,
 			untimedSkill = -1;
 
@@ -80,6 +81,14 @@ var ClassAttack = {
 		case 2: // Try to telestomp
 			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 				while (Attack.checkMonster(unit)) {
+					if (Town.needMerc()) {
+						if (Config.MercWatch && mercRevive++ < 1) {
+							Town.visitTown();
+						} else {
+							return false;
+						}
+					}
+
 					if (getDistance(me, unit) > 3) {
 						Pather.moveToUnit(unit);
 					}
