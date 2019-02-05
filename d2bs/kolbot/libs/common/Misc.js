@@ -1363,8 +1363,10 @@ var Misc = {
 			return false;
 		}
 
-		if (Config.SkipLogging[i] === unit.classid || Config.SkipLogging[i] === unit.code) {
-			return false;
+		for (i = 0; i < Config.SkipLogging.length; i++) {
+			if (Config.SkipLogging[i] === unit.classid || Config.SkipLogging[i] === unit.code) {
+				return false;
+			}
 		}
 
 		var lastArea, code, desc, sock, itemObj,
