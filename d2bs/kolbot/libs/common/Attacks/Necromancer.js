@@ -81,16 +81,16 @@ var ClassAttack = {
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return true;
+			return 1;
 		}
 
-		var index, checkSkill,
+		var index, checkSkill, result,
 			mercRevive = 0,
 			timedSkill = -1,
 			untimedSkill = -1;
@@ -100,25 +100,25 @@ var ClassAttack = {
 		if (Config.Curse[0] > 0 && this.isCursable(unit) && (unit.spectype & 0x7) && !unit.getState(this.curseState[0])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, 25, 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.Curse[0], 0, unit);
 
-			return true;
+			return 1;
 		}
 
 		if (Config.Curse[1] > 0 && this.isCursable(unit) && !(unit.spectype & 0x7) && !unit.getState(this.curseState[1])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, 25, 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.Curse[1], 0, unit);
 
-			return true;
+			return 1;
 		}
 
 		// Get timed skill
@@ -157,25 +157,22 @@ var ClassAttack = {
 			untimedSkill = Config.LowManaSkill[1];
 		}
 
-		switch (this.doCast(unit, timedSkill, untimedSkill)) {
-		case 0: // Fail
-			break;
-		case 1: // Success
+		result = this.doCast(unit, timedSkill, untimedSkill);
+
+		if (result === 1) {
 			if (Config.ActiveSummon) {
 				this.raiseArmy();
 			}
 
 			this.explodeCorpses(unit);
-
-			return true;
-		case 2: // Try to telestomp
+		} else if (result === 2) {
 			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 				while (Attack.checkMonster(unit)) {
 					if (Town.needMerc()) {
 						if (Config.MercWatch && mercRevive++ < 1) {
 							Town.visitTown();
 						} else {
-							return false;
+							return 2;
 						}
 					}
 
@@ -192,14 +189,11 @@ var ClassAttack = {
 					this.explodeCorpses(unit);
 				}
 
-				return true;
+				return 1;
 			}
-
-			break;
 		}
 
-		// Couldn't attack
-		return false;
+		return result;
 	},
 
 	afterAttack: function () {

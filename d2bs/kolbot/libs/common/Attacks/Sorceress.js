@@ -18,16 +18,16 @@ var ClassAttack = {
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return true;
+			return 1;
 		}
 
-		var index, staticRange, checkSkill,
+		var index, staticRange, checkSkill, result,
 			mercRevive = 0,
 			timedSkill = -1,
 			untimedSkill = -1;
@@ -39,13 +39,13 @@ var ClassAttack = {
 						switch (typeof id) {
 						case "number":
 							if (unit.classid && unit.classid === id) {
-								return true;
+								return 1;
 							}
 
 							break;
 						case "string":
 							if (unit.name && unit.name.toLowerCase() === id.toLowerCase()) {
-								return true;
+								return 1;
 							}
 
 							break;
@@ -54,7 +54,7 @@ var ClassAttack = {
 						}
 					}
 
-					return false;
+					return 0;
 				}
 			) && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic) {
 			staticRange = Math.floor((me.getSkill(42, 1) + 4) * 2 / 3);
@@ -62,7 +62,7 @@ var ClassAttack = {
 			while (!me.dead && Math.round(unit.hp * 100 / unit.hpmax) > Config.CastStatic && Attack.checkMonster(unit)) {
 				if (getDistance(me, unit) > staticRange || checkCollision(me, unit, 0x4)) {
 					if (!Attack.getIntoPosition(unit, staticRange, 0x4)) {
-						return false;
+						return 0;
 					}
 				}
 
@@ -110,19 +110,16 @@ var ClassAttack = {
 			untimedSkill = Config.LowManaSkill[1];
 		}
 
-		switch (this.doCast(unit, timedSkill, untimedSkill)) {
-		case 0: // Fail
-			break;
-		case 1: // Success
-			return true;
-		case 2: // Try to telestomp
+		result = this.doCast(unit, timedSkill, untimedSkill);
+
+		if (result === 2) { // Try to telestomp
 			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc() && Attack.validSpot(unit.x, unit.y)) {
 				while (Attack.checkMonster(unit)) {
 					if (Town.needMerc()) {
 						if (Config.MercWatch && mercRevive++ < 1) {
 							Town.visitTown();
 						} else {
-							return false;
+							return 2;
 						}
 					}
 
@@ -133,14 +130,11 @@ var ClassAttack = {
 					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
 				}
 
-				return true;
+				return 1;
 			}
-
-			break;
 		}
 
-		// Couldn't attack
-		return false;
+		return result;
 	},
 
 	afterAttack: function () {

@@ -139,7 +139,7 @@ var Attack = {
 			return false;
 		}
 
-		var i, target, gid,
+		var i, target, gid, result,
 			retry = 0,
 			errorInfo = "",
 			attackCount = 0;
@@ -188,7 +188,9 @@ var Attack = {
 				Packet.flash(me.gid);
 			}
 
-			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
+			result = ClassAttack.doAttack(target, attackCount % 15 === 0);
+
+			if (!result) {
 				if (retry++ > 3) {
 					errorInfo = " (doAttack failed)";
 
@@ -197,6 +199,12 @@ var Attack = {
 
 				Packet.flash(me.gid);
 			} else {
+				if (result === 2) {
+					errorInfo = " (No valid attack skills)";
+
+					break;
+				}
+
 				retry = 0;
 			}
 
@@ -225,7 +233,7 @@ var Attack = {
 	},
 
 	hurt: function (classId, percent) {
-		var i, target,
+		var i, target, result,
 			retry = 0,
 			attackCount = 0;
 
@@ -240,13 +248,19 @@ var Attack = {
 		}
 
 		while (attackCount < 300 && Attack.checkMonster(target) && Attack.skipCheck(target)) {
-			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
+			result = ClassAttack.doAttack(target, attackCount % 15 === 0);
+
+			if (!result) {
 				if (retry++ > 3) {
 					break;
 				}
 
 				Packet.flash(me.gid);
 			} else {
+				if (result === 2) {
+					break;
+				}
+
 				retry = 0;
 			}
 
@@ -405,6 +419,12 @@ var Attack = {
 
 				if (result) {
 					retry = 0;
+
+					if (result === 2) {
+						monsterList.shift();
+
+						continue;
+					}
 
 					for (i = 0; i < gidAttack.length; i += 1) {
 						if (gidAttack[i].gid === target.gid) {
@@ -572,6 +592,12 @@ var Attack = {
 
 				if (result) {
 					retry = 0;
+
+					if (result === 2) {
+						monsterList.shift();
+
+						continue;
+					}
 
 					for (i = 0; i < gidAttack.length; i += 1) {
 						if (gidAttack[i].gid === target.gid) {

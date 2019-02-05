@@ -16,16 +16,16 @@ var ClassAttack = {
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return true;
+			return 1;
 		}
 
-		var index, checkTraps, checkSkill,
+		var index, checkTraps, checkSkill, result,
 			mercRevive = 0,
 			timedSkill = -1,
 			untimedSkill = -1;
@@ -37,7 +37,7 @@ var ClassAttack = {
 			if (getDistance(me, unit) < 20) {
 				Skill.cast(264, 0);
 			} else if (!Attack.getIntoPosition(unit, 20, 0x4)) {
-				return false;
+				return 0;
 			}
 		}
 
@@ -46,7 +46,7 @@ var ClassAttack = {
 		if (checkTraps) {
 			if (Math.round(getDistance(me, unit)) > this.trapRange || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, this.trapRange, 0x4) || (checkCollision(me, unit, 0x1) && (getCollision(unit.area, unit.x, unit.y) & 0x1))) {
-					return false;
+					return 0;
 				}
 			}
 
@@ -94,19 +94,16 @@ var ClassAttack = {
 			untimedSkill = Config.LowManaSkill[1];
 		}
 
-		switch (this.doCast(unit, timedSkill, untimedSkill)) {
-		case 0: // Fail
-			break;
-		case 1: // Success
-			return true;
-		case 2: // Try to telestomp
+		result = this.doCast(unit, timedSkill, untimedSkill);
+
+		if (result === 2) {
 			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 				while (Attack.checkMonster(unit)) {
 					if (Town.needMerc()) {
 						if (Config.MercWatch && mercRevive++ < 1) {
 							Town.visitTown();
 						} else {
-							return false;
+							return 2;
 						}
 					}
 
@@ -117,14 +114,11 @@ var ClassAttack = {
 					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
 				}
 
-				return true;
+				return 1;
 			}
-
-			break;
 		}
 
-		// Couldn't attack
-		return false;
+		return result;
 	},
 
 	afterAttack: function () {
