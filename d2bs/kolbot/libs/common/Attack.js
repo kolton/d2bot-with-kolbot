@@ -190,7 +190,7 @@ var Attack = {
 
 			result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
-			if (!result) {
+			if (result === 0) {
 				if (retry++ > 3) {
 					errorInfo = " (doAttack failed)";
 
@@ -198,13 +198,11 @@ var Attack = {
 				}
 
 				Packet.flash(me.gid);
+			} else if (result === 2) {
+				errorInfo = " (No valid attack skills)";
+
+				break;
 			} else {
-				if (result === 2) {
-					errorInfo = " (No valid attack skills)";
-
-					break;
-				}
-
 				retry = 0;
 			}
 
@@ -250,17 +248,15 @@ var Attack = {
 		while (attackCount < 300 && Attack.checkMonster(target) && Attack.skipCheck(target)) {
 			result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
-			if (!result) {
+			if (result === 0) {
 				if (retry++ > 3) {
 					break;
 				}
 
 				Packet.flash(me.gid);
+			} else if (result === 2) {
+				break;
 			} else {
-				if (result === 2) {
-					break;
-				}
-
 				retry = 0;
 			}
 

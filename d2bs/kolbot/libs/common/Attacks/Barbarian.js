@@ -46,7 +46,7 @@ var ClassAttack = {
 			attackSkill = Config.LowManaSkill[0];
 		}
 
-		// Telestomp with barbs is pointless
+		// Telestomp with barb is pointless
 		return this.doCast(unit, attackSkill);
 	},
 

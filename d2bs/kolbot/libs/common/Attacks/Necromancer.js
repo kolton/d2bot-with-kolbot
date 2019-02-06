@@ -165,32 +165,30 @@ var ClassAttack = {
 			}
 
 			this.explodeCorpses(unit);
-		} else if (result === 2) {
-			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
-				while (Attack.checkMonster(unit)) {
-					if (Town.needMerc()) {
-						if (Config.MercWatch && mercRevive++ < 1) {
-							Town.visitTown();
-						} else {
-							return 2;
-						}
+		} else if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+			while (Attack.checkMonster(unit)) {
+				if (Town.needMerc()) {
+					if (Config.MercWatch && mercRevive++ < 1) {
+						Town.visitTown();
+					} else {
+						return 2;
 					}
-
-					if (getDistance(me, unit) > 3) {
-						Pather.moveToUnit(unit);
-					}
-
-					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
-
-					if (Config.ActiveSummon) {
-						this.raiseArmy();
-					}
-
-					this.explodeCorpses(unit);
 				}
 
-				return 1;
+				if (getDistance(me, unit) > 3) {
+					Pather.moveToUnit(unit);
+				}
+
+				this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+
+				if (Config.ActiveSummon) {
+					this.raiseArmy();
+				}
+
+				this.explodeCorpses(unit);
 			}
+
+			return 1;
 		}
 
 		return result;

@@ -96,26 +96,24 @@ var ClassAttack = {
 
 		result = this.doCast(unit, timedSkill, untimedSkill);
 
-		if (result === 2) {
-			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
-				while (Attack.checkMonster(unit)) {
-					if (Town.needMerc()) {
-						if (Config.MercWatch && mercRevive++ < 1) {
-							Town.visitTown();
-						} else {
-							return 2;
-						}
+		if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+			while (Attack.checkMonster(unit)) {
+				if (Town.needMerc()) {
+					if (Config.MercWatch && mercRevive++ < 1) {
+						Town.visitTown();
+					} else {
+						return 2;
 					}
-
-					if (getDistance(me, unit) > 3) {
-						Pather.moveToUnit(unit);
-					}
-
-					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
 				}
 
-				return 1;
+				if (getDistance(me, unit) > 3) {
+					Pather.moveToUnit(unit);
+				}
+
+				this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
 			}
+
+			return 1;
 		}
 
 		return result;
