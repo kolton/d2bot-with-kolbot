@@ -98,6 +98,7 @@ var Town = {
 		this.buyPotions();
 		this.clearInventory();
 		Item.autoEquip();
+		Item.autoEquipMerc();
 		this.buyKeys();
 		this.repair();
 		this.gamble();
@@ -533,7 +534,7 @@ var Town = {
 		// Avoid unnecessary NPC visits
 		for (i = 0; i < list.length; i += 1) {
 			// Only unid items or sellable junk (low level) should trigger a NPC visit
-			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1 || (!list[i].getFlag(0x10) && Item.hasTier(list[i])))) {
+			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1 || (!list[i].getFlag(0x10) && (Item.hasTier(list[i]) || Item.hasMercTier(list[i]))))) {
 				break;
 			}
 		}
@@ -562,7 +563,7 @@ MainLoop:
 				result = Pickit.checkItem(item);
 
 				// Force ID for unid items matching autoEquip criteria
-				if (result.result === 1 && !item.getFlag(0x10) && Item.hasTier(item)) {
+				if (result.result === 1 && !item.getFlag(0x10) && (Item.hasTier(item) || Item.hasMercTier(item))) {
 					result.result = -1;
 				}
 
