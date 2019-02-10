@@ -1346,6 +1346,7 @@ MainLoop:
 	addEventListener("scriptmsg", this.scriptEvent);
 
 	// Start
+	D2Bot.init(); // Get D2Bot# handle
 	Config.init(false);
 	Pickit.init(false);
 	Attack.init();
@@ -1353,6 +1354,7 @@ MainLoop:
 	CraftingSystem.buildLists();
 	Runewords.init();
 	Cubing.init();
+	LocalChat.init(true);
 
 	while (true) {
 		if (command) {

@@ -172,7 +172,7 @@ var CollMap = new function () {
 	};
 
 	this.getRandCoordinate = function (cX, xmin, xmax, cY, ymin, ymax, factor = 1) {
-		// returns randomized {x, y} object with valid coordinates 
+		// returns randomized {x, y} object with valid coordinates
 		var coordX, coordY,
 			retry = 0;
 

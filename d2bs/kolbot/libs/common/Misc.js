@@ -2470,7 +2470,7 @@ CursorLoop:
 
 		if (wait > 0) {
 			delay(wait);
-		}	
+		}
 	},
 
 	changeStat: function (stat, value) {
@@ -2559,17 +2559,20 @@ function PacketBuilder () {
 
 var LocalChat = new function () {
 	const LOCAL_CHAT_ID = 0xD2BAAAA;
-	let toggle, proxy = say;
+	let silent, toggle, proxy = say;
 
 	let relay = (msg) => D2Bot.shoutGlobal(JSON.stringify({ msg: msg, realm: me.realm, charname: me.charname, gamename: me.gamename }), LOCAL_CHAT_ID);
 
 	let onChatInput = (speaker, msg) => {
-		relay(msg);
+		if (!silent && Config.LocalChat.Mode) {
+			relay(msg);
+		}
+
 		return true;
 	};
 
 	let onChatRecv = (mode, msg) => {
-		if (mode !== LOCAL_CHAT_ID) {
+		if ((silent && Config.LocalChat.Mode) || mode !== LOCAL_CHAT_ID) {
 			return;
 		}
 
@@ -2582,17 +2585,24 @@ var LocalChat = new function () {
 
 	let onKeyEvent = (key) => {
 		if (toggle === key) {
-			this.init(true);
+			this.init(false, true);
 		}
 	};
 
-	this.init = (cycle = false) => {
+	this.init = (mute = false, cycle = false) => {
 		if (!Config.LocalChat.Enabled) {
 			return;
 		}
 
+		if (mute) {
+			silent = mute;
+		}
+
 		Config.LocalChat.Mode = (Config.LocalChat.Mode + cycle) % 3;
-		print("ÿc2LocalChat enabled. Mode: " + Config.LocalChat.Mode);
+
+		if (!silent) {
+			print("ÿc2LocalChat enabled. Mode: " + Config.LocalChat.Mode);
+		}
 
 		switch (Config.LocalChat.Mode) {
 		case 2:
