@@ -78,7 +78,7 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
 
-		if (Config.UseFixedSlot) {
+		if (Config.PrimarySlot > -1) {
 			Precast.weaponSwitch(Config.PrimarySlot);
 		} else {
 			if (Config.MFSwitchPercent) {

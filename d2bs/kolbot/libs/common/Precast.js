@@ -370,7 +370,7 @@ var Precast = new function () {
 			break;
 		}
 
-		if (Config.UseFixedSlot) {
+		if (Config.PrimarySlot > -1) {
 			this.weaponSwitch(Config.PrimarySlot);
 		}
 	};
