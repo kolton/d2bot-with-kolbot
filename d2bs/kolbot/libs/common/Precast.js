@@ -371,6 +371,28 @@ var Precast = new function () {
 		}
 	};
 
+	this.haveMainSlot = function () {
+		var item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				if (me.weaponswitch === Precast.haveCTA) {
+					if (item.bodylocation === 11 || item.bodylocation === 12) {
+						return true;
+					}
+				} else {
+					if (item.bodylocation === 4 || item.bodylocation === 5) {
+						return true;
+					}
+				}
+			} while (item.getNext());
+		}
+
+		this.weaponSwitch(this.haveCTA); // set CTA as main when other slots are empty
+
+		return false;
+	};
+
 	this.checkCTA = function () {
 		var item;
 
