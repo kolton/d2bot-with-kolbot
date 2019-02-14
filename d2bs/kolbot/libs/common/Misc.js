@@ -2559,20 +2559,17 @@ function PacketBuilder () {
 
 var LocalChat = new function () {
 	const LOCAL_CHAT_ID = 0xD2BAAAA;
-	let silent, script, isDefault, toggle, proxy = say;
+	let toggle, proxy = say;
 
 	let relay = (msg) => D2Bot.shoutGlobal(JSON.stringify({ msg: msg, realm: me.realm, charname: me.charname, gamename: me.gamename }), LOCAL_CHAT_ID);
 
 	let onChatInput = (speaker, msg) => {
-		if (!silent && Config.LocalChat.Mode) {
-			relay(msg);
-		}
-
+		relay(msg);
 		return true;
 	};
 
 	let onChatRecv = (mode, msg) => {
-		if ((silent && Config.LocalChat.Mode) || mode !== LOCAL_CHAT_ID) {
+		if (mode !== LOCAL_CHAT_ID) {
 			return;
 		}
 
@@ -2585,50 +2582,17 @@ var LocalChat = new function () {
 
 	let onKeyEvent = (key) => {
 		if (toggle === key) {
-			this.init(false, true);
+			this.init(true);
 		}
 	};
 
-	let scriptEvent = (msg) => {
-		try {
-			msg = JSON.parse(msg);
-
-			if (!isDefault && msg.msg === "ModeResponse") {
-				Config.LocalChat.Mode = msg.mode;
-			} else if (isDefault && msg.msg === "ModeRequest") {
-				scriptBroadcast(JSON.stringify({ msg: "ModeResponse", mode: Config.LocalChat.Mode }));
-			}
-		} catch (e) {
-		}
-	};
-
-	this.init = (mute = false, cycle = false) => {
+	this.init = (cycle = false) => {
 		if (!Config.LocalChat.Enabled) {
 			return;
 		}
 
-		if (!cycle) {
-			addEventListener("scriptmsg", scriptEvent);
-			script = getScript(true).name.toLowerCase();
-
-			if (script === "default.dbj") {
-				isDefault = true;
-			}
-		}
-
-		if (mute) {
-			silent = mute;
-			scriptBroadcast(JSON.stringify({ msg: "ModeRequest" }));
-			delay(300);
-
-			removeEventListener("scriptmsg", scriptEvent); // remove scriptEvent for silent thread after LocalChat.Mode sync
-		}
-
 		Config.LocalChat.Mode = (Config.LocalChat.Mode + cycle) % 3;
-
-		if (!silent) {
-			print("ÿc2LocalChat enabled. Mode: " + Config.LocalChat.Mode);
-		}
+		print("ÿc2LocalChat enabled. Mode: " + Config.LocalChat.Mode);
 
 		switch (Config.LocalChat.Mode) {
 		case 2:
