@@ -82,12 +82,8 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
 		}
 
-		if (Precast.haveCTA > -1) {
+		if (Precast.haveCTA > -1 || Precast.checkCTA()) {
 			Precast.weaponSwitch(Math.abs(Precast.haveCTA - 1));
-		} else {
-			if (Precast.checkCTA()) {
-				Precast.weaponSwitch(Math.abs(Precast.haveCTA - 1));
-			}
 		}
 
 		this.heal();
