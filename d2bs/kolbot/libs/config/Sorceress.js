@@ -444,6 +444,10 @@ function LoadConfig() {
 	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.
 	Config.MFSwitch = 0; // MF weapon slot: 0 = slot I, 1 = slot II
 
+	// Primary Slot
+	Config.UseFixedSlot = false; // Set to use specific weapon slot as primary
+	Config.PrimarySlot = 0; // Primary weapon slot: 0 = slot I, 1 = slot II
+
 	// Speedup config. Full packet casting is not recommended for melee skills.
 	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of Faster Cast Rate.
 	Config.FHR = 0; // 0 - disable, 1 to 255 - set value of Faster Hit Recovery.

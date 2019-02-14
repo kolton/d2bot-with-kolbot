@@ -221,6 +221,8 @@ var Config = {
 	TeleSwitch: false,
 	MFSwitch: 0,
 	MFSwitchPercent: 0,
+	UseFixedSlot: false,
+	PrimarySlot: 0,
 	LogExperience: false,
 	TownCheck: false,
 	PingQuit: [{Ping: 0, Duration: 0}],

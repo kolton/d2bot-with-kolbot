@@ -78,13 +78,17 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
 
-		if (Config.MFSwitchPercent) {
-			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
-		}
+		if (Config.UseFixedSlot) {
+			Precast.weaponSwitch(Config.PrimarySlot);
+		} else {
+			if (Config.MFSwitchPercent) {
+				Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+			}
 
-		if (Precast.haveCTA > -1 || Precast.checkCTA()) {
-			if (Precast.haveMainSlot()) {
-				Precast.weaponSwitch(Math.abs(Precast.haveCTA - 1));
+			if (Precast.haveCTA > -1 || Precast.checkCTA()) {
+				if (Precast.haveMainSlot()) {
+					Precast.weaponSwitch(Math.abs(Precast.haveCTA - 1));
+				}
 			}
 		}
 
