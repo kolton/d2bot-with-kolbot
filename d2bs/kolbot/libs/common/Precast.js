@@ -375,26 +375,6 @@ var Precast = new function () {
 		}
 	};
 
-	this.haveMainSlot = function (slot) {
-		var item = me.getItem(-1, 1);
-
-		if (item) {
-			do {
-				if (me.weaponswitch === slot) {
-					if (item.bodylocation === 11 || item.bodylocation === 12) {
-						return true;
-					}
-				} else {
-					if (item.bodylocation === 4 || item.bodylocation === 5) {
-						return true;
-					}
-				}
-			} while (item.getNext());
-		}
-
-		return false;
-	};
-
 	this.checkCTA = function () {
 		var item;
 

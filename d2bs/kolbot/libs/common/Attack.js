@@ -24,6 +24,45 @@ var Attack = {
 		if (me.gametype === 1) {
 			this.checkInfinity();
 			this.getCharges();
+			this.getPrimarySlot();
+		}
+	},
+
+	checkOtherSlot: function (slot) {
+		var item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				if (me.weaponswitch === slot) {
+					if (item.bodylocation === 11 || item.bodylocation === 12) {
+						return true;
+					}
+				} else {
+					if (item.bodylocation === 4 || item.bodylocation === 5) {
+						return true;
+					}
+				}
+			} while (item.getNext());
+		}
+
+		return false;
+	},
+
+	getPrimarySlot: function () {
+		if (Config.PrimarySlot === -1) { // determine primary slot if not set
+			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
+				if (this.checkOtherSlot(Precast.haveCTA)) { // have item on non-cta slot
+					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
+				} else { // other slot is empty
+					Config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
+				}
+			} else { // don't have cta
+				if (this.checkOtherSlot(me.weaponswitch) && !this.checkOtherSlot(me.weaponswitch ^ 1)) { // only other slot has items
+					Config.PrimarySlot = me.weaponswitch ^ 1;
+				} else { // both slots have items, both are empty, or only current slot has items
+					Config.PrimarySlot = me.weaponswitch; // use current slot as primary
+				}
+			}
 		}
 	},
 
