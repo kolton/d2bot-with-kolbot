@@ -370,9 +370,7 @@ var Precast = new function () {
 			break;
 		}
 
-		if (Config.PrimarySlot > -1) {
-			this.weaponSwitch(Config.PrimarySlot);
-		}
+		this.weaponSwitch(Attack.getPrimarySlot());
 	};
 
 	this.checkCTA = function () {

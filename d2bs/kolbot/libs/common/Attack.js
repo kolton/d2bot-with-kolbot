@@ -50,7 +50,11 @@ var Attack = {
 
 	getPrimarySlot: function () {
 		if (Config.PrimarySlot === -1) { // determine primary slot if not set
-			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
+            if (me.classid === 4 && Config.FindItem && Config.FindItemSwitch) {
+                Config.PrimarySlot = Config.FindItemSwitch ^ 1;
+            } else if (Config.MFSwitchPercent) {
+                Config.PrimarySlot = Config.MFSwitch ^ 1;
+            } else if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
 				if (this.checkOtherSlot(Precast.haveCTA)) { // have item on non-cta slot
 					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
 				} else { // other slot is empty
@@ -64,6 +68,8 @@ var Attack = {
 				}
 			}
 		}
+
+		return Config.PrimarySlot;
 	},
 
 	getCustomAttack: function (unit) {
