@@ -50,11 +50,7 @@ var Attack = {
 
 	getPrimarySlot: function () {
 		if (Config.PrimarySlot === -1) { // determine primary slot if not set
-			if (me.classid === 4 && Config.FindItem && Config.FindItemSwitch) {
-				Config.PrimarySlot = Config.FindItemSwitch ^ 1;
-			} else if (Config.MFSwitchPercent) {
-				Config.PrimarySlot = Config.MFSwitch ^ 1;
-			} else if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
+			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
 				if (this.checkOtherSlot(Precast.haveCTA)) { // have item on non-cta slot
 					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
 				} else { // other slot is empty
@@ -226,7 +222,7 @@ var Attack = {
 			}
 
 			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
-				Precast.weaponSwitch(Math.abs(Config.MFSwitch));
+				Precast.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 			}
 
 			if (attackCount > 0 && attackCount % 15 === 0 && Skill.getRange(Config.AttackSkill[1]) < 4) {
@@ -259,7 +255,7 @@ var Attack = {
 		}
 
 		if (Config.MFSwitchPercent) {
-			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+			Precast.weaponSwitch(Attack.getPrimarySlot());
 		}
 
 		ClassAttack.afterAttack();

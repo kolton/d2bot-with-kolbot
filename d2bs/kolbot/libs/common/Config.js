@@ -219,7 +219,6 @@ var Config = {
 	GambleGoldStop: 0,
 	MiniShopBot: false,
 	TeleSwitch: false,
-	MFSwitch: 0,
 	MFSwitchPercent: 0,
 	PrimarySlot: -1,
 	LogExperience: false,
@@ -295,7 +294,7 @@ var Config = {
 
 	// Barbarian specific
 	FindItem: false,
-	FindItemSwitch: 1,
+	FindItemSwitch: false,
 
 	// Druid specific
 	Wereform: 0,
