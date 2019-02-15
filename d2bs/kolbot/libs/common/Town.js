@@ -78,18 +78,28 @@ var Town = {
 			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
 		}
 
-		if (Config.PrimarySlot > -1) {
-			Precast.weaponSwitch(Config.PrimarySlot);
-		} else {
-			if (Config.MFSwitchPercent) {
-				Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
-			}
+		if (Config.MFSwitchPercent) {
+			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+		}
 
-			if (Precast.haveCTA > -1 || Precast.checkCTA()) {
-				if (Precast.haveMainSlot()) {
-					Precast.weaponSwitch(Math.abs(Precast.haveCTA - 1));
+		if (Config.PrimarySlot === -1) { // determine primary slot if not set
+			if (Precast.haveCTA > -1 || Precast.checkCTA()) { // have cta
+				if (Precast.haveMainSlot(Precast.haveCTA)) { // have item on non-cta slot
+					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
+				} else { // other slot is empty
+					Config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
+				}
+			} else { // don't have cta
+				if (Precast.haveMainSlot(me.weaponswitch) && !Precast.haveMainSlot(me.weaponswitch ^ 1)) { // only other slot has items
+					Config.PrimarySlot = me.weaponswitch ^ 1;
+				} else { // both slots have items, both are empty, or only current slot has items
+					Config.PrimarySlot = me.weaponswitch; // use current slot as primary
 				}
 			}
+
+			Precast.weaponSwitch(Config.PrimarySlot);
+		} else {
+			Precast.weaponSwitch(Config.PrimarySlot);
 		}
 
 		this.heal();

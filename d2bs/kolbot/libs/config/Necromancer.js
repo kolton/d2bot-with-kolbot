@@ -444,7 +444,7 @@ function LoadConfig() {
 	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.
 	Config.MFSwitch = 0; // MF weapon slot: 0 = slot I, 1 = slot II
 
-	// Primary Slot
+	// Primary Slot - Bot will try to determine primary slot if not used (non-cta slot that's not empty)
 	Config.PrimarySlot = -1; // Set to use specific weapon slot as primary weapon slot: -1 = disabled, 0 = slot I, 1 = slot II
 
 	// Fastmod config

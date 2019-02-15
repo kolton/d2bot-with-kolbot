@@ -375,12 +375,12 @@ var Precast = new function () {
 		}
 	};
 
-	this.haveMainSlot = function () {
+	this.haveMainSlot = function (slot) {
 		var item = me.getItem(-1, 1);
 
 		if (item) {
 			do {
-				if (me.weaponswitch === Precast.haveCTA) {
+				if (me.weaponswitch === slot) {
 					if (item.bodylocation === 11 || item.bodylocation === 12) {
 						return true;
 					}
@@ -391,8 +391,6 @@ var Precast = new function () {
 				}
 			} while (item.getNext());
 		}
-
-		this.weaponSwitch(this.haveCTA); // set CTA as main when other slots are empty
 
 		return false;
 	};
