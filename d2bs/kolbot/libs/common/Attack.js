@@ -88,12 +88,10 @@ var Attack = {
 				} else { // other slot is empty
 					Config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
 				}
-			} else { // don't have cta
-				if (!this.checkSlot(0) && this.checkSlot(1)) { // only slot2 has items
-					Config.PrimarySlot = 1;
-				} else { // both slots have items, both are empty, or only slot1 has items
-					Config.PrimarySlot = 0;
-				}
+			} else if (!this.checkSlot(0) && this.checkSlot(1)) { // only slot II has items
+				Config.PrimarySlot = 1;
+			} else { // both slots have items, both are empty, or only slot I has items
+				Config.PrimarySlot = 0;
 			}
 		}
 
