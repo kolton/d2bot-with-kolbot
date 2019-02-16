@@ -74,7 +74,7 @@ var Town = {
 		var i,
 			cancelFlags = [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x19, 0x1a];
 
-		Precast.weaponSwitch(Attack.getPrimarySlot());
+		Attack.weaponSwitch(Attack.getPrimarySlot());
 
 		this.heal();
 		this.identify();

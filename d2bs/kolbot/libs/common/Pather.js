@@ -196,7 +196,7 @@ var Pather = {
 		PathDebug.drawPath(path);
 
 		if (this.useTeleport && Config.TeleSwitch && path.length > 5) {
-			Precast.weaponSwitch(Attack.getPrimarySlot() ^ 1);
+			Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 		}
 
 		while (path.length > 0) {
@@ -287,7 +287,7 @@ var Pather = {
 		}
 
 		if (this.useTeleport && Config.TeleSwitch) {
-			Precast.weaponSwitch(Attack.getPrimarySlot());
+			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 
 		PathDebug.removeHooks();

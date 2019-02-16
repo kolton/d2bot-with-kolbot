@@ -28,6 +28,38 @@ var Attack = {
 		}
 	},
 
+	weaponSwitch: function (slot) {
+		if (me.gametype === 0 || me.weaponswitch === slot) {
+			return true;
+		}
+
+		var i, tick;
+
+		if (slot === undefined) {
+			slot = me.weaponswitch ^ 1;
+		}
+
+		delay(500);
+
+		for (i = 0; i < 5; i += 1) {
+			weaponSwitch();
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000 + me.ping) {
+				if (me.weaponswitch === slot) {
+					//delay(me.ping + 1);
+
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
 	checkOtherSlot: function (slot) {
 		var item = me.getItem(-1, 1);
 
@@ -222,7 +254,7 @@ var Attack = {
 			}
 
 			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
-				Precast.weaponSwitch(Attack.getPrimarySlot() ^ 1);
+				this.weaponSwitch(this.getPrimarySlot() ^ 1);
 			}
 
 			if (attackCount > 0 && attackCount % 15 === 0 && Skill.getRange(Config.AttackSkill[1]) < 4) {
@@ -255,7 +287,7 @@ var Attack = {
 		}
 
 		if (Config.MFSwitchPercent) {
-			Precast.weaponSwitch(Attack.getPrimarySlot());
+			this.weaponSwitch(this.getPrimarySlot());
 		}
 
 		ClassAttack.afterAttack();

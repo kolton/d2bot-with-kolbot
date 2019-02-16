@@ -1019,7 +1019,7 @@ var Misc = {
 		}
 
 		var i, j, shrine,
-			index  = -1,
+			index = -1,
 			shrineList = [];
 
 		// Initiate shrine states
@@ -1669,15 +1669,6 @@ var Misc = {
 		}
 
 		return false;
-	},
-
-	// Teleport with slot II
-	teleSwitch: function () {
-		this.oldSwitch = me.weaponswitch;
-
-		Precast.weaponSwitch();
-
-		return true;
 	},
 
 	// Go to town when low on hp/mp or when out of potions. can be upgraded to check for curses etc.
