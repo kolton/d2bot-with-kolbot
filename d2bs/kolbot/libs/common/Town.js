@@ -74,17 +74,7 @@ var Town = {
 		var i,
 			cancelFlags = [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x19, 0x1a];
 
-		if (me.classid === 4 && Config.FindItem && Config.FindItemSwitch) { // weapon switch fix in case last game dropped with item find switch on
-			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
-		}
-
-		if (Config.MFSwitchPercent) {
-			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
-		}
-
-		if (Precast.haveCTA > -1) {
-			Precast.weaponSwitch(Math.abs(Precast.haveCTA - 1));
-		}
+		Attack.weaponSwitch(Attack.getPrimarySlot());
 
 		this.heal();
 		this.identify();

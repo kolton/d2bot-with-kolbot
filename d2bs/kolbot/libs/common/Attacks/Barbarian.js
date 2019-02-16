@@ -182,7 +182,7 @@ MainLoop:
 			while (corpseList.length > 0) {
 				if (this.checkCloseMonsters(5)) {
 					if (Config.FindItemSwitch) {
-						Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
+						Attack.weaponSwitch(Attack.getPrimarySlot());
 					}
 
 					Attack.clear(10, false, false, false, false);
@@ -202,7 +202,7 @@ MainLoop:
 					}
 
 					if (Config.FindItemSwitch) {
-						Precast.weaponSwitch(Config.FindItemSwitch);
+						Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 					}
 
 CorpseLoop:
@@ -230,7 +230,7 @@ CorpseLoop:
 		}
 
 		if (Config.FindItemSwitch) {
-			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
+			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 
 		Pickit.pickItems();
