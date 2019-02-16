@@ -81,8 +81,6 @@ var Attack = {
 	},
 
 	getPrimarySlot: function () {
-		var slot1, slot2;
-
 		if (Config.PrimarySlot === -1) { // determine primary slot if not set
 			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
 				if (this.checkSlot(Precast.haveCTA ^ 1)) { // have item on non-cta slot
