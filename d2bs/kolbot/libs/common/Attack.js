@@ -60,12 +60,12 @@ var Attack = {
 		return false;
 	},
 
-	checkOtherSlot: function (slot) {
+	checkSlot: function (slot = me.weaponswitch) { // check if slot has items
 		var item = me.getItem(-1, 1);
 
 		if (item) {
 			do {
-				if (me.weaponswitch === slot) {
+				if (me.weaponswitch !== slot) {
 					if (item.bodylocation === 11 || item.bodylocation === 12) {
 						return true;
 					}
@@ -81,18 +81,20 @@ var Attack = {
 	},
 
 	getPrimarySlot: function () {
+		var slot1, slot2;
+
 		if (Config.PrimarySlot === -1) { // determine primary slot if not set
 			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
-				if (this.checkOtherSlot(Precast.haveCTA)) { // have item on non-cta slot
+				if (this.checkSlot(Precast.haveCTA ^ 1)) { // have item on non-cta slot
 					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
 				} else { // other slot is empty
 					Config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
 				}
 			} else { // don't have cta
-				if (this.checkOtherSlot(me.weaponswitch) && !this.checkOtherSlot(me.weaponswitch ^ 1)) { // only other slot has items
-					Config.PrimarySlot = me.weaponswitch ^ 1;
-				} else { // both slots have items, both are empty, or only current slot has items
-					Config.PrimarySlot = me.weaponswitch; // use current slot as primary
+				if (!this.checkSlot(0) && this.checkSlot(1)) { // only slot2 has items
+					Config.PrimarySlot = 1;
+				} else { // both slots have items, both are empty, or only slot1 has items
+					Config.PrimarySlot = 0;
 				}
 			}
 		}
