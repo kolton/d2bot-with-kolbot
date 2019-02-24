@@ -116,8 +116,8 @@ function LoadConfig() {
 		Config.Baal.HotTPMessage = "Hot TP!";
 		Config.Baal.SafeTPMessage = "Safe TP!";
 		Config.Baal.BaalMessage = "Baal!";
-		Config.Baal.SoulQuit = false; // End script if Souls (Undead Soul Killers) are found.
-		Config.Baal.DollQuit = false; // End script if Dolls (Undead Stigyan Dolls) are found.
+		Config.Baal.SoulQuit = false; // End script if Souls (Burning Souls) are found.
+		Config.Baal.DollQuit = false; // End script if Dolls (Undead Soul Killers) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
 
 	/* ### leeching section ###

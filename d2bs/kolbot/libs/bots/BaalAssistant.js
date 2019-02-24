@@ -408,7 +408,7 @@ function BaalAssistant() {
 						Pather.moveTo(15095, 5029);
 
 						if ((SoulQuit && getUnit(1, 641)) || (DollQuit && getUnit(1, 691))) {
-							print("Undead soul killers or Undead stygian dolls found, ending script.");
+							print("Burning Souls or Undead Soul Killers found, ending script.");
 							return true;
 						}
 
@@ -470,8 +470,8 @@ function BaalAssistant() {
 							throw new Error("No portals to Throne.");
 						}
 
-						if ((SoulQuit && getUnit(1, 691)) || (DollQuit && getUnit(1, 690))) {
-							print("Undead soul killers or Undead stygian dolls found, ending script.");
+						if ((SoulQuit && getUnit(1, 641)) || (DollQuit && getUnit(1, 691))) {
+							print("Burning Souls or Undead Soul Killers found, ending script.");
 							return true;
 						}
 

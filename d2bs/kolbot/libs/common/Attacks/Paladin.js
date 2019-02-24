@@ -100,7 +100,7 @@ var ClassAttack = {
 
 		switch (attackSkill) {
 		case 112:
-			if (unit.classid === 691 && Config.AvoidDolls) {
+			if (Config.AvoidDolls && [212, 213, 214, 215, 216, 690, 691].indexOf(unit.classid) > -1) {
 				this.dollAvoid(unit);
 
 				if (aura > -1) {
@@ -223,12 +223,15 @@ var ClassAttack = {
 	},
 
 	dollAvoid: function (unit) {
-		var i,
-			positions = [[10, 10], [-10, 10], [10, -10], [-10, -10]];
+		var i, cx, cy,
+			distance = 14;
 
-		for (i = 0; i < positions.length; i += 1) {
-			if (Attack.validSpot(unit.x + positions[i][0], unit.y + positions[i][1])) {
-				return Pather.moveTo(unit.x + positions[i][0], unit.y + positions[i][1]);
+		for (i = 0; i < 2 * Math.PI; i += Math.PI / 6) {
+			cx = Math.round(Math.cos(i) * distance);
+			cy = Math.round(Math.sin(i) * distance);
+
+			if (Attack.validSpot(unit.x + cx, unit.y + cy)) {
+				return Pather.moveTo(unit.x + cx, unit.y + cy);
 			}
 		}
 

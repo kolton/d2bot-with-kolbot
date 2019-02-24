@@ -245,7 +245,7 @@ WSKLoop:
 	}
 
 	if (Config.BaalHelper.DollQuit && getUnit(1, 691)) {
-		print("Soul Killers found.");
+		print("Undead Soul Killers found.");
 
 		return true;
 	}
