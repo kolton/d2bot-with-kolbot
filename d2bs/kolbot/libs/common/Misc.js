@@ -999,7 +999,7 @@ var Misc = {
 
 			unit = unitList.shift();
 
-			if (unit && (Pather.useTeleport || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
+			if (unit && (Pather.useTeleport() || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
 				Pickit.pickItems();
 			}
 		}
@@ -1015,7 +1015,7 @@ var Misc = {
 		}
 
 		if (!range) {
-			range = Pather.useTeleport ? 25 : 15;
+			range = Pather.useTeleport() ? 25 : 15;
 		}
 
 		var i, j, shrine,
@@ -1086,7 +1086,7 @@ var Misc = {
 					// Get the shrine if we have no active state or to refresh current state or if the shrine has no state
 					// Don't override shrine state with a lesser priority shrine
 					if (index === -1 || i <= index || this.shrineStates[i] === 0) {
-						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport || !checkCollision(me, shrineList[j], 0x4))) {
+						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport() || !checkCollision(me, shrineList[j], 0x4))) {
 							this.getShrine(shrineList[j]);
 
 							// Gem shrine - pick gem

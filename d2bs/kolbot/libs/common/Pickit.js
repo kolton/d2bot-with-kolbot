@@ -115,7 +115,7 @@ var Pickit = {
 
 			// Check if the item unit is still valid and if it's on ground or being dropped
 			if (copyUnit(pickList[0]).x !== undefined && (pickList[0].mode === 3 || pickList[0].mode === 5) &&
-					(Pather.useTeleport || me.inTown || !checkCollision(me, pickList[0], 0x1))) { // Don't pick items behind walls/obstacles when walking
+					(Pather.useTeleport() || me.inTown || !checkCollision(me, pickList[0], 0x1))) { // Don't pick items behind walls/obstacles when walking
 				// Check if the item should be picked
 				status = this.checkItem(pickList[0]);
 
@@ -267,7 +267,7 @@ MainLoop:
 				Skill.cast(43, 0, item);
 			} else {
 				if (getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
-					if (Pather.useTeleport) {
+					if (Pather.useTeleport()) {
 						Pather.moveToUnit(item);
 					} else if (!Pather.moveTo(item.x, item.y, 0)) {
 						continue MainLoop;
