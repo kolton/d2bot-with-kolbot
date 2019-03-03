@@ -172,14 +172,14 @@ var Pather = {
 
 		/* Disabling getPath optimizations, they are causing desync -- noah
 		// Teleport without calling getPath if the spot is close enough
-		if (this.useTeleport() && getDistance(me, x, y) <= this.teleDistance) {
+		if (useTeleport && getDistance(me, x, y) <= this.teleDistance) {
 			//Misc.townCheck();
 
 			return this.teleportTo(x, y);
 		}
 
 		// Walk without calling getPath if the spot is close enough
-		if (!this.useTeleport() && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
+		if (!useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
 			return this.walkTo(x, y);
 		}
 		*/
