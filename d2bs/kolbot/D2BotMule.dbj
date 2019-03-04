@@ -12,7 +12,7 @@ var StarterConfig = {
 
 
 var master, gameInfo, connectFail, makeAcc, joinInfo,
-	muleMode, muleFilename, muleObj, handle,
+	muleMode, muleFilename, muleObj, handle, maxCharCount,
 	makeNext = false,
 	status = "loading",
 	masterStatus = {
@@ -882,9 +882,10 @@ MainSwitch:
 		}
 
 		obj = MuleData.read();
+		maxCharCount = (muleObj.charsPerAcc > 0 ? Math.min(muleObj.charsPerAcc, 18) : 8);
 
 		if (makeNext) {
-			if (obj.fullChars.length === 8 || (muleMode > 0 && obj.torchChars.length === 8)) {
+			if (obj.fullChars.length >= maxCharCount || (muleMode > 0 && obj.torchChars.length >= maxCharCount)) {
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -916,9 +917,9 @@ MainSwitch:
 		}
 
 		if (ControlAction.findCharacter(info)) {
-			ControlAction.loginCharacter(info);
+			ControlAction.loginCharacter(info, false);
 		} else {
-			if (ControlAction.getCharacters().length >= 8) { // premade account that's already full
+			if (ControlAction.getCharacters().length >= maxCharCount) { // premade account that's already full
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 

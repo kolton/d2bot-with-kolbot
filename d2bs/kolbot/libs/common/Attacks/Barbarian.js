@@ -13,13 +13,13 @@ var ClassAttack = {
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(Config.AttackSkill[0])) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return true;
+			return 1;
 		}
 
 		var index,
@@ -46,17 +46,8 @@ var ClassAttack = {
 			attackSkill = Config.LowManaSkill[0];
 		}
 
-		switch (this.doCast(unit, attackSkill)) {
-		case 0: // Fail
-			break;
-		case 1: // Success
-			return true;
-		case 2: // Telestomp with barbs is pointless
-			break;
-		}
-
-		// Couldn't attack
-		return false;
+		// Telestomp with barb is pointless
+		return this.doCast(unit, attackSkill);
 	},
 
 	afterAttack: function (pickit) {
@@ -191,7 +182,7 @@ MainLoop:
 			while (corpseList.length > 0) {
 				if (this.checkCloseMonsters(5)) {
 					if (Config.FindItemSwitch) {
-						Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
+						Attack.weaponSwitch(Attack.getPrimarySlot());
 					}
 
 					Attack.clear(10, false, false, false, false);
@@ -211,7 +202,7 @@ MainLoop:
 					}
 
 					if (Config.FindItemSwitch) {
-						Precast.weaponSwitch(Config.FindItemSwitch);
+						Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 					}
 
 CorpseLoop:
@@ -239,7 +230,7 @@ CorpseLoop:
 		}
 
 		if (Config.FindItemSwitch) {
-			Precast.weaponSwitch(Math.abs(Config.FindItemSwitch - 1));
+			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 
 		Pickit.pickItems();

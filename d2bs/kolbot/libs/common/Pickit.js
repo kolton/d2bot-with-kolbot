@@ -115,7 +115,7 @@ var Pickit = {
 
 			// Check if the item unit is still valid and if it's on ground or being dropped
 			if (copyUnit(pickList[0]).x !== undefined && (pickList[0].mode === 3 || pickList[0].mode === 5) &&
-					(Pather.useTeleport || me.inTown || !checkCollision(me, pickList[0], 0x1))) { // Don't pick items behind walls/obstacles when walking
+					(Pather.useTeleport() || me.inTown || !checkCollision(me, pickList[0], 0x1))) { // Don't pick items behind walls/obstacles when walking
 				// Check if the item should be picked
 				status = this.checkItem(pickList[0]);
 
@@ -267,7 +267,7 @@ MainLoop:
 				Skill.cast(43, 0, item);
 			} else {
 				if (getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
-					if (Pather.useTeleport) {
+					if (Pather.useTeleport()) {
 						Pather.moveToUnit(item);
 					} else if (!Pather.moveTo(item.x, item.y, 0)) {
 						continue MainLoop;
@@ -330,35 +330,6 @@ MainLoop:
 
 				if (this.ignoreLog.indexOf(stats.type) === -1) {
 					Misc.itemLogger("Kept", item);
-
-					if (["pk1", "pk2", "pk3"].indexOf(item.code) > -1 && !TorchSystem.LogKeys) {
-						break;
-					}
-
-					if (["dhn", "bey", "mbr"].indexOf(item.code) > -1 && !TorchSystem.LogOrgans) {
-						break;
-					}
-
-					if (["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(item.code) > -1 && !Config.ShowLowRunes) {
-						break;
-					}
-
-					if (["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(item.code) > -1 && !Config.ShowMiddleRunes) {
-						break;
-					}
-
-					if (["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(item.code) > -1 && !Config.ShowHighRunes) {
-						break;
-					}
-
-					if (["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(item.code) > -1 && !Config.ShowLowGems) {
-						break;
-					}
-
-					if (["glv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(item.code) > -1 && !Config.ShowHighGems) {
-						break;
-					}
-
 					Misc.logItem("Kept", item, keptLine);
 				}
 

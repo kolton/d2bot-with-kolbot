@@ -999,7 +999,7 @@ var Misc = {
 
 			unit = unitList.shift();
 
-			if (unit && (Pather.useTeleport || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
+			if (unit && (Pather.useTeleport() || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
 				Pickit.pickItems();
 			}
 		}
@@ -1015,11 +1015,11 @@ var Misc = {
 		}
 
 		if (!range) {
-			range = Pather.useTeleport ? 25 : 15;
+			range = Pather.useTeleport() ? 25 : 15;
 		}
 
 		var i, j, shrine,
-			index  = -1,
+			index = -1,
 			shrineList = [];
 
 		// Initiate shrine states
@@ -1086,7 +1086,7 @@ var Misc = {
 					// Get the shrine if we have no active state or to refresh current state or if the shrine has no state
 					// Don't override shrine state with a lesser priority shrine
 					if (index === -1 || i <= index || this.shrineStates[i] === 0) {
-						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport || !checkCollision(me, shrineList[j], 0x4))) {
+						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport() || !checkCollision(me, shrineList[j], 0x4))) {
 							this.getShrine(shrineList[j]);
 
 							// Gem shrine - pick gem
@@ -1333,7 +1333,43 @@ var Misc = {
 			return false;
 		}
 
-		var i, lastArea, code, desc, sock, itemObj,
+		var i;
+
+		if (!Config.LogKeys && ["pk1", "pk2", "pk3"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogOrgans && ["dhn", "bey", "mbr"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogLowRunes && ["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogMiddleRunes && ["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogHighRunes && ["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogLowGems && ["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogHighGems && ["glv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		for (i = 0; i < Config.SkipLogging.length; i++) {
+			if (Config.SkipLogging[i] === unit.classid || Config.SkipLogging[i] === unit.code) {
+				return false;
+			}
+		}
+
+		var lastArea, code, desc, sock, itemObj,
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<:;.*]|\/|\\/g, "").trim();
 
@@ -1633,15 +1669,6 @@ var Misc = {
 		}
 
 		return false;
-	},
-
-	// Teleport with slot II
-	teleSwitch: function () {
-		this.oldSwitch = me.weaponswitch;
-
-		Precast.weaponSwitch();
-
-		return true;
 	},
 
 	// Go to town when low on hp/mp or when out of potions. can be upgraded to check for curses etc.
@@ -2434,7 +2461,7 @@ CursorLoop:
 
 		if (wait > 0) {
 			delay(wait);
-		}	
+		}
 	},
 
 	changeStat: function (stat, value) {
@@ -2476,34 +2503,32 @@ function PacketBuilder () {
 		throw new Error("PacketBuilder must be called with 'new' operator!");
 	}
 
-	let queue = [], plen = 0;
+	let queue = [], count = 0;
 
-	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
-		let strType;
-
-		[strType, type] = type === "StringZ" ? [2, "String"] : [type === "String" ? 1 : 0, type];
-
+	let enqueue = (type, size) => (...args) => { // accepts any number of arguments
 		args.forEach(arg => {
-			strType && (size = arg.length + strType - 1); // string length adjustment for null termination
-			plen += size;
+			if (type === 'String') {
+				arg = stringToEUC(arg);
+				size = arg.length + 1;
+			}
+
 			queue.push({type: type, size: size, data: arg});
+			count += size;
 		});
 
 		return this;
 	};
 
-	this.byte = storeFields("Uint8", 1);
-	this.word = storeFields("Uint16", 2);
-	this.dword = storeFields("Uint32", 4);
-	this.float = storeFields("Float32", 4);
-	this.string = storeFields("StringZ");
+	this.float = enqueue("Float32", 4);
+	this.dword = enqueue("Uint32", 4);
+	this.word = enqueue("Uint16", 2);
+	this.byte = enqueue("Uint8", 1);
+	this.string = enqueue("String");
 
 	this.buildDataView = () => {
-		let dv = new DataView(new ArrayBuffer(plen)), i = 0;
+		let dv = new DataView(new ArrayBuffer(count)), i = 0;
 		queue.forEach(field => {
 			if (field.type === "String") {
-				field.data = utf8ToEuc(field.data);
-
 				for (let l = 0; l < field.data.length; l++) {
 					dv.setUint8(i++, field.data.charCodeAt(l), true);
 				}

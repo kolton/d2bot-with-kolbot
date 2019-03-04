@@ -10,38 +10,6 @@ var Precast = new function () {
 	this.BOTick = 0;
 	this.bestSlot = {};
 
-	this.weaponSwitch = function (slot) {
-		if (me.gametype === 0 || me.weaponswitch === slot) {
-			return true;
-		}
-
-		var i, tick;
-
-		if (slot === undefined) {
-			slot = me.weaponswitch ^ 1;
-		}
-
-		delay(500);
-
-		for (i = 0; i < 5; i += 1) {
-			weaponSwitch();
-
-			tick = getTickCount();
-
-			while (getTickCount() - tick < 2000 + me.ping) {
-				if (me.weaponswitch === slot) {
-					//delay(me.ping + 1);
-
-					return true;
-				}
-
-				delay(10);
-			}
-		}
-
-		return false;
-	};
-
 	this.precastCTA = function (force) {
 		if (!force && me.getState(32)) {
 			return true;
@@ -54,14 +22,14 @@ var Precast = new function () {
 		if (this.checkCTA()) {
 			var slot = me.weaponswitch;
 
-			this.weaponSwitch(this.haveCTA);
+			Attack.weaponSwitch(this.haveCTA);
 			Skill.cast(155, 0); // Battle Command
 			Skill.cast(149, 0); // Battle Orders
 
 			this.BODuration = (20 + me.getSkill(149, 1) * 10 + (me.getSkill(138, 0) + me.getSkill(155, 0)) * 5) * 1000;
 			this.BOTick = getTickCount();
 
-			this.weaponSwitch(slot);
+			Attack.weaponSwitch(slot);
 
 			return true;
 		}
@@ -155,9 +123,9 @@ var Precast = new function () {
 	this.precastSkill = function (skillId) {
 		var swap = me.weaponswitch;
 
-		this.weaponSwitch(this.getBetterSlot(skillId));
+		Attack.weaponSwitch(this.getBetterSlot(skillId));
 		Skill.cast(skillId, 0);
-		this.weaponSwitch(swap);
+		Attack.weaponSwitch(swap);
 
 		return true;
 	};
@@ -165,8 +133,8 @@ var Precast = new function () {
 	this.doPrecast = function (force) {
 		var buffSummons = false;
 
-		// Force BO 15 seconds before it expires
-		this.precastCTA(!me.getState(32) || force || (getTickCount() - this.BOTick >= this.BODuration - 15000));
+		// Force BO 30 seconds before it expires
+		this.precastCTA(!me.getState(32) || force || (getTickCount() - this.BOTick >= this.BODuration - 30000));
 
 		switch (me.classid) {
 		case 0: // Amazon
@@ -237,7 +205,7 @@ var Precast = new function () {
 			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
 				var swap = me.weaponswitch;
 
-				this.weaponSwitch(this.getBetterSlot(149));
+				Attack.weaponSwitch(this.getBetterSlot(149));
 
 				if (!me.getState(51) || force) {
 					Skill.cast(155, 0); // Battle Command
@@ -251,7 +219,7 @@ var Precast = new function () {
 					Skill.cast(138, 0); // Shout
 				}
 
-				this.weaponSwitch(swap);
+				Attack.weaponSwitch(swap);
 			}
 
 			break;
@@ -369,6 +337,8 @@ var Precast = new function () {
 
 			break;
 		}
+
+		Attack.weaponSwitch(Attack.getPrimarySlot());
 	};
 
 	this.checkCTA = function () {
@@ -472,7 +442,7 @@ var Precast = new function () {
 	this.enchant = function () {
 		var unit, slot = me.weaponswitch, chanted = [];
 
-		this.weaponSwitch(this.getBetterSlot(52));
+		Attack.weaponSwitch(this.getBetterSlot(52));
 
 		// Player
 		unit = getUnit(0);
@@ -497,7 +467,7 @@ var Precast = new function () {
 			} while (unit.getNext());
 		}
 
-		this.weaponSwitch(slot);
+		Attack.weaponSwitch(slot);
 
 		return true;
 	};
