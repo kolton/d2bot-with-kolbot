@@ -649,6 +649,7 @@ function main() {
 			}
 
 			this.checkPing(false); // In case of quitlist triggering first
+			Pickit.pickItems();
 			this.exit();
 
 			break;
