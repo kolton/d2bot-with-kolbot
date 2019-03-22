@@ -639,7 +639,7 @@ ModeLoop:
 
 							break;
 						case 2: // stairs
-							if (!this.openExit(targetArea) && !this.useUnit(5, currExit.tileid, areas[i])) {
+							if (!this.openExit(areas[i]) && !this.useUnit(5, currExit.tileid, areas[i])) {
 								return false;
 							}
 
@@ -1394,13 +1394,17 @@ MainLoop:
 
 				if (unit) {
 					for (i = 0; i < 3; i += 1) {
+						if (unit.mode) {
+							break;
+						}
+
 						Misc.click(0, 0, unit);
 						//unit.interact();
 
 						tick = getTickCount();
 
 						while (getTickCount() - tick < 3000) {
-							if (unit.mode === 2) {
+							if (unit.mode) {
 								delay(1000);
 
 								break;
