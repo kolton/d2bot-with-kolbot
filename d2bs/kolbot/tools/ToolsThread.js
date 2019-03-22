@@ -649,6 +649,7 @@ function main() {
 			}
 
 			this.checkPing(false); // In case of quitlist triggering first
+			Pickit.pickItems(); // Give Followers a chance to pick items on last script when Leader is in quitlist
 			this.exit();
 
 			break;
