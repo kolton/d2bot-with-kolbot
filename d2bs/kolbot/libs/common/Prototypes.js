@@ -120,7 +120,7 @@ Unit.prototype.openMenu = function (addDelay) {
 				return true;
 			}
 
-			if (getInteractedNPC()) {
+			if (getInteractedNPC() && getTickCount() - tick > 1000) {
 				me.cancel();
 			}
 
@@ -1018,7 +1018,7 @@ Unit.prototype.getColor = function () {
 		}
 	} else if (this.quality === 7) { // Unique
 		for (i = 0; i < 401; i += 1) {
-			if (this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+			if (this.code === getBaseStat(17, i, 4).replace(/^\s+|\s+$/g, "") && this.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 				return getBaseStat(17, i, 13) > 20 ? -1 : getBaseStat(17, i, 13);
 			}
 		}

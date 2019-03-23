@@ -1503,7 +1503,7 @@ var Misc = {
 				break;
 			case 7: // Unique
 				for (i = 0; i < 401; i += 1) {
-					if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+					if (unit.code === getBaseStat(17, i, 4).trim() && unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 						code = getBaseStat(17, i, "invfile");
 
 						break;
@@ -2194,7 +2194,7 @@ var Packet = {
 					return true;
 				}
 
-				if (getInteractedNPC()) {
+				if (getInteractedNPC() && getTickCount() - tick > 1000) {
 					me.cancel();
 				}
 
