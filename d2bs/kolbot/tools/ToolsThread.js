@@ -425,7 +425,9 @@ function main() {
 			if ((typeof Config.QuitList === "string" && Config.QuitList.toLowerCase() === "any") ||
 					(Config.QuitList instanceof Array && Config.QuitList.indexOf(name1) > -1)) {
 				print(name1 + (mode === 0 ? " timed out" : " left"));
-
+				
+				Pickit.pickItems();	// Pick Items before quit, usefull if running as follower in last bossscript
+				
 				quitFlag = true;
 			}
 
@@ -649,7 +651,6 @@ function main() {
 			}
 
 			this.checkPing(false); // In case of quitlist triggering first
-			Pickit.pickItems(); // Give Followers a chance to pick items on last script when Leader is in quitlist
 			this.exit();
 
 			break;
