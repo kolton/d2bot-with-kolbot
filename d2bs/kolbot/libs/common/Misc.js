@@ -747,7 +747,9 @@ var Item = {
 		}
 
 		return true;
-	},
+	}
+	
+}
 
 var Chest = {
 	chestList: [],
