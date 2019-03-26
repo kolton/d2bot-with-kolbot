@@ -30,11 +30,11 @@ function Travincal() {
 	orgY = me.y;
 
 	if (Config.Travincal.PortalLeech) {
-		Pather.moveTo(orgX + 85, orgY - 139);
+		Pather.pathTo(orgX + 85, orgY - 139);
 		Attack.securePosition(orgX + 70, orgY - 139, 25, 2000);
 		Attack.securePosition(orgX + 100, orgY - 139, 25, 2000);
 		Attack.securePosition(orgX + 85, orgY - 139, 25, 5000);
-		Pather.moveTo(orgX + 85, orgY - 139);
+		Pather.pathTo(orgX + 85, orgY - 139);
 		Pather.makePortal();
 		delay(1000);
 		Precast.doPrecast(true);
@@ -45,7 +45,7 @@ function Travincal() {
 
 		for (i = 0; i < coords.length; i += 2) {
 			if (i % 4 === 0) {
-				Pather.moveTo(orgX + coords[i], orgY + coords[i + 1]);
+				Pather.pathTo(orgX + coords[i], orgY + coords[i + 1]);
 			} else {
 				Skill.cast(143, 0, orgX + coords[i], orgY + coords[i + 1]);
 				Attack.clearList(this.buildList(1));
@@ -54,7 +54,7 @@ function Travincal() {
 
 		Attack.clearList(this.buildList(0));
 	} else {
-		Pather.moveTo(orgX + 101, orgY - 56);
+		Pather.pathTo(orgX + 101, orgY - 56);
 
 		// Stack Merc
 		if (me.classid === 4 && !me.getSkill(54, 1) && me.gametype === 1) {

@@ -104,9 +104,9 @@ function DiabloHelper() {
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.sort);
 
 		if (this.vizLayout === 1) {
-			Pather.moveTo(7691, 5292);
+			Pather.pathTo(7691, 5292);
 		} else {
-			Pather.moveTo(7695, 5316);
+			Pather.pathTo(7695, 5316);
 		}
 
 		if (!this.getBoss(getLocaleString(2851))) {
@@ -124,9 +124,9 @@ function DiabloHelper() {
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.sort);
 
 		if (this.seisLayout === 1) {
-			Pather.moveTo(7771, 5196);
+			Pather.pathTo(7771, 5196);
 		} else {
-			Pather.moveTo(7798, 5186);
+			Pather.pathTo(7798, 5186);
 		}
 
 		if (!this.getBoss(getLocaleString(2852))) {
@@ -146,7 +146,7 @@ function DiabloHelper() {
 		if (this.infLayout === 1) {
 			delay(1);
 		} else {
-			Pather.moveTo(7928, 5295); // temp
+			Pather.pathTo(7928, 5295); // temp
 		}
 
 		if (!this.getBoss(getLocaleString(2853))) {
@@ -298,7 +298,7 @@ function DiabloHelper() {
 				this.clearStrays();
 			}
 
-			Pather.moveTo(path[i], path[i + 1], 3, getDistance(me, path[i], path[i + 1]) > 50);
+			Pather.pathTo(path[i], path[i + 1], 3, getDistance(me, path[i], path[i + 1]) > 50);
 			Attack.clear(30, 0, false, this.sort);
 
 			// Push cleared positions so they can be checked for strays
@@ -338,7 +338,7 @@ function DiabloHelper() {
 		}
 
 		if (getDistance(me, oldPos.x, oldPos.y) > 5) {
-			Pather.moveTo(oldPos.x, oldPos.y);
+			Pather.pathTo(oldPos.x, oldPos.y);
 		}
 
 		return true;
@@ -401,12 +401,12 @@ AreaInfoLoop:
 			Pather.useWaypoint(107);
 		}
 
-		if (!Pather.moveTo(7790, 5544)) {
+		if (!Pather.pathTo(7790, 5544)) {
 			throw new Error("Failed to move to Chaos Sanctuary");
 		}
 
 		if (!Config.DiabloHelper.Entrance) {
-			Pather.moveTo(7774, 5305);
+			Pather.pathTo(7774, 5305);
 		}
 
 CSLoop:
@@ -451,11 +451,11 @@ CSLoop:
 		Attack.clear(35, 0, false, this.sort);
 		this.followPath(this.entranceToStar);
 	} else {
-		Pather.moveTo(7774, 5305);
+		Pather.pathTo(7774, 5305);
 		Attack.clear(35, 0, false, this.sort);
 	}
 
-	Pather.moveTo(7774, 5305);
+	Pather.pathTo(7774, 5305);
 	Attack.clear(35, 0, false, this.sort);
 	this.vizierSeal();
 	this.seisSeal();
@@ -464,11 +464,11 @@ CSLoop:
 
 	switch (me.classid) {
 	case 1:
-		Pather.moveTo(7793, 5291);
+		Pather.pathTo(7793, 5291);
 
 		break;
 	default:
-		Pather.moveTo(7788, 5292);
+		Pather.pathTo(7788, 5292);
 
 		break;
 	}

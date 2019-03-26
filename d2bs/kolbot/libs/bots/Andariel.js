@@ -26,7 +26,7 @@ function Andariel() {
 			}
 
 			if (getDistance(me, target) <= 10) {
-				Pather.moveTo(me.x > 22548 ? 22535 : 22560, 9520);
+				Pather.pathTo(me.x > 22548 ? 22535 : 22560, 9520);
 			}
 		}
 
@@ -41,7 +41,7 @@ function Andariel() {
 		throw new Error("Failed to move to Catacombs Level 4");
 	}
 
-	Pather.moveTo(22549, 9520);
+	Pather.pathTo(22549, 9520);
 
 	if (me.classid === 1 && me.gametype === 0) {
 		this.killAndariel();

@@ -40,7 +40,7 @@ function BattleOrders() {
 		quit();
 	}
 
-	Pather.moveTo(me.x + 6, me.y + 6);
+	Pather.pathTo(me.x + 6, me.y + 6);
 
 	var i,
 		tick = getTickCount(),
