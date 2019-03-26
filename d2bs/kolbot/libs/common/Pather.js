@@ -78,7 +78,7 @@ var NodeAction = {
 
 var PathDebug = {
 	hooks: [],
-	enableHooks: true,
+	enableHooks: false,
 
 	drawPath: function (path, color, clear) {
 		if (!this.enableHooks) {
