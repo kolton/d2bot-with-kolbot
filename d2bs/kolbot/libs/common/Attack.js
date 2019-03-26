@@ -515,7 +515,7 @@ var Attack = {
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
 							//print("random move m8");
 							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 5);
-							Pather.moveTo(coord.x, coord.y);
+							Pather.pathTo(coord.x, coord.y);
 						}
 
 						break;
@@ -551,7 +551,6 @@ var Attack = {
 		}
 
 		ClassAttack.afterAttack(pickit);
-		this.openChests(range, orgx, orgy);
 
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
@@ -684,7 +683,7 @@ var Attack = {
 						// Tele in random direction with Blessed Hammer
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
 							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
-							Pather.moveTo(coord.x, coord.y);
+							Pather.pathTo(coord.x, coord.y);
 						}
 
 						break;
@@ -722,7 +721,6 @@ var Attack = {
 		}
 
 		ClassAttack.afterAttack(true);
-		this.openChests(30);
 
 		if (attackCount > 0) {
 			Pickit.pickItems();
@@ -744,7 +742,7 @@ var Attack = {
 
 		while (true) {
 			if (getDistance(me, x, y) > 5) {
-				Pather.moveTo(x, y);
+				Pather.pathTo(x, y);
 			}
 
 			monster = getUnit(1);
@@ -905,7 +903,7 @@ var Attack = {
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
 			if (result) {
-				Pather.moveTo(result[0], result[1], 3, spectype);
+				Pather.pathTo(result[0], result[1], 3, spectype, true);
 				previousArea = result;
 				//this.countUniques();
 
@@ -915,7 +913,7 @@ var Attack = {
 			}
 			// Make sure bot does not get stuck in different area.
 			else if (currentArea !== getArea().id) {
-				Pather.moveTo(previousArea[0], previousArea[1], 3, spectype);
+				Pather.pathTo(previousArea[0], previousArea[1], 3, spectype);
 			}
 		}
 
@@ -1008,42 +1006,6 @@ var Attack = {
 		return true;
 	},
 
-	// Open chests when clearing
-	openChests: function (range, x, y) {
-		if (!Config.OpenChests) {
-			return false;
-		}
-
-		if (x === undefined || y === undefined) {
-			x = me.x;
-			y = me.y;
-		}
-
-		var i, unit,
-			list = [],
-			ids = ["chest", "chest3", "weaponrack", "armorstand"];
-
-		unit = getUnit(2);
-
-		if (unit) {
-			do {
-				if (unit.name && getDistance(unit, x, y) <= range && ids.indexOf(unit.name.toLowerCase()) > -1) {
-					list.push(copyUnit(unit));
-				}
-			} while (unit.getNext());
-		}
-
-		while (list.length) {
-			list.sort(Sort.units);
-
-			if (Misc.openChest(list.shift())) {
-				Pickit.pickItems();
-			}
-		}
-
-		return true;
-	},
-
 	buildMonsterList: function () {
 		var monster,
 			monList = [];
@@ -1120,7 +1082,7 @@ var Attack = {
 		if (typeof index === "number") {
 			//print("Dodge build time: " + (getTickCount() - tick));
 
-			return Pather.moveTo(grid[index].x, grid[index].y, 0);
+			return Pather.pathTo(grid[index].x, grid[index].y, 0);
 		}
 
 		return false;
@@ -1550,7 +1512,7 @@ AuraLoop: // Skip monsters with auras
 					Pather.walkTo(unit.x, unit.y, 3);
 				}
 			} else {
-				Pather.moveTo(unit.x, unit.y, 0);
+				Pather.maneuverTo(unit.x, unit.y, 0);
 			}
 
 			return !CollMap.checkColl(me, unit, coll);
@@ -1598,12 +1560,12 @@ AuraLoop: // Skip monsters with auras
 							if (getDistance(me, coords[i]) < 6 && !CollMap.checkColl(me, coords[i], 0x5)) {
 								Pather.walkTo(coords[i].x, coords[i].y, 2);
 							} else {
-								Pather.moveTo(coords[i].x, coords[i].y, 1);
+								Pather.maneuverTo(coords[i].x, coords[i].y, 1);
 							}
 
 							break;
 						default:
-							Pather.moveTo(coords[i].x, coords[i].y, 1);
+							Pather.maneuverTo(coords[i].x, coords[i].y, 1, true);
 
 							break;
 						}

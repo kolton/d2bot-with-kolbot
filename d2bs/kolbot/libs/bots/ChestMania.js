@@ -14,7 +14,7 @@ function ChestMania() {
 			for (i = 0; i < Config.ChestMania[prop].length; i += 1) {
 				Pather.journeyTo(Config.ChestMania[prop][i]);
 				Precast.doPrecast(i == 0 ? true : false);
-				Misc.openChestsInArea(Config.ChestMania[prop][i]);
+				Chest.openChestsInArea(Config.ChestMania[prop][i]);
 			}
 
 			Town.doChores();

@@ -86,13 +86,13 @@ function TristramLeech() {
 						Attack.clear(10);
 					}
 				} else {
-						Pather.moveTo(copyUnit(leaderUnit).x, copyUnit(leaderUnit).y);
+						Pather.pathTo(copyUnit(leaderUnit).x, copyUnit(leaderUnit).y);
 						Attack.clear(10);
 				}
 			}
 			catch(err){
 				if (whereisleader.area === me.area){
-					Pather.moveTo(whereisleader.x, whereisleader.y);
+					Pather.pathTo(whereisleader.x, whereisleader.y);
 					Attack.clear(10);
 				}
 			}

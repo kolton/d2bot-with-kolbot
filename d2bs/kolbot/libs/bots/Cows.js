@@ -67,7 +67,7 @@ function Cows() {
 			result = Pather.getNearestWalkable(room[0], room[1], 10, 2);
 
 			if (result) {
-				Pather.moveTo(result[0], result[1], 3);
+				Pather.pathTo(result[0], result[1], 3);
 
 				if (!Attack.clear(30)) {
 					return false;
@@ -105,7 +105,7 @@ function Cows() {
 			throw new Error("Tristram portal not found");
 		}
 
-		Pather.moveTo(25048, 5177);
+		Pather.pathTo(25048, 5177);
 
 		wirt = getUnit(2, 268);
 

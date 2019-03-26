@@ -125,7 +125,7 @@ function MFHelper() {
 			result = Pather.getNearestWalkable(room[0], room[1], 10, 2);
 
 			if (result) {
-				Pather.moveTo(result[0], result[1], 3);
+				Pather.pathTo(result[0], result[1], 3);
 
 				if (!Attack.clear(30)) {
 					return false;
