@@ -35,7 +35,7 @@ function Duriel() {
 			}
 
 			if (getDistance(me, target) <= 10) {
-				Pather.moveTo(22638, me.y < target.y ? 15722 : 15693);
+				Pather.pathTo(22638, me.y < target.y ? 15722 : 15693);
 			}
 		}
 

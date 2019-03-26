@@ -15,7 +15,8 @@ function Radament() {
 
 	Attack.kill(229); // Radament
 	Pickit.pickItems();
-	Attack.openChests(20);
+	Chest.scan(20);
+	Chest.openChests();
 
 	return true;
 }

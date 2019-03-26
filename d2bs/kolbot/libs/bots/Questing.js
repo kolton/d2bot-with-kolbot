@@ -140,7 +140,7 @@ function Questing() {
 
 		stand = getUnit(2, 193);
 
-		Misc.openChest(stand);
+		Chest.openChest(stand);
 		delay(300);
 
 		book = getUnit(4, 548);
@@ -173,7 +173,7 @@ function Questing() {
 		}
 
 		Precast.doPrecast(true);
-		Pather.moveTo(3883, 5113);
+		Pather.pathTo(3883, 5113);
 		Attack.kill(getLocaleString(22435)); // Shenk the Overseer
 		Town.goToTown();
 

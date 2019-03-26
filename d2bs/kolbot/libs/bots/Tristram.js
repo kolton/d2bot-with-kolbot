@@ -20,7 +20,7 @@ function Tristram() {
 
 			tree = getUnit(2, 30);
 
-			Misc.openChest(tree);
+			Chest.openChest(tree);
 			delay(300);
 
 			scroll = getUnit(4, 524);
@@ -67,7 +67,7 @@ function Tristram() {
 		Attack.securePosition(me.x, me.y, 10, 1000);
 	}
 
-	Pather.moveTo(me.x, me.y + 6);
+	Pather.pathTo(me.x, me.y + 6);
 
 	if (Config.Tristram.PortalLeech) {
 		Pather.makePortal();
@@ -82,7 +82,7 @@ function Tristram() {
 			throw new Error("Failed to move to Cain's Gibbet");
 		}
 
-		Misc.openChest(gibbet);
+		Chest.openChest(gibbet);
 	}
 
 	if (Config.Tristram.PortalLeech) {

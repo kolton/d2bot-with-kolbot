@@ -20,7 +20,7 @@ function Rakanishu() {
 			throw new Error("Failed to move to Tristram");
 		}
 
-		Pather.moveTo(25149, 5180);
+		Pather.pathTo(25149, 5180);
 		Attack.clear(20, 0xF, 365); // Griswold
 	}
 
