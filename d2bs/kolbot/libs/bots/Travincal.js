@@ -58,10 +58,7 @@ function Travincal() {
 
 		// Stack Merc
 		if (me.classid === 4 && !me.getSkill(54, 1) && me.gametype === 1) {
-			// WAR - moveToExit needs to be fixed
-			Pather.moveToExit(100, true);
-			delay(me.ping*2 + 100);
-			Pather.moveToExit(83, true);
+			Pather.moveToExit([100, 83], true);
 		}
 
 		if (Config.MFLeader) {
