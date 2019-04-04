@@ -1366,7 +1366,7 @@ CursorLoop:
 
 		if (item) {
 			do {
-				if (!item.getFlag(0x400000)) { // Skip ethereal items
+				if (!item.getFlag(0x400000) || !item.getStat(152)) { // Skip ethereal or indestructible items
 					switch (item.itemType) {
 					// Quantity check
 					case 42: // Throwing knives
