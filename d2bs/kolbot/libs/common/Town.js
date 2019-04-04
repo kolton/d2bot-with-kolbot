@@ -1255,12 +1255,16 @@ CursorLoop:
 		return false;
 	},
 
-	repair: function () {
+	repair: function (force = false) {
 		var i, quiver, myQuiver, npc, repairAction, bowCheck;
 
 		this.cubeRepair();
 
 		repairAction = this.needRepair();
+
+		if (force && repairAction.indexOf("repair") === -1) {
+			repairAction.push("repair");
+		}
 
 		if (!repairAction || !repairAction.length) {
 			return true;
@@ -1316,7 +1320,7 @@ CursorLoop:
 		return true;
 	},
 
-	needRepair: function (check = false) {
+	needRepair: function () {
 		var quiver, bowCheck, quantity,
 			repairAction = [],
 			canAfford = me.gold >= me.getRepairCost();
@@ -1341,7 +1345,7 @@ CursorLoop:
 			} else {
 				quantity = quiver.getStat(70);
 
-				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= check ? (Config.RepairPercent / 2) : Config.RepairPercent) {
+				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= Config.RepairPercent) {
 					repairAction.push("buyQuiver");
 				}
 			}
@@ -1349,7 +1353,7 @@ CursorLoop:
 
 		// Repair durability/quantity/charges
 		if (canAfford) {
-			if (this.getItemsForRepair(check ? (Config.RepairPercent / 2) : Config.RepairPercent, true).length > 0) {
+			if (this.getItemsForRepair(Config.RepairPercent, true).length > 0) {
 				repairAction.push("repair");
 			}
 		} else {
@@ -2170,7 +2174,7 @@ MainLoop:
 		return true;
 	},
 
-	visitTown: function () {
+	visitTown: function (repair = false) {
 		if (me.inTown) {
 			this.doChores();
 			this.move("stash");
@@ -2188,6 +2192,10 @@ MainLoop:
 		}
 
 		this.doChores();
+
+		if (repair) {
+			this.repair(true);
+		}
 
 		if (me.act !== preAct) {
 			this.goToTown(preAct);
