@@ -105,7 +105,7 @@ var Loader = {
 								reconfiguration = typeof Scripts[i] === 'object';
 
 								if (typeof (global[i]) === "function") {
-									if (i !== "Test" && i !== "Follower") {
+									if (i !== "Test" && i !== "Follower" && i !== "Duriel") {
 										townCheck = Town.goToTown();
 									} else {
 										townCheck = true;
