@@ -895,6 +895,14 @@ ModeLoop:
 			}
 
 			if (me.inTown) {
+				if (me.area === 40 && me.x === 5153 && me.y === 5203) {
+					let npc = getUnit(1, "warriv");
+
+					if (npc && npc.openMenu()) {
+						Misc.useMenu(0x0D37);
+					}
+				}
+
 				Town.move("waypoint");
 			}
 
