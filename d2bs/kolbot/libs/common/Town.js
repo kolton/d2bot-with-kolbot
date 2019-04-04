@@ -66,7 +66,7 @@ var Town = {
 	],
 
 	// Do town chores
-	doChores: function () {
+	doChores: function (repair = false) {
 		if (!me.inTown) {
 			this.goToTown();
 		}
@@ -89,7 +89,7 @@ var Town = {
 		this.clearInventory();
 		Item.autoEquip();
 		this.buyKeys();
-		this.repair();
+		this.repair(repair);
 		this.gamble();
 		this.reviveMerc();
 		Cubing.doCubing();
@@ -2191,11 +2191,7 @@ MainLoop:
 			return false;
 		}
 
-		this.doChores();
-
-		if (repair) {
-			this.repair(true);
-		}
+		this.doChores(repair);
 
 		if (me.act !== preAct) {
 			this.goToTown(preAct);
