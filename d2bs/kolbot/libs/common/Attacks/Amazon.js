@@ -9,7 +9,7 @@ var ClassAttack = {
 	lightFuryTick: 0,
 
 	doAttack: function (unit, preattack) {
-		if (Config.MercWatch && Town.needMerc()) {
+		if ((Config.MercWatch && Town.needMerc()) || Town.needRepair(true).length > 0) {
 			Town.visitTown();
 		}
 

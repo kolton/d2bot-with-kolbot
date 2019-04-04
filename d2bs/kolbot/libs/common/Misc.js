@@ -1290,10 +1290,13 @@ var Misc = {
 
 		var desc,
 			date = new Date(),
+			y = date.getFullYear(),
+			mo = date.getMonth() + 1,
+			d = date.getDate(),
 			h = date.getHours(),
 			m = date.getMinutes(),
 			s = date.getSeconds(),
-			dateString = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
+			dateString = "[" + y + "/" + (d < 10 ? "0" + d : d) + "/" + (mo < 10 ? "0" + mo : mo) + " " + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
 
 		switch (action) {
 		case "Sold":
@@ -1847,23 +1850,27 @@ MainLoop:
 
 	// Report script errors to logs/ScriptErrorLog.txt
 	errorReport: function (error, script) {
-		var i, h, m, s, date, msg, oogmsg, filemsg, source, stack,
+		var i, y, mo, d, h, m, s, date, dateString, msg, oogmsg, filemsg, source, stack,
 			stackLog = "";
 
 		date = new Date();
+		y = date.getFullYear();
+		mo = date.getMonth() + 1;
+		d = date.getDate();
 		h = date.getHours();
 		m = date.getMinutes();
 		s = date.getSeconds();
+		dateString = "[" + y + "/" + (d < 10 ? "0" + d : d) + "/" + (mo < 10 ? "0" + mo : mo) + " " + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
 
 		if (typeof error === "string") {
 			msg = error;
 			oogmsg = error.replace(/ÿc[0-9!"+<:;.*]/gi, "");
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
+			filemsg = dateString + " <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
 		} else {
 			source = error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length);
 			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
 			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
+			filemsg = dateString + " <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
 
 			if (error.hasOwnProperty("stack")) {
 				stack = error.stack;

@@ -1316,7 +1316,7 @@ CursorLoop:
 		return true;
 	},
 
-	needRepair: function () {
+	needRepair: function (check = false) {
 		var quiver, bowCheck, quantity,
 			repairAction = [],
 			canAfford = me.gold >= me.getRepairCost();
@@ -1341,7 +1341,7 @@ CursorLoop:
 			} else {
 				quantity = quiver.getStat(70);
 
-				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= Config.RepairPercent) {
+				if (typeof quantity === "number" && quantity * 100 / getBaseStat("items", quiver.classid, "maxstack") <= check ? (Config.RepairPercent / 2) : Config.RepairPercent) {
 					repairAction.push("buyQuiver");
 				}
 			}
@@ -1349,7 +1349,7 @@ CursorLoop:
 
 		// Repair durability/quantity/charges
 		if (canAfford) {
-			if (this.getItemsForRepair(Config.RepairPercent, true).length > 0) {
+			if (this.getItemsForRepair(check ? (Config.RepairPercent / 2) : Config.RepairPercent, true).length > 0) {
 				repairAction.push("repair");
 			}
 		} else {
