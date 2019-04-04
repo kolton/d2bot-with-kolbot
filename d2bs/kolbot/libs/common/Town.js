@@ -1366,29 +1366,31 @@ CursorLoop:
 
 		if (item) {
 			do {
-				if (!item.getFlag(0x400000) && !item.getStat(152)) { // Skip ethereal or indestructible items
-					switch (item.itemType) {
-					// Quantity check
-					case 42: // Throwing knives
-					case 43: // Throwing axes
-					case 44: // Javelins
-					case 87: // Amazon javelins
-						quantity = item.getStat(70);
+				if (!item.getFlag(0x400000)) { // Skip ethereal items
+					if (!item.getStat(152)) { // Skip indestructible items
+						switch (item.itemType) {
+						// Quantity check
+						case 42: // Throwing knives
+						case 43: // Throwing axes
+						case 44: // Javelins
+						case 87: // Amazon javelins
+							quantity = item.getStat(70);
 
-						if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
-							itemList.push(copyUnit(item));
+							if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+								itemList.push(copyUnit(item));
+							}
+
+							break;
+						// Durability check
+						default:
+							durability = item.getStat(72);
+
+							if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
+								itemList.push(copyUnit(item));
+							}
+
+							break;
 						}
-
-						break;
-					// Durability check
-					default:
-						durability = item.getStat(72);
-
-						if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
-							itemList.push(copyUnit(item));
-						}
-
-						break;
 					}
 
 					if (chargedItems) {
