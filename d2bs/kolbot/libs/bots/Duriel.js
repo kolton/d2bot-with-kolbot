@@ -47,8 +47,9 @@ function Duriel() {
 	if (me.area !== 46) {
 		Town.doChores();
 		Pather.useWaypoint(46);
-		Precast.doPrecast(true);
 	}
+
+	Precast.doPrecast(true);
 
 	if (!Pather.moveToExit(getRoom().correcttomb, true)) {
 		throw new Error("Failed to move to Tal Rasha's Tomb");
