@@ -1290,13 +1290,7 @@ var Misc = {
 
 		var desc,
 			date = new Date(),
-			y = date.getFullYear(),
-			mo = date.getMonth() + 1,
-			d = date.getDate(),
-			h = date.getHours(),
-			m = date.getMinutes(),
-			s = date.getSeconds(),
-			dateString = "[" + y + "/" + (d < 10 ? "0" + d : d) + "/" + (mo < 10 ? "0" + mo : mo) + " " + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
+			dateString = "[" + new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0,-5).replace(/-/g, '/').replace('T', ' ') + "]";
 
 		switch (action) {
 		case "Sold":
@@ -1850,17 +1844,11 @@ MainLoop:
 
 	// Report script errors to logs/ScriptErrorLog.txt
 	errorReport: function (error, script) {
-		var i, y, mo, d, h, m, s, date, dateString, msg, oogmsg, filemsg, source, stack,
+		var i, date, dateString, msg, oogmsg, filemsg, source, stack,
 			stackLog = "";
 
 		date = new Date();
-		y = date.getFullYear();
-		mo = date.getMonth() + 1;
-		d = date.getDate();
-		h = date.getHours();
-		m = date.getMinutes();
-		s = date.getSeconds();
-		dateString = "[" + y + "/" + (d < 10 ? "0" + d : d) + "/" + (mo < 10 ? "0" + mo : mo) + " " + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
+		dateString = "[" + new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0,-5).replace(/-/g, '/').replace('T', ' ') + "]";
 
 		if (typeof error === "string") {
 			msg = error;
