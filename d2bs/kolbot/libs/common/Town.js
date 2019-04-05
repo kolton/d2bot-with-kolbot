@@ -66,7 +66,7 @@ var Town = {
 	],
 
 	// Do town chores
-	doChores: function () {
+	doChores: function (repair = false) {
 		if (!me.inTown) {
 			this.goToTown();
 		}
@@ -89,7 +89,7 @@ var Town = {
 		this.clearInventory();
 		Item.autoEquip();
 		this.buyKeys();
-		this.repair();
+		this.repair(repair);
 		this.gamble();
 		this.reviveMerc();
 		Cubing.doCubing();
@@ -1255,12 +1255,16 @@ CursorLoop:
 		return false;
 	},
 
-	repair: function () {
+	repair: function (force = false) {
 		var i, quiver, myQuiver, npc, repairAction, bowCheck;
 
 		this.cubeRepair();
 
 		repairAction = this.needRepair();
+
+		if (force && repairAction.indexOf("repair") === -1) {
+			repairAction.push("repair");
+		}
 
 		if (!repairAction || !repairAction.length) {
 			return true;
@@ -1367,28 +1371,30 @@ CursorLoop:
 		if (item) {
 			do {
 				if (!item.getFlag(0x400000)) { // Skip ethereal items
-					switch (item.itemType) {
-					// Quantity check
-					case 42: // Throwing knives
-					case 43: // Throwing axes
-					case 44: // Javelins
-					case 87: // Amazon javelins
-						quantity = item.getStat(70);
+					if (!item.getStat(152)) { // Skip indestructible items
+						switch (item.itemType) {
+						// Quantity check
+						case 42: // Throwing knives
+						case 43: // Throwing axes
+						case 44: // Javelins
+						case 87: // Amazon javelins
+							quantity = item.getStat(70);
 
-						if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
-							itemList.push(copyUnit(item));
+							if (typeof quantity === "number" && quantity * 100 / (getBaseStat("items", item.classid, "maxstack") + item.getStat(254)) <= repairPercent) { // Stat 254 = increased stack size
+								itemList.push(copyUnit(item));
+							}
+
+							break;
+						// Durability check
+						default:
+							durability = item.getStat(72);
+
+							if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
+								itemList.push(copyUnit(item));
+							}
+
+							break;
 						}
-
-						break;
-					// Durability check
-					default:
-						durability = item.getStat(72);
-
-						if (typeof durability === "number" && durability * 100 / item.getStat(73) <= repairPercent) {
-							itemList.push(copyUnit(item));
-						}
-
-						break;
 					}
 
 					if (chargedItems) {
@@ -2168,7 +2174,7 @@ MainLoop:
 		return true;
 	},
 
-	visitTown: function () {
+	visitTown: function (repair = false) {
 		if (me.inTown) {
 			this.doChores();
 			this.move("stash");
@@ -2185,7 +2191,7 @@ MainLoop:
 			return false;
 		}
 
-		this.doChores();
+		this.doChores(repair);
 
 		if (me.act !== preAct) {
 			this.goToTown(preAct);
