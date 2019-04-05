@@ -4,7 +4,7 @@
 *	@desc		kill Duriel
 */
 
-function Duriel () {
+function Duriel() {
 	this.killDuriel = function () {
 		var i, target;
 
@@ -42,22 +42,9 @@ function Duriel () {
 		return target.dead;
 	};
 
-	// return the script position in the list of scripts to be ran
-	this.scriptIndex = function (script) {
-		let s, charScripts = [];
-
-		for (s in Scripts) {
-			if (Scripts[s]) {
-				charScripts.push(s);
-			}
-		}
-
-		return charScripts.indexOf(script);
-	};
-
 	var i, unit;
 
-	if (!Scripts.Summoner || this.scriptIndex("Duriel") !== this.scriptIndex("Summoner") + 1) {
+	if (me.area !== 46) {
 		Town.doChores();
 		Pather.useWaypoint(46);
 		Precast.doPrecast(true);

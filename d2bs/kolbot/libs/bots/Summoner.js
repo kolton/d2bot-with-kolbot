@@ -4,20 +4,7 @@
 *	@desc		kill the Summoner
 */
 
-function Summoner () {
-	// return the script position in the list of scripts to be ran
-	this.scriptIndex = function (script) {
-		let s, charScripts = [];
-
-		for (s in Scripts) {
-			if (Scripts[s]) {
-				charScripts.push(s);
-			}
-		}
-
-		return charScripts.indexOf(script);
-	};
-
+function Summoner() {
 	Town.doChores();
 	Pather.useWaypoint(74);
 	Precast.doPrecast(true);
@@ -40,14 +27,14 @@ function Summoner () {
 
 	Attack.clear(15, 0, 250); // The Summoner
 
-	if (Scripts.Duriel && this.scriptIndex("Duriel") === this.scriptIndex("Summoner") + 1) {
+	if (Loader.scriptName(1) === "Duriel") {
 		let journal = getUnit(2, 357);
 
 		if (!journal) {
 			throw new Error("Journal not found");
 		}
 
-		Pather.moveTo(journal.x, journal.y);
+		Pather.moveToUnit(journal);
 		journal.interact();
 		delay(500);
 		me.cancel();

@@ -4,7 +4,7 @@
 *	@desc		kill Andariel
 */
 
-function Andariel () {
+function Andariel() {
 	this.killAndariel = function () {
 		var i,
 			target = getUnit(1, 156);

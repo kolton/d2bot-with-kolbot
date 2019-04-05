@@ -8,6 +8,7 @@ var global = this;
 
 var Loader = {
 	scriptList: [],
+	scriptIndex: -1,
 
 	init: function () {
 		this.getScripts();
@@ -115,6 +116,7 @@ var Loader = {
 										print("ÿc2Starting script: ÿc9" + i);
 										//scriptBroadcast(JSON.stringify({currScript: i}));
 										Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: i}));
+										this.scriptIndex++;
 
 										if (reconfiguration) {
 											print("ÿc2Copying Config properties from " + i + " object.");
@@ -141,5 +143,22 @@ var Loader = {
 				}
 			}
 		}
+	},
+
+	scriptName: function (offset = 0) {
+		let s, charScripts = [],
+			index = this.scriptIndex + offset;
+
+		for (s in Scripts) {
+			if (Scripts[s]) {
+				charScripts.push(s);
+			}
+		}
+
+		if (index < 0 || index >= charScripts.length) {
+			return undefined;
+		}
+
+		return charScripts[index];
 	}
 };

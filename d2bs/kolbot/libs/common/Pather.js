@@ -887,7 +887,7 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp, coord, retry;
+		var i, tick, wp, coord, retry, npc;
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -895,9 +895,7 @@ ModeLoop:
 			}
 
 			if (me.inTown) {
-				if (me.area === 40 && me.x === 5153 && me.y === 5203) {
-					let npc = getUnit(1, "warriv");
-
+				if (me.area === 40 && npc && getDistance(me, npc) < 50) {
 					if (npc && npc.openMenu()) {
 						Misc.useMenu(0x0D37);
 					}
