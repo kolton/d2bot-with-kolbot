@@ -4,7 +4,7 @@
 *	@desc		kill the Summoner
 */
 
-function Summoner() {
+function Summoner () {
 	Town.doChores();
 	Pather.useWaypoint(74);
 	Precast.doPrecast(true);
@@ -42,6 +42,8 @@ function Summoner() {
 		if (!Pather.usePortal(46)) {
 			throw new Error("Failed to take arcane portal");
 		}
+
+		Loader.skipTown.push("Duriel");
 	}
 
 	return true;

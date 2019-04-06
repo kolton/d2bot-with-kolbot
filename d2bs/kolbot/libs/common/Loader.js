@@ -9,6 +9,7 @@ var global = this;
 var Loader = {
 	scriptList: [],
 	scriptIndex: -1,
+	skipTown: ["Test", "Follower"],
 
 	init: function () {
 		this.getScripts();
@@ -106,10 +107,10 @@ var Loader = {
 								reconfiguration = typeof Scripts[i] === 'object';
 
 								if (typeof (global[i]) === "function") {
-									if (i !== "Test" && i !== "Follower" && i !== "Duriel") {
-										townCheck = Town.goToTown();
-									} else {
+									if (this.skipTown.indexOf(i) > -1) {
 										townCheck = true;
+									} else {
+										townCheck = Town.goToTown();
 									}
 
 									if (townCheck) {

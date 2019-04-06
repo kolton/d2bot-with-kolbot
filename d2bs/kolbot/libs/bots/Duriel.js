@@ -4,7 +4,7 @@
 *	@desc		kill Duriel
 */
 
-function Duriel() {
+function Duriel () {
 	this.killDuriel = function () {
 		var i, target;
 

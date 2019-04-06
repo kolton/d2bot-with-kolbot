@@ -895,6 +895,8 @@ ModeLoop:
 			}
 
 			if (me.inTown) {
+				npc = getUnit(1, NPC.Warriv);
+
 				if (me.area === 40 && npc && getDistance(me, npc) < 50) {
 					if (npc && npc.openMenu()) {
 						Misc.useMenu(0x0D37);
