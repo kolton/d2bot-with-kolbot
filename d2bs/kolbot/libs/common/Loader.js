@@ -149,10 +149,10 @@ var Loader = {
 	scriptName: function (offset = 0) {
 		let index = this.scriptIndex + offset;
 
-		if (index < 0 || index >= this.scriptList.length) {
-			return undefined;
+		if (index >= 0 && index < this.scriptList.length) {
+			return this.scriptList[index];
 		}
 
-		return this.scriptList[index];
+		return null;
 	}
 };
