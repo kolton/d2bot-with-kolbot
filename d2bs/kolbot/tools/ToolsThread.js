@@ -26,6 +26,7 @@ include("common/Precast.js");
 include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
+include("common/Mercenary.js");
 include("common/Town.js");
 
 function main() {
@@ -600,7 +601,7 @@ function main() {
 
 				if (Config.UseMerc) {
 					mercHP = getMercHP();
-					merc = me.getMerc();
+					merc = Mercenary.getMerc();
 
 					if (mercHP > 0 && merc && merc.mode !== 12) {
 						if (mercHP < Config.MercChicken) {

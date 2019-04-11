@@ -77,6 +77,8 @@ var Town = {
 		Attack.weaponSwitch(Attack.getPrimarySlot());
 
 		this.heal();
+		Mercenary.revive();
+		Mercenary.hire(Config.UseMerc);
 		this.identify();
 		this.shopItems();
 		this.fillTome(518);
@@ -91,7 +93,6 @@ var Town = {
 		this.buyKeys();
 		this.repair();
 		this.gamble();
-		this.reviveMerc();
 		Cubing.doCubing();
 		Runewords.makeRunewords();
 		this.stash(true);
@@ -1412,92 +1413,6 @@ CursorLoop:
 		}
 
 		return itemList;
-	},
-
-	reviveMerc: function () {
-		if (!this.needMerc()) {
-			return true;
-		}
-
-		// Fuck Aheara
-		if (me.act === 3) {
-			this.goToTown(2);
-		}
-
-		var i, tick, dialog, lines,
-			preArea = me.area,
-			npc = this.initNPC("Merc", "reviveMerc");
-
-		if (!npc) {
-			return false;
-		}
-
-MainLoop:
-		for (i = 0; i < 3; i += 1) {
-			dialog = getDialogLines();
-
-			for (lines = 0; lines < dialog.length; lines += 1) {
-				if (dialog[lines].text.match(":", "gi")) {
-					dialog[lines].handler();
-					delay(Math.max(750, me.ping * 2));
-				}
-
-				// "You do not have enough gold for that."
-				if (dialog[lines].text.match(getLocaleString(3362), "gi")) {
-					return false;
-				}
-			}
-
-			while (getTickCount() - tick < 2000) {
-				if (!!me.getMerc()) {
-					delay(Math.max(750, me.ping * 2));
-
-					break MainLoop;
-				}
-
-				delay(200);
-			}
-		}
-
-		Attack.checkInfinity();
-
-		if (!!me.getMerc()) {
-			if (Config.MercWatch) { // Cast BO on merc so he doesn't just die again
-				print("MercWatch precast");
-				Pather.useWaypoint("random");
-				Precast.doPrecast(true);
-				Pather.useWaypoint(preArea);
-			}
-
-			return true;
-		}
-
-		return false;
-	},
-
-	needMerc: function () {
-		var i, merc;
-
-		if (me.gametype === 0 || !Config.UseMerc || me.gold < me.mercrevivecost) { // gametype 0 = classic
-			return false;
-		}
-
-		// me.getMerc() might return null if called right after taking a portal, that's why there's retry attempts
-		for (i = 0; i < 3; i += 1) {
-			merc = me.getMerc();
-
-			if (merc && merc.mode !== 0 && merc.mode !== 12) {
-				return false;
-			}
-
-			delay(100);
-		}
-
-		if (!me.mercrevivecost) { // In case we never had a merc and Config.UseMerc is still set to true for some odd reason
-			return false;
-		}
-
-		return true;
 	},
 
 	canStash: function (item) {

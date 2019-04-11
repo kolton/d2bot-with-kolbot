@@ -483,6 +483,10 @@ var Item = {
 		return Config.AutoEquip && NTIP.GetTier(item) > 0;
 	},
 
+	hasMercTier: function (item) {
+        return Config.AutoEquip && NTIP.GetMercTier(item) > 0;
+    },
+	
 	canEquip: function (item) {
 		if (item.type !== 4) { // Not an item
 			return false;
@@ -493,11 +497,33 @@ var Item = {
 		}
 
 		if (item.getStat(92) > me.getStat(12) || item.dexreq > me.getStat(2) || item.strreq > me.getStat(0)) { // Higher requirements
+			print("Can't equip " + item.name);
 			return false;
 		}
 
 		return true;
 	},
+	
+	canEquipMerc: function (item, bodyLoc) {  
+        if (!Mercenary.hasMerc()) { // dont have merc or he is dead
+            return false;
+        }
+          if (item.type !== 4) { // Not an item
+            return false;
+        }
+        if (!item.getFlag(0x10)) { // Unid item
+            return false;
+        }
+        
+        var merc = Mercenary.getMerc();
+        var curr = this.getEquippedItemMerc(bodyLoc);
+ 
+        if (item.getStat(92) > merc.getStat(12) || item.dexreq > merc.getStat(2) - curr.dex || item.strreq > merc.getStat(0)) { // Higher requirements
+            return false;
+        }
+ 
+        return true;
+    },
 
 	// Equips an item and throws away the old equipped item
 	equip: function (item, bodyLoc) {
@@ -543,6 +569,50 @@ var Item = {
 
 		return false;
 	},
+	
+	equipMerc: function (item, bodyLoc) {
+        if (!this.canEquipMerc(item, bodyLoc)) {
+            return false;
+        }
+ 
+        // Already equipped in the right slot
+        if (item.mode === 1 && item.bodylocation === bodyLoc) {
+            return true;
+        }
+ 
+        var i, cursorItem;
+ 
+        if (item.location === 7) {
+            if (!Town.openStash()) {
+                return false;
+            }
+        }
+ 
+        for (i = 0; i < 3; i += 1) {
+            if (item.toCursor()) {
+                var gid = item.gid;
+                clickItem(4, bodyLoc);
+                delay(me.ping * 2 + 500);
+ 
+                if (item.bodylocation === bodyLoc) {
+        
+                    if (getCursorType() === 3) {
+ 
+                        cursorItem = getUnit(100);
+ 
+                        if (cursorItem && Pickit.checkItem(cursorItem).result > 0) {
+                            if (Storage.Inventory.CanFit(cursorItem)) {
+                                Storage.Inventory.MoveTo(cursorItem);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+ 
+        return false;
+    },
 
 	getEquippedItem: function (bodyLoc) {
 		var item = me.getItem();
@@ -565,6 +635,35 @@ var Item = {
 		};
 	},
 
+	 getEquippedItemMerc: function (bodyLoc) {
+        var merc = Mercenary.getMerc();
+        var item = merc.getItem();
+ 
+        if (item) {
+            do {
+                if (item.bodylocation === bodyLoc && item.location === 1) {
+                    //print("Current Merc item tier: " + NTIP.GetMercTier(item) + " (" + item.name + ")");
+                    return {
+                        classid: item.classid,
+                        tier: NTIP.GetMercTier(item),
+                        name: item.name,
+                        str: item.getStatEx(0),
+                        dex: item.getStatEx(2)
+                    };
+                }
+            } while (item.getNext());
+        }
+ 
+        // Don't have anything equipped in there
+        return {
+            classid: -1,
+            tier: -1,
+            name: "none",
+            str: 0,
+            dex: 0
+        };
+    },
+	
 	getBodyLoc: function (item) {
 		var bodyLoc;
 
@@ -647,6 +746,42 @@ var Item = {
 		return bodyLoc;
 	},
 
+	 getBodyLocMerc: function (item) {
+        var bodyLocMerc;
+ 
+        switch (item.itemType) {
+        case 2: // Shield
+            bodyLocMerc = 5;
+ 
+            break;
+        case 3: // Armor
+            bodyLocMerc = 3;
+ 
+            break;
+            
+        case 37: // Helm
+        case 75: // Circlet
+            bodyLocMerc = 1;
+ 
+            break;
+        case 27: //
+        case 30: //
+        case 33: //
+        case 34: //
+            bodyLocMerc = 4;
+ 
+            break;
+        default:
+            return false;
+        }
+ 
+        if (typeof bodyLocMerc === "number") {
+            bodyLocMerc = [bodyLocMerc];
+        }
+ 
+        return bodyLocMerc;
+    },
+	
 	autoEquipCheck: function (item) {
 		if (!Config.AutoEquip) {
 			return true;
@@ -662,6 +797,8 @@ var Item = {
 				if (tier > this.getEquippedItem(bodyLoc[i]).tier && (this.canEquip(item) || !item.getFlag(0x10))) {
 					return true;
 				}
+				else if (item.getFlag(0x10))
+					print("Should not autoequip tier " + tier + " " + item.name + " - my tier " + this.getEquippedItem(bodyLoc[i]).tier);
 			}
 		}
 
@@ -672,6 +809,40 @@ var Item = {
 
 		return true;
 	},
+	
+	autoEquipCheckMerc: function (item) {
+        if (!Config.AutoEquip) {
+            return true;
+        }
+        
+        if (Config.AutoEquip && !Mercenary.hasMerc()) {
+            return false;
+        }
+ 
+        var i,
+            tier = NTIP.GetMercTier(item),
+            color = Pickit.itemColor(item),
+            bodyLoc = this.getBodyLocMerc(item);
+        
+        if (tier > 0 && bodyLoc) {
+            for (i = 0; i < bodyLoc.length; i += 1) {
+                // Low tier items shouldn't be kept if they can't be equipped
+                var oldTier = this.getEquippedItemMerc(bodyLoc[i]).tier;
+                if (tier > oldTier && (this.canEquipMerc(item) || !item.getFlag(0x10))) {
+                    //print("\xFFc8AutoPlay \xFFc0:: New merc item: " + color + item.name + " \xFFc0(new: " + tier + ", old: " + oldTier + ")");
+					return true;
+                }
+
+            }
+        }
+
+		if (tier > 0 && tier < 100) {
+			return false;
+		}
+		
+        return true;
+		
+    },
 
 	// returns true if the item should be kept+logged, false if not
 	autoEquip: function () {
