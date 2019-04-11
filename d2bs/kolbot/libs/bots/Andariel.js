@@ -4,7 +4,7 @@
 *	@desc		kill Andariel
 */
 
-function Andariel() {
+function Andariel () {
 	this.killAndariel = function () {
 		var i,
 			target = getUnit(1, 156);
@@ -19,7 +19,7 @@ function Andariel() {
 		}
 
 		for (i = 0; i < 300; i += 1) {
-			ClassAttack.doCast(target, Config.AttackSkill[1], Config.AttackSkill[2]);
+			ClassAttack.doAttack(target);
 
 			if (target.dead) {
 				return true;
