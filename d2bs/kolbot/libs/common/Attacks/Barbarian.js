@@ -6,7 +6,7 @@
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
-		if (Config.MercWatch && Town.needMerc()) {
+		if (Config.MercWatch && Mercenary.needMerc()) {
 			Town.visitTown();
 		}
 

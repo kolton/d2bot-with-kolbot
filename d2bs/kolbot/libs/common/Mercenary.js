@@ -72,7 +72,7 @@ var Mercenary = {
 
 	hasMerc: function (mercType, variant) {
 		if (!Config.UseMerc) {
-			return false;	//We don't want a merc
+			return true;	//We don't want a merc
 		}
 
 		if (mercType === undefined) {
@@ -100,7 +100,7 @@ var Mercenary = {
 		var merc = this.getMerc();
 
 		if (!merc && (me.mercrevivecost === 0 || me.gametype === 0)) {
-			return false;	//We never had a merc
+			return true;	//We never had a merc
 		} else if (this.isDead()) {
 			return true;	//Merc is dead so we can't determine the variant or type
 		} else if (this.classIds[mercType] !== merc.classid) {
@@ -122,7 +122,7 @@ var Mercenary = {
 	},
 
 	isDead: function () {
-		return Config.UseMerc && me.mercrevivecost > 0;
+		return me.mercrevivecost > 0;
 
 	},
 
@@ -131,7 +131,7 @@ var Mercenary = {
 			return false;
 		}
 
-		return Config.UseMerc;
+		return Config.UseMerc && (this.isDead() || !this.hasMerc());
 
 	},
 
@@ -149,7 +149,8 @@ var Mercenary = {
 
 		switch (mercType) {
 		case 1:
-			if ((this._checkQuest(2, 1) || this._checkQuest(2, 0)) && me.charlvl >= 8) {
+
+			if ((this._checkQuest(2, 1) || this._checkQuest(2, 0)) || me.charlvl >= 8) {
 				canHire = true;
 			}
 
