@@ -27,7 +27,7 @@ function GhostBusters() {
 			result = Pather.getNearestWalkable(room[0], room[1], 15, 2);
 
 			if (result) {
-				Pather.pathTo(result[0], result[1], 3);
+				Pather.moveTo(result[0], result[1], 3);
 
 				monList = [];
 				monster = getUnit(1);

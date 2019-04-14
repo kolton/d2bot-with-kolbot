@@ -313,7 +313,7 @@ function Follower() {
 			target = getUnit(2, 342);
 
 			if (target) {
-				Pather.pathTo(target.x - 3, target.y - 1);
+				Pather.moveTo(target.x - 3, target.y - 1);
 			}
 
 			Pather.usePortal(null);
@@ -735,7 +735,7 @@ function Follower() {
 			break;
 		case "move":
 			coord = CollMap.getRandCoordinate(me.x, -5, 5, me.y, -5, 5);
-			Pather.pathTo(coord.x, coord.y);
+			Pather.moveTo(coord.x, coord.y);
 
 			break;
 		case "wp":

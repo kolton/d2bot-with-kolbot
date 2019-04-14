@@ -141,7 +141,7 @@ function BaalAssistant() {
 					return false;
 				}
 				if (getDistance(me, 15094, 5029) > 3) {
-					Pather.pathTo(15094, 5029);
+					Pather.moveTo(15094, 5029);
 				}
 				if (Config.AttackSkill[4] > 0) {
 					Skill.setSkill(Config.AttackSkill[4], 0);
@@ -225,7 +225,7 @@ function BaalAssistant() {
 			}
 		}
 		for (i = 0; i < pos.length; i += 2) {
-			Pather.pathTo(pos[i], pos[i + 1]);
+			Pather.moveTo(pos[i], pos[i + 1]);
 			Attack.clear(25);
 		}
 	};
@@ -235,7 +235,7 @@ function BaalAssistant() {
 		if (hydra) {
 			do {
 				if (hydra.mode !== 12 && hydra.getStat(172) !== 2) {
-					Pather.pathTo(15072, 5002);
+					Pather.moveTo(15072, 5002);
 					while (hydra.mode !== 12) {
 						delay(500);
 						if (!copyUnit(hydra).x) {
@@ -398,26 +398,26 @@ function BaalAssistant() {
 						}
 
 						if (entrance) {
-							Pather.pathTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
+							Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
 						}
 
-						if (!Pather.moveToExit(131, true) || !Pather.pathTo(15118, 5002)) {
+						if (!Pather.moveToExit(131, true) || !Pather.moveTo(15118, 5002)) {
 							throw new Error("Failed to move to Throne of Destruction.");
 						}
 
-						Pather.pathTo(15095, 5029);
+						Pather.moveTo(15095, 5029);
 
 						if ((SoulQuit && getUnit(1, 641)) || (DollQuit && getUnit(1, 691))) {
 							print("Burning Souls or Undead Soul Killers found, ending script.");
 							return true;
 						}
 
-						Pather.pathTo(15118, 5002);
+						Pather.moveTo(15118, 5002);
 						if (Helper) {
 							Attack.clear(15);
-							Pather.pathTo(15118, 5002);
+							Pather.moveTo(15118, 5002);
 						} else {
-							Pather.pathTo(15117, 5045);
+							Pather.moveTo(15117, 5045);
 						}
 
 						secondAttempt = true;
@@ -431,9 +431,9 @@ function BaalAssistant() {
 							}
 							if (Helper) {
 								Attack.clear(15);
-								Pather.pathTo(15118, 5002);
+								Pather.moveTo(15118, 5002);
 							} else {
-								Pather.pathTo(15117, 5045);
+								Pather.moveTo(15117, 5045);
 							}
 						}
 					}
@@ -477,9 +477,9 @@ function BaalAssistant() {
 
 						if (Helper) {
 							Attack.clear(15);
-							Pather.pathTo(15118, 5002);
+							Pather.moveTo(15118, 5002);
 						} else {
-							Pather.pathTo(15117, 5045);
+							Pather.moveTo(15117, 5045);
 						}
 
 						secondAttempt = true;
@@ -493,9 +493,9 @@ function BaalAssistant() {
 							}
 							if (Helper) {
 								Attack.clear(15);
-								Pather.pathTo(15118, 5002);
+								Pather.moveTo(15118, 5002);
 							} else {
-								Pather.pathTo(15117, 5045);
+								Pather.moveTo(15117, 5045);
 							}
 						}
 					}
@@ -515,7 +515,7 @@ function BaalAssistant() {
 						Attack.clear(15);
 						this.clearThrone();
 
-						Pather.pathTo(15094, me.classid === 3 ? 5029 : 5038);
+						Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
 						Precast.doPrecast(true);
 					}
 
@@ -524,7 +524,7 @@ function BaalAssistant() {
 					MainLoop: while (true) {
 						if (Helper) {
 							if (getDistance(me, 15094, me.classid === 3 ? 5029 : 5038) > 3) {
-								Pather.pathTo(15094, me.classid === 3 ? 5029 : 5038);
+								Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
 							}
 						}
 
@@ -607,11 +607,11 @@ function BaalAssistant() {
 
 			if ((throneStatus || baalCheck) && KillBaal && me.area === 131) {
 				if (Helper) {
-					Pather.pathTo(15090, 5008);
+					Pather.moveTo(15090, 5008);
 					delay(2000);
 					Precast.doPrecast(true);
 				} else {
-					Pather.pathTo(15090, 5010);
+					Pather.moveTo(15090, 5010);
 					Precast.doPrecast(true);
 				}
 
@@ -638,7 +638,7 @@ function BaalAssistant() {
 
 				if (Helper) {
 					delay(1000);
-					Pather.pathTo(15134, 5923);
+					Pather.moveTo(15134, 5923);
 					baal = getUnit(1, 544);
 					Attack.kill(544);
 					Pickit.pickItems();
@@ -649,7 +649,7 @@ function BaalAssistant() {
 						return true;
 					}
 				} else {
-					Pather.pathTo(15177, 5952);
+					Pather.moveTo(15177, 5952);
 					baal = getUnit(1, 544);
 					while (baal) {
 						delay(1000);

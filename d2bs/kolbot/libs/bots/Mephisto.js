@@ -35,7 +35,7 @@ function Mephisto() {
 
 					if (Attack.validSpot(pos.x, pos.y)) {
 						me.overhead("move, bitch!");
-						Pather.pathTo(pos.x, pos.y);
+						Pather.moveTo(pos.x, pos.y);
 
 						break;
 					}
@@ -58,7 +58,7 @@ function Mephisto() {
 		count = 0;
 
 		delay(350);
-		Pather.pathTo(17563, 8072);
+		Pather.moveTo(17563, 8072);
 
 		mephisto = getUnit(1, 242);
 
@@ -67,40 +67,40 @@ function Mephisto() {
 		}
 
 		delay(350);
-		Pather.pathTo(17575, 8086);
+		Pather.moveTo(17575, 8086);
 		delay(350);
-		Pather.pathTo(17584, 8091);
+		Pather.moveTo(17584, 8091);
 		delay(1200);
-		Pather.pathTo(17600, 8095);
+		Pather.moveTo(17600, 8095);
 		delay(550);
-		Pather.pathTo(17610, 8094);
+		Pather.moveTo(17610, 8094);
 		delay(2500);
 		Attack.clear(10);
-		Pather.pathTo(17610, 8094);
+		Pather.moveTo(17610, 8094);
 
 		distance = getDistance(me, mephisto);
 
 		while (distance > 27) {
 			count += 1;
 
-			Pather.pathTo(17600, 8095);
+			Pather.moveTo(17600, 8095);
 			delay(150);
-			Pather.pathTo(17584, 8091);
+			Pather.moveTo(17584, 8091);
 			delay(150);
-			Pather.pathTo(17575, 8086);
+			Pather.moveTo(17575, 8086);
 			delay(150);
-			Pather.pathTo(17563, 8072);
+			Pather.moveTo(17563, 8072);
 			delay(350);
-			Pather.pathTo(17575, 8086);
+			Pather.moveTo(17575, 8086);
 			delay(350);
-			Pather.pathTo(17584, 8091);
+			Pather.moveTo(17584, 8091);
 			delay(1200);
-			Pather.pathTo(17600, 8095);
+			Pather.moveTo(17600, 8095);
 			delay(550);
-			Pather.pathTo(17610, 8094);
+			Pather.moveTo(17610, 8094);
 			delay(2500);
 			Attack.clear(10);
-			Pather.pathTo(17610, 8094);
+			Pather.moveTo(17610, 8094);
 
 			distance = getDistance(me, mephisto);
 
@@ -117,7 +117,7 @@ function Mephisto() {
 			coords = [17600, 8125, 17600, 8015, 17643, 8068];
 
 		for (i = 0; i < coords.length; i += 2) {
-			Pather.pathTo(coords[i], coords[i + 1]);
+			Pather.moveTo(coords[i], coords[i + 1]);
 
 			if (Config.MFLeader) {
 				Pather.makePortal();
@@ -142,7 +142,7 @@ function Mephisto() {
 		this.killCouncil();
 	}
 
-	Pather.pathTo(17566, 8069);
+	Pather.moveTo(17566, 8069);
 
 	if (me.classid === 1) {
 		if (Config.Mephisto.MoatTrick) {
@@ -164,21 +164,21 @@ function Mephisto() {
 	Pickit.pickItems();
 
 	if (Config.OpenChests) {
-		Pather.pathTo(17572, 8011);
+		Pather.moveTo(17572, 8011);
 		Chest.scan(5);	//Chest stuff should no longer be necessary but leaving it here just in case
 		Chest.openChests();
-		Pather.pathTo(17572, 8125);
+		Pather.moveTo(17572, 8125);
 		Chest.scan(5);
 		Chest.openChests();
-		Pather.pathTo(17515, 8061);
+		Pather.moveTo(17515, 8061);
 		Chest.scan(5);
 		Chest.openChests();
 	}
 
 	if (Config.Mephisto.TakeRedPortal) {
-		Pather.pathTo(17590, 8068);
+		Pather.moveTo(17590, 8068);
 		delay(1500);
-		Pather.pathTo(17601, 8070);
+		Pather.moveTo(17601, 8070);
 		Pather.usePortal(null);
 	}
 

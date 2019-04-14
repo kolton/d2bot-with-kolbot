@@ -103,7 +103,7 @@ function main() {
 		Pather.useWaypoint(35, true);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([36, 37], true) || !Pather.pathTo(22582, 9612)) {
+		if (!Pather.moveToExit([36, 37], true) || !Pather.moveTo(22582, 9612)) {
 			throw new Error("andy failed");
 		}
 
@@ -112,13 +112,13 @@ function main() {
 		say("1");
 
 		while (!this.playerIn()) {
-			Pather.pathTo(22582, 9612);
+			Pather.moveTo(22582, 9612);
 			delay(250);
 		}
 
 		Attack.kill(156);
 		say("2");
-		Pather.pathTo(22582, 9612);
+		Pather.moveTo(22582, 9612);
 
 		while (this.playerIn()) {
 			delay(250);
@@ -169,7 +169,7 @@ function main() {
 		Pather.useWaypoint(44, true);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([45, 58, 61], true) || !Pather.pathTo(15044, 14045)) {
+		if (!Pather.moveToExit([45, 58, 61], true) || !Pather.moveTo(15044, 14045)) {
 			throw new Error("amulet failed");
 		}
 
@@ -342,12 +342,12 @@ function main() {
 
 		Pather.teleport = false;
 
-		Pather.pathTo(22579, 15706);
+		Pather.moveTo(22579, 15706);
 
 		Pather.teleport = true;
 
-		Pather.pathTo(22577, 15649, 10);
-		Pather.pathTo(22577, 15609, 10);
+		Pather.moveTo(22577, 15649, 10);
+		Pather.moveTo(22577, 15609, 10);
 		Pather.makePortal();
 		say("1");
 
@@ -361,7 +361,7 @@ function main() {
 
 		Pather.useWaypoint(52);
 		Pather.moveToExit([51, 50], true);
-		Pather.pathTo(10022, 5047);
+		Pather.moveTo(10022, 5047);
 		say("a3");
 		Town.goToTown(3);
 		Town.doChores();
@@ -381,7 +381,7 @@ function main() {
 
 		var coords = [me.x, me.y];
 
-		Pather.pathTo(coords[0] + 23, coords[1] - 102);
+		Pather.moveTo(coords[0] + 23, coords[1] - 102);
 		Pather.makePortal();
 		Attack.securePosition(me.x, me.y, 40, 3000);
 		say("1");
@@ -390,9 +390,9 @@ function main() {
 			delay(250);
 		}
 
-		Pather.pathTo(coords[0] + 30, coords[1] - 134);
-		Pather.pathTo(coords[0] + 86, coords[1] - 130);
-		Pather.pathTo(coords[0] + 71, coords[1] - 94);
+		Pather.moveTo(coords[0] + 30, coords[1] - 134);
+		Pather.moveTo(coords[0] + 86, coords[1] - 130);
+		Pather.moveTo(coords[0] + 71, coords[1] - 94);
 		Attack.securePosition(me.x, me.y, 40, 3000);
 
 		/*Attack.kill(getLocaleString(2863));
@@ -400,7 +400,7 @@ function main() {
 		Attack.kill(getLocaleString(2860));*/
 
 		say("2");
-		Pather.pathTo(coords[0] + 23, coords[1] - 102);
+		Pather.moveTo(coords[0] + 23, coords[1] - 102);
 		Pather.usePortal(null, me.name);
 
 		return true;
@@ -415,7 +415,7 @@ function main() {
 		Pather.useWaypoint(101, true);
 		Precast.doPrecast(true);
 		Pather.moveToExit(102, true);
-		Pather.pathTo(17692, 8023);
+		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
 		delay(2000);
 		say("1");
@@ -424,10 +424,10 @@ function main() {
 			delay(250);
 		}
 
-		Pather.pathTo(17591, 8070);
+		Pather.moveTo(17591, 8070);
 		Attack.kill(242);
 		Pickit.pickItems();
-		Pather.pathTo(17692, 8023);
+		Pather.moveTo(17692, 8023);
 		Pather.makePortal();
 		say("2");
 
@@ -435,7 +435,7 @@ function main() {
 			delay(250);
 		}
 
-		Pather.pathTo(17591, 8070);
+		Pather.moveTo(17591, 8070);
 		Attack.securePosition(me.x, me.y, 40, 3000);
 
 		hydra = getUnit(1, getLocaleString(3325));
@@ -449,7 +449,7 @@ function main() {
 		}
 
 		Pather.makePortal();
-		Pather.pathTo(17581, 8070);
+		Pather.moveTo(17581, 8070);
 		say("1");
 
 		while (!this.playerIn()) {
@@ -457,7 +457,7 @@ function main() {
 		}
 
 		say("a4");
-		//Pather.pathTo(17591, 8070);
+		//Pather.moveTo(17591, 8070);
 
 		while (!this.playersInAct(4)) {
 			delay(250);
@@ -537,7 +537,7 @@ function main() {
 
 				for (i = 0; i < positions.length; i += 1) {
 					if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
-						Pather.pathTo(target.x + positions[i][0], target.y + positions[i][1]);
+						Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
 						Skill.setSkill(Config.AttackSkill[2], 0);
 
 						for (n = 0; n < amount; n += 1) {
@@ -591,7 +591,7 @@ function main() {
 		Town.doChores();
 		Pather.useWaypoint(107, true);
 		Precast.doPrecast(true);
-		Pather.pathTo(7790, 5544);
+		Pather.moveTo(7790, 5544);
 		this.initLayout();
 
 		if (!this.openSeal(395) || !this.openSeal(396)) {
@@ -599,9 +599,9 @@ function main() {
 		}
 
 		if (this.vizLayout === 1) {
-			Pather.pathTo(7691, 5292);
+			Pather.moveTo(7691, 5292);
 		} else {
-			Pather.pathTo(7695, 5316);
+			Pather.moveTo(7695, 5316);
 		}
 
 		if (!this.getBoss(getLocaleString(2851))) {
@@ -613,9 +613,9 @@ function main() {
 		}
 
 		if (this.seisLayout === 1) {
-			Pather.pathTo(7771, 5196);
+			Pather.moveTo(7771, 5196);
 		} else {
-			Pather.pathTo(7798, 5186);
+			Pather.moveTo(7798, 5186);
 		}
 
 		if (!this.getBoss(getLocaleString(2852))) {
@@ -629,23 +629,23 @@ function main() {
 		if (this.infLayout === 1) {
 			delay(1);
 		} else {
-			Pather.pathTo(7928, 5295); // temp
+			Pather.moveTo(7928, 5295); // temp
 		}
 
 		if (!this.getBoss(getLocaleString(2853))) {
 			throw new Error("Failed to kill Infector");
 		}
 
-		Pather.pathTo(7763, 5267);
+		Pather.moveTo(7763, 5267);
 		Pather.makePortal();
-		Pather.pathTo(7727, 5267);
+		Pather.moveTo(7727, 5267);
 		say("1");
 
 		while (!this.playerIn()) {
 			delay(250);
 		}
 
-		Pather.pathTo(7763, 5267);
+		Pather.moveTo(7763, 5267);
 
 		while (!getUnit(1, 243)) {
 			delay(500);
@@ -700,7 +700,7 @@ function main() {
 			throw new Error("Failed to go to Ancients way.");
 		}
 
-		Pather.pathTo(10089, 12622);
+		Pather.moveTo(10089, 12622);
 		Pather.makePortal();
 		say("3");
 
@@ -708,7 +708,7 @@ function main() {
 			delay(250);
 		}
 
-		Pather.pathTo(10048, 12628);
+		Pather.moveTo(10048, 12628);
 
 		altar = getUnit(2, 546);
 
@@ -726,7 +726,7 @@ function main() {
 		}
 
 		Attack.clear(50);
-		Pather.pathTo(10089, 12622);
+		Pather.moveTo(10089, 12622);
 		me.cancel();
 		Pather.makePortal();
 
@@ -766,7 +766,7 @@ function main() {
 				}
 
 				if (getDistance(me, 15093, 5029) > 3) {
-					Pather.pathTo(15093, 5029);
+					Pather.moveTo(15093, 5029);
 				}
 
 				if (Config.AttackSkill[4] > 0) {
@@ -855,7 +855,7 @@ function main() {
 			}
 
 			for (i = 0; i < pos.length; i += 2) {
-				Pather.pathTo(pos[i], pos[i + 1]);
+				Pather.moveTo(pos[i], pos[i + 1]);
 				Attack.clear(30);
 			}
 		};
@@ -866,7 +866,7 @@ function main() {
 			if (hydra) {
 				do {
 					if (hydra.mode !== 12 && hydra.getStat(172) !== 2) {
-						Pather.pathTo(15118, 5002);
+						Pather.moveTo(15118, 5002);
 
 						while (hydra.mode !== 12) {
 							delay(500);
@@ -894,17 +894,17 @@ function main() {
 			}
 		}
 
-		Pather.pathTo(15113, 5040);
+		Pather.moveTo(15113, 5040);
 		Attack.clear(15);
 		this.clearThrone();
 
 		tick = getTickCount();
-		Pather.pathTo(15093, me.classid === 3 ? 5029 : 5039);
+		Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 
 MainLoop:
 		while (true) {
 			if (getDistance(me, 15093, me.classid === 3 ? 5029 : 5039) > 3) {
-				Pather.pathTo(15093, me.classid === 3 ? 5029 : 5039);
+				Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 			}
 
 			if (!getUnit(1, 543)) {
@@ -964,7 +964,7 @@ MainLoop:
 		}
 
 		this.clearThrone();
-		Pather.pathTo(15092, 5011);
+		Pather.moveTo(15092, 5011);
 		Precast.doPrecast(true);
 
 		while (getUnit(1, 543)) {
@@ -981,9 +981,9 @@ MainLoop:
 			throw new Error("Couldn't find portal.");
 		}
 
-		Pather.pathTo(15213, 5908);
+		Pather.moveTo(15213, 5908);
 		Pather.makePortal();
-		Pather.pathTo(15170, 5950);
+		Pather.moveTo(15170, 5950);
 		delay(1000);
 		say("3");
 
@@ -991,7 +991,7 @@ MainLoop:
 			delay(250);
 		}
 
-		Pather.pathTo(15134, 5923);
+		Pather.moveTo(15134, 5923);
 		Attack.kill(544); // Baal
 		Pickit.pickItems();
 
@@ -1255,7 +1255,7 @@ MainLoop:
 
 		Pather.useWaypoint(111, true);
 		Precast.doPrecast(false);
-		Pather.pathTo(3846, 5120);
+		Pather.moveTo(3846, 5120);
 		Attack.securePosition(me.x, me.y, 30, 3000);
 		Pather.makePortal();
 		say("1");
@@ -1266,7 +1266,7 @@ MainLoop:
 
 		Attack.kill(getLocaleString(22435)); // Shenk
 		Pickit.pickItems();
-		Pather.pathTo(3846, 5120);
+		Pather.moveTo(3846, 5120);
 		say("2");
 
 		while (this.playerIn()) {

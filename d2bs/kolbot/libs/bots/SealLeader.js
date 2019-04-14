@@ -59,7 +59,7 @@ function SealLeader() {
 
 			for (i = 0; i < positions.length; i += 1) {
 				if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
-					Pather.pathTo(target.x + positions[i][0], target.y + positions[i][1]);
+					Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
 					Skill.setSkill(Config.AttackSkill[2], 0);
 
 					for (n = 0; n < amount; n += 1) {
@@ -183,9 +183,9 @@ function SealLeader() {
 
 			if (!seal.mode) {
 				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
-					Pather.pathTo(seal.x + 15, seal.y);
+					Pather.moveTo(seal.x + 15, seal.y);
 				} else {
-					Pather.pathTo(seal.x - 5, seal.y - 5);
+					Pather.moveTo(seal.x - 5, seal.y - 5);
 				}
 
 				delay(500);
@@ -204,9 +204,9 @@ function SealLeader() {
 	this.initLayout();
 
 	if (this.vizLayout === 1) {
-		Pather.pathTo(7708, 5269);
+		Pather.moveTo(7708, 5269);
 	} else {
-		Pather.pathTo(7647, 5267);
+		Pather.moveTo(7647, 5267);
 	}
 
 	Attack.securePosition(me.x, me.y, 35, 3000, true);
@@ -216,9 +216,9 @@ function SealLeader() {
 	this.openSeal(396);
 
 	if (this.vizLayout === 1) {
-		Pather.pathTo(7691, 5292);
+		Pather.moveTo(7691, 5292);
 	} else {
-		Pather.pathTo(7695, 5316);
+		Pather.moveTo(7695, 5316);
 	}
 
 	// Kill Viz
@@ -229,9 +229,9 @@ function SealLeader() {
 	say("out");
 
 	if (this.seisLayout === 1) {
-		Pather.pathTo(7767, 5147);
+		Pather.moveTo(7767, 5147);
 	} else {
-		Pather.pathTo(7820, 5147);
+		Pather.moveTo(7820, 5147);
 	}
 
 	Attack.securePosition(me.x, me.y, 35, 3000, true);
@@ -240,9 +240,9 @@ function SealLeader() {
 	this.openSeal(394);
 
 	if (this.seisLayout === 1) {
-		Pather.pathTo(7771, 5196);
+		Pather.moveTo(7771, 5196);
 	} else {
-		Pather.pathTo(7798, 5186);
+		Pather.moveTo(7798, 5186);
 	}
 
 	if (!this.getBoss(getLocaleString(2852))) {
@@ -252,9 +252,9 @@ function SealLeader() {
 	say("out");
 
 	if (this.infLayout === 1) {
-		Pather.pathTo(7860, 5314);
+		Pather.moveTo(7860, 5314);
 	} else {
-		Pather.pathTo(7909, 5317);
+		Pather.moveTo(7909, 5317);
 	}
 
 	Attack.securePosition(me.x, me.y, 35, 3000, true);
@@ -263,7 +263,7 @@ function SealLeader() {
 	this.openSeal(392);
 
 	if (this.infLayout === 2) {
-		Pather.pathTo(7928, 5295);
+		Pather.moveTo(7928, 5295);
 	}
 
 	if (!this.getBoss(getLocaleString(2853))) {
@@ -272,9 +272,9 @@ function SealLeader() {
 
 	this.openSeal(393);
 	say("out");
-	Pather.pathTo(7763, 5267);
+	Pather.moveTo(7763, 5267);
 	Pather.makePortal();
-	Pather.pathTo(7788, 5292);
+	Pather.moveTo(7788, 5292);
 	say("in");
 	this.diabloPrep();
 	Attack.kill(243); // Diablo

@@ -221,7 +221,7 @@ function Wakka() {
 				}
 			}
 
-			if (Pather.pathTo(path[0].x, path[0].y)) {
+			if (Pather.moveTo(path[0].x, path[0].y)) {
 				path.shift();
 			}
 
@@ -360,7 +360,7 @@ function Wakka() {
 					break;
 				}
 
-				Pather.pathTo(7767, 5263);
+				Pather.moveTo(7767, 5263);
 
 				diablo = getUnit(1, 243);
 

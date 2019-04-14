@@ -36,7 +36,7 @@ function Pindleskin() {
 		Precast.doPrecast(true);
 	}
 
-	Pather.pathTo(10058, 13234);
+	Pather.moveTo(10058, 13234);
 
 	try {
 		Attack.clear(15, 0, getLocaleString(22497)); // Pindleskin

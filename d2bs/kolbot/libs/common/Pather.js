@@ -149,7 +149,7 @@ var Pather = {
 	},
 	
 	/*
-		Pather.pathTo(x, y, retry, clearPath, pop, maneuvering);
+		Pather.moveTo(x, y, retry, clearPath, pop, maneuvering);
 		x - the x coord to path to
 		y - the y coord to path to
 		retry - the number of times to retry before aborting
@@ -157,7 +157,7 @@ var Pather = {
 		pop - removes the first path node before pathing
 		maneuvering - set to true if only moving short distances - prevents performing node actions
 	*/
-	pathTo: function(x, y, retry, clearPath, pop, maneuvering) {
+	moveTo: function(x, y, retry, clearPath, pop, maneuvering) {
 		//Validate Arguments
 		if (getDistance(me, x, y) < 2)
 			return true;	//Don't bother if the distance is really close
@@ -166,10 +166,10 @@ var Pather = {
 			return false;
 		
 		if (x === undefined || y === undefined) 
-			throw new Error("Pather.pathTo: Function must be called with at least 2 arguments.");
+			throw new Error("Pather.moveTo: Function must be called with at least 2 arguments.");
 		
 		if (typeof x !== "number" || typeof y !== "number")
-			throw new Error("Pather.pathTo: Coords must be numbers");
+			throw new Error("Pather.moveTo: Coords must be numbers");
 		
 		if (maneuvering === undefined)
 			maneuvering = false;
@@ -295,10 +295,16 @@ var Pather = {
 		
 	},
 	
+	/*
+		Pather.maneuverTo(x, y, retry, clearPath, pop);
+		Shortcut method for Pather.moveTo
+		Useful when the bot should move from point A to B without taking diversions (chests/shrines/etc)
+		
+	*/
 	maneuverTo: function(x, y, retry, clearPath, pop) {
 		//print("Maneuvering");
 		
-		return this.pathTo(x, y, retry, clearPath, pop, true);
+		return this.moveTo(x, y, retry, clearPath, pop, true);
 		
 	},
 	
@@ -549,15 +555,15 @@ ModeLoop:
 		}
 
 		if (unit instanceof PresetUnit) {
-			return this.pathTo(unit.roomx * 5 + unit.x + offX, unit.roomy * 5 + unit.y + offY, 3, clearPath);
+			return this.moveTo(unit.roomx * 5 + unit.x + offX, unit.roomy * 5 + unit.y + offY, 3, clearPath);
 		}
 
 		if (!useTeleport) {
 			// The unit will most likely be moving so call the first walk with 'pop' parameter
-			this.pathTo(unit.x + offX, unit.y + offY, 0, clearPath, true);
+			this.moveTo(unit.x + offX, unit.y + offY, 0, clearPath, true);
 		}
 
-		return this.pathTo(unit.x + offX, unit.y + offY, useTeleport && unit.type && unit.type === 1 ? 3 : 0, clearPath, pop);
+		return this.moveTo(unit.x + offX, unit.y + offY, useTeleport && unit.type && unit.type === 1 ? 3 : 0, clearPath, pop);
 	},
 
 	/*
@@ -597,7 +603,7 @@ ModeLoop:
 			throw new Error("moveToPreset: Couldn't find preset unit - id " + unitId);
 		}
 
-		return this.pathTo(presetUnit.roomx * 5 + presetUnit.x + offX, presetUnit.roomy * 5 + presetUnit.y + offY, 3, clearPath, pop);
+		return this.moveTo(presetUnit.roomx * 5 + presetUnit.x + offX, presetUnit.roomy * 5 + presetUnit.y + offY, 3, clearPath, pop);
 	},
 
 	/*
@@ -648,7 +654,7 @@ ModeLoop:
 						return false;
 					}
 
-					if (!this.pathTo(dest[0], dest[1], 3, clearPath)) {
+					if (!this.moveTo(dest[0], dest[1], 3, clearPath)) {
 						return false;
 					}
 
@@ -661,7 +667,7 @@ ModeLoop:
 							targetRoom = this.getNearestRoom(areas[i]);
 
 							if (targetRoom) {
-								this.pathTo(targetRoom[0], targetRoom[1]);
+								this.moveTo(targetRoom[0], targetRoom[1]);
 							} else {
 								// might need adjustments
 								return false;
@@ -817,7 +823,7 @@ ModeLoop:
 			}
 
 			coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 3);
-			this.pathTo(coord.x, coord.y);
+			this.moveTo(coord.x, coord.y);
 		}
 
 		return false;
@@ -885,7 +891,7 @@ ModeLoop:
 			}
 
 			coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 3);
-			this.pathTo(coord.x, coord.y);
+			this.moveTo(coord.x, coord.y);
 		}
 
 		return targetArea ? me.area === targetArea : me.area !== preArea;
@@ -1423,7 +1429,7 @@ MainLoop:
 				this.useWaypoint(target.course[0], !this.plotCourse_openedWpMenu);
 				Precast.doPrecast(false);
 			} else if (me.area === 109 && target.course[0] === 110) { // Harrogath -> Bloody Foothills
-				this.pathTo(5026, 5095);
+				this.moveTo(5026, 5095);
 
 				unit = getUnit(2, 449); // Gate
 
@@ -1479,7 +1485,7 @@ MainLoop:
 					}
 				}
 			} else if (me.area === 54 && target.course[0] === 74) { // Palace -> Arcane
-				this.pathTo(10073, 8670);
+				this.moveTo(10073, 8670);
 				this.usePortal(null);
 			} else if (me.area === 109 && target.course[0] === 121) { // Harrogath -> Nihlathak's Temple
 				Town.move(NPC.Anya);

@@ -162,7 +162,7 @@ function Enchant() {
 			return false;
 		}
 
-		Pather.pathTo(25048, 5177);
+		Pather.moveTo(25048, 5177);
 
 		wirt = getUnit(2, 268);
 
@@ -581,7 +581,7 @@ MainLoop:
 		}
 
 		if (spot && getDistance(me, spot) > 10) {
-			Pather.pathTo(spot.x, spot.y);
+			Pather.moveTo(spot.x, spot.y);
 		}
 
 		if (command && !this.floodCheck(command)) {

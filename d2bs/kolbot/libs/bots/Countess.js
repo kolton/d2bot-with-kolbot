@@ -23,10 +23,10 @@ function Countess() {
 
 	switch (poi.roomx * 5 + poi.x) {
 	case 12565:
-		Pather.pathTo(12578, 11043);
+		Pather.moveTo(12578, 11043);
 		break;
 	case 12526:
-		Pather.pathTo(12548, 11083);
+		Pather.moveTo(12548, 11083);
 		break;
 	}
 

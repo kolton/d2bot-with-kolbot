@@ -11,7 +11,7 @@ function OrgTorch() {
 	// Identify & mule
 	this.checkTorch = function () {
 		if (me.area === 136) {
-			Pather.pathTo(25105, 5140);
+			Pather.moveTo(25105, 5140);
 			Pather.usePortal(109);
 		}
 
@@ -101,7 +101,7 @@ function OrgTorch() {
 				print("Getting Fade");
 				Pather.useWaypoint(107);
 				Precast.doPrecast(true);
-				Pather.pathTo(7811, 5872);
+				Pather.moveTo(7811, 5872);
 
 				if (me.classid === 3 && me.getSkill(125, 1)) {
 					Skill.setSkill(125, 0);
@@ -187,7 +187,7 @@ function OrgTorch() {
 			findLoc = [20196, 8694, 20308, 8588, 20187, 8639, 20100, 8550, 20103, 8688, 20144, 8709, 20263, 8811, 20247, 8665];
 
 			for (i = 0; i < findLoc.length; i += 2) {
-				Pather.pathTo(findLoc[i], findLoc[i + 1]);
+				Pather.moveTo(findLoc[i], findLoc[i + 1]);
 				delay(500);
 
 				if (getUnit(1, 708)) {
@@ -209,23 +209,23 @@ function OrgTorch() {
 
 			break;
 		case 136: // Tristram
-			Pather.pathTo(25068, 5078);
+			Pather.moveTo(25068, 5078);
 			Precast.doPrecast(true);
 
 			findLoc = [25040, 5101, 25040, 5166, 25122, 5170];
 
 			for (i = 0; i < findLoc.length; i += 2) {
-				Pather.pathTo(findLoc[i], findLoc[i + 1]);
+				Pather.moveTo(findLoc[i], findLoc[i + 1]);
 			}
 
 			Skill.setSkill(125, 0);
 			this.lure(704);
-			Pather.pathTo(25129, 5198);
+			Pather.moveTo(25129, 5198);
 			Skill.setSkill(125, 0);
 			this.lure(704);
 
 			if (!getUnit(1, 704)) {
-				Pather.pathTo(25122, 5170);
+				Pather.moveTo(25122, 5170);
 			}
 
 			if (Config.OrgTorch.UseSalvation && me.classid === 3 && me.getSkill(125, 1)) {
@@ -243,17 +243,17 @@ function OrgTorch() {
 				Attack.init();
 			}
 
-			Pather.pathTo(25162, 5141);
+			Pather.moveTo(25162, 5141);
 			delay(3250);
 
 			if (!getUnit(1, 709)) {
-				Pather.pathTo(25122, 5170);
+				Pather.moveTo(25122, 5170);
 			}
 
 			Attack.kill(709);
 
 			if (!getUnit(1, 705)) {
-				Pather.pathTo(25122, 5170);
+				Pather.moveTo(25122, 5170);
 			}
 
 			Attack.kill(705);

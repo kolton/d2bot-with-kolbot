@@ -173,7 +173,7 @@ function Questing() {
 		}
 
 		Precast.doPrecast(true);
-		Pather.pathTo(3883, 5113);
+		Pather.moveTo(3883, 5113);
 		Attack.kill(getLocaleString(22435)); // Shenk the Overseer
 		Town.goToTown();
 

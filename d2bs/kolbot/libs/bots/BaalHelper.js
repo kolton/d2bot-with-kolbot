@@ -117,7 +117,7 @@ function BaalHelper() { // experi-mental
 		}
 
 		for (i = 0; i < pos.length; i += 2) {
-			Pather.pathTo(pos[i], pos[i + 1]);
+			Pather.moveTo(pos[i], pos[i + 1]);
 			Attack.clear(30);
 		}
 	};
@@ -128,7 +128,7 @@ function BaalHelper() { // experi-mental
 		if (hydra) {
 			do {
 				if (hydra.mode !== 12 && hydra.getStat(172) !== 2) {
-					Pather.pathTo(15118, 5002);
+					Pather.moveTo(15118, 5002);
 
 					while (hydra.mode !== 12) {
 						delay(500);
@@ -213,7 +213,7 @@ WSKLoop:
 		}
 
 		if (entrance) {
-			Pather.pathTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
+			Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
 		}
 
 		if (!Pather.moveToExit([130, 131], false)) {
@@ -224,7 +224,7 @@ WSKLoop:
 			throw new Error("Failed to move to Throne of Destruction.");
 		}
 
-		if (!Pather.pathTo(15113, 5040)) {
+		if (!Pather.moveTo(15113, 5040)) {
 			D2Bot.printToConsole("path fail");
 		}
 	} else {
@@ -256,12 +256,12 @@ WSKLoop:
 
 	tick = getTickCount();
 
-	Pather.pathTo(15093, me.classid === 3 ? 5029 : 5039);
+	Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 
 MainLoop:
 	while (true) {
 		if (getDistance(me, 15093, me.classid === 3 ? 5029 : 5039) > 3) {
-			Pather.pathTo(15093, me.classid === 3 ? 5029 : 5039);
+			Pather.moveTo(15093, me.classid === 3 ? 5029 : 5039);
 		}
 
 		if (!getUnit(1, 543)) {
@@ -321,7 +321,7 @@ MainLoop:
 	}
 
 	if (Config.BaalHelper.KillBaal) {
-		Pather.pathTo(15092, 5011);
+		Pather.moveTo(15092, 5011);
 		Precast.doPrecast(false);
 
 		while (getUnit(1, 543)) {
@@ -329,7 +329,7 @@ MainLoop:
 		}
 
 		delay(1000);
-		Pather.pathTo(15092, 5011);
+		Pather.moveTo(15092, 5011);
 
 		portal = getUnit(2, 563);
 
@@ -339,7 +339,7 @@ MainLoop:
 			throw new Error("Couldn't find portal.");
 		}
 
-		Pather.pathTo(15134, 5923);
+		Pather.moveTo(15134, 5923);
 		Attack.kill(544); // Baal
 		Pickit.pickItems();
 	} else {

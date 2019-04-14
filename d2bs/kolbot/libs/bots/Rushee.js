@@ -241,7 +241,7 @@ function Rushee() {
 				npc = getUnit(1, NPC.Jerhyn);
 
 				if (!npc || !npc.openMenu()) {
-					Pather.pathTo(5166, 5206);
+					Pather.moveTo(5166, 5206);
 
 					return false;
 				}
@@ -280,7 +280,7 @@ function Rushee() {
 					delay(1500);
 				}
 
-				Pather.pathTo(17591, 8070);
+				Pather.moveTo(17591, 8070);
 				Pather.usePortal(null);
 
 				break;
@@ -553,7 +553,7 @@ function Rushee() {
 						break;
 					case 108: // Chaos Sanctuary
 						Pather.usePortal(108, Config.Leader);
-						Pather.pathTo(7762, 5268);
+						Pather.moveTo(7762, 5268);
 						Packet.flash(me.gid);
 						delay(500);
 						Pather.walkTo(7763, 5267, 2);
@@ -562,7 +562,7 @@ function Rushee() {
 							delay(500);
 						}
 
-						Pather.pathTo(7763, 5267);
+						Pather.moveTo(7763, 5267);
 						actions.shift();
 
 						break;

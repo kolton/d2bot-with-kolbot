@@ -10,7 +10,7 @@ function Eldritch() {
 	Town.doChores();
 	Pather.useWaypoint(111);
 	Precast.doPrecast(true);
-	Pather.pathTo(3745, 5084);
+	Pather.moveTo(3745, 5084);
 	Attack.clear(15, 0, getLocaleString(22500)); // Eldritch the Rectifier
 
 	if (Config.Eldritch.OpenChest) {
@@ -28,12 +28,12 @@ function Eldritch() {
 	}
 
 	if (Config.Eldritch.KillShenk) {
-		Pather.pathTo(3876, 5130);
+		Pather.moveTo(3876, 5130);
 		Attack.clear(15, 0, getLocaleString(22435)); // Shenk the Overseer
 	}
 
 	if (Config.Eldritch.KillDacFarren) {
-		Pather.pathTo(4478, 5108);
+		Pather.moveTo(4478, 5108);
 		Attack.clear(15, 0, getLocaleString(22501)); // Dac Farren
 	}
 

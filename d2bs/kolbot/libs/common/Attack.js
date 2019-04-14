@@ -515,7 +515,7 @@ var Attack = {
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
 							//print("random move m8");
 							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 5);
-							Pather.pathTo(coord.x, coord.y);
+							Pather.moveTo(coord.x, coord.y);
 						}
 
 						break;
@@ -683,7 +683,7 @@ var Attack = {
 						// Tele in random direction with Blessed Hammer
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
 							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
-							Pather.pathTo(coord.x, coord.y);
+							Pather.moveTo(coord.x, coord.y);
 						}
 
 						break;
@@ -742,7 +742,7 @@ var Attack = {
 
 		while (true) {
 			if (getDistance(me, x, y) > 5) {
-				Pather.pathTo(x, y);
+				Pather.moveTo(x, y);
 			}
 
 			monster = getUnit(1);
@@ -903,7 +903,7 @@ var Attack = {
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
 			if (result) {
-				Pather.pathTo(result[0], result[1], 3, spectype, true);
+				Pather.moveTo(result[0], result[1], 3, spectype, true);
 				previousArea = result;
 				//this.countUniques();
 
@@ -913,7 +913,7 @@ var Attack = {
 			}
 			// Make sure bot does not get stuck in different area.
 			else if (currentArea !== getArea().id) {
-				Pather.pathTo(previousArea[0], previousArea[1], 3, spectype);
+				Pather.moveTo(previousArea[0], previousArea[1], 3, spectype);
 			}
 		}
 
@@ -1082,7 +1082,7 @@ var Attack = {
 		if (typeof index === "number") {
 			//print("Dodge build time: " + (getTickCount() - tick));
 
-			return Pather.pathTo(grid[index].x, grid[index].y, 0);
+			return Pather.moveTo(grid[index].x, grid[index].y, 0);
 		}
 
 		return false;

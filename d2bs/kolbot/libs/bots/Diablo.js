@@ -117,9 +117,9 @@ function Diablo() {
 
 			if (!seal.mode) {
 				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
-					Pather.pathTo(seal.x + 15, seal.y);
+					Pather.moveTo(seal.x + 15, seal.y);
 				} else {
-					Pather.pathTo(seal.x - 5, seal.y - 5);
+					Pather.moveTo(seal.x - 5, seal.y - 5);
 				}
 
 				delay(500);
@@ -152,7 +152,7 @@ function Diablo() {
 
 			for (i = 0; i < positions.length; i += 1) {
 				if (Attack.validSpot(target.x + positions[i][0], target.y + positions[i][1])) { // check if we can move there
-					Pather.pathTo(target.x + positions[i][0], target.y + positions[i][1]);
+					Pather.moveTo(target.x + positions[i][0], target.y + positions[i][1]);
 					Skill.setSkill(Config.AttackSkill[2], 0);
 
 					for (n = 0; n < amount; n += 1) {
@@ -201,9 +201,9 @@ function Diablo() {
 		}
 
 		if (this.vizLayout === 1) {
-			Pather.pathTo(7691, 5292);
+			Pather.moveTo(7691, 5292);
 		} else {
-			Pather.pathTo(7695, 5316);
+			Pather.moveTo(7695, 5316);
 		}
 
 		if (!this.getBoss(getLocaleString(2851))) {
@@ -222,9 +222,9 @@ function Diablo() {
 		}
 
 		if (this.seisLayout === 1) {
-			Pather.pathTo(7771, 5196);
+			Pather.moveTo(7771, 5196);
 		} else {
-			Pather.pathTo(7798, 5186);
+			Pather.moveTo(7798, 5186);
 		}
 
 		if (!this.getBoss(getLocaleString(2852))) {
@@ -245,7 +245,7 @@ function Diablo() {
 		if (this.infLayout === 1) {
 			delay(1);
 		} else {
-			Pather.pathTo(7928, 5295); // temp
+			Pather.moveTo(7928, 5295); // temp
 		}
 
 		if (!this.getBoss(getLocaleString(2853))) {
@@ -334,7 +334,7 @@ function Diablo() {
 				this.clearStrays();
 			}
 
-			Pather.pathTo(path[i], path[i + 1], 3, getDistance(me, path[i], path[i + 1]) > 50);
+			Pather.moveTo(path[i], path[i + 1], 3, getDistance(me, path[i], path[i + 1]) > 50);
 			Attack.clear(30, 0, false, this.sort);
 
 			// Push cleared positions so they can be checked for strays
@@ -374,7 +374,7 @@ function Diablo() {
 		}
 
 		if (getDistance(me, oldPos.x, oldPos.y) > 5) {
-			Pather.pathTo(oldPos.x, oldPos.y);
+			Pather.moveTo(oldPos.x, oldPos.y);
 		}
 
 		return true;
@@ -404,7 +404,7 @@ function Diablo() {
 		}
 
 		if (getDistance(me, oldPos.x, oldPos.y) > 5) {
-			Pather.pathTo(oldPos.x, oldPos.y);
+			Pather.moveTo(oldPos.x, oldPos.y);
 		}
 
 		return true;
@@ -431,7 +431,7 @@ function Diablo() {
 		Pather.useWaypoint(107);
 	}
 
-	if (!Pather.pathTo(7790, 5544)) {
+	if (!Pather.moveTo(7790, 5544)) {
 		throw new Error("Failed to move to Chaos Sanctuary");
 	}
 
@@ -439,7 +439,7 @@ function Diablo() {
 
 	if (Config.Diablo.Entrance) {
 		Attack.clear(30, 0, false, this.sort);
-		Pather.pathTo(7790, 5544);
+		Pather.moveTo(7790, 5544);
 
 		if (Config.PublicMode) {
 			Pather.makePortal();
@@ -447,16 +447,16 @@ function Diablo() {
 			Pather.teleport = !Config.Diablo.WalkClear && Pather._teleport;
 		}
 
-		Pather.pathTo(7790, 5544);
+		Pather.moveTo(7790, 5544);
 		Precast.doPrecast(true);
 		Attack.clear(30, 0, false, this.sort);
 		this.followPath(this.entranceToStar);
 	} else {
-		Pather.pathTo(7774, 5305);
+		Pather.moveTo(7774, 5305);
 		Attack.clear(15, 0, false, this.sort);
 	}
 
-	Pather.pathTo(7791, 5293);
+	Pather.moveTo(7791, 5293);
 
 	if (Config.PublicMode) {
 		Pather.makePortal();
@@ -472,11 +472,11 @@ function Diablo() {
 
 	switch (me.classid) {
 	case 1:
-		Pather.pathTo(7792, 5294);
+		Pather.moveTo(7792, 5294);
 
 		break;
 	default:
-		Pather.pathTo(7788, 5292);
+		Pather.moveTo(7788, 5292);
 
 		break;
 	}

@@ -176,7 +176,7 @@ function main() {
 			coordy = Math.round((Math.sin((angle + angles[i]) * Math.PI / 180)) * range + unit.y); // unit.targety
 
 			if (Attack.validSpot(coordx, coordy)) {
-				return Pather.pathTo(coordx, coordy);
+				return Pather.moveTo(coordx, coordy);
 			}
 		}
 
@@ -216,7 +216,7 @@ function main() {
 				case 1: // Sorceress
 					prevPos = {x: me.x, y: me.y};
 					this.pause();
-					Pather.pathTo(15103, 5247);
+					Pather.moveTo(15103, 5247);
 
 					while (!this.findPlayer() && hostiles.length > 0) {
 						if (!me.getState(121)) {
@@ -241,7 +241,7 @@ function main() {
 
 					prevPos = {x: me.x, y: me.y};
 					this.pause();
-					Pather.pathTo(15103, 5247);
+					Pather.moveTo(15103, 5247);
 
 					while (!this.findPlayer() && hostiles.length > 0) {
 						// Tornado path is a function of target x. Slight randomization will make sure it can't always miss
@@ -252,7 +252,7 @@ function main() {
 				case 6: // Assassin
 					prevPos = {x: me.x, y: me.y};
 					this.pause();
-					Pather.pathTo(15103, 5247);
+					Pather.moveTo(15103, 5247);
 
 					while (!this.findPlayer() && hostiles.length > 0) {
 						if (Config.UseTraps) {
@@ -276,7 +276,7 @@ function main() {
 
 			// Player left, return to old position
 			if (!hostiles.length && prevPos) {
-				Pather.pathTo(prevPos.x, prevPos.y);
+				Pather.moveTo(prevPos.x, prevPos.y);
 				this.resume();
 
 				// Reset position
@@ -363,7 +363,7 @@ function main() {
 					}
 				}
 
-				Pather.pathTo(prevPos.x, prevPos.y);
+				Pather.moveTo(prevPos.x, prevPos.y);
 				this.resume();
 			}
 		}

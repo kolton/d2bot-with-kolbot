@@ -119,7 +119,7 @@ function Baal() {
 		}
 
 		for (i = 0; i < pos.length; i += 2) {
-			Pather.pathTo(pos[i], pos[i + 1]);
+			Pather.moveTo(pos[i], pos[i + 1]);
 			Attack.clear(25);
 		}
 	};
@@ -129,7 +129,7 @@ function Baal() {
 		if (hydra) {
 			do {
 				if (hydra.mode !== 12 && hydra.getStat(172) !== 2) {
-					Pather.pathTo(15072, 5002);
+					Pather.moveTo(15072, 5002);
 					while (hydra.mode !== 12) {
 						delay(500);
 						if (!copyUnit(hydra).x) {
@@ -208,7 +208,7 @@ function Baal() {
 		throw new Error("Failed to move to Throne of Destruction.");
 	}
 
-	Pather.pathTo(15095, 5029);
+	Pather.moveTo(15095, 5029);
 
 	if (Config.Baal.DollQuit && getUnit(1, 691)) {
 		say("Dolls found! NG.");
@@ -224,7 +224,7 @@ function Baal() {
 
 	if (Config.PublicMode) {
 		this.announce();
-		Pather.pathTo(15118, 5002);
+		Pather.moveTo(15118, 5002);
 		Pather.makePortal();
 		say(Config.Baal.HotTPMessage);
 		Attack.clear(15);
@@ -233,7 +233,7 @@ function Baal() {
 	this.clearThrone();
 
 	if (Config.PublicMode) {
-		Pather.pathTo(15118, 5045);
+		Pather.moveTo(15118, 5045);
 		Pather.makePortal();
 		say(Config.Baal.SafeTPMessage);
 		Precast.doPrecast(true);
@@ -241,12 +241,12 @@ function Baal() {
 
 	tick = getTickCount();
 
-	Pather.pathTo(15094, me.classid === 3 ? 5029 : 5038);
+	Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
 
 MainLoop:
 	while (true) {
 		if (getDistance(me, 15094, me.classid === 3 ? 5029 : 5038) > 3) {
-			Pather.pathTo(15094, me.classid === 3 ? 5029 : 5038);
+			Pather.moveTo(15094, me.classid === 3 ? 5029 : 5038);
 		}
 
 		if (!getUnit(1, 543)) {
@@ -309,7 +309,7 @@ MainLoop:
 			say(Config.Baal.BaalMessage);
 		}
 
-		Pather.pathTo(15090, 5008);
+		Pather.moveTo(15090, 5008);
 		delay(5000);
 		Precast.doPrecast(true);
 
@@ -325,7 +325,7 @@ MainLoop:
 			throw new Error("Couldn't find portal.");
 		}
 
-		Pather.pathTo(15134, 5923);
+		Pather.moveTo(15134, 5923);
 		Attack.kill(544); // Baal
 		Pickit.pickItems();
 	}

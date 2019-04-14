@@ -67,7 +67,7 @@ function Tristram() {
 		Attack.securePosition(me.x, me.y, 10, 1000);
 	}
 
-	Pather.pathTo(me.x, me.y + 6);
+	Pather.moveTo(me.x, me.y + 6);
 
 	if (Config.Tristram.PortalLeech) {
 		Pather.makePortal();

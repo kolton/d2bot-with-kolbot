@@ -350,7 +350,7 @@ function shopStuff(npcId, classids, amount) {
 		path = this.processPath(npc, path);
 
 		for (i = 0; i < path.length; i += 2) {
-			Pather.pathTo(path[i] - 3, path[i + 1] - 3);
+			Pather.moveTo(path[i] - 3, path[i + 1] - 3);
 			moveNPC(npc, path[i], path[i + 1]);
 
 			for (j = 0; j < leadTimeout; j += 1) {

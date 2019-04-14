@@ -212,7 +212,7 @@ function AutoBaal() {
 			if (throneCheck && me.area === 109) { // wait for throne signal - leader's safe message
 				print("ÿc4AutoBaal: ÿc0Trying to take TP to throne.");
 				Pather.usePortal(131, null); // take TP to throne
-				Pather.pathTo(Config.AutoBaal.LeechSpot[0], Config.AutoBaal.LeechSpot[1]); // move to a safe spot
+				Pather.moveTo(Config.AutoBaal.LeechSpot[0], Config.AutoBaal.LeechSpot[1]); // move to a safe spot
 				Precast.doPrecast(true);
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
 			}
@@ -222,7 +222,7 @@ function AutoBaal() {
 			}
 
 			if (baalCheck && me.area === 131) { // wait for baal signal - leader's baal message
-				Pather.pathTo(15092, 5010); // move closer to chamber portal
+				Pather.moveTo(15092, 5010); // move closer to chamber portal
 				Precast.doPrecast(false);
 
 				while (getUnit(1, 543)) { // wait for baal to go through the portal
@@ -235,7 +235,7 @@ function AutoBaal() {
 				print("ÿc4AutoBaal: ÿc0Entering chamber.");
 
 				if (Pather.usePortal(null, null, portal)) { // enter chamber
-					Pather.pathTo(15166, 5903); // go to a safe position
+					Pather.moveTo(15166, 5903); // go to a safe position
 				}
 
 				Town.getCorpse(); // check for corpse - happens if you die and reenter

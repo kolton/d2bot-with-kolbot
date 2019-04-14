@@ -104,9 +104,9 @@ function Idle() {
 			switch (me.area) {
 				case 108:
 					if (this.infLayout === 1) {
-						Pather.pathTo(7893, 5306);
+						Pather.moveTo(7893, 5306);
 					} else {
-						Pather.pathTo(7929, 5294);
+						Pather.moveTo(7929, 5294);
 					}
 					Pather.makePortal();
 					say("Infector of Souls TP Up!");
@@ -119,9 +119,9 @@ function Idle() {
 			switch (me.area) {
 				case 108:
 					if (this.seisLayout === 1) {
-						Pather.pathTo(7773, 5191);
+						Pather.moveTo(7773, 5191);
 					} else {
-						Pather.pathTo(7794, 5189);
+						Pather.moveTo(7794, 5189);
 					}
 					Pather.makePortal();
 					say("Lord De Seis TP Up!");
@@ -134,9 +134,9 @@ function Idle() {
 			switch (me.area) {
 				case 108:
 					if (this.vizLayout === 1) {
-						Pather.pathTo(7681, 5302);
+						Pather.moveTo(7681, 5302);
 					} else {
-						Pather.pathTo(7675, 5305);
+						Pather.moveTo(7675, 5305);
 					}
 					Pather.makePortal();
 					say("Grand Vizier of Chaos TP Up!");
@@ -152,9 +152,9 @@ function Idle() {
 					this.openSeal(392)
 					say("Infector of Souls spawned!");
 					if (this.infLayout === 1) {
-						Pather.pathTo(7893, 5306);
+						Pather.moveTo(7893, 5306);
 					} else {
-						Pather.pathTo(7929, 5294);
+						Pather.moveTo(7929, 5294);
 					}
 					break;
 			}
@@ -167,9 +167,9 @@ function Idle() {
 					this.openSeal(394)
 					say("Lord De Seis spawned!");
 					if (this.seisLayout === 1) {
-						Pather.pathTo(7773, 5191);
+						Pather.moveTo(7773, 5191);
 					} else {
-						Pather.pathTo(7794, 5189);
+						Pather.moveTo(7794, 5189);
 					}
 					break;
 			}
@@ -182,9 +182,9 @@ function Idle() {
 					this.openSeal(396)
 					say("Grand Vizier of Chaos spawned!");
 					if (this.vizLayout === 1) {
-						Pather.pathTo(7681, 5302);
+						Pather.moveTo(7681, 5302);
 					} else {
-						Pather.pathTo(7675, 5305);
+						Pather.moveTo(7675, 5305);
 					}
 					break;
 			}

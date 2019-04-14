@@ -231,7 +231,7 @@ var ClassAttack = {
 			cy = Math.round(Math.sin(i) * distance);
 
 			if (Attack.validSpot(unit.x + cx, unit.y + cy)) {
-				return Pather.pathTo(unit.x + cx, unit.y + cy);
+				return Pather.moveTo(unit.x + cx, unit.y + cy);
 			}
 		}
 
@@ -295,7 +295,7 @@ var ClassAttack = {
 		if (Math.round(getDistance(me, x, y) > 0)) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
 				if (getDistance(me, x, y) > 40) {
-					Pather.pathTo(x, y);
+					Pather.moveTo(x, y);
 				} else {
 					Pather.teleportTo(x, y, 3);
 				}

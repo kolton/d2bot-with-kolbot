@@ -919,7 +919,7 @@ var Chest = {
 				return true;
 			}
 			
-			if (Pather.pathTo(unit.x + 1, unit.y + 2, 0, clearPath) && getDistance(me, unit.x + 1, unit.y + 2) < 5) {
+			if (Pather.moveTo(unit.x + 1, unit.y + 2, 0, clearPath) && getDistance(me, unit.x + 1, unit.y + 2) < 5) {
 				
 				//Misc.click(0, 0, unit);
 				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
@@ -1351,14 +1351,14 @@ var Misc = {
 
 			coords = shrineLocs.shift();
 
-			Pather.pathTo(coords[0], coords[1], 2);
+			Pather.moveTo(coords[0], coords[1], 2);
 
 			shrine = getUnit(2, "shrine");
 
 			if (shrine) {
 				do {
 					if (shrine.objtype === type && shrine.mode === 0) {
-						Pather.pathTo(shrine.x - 2, shrine.y - 2);
+						Pather.moveTo(shrine.x - 2, shrine.y - 2);
 
 						if (!use || this.getShrine(shrine)) {
 							return true;
