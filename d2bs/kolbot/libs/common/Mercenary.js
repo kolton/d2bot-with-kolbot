@@ -195,7 +195,7 @@ var Mercenary = {
 			return false;	//Bail out if we can't unload the merc's equipment, just in case
 		
 		Town.move(Town.tasks[args.mercType - 1]["Merc"]);	//Move to Merc NPC for the mercType act
-		Pather.pathTo(me.x + rand(-3, 3), me.y + rand(-3, 3));
+		Pather.moveTo(me.x + rand(-3, 3), me.y + rand(-3, 3));
 		Town.move(Town.tasks[args.mercType - 1]["Merc"]);
 		
 		delay(1000);
