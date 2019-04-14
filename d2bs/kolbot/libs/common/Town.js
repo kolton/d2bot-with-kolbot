@@ -1659,7 +1659,7 @@ MainLoop:
 
 			if (getTickCount() - timer > 3000) {
 				coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
-				Pather.pathTo(coord.x, coord.y);
+				Pather.moveTo(coord.x, coord.y);
 			}
 
 			if (getTickCount() - timer > 30000) {
@@ -2095,7 +2095,7 @@ MainLoop:
 			//print("moveToSpot: " + spot + " from " + me.x + ", " + me.y);
 
 			if (getDistance(me, townSpot[i], townSpot[i + 1]) > 2) {
-				Pather.pathTo(townSpot[i], townSpot[i + 1], 3, false, true);
+				Pather.moveTo(townSpot[i], townSpot[i + 1], 3, false, true);
 			}
 
 			switch (spot) {
