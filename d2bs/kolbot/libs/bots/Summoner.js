@@ -4,7 +4,7 @@
 *	@desc		kill the Summoner
 */
 
-function Summoner() {
+function Summoner () {
 	Town.doChores();
 	Pather.useWaypoint(74);
 	Precast.doPrecast(true);
@@ -26,6 +26,25 @@ function Summoner() {
 	}
 
 	Attack.clear(15, 0, 250); // The Summoner
+
+	if (Loader.scriptName(1) === "Duriel") {
+		let journal = getUnit(2, 357);
+
+		if (!journal) {
+			throw new Error("Journal not found");
+		}
+
+		Pather.moveToUnit(journal);
+		journal.interact();
+		delay(500);
+		me.cancel();
+
+		if (!Pather.usePortal(46)) {
+			throw new Error("Failed to take arcane portal");
+		}
+
+		Loader.skipTown.push("Duriel");
+	}
 
 	return true;
 }

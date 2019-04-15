@@ -6,8 +6,10 @@
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
-		if (Config.MercWatch && Mercenary.needMerc()) {
-			Town.visitTown();
+		var needRepair = Town.needRepair();
+
+		if ((Config.MercWatch && Mercenary.needMerc()) || needRepair.length > 0) {
+			Town.visitTown(!!needRepair.length);
 		}
 
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(Config.AttackSkill[0])) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
@@ -59,7 +61,7 @@ var ClassAttack = {
 		needRepair = Town.needRepair();
 
 		if (needRepair && needRepair.length > 0) { // Repair check
-			Town.visitTown();
+			Town.visitTown(true);
 		}
 
 		if (pickit) {
