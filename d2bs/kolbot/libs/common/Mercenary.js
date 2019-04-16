@@ -29,7 +29,7 @@ var Mercenary = {
 		for (var i = 0; i < 3; i++) {
 			merc = me.getMerc();
 
-			if (merc && merc.mode === 0 && merc.mode === 12) {
+			if (merc && (merc.mode === 0 || merc.mode === 12)) {
 				return null;
 			} else if (merc) {
 				break;
@@ -99,13 +99,12 @@ var Mercenary = {
 
 		var merc = this.getMerc();
 
-		if (!merc && (me.mercrevivecost === 0 || me.gametype === 0)) {
-			return true;	//We never had a merc
-		} else if (this.isDead()) {
+		if (this.isDead()) {
 			return true;	//Merc is dead so we can't determine the variant or type
+		} else if (!merc && (me.mercrevivecost === 0 || me.gametype === 0)) {
+			return true;	//We never had a merc
 		} else if (this.classIds[mercType] !== merc.classid) {
 			return false;	//We want a different type of merc
-
 		}
 
 		//If the variant was specified, determine if the merc variant is the same
@@ -333,7 +332,7 @@ var Mercenary = {
 			}
 
 			while (getTickCount() - tick < 2000) {
-				if (me.getMerc()) {
+				if (this.getMerc()) {
 					delay(Math.max(750, me.ping * 2));
 
 					break MainLoop;
@@ -345,7 +344,7 @@ var Mercenary = {
 
 		Attack.checkInfinity();
 
-		if (me.getMerc()) {
+		if (this.getMerc()) {
 			if (Config.MercWatch && !me.inTown) { // Cast BO on merc so he doesn't just die again
 				print("MercWatch precast");
 				Pather.useWaypoint("random");
