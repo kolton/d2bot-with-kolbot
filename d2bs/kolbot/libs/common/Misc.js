@@ -910,7 +910,7 @@ var Chest = {
 		}
 
 		var i, tick;
-		var clearPath = !Pather.useTeleport();
+		var clearPath = !Pather.useTeleport() || !!Config.ClearPath;
 
 		for (i = 0; i < 3; i += 1) {
 			// already open
@@ -948,8 +948,12 @@ var Chest = {
 
 		return false;
 	},
-	
-	openChests: function() {
+
+	openChests: function(scanDistance) {
+		if (scanDistance !== undefined) {
+			this.scan(scanDistance);
+		}
+
 		if (this.chestList.length === 0) {
 			this.openingChests = false;
 			return;

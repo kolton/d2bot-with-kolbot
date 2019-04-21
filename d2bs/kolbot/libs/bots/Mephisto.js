@@ -165,14 +165,11 @@ function Mephisto() {
 
 	if (Config.OpenChests) {
 		Pather.moveTo(17572, 8011);
-		Chest.scan(5);	//Chest stuff should no longer be necessary but leaving it here just in case
-		Chest.openChests();
+		Chest.openChests(5);	//Chest stuff should no longer be necessary but leaving it here just in case
 		Pather.moveTo(17572, 8125);
-		Chest.scan(5);
-		Chest.openChests();
+		Chest.openChests(5);
 		Pather.moveTo(17515, 8061);
-		Chest.scan(5);
-		Chest.openChests();
+		Chest.openChests(5);
 	}
 
 	if (Config.Mephisto.TakeRedPortal) {

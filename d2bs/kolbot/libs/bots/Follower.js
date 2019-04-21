@@ -433,8 +433,7 @@ function Follower() {
 
 			unit = unitList.shift();
 
-			if (unit) {
-				Chest.openChest(unit);
+			if (unit && Chest.openChest(unit)) {
 				Pickit.pickItems();
 			}
 		}

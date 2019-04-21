@@ -270,10 +270,9 @@ MainLoop:
 				Skill.cast(43, 0, item);
 			} else {
 				if (getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
-					
 					if (Pather.useTeleport()) {
 						Pather.moveToUnit(item);
-					} else if (!Pather.maneuverTo(item.x, item.y, 0)) {
+					} else if (!Pather.moveTo(item.x, item.y, 0, false)) {
 						continue MainLoop;
 					}
 				}

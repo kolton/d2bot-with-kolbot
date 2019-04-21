@@ -9,9 +9,7 @@ function AncientTunnels() {
 	Pather.useWaypoint(44);
 	Precast.doPrecast(true);
 
-	if (Config.AncientTunnels.OpenChest && Pather.moveToPreset(me.area, 2, 580)) {
-		Chest.scan(5);
-		Chest.openChests();
+	if (Config.AncientTunnels.OpenChest && Pather.moveToPreset(me.area, 2, 580) && Chest.openChests(5)) {
 		Pickit.pickItems();
 	}
 
