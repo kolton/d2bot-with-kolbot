@@ -61,7 +61,7 @@ var NodeAction = {
 		}
 
 		if (arg.clearPath !== false) {
-			Attack.clear(30, typeof arg.clearPath === "number" ? arg.clearPath : 0);
+			Attack.clear(15, typeof arg.clearPath === "number" ? arg.clearPath : 0);
 		}
 
 	},
@@ -72,7 +72,7 @@ var NodeAction = {
 			Chest.scan(Config.PickRange);
 
 			if (!arg.maneuvering) {
-				Chest.openChests(Config.PickRange);
+				Chest.openChests();
 
 			}
 

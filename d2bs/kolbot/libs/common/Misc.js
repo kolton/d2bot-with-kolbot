@@ -915,7 +915,7 @@ var Chest = {
 		for (i = 0; i < 3; i += 1) {
 			// already open
 			if (!unit || unit.gid === undefined || unit.mode) {
-				print("chest already open: " + unit);
+				//print("chest already open: " + unit);
 				return true;
 			}
 			
@@ -932,7 +932,7 @@ var Chest = {
 
 			tick = getTickCount();
 			
-			while (getTickCount() - tick < 1000) {
+			while (getTickCount() - tick < 3000) {
 				if (unit.gid === undefined || unit.mode > 1) {
 					
 					return true;
