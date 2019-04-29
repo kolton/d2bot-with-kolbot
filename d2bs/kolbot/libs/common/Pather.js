@@ -1399,11 +1399,6 @@ var Pather = {
 		switch (me.act) {
 
 		case 1:
-			if (me.act >= 2) {
-				return true;
-
-			}
-
 			Town.move("warriv");
 
 			npc = getUnit(1, "warriv");
@@ -1421,8 +1416,34 @@ var Pather = {
 
 			break;
 
+		case 2:
+			var jerhyn, meshif;
+
+			if (!me.getQuest(14, 0)) {
+				Town.move("palace");
+				jerhyn = getUnit(1, "jerhyn");
+
+				if (!jerhyn || !jerhyn.openMenu()) {
+					return false;
+				}
+
+				me.cancel();
+
+			}
+
+			Town.move("meshif");
+			meshif = getUnit(1, "meshif");
+
+			if (!meshif || !meshif.openMenu()) {
+				return false;
+			}
+
+			Misc.useMenu(0x0D38);
+
+			break;
+
 		default:
-			throw new Error("Pather.goToNextAct: Act transition from act " + me.act + "->" + me.act + 1 + " not yet supported.");
+			throw new Error("Pather.goToNextAct: Act transition from act " + me.act + "->" + (me.act + 1) + " not yet supported.");
 
 		}
 
