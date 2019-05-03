@@ -2,18 +2,18 @@
 var Mercenary = {
 	variants: {
 		"271": [7, 11],
-		"338": [[99, 104, 108], [103, 114, 98]],	//Normal/Hell, Nightmare
+		"338": [[99, 104, 108], [103, 114, 98]],	// Normal/Hell, Nightmare
 		"359": [41, 55, 38],
 		"560": [126]
 	},
 
 	classIds: [
 		-1,
-		271, 	//Act 1 - Rogue
-		338,	//Act 2 - Guard
-		359,	//Act 3 - Iron Wolf
+		271,	// Act 1 - Rogue
+		338,	// Act 2 - Guard
+		359,	// Act 3 - Iron Wolf
 		-1,
-		560		//Act 5 - Barb
+		560		// Act 5 - Barb
 	],
 
 	availableMercs: [],
@@ -23,24 +23,23 @@ var Mercenary = {
 			return null;
 		}
 
-		var merc = null;
+		var merc = me.getMerc();
 
 		// me.getMerc() might return null if called right after taking a portal, that's why there's retry attempts
 		for (var i = 0; i < 3; i++) {
-			merc = me.getMerc();
+			if (merc) {
+				if (merc.mode === 0 || merc.mode === 12) {
+					return null;
+				}
 
-			if (merc && (merc.mode === 0 || merc.mode === 12)) {
-				return null;
-			} else if (merc) {
 				break;
 			}
 
 			delay(100);
-
+			merc = me.getMerc();
 		}
 
 		return merc;
-
 	},
 
 	getVariant: function () {
@@ -57,22 +56,17 @@ var Mercenary = {
 						return this.variants[merc.classid][i][j];
 					}
 				}
-			} else {
-				if (merc.getSkill(this.variants[merc.classid][i], 1)) {
-					return this.variants[merc.classid][i];
-				}
-
+			} else if (merc.getSkill(this.variants[merc.classid][i], 1)) {
+				return this.variants[merc.classid][i];
 			}
-
 		}
 
 		throw new Error("Mercenary.getVariant: Couldn't determine merc variant.");
-
 	},
 
 	hasMerc: function (mercType, variant) {
 		if (!Config.UseMerc) {
-			return false;	//We don't want a merc
+			return false;	// We don't want a merc
 		}
 
 		if (mercType === undefined) {
@@ -81,7 +75,6 @@ var Mercenary = {
 			} else {
 				mercType = Config.UseMerc;
 			}
-
 		}
 
 		if (variant === undefined) {
@@ -90,7 +83,6 @@ var Mercenary = {
 			} else {
 				variant = -1;
 			}
-
 		}
 
 		if (mercType < 1 || mercType > 5 || mercType === 4) {
@@ -99,30 +91,18 @@ var Mercenary = {
 
 		var merc = this.getMerc();
 
-		if (!merc && (me.mercrevivecost === 0 || me.gametype === 0)) {
-			return false;	//We never had a merc
-		} else if (this.isDead()) {
-			return true;	//Merc is dead so we can't determine the variant or type
-		} else if (this.classIds[mercType] !== merc.classid) {
-			return false;	//We want a different type of merc
-		}
-
-		//If the variant was specified, determine if the merc variant is the same
-		if (variant !== -1) {
-			if (this.getVariant() !== variant) {
-				return false;	//We want a different variant of merc
-
-			}
-
+		if (this.isDead()) {
+			return true;	// Merc is dead so we can't determine the variant or type
+		} else if ((!merc && (me.mercrevivecost === 0 || me.gametype === 0))
+			|| (this.classIds[mercType] !== merc.classid || (variant !== -1 && this.getVariant() !== variant))) {
+			return false;	// We never had a merc, or we want a different type or possibly variant of merc
 		}
 
 		return true;
-
 	},
 
 	isDead: function () {
 		return me.mercrevivecost > 0;
-
 	},
 
 	needMerc: function () {
@@ -131,7 +111,6 @@ var Mercenary = {
 		}
 
 		return Config.UseMerc && (this.isDead() || !this.hasMerc());
-
 	},
 
 	canHire: function (mercType) {
@@ -141,47 +120,43 @@ var Mercenary = {
 			} else {
 				mercType = Config.UseMerc;
 			}
-
 		}
-
-		var canHire = false;
 
 		switch (mercType) {
 		case 1:
 
-			if ((this._checkQuest(2, 1) || this._checkQuest(2, 0)) || me.charlvl >= 8) {
-				canHire = true;
+			if ((Misc.checkQuest(2, 1) || Misc.checkQuest(2, 0)) || me.charlvl >= 8) {
+				return true;
 			}
 
 			break;
 
 		case 2:
-			if (me.getQuest(6, 0) || me.getQuest(6, 1)) {
-				canHire = true;
+			if (Misc.checkQuest(6, 0) || Misc.checkQuest(6, 1)) {
+				return true;
 			}
 
 			break;
 
 		case 3:
-			if (me.getQuest(14, 0) || me.getQuest(14, 1) || me.getQuest(14, 3) || me.getQuest(14, 4)) {
-				canHire = true;
+			if (Misc.checkQuest(14, 0) || Misc.checkQuest(14, 1) || Misc.checkQuest(14, 3) || Misc.checkQuest(14, 4)) {
+				return true;
 			}
 
 			break;
 
 		case 5:
-			if (me.getQuest(36, 0)) {
-				canHire = true;
+			if (Misc.checkQuest(36, 0)) {
+				return true;
 			}
 
 			break;
 
 		default:
 			throw new Error("Mercenary.canHire: Incorrect value for mercType: " + mercType);
-
 		}
 
-		return canHire;
+		return false;
 
 	},
 
@@ -200,7 +175,7 @@ var Mercenary = {
 
 		if (args.replace === undefined) {
 			args.replace = false;
-		}	//useful if the merc level is far behind our level and we want a new one to catch up
+		}	// useful if the merc level is far behind our level and we want a new one to catch up
 
 		if (args.variant === undefined) {
 			args.variant = -1;
@@ -214,7 +189,6 @@ var Mercenary = {
 			print("Mercenary.hire:  Can't hire merc of type " + args.mercType);
 
 			return false;
-
 		}
 
 		print("Mercenary.hire: Hiring new Merc of type " + args.mercType + " and variant " + args.variant);
@@ -225,19 +199,19 @@ var Mercenary = {
 
 		if (this.isDead()) {
 			this.revive();
-		}	//Revive so we can pull the equipment off, just in case
+		}	// Revive so we can pull the equipment off, just in case
 
 		if (!this.unloadEquipment()) {
 			return false;
-		}	//Bail out if we can't unload the merc's equipment, just in case
+		}	// Bail out if we can't unload the merc's equipment, just in case
 
-		Town.move(Town.tasks[args.mercType - 1].Merc);	//Move to Merc NPC for the mercType act
+		Town.move(Town.tasks[args.mercType - 1].Merc);	// Move to Merc NPC for the mercType act
 		Pather.moveTo(me.x + rand(-3, 3), me.y + rand(-3, 3));
 		Town.move(Town.tasks[args.mercType - 1].Merc);
 
 		delay(1000);
 
-		addEventListener("gamepacket", this._gamePacket);
+		addEventListener("gamepacket", this.mercPacket);
 		var hire = getUnit(1, Town.tasks[args.mercType - 1].Merc);
 
 		if (!hire || !hire.openMenu()) {
@@ -257,7 +231,7 @@ var Mercenary = {
 
 		removeEventListener("gamepacket", this._gamePacket);
 
-		//Hire mercs until we get the right one.
+		// Hire mercs until we get the right one.
 		if (Mercenary.availableMercs.length) {
 			do {
 				print("Trying to hire a merc");
@@ -282,13 +256,11 @@ var Mercenary = {
 			me.cancel();
 
 			return false;
-
 		}
 
 		me.cancel();
 
 		return true;
-
 	},
 
 	revive: function () {
@@ -356,14 +328,13 @@ var Mercenary = {
 		}
 
 		return false;
-
 	},
 
 	unloadEquipment: function () {
 		print("Unloading merc equipment");
 		var cursorItem;
 
-		//ok this is a bit stupid
+		// ok this is a bit stupid
 		clickItem(4, 4);
 		delay(me.ping + 500);
 
@@ -403,9 +374,7 @@ var Mercenary = {
 					Misc.click(0, 0, me);
 					delay(me.ping + 500);
 				}
-
 			}
-
 		}
 
 		clickItem(4, 1);
@@ -433,27 +402,19 @@ var Mercenary = {
 
 	},
 
-	_gamePacket: function (bytes) {
-		switch (bytes[0]) {
-		case 0x4e:
-			//print("bytes " + bytes.toSource());
-			var id = (bytes[2] << 8) + bytes[1];
-
-			if (Mercenary.availableMercs.indexOf(id) !== -1) {
-				//print("length = 0");
-				Mercenary.availableMercs.length = 0;
-			}
-
-			Mercenary.availableMercs.push(id);
-			break;
+	mercPacket: function (bytes) {
+		if (bytes[0] !== 0x4e) {
+			return;
 		}
-	},
 
-	_checkQuest: function (id, state) {
-		sendPacket(1, 0x40);
-		delay(500);
+		var id = (bytes[2] << 8) + bytes[1];
 
-		return me.getQuest(id, state);
+		if (Mercenary.availableMercs.indexOf(id) !== -1) {
+			Mercenary.availableMercs.length = 0;
+		}
+
+		Mercenary.availableMercs.push(id);
+
+		return;
 	}
-
 };
