@@ -521,6 +521,9 @@ function main() {
 
 					MuleData.write(obj);
 					D2Bot.printToConsole("Done muling.", 7);
+
+                    waitMinGameTime(tick);
+
 					sendCopyData(null, master, 10, JSON.stringify({status: "quit"}));
 					//delay(500);
 					D2Bot.stop(me.profile, true);
@@ -543,12 +546,7 @@ function main() {
 					nextChar();
 					D2Bot.printToConsole("Mule full, getting next character.", 7);
 
-					if (StarterConfig.MinGameTime && getTickCount() - tick < StarterConfig.MinGameTime * 1000) {
-						while (getTickCount() - tick < StarterConfig.MinGameTime * 1000) {
-							me.overhead("Stalling for " + Math.round(((tick + (StarterConfig.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
-							delay(1000);
-						}
-					}
+                    waitMinGameTime(tick);
 
 					quit();
 
@@ -576,6 +574,15 @@ function main() {
 
 		delay(100);
 	}
+}
+
+function waitMinGameTime(tick) {
+    if (StarterConfig.MinGameTime && getTickCount() - tick < StarterConfig.MinGameTime * 1000) {
+    	while (getTickCount() - tick < StarterConfig.MinGameTime * 1000) {
+    		me.overhead("Stalling for " + Math.round(((tick + (StarterConfig.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
+    		delay(1000);
+    	}
+    }
 }
 
 function locationAction(location) {
