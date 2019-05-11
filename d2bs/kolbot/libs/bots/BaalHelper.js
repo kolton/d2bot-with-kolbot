@@ -250,6 +250,12 @@ WSKLoop:
 		return true;
 	}
 
+	if (Config.BaalHelper.SoulQuit && getUnit(1, 641)) {
+		print("Burning Souls found.");
+
+		return true;
+	}
+
 	Precast.doPrecast(false);
 	Attack.clear(15);
 	this.clearThrone();

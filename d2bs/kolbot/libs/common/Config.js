@@ -392,6 +392,7 @@ var Config = {
 		KillNihlathak: false,
 		FastChaos: false,
 		DollQuit: false,
+		SoulQuit: false,
 		KillBaal: false,
 		SkipTP: false
 	},
