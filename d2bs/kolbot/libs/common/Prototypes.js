@@ -1216,3 +1216,13 @@ Unit.prototype.useChargedSkill = function (...args) {
 			throw Error('Needs to be called on either the me object, or a item unit')
 	}
 };
+
+/**
+ * Simple functionality to read the distance between you and an unit.
+ * Example: getUnit(...).distance <-- gives the distance between you and the unit.
+ */
+Object.defineProperty(Unit.prototype, 'distance', {
+	get: function() {
+		return getDistance(me,this);
+	}
+});
