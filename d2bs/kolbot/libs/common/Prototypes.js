@@ -1122,8 +1122,12 @@ if (!Array.prototype.first) {
  */
 Unit.prototype.getItems = function (...args) {
 	let item = this.getItem.apply(this, args), items = [];
-	if (!item) {return [];}
-	do {items.push(copyUnit(item));} while (item.getNext());
+	item && items.push(copyUnit(item));
+
+	while (item && item.getNext()) {
+		items.push(copyUnit(item));
+	}
+
 	return items;
 };
 
@@ -1134,85 +1138,115 @@ Unit.prototype.getItems = function (...args) {
  * @param {int} y = undefined
  */
 Unit.prototype.useChargedSkill = function (...args) {
-	let skillId, x, y, unit;
+	let skillId, x, y, unit, chargedItems, chargeItem, charge,
+		sortBylvl = (a, b) => a.level - b.level,
+		filterCorrect = charge => charge.skill === skillId && charge.charges;
+
+
 	switch (args.length) {
-		case 0: // item.useChargedSkill()
-			break;
-		case 1:
-			if (args[0] instanceof Unit) { // hellfire.useChargedSkill(monster);
-				unit = args[0];
-			} else {
-				skillId = args[0];
-			}
-			break;
-		case 2:
-			if (typeof args[0] === 'number' && args[1] instanceof Unit) { // me.useChargedSkill(skillId,unit)
-				[skillId, unit] = [...args];
-			} else if (typeof args[0] === 'number' && typeof args[0] === 'number') { // item.useChargedSkill(x,y)
-				[x, y] = [...args];
-			} else {
-				throw new Error('If me.useChargedSkill with 2 arguments, it should (skillid,unit) or (x,y)')
-			}
-			break;
-		case 3:
-			// If all arguments are numbers
-			if (args.map(Number.isInteger).reduce((a, b) => a && b, true)) {
-				[skillId, x, y] = [...args];
-			}
-			break;
-		default:
-			throw new Error('unit.useChargedSkill() called with wrong arguments. Its either me.useChargedSkill(skillid), or item.useChargedSkill(), or me.useChargedSkill(skillid,x,y) or ')
+	case 0: // item.useChargedSkill()
+		break;
+	case 1:
+		if (args[0] instanceof Unit) { // hellfire.useChargedSkill(monster);
+			unit = args[0];
+		} else {
+			skillId = args[0];
+		}
+
+		break;
+	case 2:
+		if (typeof args[0] === 'number' && args[1] instanceof Unit) { // me.useChargedSkill(skillId,unit)
+			[skillId, unit] = [...args];
+		} else if (typeof args[0] === 'number' && typeof args[0] === 'number') { // item.useChargedSkill(x,y)
+			[x, y] = [...args];
+		} else {
+			throw new Error('If me.useChargedSkill with 2 arguments, it should (skillid,unit) or (x,y)');
+		}
+
+		break;
+	case 3:
+		// If all arguments are numbers
+		if (args.map(Number.isInteger).reduce((a, b) => a && b, true)) {
+			[skillId, x, y] = [...args];
+		}
+
+		break;
+	default:
+		throw new Error('unit.useChargedSkill() called with wrong arguments. Its either me.useChargedSkill(skillid), or item.useChargedSkill(), or me.useChargedSkill(skillid,x,y) or ');
 	}
+
 	// You cant cast a charged skill ON a unit, but we know where the x and y of the unit is
-	unit && ([x,y] = [unit.x,unit.y]);
+	unit && ([x, y] = [unit.x, unit.y]);
+
 	switch (true) {
-		case this===me: // Called the function the unit, me.
-			if (!skillId) {
-				throw Error('Must supply skillId on me.useChargedSkill');
+	case this === me: // Called the function the unit, me.
+		if (!skillId) {
+			throw Error('Must supply skillId on me.useChargedSkill');
+		}
+
+		// Get all items with charges on it
+		chargedItems = this.getItems(-1)
+			.filter(item => item
+					&& (	// Item needs to be on equipment, or a charm in inventory
+						item.location === 1 /*equipment*/
+						|| (item.location === 3 /*inventory*/
+							&& item.itemType === 82 /*charms*/)
+					) && item.getStat(-2).hasOwnProperty(204)
+					&& item.getStat(-2)[204]
+			);
+
+		// Filter those with the given skill, and enough charges
+		chargedItems = chargedItems.filter(item => !!item.getStat(-2)[204].filter(filterCorrect).length);
+
+		if (chargedItems.length === 0) {
+			throw Error("Don't have the charged skill (" + skillId + "), or not enough charges");
+		}
+
+		chargeItem = chargedItems
+			.map(item => ({
+				item: item,
+				charge: item.getStat(-2)[204].filter(filterCorrect).sort(sortBylvl).first()
+			}))
+			.sort((a, b) => a.charge.level - b.charge.level) // Get the highest lvl of charge
+			.first()
+			.item;
+
+		return chargeItem.useChargedSkill.apply(chargeItem, args);
+	case this.type === 4: // called on an item
+		charge = this.getStat(-2)[204]; // WARNING. Somehow this gives duplicates
+
+		if (!charge) {
+			throw Error('No charged skill on this item');
+		}
+
+		if (skillId) {
+			charge = charge.filter(item => (skillId && item.skill === skillId) && !!item.charges); // Filter out all other charged skills
+		} else if (charge.length > 1) {
+			throw new Error('multiple charges on this item without a given skillId');
+		}
+
+		charge = charge.first();
+
+		if (charge) {
+			// Setting skill on hand
+			if (!Config.PacketCasting || Config.PacketCasting === 1 && skillId !== 54) {
+				return Skill.cast(skillId, 0, x || me.x, y || me.y, this); // Non packet casting
 			}
-			let sortBylvl = (a, b) => a.level - b.level,
-				filterCorrect = charge => charge.skill === skillId && charge.charges;
-			// Get all items with charges on it
-			let chargedItems = this.getItems().filter(item => item.location === 1 /*equipment*/ && item.getStat(-2)[204]);
 
-			// Filter those with the given skill, and enough charges
-			chargedItems = chargedItems.filter(item => !!item.getStat(-2)[204].filter(filterCorrect).length);
+			// Packet casting
+			sendPacket(1, 0x3c, 2, charge.skill, 1, 0x0, 1, 0x00, 4, this.gid);
+			// No need for a delay, since its TCP, the server recv's the next statement always after the send cast skill packet
 
-			if (chargedItems.length === 0) {
-				throw Error("Don't have the charged skill (" + skillId + "), or not enough charges");
-			}
+			// The result of "successfully" casted is different, so we cant wait for it here. We have to assume it worked
+			sendPacket(1, 0x0C, 2, x || me.x, 2, y || me.y); // Cast the skill
 
-			let item = chargedItems.map(item => {
-				return {item: item, charge: item.getStat(-2)[204].filter(filterCorrect).sort(sortBylvl).first()}
-			}).sort((a, b) => a.charge.level - b.charge.level)
-				.first()
-				.item;
+			return true;
+		}
 
-			item.useChargedSkill.apply(item, args);
-			break;
-		case this.type === 4: // called on an item
-			let charge = this.getStat(-2)[204]; // WARNING. Somehow this gives duplicates
-
-			if (!charge) {
-				throw Error('No charged skill on this item');
-			}
-
-			if (skillId) {
-				charge = charge.filter(charge => (skillId && charge.skill === skillId) && !!charge.charges); // Filter out all other charged skills
-			}
-
-			charge = charge.first();
-			if (charge) {
-				// Setting skill on hand
-				sendPacket(1, 0x3c, 2, charge.skill, 1, 0x0, 1, 0x00, 4, this.gid);
-
-				// No need for a delay, since its TCP, the server recv's the next statement always after the send cast skill packet
-
-				// The result of "successfully" casted is different, so we cant wait for it here. We have to assume it worked
-				sendPacket(1, 0x0C, 2, x || me.x, 2, y || me.y) // Cast the skill
-			}
-			break;
-		default:
-			throw Error('Needs to be called on either the me object, or a item unit')
+		break;
+	default:
+		throw Error('Needs to be called on either the me object, or a item unit');
 	}
+
+	return false;
 };
