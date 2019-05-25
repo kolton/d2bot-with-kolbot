@@ -1164,7 +1164,7 @@ Unit.prototype.useChargedSkill = function (...args) {
 				[x, y] = [...args];
 			}
 		} else {
-			throw new Error('If me.useChargedSkill with 2 arguments, it should (skillid,unit) or (x,y)');
+			throw new Error(' invalid arguments, expected (skillId, unit) or (x, y)');
 		}
 
 		break;
@@ -1241,7 +1241,7 @@ Unit.prototype.useChargedSkill = function (...args) {
 			return true;
 		}
 	} else {
-		throw Error('Needs to be called on either the me object, or a item unit');
+		throw Error("invalid arguments, expected 'me' object or 'item' unit");
 	}
 
 	return false;
