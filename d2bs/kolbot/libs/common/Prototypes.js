@@ -1106,7 +1106,7 @@ if (!Array.prototype.find) {
 }
 
 /**
- * @description very simple but handy function, that either returns the first element, or undefined
+ * @description Return the first element or undefined
  */
 if (!Array.prototype.first) {
 	Array.prototype.first = function () {
@@ -1115,32 +1115,34 @@ if (!Array.prototype.first) {
 }
 
 /**
- * Just a simple wrapper around unit.getItem(), to avoid the use of .getNext() but just get an array,
- * and the guaranty of getting an array ack if the unit doesnt have items
+ * @description Return the items of a player, or an empty array
  * @param args
  * @returns Unit[]
  */
 Unit.prototype.getItems = function (...args) {
 	let item = this.getItem.apply(this, args), items = [];
-	item && items.push(copyUnit(item));
 
-	while (item && item.getNext()) {
-		items.push(copyUnit(item));
+	if (item) {
+		do {
+			items.push(copyUnit(item));
+		} while (item.getNext());
 	}
 
 	return items;
 };
 
 /**
- * @description ArachnidMesh.useChargedSkill() casts a venom or me.useChargedSkill(278);
+ * @description Used upon item units like ArachnidMesh.useChargedSkill([skillId]) or directly on the "me" unit me.useChargedSkill(278);
  * @param {int} skillId = undefined
  * @param {int} x = undefined
  * @param {int} y = undefined
  */
 Unit.prototype.useChargedSkill = function (...args) {
-	let skillId, x, y, unit, chargedItems, chargeItem, charge,
-		sortBylvl = (a, b) => a.level - b.level,
-		filterCorrect = charge => charge.skill === skillId && charge.charges;
+	let skillId, x, y, unit, chargedItem, charge,
+		chargedItems = [],
+		validCharge = function (itemCharge) {
+			return itemCharge.skill === skillId && itemCharge.charges;
+		};
 
 
 	switch (args.length) {
@@ -1155,10 +1157,12 @@ Unit.prototype.useChargedSkill = function (...args) {
 
 		break;
 	case 2:
-		if (typeof args[0] === 'number' && args[1] instanceof Unit) { // me.useChargedSkill(skillId,unit)
-			[skillId, unit] = [...args];
-		} else if (typeof args[0] === 'number' && typeof args[0] === 'number') { // item.useChargedSkill(x,y)
-			[x, y] = [...args];
+		if (typeof args[0] === 'number') {
+			if (args[1] instanceof Unit) { // me.useChargedSkill(skillId,unit)
+				[skillId, unit] = [...args];
+			} else if (typeof args[1] === 'number') { // item.useChargedSkill(x,y)
+				[x, y] = [...args];
+			}
 		} else {
 			throw new Error('If me.useChargedSkill with 2 arguments, it should (skillid,unit) or (x,y)');
 		}
@@ -1166,53 +1170,47 @@ Unit.prototype.useChargedSkill = function (...args) {
 		break;
 	case 3:
 		// If all arguments are numbers
-		if (args.map(Number.isInteger).reduce((a, b) => a && b, true)) {
+		if (typeof args[0] === 'number' && typeof args[1] === 'number' && typeof args[2] === 'number') {
 			[skillId, x, y] = [...args];
 		}
 
 		break;
 	default:
-		throw new Error('unit.useChargedSkill() called with wrong arguments. Its either me.useChargedSkill(skillid), or item.useChargedSkill(), or me.useChargedSkill(skillid,x,y) or ');
+		throw new Error("invalid arguments, expected 'me' object or 'item' unit");
 	}
 
-	// You cant cast a charged skill ON a unit, but we know where the x and y of the unit is
+	// Charged skills can only be casted on x, y coordinates
 	unit && ([x, y] = [unit.x, unit.y]);
 
-	switch (true) {
-	case this === me: // Called the function the unit, me.
+	if (this === me) { // Called the function the unit, me.
 		if (!skillId) {
 			throw Error('Must supply skillId on me.useChargedSkill');
 		}
 
-		// Get all items with charges on it
-		chargedItems = this.getItems(-1)
-			.filter(item => item
-					&& (	// Item needs to be on equipment, or a charm in inventory
-						item.location === 1 /*equipment*/
-						|| (item.location === 3 /*inventory*/
-							&& item.itemType === 82 /*charms*/)
-					) && item.getStat(-2).hasOwnProperty(204)
-					&& item.getStat(-2)[204]
-			);
+		chargedItems = [];
 
-		// Filter those with the given skill, and enough charges
-		chargedItems = chargedItems.filter(item => !!item.getStat(-2)[204].filter(filterCorrect).length);
+		this.getItems(-1) // Item must be in inventory, or a charm in inventory
+			.filter(item => item && (item.location === 1 || (item.location === 3 && item.itemType === 82)))
+			.forEach(function (item) {
+				let stats = item.getStat(-2);
+
+				if (!stats.hasOwnProperty(204)) {
+					stats = stats[204].filter(validCharge);
+					stats.length && chargedItems.push({
+						charge: stats.first(),
+						item: item
+					});
+				}
+			});
 
 		if (chargedItems.length === 0) {
 			throw Error("Don't have the charged skill (" + skillId + "), or not enough charges");
 		}
 
-		chargeItem = chargedItems
-			.map(item => ({
-				item: item,
-				charge: item.getStat(-2)[204].filter(filterCorrect).sort(sortBylvl).first()
-			}))
-			.sort((a, b) => a.charge.level - b.charge.level) // Get the highest lvl of charge
-			.first()
-			.item;
+		chargedItem = chargedItems.sort((a, b) => a.charge.level - b.charge.level).first().item;
 
-		return chargeItem.useChargedSkill.apply(chargeItem, args);
-	case this.type === 4: // called on an item
+		return chargedItem.useChargedSkill.apply(chargedItem, args);
+	} else if (this.type === 4) {
 		charge = this.getStat(-2)[204]; // WARNING. Somehow this gives duplicates
 
 		if (!charge) {
@@ -1242,9 +1240,7 @@ Unit.prototype.useChargedSkill = function (...args) {
 
 			return true;
 		}
-
-		break;
-	default:
+	} else {
 		throw Error('Needs to be called on either the me object, or a item unit');
 	}
 

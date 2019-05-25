@@ -249,7 +249,6 @@ var Skill = {
 			return false;
 		}
 
-		// If item is given, getSkill(skillId, 1), as we dont have the skill
 		if (!item && !me.getSkill(skillId, 1)) {
 			return false;
 		}
@@ -258,7 +257,7 @@ var Skill = {
 			return false;
 		}
 
-		// No mana to cast. Charged skill dont cost mana
+		// Check mana cost, charged skills don't use mana
 		if (!item && this.getManaCost(skillId) > me.mp) {
 			// Maybe delay on ALL skills that we don't have enough mana for?
 			if (Config.AttackSkill.concat([42, 54]).concat(Config.LowManaSkill).indexOf(skillId) > -1) {
@@ -381,16 +380,16 @@ MainLoop:
 			return true;
 		}
 
-		if (!me.getSkill(skillId, 1) && !item) {
+		if (!item && !me.getSkill(skillId, 1)) {
 			return false;
 		}
 
-		// Charged skills are always right
+		// Charged skills must be cast from right hand
 		if (hand === undefined || hand === 3 || item) {
 			hand = 0;
 		}
 
-		if (me.setSkill(skillId, hand,item)) {
+		if (me.setSkill(skillId, hand, item)) {
 			return true;
 		}
 
