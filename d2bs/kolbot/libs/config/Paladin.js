@@ -52,6 +52,7 @@ function LoadConfig() {
 
 	// *** act 2 ***
 	Scripts.Radament = false;
+	Scripts.CreepingFeature = false;
 	Scripts.Coldworm = false;
 		Config.Coldworm.KillBeetleburst = false;
 		Config.Coldworm.ClearMaggotLair = false; // Clear all 3 levels
