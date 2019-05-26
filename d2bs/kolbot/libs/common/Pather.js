@@ -887,7 +887,8 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp, coord, retry, npc;
+		var i, tick, wp, coord, retry, npc,
+			j = 0;
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -900,6 +901,15 @@ ModeLoop:
 				if (me.area === 40 && npc && getDistance(me, npc) < 50) {
 					if (npc && npc.openMenu()) {
 						Misc.useMenu(0x0D37);
+
+						while (me.area !== 1) {
+							delay(100);
+							j++;
+
+							if (j === 20) {
+								throw new Error("Failed to go to act 1 using Warriv");
+							}
+						}
 					}
 				}
 

@@ -31,7 +31,7 @@ function Summoner () {
 		let journal = getUnit(2, 357);
 
 		if (!journal) {
-			throw new Error("Journal not found");
+			return true;
 		}
 
 		Pather.moveToUnit(journal);
@@ -40,7 +40,7 @@ function Summoner () {
 		me.cancel();
 
 		if (!Pather.usePortal(46)) {
-			throw new Error("Failed to take arcane portal");
+			return true;
 		}
 
 		Loader.skipTown.push("Duriel");
