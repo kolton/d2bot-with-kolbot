@@ -887,8 +887,7 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp, coord, retry, npc,
-			j = 0;
+		var i, tick, wp, coord, retry, npc;
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -902,13 +901,10 @@ ModeLoop:
 					if (npc && npc.openMenu()) {
 						Misc.useMenu(0x0D37);
 
-						while (me.area !== 1) {
-							delay(100);
-							j++;
-
-							if (j === 20) {
-								throw new Error("Failed to go to act 1 using Warriv");
-							}
+						if (!Misc.poll(function () {
+							return me.area === 1;
+						}, 2000, 100)) {
+							throw new Error("Failed to go to act 1 using Warriv");
 						}
 					}
 				}
