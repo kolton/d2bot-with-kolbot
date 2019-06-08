@@ -1147,7 +1147,6 @@ Unit.prototype.castChargedSkill = function (...args) {
 			return itemCharge.skill === skillId && itemCharge.charges;
 		};
 
-
 	switch (args.length) {
 	case 0: // item.castChargedSkill()
 		break;
@@ -1184,6 +1183,10 @@ Unit.prototype.castChargedSkill = function (...args) {
 
 	// Charged skills can only be casted on x, y coordinates
 	unit && ([x, y] = [unit.x, unit.y]);
+
+	if (this !== me && this.type === 4) {
+		throw Error("invalid arguments, expected 'me' object or 'item' unit");
+	}
 
 	if (this === me) { // Called the function the unit, me.
 		if (!skillId) {
@@ -1243,8 +1246,6 @@ Unit.prototype.castChargedSkill = function (...args) {
 
 			return true;
 		}
-	} else {
-		throw Error("invalid arguments, expected 'me' object or 'item' unit");
 	}
 
 	return false;
