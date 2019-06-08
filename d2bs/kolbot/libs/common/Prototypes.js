@@ -1107,6 +1107,7 @@ if (!Array.prototype.find) {
 
 /**
  * @description Return the first element or undefined
+ * @return undefined|*
  */
 if (!Array.prototype.first) {
 	Array.prototype.first = function () {
@@ -1132,12 +1133,14 @@ Unit.prototype.getItems = function (...args) {
 };
 
 /**
- * @description Used upon item units like ArachnidMesh.useChargedSkill([skillId]) or directly on the "me" unit me.useChargedSkill(278);
+ * @description Used upon item units like ArachnidMesh.castChargedSkill([skillId]) or directly on the "me" unit me.castChargedSkill(278);
  * @param {int} skillId = undefined
  * @param {int} x = undefined
  * @param {int} y = undefined
+ * @return boolean
+ * @throws Error
  */
-Unit.prototype.useChargedSkill = function (...args) {
+Unit.prototype.castChargedSkill = function (...args) {
 	let skillId, x, y, unit, chargedItem, charge,
 		chargedItems = [],
 		validCharge = function (itemCharge) {
@@ -1146,10 +1149,10 @@ Unit.prototype.useChargedSkill = function (...args) {
 
 
 	switch (args.length) {
-	case 0: // item.useChargedSkill()
+	case 0: // item.castChargedSkill()
 		break;
 	case 1:
-		if (args[0] instanceof Unit) { // hellfire.useChargedSkill(monster);
+		if (args[0] instanceof Unit) { // hellfire.castChargedSkill(monster);
 			unit = args[0];
 		} else {
 			skillId = args[0];
@@ -1158,9 +1161,9 @@ Unit.prototype.useChargedSkill = function (...args) {
 		break;
 	case 2:
 		if (typeof args[0] === 'number') {
-			if (args[1] instanceof Unit) { // me.useChargedSkill(skillId,unit)
+			if (args[1] instanceof Unit) { // me.castChargedSkill(skillId,unit)
 				[skillId, unit] = [...args];
-			} else if (typeof args[1] === 'number') { // item.useChargedSkill(x,y)
+			} else if (typeof args[1] === 'number') { // item.castChargedSkill(x,y)
 				[x, y] = [...args];
 			}
 		} else {
@@ -1184,7 +1187,7 @@ Unit.prototype.useChargedSkill = function (...args) {
 
 	if (this === me) { // Called the function the unit, me.
 		if (!skillId) {
-			throw Error('Must supply skillId on me.useChargedSkill');
+			throw Error('Must supply skillId on me.castChargedSkill');
 		}
 
 		chargedItems = [];
@@ -1209,7 +1212,7 @@ Unit.prototype.useChargedSkill = function (...args) {
 
 		chargedItem = chargedItems.sort((a, b) => a.charge.level - b.charge.level).first().item;
 
-		return chargedItem.useChargedSkill.apply(chargedItem, args);
+		return chargedItem.castChargedSkill.apply(chargedItem, args);
 	} else if (this.type === 4) {
 		charge = this.getStat(-2)[204]; // WARNING. Somehow this gives duplicates
 
