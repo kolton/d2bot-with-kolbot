@@ -570,8 +570,6 @@ var Precast = new function () {
 
 				// Bit 135 rules the type of packet it is. 0 = high bo (>=128), 1= low bo (=<127)
 				position = position[bits[135]];
-				print(packetbytes.map(x=>format(x.toString(16),2)).join(' '));
-				print(bits.join(''));
 				Precast.BOEffect = parseInt(bits.splice(position.p, position.l).join(''), 2);
 				Precast.BOTick = getTickCount();
 				boLvl = ((Precast.BOEffect - 32) / 3);
