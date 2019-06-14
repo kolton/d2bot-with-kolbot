@@ -8,6 +8,7 @@ var Precast = new function () {
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;
+	this.BOEffect = 0;
 	this.bestSlot = {};
 
 	this.precastCTA = function (force) {
@@ -17,6 +18,11 @@ var Precast = new function () {
 
 		if (me.gametype === 0 || me.classid === 4 || me.inTown) {
 			return false;
+		}
+
+		// Dont over bo a better bo
+		if (!force && (32 + (this.myBoLvl() * 3) < this.BOEffect)) {
+			return true;
 		}
 
 		if (this.checkCTA()) {
@@ -117,24 +123,27 @@ var Precast = new function () {
 		}
 
 		this.bestSlot[skillId] = (sumSwap > sumCurr) ? me.weaponswitch ^ 1 : me.weaponswitch;
+
 		return this.bestSlot[skillId];
 	};
 
-	this.precastSkill = function (skillId) {
+	this.precastSkill = function (skillId, switchBack = true) {
 		var swap = me.weaponswitch;
 
 		Attack.weaponSwitch(this.getBetterSlot(skillId));
 		Skill.cast(skillId, 0);
-		Attack.weaponSwitch(swap);
+		switchBack && Attack.weaponSwitch(swap);
 
 		return true;
 	};
 
 	this.doPrecast = function (force) {
-		var buffSummons = false;
+		let buffSummons = false,
+			needBo = getTickCount() - this.BOTick >= this.BODuration - 30000 // Rebo if the time is up
+				|| 32 + (this.myBoLvl() * 3) > this.BOEffect; // a higher bo can be cast by me
 
 		// Force BO 30 seconds before it expires
-		this.precastCTA(!me.getState(32) || force || (getTickCount() - this.BOTick >= this.BODuration - 30000));
+		this.precastCTA(!me.getState(32) || force || needBo);
 
 		switch (me.classid) {
 		case 0: // Amazon
@@ -201,25 +210,25 @@ var Precast = new function () {
 			}
 
 			break;
-		case 4: // Barbarian - TODO: BO duration
-			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force) {
-				var swap = me.weaponswitch;
+		case 4: // Barbarian
+			if (!me.getState(32) || !me.getState(51) || !me.getState(26) || force || needBo ) {
+				let originalSwap = me.weaponswitch;
 
-				Attack.weaponSwitch(this.getBetterSlot(149));
-
-				if (!me.getState(51) || force) {
-					Skill.cast(155, 0); // Battle Command
+				if (!me.getState(51) || force || needBo) {
+					this.precastSkill(155, false); // Battle Command
 				}
 
-				if (!me.getState(32) || force) {
-					Skill.cast(149, 0); // Battle Orders
+				if (!me.getState(32) || force || needBo) {
+					this.BODuration = 20 + ((me.getSkill(149, 1) + me.getSkill(155, 0) + me.getSkill(138, 0)) * 5);
+					this.BOTick = getTickCount();
+					this.precastSkill(149, 0); // Battle Orders
 				}
 
-				if (!me.getState(26) || force) {
-					Skill.cast(138, 0); // Shout
+				if (!me.getState(26) || force || needBo) {
+					this.precastSkill(138, 0); // Shout
 				}
 
-				Attack.weaponSwitch(swap);
+				Attack.weaponSwitch(originalSwap);
 			}
 
 			break;
@@ -471,4 +480,125 @@ var Precast = new function () {
 
 		return true;
 	};
+
+	/**
+	 * @description calculates the level of bo you do
+	 * @returns {number}
+	 */
+	this.myBoLvl = function () {
+		let tmpItem = me.getItem(), items = [], slvl_slot = [0, 0], chooseSlot = -1,
+			slvl = me.getSkill(149, 0), // Hard skills in battle orders
+			haveSkill = !!slvl,
+			haveBattleCommand = !!me.getSkill(155, 0), // hardpoints in battle command
+			weaponSlot = [11, 4, 12, 5],
+			charms = [82, 83, 84],
+			aBarb = me.classid === 3;
+
+		const parseItem = function (item) {
+			// If we dont have the skill, set haveSkill on true, once we found a o skill
+			if (!haveSkill && item.getStat(97/*o skill (cta)*/, 149/*bo*/)) {
+				haveSkill = true;
+				chooseSlot = weaponSlot.indexOf(item.bodylocation) % 2;
+				haveBattleCommand |= !!item.getStat(97, 155); // This is a cta, so it has +x battle command
+			}
+
+			return item.getStat(127/*all skills*/)
+				+ item.getStat(83/* class , 4 /*barbskills*/)
+				+ (aBarb ? item.getStat(188/*+tab (class only)*/, 34 /*warcry*/)
+					: 0)
+				+ (aBarb ? item.getStat(107/*+skill (class only)*/, 149/*bo*/)
+					: 0)
+				+ (aBarb ? Math.min(item.getStat(97/*o skill (cta)*/, 149/*bo*/), 3)
+					: item.getStat(97/*o skill (cta)*/, 149/*bo*/));
+		};
+
+		if (tmpItem) { // only add items to the array, if we do have items
+			do {
+				items.push(copyUnit(tmpItem));
+			} while (tmpItem.getNext());
+		}
+
+		// determin +x on weapon slots
+		items.forEach(item => item.location === 1 // wearing it
+			&& weaponSlot.indexOf(item.bodylocation) !== -1 // on a weapon/shield slot
+			&& (slvl_slot[weaponSlot.indexOf(item.bodylocation) % 2] += parseItem(item)));
+
+		// determin +x on other items equipment
+		items.forEach(item => item.location === 1 // wearing it
+			&& weaponSlot.indexOf(item.bodylocation) === -1 // Not a weapon/shield
+			&& (slvl += parseItem(item)) // add it the total amount of + lvl
+		);
+
+		// count the +x on charms
+		items.forEach(item => item.location === 3 // inventory
+			&& charms.indexOf(item.classid) === -1 // Only charms, a random item doesnt have effect in inventory
+			&& (slvl += parseItem(item)) // add the skills a charm give
+		);
+
+		// Dont have the skill, so lvl 0
+		if (!haveSkill) {
+			return 0;
+		}
+
+		// If battle orders is skilled, or if the state is active, count it as a +1 skill
+		(haveBattleCommand || me.getState(51)) && slvl++;
+
+		// Only have battle orders in a specific slot, so return the + skills of that slot
+		if (chooseSlot !== -1) {
+			return slvl + slvl_slot[chooseSlot];
+		}
+
+		// Their are hard points in the skill, so return the highest slot available
+		return slvl + slvl_slot.sort((a, b) => a - b)[0];
+	};
+
+	// If the char can cast a bo.
+	if (this.myBoLvl()) {
+		const format = (input, length) => (Array(length + 1).join('0') + input).slice(-length).toString(),
+			parseBoPacket = function (bytes) {
+				let position = [{l: 8, p: 94}, {l: 7, p: 72}],	packetbytes = [], bits, boLvl, myBoLvl = Precast.myBoLvl();
+
+				// Build an array of the packet
+				for (let b in bytes) {
+					packetbytes.push(bytes[b]);
+				}
+
+				// generate an array of bits
+				bits = packetbytes.map(x => (x).toString(2)) // convert all to a binary value
+					.map(x => format(x, 8)) // make sure it is 8 bits long
+					.join('').split(''); // join them together, split them to have an array of bits
+
+				// Bit 135 rules the type of packet it is. 0 = high bo (>=128), 1= low bo (=<127)
+				position = position[bits[135]];
+				print(packetbytes.map(x=>format(x.toString(16),2)).join(' '));
+				print(bits.join(''));
+				Precast.BOEffect = parseInt(bits.splice(position.p, position.l).join(''), 2);
+				Precast.BOTick = getTickCount();
+				boLvl = ((Precast.BOEffect - 32) / 3);
+
+				// received less good bo
+				if (boLvl < myBoLvl) {
+					Precast.BODuration = 0; // Forces a rebo the next time Precast.doPrecast is called
+				} else {
+					// The duration of the bo isn't figured out yet. So its estimate the duration
+					// 5 seconds for each lvl. + 5 seconds for each lvl of battle command + 5 seconds for each lvl of shout
+					// We can assume battle command is mostly at the same lvl as battle orders.
+					// On barbs however, it is lower, but they have shout that levels it out
+					// Better to guess this too high, so the higher giving char can calculate it better
+					Precast.BODuration = (boLvl * 5 * 2) + 20;
+				}
+
+				print('bo effect - ' + Precast.BOEffect + '% hp/mp/stamina');
+
+			};
+
+		addEventListener('gamepacket', bytes => bytes
+			&& bytes.length > 16
+			&& bytes[0] === 0xA8 // a set state packet
+			&& bytes[7] === 0x20 // state battle orders
+			&& bytes[1] === 0x00 // directed at players
+			&& (bytes[3] * 256) + bytes[2] === me.gid // directed at me
+			&& parseBoPacket(bytes)
+		);
+	}
 };
