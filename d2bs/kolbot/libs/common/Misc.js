@@ -386,6 +386,7 @@ MainLoop:
 
 		// Charged skills must be cast from right hand
 		if (hand === undefined || hand === 3 || item) {
+			item && hand !== 0 && print('[ÿc9Warningÿc0] charged skills must be cast from right hand');
 			hand = 0;
 		}
 
