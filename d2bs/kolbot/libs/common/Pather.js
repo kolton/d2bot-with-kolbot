@@ -900,6 +900,12 @@ ModeLoop:
 				if (me.area === 40 && npc && getDistance(me, npc) < 50) {
 					if (npc && npc.openMenu()) {
 						Misc.useMenu(0x0D37);
+
+						if (!Misc.poll(function () {
+							return me.area === 1;
+						}, 2000, 100)) {
+							throw new Error("Failed to go to act 1 using Warriv");
+						}
 					}
 				}
 
