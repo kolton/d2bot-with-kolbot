@@ -78,6 +78,7 @@ function LoadConfig() {
 	// *** act 4 ***
 	Scripts.OuterSteppes = false;
 	Scripts.Izual = false;
+	Scripts.RiverOfFlame = false;
 	Scripts.Hephasto = false;
 	Scripts.Vizier = false; // Intended for classic sorc, kills Vizier only.
 	Scripts.FastDiablo = false;
