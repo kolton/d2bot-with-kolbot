@@ -26,6 +26,10 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
+if(FileTools.exists("log/mulelog.json")) {
+    
+}
+
 var handle, gameInfo, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList, nextAcc,
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
@@ -37,6 +41,7 @@ function parseInfo() {
 
 	for (i in MuleLogger.LogAccounts) {
 		if (MuleLogger.LogAccounts.hasOwnProperty(i) && typeof i === "string") {
+            print(i);
 			accounts.push(i);
 			chars.push(MuleLogger.LogAccounts[i]);
 		}
@@ -262,6 +267,8 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
+        
+        //D2Bot.printToConsole("Acc select Select");
 		if (nextAcc) {
 			accounts.shift();
 			chars.shift();
@@ -414,6 +421,8 @@ MainSwitch:
 
 		break;
 	case 12: // Character Select
+        //D2Bot.printToConsole("Character Select");
+        //D2Bot.printToConsole("Remaining Characters: " + charList.join(", "), 7);
 		// Single Player screen fix
 		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
 			ControlAction.click(6, 33, 572, 128, 35);
@@ -429,6 +438,13 @@ MainSwitch:
 
 		if (charList[0] === "all") {
 			charList = ControlAction.getCharacters();
+            //D2Bot.printToConsole("Getting all");
+            
+            //D2Bot.printToConsole("BeforePop: " + charList.join(","));
+            
+            charList.pop();
+            
+            //D2Bot.printToConsole("AfterPop: " + charList.join(","));
 		}
 
 		if (FileTools.exists("logs/MuleLog.json")) {
@@ -448,7 +464,8 @@ MainSwitch:
 		// last char in acc = trigger next acc
 		if (!charList.length) {
 			nextAcc = true;
-
+            //D2Bot.printToConsole("Switching Accounts");
+            FileTools.remove("logs/MuleLog.json");
 			break;
 		}
 
