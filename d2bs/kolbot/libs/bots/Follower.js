@@ -886,6 +886,9 @@ WPLoop:
 
 		delay(100);
 	}
+	// Following two lines added by Sonny
 
+	print(Config.Follower.ExitTimeout + "s exit timeout");
+	delay(Config.Follower.ExitTimeout * 1000 + 1);
 	return true;
 }
