@@ -1,31 +1,3 @@
-# D2BS with HotFixes and extended functionality 
-
-## What is this?
-This is a fork of the (in)famous D2Bot with Kolbot. It is based on the latest release of Kolbot as of 07/2019.
-I've added some personal scripting and fixed some issues with the major version of this software.
-
-
-## HotFixes
-- fixed a Bug in D2BotMuleLogging, which made it impossible to log multiple accounts with char "all" setting
-- fixed a Bug, which caused D2BotMuleLogging to log first mule in account twice (GER) on char "all" setting
-
-
-## What's to come?
-This Fork will be for "semi-legit" Bot-using and scripting as for everyday needs like:
-- muling from one account to another
-- getting mule logs
-- making an UI for proper overview of multiple accounts
-- muling in Browser-UI (qequed and executed by bot)
-- Profile for "Mule-Keeping"
-- advanced human behaviour 
-- more scripts to run
-
-
-
-#Shoutout to D2BS-Team, who made this awesome project possible. All credit goes to this guys. Please feel free to use whatever you want!
-
-______________________________________________________________________________________________________________________
-
 # D2BS IS NOT SAFE FROM DETECTION!
 
 [**Join the Forums!**](https://d2bot.discourse.group/)
