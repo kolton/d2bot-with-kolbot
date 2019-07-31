@@ -347,6 +347,9 @@ var Config = {
 	Rakanishu: {
 		KillGriswold: false
 	},
+	Wakka: {
+		SkipIfBaal: true
+	},
 	AutoBaal: {
 		Leader: "",
 		FindShrine: false,
@@ -428,7 +431,9 @@ var Config = {
 		GameLength: 3
 	},
 	Follower: {
-		Leader: ""
+		Leader: "",
+		// Line added by Sonny
+		ExitTimeout: 20
 	},
 	Mephisto: {
 		MoatTrick: false,

@@ -12,7 +12,7 @@ var StarterConfig = {
 	CDKeyInUseDelay: 5, // Minutes to wait before connecting again if CD-Key is in use. SwitchKeys overrides this!
 	ConnectingTimeout: 20, // Seconds to wait before cancelling the 'Connecting...' screen
 	PleaseWaitTimeout: 30, // Seconds to wait before cancelling the 'Please Wait...' screen
-	WaitInLineTimeout: 60, // Seconds to wait before cancelling the 'Waiting in Line...' screen
+	WaitInLineTimeout: 80, // Seconds to wait before cancelling the 'Waiting in Line...' screen
 	GameDoesNotExistTimeout: 30 // Seconds to wait before cancelling the 'Game does not exist.' screen
 };
 
@@ -26,10 +26,9 @@ var StarterConfig = {
 			"lead1": ["follow1", "follow2"],
 			"lead2": ["follow3", "follow4"]
 		};
+        
 */
-
 var JoinSettings = {
-	"Leader": ["Leecher"]
 };
 
 // Advanced config - you don't have to edit this unless you need some of the features provided
@@ -45,7 +44,7 @@ var AdvancedConfig = {
 	*/
 
 	// Put your lines under this one. Multiple entries are separated by commas. No comma after the last one.
-
+    
 };
 
 
@@ -58,6 +57,7 @@ include("gambling.js");
 include("craftingsystem.js");
 include("torchsystem.js");
 include("common/misc.js");
+include("common/config.js");
 
 var i, j, gameInfo, joinInfo, gameStart, ingame, handle,
 	firstLogin, chatActionsDone, lastGameTick, connectFail,
@@ -158,7 +158,6 @@ function ReceiveCopyData (mode, msg) {
 
 		if (gameInfo) {
 			obj = JSON.parse(msg);
-
 			D2Bot.joinMe(obj.profile, me.gamename || "", "", me.gamepassword || "", me.gameReady ? "yes" : "no");
 		}
 
@@ -404,6 +403,7 @@ MainSwitch:
 			}
 		}
 
+
 		if (!leader || !leader.length) {
 			break;
 		}
@@ -434,6 +434,7 @@ JoinLoop2:
 						}
 					}
 
+
 					if (!joinInfo.inGame) {
 						continue;
 					}
@@ -448,6 +449,10 @@ JoinLoop2:
 					if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].JoinDelay === "number") {
 						ControlAction.timeoutDelay("Custom Join Delay", AdvancedConfig[me.profile].JoinDelay * 1e3);
 					}
+
+                   if (typeof AdvancedConfig[me.profile] === "object" && typeof AdvancedConfig[me.profile].ExitDelay === "number") {
+                   						Config.Follower.ExitTimeout = AdvancedConfig[me.profile].ExitDelay;
+                   					}
 
 					me.blockMouse = true;
 
