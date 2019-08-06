@@ -1579,6 +1579,80 @@ MainLoop:
 	},
 
 	/*
+	    Pather.TeamCheck();
+		Make Leader communication to others. Add by WhyY0416
+	*/
+	TeamCheck: function (phase) {
+		var MemberCount = 0, 
+		    Member = [], 
+		    timeOut = 600;    //How to put this in character's config ?
+		
+	    function ChatEvent(name,msg) {
+			if (me.name !== name){
+				var i, command,
+			    match = ["Ready","Finished"];
+				
+				if (msg) {
+				    for (i = 0; i < match.length; i += 1) {
+                        if (msg.match(match[i])) {
+							if(Member.indexOf(name) > -1){
+								continue;
+							}
+							else{
+			                    Member.push(name);
+					            break;
+							}
+				        }
+					}
+				}
+	        }
+		}
+		    			
+		addEventListener("chatmsg", ChatEvent);
+		
+		if (me.area === 108){    //Diablo Script.
+			return true;
+		}
+		
+		if (!party = getParty()){    //single playermode.
+			return true;
+		}
+		else if (MemberCount === 0){    //Except MFLeader!!!
+			do {
+			    if (party.name !== me.name){
+				    MemberCount += 1;
+			    }
+		    }
+			while (party.getNext());
+		}
+		
+		if (phase === 1){
+			say("Position " + getArea().id);
+			delay(1000);
+		}
+	
+		
+MainLoop:
+		while (timeOut > 0){
+			if (Member.length === MemberCount){
+				break MainLoop;
+			}
+			if (timeOut % 5 === 0){
+				if (phase === 1){
+					say("TeamCheck");
+				}
+				else if (phase === 2){
+					say("FinishCheck");
+				}
+			}
+			timeOut -= 1;
+			delay(1000);
+		} 
+		Member.length = 0;
+		return true;
+	},
+
+	/*
 		Pather.getAreaName(area);
 		area - id of the area to get the name for
 	*/
