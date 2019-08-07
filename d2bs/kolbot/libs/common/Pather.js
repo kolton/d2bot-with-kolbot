@@ -1614,17 +1614,18 @@ MainLoop:
 		return true;
 	    }
 		
-	    if (!party = getParty()){    //single playermode.
-		return true;
-	    }
-	    else if (MemberCount === 0){    //Except MFLeader!!!
+            if (MemberCount === 0){    //Except MFLeader!!!
+		var party = getParty();
 		do {
 	            if (party.name !== me.name){
 		        MemberCount += 1;
 		    }
 		}
 	        while (party.getNext());
-		}
+		if (!party){    //single playermode.
+		    return true;
+	        }
+            }
 		
 	    if (phase === 1){
 		say("Position " + getArea().id);
