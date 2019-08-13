@@ -1,5 +1,36 @@
 # D2BS IS NOT SAFE FROM DETECTION!
 
+#Improved version of kolton
+Hi, first of all, welcome to this improved version of kolton. What exactly is the difference compared to original kolton?
+- Node like require. You can write your own modules in lib/module
+- ES6 Promises, full support
+- SpeedDiablo. A faster version diablo run
+- Quite some custom libs
+- Development script, easily reload your current script.
+
+
+## to do list
+- Assasin:
+    - automatic switching to burst of speed in town
+    - automatic switching to fade, when leaving town 
+
+- Scripts:
+    - SpeedBaal. A high performance baalrun. Some versions are already leaked
+
+- Config:
+    - Autoconfig, taking allot out of hand to setup yourself. 
+
+## Documentation
+- Development script:
+    - currently it bugs with D2BotMap. Causes unknown.
+    - fill in `Config.Development = 'Script';` and put `Script.Development = true;`.
+    - reload current script with ctrl + r. (make sure you press ctrl for a sec)
+
+- SpeedDiablo
+    - Both a leader as a follower script, which you toggle with the follower config. Example configuration in config file.
+        
+# Original readme:
+
 [**Join the Forums!**](https://d2bot.discourse.group/)
 
 [**Join the Discord Channel!**](https://discord.gg/FuBG8N2)
