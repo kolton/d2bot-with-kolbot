@@ -1250,3 +1250,7 @@ Unit.prototype.castChargedSkill = function (...args) {
 
 	return false;
 };
+
+PresetUnit.prototype.__defineGetter__('unit', function () {
+	return getUnits(this.type, this.id).first();
+});

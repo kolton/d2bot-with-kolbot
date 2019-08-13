@@ -1,7 +1,7 @@
 // default.dbj gets executed upon gamejoin
 js_strict(true);
 
-include("json2.js");
+include('sdk.js');
 include("NTItemParser.dbl");
 include("OOG.js");
 include("AutoMule.js");
@@ -10,6 +10,7 @@ include("CraftingSystem.js");
 include("TorchSystem.js");
 include("MuleLogger.js");
 include("GameAction.js");
+include("require.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/CollMap.js");
@@ -20,10 +21,10 @@ include("common/Pickit.js");
 include("common/Pather.js");
 include("common/Precast.js");
 include("common/Prototypes.js");
-include("common/Polyfills.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+include('common/Object.js');
 
 function main() {
 	D2Bot.init(); // Get D2Bot# handle
