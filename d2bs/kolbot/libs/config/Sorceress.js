@@ -88,6 +88,10 @@ function LoadConfig() {
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
 		Config.Diablo.DiabloMsg = "Diablo";
+	Scripts.SpeedDiablo = true;
+		Config.SpeedDiablo.Follower = false; // Take portal and do dia run, or teleport
+		Config.SpeedDiablo.Entrance = true; // Do the entrance
+		Config.SpeedDiablo.Fast = false; // Do a fast dia run
 	Scripts.SealLeader = false; // Clear a safe spot around seals and invite leechers in. Leechers should run SealLeecher script. Don't run with Diablo or FastDiablo.
 
 	// *** act 5 ***

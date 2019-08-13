@@ -4,11 +4,12 @@
 # except
 !.gitignore
 !Amazon.js
-!Assasin.js
+!Assassin.js
 !Barbarian.js
 !Necromancer.js
 !Paladin.js
 !Sorceress.js
+!Druid.js
 
 # Dont ignore subdirectories
 !*/
