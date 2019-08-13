@@ -529,5 +529,6 @@ var Config = {
 		Fast: false,
 		Follower: false,
 		Entrance: true,
-	}
+	},
+	Development: '',
 };

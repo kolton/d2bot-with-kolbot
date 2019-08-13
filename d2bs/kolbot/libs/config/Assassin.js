@@ -228,6 +228,10 @@ function LoadConfig() {
 		Config.BaalAssistant.BaalMessage = ["Baal"]; // Configure baal messages, this is a precautionary measure.
 		Config.BaalAssistant.NextGameMessage = ["Next Game", "Next", "New Game"];	// Next Game message, this is a precautionary quit command, Reccomended setting up: Config.QuitList
 
+	// *** development script ***
+	Scripts.Development = false;
+		Config.Development = ''; // name of script here (case sensitive, basically the filename in /libs/bots)
+
 	// Town settings
 	Config.HealHP = 50; // Go to a healer if under designated percent of life.
 	Config.HealMP = 0; // Go to a healer if under designated percent of mana.
