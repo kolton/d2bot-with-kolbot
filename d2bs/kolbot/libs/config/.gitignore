@@ -1,0 +1,14 @@
+# ignore everything here, except
+*
+
+# except
+!.gitignore
+!Amazon.js
+!Assasin.js
+!Barbarian.js
+!Necromancer.js
+!Paladin.js
+!Sorceress.js
+
+# Dont ignore subdirectories
+!*/

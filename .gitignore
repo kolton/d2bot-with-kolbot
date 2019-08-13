@@ -1,0 +1,8 @@
+data/*
+images/*
+limedrop/*
+logs/*
+
+.idea
+d2bs/d2bs.ini
+d2bs/d2bs.log
