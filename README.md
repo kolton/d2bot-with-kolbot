@@ -7,13 +7,10 @@ Hi, first of all, welcome to this improved version of kolton. What exactly is th
 - SpeedDiablo. A faster version diablo run
 - Quite some custom libs
 - Development script, easily reload your current script.
+- Assasin casts BoS in town, and Fade once it leaves again.
 
 
 ## to do list
-- Assasin:
-    - automatic switching to burst of speed in town
-    - automatic switching to fade, when leaving town 
-
 - Scripts:
     - SpeedBaal. A high performance baalrun. Some versions are already leaked
 
