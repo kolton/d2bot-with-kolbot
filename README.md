@@ -28,7 +28,40 @@ Hi, first of all, welcome to this improved version of kolton. What exactly is th
 
 - SpeedDiablo
     - Both a leader as a follower script, which you toggle with the follower config. Example configuration in config file.
-        
+# Promises?
+As we mostly write in ancient javascript, this may needs some [explanation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). The idea is that you can give a promise, that something will happen in the future. This is a javascript ES6 standard, and not implemented in the old firefox version we are using in d2bs. This implements it (polyfill) it for the old engine we run on
+# Simple example
+
+```javascript
+let promises = [
+		new Promise(resolve => me.area === 109 && resolve()),
+		new Promise(resolve => me.area === 103 && resolve()),
+		new Promise(resolve => me.area === 75 && resolve()),
+		new Promise(resolve => me.area === 40 && resolve()),
+		new Promise(resolve => me.area === 1 && resolve()),
+	];
+
+	Promise.allSettled(promises).then(_ => me.overhead('been in all acts'));
+```
+[Simple example in action](https://user-images.githubusercontent.com/31186222/60744835-f90fd600-9f77-11e9-998f-f680ddd5dfb8.gif)
+
+# Why is this handy?
+The ability to do stuff on the background can be very useful. As it can be defined anywhere, and it just jumps to this code once it is called. Where, you can make another promise.
+
+
+# Other stuff
+To make this ability, i also wrote a background worker.
+You can simply write a function that runs on the background, by doing this;
+```javascript
+let lastArea = me.area;
+Worker.runInBackground.name = function() {
+    // Gets executed all the time, aslong you return true;
+    if (me.area !== lastArea) {
+        print('now in area: '+me.area);
+    }
+    return true;
+}
+```
 # Original readme:
 
 [**Join the Forums!**](https://d2bot.discourse.group/)
