@@ -1,5 +1,6 @@
 function SpeedDiablo() {
 	const Promise = require('Promise');
+
 	function openSeal(seal) {
 		for (let i = 0; i < 5; i += 1) {
 			if (seal.mode) return true;
@@ -12,7 +13,7 @@ function SpeedDiablo() {
 
 			delay(seal.classid === 394 ? 1000 : 500);
 
-			if (seal.mode || i===5) return i!==5;
+			if (seal.mode || i === 5) return i !== 5;
 
 			if (seal.classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
 				Pather.moveTo(seal.x + 15, seal.y);
@@ -88,7 +89,7 @@ function SpeedDiablo() {
 							}
 						} while (!boss);
 
-						return diaTick || !Attack.clear(40, 0, getLocaleString(locale), diaSort);
+						return diaTick || !(Config.SpeedDiablo.Fast && Attack.kill(boss) || Attack.clear(40, 0, getLocaleString(locale), diaSort));
 					}
 					return diaTick;
 				});
@@ -96,15 +97,15 @@ function SpeedDiablo() {
 		};
 
 	new Promise(resolve => diaTick && resolve()).then(function () { // All seals done; Time to go do dia
-		print('here');
 		//Do dia
 		star.moveTo(); // go to star
 		let diablo;
 
 		do {
-			print(getTickCount() - diaTick - 152e2);
+			//ToDo; Writer some decent preattack for here
 			delay(10);
 		} while (!(diablo = getUnit(1, sdk.monsters.Diablo1)));
+		//print(getTickCount() - diaTick - 15500);
 
 		Attack.kill(sdk.monsters.Diablo1);
 	});
@@ -156,7 +157,7 @@ function SpeedDiablo() {
 		star.path.forEach(node => node.moveTo() && Attack.clear(30));
 	}
 
-	const gamepacketHandler = bytes => bytes && bytes.length && bytes[0] === 0x50 && (diaTick = getTickCount());
+	const gamepacketHandler = bytes => bytes && bytes.hasOwnProperty(0) && bytes[0] === 0x89 && (diaTick = getTickCount()-(me.ping/2));
 
 	addEventListener('gamepacket', gamepacketHandler);
 	try {

@@ -15,17 +15,25 @@
         return [undefined, undefined];
     };
 
-    Object.prototype.__defineGetter__('distance', function () {
-        return !me.gameReady ? NaN : getDistance.apply(null, [me, ...coords.apply(this)]);
-    });
+    Object.defineProperties(Object.prototype, {
+        distance: {
+            get: function() {
+                return !me.gameReady ? NaN : getDistance.apply(null, [me, ...coords.apply(this)]);
+            },
+            enumerable:false,
+        },
+        moveTo: {
+            get: function() {
+                return () => Pather.moveTo.apply(Pather, coords.apply(this))
+            },
+            enumerable:false,
+        },
+        path: {
+            get: function() {
+                let useTeleport = Pather.useTeleport();
+                return getPath.apply(this, [typeof this.area !== 'undefined' ? this.area : me.area, me.x, me.y, ...coords.apply(this), useTeleport ? 1 : 0, useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : Pather.teleDistance) : Pather.walkDistance])
+            }
 
-    Object.prototype.moveTo = function () {
-        return Pather.moveTo.apply(Pather, coords.apply(this))
-    };
-
-    Object.prototype.__defineGetter__('path', function () {
-        let useTeleport = Pather.useTeleport();
-        return getPath.apply(this, [typeof this.area !== 'undefined' ? this.area : me.area, me.x, me.y, ...coords.apply(this), useTeleport ? 1 : 0, useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : Pather.teleDistance) : Pather.walkDistance])
-
+        }
     });
 })(typeof global !== 'undefined' ? global : this);
