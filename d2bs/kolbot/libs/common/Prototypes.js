@@ -1200,7 +1200,7 @@ Unit.prototype.castChargedSkill = function (...args) {
 			.forEach(function (item) {
 				let stats = item.getStat(-2);
 
-				if (!stats.hasOwnProperty(204)) {
+				if (stats && typeof stats === 'object' && stats.hasOwnProperty(204)) {
 					stats = stats[204].filter(validCharge);
 					stats.length && chargedItems.push({
 						charge: stats.first(),
