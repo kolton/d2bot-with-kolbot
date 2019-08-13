@@ -1,6 +1,6 @@
 # D2BS IS NOT SAFE FROM DETECTION!
 
-#Improved version of kolton
+# Improved version of kolton
 Hi, first of all, welcome to this improved version of kolton. What exactly is the difference compared to original kolton?
 - Node like require. You can write your own modules in lib/module
 - ES6 Promises, full support
