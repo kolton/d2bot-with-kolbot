@@ -251,7 +251,7 @@ var MuleLogger = {
 			break;
 		case 7: // Unique
 			for (i = 0; i < 401; i += 1) {
-				if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+				if (unit.code === getBaseStat(17, i, 4).trim() && unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 					code = getBaseStat(17, i, "invfile");
 
 					break;
@@ -342,7 +342,7 @@ var MuleLogger = {
 		items.sort(itemSort);
 
 		for (i = 0; i < items.length; i += 1) {
-			if ((this.LogEquipped || items[i].mode === 0) && !Misc.skipItem(items[i].classid)) {
+			if ((this.LogEquipped || items[i].mode === 0) && (items[i].quality !== 2 || !Misc.skipItem(items[i].classid))) {
 				parsedItem = this.logItem(items[i], logIlvl);
 
 				// Log names to saved image

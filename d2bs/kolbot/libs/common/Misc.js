@@ -244,12 +244,12 @@ var Skill = {
 	charges: [],
 
 	// Cast a skill on self, Unit or coords
-	cast: function (skillId, hand, x, y) {
+	cast: function (skillId, hand, x, y, item) {
 		if (me.inTown && !this.townSkill(skillId)) {
 			return false;
 		}
 
-		if (!me.getSkill(skillId, 1)) {
+		if (!item && !me.getSkill(skillId, 1)) {
 			return false;
 		}
 
@@ -257,8 +257,8 @@ var Skill = {
 			return false;
 		}
 
-		// No mana to cast
-		if (this.getManaCost(skillId) > me.mp) {
+		// Check mana cost, charged skills don't use mana
+		if (!item && this.getManaCost(skillId) > me.mp) {
 			// Maybe delay on ALL skills that we don't have enough mana for?
 			if (Config.AttackSkill.concat([42, 54]).concat(Config.LowManaSkill).indexOf(skillId) > -1) {
 				delay(300);
@@ -285,7 +285,7 @@ var Skill = {
 			y = me.y;
 		}
 
-		if (!this.setSkill(skillId, hand)) {
+		if (!this.setSkill(skillId, hand, item)) {
 			return false;
 		}
 
@@ -374,46 +374,24 @@ MainLoop:
 	},
 
 	// Put a skill on desired slot
-	setSkill: function (skillId, hand) {
+	setSkill: function (skillId, hand, item) {
 		// Check if the skill is already set
 		if (me.getSkill(hand === 0 ? 2 : 3) === skillId) {
 			return true;
 		}
 
-		if (!me.getSkill(skillId, 1)) {
+		if (!item && !me.getSkill(skillId, 1)) {
 			return false;
 		}
 
-		if (hand === undefined || hand === 3) {
+		// Charged skills must be cast from right hand
+		if (hand === undefined || hand === 3 || item) {
+			item && hand !== 0 && print('[ÿc9Warningÿc0] charged skills must be cast from right hand');
 			hand = 0;
 		}
 
-		var charge = this.getCharge(skillId);
-
-		if (!!charge) {
-			// charge.charges is a cached value from Attack.getCharges
-			/*if (charge.charges > 0 && me.setSkill(skillId, hand, charge.unit)) {
-				return true;
-			}*/
-
-			return false;
-		}
-
-		if (me.setSkill(skillId, hand)) {
+		if (me.setSkill(skillId, hand, item)) {
 			return true;
-		}
-
-		return false;
-	},
-
-	// Charged skill
-	getCharge: function (skillId) {
-		var i;
-
-		for (i = 0; i < this.charges.length; i += 1) {
-			if (this.charges[i].skill === skillId && me.getSkill(skillId, 0) === this.charges[i].level && me.getSkill(skillId, 0) === me.getSkill(skillId, 1)) {
-				return this.charges[i];
-			}
 		}
 
 		return false;
@@ -999,7 +977,7 @@ var Misc = {
 
 			unit = unitList.shift();
 
-			if (unit && (Pather.useTeleport || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
+			if (unit && (Pather.useTeleport() || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
 				Pickit.pickItems();
 			}
 		}
@@ -1015,11 +993,11 @@ var Misc = {
 		}
 
 		if (!range) {
-			range = Pather.useTeleport ? 25 : 15;
+			range = Pather.useTeleport() ? 25 : 15;
 		}
 
 		var i, j, shrine,
-			index  = -1,
+			index = -1,
 			shrineList = [];
 
 		// Initiate shrine states
@@ -1086,7 +1064,7 @@ var Misc = {
 					// Get the shrine if we have no active state or to refresh current state or if the shrine has no state
 					// Don't override shrine state with a lesser priority shrine
 					if (index === -1 || i <= index || this.shrineStates[i] === 0) {
-						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport || !checkCollision(me, shrineList[j], 0x4))) {
+						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport() || !checkCollision(me, shrineList[j], 0x4))) {
 							this.getShrine(shrineList[j]);
 
 							// Gem shrine - pick gem
@@ -1290,10 +1268,7 @@ var Misc = {
 
 		var desc,
 			date = new Date(),
-			h = date.getHours(),
-			m = date.getMinutes(),
-			s = date.getSeconds(),
-			dateString = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "]";
+			dateString = "[" + new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0,-5).replace(/-/g, '/').replace('T', ' ') + "]";
 
 		switch (action) {
 		case "Sold":
@@ -1333,7 +1308,43 @@ var Misc = {
 			return false;
 		}
 
-		var i, lastArea, code, desc, sock, itemObj,
+		var i;
+
+		if (!Config.LogKeys && ["pk1", "pk2", "pk3"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogOrgans && ["dhn", "bey", "mbr"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogLowRunes && ["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogMiddleRunes && ["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogHighRunes && ["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogLowGems && ["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		if (!Config.LogHighGems && ["gzv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(unit.code) > -1) {
+			return false;
+		}
+
+		for (i = 0; i < Config.SkipLogging.length; i++) {
+			if (Config.SkipLogging[i] === unit.classid || Config.SkipLogging[i] === unit.code) {
+				return false;
+			}
+		}
+
+		var lastArea, code, desc, sock, itemObj,
 			color = -1,
 			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<:;.*]|\/|\\/g, "").trim();
 
@@ -1467,7 +1478,7 @@ var Misc = {
 				break;
 			case 7: // Unique
 				for (i = 0; i < 401; i += 1) {
-					if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
+					if (unit.code === getBaseStat(17, i, 4).trim() && unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
 						code = getBaseStat(17, i, "invfile");
 
 						break;
@@ -1633,15 +1644,6 @@ var Misc = {
 		}
 
 		return false;
-	},
-
-	// Teleport with slot II
-	teleSwitch: function () {
-		this.oldSwitch = me.weaponswitch;
-
-		Precast.weaponSwitch();
-
-		return true;
 	},
 
 	// Go to town when low on hp/mp or when out of potions. can be upgraded to check for curses etc.
@@ -1820,23 +1822,21 @@ MainLoop:
 
 	// Report script errors to logs/ScriptErrorLog.txt
 	errorReport: function (error, script) {
-		var i, h, m, s, date, msg, oogmsg, filemsg, source, stack,
+		var i, date, dateString, msg, oogmsg, filemsg, source, stack,
 			stackLog = "";
 
 		date = new Date();
-		h = date.getHours();
-		m = date.getMinutes();
-		s = date.getSeconds();
+		dateString = "[" + new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0,-5).replace(/-/g, '/').replace('T', ' ') + "]";
 
 		if (typeof error === "string") {
 			msg = error;
 			oogmsg = error.replace(/ÿc[0-9!"+<:;.*]/gi, "");
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
+			filemsg = dateString + " <" + me.profile + "> " + error.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
 		} else {
 			source = error.fileName.substring(error.fileName.lastIndexOf("\\") + 1, error.fileName.length);
 			msg = "ÿc1Error in ÿc0" + script + " ÿc1(" + source + " line ÿc1" + error.lineNumber + "): ÿc1" + error.message;
 			oogmsg = " Error in " + script + " (" + source + " #" + error.lineNumber + ") " + error.message + " (Area: " + me.area + ", Ping:" + me.ping + ", Game: " + me.gamename + ")";
-			filemsg = "[" + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + "] <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
+			filemsg = dateString + " <" + me.profile + "> " + msg.replace(/ÿc[0-9!"+<:;.*]/gi, "") + "\n";
 
 			if (error.hasOwnProperty("stack")) {
 				stack = error.stack;
@@ -2167,7 +2167,7 @@ var Packet = {
 					return true;
 				}
 
-				if (getInteractedNPC()) {
+				if (getInteractedNPC() && getTickCount() - tick > 1000) {
 					me.cancel();
 				}
 
@@ -2434,7 +2434,7 @@ CursorLoop:
 
 		if (wait > 0) {
 			delay(wait);
-		}	
+		}
 	},
 
 	changeStat: function (stat, value) {
@@ -2476,34 +2476,32 @@ function PacketBuilder () {
 		throw new Error("PacketBuilder must be called with 'new' operator!");
 	}
 
-	let queue = [], plen = 0;
+	let queue = [], count = 0;
 
-	let storeFields = (type, size) => (...args) => { // accepts any number of arguments
-		let strType;
-
-		[strType, type] = type === "StringZ" ? [2, "String"] : [type === "String" ? 1 : 0, type];
-
+	let enqueue = (type, size) => (...args) => { // accepts any number of arguments
 		args.forEach(arg => {
-			strType && (size = arg.length + strType - 1); // string length adjustment for null termination
-			plen += size;
+			if (type === 'String') {
+				arg = stringToEUC(arg);
+				size = arg.length + 1;
+			}
+
 			queue.push({type: type, size: size, data: arg});
+			count += size;
 		});
 
 		return this;
 	};
 
-	this.byte = storeFields("Uint8", 1);
-	this.word = storeFields("Uint16", 2);
-	this.dword = storeFields("Uint32", 4);
-	this.float = storeFields("Float32", 4);
-	this.string = storeFields("StringZ");
+	this.float = enqueue("Float32", 4);
+	this.dword = enqueue("Uint32", 4);
+	this.word = enqueue("Uint16", 2);
+	this.byte = enqueue("Uint8", 1);
+	this.string = enqueue("String");
 
 	this.buildDataView = () => {
-		let dv = new DataView(new ArrayBuffer(plen)), i = 0;
+		let dv = new DataView(new ArrayBuffer(count)), i = 0;
 		queue.forEach(field => {
 			if (field.type === "String") {
-				field.data = utf8ToEuc(field.data);
-
 				for (let l = 0; l < field.data.length; l++) {
 					dv.setUint8(i++, field.data.charCodeAt(l), true);
 				}

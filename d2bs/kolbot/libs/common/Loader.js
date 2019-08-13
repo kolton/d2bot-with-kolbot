@@ -7,7 +7,10 @@
 var global = this;
 
 var Loader = {
+	fileList: [],
 	scriptList: [],
+	scriptIndex: -1,
+	skipTown: ["Test", "Follower"],
 
 	init: function () {
 		this.getScripts();
@@ -20,7 +23,7 @@ var Loader = {
 
 		for (i = 0; i < fileList.length; i += 1) {
 			if (fileList[i].indexOf(".js") > -1) {
-				this.scriptList.push(fileList[i].substring(0, fileList[i].indexOf(".js")));
+				this.fileList.push(fileList[i].substring(0, fileList[i].indexOf(".js")));
 			}
 		}
 	},
@@ -81,65 +84,75 @@ var Loader = {
 	},
 
 	loadScripts: function () {
-		var i, townCheck, reconfiguration,
+		var reconfiguration, s, script,
 			unmodifiedConfig = {};
 
 		this.copy(Config, unmodifiedConfig);
 
-		if (!this.scriptList.length) {
+		if (!this.fileList.length) {
 			showConsole();
 
 			throw new Error("You don't have any valid scripts in bots folder.");
 		}
 
-		for (i in Scripts) {
-			if (Scripts.hasOwnProperty(i)) {
-				if (this.scriptList.indexOf(i) > -1) {
-					if (!!Scripts[i]) {
-						if (!include("bots/" + i + ".js")) {
-							Misc.errorReport("Failed to include script: " + i);
+		for (s in Scripts) {
+			if (Scripts.hasOwnProperty(s) && Scripts[s]) {
+				this.scriptList.push(s);
+			}
+		}
+
+		for (this.scriptIndex = 0; this.scriptIndex < this.scriptList.length; this.scriptIndex++) {
+			script = this.scriptList[this.scriptIndex];
+
+			if (this.fileList.indexOf(script) < 0) {
+				Misc.errorReport("ÿc1Script " + script + " doesn't exist.");
+				continue;
+			}
+
+			if (!include("bots/" + script + ".js")) {
+				Misc.errorReport("Failed to include script: " + script);
+				continue;
+			}
+
+			if (isIncluded("bots/" + script + ".js")) {
+				try {
+					if (typeof (global[script]) !== "function") {
+						throw new Error("Invalid script function name");
+					}
+
+					if (this.skipTown.indexOf(script) > -1 || Town.goToTown()) {
+						print("ÿc2Starting script: ÿc9" + script);
+						//scriptBroadcast(JSON.stringify({currScript: script}));
+						Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: script}));
+
+						reconfiguration = typeof Scripts[script] === 'object';
+
+						if (reconfiguration) {
+							print("ÿc2Copying Config properties from " + script + " object.");
+							this.copy(Scripts[script], Config);
 						}
 
-						if (isIncluded("bots/" + i + ".js")) {
-							try {
-								reconfiguration = typeof Scripts[i] === 'object';
+						global[script]();
 
-								if (typeof (global[i]) === "function") {
-									if (i !== "Test" && i !== "Follower") {
-										townCheck = Town.goToTown();
-									} else {
-										townCheck = true;
-									}
-
-									if (townCheck) {
-										print("ÿc2Starting script: ÿc9" + i);
-										//scriptBroadcast(JSON.stringify({currScript: i}));
-										Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: i}));
-
-										if (reconfiguration) {
-											print("ÿc2Copying Config properties from " + i + " object.");
-											this.copy(Scripts[i], Config);
-										}
-
-										global[i]();
-
-										if (reconfiguration) {
-											print("ÿc2Reverting back unmodified config properties.");
-											this.copy(unmodifiedConfig, Config);
-										}
-									}
-								} else {
-									throw new Error("Invalid script function name");
-								}
-							} catch (error) {
-								Misc.errorReport(error, i);
-							}
+						if (reconfiguration) {
+							print("ÿc2Reverting back unmodified config properties.");
+							this.copy(unmodifiedConfig, Config);
 						}
 					}
-				} else {
-					Misc.errorReport("ÿc1Script " + i + " doesn't exist.");
+				} catch (error) {
+					Misc.errorReport(error, script);
 				}
 			}
 		}
+	},
+
+	scriptName: function (offset = 0) {
+		let index = this.scriptIndex + offset;
+
+		if (index >= 0 && index < this.scriptList.length) {
+			return this.scriptList[index];
+		}
+
+		return null;
 	}
 };

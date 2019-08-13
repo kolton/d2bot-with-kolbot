@@ -117,6 +117,10 @@ var Pather = {
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
 	recursion: true,
 
+	useTeleport: function () {
+		return this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+	},
+
 	/*
 		Pather.moveTo(x, y, retry, clearPath, pop);
 		x - the x coord to move to
@@ -130,7 +134,7 @@ var Pather = {
 			return false;
 		}
 
-		var i, path, adjustedNode, cleared,
+		var i, path, adjustedNode, cleared, useTeleport,
 			node = {x: x, y: y},
 			fail = 0;
 
@@ -164,24 +168,23 @@ var Pather = {
 			pop = false;
 		}
 
-		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
-							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+		useTeleport = this.useTeleport();
 
 		/* Disabling getPath optimizations, they are causing desync -- noah
 		// Teleport without calling getPath if the spot is close enough
-		if (this.useTeleport && getDistance(me, x, y) <= this.teleDistance) {
+		if (useTeleport && getDistance(me, x, y) <= this.teleDistance) {
 			//Misc.townCheck();
 
 			return this.teleportTo(x, y);
 		}
 
 		// Walk without calling getPath if the spot is close enough
-		if (!this.useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
+		if (!useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
 			return this.walkTo(x, y);
 		}
 		*/
 
-		path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
+		path = getPath(me.area, x, y, me.x, me.y, useTeleport ? 1 : 0, useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
 		if (!path) {
 			throw new Error("moveTo: Failed to generate path.");
@@ -195,8 +198,8 @@ var Pather = {
 
 		PathDebug.drawPath(path);
 
-		if (this.useTeleport && Config.TeleSwitch) {
-			Misc.teleSwitch();
+		if (useTeleport && Config.TeleSwitch && path.length > 5) {
+			Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 		}
 
 		while (path.length > 0) {
@@ -226,7 +229,7 @@ var Pather = {
 					}
 				}
 
-				if (this.useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, (fail > 0 || me.inTown) ? 2 : 4)) {
+				if (useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, (fail > 0 || me.inTown) ? 2 : 4)) {
 					if (!me.inTown) {
 						if (this.recursion) {
 							this.recursion = false;
@@ -243,7 +246,7 @@ var Pather = {
 						Misc.townCheck();
 					}
 				} else {
-					if (fail > 0 && !this.useTeleport && !me.inTown) {
+					if (fail > 0 && !useTeleport && !me.inTown) {
 						// Don't go berserk on longer paths
 						if (!cleared) {
 							Attack.clear(5);
@@ -257,7 +260,7 @@ var Pather = {
 					}
 
 					// Reduce node distance in new path
-					path = getPath(me.area, x, y, me.x, me.y, this.useTeleport ? 1 : 0, this.useTeleport ? rand(25, 35) : rand(10, 15));
+					path = getPath(me.area, x, y, me.x, me.y, useTeleport ? 1 : 0, useTeleport ? rand(25, 35) : rand(10, 15));
 					fail += 1;
 
 					if (!path) {
@@ -286,8 +289,8 @@ var Pather = {
 			delay(5);
 		}
 
-		if (this.useTeleport && Config.TeleSwitch) {
-			Precast.weaponSwitch(Misc.oldSwitch);
+		if (useTeleport && Config.TeleSwitch) {
+			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 
 		PathDebug.removeHooks();
@@ -496,8 +499,7 @@ ModeLoop:
 		pop - remove last node
 	*/
 	moveToUnit: function (unit, offX, offY, clearPath, pop) {
-		this.useTeleport = this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown &&
-							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+		var useTeleport = this.useTeleport();
 
 		if (offX === undefined) {
 			offX = 0;
@@ -523,12 +525,12 @@ ModeLoop:
 			return this.moveTo(unit.roomx * 5 + unit.x + offX, unit.roomy * 5 + unit.y + offY, 3, clearPath);
 		}
 
-		if (!this.useTeleport) {
+		if (!useTeleport) {
 			// The unit will most likely be moving so call the first walk with 'pop' parameter
 			this.moveTo(unit.x + offX, unit.y + offY, 0, clearPath, true);
 		}
 
-		return this.moveTo(unit.x + offX, unit.y + offY, this.useTeleport && unit.type && unit.type === 1 ? 3 : 0, clearPath, pop);
+		return this.moveTo(unit.x + offX, unit.y + offY, useTeleport && unit.type && unit.type === 1 ? 3 : 0, clearPath, pop);
 	},
 
 	/*
@@ -637,7 +639,7 @@ ModeLoop:
 
 							break;
 						case 2: // stairs
-							if (!this.openExit(targetArea) && !this.useUnit(5, currExit.tileid, areas[i])) {
+							if (!this.openExit(areas[i]) && !this.useUnit(5, currExit.tileid, areas[i])) {
 								return false;
 							}
 
@@ -885,7 +887,7 @@ ModeLoop:
 			break;
 		}
 
-		var i, tick, wp, coord, retry;
+		var i, tick, wp, coord, retry, npc;
 
 		for (i = 0; i < 12; i += 1) {
 			if (me.area === targetArea || me.dead) {
@@ -893,6 +895,20 @@ ModeLoop:
 			}
 
 			if (me.inTown) {
+				npc = getUnit(1, NPC.Warriv);
+
+				if (me.area === 40 && npc && getDistance(me, npc) < 50) {
+					if (npc && npc.openMenu()) {
+						Misc.useMenu(0x0D37);
+
+						if (!Misc.poll(function () {
+							return me.area === 1;
+						}, 2000, 100)) {
+							throw new Error("Failed to go to act 1 using Warriv");
+						}
+					}
+				}
+
 				Town.move("waypoint");
 			}
 
@@ -1392,13 +1408,17 @@ MainLoop:
 
 				if (unit) {
 					for (i = 0; i < 3; i += 1) {
+						if (unit.mode) {
+							break;
+						}
+
 						Misc.click(0, 0, unit);
 						//unit.interact();
 
 						tick = getTickCount();
 
 						while (getTickCount() - tick < 3000) {
-							if (unit.mode === 2) {
+							if (unit.mode) {
 								delay(1000);
 
 								break;

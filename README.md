@@ -1,17 +1,14 @@
 # D2BS IS NOT SAFE FROM DETECTION!
 
-## (New) Discourse Forum
-[Click Here!](https://d2bot.discourse.group/)
+[**Join the Forums!**](https://d2bot.discourse.group/)
 
-## Discord Channel
-[Click Here!](https://discord.gg/FuBG8N2)
+[**Join the Discord Channel!**](https://discord.gg/FuBG8N2)
 
-## Documentation Repo
-[Click Here!](https://github.com/blizzhackers/documentation)
+[**Documentation Repo**](https://github.com/blizzhackers/documentation)
 
 ## Install Dependencies - DO THIS FIRST!
 - [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)
-- [Microsoft .NET Framework 4.0 (or higher)](https://www.microsoft.com/net/download/Windows/run)
+- [Microsoft .NET Framework 4.0 (or higher)](https://dotnet.microsoft.com/download/dotnet-framework)
 
 ## MASTER Branch (also known as TRUNK)
 
@@ -40,7 +37,8 @@ If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask ar
 
 # LimeDrop Web Based Item Manager and Dropper
 ## Setup
-- [LimeDrop Install](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Install)
-- [LimeDrop Usage](https://github.com/kolton/d2bot-with-kolbot/wiki/Lime-Drop-Use)
+**Limedrop is available by default on the master and unicode branches.**
+- [Limedrop Install and Usage](https://github.com/blizzhackers/documentation/blob/master/limedrop/README.md)
+
 
 ![](https://i.imgur.com/bsmEv3j.png)

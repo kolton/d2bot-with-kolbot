@@ -24,7 +24,78 @@ var Attack = {
 		if (me.gametype === 1) {
 			this.checkInfinity();
 			this.getCharges();
+			this.getPrimarySlot();
 		}
+	},
+
+	weaponSwitch: function (slot) {
+		if (me.gametype === 0 || me.weaponswitch === slot) {
+			return true;
+		}
+
+		var i, tick;
+
+		if (slot === undefined) {
+			slot = me.weaponswitch ^ 1;
+		}
+
+		delay(500);
+
+		for (i = 0; i < 5; i += 1) {
+			weaponSwitch();
+
+			tick = getTickCount();
+
+			while (getTickCount() - tick < 2000 + me.ping) {
+				if (me.weaponswitch === slot) {
+					//delay(me.ping + 1);
+
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		return false;
+	},
+
+	checkSlot: function (slot = me.weaponswitch) { // check if slot has items
+		var item = me.getItem(-1, 1);
+
+		if (item) {
+			do {
+				if (me.weaponswitch !== slot) {
+					if (item.bodylocation === 11 || item.bodylocation === 12) {
+						return true;
+					}
+				} else {
+					if (item.bodylocation === 4 || item.bodylocation === 5) {
+						return true;
+					}
+				}
+			} while (item.getNext());
+		}
+
+		return false;
+	},
+
+	getPrimarySlot: function () {
+		if (Config.PrimarySlot === -1) { // determine primary slot if not set
+			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
+				if (this.checkSlot(Precast.haveCTA ^ 1)) { // have item on non-cta slot
+					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
+				} else { // other slot is empty
+					Config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
+				}
+			} else if (!this.checkSlot(0) && this.checkSlot(1)) { // only slot II has items
+				Config.PrimarySlot = 1;
+			} else { // both slots have items, both are empty, or only slot I has items
+				Config.PrimarySlot = 0;
+			}
+		}
+
+		return Config.PrimarySlot;
 	},
 
 	getCustomAttack: function (unit) {
@@ -139,7 +210,8 @@ var Attack = {
 			return false;
 		}
 
-		var i, target, gid,
+		var i, target, gid, result,
+			retry = 0,
 			errorInfo = "",
 			attackCount = 0;
 
@@ -180,17 +252,29 @@ var Attack = {
 			}
 
 			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
-				Precast.weaponSwitch(Math.abs(Config.MFSwitch));
+				this.weaponSwitch(this.getPrimarySlot() ^ 1);
 			}
 
 			if (attackCount > 0 && attackCount % 15 === 0 && Skill.getRange(Config.AttackSkill[1]) < 4) {
 				Packet.flash(me.gid);
 			}
 
-			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
-				errorInfo = " (doAttack failed)";
+			result = ClassAttack.doAttack(target, attackCount % 15 === 0);
+
+			if (result === 0) {
+				if (retry++ > 3) {
+					errorInfo = " (doAttack failed)";
+
+					break;
+				}
+
+				Packet.flash(me.gid);
+			} else if (result === 2) {
+				errorInfo = " (No valid attack skills)";
 
 				break;
+			} else {
+				retry = 0;
 			}
 
 			attackCount += 1;
@@ -201,7 +285,7 @@ var Attack = {
 		}
 
 		if (Config.MFSwitchPercent) {
-			Precast.weaponSwitch(Math.abs(Config.MFSwitch - 1));
+			this.weaponSwitch(this.getPrimarySlot());
 		}
 
 		ClassAttack.afterAttack();
@@ -218,7 +302,8 @@ var Attack = {
 	},
 
 	hurt: function (classId, percent) {
-		var i, target,
+		var i, target, result,
+			retry = 0,
 			attackCount = 0;
 
 		for (i = 0; i < 5; i += 1) {
@@ -232,8 +317,18 @@ var Attack = {
 		}
 
 		while (attackCount < 300 && Attack.checkMonster(target) && Attack.skipCheck(target)) {
-			if (!ClassAttack.doAttack(target, attackCount % 15 === 0)) {
+			result = ClassAttack.doAttack(target, attackCount % 15 === 0);
+
+			if (result === 0) {
+				if (retry++ > 3) {
+					break;
+				}
+
+				Packet.flash(me.gid);
+			} else if (result === 2) {
 				break;
+			} else {
+				retry = 0;
 			}
 
 			if (!copyUnit(target).x) {
@@ -317,6 +412,7 @@ var Attack = {
 		}
 
 		var i, boss, orgx, orgy, target, result, monsterList, start, coord,
+			retry = 0,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -389,6 +485,14 @@ var Attack = {
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				if (result) {
+					retry = 0;
+
+					if (result === 2) {
+						monsterList.shift();
+
+						continue;
+					}
+
 					for (i = 0; i < gidAttack.length; i += 1) {
 						if (gidAttack[i].gid === target.gid) {
 							break;
@@ -434,7 +538,12 @@ var Attack = {
 						Pickit.fastPick();
 					}
 				} else {
-					monsterList.shift();
+					if (retry++ > 3) {
+						monsterList.shift();
+						retry = 0;
+					}
+
+					Packet.flash(me.gid);
 				}
 			} else {
 				monsterList.shift();
@@ -502,6 +611,7 @@ var Attack = {
 	// Clear an already formed array of monstas
 	clearList: function (mainArg, sortFunc, refresh) {
 		var i, target, result, monsterList, coord,
+			retry = 0,
 			gidAttack = [],
 			attackCount = 0;
 
@@ -548,6 +658,14 @@ var Attack = {
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
 
 				if (result) {
+					retry = 0;
+
+					if (result === 2) {
+						monsterList.shift();
+
+						continue;
+					}
+
 					for (i = 0; i < gidAttack.length; i += 1) {
 						if (gidAttack[i].gid === target.gid) {
 							break;
@@ -591,7 +709,12 @@ var Attack = {
 						Pickit.fastPick();
 					}
 				} else {
-					monsterList.shift();
+					if (retry++ > 3) {
+						monsterList.shift();
+						retry = 0;
+					}
+
+					Packet.flash(me.gid);
 				}
 			} else {
 				monsterList.shift();

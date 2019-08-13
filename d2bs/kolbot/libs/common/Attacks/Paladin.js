@@ -14,16 +14,17 @@ var ClassAttack = {
 		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
 			if (getDistance(me, unit) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
-					return false;
+					return 0;
 				}
 			}
 
 			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
 
-			return true;
+			return 1;
 		}
 
-		var index,
+		var index, result,
+			mercRevive = 0,
 			attackSkill = -1,
 			aura = -1;
 
@@ -56,29 +57,29 @@ var ClassAttack = {
 			aura = Config.LowManaSkill[1];
 		}
 
-		switch (this.doCast(unit, attackSkill, aura)) {
-		case 0: // Fail
-			break;
-		case 1: // Success
-			return true;
-		case 2: // Try to telestomp
-			if (Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
-				while (Attack.checkMonster(unit)) {
-					if (getDistance(me, unit) > 3) {
-						Pather.moveToUnit(unit);
-					}
+		result = this.doCast(unit, attackSkill, aura);
 
-					this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+		if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+			while (Attack.checkMonster(unit)) {
+				if (Town.needMerc()) {
+					if (Config.MercWatch && mercRevive++ < 1) {
+						Town.visitTown();
+					} else {
+						return 2;
+					}
 				}
 
-				return true;
+				if (getDistance(me, unit) > 3) {
+					Pather.moveToUnit(unit);
+				}
+
+				this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
 			}
 
-			break;
+			return 1;
 		}
 
-		// Couldn't attack
-		return false;
+		return result;
 	},
 
 	afterAttack: function () {
@@ -94,12 +95,12 @@ var ClassAttack = {
 		var i, walk;
 
 		if (attackSkill < 0) {
-			return false;
+			return 2;
 		}
 
 		switch (attackSkill) {
 		case 112:
-			if (unit.classid === 691 && Config.AvoidDolls) {
+			if (Config.AvoidDolls && [212, 213, 214, 215, 216, 690, 691].indexOf(unit.classid) > -1) {
 				this.dollAvoid(unit);
 
 				if (aura > -1) {
@@ -222,12 +223,15 @@ var ClassAttack = {
 	},
 
 	dollAvoid: function (unit) {
-		var i,
-			positions = [[10, 10], [-10, 10], [10, -10], [-10, -10]];
+		var i, cx, cy,
+			distance = 14;
 
-		for (i = 0; i < positions.length; i += 1) {
-			if (Attack.validSpot(unit.x + positions[i][0], unit.y + positions[i][1])) {
-				return Pather.moveTo(unit.x + positions[i][0], unit.y + positions[i][1]);
+		for (i = 0; i < 2 * Math.PI; i += Math.PI / 6) {
+			cx = Math.round(Math.cos(i) * distance);
+			cy = Math.round(Math.sin(i) * distance);
+
+			if (Attack.validSpot(unit.x + cx, unit.y + cy)) {
+				return Pather.moveTo(unit.x + cx, unit.y + cy);
 			}
 		}
 

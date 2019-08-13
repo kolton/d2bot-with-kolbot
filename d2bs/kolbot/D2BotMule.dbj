@@ -1,4 +1,6 @@
 var StarterConfig = {
+	MinGameTime: 30, // Minimum game length in seconds.
+
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
 	RealmDownDelay: 3, // Minutes to wait after getting Realm Down message
 	UnableToConnectDelay: 5, // Minutes to wait after Unable To Connect message
@@ -10,7 +12,7 @@ var StarterConfig = {
 
 
 var master, gameInfo, connectFail, makeAcc, joinInfo,
-	muleMode, muleFilename, muleObj, handle,
+	muleMode, muleFilename, muleObj, handle, maxCharCount,
 	makeNext = false,
 	status = "loading",
 	masterStatus = {
@@ -60,12 +62,13 @@ var MuleData = {
 // stash picked items
 function stashItems() {
 	var i,
-		items = me.getItems();
+		items = me.findItems(-1, 0, 3);
+
+	// stash large items first by sorting items by size in descending order
+	items.sort(function(a, b) {return (b.sizex * b.sizey - a.sizex * a.sizey);});
 
 	for (i = 0; i < items.length; i += 1) {
-		if (items[i].mode === 0 && items[i].location === 3) {
-			Storage.Stash.MoveTo(items[i]);
-		}
+		Storage.Stash.MoveTo(items[i]);
 	}
 
 	return true;
@@ -129,6 +132,19 @@ function pickItems() {
 				break;
 			}
 
+			// pick large items first by sorting items by size in descending order and move gheed's charm to the end of the list
+			list.sort(function(a, b) {
+				if (a.classid === 605 && a.quality === 7 && !Pickit.canPick(a)) {
+					return 1;
+				}
+
+				if (b.classid === 605 && b.quality === 7 && !Pickit.canPick(b)) {
+					return -1;
+				}
+
+				return (b.sizex * b.sizey - a.sizex * a.sizey);
+			});
+
 			while (list.length > 0) {
 				item = list.shift();
 				canFit = Storage.Inventory.CanFit(item);
@@ -144,6 +160,12 @@ function pickItems() {
 				if (muleMode > 0 && item.classid === 603 && item.quality === 7 && !Pickit.canPick(item)) {
 					D2Bot.printToConsole("Mule already has an Anni.", 7);
 
+					rval = "next";
+				}
+
+				// Gheed's Fortune handling
+				if (item.classid === 605 && item.quality === 7 && !Pickit.canPick(item)) {
+					D2Bot.printToConsole("Mule already has Gheed's.", 7);
 					rval = "next";
 				}
 
@@ -454,7 +476,11 @@ function main() {
 
 					D2Bot.updateStatus("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.");
 					D2Bot.printToConsole("In " + (muleMode === 2 ? "anni" : muleMode === 1 ? "torch" : "") + " mule game.", 7);
-					delay(500);
+					tick = getTickCount();
+
+					while (!me.area && getTickCount() - tick < 2000) {
+						delay(200);
+					}
 
 					Town.goToTown(1);
 					Town.move("stash");
@@ -516,6 +542,14 @@ function main() {
 					MuleData.write(obj);
 					nextChar();
 					D2Bot.printToConsole("Mule full, getting next character.", 7);
+
+					if (StarterConfig.MinGameTime && getTickCount() - tick < StarterConfig.MinGameTime * 1000) {
+						while (getTickCount() - tick < StarterConfig.MinGameTime * 1000) {
+							me.overhead("Stalling for " + Math.round(((tick + (StarterConfig.MinGameTime * 1000)) - getTickCount()) / 1000) + " Seconds");
+							delay(1000);
+						}
+					}
+
 					quit();
 
 					// TODO: see whether a for loop is better
@@ -848,9 +882,10 @@ MainSwitch:
 		}
 
 		obj = MuleData.read();
+		maxCharCount = (muleObj.charsPerAcc > 0 ? Math.min(muleObj.charsPerAcc, 18) : 8);
 
 		if (makeNext) {
-			if (obj.fullChars.length === 8 || (muleMode > 0 && obj.torchChars.length === 8)) {
+			if (obj.fullChars.length >= maxCharCount || (muleMode > 0 && obj.torchChars.length >= maxCharCount)) {
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 
@@ -882,9 +917,9 @@ MainSwitch:
 		}
 
 		if (ControlAction.findCharacter(info)) {
-			ControlAction.loginCharacter(info);
+			ControlAction.loginCharacter(info, false);
 		} else {
-			if (ControlAction.getCharacters().length >= 8) { // premade account that's already full
+			if (ControlAction.getCharacters().length >= maxCharCount) { // premade account that's already full
 				ControlAction.click(6, 33, 572, 128, 35);
 				nextAccount();
 

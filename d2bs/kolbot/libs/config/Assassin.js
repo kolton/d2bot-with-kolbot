@@ -116,8 +116,8 @@ function LoadConfig() {
 		Config.Baal.HotTPMessage = "Hot TP!";
 		Config.Baal.SafeTPMessage = "Safe TP!";
 		Config.Baal.BaalMessage = "Baal!";
-		Config.Baal.SoulQuit = false; // End script if Souls (Undead Soul Killers) are found.
-		Config.Baal.DollQuit = false; // End script if Dolls (Undead Stigyan Dolls) are found.
+		Config.Baal.SoulQuit = false; // End script if Souls (Burning Souls) are found.
+		Config.Baal.DollQuit = false; // End script if Dolls (Undead Soul Killers) are found.
 		Config.Baal.KillBaal = true; // Kill Baal. Leaves game after wave 5 if false.
 
 	/* ### leeching section ###
@@ -316,12 +316,15 @@ function LoadConfig() {
 	Config.DroppedItemsAnnounce.Quality = []; // Quality of item to announce. See NTItemAlias.dbl for values. Example: Config.DroppedItemsAnnounce.Quality = [6, 7, 8];
 
 	// Manager Item Log Screen
-	Config.ShowLowRunes = false; // show/hide low runes (El - Dol) on the item log screen
-	Config.ShowMiddleRunes = false; // show/hide middle runes (Hel - Mal) on the item log screen
-	Config.ShowHighRunes = true; // show/hide high runes (Ist - Zod) on the item log screen
-	Config.ShowLowGems = false; // show/hide low gems (chipped, flawed, normal) on the item log screen
-	Config.ShowHighGems = false; // show/hide high gems (flawless, perfect) on the item log screen
-	Config.ShowCubingInfo = true; // show/hide the cubing messages on console and item log screen
+	Config.LogKeys = false; // Log keys on item viewer
+	Config.LogOrgans = true; // Log organs on item viewer
+	Config.LogLowRunes = false; // Log low runes (El - Dol) on item viewer
+	Config.LogMiddleRunes = false; // Log middle runes (Hel - Mal) on item viewer
+	Config.LogHighRunes = true; // Log high runes (Ist - Zod) on item viewer
+	Config.LogLowGems = false; // Log low gems (chipped, flawed, normal) on item viewer
+	Config.LogHighGems = false; // Log high gems (flawless, perfect) on item viewer
+	Config.SkipLogging = []; // Custom log skip list. Set as three digit item code or classid. Example: ["tes", "ceh", 656, 657] will ignore logging of essences.
+	Config.ShowCubingInfo = true; // Show cubing messages on console
 
 	// Repair settings
 	Config.CubeRepair = false; // Repair weapons with Ort and armor with Ral rune. Don't use it if you don't understand the risk of losing items.
@@ -392,8 +395,8 @@ function LoadConfig() {
 	 */
 	Config.MakeRunewords = false; // Set to true to enable runeword making/rerolling
 
-	//Config.Runewords.push([Runeword.Insight, "Thresher", Roll.Eth]); // Make Insight Thresher
-	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe", Roll.Eth]); // Make Insight Cryptic Axe
+	//Config.Runewords.push([Runeword.Insight, "Thresher", Roll.Eth]); // Make ethereal Insight Thresher
+	//Config.Runewords.push([Runeword.Insight, "Cryptic Axe", Roll.Eth]); // Make ethereal Insight Cryptic Axe
 
 	//Config.KeepRunewords.push("[type] == polearm # [meditationaura] == 17");
 
@@ -425,7 +428,7 @@ function LoadConfig() {
 	Config.LastMessage = ""; // Message or array of messages to say at the end of the run. Use $nextgame to say next game - "Next game: $nextgame" (works with lead entry point)
 	Config.MinGameTime = 60; // Min game time in seconds. Bot will TP to town and stay in game if the run is completed before.
 	Config.MaxGameTime = 0; // Maximum game time in seconds. Quit game when limit is reached.
-	Config.TeleSwitch = false; // Switch to slot II when teleporting more than 1 node.
+	Config.TeleSwitch = false; // Switch to secondary (non-primary) slot when teleporting more than 5 nodes.
 	Config.OpenChests = false; // Open chests. Controls key buying.
 	Config.MiniShopBot = true; // Scan items in NPC shops.
 	Config.PacketShopping = false; // Use packets to shop. Improves shopping speed.
@@ -438,8 +441,10 @@ function LoadConfig() {
 	Config.ScanShrines = [];
 
 	// MF Switch
-	Config.MFSwitchPercent = 0; // Boss life % to switch weapons at. Set to 0 to disable.
-	Config.MFSwitch = 0; // MF weapon slot: 0 = slot I, 1 = slot II
+	Config.MFSwitchPercent = 0; // Boss life % to switch to non-primiary weapon slot. Set to 0 to disable.
+
+	// Primary Slot - Bot will try to determine primary slot if not used (non-cta slot that's not empty)
+	Config.PrimarySlot = -1; // Set to use specific weapon slot as primary weapon slot: -1 = disabled, 0 = slot I, 1 = slot II
 
 	// Fastmod config
 	Config.FCR = 0; // 0 - disable, 1 to 255 - set value of faster cast rate
@@ -543,7 +548,7 @@ function LoadConfig() {
 	 *	You can also set stat to string value "all", and it will spend all the remaining points.
 	 *	Dexterity can be set to "block" and it will stat dexterity up the the desired block value specified in arguemnt (ignored in classic).
 	 *
-	 *	See libs/config/Templates/AutoStatExampleBuilds.txt for Config.AutoStat.Build examples. 
+	 *	See libs/config/Templates/AutoStatExampleBuilds.txt for Config.AutoStat.Build examples.
 	 */
 	Config.AutoStat.Enabled = false; // Enable or disable AutoStat system
 	Config.AutoStat.Save = 0; // Number stat points that will not be spent and saved.
