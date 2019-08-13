@@ -42,7 +42,8 @@
 			};
 
 
-		if (this.__proto__.constructor !== global.Promise) {
+		if (this.__proto__.constructor !== Promise) {
+			print((new Error).stack);
 			throw new Error("Promise must be called with 'new' operator!");
 		}
 

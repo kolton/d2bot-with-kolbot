@@ -524,5 +524,10 @@ var Config = {
 		Template: "",
 		Verbose: false,
 		DebugMode: false
+	},
+	SpeedDiablo: {
+		Fast: false,
+		Follower: false,
+		Entrance: true,
 	}
 };

@@ -1254,3 +1254,19 @@ Unit.prototype.castChargedSkill = function (...args) {
 PresetUnit.prototype.__defineGetter__('unit', function () {
 	return getUnits(this.type, this.id).first();
 });
+
+/**
+ * @param args
+ * @returns {Unit[]}
+ */
+function getUnits(...args) {
+	let units = [], unit = getUnit.apply(null, args);
+
+	if (!unit) {
+		return [];
+	}
+	do {
+		units.push(copyUnit(unit));
+	} while (unit.getNext());
+	return units;
+}

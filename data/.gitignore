@@ -1,0 +1,5 @@
+# ignore everything here, except
+*
+
+# except
+!.gitignore

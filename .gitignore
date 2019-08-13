@@ -4,6 +4,6 @@ limedrop/*
 logs/*
 
 .idea
-d2bs/d2bs.ini
 d2bs/d2bs.log
 d2bs/kolton/data
+/d2bs/d2bs.ini

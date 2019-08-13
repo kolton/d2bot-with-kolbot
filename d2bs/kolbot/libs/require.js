@@ -3,6 +3,7 @@
  * @author Jaenster
  */
 
+global['module'] = {exports: undefined};
 const require = (function (include,isIncluded) {
     let depth = 0;
     let packages = {};
@@ -27,7 +28,7 @@ const require = (function (include,isIncluded) {
 
             // Include the file;
             try {
-                if (!_include(path + field + '.js')) {
+                if (!include(path + field + '.js')) {
                     throw Error('module ' + field + ' not found');
                 }
             } finally {
