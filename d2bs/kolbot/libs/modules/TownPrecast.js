@@ -33,7 +33,6 @@
 	Object.defineProperty(TownPrecast, 'can', {
 		get: function () {
 			const wantToCast = Precast.skills;
-			print(JSON.stringify(wantToCast));
 			return wantToCast.every(sk => TownPrecast.townCastable.indexOf(sk.skillId) > -1) && wantToCast;
 		}
 	});

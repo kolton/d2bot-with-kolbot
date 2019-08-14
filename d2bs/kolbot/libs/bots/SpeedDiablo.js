@@ -1,5 +1,11 @@
+/**
+ * @author Jaenster
+ * @description An improved version of a diablo run.
+ */
 function SpeedDiablo() {
-	const Promise = require('Promise');
+	const Promise = require('Promise'),
+		TownPrecast = require('TownPrecast'),
+		Precast = require('precast');
 
 	function openSeal(seal) {
 		for (let i = 0; i < 5; i += 1) {
@@ -120,27 +126,13 @@ function SpeedDiablo() {
 
 		Town.doChores(); // Do the chores
 		Pather.useWaypoint(107);
-		Precast.doPrecast(true);
+		Precast();
 	} else {
-		if (!me.getState(sdk.states.BattleOrders)) {
-			let haveCTA = function () {
-				let item = me.getItem(-1, 1);
-				while (!item.getPrefix(20519) && item.getNext()) ;
-				return item.getPrefix(20519)
-			};
+		// town precast if possible, or go bo
+		!TownPrecast() && Precast.outTown();
 
-			// Why a barb doesn't bo here. He does it straight away when everyone gets in the portal so everyone have a good bo
-			if (!(!haveCTA() || me.classid === 4)) {
-
-				Town.heal(); // This can be called before a do chores, so lets be sure we have enough health in before we go to a random location
-				me.cancel();
-				Pather.useWaypoint('random');
-				Precast.doPrecast(true);
-				Pather.useWaypoint(sdk.areas.PandemoniumFortress);
-			}
-		}
 		Town.doChores();
-		Town.goToTown(4); // make sure we really are in act 5.
+		Town.goToTown(4); // make sure we really are in act 4
 		Town.move("portalspot");
 		print('wait for portal');
 		for (let i = 0; i < 30 * 10; i += 1) {
@@ -148,7 +140,6 @@ function SpeedDiablo() {
 			delay(100);
 		}
 		if (!me.area === sdk.areas.ChaosSanctuary) throw Error('failed going to chaos');
-		Precast.doPrecast();
 	}
 
 

@@ -15,10 +15,7 @@
 
 		(skills || Precast.skills).forEach(result => {
 			// switchWeapons if needed
-			if (me.gametype !== 0 && me.weaponswitch !== result.slot) {
-				print('Switching from ' + me.weaponswitch + ' -- to ' + result.slot);
-				Attack.weaponSwitch(result.slot);
-			}
+			me.gametype !== 0 && me.weaponswitch !== result.slot && Attack.weaponSwitch(result.slot);
 
 			print('Precasting ' + getSkillById(result.skillId) + ' on slot ' + result.slot);
 			Skill.cast(result.skillId, Skill.getHand(result.skillId));
@@ -27,6 +24,17 @@
 		Attack.weaponSwitch(beforeSlot);
 		return true;
 	}
+
+	Precast.outTown = function (callback = undefined) {
+		const skills = Precast.skills, area = me.area;
+		skills.length && Town.heal()
+		&& Pather.useWaypoint('random')
+		&& Precast(skills)
+		&& (
+			(typeof callback === 'function' && callback())
+			|| Pather.useWaypoint(area)
+		);
+	};
 
 	Object.defineProperty(Precast, 'skills', {
 		get: function () { // Calculate skills for precasting
