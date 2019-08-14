@@ -9,6 +9,7 @@
 	const getSkill = skillId => Math.max.apply(Math, Skills.getSkillLevel(skillId));
 	const bestSkill = arr => arr.length === 1 && arr.first() || arr.sort((a, b) => getSkill(b) - getSkill(a)).first();
 
+	/** @return {boolean} */
 	function Precast(skills) {
 		const beforeSlot = me.weaponswitch;
 
