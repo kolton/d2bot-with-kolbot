@@ -38,7 +38,7 @@
 		).then(
 			() => castBoS() && new Promise(
 				resolve => !me.inTown && resolve()
-			).then(() => self())));
+			).then(() => self(self))));
 
 	module.exports ={};
 })(module, require);
