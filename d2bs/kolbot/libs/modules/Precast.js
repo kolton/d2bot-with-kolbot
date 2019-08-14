@@ -25,6 +25,17 @@
 		return true;
 	}
 
+	Precast.outTown = function (callback = undefined) {
+		const skills = Precast.skills, area = me.area;
+		skills.length && Town.heal()
+		&& Pather.useWaypoint('random')
+		&& Precast(skills)
+		&& (
+			(typeof callback === 'function' && callback())
+			|| Pather.useWaypoint(area)
+		);
+	};
+
 	Object.defineProperty(Precast, 'skills', {
 		get: function () { // Calculate skills for precasting
 			return Precast.precastable.map(function (what) {
