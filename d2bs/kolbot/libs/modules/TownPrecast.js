@@ -4,13 +4,14 @@
  */
 
 (function (module, require) {
-
+	const Precast = require('Precast');
 	/**
 	 * @return {boolean}
 	 */
 	function TownPrecast() {
-		let skills = this.can;
-		return skills && !skills.forEach(sk => Skill.cast(sk));
+		let skills = TownPrecast.can;
+		// print(JSON.stringify(skills && skills.map(getSkillById)));
+		return skills && Precast(skills);
 	}
 
 	TownPrecast.townCastable = [
@@ -24,8 +25,9 @@
 
 	Object.defineProperty(TownPrecast, 'can', {
 		get: function () {
-			const wantToCast = require('Precast').skills;
-			return !!wantToCast.filter(sk => TownPrecast.indexOf(sk) > -1).length === wantToCast.length && wantToCast;
+			const wantToCast = Precast.skills;
+			print(JSON.stringify(wantToCast));
+			return wantToCast.every(sk => TownPrecast.townCastable.indexOf(sk.skillId) > -1) && wantToCast;
 		}
 	});
 	module.exports = TownPrecast;
