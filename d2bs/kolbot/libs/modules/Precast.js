@@ -15,10 +15,7 @@
 
 		(skills || Precast.skills).forEach(result => {
 			// switchWeapons if needed
-			if (me.gametype !== 0 && me.weaponswitch !== result.slot) {
-				print('Switching from ' + me.weaponswitch + ' -- to ' + result.slot);
-				Attack.weaponSwitch(result.slot);
-			}
+			me.gametype !== 0 && me.weaponswitch !== result.slot && Attack.weaponSwitch(result.slot);
 
 			print('Precasting ' + getSkillById(result.skillId) + ' on slot ' + result.slot);
 			Skill.cast(result.skillId, Skill.getHand(result.skillId));
