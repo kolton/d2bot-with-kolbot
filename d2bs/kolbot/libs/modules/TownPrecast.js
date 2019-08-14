@@ -14,6 +14,13 @@
 		return skills && Precast(skills);
 	}
 
+	/**
+	 * @description Cast what we can in town already.
+	 */
+	TownPrecast.prepare = function() {
+		Precast(Precast.skills.filter(sk=>TownPrecast.townCastable.indexOf(sk.skillId) > -1));
+	};
+
 	TownPrecast.townCastable = [
 		sdk.skills.Valkyrie, sdk.skills.FrozenArmor, sdk.skills.ShiverArmor, sdk.skills.EnergyShield, sdk.skills.Enchant,
 		sdk.skills.ChillingArmor, sdk.skills.BoneArmor, sdk.skills.ClayGolem, sdk.skills.BloodGolem, sdk.skills.FireGolem,
@@ -31,4 +38,5 @@
 		}
 	});
 	module.exports = TownPrecast;
+
 })(module, require);
