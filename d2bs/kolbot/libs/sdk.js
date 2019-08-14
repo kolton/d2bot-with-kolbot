@@ -2385,6 +2385,7 @@ let sdk = {
         hppot: 76,
         mppot: 77,
         rvpot: 78,
+        charms: 82,
     }
 };
 
