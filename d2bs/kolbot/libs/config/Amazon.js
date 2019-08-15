@@ -522,7 +522,6 @@ function LoadConfig() {
 	Config.Wereform = false; // 0 / false - don't shapeshift, 1 / "Werewolf" - change to werewolf, 2 / "Werebear" - change to werebear
 
 	// Class specific config
-	Config.LightningFuryDelay = 10; // Lightning fury interval in seconds. LF is treated as timed skill.
 	Config.SummonValkyrie = true; // Summon Valkyrie
 
 	/* AutoSkill builds character based on array defined by the user and it replaces AutoBuild's skill system.

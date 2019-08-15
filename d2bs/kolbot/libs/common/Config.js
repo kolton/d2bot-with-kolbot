@@ -267,7 +267,6 @@ var Config = {
 	BossPriority: false,
 
 	// Amazon specific
-	LightningFuryDelay: 0,
 	SummonValkyrie: false,
 
 	// Sorceress specific
