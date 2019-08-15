@@ -5,21 +5,22 @@
 */
 
 var ClassAttack = {
+	config: require('Config'),
 	doAttack: function (unit, preattack) {
 		var needRepair = Town.needRepair();
 
-		if ((Config.MercWatch && Town.needMerc()) || needRepair.length > 0) {
+		if ((ClassAttack.config.MercWatch && Town.needMerc()) || needRepair.length > 0) {
 			Town.visitTown(!!needRepair.length);
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(Config.AttackSkill[0])) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
+		if (preattack && ClassAttack.config.AttackSkill[0] > 0 && Attack.checkResist(unit, Attack.getSkillElement(ClassAttack.config.AttackSkill[0])) && (!me.getState(121) || !Skill.isTimed(ClassAttack.config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(ClassAttack.config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(ClassAttack.config.AttackSkill[0]), 0x4)) {
 					return 0;
 				}
 			}
 
-			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
+			Skill.cast(ClassAttack.config.AttackSkill[0], Skill.getHand(ClassAttack.config.AttackSkill[0]), unit);
 
 			return 1;
 		}
@@ -32,20 +33,20 @@ var ClassAttack = {
 		if (Attack.getCustomAttack(unit)) {
 			attackSkill = Attack.getCustomAttack(unit)[0];
 		} else {
-			attackSkill = Config.AttackSkill[index];
+			attackSkill = ClassAttack.config.AttackSkill[index];
 		}
 
 		if (!Attack.checkResist(unit, attackSkill)) {
 			attackSkill = -1;
 
-			if (Config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, Config.AttackSkill[index + 1])) {
-				attackSkill = Config.AttackSkill[index + 1];
+			if (ClassAttack.config.AttackSkill[index + 1] > -1 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[index + 1])) {
+				attackSkill = ClassAttack.config.AttackSkill[index + 1];
 			}
 		}
 
 		// Low mana skill
-		if (Skill.getManaCost(attackSkill) > me.mp && Config.LowManaSkill[0] > -1 && Attack.checkResist(unit, Config.LowManaSkill[0])) {
-			attackSkill = Config.LowManaSkill[0];
+		if (Skill.getManaCost(attackSkill) > me.mp && ClassAttack.config.LowManaSkill[0] > -1 && Attack.checkResist(unit, ClassAttack.config.LowManaSkill[0])) {
+			attackSkill = ClassAttack.config.LowManaSkill[0];
 		}
 
 		// Telestomp with barb is pointless
@@ -148,8 +149,8 @@ var ClassAttack = {
 		if (monster) {
 			do {
 				if (getDistance(me, monster) <= range && Attack.checkMonster(monster) && !checkCollision(me, monster, 0x4) &&
-						(Attack.checkResist(monster, Attack.getSkillElement(Config.AttackSkill[(monster.spectype & 0x7) ? 1 : 3])) ||
-						(Config.AttackSkill[3] > -1 && Attack.checkResist(monster, Attack.getSkillElement(Config.AttackSkill[3]))))) {
+					(Attack.checkResist(monster, Attack.getSkillElement(ClassAttack.config.AttackSkill[(monster.spectype & 0x7) ? 1 : 3])) ||
+						(ClassAttack.config.AttackSkill[3] > -1 && Attack.checkResist(monster, Attack.getSkillElement(ClassAttack.config.AttackSkill[3]))))) {
 					return true;
 				}
 			} while (monster.getNext());
@@ -159,7 +160,7 @@ var ClassAttack = {
 	},
 
 	findItem: function (range) {
-		if (!Config.FindItem || !me.getSkill(142, 1)) {
+		if (!ClassAttack.config.FindItem || !me.getSkill(142, 1)) {
 			return false;
 		}
 
@@ -183,7 +184,7 @@ MainLoop:
 
 			while (corpseList.length > 0) {
 				if (this.checkCloseMonsters(5)) {
-					if (Config.FindItemSwitch) {
+					if (ClassAttack.config.FindItemSwitch) {
 						Attack.weaponSwitch(Attack.getPrimarySlot());
 					}
 
@@ -203,7 +204,7 @@ MainLoop:
 						Pather.moveToUnit(corpse);
 					}
 
-					if (Config.FindItemSwitch) {
+					if (ClassAttack.config.FindItemSwitch) {
 						Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 					}
 
@@ -231,7 +232,7 @@ CorpseLoop:
 			return this.findItem(me.area === 83 ? 60 : 20);
 		}
 
-		if (Config.FindItemSwitch) {
+		if (ClassAttack.config.FindItemSwitch) {
 			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 

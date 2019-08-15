@@ -1,8 +1,8 @@
 /**
-*	@filename	Loader.js
-*	@author		kolton
-*	@desc		script loader, based on mBot's Sequencer.js
-*/
+ *    @filename    Loader.js
+ *    @author        kolton
+ *    @desc        script loader, based on mBot's Sequencer.js
+ */
 
 var global = this;
 
@@ -84,7 +84,9 @@ var Loader = {
 	},
 
 	loadScripts: function () {
-		var reconfiguration, s, script,
+		const Config = require('Config');
+		const Scripts = Config.Scripts;
+		var s, script,
 			unmodifiedConfig = {};
 
 		this.copy(Config, unmodifiedConfig);
@@ -116,28 +118,15 @@ var Loader = {
 
 			if (isIncluded("bots/" + script + ".js")) {
 				try {
-					if (typeof (global[script]) !== "function") {
-						throw new Error("Invalid script function name");
-					}
+					if (typeof (global[script]) !== "function") throw new Error("Invalid script function name");
 
 					if (this.skipTown.indexOf(script) > -1 || Town.goToTown()) {
 						print("ÿc2Starting script: ÿc9" + script);
 						//scriptBroadcast(JSON.stringify({currScript: script}));
 						Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: script}));
 
-						reconfiguration = typeof Scripts[script] === 'object';
-
-						if (reconfiguration) {
-							print("ÿc2Copying Config properties from " + script + " object.");
-							this.copy(Scripts[script], Config);
-						}
-
-						global[script]();
-
-						if (reconfiguration) {
-							print("ÿc2Reverting back unmodified config properties.");
-							this.copy(unmodifiedConfig, Config);
-						}
+						// Assign a new object to the config object
+						global[script](Object.assign(typeof Scripts[script] === 'object' && Scripts[script] || {}, Config));
 					}
 				} catch (error) {
 					Misc.errorReport(error, script);

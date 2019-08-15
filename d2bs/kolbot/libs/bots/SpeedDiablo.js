@@ -2,7 +2,7 @@
  * @author Jaenster
  * @description An improved version of a diablo run.
  */
-function SpeedDiablo() {
+function SpeedDiablo(Config) {
 	const Promise = require('Promise'),
 		TownPrecast = require('TownPrecast'),
 		Precast = require('precast');
@@ -165,5 +165,3 @@ function SpeedDiablo() {
 		removeEventListener('gamepacket', gamepacketHandler);
 	}
 }
-
-typeof Config.SpeedDiablo === 'undefined' && (Config.SpeedDiablo = {Follower: false, Entrance: true, Fast: false});

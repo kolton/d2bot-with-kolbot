@@ -4,7 +4,7 @@
 *	@desc		kill Hephasto the Armorer
 */
 
-function Hephasto() {
+function Hephasto(Config) {
 	Town.doChores();
 	Pather.useWaypoint(107);
 	Precast.doPrecast(true);

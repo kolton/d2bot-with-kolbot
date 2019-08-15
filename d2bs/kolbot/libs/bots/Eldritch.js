@@ -4,7 +4,7 @@
 *	@desc		kill Eldritch the Rectifier, optionally kill Shenk the Overseer, Dac Farren and open chest
 */
 
-function Eldritch() {
+function Eldritch(Config) {
 	var chest;
 
 	Town.doChores();

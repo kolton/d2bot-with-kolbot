@@ -5,8 +5,9 @@
 */
 
 var ClassAttack = {
+	config: require('Config'),
 	doAttack: function (unit, preattack) {
-		if (Config.MercWatch && Town.needMerc()) {
+		if (ClassAttack.config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
@@ -18,14 +19,14 @@ var ClassAttack = {
 			Skill.cast(235, 0);
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
+		if (preattack && ClassAttack.config.AttackSkill[0] > 0 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(ClassAttack.config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(ClassAttack.config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(ClassAttack.config.AttackSkill[0]), 0x4)) {
 					return 0;
 				}
 			}
 
-			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
+			Skill.cast(ClassAttack.config.AttackSkill[0], Skill.getHand(ClassAttack.config.AttackSkill[0]), unit);
 
 			return 1;
 		}
@@ -41,44 +42,44 @@ var ClassAttack = {
 		if (Attack.getCustomAttack(unit)) {
 			checkSkill = Attack.getCustomAttack(unit)[0];
 		} else {
-			checkSkill = Config.AttackSkill[index];
+			checkSkill = ClassAttack.config.AttackSkill[index];
 		}
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
-			timedSkill = Config.AttackSkill[5];
+		} else if (ClassAttack.config.AttackSkill[5] > -1 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[5]) && ([56, 59].indexOf(ClassAttack.config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+			timedSkill = ClassAttack.config.AttackSkill[5];
 		}
 
 		// Get untimed skill
 		if (Attack.getCustomAttack(unit)) {
 			checkSkill = Attack.getCustomAttack(unit)[1];
 		} else {
-			checkSkill = Config.AttackSkill[index + 1];
+			checkSkill = ClassAttack.config.AttackSkill[index + 1];
 		}
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
-			untimedSkill = Config.AttackSkill[6];
+		} else if (ClassAttack.config.AttackSkill[6] > -1 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[6]) && ([56, 59].indexOf(ClassAttack.config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+			untimedSkill = ClassAttack.config.AttackSkill[6];
 		}
 
 		// Low mana timed skill
-		if (Config.LowManaSkill[0] > -1 && Skill.getManaCost(timedSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[0])) {
-			timedSkill = Config.LowManaSkill[0];
+		if (ClassAttack.config.LowManaSkill[0] > -1 && Skill.getManaCost(timedSkill) > me.mp && Attack.checkResist(unit, ClassAttack.config.LowManaSkill[0])) {
+			timedSkill = ClassAttack.config.LowManaSkill[0];
 		}
 
 		// Low mana untimed skill
-		if (Config.LowManaSkill[1] > -1 && Skill.getManaCost(untimedSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[1])) {
-			untimedSkill = Config.LowManaSkill[1];
+		if (ClassAttack.config.LowManaSkill[1] > -1 && Skill.getManaCost(untimedSkill) > me.mp && Attack.checkResist(unit, ClassAttack.config.LowManaSkill[1])) {
+			untimedSkill = ClassAttack.config.LowManaSkill[1];
 		}
 
 		result = this.doCast(unit, timedSkill, untimedSkill);
 
-		if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+		if (result === 2 && ClassAttack.config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 			while (Attack.checkMonster(unit)) {
 				if (Town.needMerc()) {
-					if (Config.MercWatch && mercRevive++ < 1) {
+					if (ClassAttack.config.MercWatch && mercRevive++ < 1) {
 						Town.visitTown();
 					} else {
 						return 2;
@@ -89,7 +90,7 @@ var ClassAttack = {
 					Pather.moveToUnit(unit);
 				}
 
-				this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+				this.doCast(unit, ClassAttack.config.AttackSkill[1], ClassAttack.config.AttackSkill[2]);
 			}
 
 			return 1;

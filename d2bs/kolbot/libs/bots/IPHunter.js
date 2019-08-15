@@ -4,7 +4,7 @@
 *	@desc		search for a "hot" IP and stop if the correct server is found
 */
 
-function IPHunter() {
+function IPHunter(Config) {
 	var ip = Number(me.gameserverip.split(".")[3]);
 
 	if (Config.IPHunter.IPList.indexOf(ip) > -1) {

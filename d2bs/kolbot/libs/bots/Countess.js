@@ -4,7 +4,7 @@
 *	@desc		kill The Countess and optionally kill Ghosts along the way
 */
 
-function Countess() {
+function Countess(Config) {
 	var i, poi;
 
 	Town.doChores();

@@ -4,7 +4,7 @@
 *	@desc		clear Ancient Tunnels
 */
 
-function AncientTunnels() {
+function AncientTunnels(Config) {
 	Town.doChores();
 	Pather.useWaypoint(44);
 	Precast.doPrecast(true);

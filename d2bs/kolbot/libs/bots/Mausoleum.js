@@ -4,7 +4,7 @@
 *	@desc		clear Mausoleum
 */
 
-function Mausoleum() {
+function Mausoleum(Config) {
 	Town.doChores();
 	Pather.useWaypoint(3);
 	Precast.doPrecast(true);

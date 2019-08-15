@@ -7,7 +7,7 @@
 *				Make sure you setup safeMsg and baalMsg accordingly
 */
 
-function AutoBaal() {
+function AutoBaal(Config) {
 	// editable variables
 	var i, baalCheck, throneCheck, hotCheck, leader, suspect, solofail, portal, baal,
 		// internal variables

@@ -4,7 +4,7 @@
  *	@desc		clear Throne of Destruction and kill Baal
  */
 
-function Baal() {
+function Baal(Config) {
 	var portal, tick;
 
 	this.preattack = function () {

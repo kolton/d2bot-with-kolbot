@@ -4,7 +4,7 @@
 *	@desc		kill Thresh Socket
 */
 
-function ThreshSocket() {
+function ThreshSocket(Config) {
 	Town.doChores();
 	Pather.useWaypoint(112);
 	Precast.doPrecast(true);

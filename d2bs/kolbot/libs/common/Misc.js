@@ -5,6 +5,7 @@
 */
 
 var Skill = {
+	config: require('Config'),
 	usePvpRange: false,
 
 	getRange: function (skillId) {
@@ -260,7 +261,7 @@ var Skill = {
 		// Check mana cost, charged skills don't use mana
 		if (!item && this.getManaCost(skillId) > me.mp) {
 			// Maybe delay on ALL skills that we don't have enough mana for?
-			if (Config.AttackSkill.concat([42, 54]).concat(Config.LowManaSkill).indexOf(skillId) > -1) {
+			if (Skill.config.AttackSkill.concat([42, 54]).concat(Skill.config.LowManaSkill).indexOf(skillId) > -1) {
 				delay(300);
 			}
 
@@ -289,7 +290,7 @@ var Skill = {
 			return false;
 		}
 
-		if (Config.PacketCasting > 1) {
+		if (Skill.config.PacketCasting > 1) {
 			switch (typeof x) {
 			case "number":
 				Packet.castSkill(hand, x, y);
@@ -458,7 +459,7 @@ MainLoop:
 
 var Item = {
 	hasTier: function (item) {
-		return Config.AutoEquip && NTIP.GetTier(item) > 0;
+		return Skill.config.AutoEquip && NTIP.GetTier(item) > 0;
 	},
 
 	canEquip: function (item) {
@@ -626,7 +627,7 @@ var Item = {
 	},
 
 	autoEquipCheck: function (item) {
-		if (!Config.AutoEquip) {
+		if (!Skill.config.AutoEquip) {
 			return true;
 		}
 
@@ -653,7 +654,7 @@ var Item = {
 
 	// returns true if the item should be kept+logged, false if not
 	autoEquip: function () {
-		if (!Config.AutoEquip) {
+		if (!Skill.config.AutoEquip) {
 			return true;
 		}
 
@@ -952,7 +953,7 @@ var Misc = {
 		}
 
 		// Testing all container code
-		if (Config.OpenChests === 2) {
+		if (Skill.config.OpenChests === 2) {
 			containers = [
 				"chest", "loose rock", "hidden stash", "loose boulder", "corpseonstick", "casket", "armorstand", "weaponrack", "barrel", "holeanim", "tomb2",
 				"tomb3", "roguecorpse", "ratnest", "corpse", "goo pile", "largeurn", "urn", "chest3", "jug", "skeleton", "guardcorpse", "sarcophagus", "object2",
@@ -988,7 +989,7 @@ var Misc = {
 	shrineStates: false,
 
 	scanShrines: function (range) {
-		if (!Config.ScanShrines.length) {
+		if (!Skill.config.ScanShrines.length) {
 			return false;
 		}
 
@@ -1004,8 +1005,8 @@ var Misc = {
 		if (!this.shrineStates) {
 			this.shrineStates = [];
 
-			for (i = 0; i < Config.ScanShrines.length; i += 1) {
-				switch (Config.ScanShrines[i]) {
+			for (i = 0; i < Skill.config.ScanShrines.length; i += 1) {
+				switch (Skill.config.ScanShrines[i]) {
 				case 0: // None
 				case 1: // Refilling
 				case 2: // Health
@@ -1033,7 +1034,7 @@ var Misc = {
 				case 14: // Stamina
 				case 15: // Experience
 					// Both states and shrines are arranged in same order with armor shrine starting at 128
-					this.shrineStates[i] = Config.ScanShrines[i] + 122;
+					this.shrineStates[i] = Skill.config.ScanShrines[i] + 122;
 
 					break;
 				}
@@ -1059,16 +1060,16 @@ var Misc = {
 				}
 			}
 
-			for (i = 0; i < Config.ScanShrines.length; i += 1) {
+			for (i = 0; i < Skill.config.ScanShrines.length; i += 1) {
 				for (j = 0; j < shrineList.length; j += 1) {
 					// Get the shrine if we have no active state or to refresh current state or if the shrine has no state
 					// Don't override shrine state with a lesser priority shrine
 					if (index === -1 || i <= index || this.shrineStates[i] === 0) {
-						if (shrineList[j].objtype === Config.ScanShrines[i] && (Pather.useTeleport() || !checkCollision(me, shrineList[j], 0x4))) {
+						if (shrineList[j].objtype === Skill.config.ScanShrines[i] && (Pather.useTeleport() || !checkCollision(me, shrineList[j], 0x4))) {
 							this.getShrine(shrineList[j]);
 
 							// Gem shrine - pick gem
-							if (Config.ScanShrines[i] === 18) {
+							if (Skill.config.ScanShrines[i] === 18) {
 								Pickit.pickItems();
 							}
 						}
@@ -1262,7 +1263,7 @@ var Misc = {
 	useItemLog: true, // Might be a bit dirty
 
 	itemLogger: function (action, unit, text) {
-		if (!Config.ItemInfo || !this.useItemLog) {
+		if (!Skill.config.ItemInfo || !this.useItemLog) {
 			return false;
 		}
 
@@ -1272,7 +1273,7 @@ var Misc = {
 
 		switch (action) {
 		case "Sold":
-			if (Config.ItemInfoQuality.indexOf(unit.quality) === -1) {
+			if (Skill.config.ItemInfoQuality.indexOf(unit.quality) === -1) {
 				return false;
 			}
 
@@ -1310,36 +1311,36 @@ var Misc = {
 
 		var i;
 
-		if (!Config.LogKeys && ["pk1", "pk2", "pk3"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogKeys && ["pk1", "pk2", "pk3"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		if (!Config.LogOrgans && ["dhn", "bey", "mbr"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogOrgans && ["dhn", "bey", "mbr"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		if (!Config.LogLowRunes && ["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogLowRunes && ["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10", "r11", "r12", "r13", "r14"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		if (!Config.LogMiddleRunes && ["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogMiddleRunes && ["r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		if (!Config.LogHighRunes && ["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogHighRunes && ["r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31", "r32", "r33"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		if (!Config.LogLowGems && ["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogLowGems && ["gcv", "gcy", "gcb", "gcg", "gcr", "gcw", "skc", "gfv", "gfy", "gfb", "gfg", "gfr", "gfw", "skf", "gsv", "gsy", "gsb", "gsg", "gsr", "gsw", "sku"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		if (!Config.LogHighGems && ["gzv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(unit.code) > -1) {
+		if (!Skill.config.LogHighGems && ["gzv", "gly", "glb", "glg", "glr", "glw", "skl", "gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"].indexOf(unit.code) > -1) {
 			return false;
 		}
 
-		for (i = 0; i < Config.SkipLogging.length; i++) {
-			if (Config.SkipLogging[i] === unit.classid || Config.SkipLogging[i] === unit.code) {
+		for (i = 0; i < Skill.config.SkipLogging.length; i++) {
+			if (Skill.config.SkipLogging[i] === unit.classid || Skill.config.SkipLogging[i] === unit.code) {
 				return false;
 			}
 		}
@@ -1657,11 +1658,11 @@ var Misc = {
 			return false;
 		}
 
-		if (Config.TownCheck && !me.inTown) {
+		if (Skill.config.TownCheck && !me.inTown) {
 			try {
 				if (me.gold > 1000) {
 					for (i = 0; i < 4; i += 1) {
-						if (Config.BeltColumn[i] === "hp" && Config.MinColumn[i] > 0) {
+						if (Skill.config.BeltColumn[i] === "hp" && Skill.config.MinColumn[i] > 0) {
 							potion = me.getItem(-1, 2); // belt item
 
 							if (potion) {
@@ -1681,7 +1682,7 @@ var Misc = {
 							}
 						}
 
-						if (Config.BeltColumn[i] === "mp" && Config.MinColumn[i] > 0) {
+						if (Skill.config.BeltColumn[i] === "mp" && Skill.config.MinColumn[i] > 0) {
 							potion = me.getItem(-1, 2); // belt item
 
 							if (potion) {
@@ -1703,7 +1704,7 @@ var Misc = {
 					}
 				}
 
-				if (Config.OpenChests && Town.needKeys()) {
+				if (Skill.config.OpenChests && Town.needKeys()) {
 					check = true;
 				}
 			} catch (e) {
@@ -1880,7 +1881,7 @@ MainLoop:
 	},
 
 	debugLog: function (msg) {
-		if (!Config.Debug) {
+		if (!Skill.config.Debug) {
 			return;
 		}
 
@@ -2551,14 +2552,14 @@ var LocalChat = new function () {
 	};
 
 	this.init = (cycle = false) => {
-		if (!Config.LocalChat.Enabled) {
+		if (!Skill.config.LocalChat.Enabled) {
 			return;
 		}
 
-		Config.LocalChat.Mode = (Config.LocalChat.Mode + cycle) % 3;
-		print("ÿc2LocalChat enabled. Mode: " + Config.LocalChat.Mode);
+		Skill.config.LocalChat.Mode = (Skill.config.LocalChat.Mode + cycle) % 3;
+		print("ÿc2LocalChat enabled. Mode: " + Skill.config.LocalChat.Mode);
 
-		switch (Config.LocalChat.Mode) {
+		switch (Skill.config.LocalChat.Mode) {
 		case 2:
 			removeEventListener("chatinputblocker", onChatInput);
 			addEventListener("chatinputblocker", onChatInput);
@@ -2574,9 +2575,9 @@ var LocalChat = new function () {
 			break;
 		}
 
-		if (Config.LocalChat.Toggle) {
-			toggle = typeof Config.LocalChat.Toggle === 'string' ? Config.LocalChat.Toggle.charCodeAt(0) : Config.LocalChat.Toggle;
-			Config.LocalChat.Toggle = false;
+		if (Skill.config.LocalChat.Toggle) {
+			toggle = typeof Skill.config.LocalChat.Toggle === 'string' ? Skill.config.LocalChat.Toggle.charCodeAt(0) : Skill.config.LocalChat.Toggle;
+			Skill.config.LocalChat.Toggle = false;
 			addEventListener("keyup", onKeyEvent);
 		}
 	};
@@ -2656,7 +2657,7 @@ var Events = {
 		// Block movement after using TP/WP/Exit
 		case 0x0D: // Player Stop
 			// This can mess up death screen so disable for characters that are allowed to die
-			if (Config.LifeChicken > 0) {
+			if (Skill.config.LifeChicken > 0) {
 				return true;
 			}
 

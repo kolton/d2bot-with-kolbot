@@ -4,7 +4,7 @@
 *	@desc		help another player kill bosses or clear areas
 */
 
-function MFHelper() {
+function MFHelper(Config) {
 	var i, player, playerAct, split,
 		oldCommand = "",
 		command = "";

@@ -4,7 +4,7 @@
 *	@desc		kill Coldworm; optionally kill Beetleburst and clear Maggot Lair
 */
 
-function Coldworm() {
+function Coldworm(Config) {
 	var i;
 
 	Town.doChores();

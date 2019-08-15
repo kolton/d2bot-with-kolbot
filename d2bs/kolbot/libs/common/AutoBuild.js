@@ -15,12 +15,17 @@
 */
 js_strict(true);
 
+if (!isIncluded("require.js")) {
+	include("require.js");
+}
+;
 if (!isIncluded("common/Cubing.js")) { include("common/Cubing.js"); };
 if (!isIncluded("common/Prototypes.js")) { include("common/Prototypes.js"); };
 if (!isIncluded("common/Runewords.js")) { include("common/Runewords.js"); };
 
-var AutoBuild = new function AutoBuild () {
 
+var AutoBuild = new function AutoBuild () {
+	const Config = !isIncluded('GameData.js') && require('Config')() || require('Config'); // Either load the config file, or get the config
 	if (Config.AutoBuild.DebugMode) { Config.AutoBuild.Verbose = true; }
 
 	var debug = !!Config.AutoBuild.DebugMode,
@@ -43,7 +48,7 @@ var AutoBuild = new function AutoBuild () {
 	function getBuildType () {
 		var build = Config.AutoBuild.Template;
 		if (!build) {
-			this.print("Config.AutoBuild.Template is either 'false', or invalid ("+build+")");
+			this.print("Template is either 'false', or invalid (" + build + ")");
 			throw new Error("Invalid build template, read libs/config/Builds/README.txt for information");
 		}
 		return build;

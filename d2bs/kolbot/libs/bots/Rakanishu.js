@@ -4,7 +4,7 @@
 *	@desc		kill Rakanishu and optionally Griswold
 */
 
-function Rakanishu() {
+function Rakanishu(Config) {
 	Town.doChores();
 	Pather.useWaypoint(4);
 	Precast.doPrecast(true);

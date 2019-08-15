@@ -7,7 +7,7 @@
 var info,
 	gameRequest = false;
 
-function Crafting() {
+function Crafting(Config) {
 	var i, npcName, num;
 
 	info = CraftingSystem.getInfo();
@@ -248,6 +248,7 @@ MainSwitch:
 }
 
 function runewordIngredient(item) {
+	const Config = require('Config');
 	if (Runewords.validGids.indexOf(item.gid) > -1) {
 		return true;
 	}

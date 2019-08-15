@@ -3,6 +3,8 @@
  * @author Jaenster
  */
 
+if (typeof global === 'undefined') var global = this; // need a var here as a let would block the scope
+
 global['module'] = {exports: undefined};
 const require = (function (include,isIncluded) {
     let depth = 0;

@@ -12,7 +12,7 @@
 *				example: do travincal
 */
 
-function Rusher() {
+function Rusher(Config) {
 	load("tools/rushthread.js");
 	delay(500);
 

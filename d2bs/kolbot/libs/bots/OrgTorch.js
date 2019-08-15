@@ -5,7 +5,7 @@
 *	@notes		Search for the word "Start" and follow the comments if you want to know what this script does and when.
 */
 
-function OrgTorch() {
+function OrgTorch(Config) {
 	this.doneAreas = [];
 
 	// Identify & mule

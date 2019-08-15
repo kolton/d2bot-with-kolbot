@@ -4,7 +4,7 @@
 *	@desc		kill Icehawk Riftwing
 */
 
-function Icehawk() {
+function Icehawk(Config) {
 	Town.doChores();
 	Pather.useWaypoint(80);
 	Precast.doPrecast(true);

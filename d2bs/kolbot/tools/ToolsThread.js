@@ -27,9 +27,8 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
-
 function main() {
-	var i, mercHP, ironGolem, tick, merc,
+	var i, mercHP, ironGolem, tick, merc, Config = require('Config');
 		debugInfo = {area: 0, currScript: "no entry"},
 		pingTimer = [],
 		quitFlag = false,

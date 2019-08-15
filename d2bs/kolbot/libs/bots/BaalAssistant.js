@@ -4,7 +4,7 @@
  *	@desc		Help or Leech Baal Runs.
  */
 
-function BaalAssistant() {
+function BaalAssistant(Config) {
 
 	var Leader = Config.Leader, // Not entriely needed in the configs.
 		KillNihlathak = Config.BaalAssistant.KillNihlathak,

@@ -4,7 +4,7 @@
 *	@desc		clear Pit
 */
 
-function Pit() {
+function Pit(Config) {
 	Town.doChores();
 	Pather.useWaypoint(6);
 	Precast.doPrecast(true);

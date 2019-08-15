@@ -4,7 +4,7 @@
 *   @desc	   Travinical Leech
 */
 
-function TravincalLeech() {
+function TravincalLeech(Config) {
 	Town.goToTown(3);
 	Town.move("portalspot");
 

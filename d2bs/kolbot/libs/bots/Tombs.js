@@ -4,7 +4,7 @@
 *	@desc		clear Tal Rasha's Tombs
 */
 
-function Tombs() {
+function Tombs(Config) {
 	var i;
 
 	Town.doChores();

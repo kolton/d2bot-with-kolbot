@@ -1,8 +1,8 @@
 /**
-*	@filename  GameData.js
-*	@author    Nishimura-Katsuo
-*	@desc      game data library
-*/
+ *	@filename  GameData.js
+ *	@author    Nishimura-Katsuo
+ *	@desc      game data library
+ */
 
 include('StringLib.js');
 include('LocaleStringID.js'); /* global LocaleStringName */
@@ -434,6 +434,7 @@ var GameData = {
 	},
 	damageTypes: ["Physical", "Fire", "Lightning", "Magic", "Cold", "Poison", "?", "?", "?", "Physical"], // 9 is Stun, but stun isn't an element
 	synergyCalc: { // TODO: add melee skill damage and synergies - they are poop
+
 		// sorc fire spells
 		36: [47, 0.16, 56, 0.16],			// fire bolt
 		41: [37, 0.13],	// inferno
@@ -544,6 +545,7 @@ var GameData = {
 	},
 	skillRadius: {
 		47: 8,
+		48: 5, // Nova
 		55: 3,
 		56: 12,
 		92: 24,
@@ -596,6 +598,14 @@ var GameData = {
 		243: true,
 		248: true,
 	},
+	nonDamage: {
+		// Some fakes to avoid these
+		217: true, // scroll identify
+		218: true, // portal scroll
+		219: true, // I assume this is the book of scroll
+		220: true, // book portal. Not really a skill you want to use, do you
+		117: true, // Holy shield. Holy shield it self doesnt give damage
+	},
 	shiftState: function () {
 		if (me.getState(139)) {
 			return "wolf";
@@ -634,54 +644,55 @@ var GameData = {
 		let aps = (typeof target === 'number' ? this.averagePackSize(target) : 1), eliteBonus = (target.spectype && target.spectype & 0x7) ? 1 : 0, hitcap = 1;
 
 		switch (skillID) { // charged bolt/strike excluded, it's so unreliably random
-		case 15: // poison javalin
-		case 25: // plague javalin
-		case 16: // exploding arrow
-		case 27: // immolation arrow
-		case 31: // freezing arrow
-		case 35: // lightning fury
-		case 44: // frost nova
-		case 48: // nova
-		case 56: // meteor
-		case 59: // blizzard
-		case 64: // frozen orb
-		case 83: // poison explosion
-		case 92: // poison nova
-		case 112: // blessed hammer
-		case 154: // war cry
-		case 229: // molten boulder
-		case 234: // fissure
-		case 249: // armageddon
-		case 244: // volcano
-		case 250: // hurricane
-		case 251: // fireblast
-		case 261: // charged bolt sentry
-		case 262: // wake of fire
-		case 55: // glacial spike
-		case 47: // fire ball
-			hitcap = Infinity;
-			break;
-		case 34: // lightning strike
-			hitcap = 1 + this.skillLevel(34);
-			break;
-		case 38: // charged bolt
-			hitcap = 2 + this.skillLevel(38);
-			break;
-		case 67: // teeth
-			hitcap = 1 + this.skillLevel(67);
-			break;
-		case 53: // chain lightning
-			hitcap = 5 + ((this.skillLevel(53) / 5) | 0);
-			break;
-		case 49: // lightning
-		case 84: // bone spear
-		case 271: // lightning sentry
-		case 276: // death sentry
-			hitcap = aps ? Math.sqrt(aps / Math.PI) * 2 : 1;
-			break;
-		default:
-			hitcap = 1;
-			break;
+			case 15: // poison javalin
+			case 25: // plague javalin
+			case 16: // exploding arrow
+			case 27: // immolation arrow
+			case 31: // freezing arrow
+			case 35: // lightning fury
+			case 44: // frost nova
+			case 48: // nova
+			case 56: // meteor
+			case 59: // blizzard
+			case 64: // frozen orb
+			case 83: // poison explosion
+			case 92: // poison nova
+			case 112: // blessed hammer
+			case 154: // war cry
+			case 229: // molten boulder
+			case 234: // fissure
+			case 249: // armageddon
+			case 244: // volcano
+			case 250: // hurricane
+			case 251: // fireblast
+			case 261: // charged bolt sentry
+			case 262: // wake of fire
+			case 55: // glacial spike
+			case 47: // fire ball
+			case 42: // Static field.
+				hitcap = Infinity;
+				break;
+			case 34: // lightning strike
+				hitcap = 1 + this.skillLevel(34);
+				break;
+			case 38: // charged bolt
+				hitcap = 2 + this.skillLevel(38);
+				break;
+			case 67: // teeth
+				hitcap = 1 + this.skillLevel(67);
+				break;
+			case 53: // chain lightning
+				hitcap = 5 + ((this.skillLevel(53) / 5) | 0);
+				break;
+			case 49: // lightning
+			case 84: // bone spear
+			case 271: // lightning sentry
+			case 276: // death sentry
+				hitcap = aps ? Math.sqrt(aps / Math.PI) * 2 : 1;
+				break;
+			default:
+				hitcap = 1;
+				break;
 		}
 
 		if (typeof target !== 'number') {
@@ -748,31 +759,31 @@ var GameData = {
 		}
 
 		switch (dmg.type) {
-		case "Fire": // fire mastery
-			mastery = 1 + me.getStat(329) / 100;
-			dmg.min *= mastery;
-			dmg.max *= mastery;
-			break;
-		case "Lightning": // lightning mastery
-			mastery = 1 + me.getStat(330) / 100;
-			dmg.min *= mastery;
-			dmg.max *= mastery;
-			break;
-		case "Cold": // cold mastery
-			mastery = 1 + me.getStat(331) / 100;
-			dmg.min *= mastery;
-			dmg.max *= mastery;
-			break;
-		case "Poison": // poison mastery
-			mastery = 1 + me.getStat(332) / 100;
-			dmg.min *= mastery;
-			dmg.max *= mastery;
-			break;
-		case "Magic": // magic mastery
-			mastery = 1 + me.getStat(357) / 100;
-			dmg.min *= mastery;
-			dmg.max *= mastery;
-			break;
+			case "Fire": // fire mastery
+				mastery = 1 + me.getStat(329) / 100;
+				dmg.min *= mastery;
+				dmg.max *= mastery;
+				break;
+			case "Lightning": // lightning mastery
+				mastery = 1 + me.getStat(330) / 100;
+				dmg.min *= mastery;
+				dmg.max *= mastery;
+				break;
+			case "Cold": // cold mastery
+				mastery = 1 + me.getStat(331) / 100;
+				dmg.min *= mastery;
+				dmg.max *= mastery;
+				break;
+			case "Poison": // poison mastery
+				mastery = 1 + me.getStat(332) / 100;
+				dmg.min *= mastery;
+				dmg.max *= mastery;
+				break;
+			case "Magic": // magic mastery
+				mastery = 1 + me.getStat(357) / 100;
+				dmg.min *= mastery;
+				dmg.max *= mastery;
+				break;
 		}
 
 		dmg.pmin *= psynergy;
@@ -785,21 +796,21 @@ var GameData = {
 		dmg.max *= synergy;
 
 		switch (skillID) {
-		case 102: // holy fire
-			dmg.min *= 6; // weapon damage is 6x the aura damage
-			dmg.max *= 6;
-			break;
-		case 114: // holy freeze
-			dmg.min *= 5; // weapon damage is 5x the aura damage
-			dmg.max *= 5;
-			break;
-		case 118: // holy shock
-			dmg.min *= 6; // weapon damage is 6x the aura damage
-			dmg.max *= 6;
-			break;
-		case 249: // armageddon
-			dmg.pmin = dmg.pmax = 0;
-			break;
+			case 102: // holy fire
+				dmg.min *= 6; // weapon damage is 6x the aura damage
+				dmg.max *= 6;
+				break;
+			case 114: // holy freeze
+				dmg.min *= 5; // weapon damage is 5x the aura damage
+				dmg.max *= 5;
+				break;
+			case 118: // holy shock
+				dmg.min *= 6; // weapon damage is 6x the aura damage
+				dmg.max *= 6;
+				break;
+			case 249: // armageddon
+				dmg.pmin = dmg.pmax = 0;
+				break;
 		}
 
 		dmg.pmin >>= 8;
@@ -808,70 +819,70 @@ var GameData = {
 		dmg.max >>= 8;
 
 		switch (skillID) {
-		case 59: // blizzard - on average hits twice
-			dmg.min *= 2;
-			dmg.max *= 2;
-			break;
-		case 62: // hydra - 3 heads
-			dmg.min *= 3;
-			dmg.max *= 3;
-			break;
-		case 64: // frozen orb - on average hits ~5 times
-			dmg.min *= 5;
-			dmg.max *= 5;
-			break;
-		case 70: // skeleton - a hit per skeleton
-			sl = this.skillLevel(70);
-			shots = sl < 4 ? sl : (2 + sl / 3) | 0;
-			sl = Math.max(0, sl - 3);
-			dmg.pmin = shots * (dmg.pmin + 1 + this.skillLevel(69) * 2) * (1 + sl * 0.07);
-			dmg.pmax = shots * (dmg.pmax + 2 + this.skillLevel(69) * 2) * (1 + sl * 0.07);
-			break;
-		case 94: // fire golem
-			sl = this.skillLevel(94);
-			dmg.min = [10, 15, 18][me.diff] + dmg.min + (this.stagedDamage(sl + 7, 2, 1, 2, 3, 5, 7) >> 1) * 6; // basically holy fire added
-			dmg.max = [27, 39, 47][me.diff] + dmg.max + (this.stagedDamage(sl + 7, 6, 1, 2, 3, 5, 7) >> 1) * 6;
-			break;
-		case 101: // holy bolt
-			dmg.undeadOnly = true;
-			break;
-		case 112: // blessed hammer
-			sl = this.skillLevel(113);
+			case 59: // blizzard - on average hits twice
+				dmg.min *= 2;
+				dmg.max *= 2;
+				break;
+			case 62: // hydra - 3 heads
+				dmg.min *= 3;
+				dmg.max *= 3;
+				break;
+			case 64: // frozen orb - on average hits ~5 times
+				dmg.min *= 5;
+				dmg.max *= 5;
+				break;
+			case 70: // skeleton - a hit per skeleton
+				sl = this.skillLevel(70);
+				shots = sl < 4 ? sl : (2 + sl / 3) | 0;
+				sl = Math.max(0, sl - 3);
+				dmg.pmin = shots * (dmg.pmin + 1 + this.skillLevel(69) * 2) * (1 + sl * 0.07);
+				dmg.pmax = shots * (dmg.pmax + 2 + this.skillLevel(69) * 2) * (1 + sl * 0.07);
+				break;
+			case 94: // fire golem
+				sl = this.skillLevel(94);
+				dmg.min = [10, 15, 18][me.diff] + dmg.min + (this.stagedDamage(sl + 7, 2, 1, 2, 3, 5, 7) >> 1) * 6; // basically holy fire added
+				dmg.max = [27, 39, 47][me.diff] + dmg.max + (this.stagedDamage(sl + 7, 6, 1, 2, 3, 5, 7) >> 1) * 6;
+				break;
+			case 101: // holy bolt
+				dmg.undeadOnly = true;
+				break;
+			case 112: // blessed hammer
+				sl = this.skillLevel(113);
 
-			if (sl > 0) {
-				mastery = (100 + ((45 + this.skillLevel(113) * 15) >> 1)) / 100;	// hammer gets half concentration dmg bonus
-				dmg.min *= mastery;
-				dmg.max *= mastery;
-			}
+				if (sl > 0) {
+					mastery = (100 + ((45 + this.skillLevel(113) * 15) >> 1)) / 100;	// hammer gets half concentration dmg bonus
+					dmg.min *= mastery;
+					dmg.max *= mastery;
+				}
 
-			break;
-		case 221: // raven - a hit per raven
-			shots = Math.min(5, this.skillLevel(221)); // 1-5 ravens
-			dmg.pmin *= shots;
-			dmg.pmax *= shots;
-			break;
-		case 227: // spirit wolf - a hit per wolf
-			shots = Math.min(5, this.skillLevel(227));
-			dmg.pmin *= shots;
-			dmg.pmax *= shots;
-			break;
-		case 237: // dire wolf - a hit per wolf
-			shots = Math.min(3, this.skillLevel(237));
-			dmg.pmin *= shots;
-			dmg.pmax *= shots;
-			break;
-		case 240: // twister
-			dmg.pmin *= 3;
-			dmg.pmax *= 3;
-			break;
-		case 261: // charged bolt sentry
-		case 262: // wake of fire
-		case 271: // lightning sentry
-		case 272: // inferno sentry
-		case 276: // death sentry
-			dmg.min *= 5;	// can have 5 traps out at a time
-			dmg.max *= 5;
-			break;
+				break;
+			case 221: // raven - a hit per raven
+				shots = Math.min(5, this.skillLevel(221)); // 1-5 ravens
+				dmg.pmin *= shots;
+				dmg.pmax *= shots;
+				break;
+			case 227: // spirit wolf - a hit per wolf
+				shots = Math.min(5, this.skillLevel(227));
+				dmg.pmin *= shots;
+				dmg.pmax *= shots;
+				break;
+			case 237: // dire wolf - a hit per wolf
+				shots = Math.min(3, this.skillLevel(237));
+				dmg.pmin *= shots;
+				dmg.pmax *= shots;
+				break;
+			case 240: // twister
+				dmg.pmin *= 3;
+				dmg.pmax *= 3;
+				break;
+			case 261: // charged bolt sentry
+			case 262: // wake of fire
+			case 271: // lightning sentry
+			case 272: // inferno sentry
+			case 276: // death sentry
+				dmg.min *= 5;	// can have 5 traps out at a time
+				dmg.max *= 5;
+				break;
 		}
 
 		dmg.pmin |= 0;
@@ -883,8 +894,13 @@ var GameData = {
 	},
 	allSkillDamage: function () {
 		let skills = {};
-
-		me.getSkill(4).forEach(skill => (skills[skill[0]] = this.skillDamage(skill[0])));
+		let self=this;
+		me.getSkill(4).forEach(function (skill) {
+			if (self.nonDamage.hasOwnProperty(skill[0])) {
+				return false; // Doesnt do damage
+			}
+			return skills[skill[0]] = self.skillDamage(skill[0]);
+		});
 
 		return skills;
 	},
@@ -1011,8 +1027,12 @@ var GameData = {
 		return stat ? (unit.getStat ? unit.getStat(stat) : MonsterData[unit][type]) : 0;
 	},
 	getConviction: function () {
-		let sl = this.skillLevel(123); // conviction
-
+		let merc = me.getMerc(),sl = this.skillLevel(123); // conviction
+		if (( // Either me, or merc is wearing a conviction
+			merc && merc.getItems().filter(item => item.getPrefix(sdk.locale.items.Infinity)).first()
+			|| me.getItems().filter(item => item.getPrefix(sdk.locale.items.Infinity)).first())) {
+			sl = 12;
+		}
 		return sl > 0 ? Math.min(150, 30 + (sl - 1) * 5) : 0;
 	},
 	getAmp: function () {
@@ -1020,7 +1040,8 @@ var GameData = {
 	},
 	monsterEffort: function (unit, areaID, skillDamageInfo, parent = undefined) {
 		let eret = {effort: Infinity, skill: -1, type: "Physical"};
-		let useCooldown = (typeof unit === 'number' ? false : Boolean(me.getState(121))), hp = this.monsterMaxHP(typeof unit.classid === 'number' ? unit.classid : unit, areaID);
+		let useCooldown = (typeof unit === 'number' ? false : Boolean(me.getState(121))),
+			hp = this.monsterMaxHP(typeof unit.classid === 'number' ? unit.classid : unit, areaID);
 		let conviction = this.getConviction(), ampDmg = this.getAmp(), isUndead = (typeof unit === 'number' ? MonsterData[unit].Undead : MonsterData[unit.classid].Undead);
 		skillDamageInfo = skillDamageInfo || this.allSkillDamage();
 

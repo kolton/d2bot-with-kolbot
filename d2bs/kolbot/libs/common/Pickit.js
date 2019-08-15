@@ -5,6 +5,7 @@
 */
 
 var Pickit = {
+	config: require('Config'),
 	gidList: [],
 	beltSize: 1,
 	ignoreLog: [4, 5, 6, 22, 41, 76, 77, 78, 79, 80, 81], // Ignored item types for item logging
@@ -12,8 +13,8 @@ var Pickit = {
 	init: function (notify) {
 		var i, filename;
 
-		for (i = 0; i < Config.PickitFiles.length; i += 1) {
-			filename = "pickit/" + Config.PickitFiles[i];
+		for (i = 0; i < Pickit.config.PickitFiles.length; i += 1) {
+			filename = "pickit/" + Pickit.config.PickitFiles[i];
 
 			NTIP.OpenFile(filename, notify);
 		}
@@ -61,7 +62,7 @@ var Pickit = {
 
 		// If total gold is less than 10k pick up anything worth 10 gold per
 		// square to sell in town.
-		if (rval.result === 0 && Town.ignoredItemTypes.indexOf(unit.itemType) === -1 && me.gold < Config.LowGold && unit.itemType !== 39) {
+		if (rval.result === 0 && Town.ignoredItemTypes.indexOf(unit.itemType) === -1 && me.gold < Pickit.config.LowGold && unit.itemType !== 39) {
 			// Gold doesn't take up room, just pick it up
 			if (unit.classid === 523) {
 				return {
@@ -100,7 +101,7 @@ var Pickit = {
 
 		if (item) {
 			do {
-				if ((item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Config.PickRange) {
+				if ((item.mode === 3 || item.mode === 5) && getDistance(me, item) <= Pickit.config.PickRange) {
 					pickList.push(copyUnit(item));
 				}
 			} while (item.getNext());
@@ -124,7 +125,7 @@ var Pickit = {
 					canFit = Storage.Inventory.CanFit(pickList[0]) || [4, 22, 76, 77, 78].indexOf(pickList[0].itemType) > -1;
 
 					// Try to make room with FieldID
-					if (!canFit && Config.FieldID && Town.fieldID()) {
+					if (!canFit && Pickit.config.FieldID && Town.fieldID()) {
 						canFit = Storage.Inventory.CanFit(pickList[0]) || [4, 22, 76, 77, 78].indexOf(pickList[0].itemType) > -1;
 					}
 
@@ -176,12 +177,12 @@ var Pickit = {
 
 	// Check if we can even free up the inventory
 	canMakeRoom: function () {
-		if (!Config.MakeRoom) {
+		if (!Pickit.config.MakeRoom) {
 			return false;
 		}
 
 		var i,
-			items = Storage.Inventory.Compare(Config.Inventory);
+			items = Storage.Inventory.Compare(Pickit.config.Inventory);
 
 		if (items) {
 			for (i = 0; i < items.length; i += 1) {
@@ -216,7 +217,7 @@ var Pickit = {
 			this.name = unit.name;
 			this.color = Pickit.itemColor(unit);
 			this.gold = unit.getStat(14);
-			this.useTk = Config.UseTelekinesis && me.classid === 1 && me.getSkill(43, 1) && (this.type === 4 || this.type === 22 || (this.type > 75 && this.type < 82)) &&
+			this.useTk = Pickit.config.UseTelekinesis && me.classid === 1 && me.getSkill(43, 1) && (this.type === 4 || this.type === 22 || (this.type > 75 && this.type < 82)) &&
 						getDistance(me, unit) > 5 && getDistance(me, unit) < 20 && !checkCollision(me, unit, 0x4);
 			this.picked = false;
 		}
@@ -266,7 +267,7 @@ MainLoop:
 			if (stats.useTk) {
 				Skill.cast(43, 0, item);
 			} else {
-				if (getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
+				if (getDistance(me, item) > (Pickit.config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
 					if (Pather.useTeleport()) {
 						Pather.moveToUnit(item);
 					} else if (!Pather.moveTo(item.x, item.y, 0)) {
@@ -274,7 +275,7 @@ MainLoop:
 					}
 				}
 
-				if (Config.FastPick < 2) {
+				if (Pickit.config.FastPick < 2) {
 					Misc.click(0, 0, item);
 				} else {
 					sendPacket(1, 0x16, 4, 0x4, 4, item.gid, 4, 0);
@@ -484,7 +485,7 @@ MainLoop:
 			needPots = 0;
 
 			for (i = 0; i < 4; i += 1) {
-				if (typeof unit.code === "string" && unit.code.indexOf(Config.BeltColumn[i]) > -1) {
+				if (typeof unit.code === "string" && unit.code.indexOf(Pickit.config.BeltColumn[i]) > -1) {
 					needPots += this.beltSize;
 				}
 			}
@@ -503,7 +504,7 @@ MainLoop:
 				buffers = ["HPBuffer", "MPBuffer", "RejuvBuffer"];
 
 				for (i = 0; i < buffers.length; i += 1) {
-					if (Config[buffers[i]]) {
+					if (Pickit.config[buffers[i]]) {
 						switch (buffers[i]) {
 						case "HPBuffer":
 							pottype = 76;
@@ -524,7 +525,7 @@ MainLoop:
 								return false;
 							}
 
-							needPots = Config[buffers[i]];
+							needPots = Pickit.config[buffers[i]];
 							potion = me.getItem(-1, 0);
 
 							if (potion) {
@@ -611,7 +612,7 @@ MainLoop:
 			gid = this.gidList.shift();
 			item = getUnit(4, -1, -1, gid);
 
-			if (item && (item.mode === 3 || item.mode === 5) && Town.ignoredItemTypes.indexOf(item.itemType) === -1 && getDistance(me, item) <= Config.PickRange) {
+			if (item && (item.mode === 3 || item.mode === 5) && Town.ignoredItemTypes.indexOf(item.itemType) === -1 && getDistance(me, item) <= Pickit.config.PickRange) {
 				itemList.push(copyUnit(item));
 			}
 		}

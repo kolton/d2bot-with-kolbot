@@ -4,7 +4,7 @@
 *	@desc		kill Radament
 */
 
-function Radament() {
+function Radament(Config) {
 	Town.doChores();
 	Pather.useWaypoint(48);
 	Precast.doPrecast(true);

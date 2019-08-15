@@ -4,7 +4,7 @@
 *	@desc		kill Bone Ash
 */
 
-function BoneAsh() {
+function BoneAsh(Config) {
 	Town.doChores();
 	Pather.useWaypoint(32);
 	Precast.doPrecast(true);

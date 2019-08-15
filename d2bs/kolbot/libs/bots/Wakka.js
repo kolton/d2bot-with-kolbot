@@ -4,9 +4,8 @@
 *	@desc		walking Chaos Sanctuary leecher
 */
 
-var stopLvl = 99;
-
-function Wakka() {
+function Wakka(Config) {
+	var stopLvl = 99;
 	var i, safeTP, portal, vizClear, seisClear, infClear, tick, diablo,
 		timeout = 1, // minutes
 		minDist = 50,
