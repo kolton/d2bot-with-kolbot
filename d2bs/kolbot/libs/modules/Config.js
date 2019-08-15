@@ -9,6 +9,8 @@
 		Object.keys(scripts)
 			.forEach(x => Config.Scripts[x] = scripts[x]);
 
+		Config.Silence && (global.say = print);
+
 		return Config;
 	}
 
@@ -288,7 +290,7 @@
 	Config.Baal = {
 		DollQuit: false,
 		SoulQuit: false,
-		KillBaal: false,
+		KillBaal: true,
 		HotTPMessage: "Hot TP!",
 		SafeTPMessage: "Safe TP!",
 		BaalMessage: "Baal!"
@@ -453,6 +455,9 @@
 		Follower: false,
 		Entrance: true,
 	};
+
+	Config.Silence = true;
+
 	Config.Development = '';
 
 	Config.Scripts = {};
