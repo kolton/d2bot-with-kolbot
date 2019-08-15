@@ -4,7 +4,7 @@
 *	@desc		Clears any area
 */
 
-function ClearAnyArea() {
+function ClearAnyArea(Config) {
 	var i;
 
 	Town.doChores();

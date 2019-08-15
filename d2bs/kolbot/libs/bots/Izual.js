@@ -4,7 +4,7 @@
 *	@desc		kill Izual
 */
 
-function Izual() {
+function Izual(Config) {
 	Town.doChores();
 	Pather.useWaypoint(106);
 	Precast.doPrecast(true);

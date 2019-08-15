@@ -4,7 +4,7 @@
 *	@desc		help leading player in clearing Chaos Sanctuary and killing Diablo
 */
 
-function DiabloHelper() {
+function DiabloHelper(Config) {
 	// Sort function
 	this.sort = function (a, b) {
 		if (Config.BossPriority) {

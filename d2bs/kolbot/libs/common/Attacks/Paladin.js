@@ -5,20 +5,21 @@
 */
 
 var ClassAttack = {
+	config: require('Config'),
 	doAttack: function (unit, preattack) {
-		if (Config.MercWatch && Town.needMerc()) {
+		if (ClassAttack.config.MercWatch && Town.needMerc()) {
 			print("mercwatch");
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (getDistance(me, unit) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
+		if (preattack && ClassAttack.config.AttackSkill[0] > 0 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(ClassAttack.config.AttackSkill[0]))) {
+			if (getDistance(me, unit) > Skill.getRange(ClassAttack.config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(ClassAttack.config.AttackSkill[0]), 0x4)) {
 					return 0;
 				}
 			}
 
-			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
+			Skill.cast(ClassAttack.config.AttackSkill[0], Skill.getHand(ClassAttack.config.AttackSkill[0]), unit);
 
 			return 1;
 		}
@@ -34,8 +35,8 @@ var ClassAttack = {
 			attackSkill = Attack.getCustomAttack(unit)[0];
 			aura = Attack.getCustomAttack(unit)[1];
 		} else {
-			attackSkill = Config.AttackSkill[index];
-			aura = Config.AttackSkill[index + 1];
+			attackSkill = ClassAttack.config.AttackSkill[index];
+			aura = ClassAttack.config.AttackSkill[index + 1];
 		}
 
 		// Monster immune to primary skill
@@ -45,24 +46,24 @@ var ClassAttack = {
 			aura = -1;
 
 			// Set to secondary if not immune
-			if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5])) {
-				attackSkill = Config.AttackSkill[5];
-				aura = Config.AttackSkill[6];
+			if (ClassAttack.config.AttackSkill[5] > -1 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[5])) {
+				attackSkill = ClassAttack.config.AttackSkill[5];
+				aura = ClassAttack.config.AttackSkill[6];
 			}
 		}
 
 		// Low mana skill
-		if (Config.LowManaSkill[0] > -1 && Skill.getManaCost(attackSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[0])) {
-			attackSkill = Config.LowManaSkill[0];
-			aura = Config.LowManaSkill[1];
+		if (ClassAttack.config.LowManaSkill[0] > -1 && Skill.getManaCost(attackSkill) > me.mp && Attack.checkResist(unit, ClassAttack.config.LowManaSkill[0])) {
+			attackSkill = ClassAttack.config.LowManaSkill[0];
+			aura = ClassAttack.config.LowManaSkill[1];
 		}
 
 		result = this.doCast(unit, attackSkill, aura);
 
-		if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+		if (result === 2 && ClassAttack.config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 			while (Attack.checkMonster(unit)) {
 				if (Town.needMerc()) {
-					if (Config.MercWatch && mercRevive++ < 1) {
+					if (ClassAttack.config.MercWatch && mercRevive++ < 1) {
 						Town.visitTown();
 					} else {
 						return 2;
@@ -73,7 +74,7 @@ var ClassAttack = {
 					Pather.moveToUnit(unit);
 				}
 
-				this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+				this.doCast(unit, ClassAttack.config.AttackSkill[1], ClassAttack.config.AttackSkill[2]);
 			}
 
 			return 1;
@@ -86,7 +87,7 @@ var ClassAttack = {
 		Misc.unShift();
 		Precast.doPrecast(false);
 
-		if (Config.Redemption instanceof Array && (me.hp * 100 / me.hpmax < Config.Redemption[0] || me.mp * 100 / me.mpmax < Config.Redemption[1]) && Skill.setSkill(124, 0)) {
+		if (ClassAttack.config.Redemption instanceof Array && (me.hp * 100 / me.hpmax < ClassAttack.config.Redemption[0] || me.mp * 100 / me.mpmax < ClassAttack.config.Redemption[1]) && Skill.setSkill(124, 0)) {
 			delay(1500);
 		}
 	},
@@ -100,7 +101,7 @@ var ClassAttack = {
 
 		switch (attackSkill) {
 		case 112:
-			if (Config.AvoidDolls && [212, 213, 214, 215, 216, 690, 691].indexOf(unit.classid) > -1) {
+			if (ClassAttack.config.AvoidDolls && [212, 213, 214, 215, 216, 690, 691].indexOf(unit.classid) > -1) {
 				this.dollAvoid(unit);
 
 				if (aura > -1) {
@@ -116,8 +117,8 @@ var ClassAttack = {
 				//print("Can't get to " + unit.name);
 
 				// Fallback to secondary skill if it exists
-				if (Config.AttackSkill[5] > -1 && Config.AttackSkill[5] !== 112 && Attack.checkResist(unit, Config.AttackSkill[5])) {
-					return this.doCast(unit, Config.AttackSkill[5], Config.AttackSkill[6]);
+				if (ClassAttack.config.AttackSkill[5] > -1 && ClassAttack.config.AttackSkill[5] !== 112 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[5])) {
+					return this.doCast(unit, ClassAttack.config.AttackSkill[5], ClassAttack.config.AttackSkill[6]);
 				}
 
 				return 0;

@@ -1,5 +1,47 @@
+/***************************************************
+ *
+ *
+ * You do not need to set-up anything here
+ *    You do this in the character config file
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 function main () {
-	include("json2.js");
+	include('require.js');
 	include("OOG.js");
 	include("common/misc.js");
 
@@ -8,28 +50,28 @@ function main () {
 
 	function copyDataEvent (mode, msg) {
 		switch (msg) {
-		case "Handle":
-			handle = mode;
+			case "Handle":
+				handle = mode;
 
-			break;
+				break;
 		}
 
 		switch (mode) {
-		case 3: // request game
-			var obj = JSON.parse(msg);
+			case 3: // request game
+				var obj = JSON.parse(msg);
 
-			if (me.gameReady) {
-				D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
-			}
+				if (me.gameReady) {
+					D2Bot.joinMe(obj.profile, me.gamename.toLowerCase(), "", me.gamepassword.toLowerCase(), isUp);
+				}
 
-			break;
-		case 4:
-			// Heartbeat ping
-			if (msg === "pingreq") {
-				sendCopyData(null, me.windowtitle, 4, "pingrep");
-			}
+				break;
+			case 4:
+				// Heartbeat ping
+				if (msg === "pingreq") {
+					sendCopyData(null, me.windowtitle, 4, "pingrep");
+				}
 
-			break;
+				break;
 		}
 	}
 

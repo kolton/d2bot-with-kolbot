@@ -4,7 +4,7 @@
 *	@desc		kill Nihlathak
 */
 
-function Nihlathak() {
+function Nihlathak(Config) {
 	Town.doChores();
 	Pather.useWaypoint(123);
 	Precast.doPrecast(false);

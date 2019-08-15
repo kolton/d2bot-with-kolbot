@@ -5,6 +5,7 @@
 */
 
 function main() {
+	include('require.js');
 	include("OOG.js");
 	include("json2.js");
 	include("common/Config.js");
@@ -14,7 +15,7 @@ function main() {
 	include("common/Prototypes.js");
 	include("common/Town.js");
 
-	Config.init();
+	const Config = require('Config');
 
 	var i, myPartyId, player, otherParty, shitList, currScript, scriptList,
 		classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],

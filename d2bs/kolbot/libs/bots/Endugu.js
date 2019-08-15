@@ -4,7 +4,7 @@
 *	@desc		kill Witch Doctor Endugu
 */
 
-function Endugu() {
+function Endugu(Config) {
 	Town.doChores();
 	Pather.useWaypoint(78);
 	Precast.doPrecast(true);

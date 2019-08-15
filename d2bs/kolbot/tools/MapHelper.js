@@ -1,4 +1,4 @@
-include("json2.js");
+include('require.js');
 include("NTItemParser.dbl");
 include("OOG.js");
 include("AutoMule.js");
@@ -19,13 +19,14 @@ include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
 
+
 function main() {
 	include("json2.js");
 
 	var obj, action,
 		mapThread = getScript("tools/mapthread.js");
 
-	Config.init();
+	const Config = require('Config')();
 	Pickit.init();
 	Storage.Init();
 	addEventListener("scriptmsg", function (msg) {

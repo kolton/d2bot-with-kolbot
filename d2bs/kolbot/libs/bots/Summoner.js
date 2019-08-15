@@ -4,7 +4,7 @@
 *	@desc		kill the Summoner
 */
 
-function Summoner () {
+function Summoner(Config) {
 	Town.doChores();
 	Pather.useWaypoint(74);
 	Precast.doPrecast(true);

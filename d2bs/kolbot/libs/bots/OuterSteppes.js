@@ -1,4 +1,4 @@
-function OuterSteppes() {
+function OuterSteppes(Config) {
 	Town.goToTown(4);
 	Town.doChores();
 

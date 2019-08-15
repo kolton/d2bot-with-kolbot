@@ -21,7 +21,7 @@ var NodeAction = {
 	killMonsters: function (arg) {
 		var monList;
 
-		if (Config.Countess.KillGhosts && [21, 22, 23, 24, 25].indexOf(me.area) > -1) {
+		if (Pather.config.Countess.KillGhosts && [21, 22, 23, 24, 25].indexOf(me.area) > -1) {
 			monList = Attack.getMob(38, 0, 30);
 
 			if (monList) {
@@ -29,15 +29,15 @@ var NodeAction = {
 			}
 		}
 
-		if ((typeof Config.ClearPath === "number" || typeof Config.ClearPath === "object") && arg.clearPath === false) {
-			switch (typeof Config.ClearPath) {
+		if ((typeof Pather.config.ClearPath === "number" || typeof Pather.config.ClearPath === "object") && arg.clearPath === false) {
+			switch (typeof Pather.config.ClearPath) {
 			case "number":
-				Attack.clear(30, Config.ClearPath);
+				Attack.clear(30, Pather.config.ClearPath);
 
 				break;
 			case "object":
-				if (!Config.ClearPath.hasOwnProperty("Areas") || Config.ClearPath.Areas.length === 0 || Config.ClearPath.Areas.indexOf(me.area) > -1) {
-					Attack.clear(Config.ClearPath.Range, Config.ClearPath.Spectype);
+				if (!Pather.config.ClearPath.hasOwnProperty("Areas") || Pather.config.ClearPath.Areas.length === 0 || Pather.config.ClearPath.Areas.indexOf(me.area) > -1) {
+					Attack.clear(Pather.config.ClearPath.Range, Pather.config.ClearPath.Spectype);
 				}
 
 				break;
@@ -51,14 +51,14 @@ var NodeAction = {
 
 	// Open chests while pathing
 	popChests: function () {
-		if (!!Config.OpenChests) {
+		if (!!Pather.config.OpenChests) {
 			Misc.openChests(20);
 		}
 	},
 
 	// Scan shrines while pathing
 	getShrines: function () {
-		if (!!Config.ScanShrines && Config.ScanShrines.length > 0) {
+		if (!!Pather.config.ScanShrines && Pather.config.ScanShrines.length > 0) {
 			Misc.scanShrines();
 		}
 	}
@@ -110,6 +110,7 @@ var PathDebug = {
 };
 
 var Pather = {
+	config: require('Config'),
 	teleport: true,
 	walkDistance: 5,
 	teleDistance: 40,
@@ -198,7 +199,7 @@ var Pather = {
 
 		PathDebug.drawPath(path);
 
-		if (useTeleport && Config.TeleSwitch && path.length > 5) {
+		if (useTeleport && Pather.config.TeleSwitch && path.length > 5) {
 			Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
 		}
 
@@ -289,7 +290,7 @@ var Pather = {
 			delay(5);
 		}
 
-		if (useTeleport && Config.TeleSwitch) {
+		if (useTeleport && Pather.config.TeleSwitch) {
 			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 
@@ -312,7 +313,7 @@ var Pather = {
 
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
-			if (Config.PacketCasting) {
+			if (Pather.config.PacketCasting) {
 				Skill.setSkill(54, 0);
 				Packet.castSkill(0, x, y);
 			} else {
@@ -362,8 +363,8 @@ MainLoop:
 				me.runwalk = 1;
 			}
 
-			if (Config.Charge && me.classid === 3 && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
-				if (Config.Vigor) {
+			if (Pather.config.Charge && me.classid === 3 && me.mp >= 9 && getDistance(me.x, me.y, x, y) > 8 && Skill.setSkill(107, 1)) {
+				if (Pather.config.Vigor) {
 					Skill.setSkill(115, 0);
 				}
 
@@ -380,7 +381,7 @@ MainLoop:
 		}
 
 		while (getDistance(me.x, me.y, x, y) > minDist && !me.dead) {
-			if (me.classid === 3 && Config.Vigor) {
+			if (me.classid === 3 && Pather.config.Vigor) {
 				Skill.setSkill(115, 0);
 			}
 
@@ -919,7 +920,7 @@ ModeLoop:
 					this.moveToUnit(wp);
 				}
 
-				if (check || Config.WaypointMenu) {
+				if (check || Pather.config.WaypointMenu) {
 					if (getDistance(me, wp) > 5) {
 						this.moveToUnit(wp);
 					}

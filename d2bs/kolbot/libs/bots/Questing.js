@@ -4,7 +4,7 @@
 *	@desc		Do quests, only most popular ones for now
 */
 
-function Questing() {
+function Questing(Config) {
 	var i, j,
 		quests = [
 			[1, "clearDen"],

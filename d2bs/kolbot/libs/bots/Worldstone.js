@@ -4,7 +4,7 @@
 *	@desc		Clear Worldstone levels
 */
 
-function Worldstone() {
+function Worldstone(Config) {
 	Town.doChores();
 	Pather.useWaypoint(129);
 	Precast.doPrecast(true);

@@ -6,7 +6,7 @@
 
 js_strict(true);
 
-include("json2.js");
+include('require.js');
 include("NTItemParser.dbl");
 include("OOG.js");
 include("Gambling.js");
@@ -146,7 +146,7 @@ function main() {
 
 	// Init config and attacks
 	D2Bot.init();
-	Config.init();
+	const Config = require('Config')();
 	Attack.init();
 	Storage.Init();
 

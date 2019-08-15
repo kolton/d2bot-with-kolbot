@@ -1,6 +1,6 @@
 // Blank starter used for testin
 function main() {
-	include("json2.js");
+	include('require.js');
 	include("OOG.js");
 	include("common/misc.js");
 

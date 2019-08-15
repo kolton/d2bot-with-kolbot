@@ -4,7 +4,7 @@
 *	@desc		Move and clear Underground passage level 2
 */
 
-function UndergroundPassage() {
+function UndergroundPassage(Config) {
 	Town.doChores();
 	Pather.useWaypoint(4);
 	Precast.doPrecast(true);

@@ -4,7 +4,7 @@
 *	@desc		kill Treehead
 */
 
-function Treehead() {
+function Treehead(Config) {
 	Town.doChores();
 	Pather.useWaypoint(5);
 	Precast.doPrecast(true);

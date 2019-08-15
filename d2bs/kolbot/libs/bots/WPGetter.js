@@ -1,4 +1,4 @@
-function WPGetter() {
+function WPGetter(Config) {
 	Town.doChores();
 	Town.goToTown(1);
 	Pather.getWP(me.area);

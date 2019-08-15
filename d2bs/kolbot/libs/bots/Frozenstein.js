@@ -4,7 +4,7 @@
 *	@desc		kill Frozensteinand optionally clear Frozen River
 */
 
-function Frozenstein() {
+function Frozenstein(Config) {
 	Town.doChores();
 	Pather.useWaypoint(113);
 	Precast.doPrecast(true);

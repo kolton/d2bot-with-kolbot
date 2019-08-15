@@ -4,7 +4,7 @@
 *	@desc		kill Coldcrow
 */
 
-function Coldcrow() {
+function Coldcrow(Config) {
 	Town.doChores();
 	Pather.useWaypoint(3);
 	Precast.doPrecast(true);

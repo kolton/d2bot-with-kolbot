@@ -4,7 +4,7 @@
 *	@desc		kill Counncil members in Travincal
 */
 
-function Travincal() {
+function Travincal(Config) {
 	var i, orgX, orgY, coords;
 
 	this.buildList = function (checkColl) {

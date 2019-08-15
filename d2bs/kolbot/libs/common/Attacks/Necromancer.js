@@ -5,6 +5,7 @@
 */
 
 var ClassAttack = {
+	config: require('Config'),
 	novaTick: 0,
 	cursesSet: false,
 	curseState: [],
@@ -12,8 +13,8 @@ var ClassAttack = {
 	initCurses: function () {
 		var i;
 
-		for (i = 0; i < Config.Curse.length; i += 1) {
-			switch (Config.Curse[i]) {
+		for (i = 0; i < ClassAttack.config.Curse.length; i += 1) {
+			switch (ClassAttack.config.Curse[i]) {
 			case 0: //nothing
 				this.curseState[i] = 0;
 
@@ -59,7 +60,7 @@ var ClassAttack = {
 
 				break;
 			default:
-				Config.Curse[i] = 0;
+				ClassAttack.config.Curse[i] = 0;
 				print("Invalid curse id");
 
 				break;
@@ -74,18 +75,18 @@ var ClassAttack = {
 			this.initCurses();
 		}
 
-		if (Config.MercWatch && Town.needMerc()) {
+		if (ClassAttack.config.MercWatch && Town.needMerc()) {
 			Town.visitTown();
 		}
 
-		if (preattack && Config.AttackSkill[0] > 0 && Attack.checkResist(unit, Config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(Config.AttackSkill[0]))) {
-			if (Math.round(getDistance(me, unit)) > Skill.getRange(Config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
-				if (!Attack.getIntoPosition(unit, Skill.getRange(Config.AttackSkill[0]), 0x4)) {
+		if (preattack && ClassAttack.config.AttackSkill[0] > 0 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[0]) && (!me.getState(121) || !Skill.isTimed(ClassAttack.config.AttackSkill[0]))) {
+			if (Math.round(getDistance(me, unit)) > Skill.getRange(ClassAttack.config.AttackSkill[0]) || checkCollision(me, unit, 0x4)) {
+				if (!Attack.getIntoPosition(unit, Skill.getRange(ClassAttack.config.AttackSkill[0]), 0x4)) {
 					return 0;
 				}
 			}
 
-			Skill.cast(Config.AttackSkill[0], Skill.getHand(Config.AttackSkill[0]), unit);
+			Skill.cast(ClassAttack.config.AttackSkill[0], Skill.getHand(ClassAttack.config.AttackSkill[0]), unit);
 
 			return 1;
 		}
@@ -97,26 +98,26 @@ var ClassAttack = {
 
 		index = ((unit.spectype & 0x7) || unit.type === 0) ? 1 : 3;
 
-		if (Config.Curse[0] > 0 && this.isCursable(unit) && (unit.spectype & 0x7) && !unit.getState(this.curseState[0])) {
+		if (ClassAttack.config.Curse[0] > 0 && this.isCursable(unit) && (unit.spectype & 0x7) && !unit.getState(this.curseState[0])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, 25, 0x4)) {
 					return 0;
 				}
 			}
 
-			Skill.cast(Config.Curse[0], 0, unit);
+			Skill.cast(ClassAttack.config.Curse[0], 0, unit);
 
 			return 1;
 		}
 
-		if (Config.Curse[1] > 0 && this.isCursable(unit) && !(unit.spectype & 0x7) && !unit.getState(this.curseState[1])) {
+		if (ClassAttack.config.Curse[1] > 0 && this.isCursable(unit) && !(unit.spectype & 0x7) && !unit.getState(this.curseState[1])) {
 			if (getDistance(me, unit) > 25 || checkCollision(me, unit, 0x4)) {
 				if (!Attack.getIntoPosition(unit, 25, 0x4)) {
 					return 0;
 				}
 			}
 
-			Skill.cast(Config.Curse[1], 0, unit);
+			Skill.cast(ClassAttack.config.Curse[1], 0, unit);
 
 			return 1;
 		}
@@ -125,50 +126,50 @@ var ClassAttack = {
 		if (Attack.getCustomAttack(unit)) {
 			checkSkill = Attack.getCustomAttack(unit)[0];
 		} else {
-			checkSkill = Config.AttackSkill[index];
+			checkSkill = ClassAttack.config.AttackSkill[index];
 		}
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			timedSkill = checkSkill;
-		} else if (Config.AttackSkill[5] > -1 && Attack.checkResist(unit, Config.AttackSkill[5]) && ([56, 59].indexOf(Config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
-			timedSkill = Config.AttackSkill[5];
+		} else if (ClassAttack.config.AttackSkill[5] > -1 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[5]) && ([56, 59].indexOf(ClassAttack.config.AttackSkill[5]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+			timedSkill = ClassAttack.config.AttackSkill[5];
 		}
 
 		// Get untimed skill
 		if (Attack.getCustomAttack(unit)) {
 			checkSkill = Attack.getCustomAttack(unit)[1];
 		} else {
-			checkSkill = Config.AttackSkill[index + 1];
+			checkSkill = ClassAttack.config.AttackSkill[index + 1];
 		}
 
 		if (Attack.checkResist(unit, checkSkill)) {
 			untimedSkill = checkSkill;
-		} else if (Config.AttackSkill[6] > -1 && Attack.checkResist(unit, Config.AttackSkill[6]) && ([56, 59].indexOf(Config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
-			untimedSkill = Config.AttackSkill[6];
+		} else if (ClassAttack.config.AttackSkill[6] > -1 && Attack.checkResist(unit, ClassAttack.config.AttackSkill[6]) && ([56, 59].indexOf(ClassAttack.config.AttackSkill[6]) === -1 || Attack.validSpot(unit.x, unit.y))) {
+			untimedSkill = ClassAttack.config.AttackSkill[6];
 		}
 
 		// Low mana timed skill
-		if (Config.LowManaSkill[0] > -1 && Skill.getManaCost(timedSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[0])) {
-			timedSkill = Config.LowManaSkill[0];
+		if (ClassAttack.config.LowManaSkill[0] > -1 && Skill.getManaCost(timedSkill) > me.mp && Attack.checkResist(unit, ClassAttack.config.LowManaSkill[0])) {
+			timedSkill = ClassAttack.config.LowManaSkill[0];
 		}
 
 		// Low mana untimed skill
-		if (Config.LowManaSkill[1] > -1 && Skill.getManaCost(untimedSkill) > me.mp && Attack.checkResist(unit, Config.LowManaSkill[1])) {
-			untimedSkill = Config.LowManaSkill[1];
+		if (ClassAttack.config.LowManaSkill[1] > -1 && Skill.getManaCost(untimedSkill) > me.mp && Attack.checkResist(unit, ClassAttack.config.LowManaSkill[1])) {
+			untimedSkill = ClassAttack.config.LowManaSkill[1];
 		}
 
 		result = this.doCast(unit, timedSkill, untimedSkill);
 
 		if (result === 1) {
-			if (Config.ActiveSummon) {
+			if (ClassAttack.config.ActiveSummon) {
 				this.raiseArmy();
 			}
 
 			this.explodeCorpses(unit);
-		} else if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
+		} else if (result === 2 && ClassAttack.config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 			while (Attack.checkMonster(unit)) {
 				if (Town.needMerc()) {
-					if (Config.MercWatch && mercRevive++ < 1) {
+					if (ClassAttack.config.MercWatch && mercRevive++ < 1) {
 						Town.visitTown();
 					} else {
 						return 2;
@@ -179,9 +180,9 @@ var ClassAttack = {
 					Pather.moveToUnit(unit);
 				}
 
-				this.doCast(unit, Config.AttackSkill[1], Config.AttackSkill[2]);
+				this.doCast(unit, ClassAttack.config.AttackSkill[1], ClassAttack.config.AttackSkill[2]);
 
-				if (Config.ActiveSummon) {
+				if (ClassAttack.config.ActiveSummon) {
 					this.raiseArmy();
 				}
 
@@ -211,7 +212,7 @@ var ClassAttack = {
 		}
 
 		// Check for bodies to exploit for CorpseExplosion before committing to an attack for non-summoner type necros
-		if (Config.Skeletons + Config.SkeletonMages + Config.Revives === 0) {
+		if (ClassAttack.config.Skeletons + ClassAttack.config.SkeletonMages + ClassAttack.config.Revives === 0) {
 			if (this.checkCorpseNearMonster(unit)) {
 				this.explodeCorpses(unit);
 			}
@@ -220,7 +221,7 @@ var ClassAttack = {
 		if (timedSkill > -1 && (!me.getState(121) || !Skill.isTimed(timedSkill))) {
 			switch (timedSkill) {
 			case 92: // Poison Nova
-				if (!this.novaTick || getTickCount() - this.novaTick > Config.PoisonNovaDelay * 1000) {
+				if (!this.novaTick || getTickCount() - this.novaTick > ClassAttack.config.PoisonNovaDelay * 1000) {
 					if (Math.round(getDistance(me, unit)) > Skill.getRange(timedSkill) || checkCollision(me, unit, 0x4)) {
 						if (!Attack.getIntoPosition(unit, Skill.getRange(timedSkill), 0x4)) {
 							return 0;
@@ -295,7 +296,7 @@ var ClassAttack = {
 		}
 
 		// Delay for Poison Nova
-		while (this.novaTick && getTickCount() - this.novaTick < Config.PoisonNovaDelay * 1000) {
+		while (this.novaTick && getTickCount() - this.novaTick < ClassAttack.config.PoisonNovaDelay * 1000) {
 			delay(40);
 		}
 
@@ -330,25 +331,25 @@ var ClassAttack = {
 			range = 25;
 		}
 
-		if (Config.Skeletons === "max") {
+		if (ClassAttack.config.Skeletons === "max") {
 			skill = me.getSkill(70, 1);
 			maxSkeletons = skill < 4 ? skill : (Math.floor(skill / 3) + 2);
 		} else {
-			maxSkeletons = Config.Skeletons;
+			maxSkeletons = ClassAttack.config.Skeletons;
 		}
 
-		if (Config.SkeletonMages === "max") {
+		if (ClassAttack.config.SkeletonMages === "max") {
 			skill = me.getSkill(80, 1);
 			maxMages = skill < 4 ? skill : (Math.floor(skill / 3) + 2);
 		} else {
-			maxMages = Config.SkeletonMages;
+			maxMages = ClassAttack.config.SkeletonMages;
 		}
 
-		if (Config.Revives === "max") {
+		if (ClassAttack.config.Revives === "max") {
 			skill = me.getSkill(95, 1);
 			maxRevives = skill;
 		} else {
-			maxRevives = Config.Revives;
+			maxRevives = ClassAttack.config.Revives;
 		}
 
 		for (i = 0; i < 3; i += 1) {
@@ -426,13 +427,13 @@ MainLoop:
 	},
 
 	explodeCorpses: function (unit) {
-		if (Config.ExplodeCorpses === 0 || unit.mode === 0 || unit.mode === 12) {
+		if (ClassAttack.config.ExplodeCorpses === 0 || unit.mode === 0 || unit.mode === 12) {
 			return false;
 		}
 
 		var i,
 			corpseList = [],
-			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3),
+			range = Math.floor((me.getSkill(ClassAttack.config.ExplodeCorpses, 1) + 7) / 3),
 			corpse = getUnit(1, -1, 12);
 
 		if (corpse) {
@@ -447,7 +448,7 @@ MainLoop:
 				corpseList = corpseList.shuffle();
 			}
 
-			if (Config.Skeletons + Config.SkeletonMages + Config.Revives === 0) {
+			if (ClassAttack.config.Skeletons + ClassAttack.config.SkeletonMages + ClassAttack.config.Revives === 0) {
 				// We don't need corpses as we are not a Summoner Necro, Spam CE till monster dies or we run out of bodies.
 				do {
 					corpse = corpseList.shift();
@@ -456,7 +457,7 @@ MainLoop:
 						if (!unit.dead && this.checkCorpse(corpse) && getDistance(corpse, unit) <= range) {
 							me.overhead("Exploding: " + corpse.classid + " " + corpse.name + " id:" + corpse.gid); // Added corpse ID so I can see when it blows another monster with the same ClassID and Name
 
-							if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
+							if (Skill.cast(ClassAttack.config.ExplodeCorpses, 0, corpse)) {
 								delay(me.ping + 1);
 							}
 						}
@@ -471,7 +472,7 @@ MainLoop:
 						if (corpse) {
 							me.overhead("Exploding: " + corpse.classid + " " + corpse.name);
 
-							if (Skill.cast(Config.ExplodeCorpses, 0, corpse)) {
+							if (Skill.cast(ClassAttack.config.ExplodeCorpses, 0, corpse)) {
 								delay(200);
 							}
 						}
@@ -489,7 +490,7 @@ MainLoop:
 		var corpse = getUnit(1, -1, 12);
 
 		if (range === undefined) { // Assume CorpseExplosion if no range specified
-			range = Math.floor((me.getSkill(Config.ExplodeCorpses, 1) + 7) / 3);
+			range = Math.floor((me.getSkill(ClassAttack.config.ExplodeCorpses, 1) + 7) / 3);
 		}
 
 		if (corpse) {
@@ -515,7 +516,7 @@ MainLoop:
 		var baseId = getBaseStat("monstats", unit.classid, "baseid"),
 			badList = [312, 571];
 
-		if (revive && ((unit.spectype & 0x7) || badList.indexOf(baseId) > -1 || (Config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3))) {
+		if (revive && ((unit.spectype & 0x7) || badList.indexOf(baseId) > -1 || (ClassAttack.config.ReviveUnstackable && getBaseStat("monstats2", baseId, "sizex") === 3))) {
 			return false;
 		}
 

@@ -5,6 +5,7 @@
 */
 
 var Precast = new function () {
+	const Config = require('Config');
 	this.haveCTA = -1;
 	this.BODuration = 0;
 	this.BOTick = 0;

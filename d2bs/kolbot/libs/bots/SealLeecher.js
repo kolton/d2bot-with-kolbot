@@ -1,4 +1,4 @@
-function SealLeecher() {
+function SealLeecher(Config) {
 	var monster,
 		commands = [];
 

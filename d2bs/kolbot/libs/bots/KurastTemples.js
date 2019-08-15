@@ -4,7 +4,7 @@
 *	@desc		clear Kurast Temples
 */
 
-function KurastTemples() {
+function KurastTemples(Config) {
 	Town.doChores();
 	Pather.useWaypoint(80);
 	Precast.doPrecast(true);

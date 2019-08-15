@@ -6,7 +6,7 @@
 
 js_strict(true);
 
-include("json2.js");
+include('require.js');
 include("NTItemParser.dbl");
 include("OOG.js");
 include("Gambling.js");
@@ -27,9 +27,11 @@ include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
 
+
 var gidList = [];
 
 function main() {
+	const Config = require('Config')();
 	this.playerIn = function (area) {
 		if (!area) {
 			area = me.area;

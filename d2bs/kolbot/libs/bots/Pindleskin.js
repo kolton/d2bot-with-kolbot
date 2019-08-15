@@ -4,7 +4,7 @@
 *	@desc		kill Pindleskin and optionally Nihlathak
 */
 
-function Pindleskin() {
+function Pindleskin(Config) {
 	var anya;
 
 	Town.goToTown(Config.Pindleskin.UseWaypoint ? undefined : 5);

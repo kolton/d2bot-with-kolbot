@@ -4,7 +4,7 @@
 *	@desc		kill Eyeback the Unleashed
 */
 
-function Eyeback() {
+function Eyeback(Config) {
 	Town.doChores();
 	Pather.useWaypoint(112);
 	Precast.doPrecast(true);

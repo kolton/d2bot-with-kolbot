@@ -4,7 +4,7 @@
 *	@desc		kill Stormtree
 */
 
-function Stormtree() {
+function Stormtree(Config) {
 	Town.doChores();
 	Pather.useWaypoint(79);
 	Precast.doPrecast(true);

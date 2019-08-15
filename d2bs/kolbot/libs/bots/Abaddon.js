@@ -4,7 +4,7 @@
 *	@desc		clear Abaddon
 */
 
-function Abaddon() {
+function Abaddon(Config) {
 	Town.doChores();
 	Pather.useWaypoint(111);
 	Precast.doPrecast(true);

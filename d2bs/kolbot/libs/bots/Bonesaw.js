@@ -4,7 +4,7 @@
 *	@desc		kill Bonesaw Breaker
 */
 
-function Bonesaw() {
+function Bonesaw(Config) {
 	Town.doChores();
 	Pather.useWaypoint(115);
 	Precast.doPrecast(true);

@@ -434,6 +434,7 @@ var GameData = {
 	},
 	damageTypes: ["Physical", "Fire", "Lightning", "Magic", "Cold", "Poison", "?", "?", "?", "Physical"], // 9 is Stun, but stun isn't an element
 	synergyCalc: { // TODO: add melee skill damage and synergies - they are poop
+
 		// sorc fire spells
 		36: [47, 0.16, 56, 0.16],			// fire bolt
 		41: [37, 0.13],	// inferno
@@ -1039,7 +1040,8 @@ var GameData = {
 	},
 	monsterEffort: function (unit, areaID, skillDamageInfo, parent = undefined) {
 		let eret = {effort: Infinity, skill: -1, type: "Physical"};
-		let useCooldown = (typeof unit === 'number' ? false : Boolean(me.getState(121))), hp = this.monsterMaxHP(typeof unit.classid === 'number' ? unit.classid : unit, areaID);
+		let useCooldown = (typeof unit === 'number' ? false : Boolean(me.getState(121))),
+			hp = this.monsterMaxHP(typeof unit.classid === 'number' ? unit.classid : unit, areaID);
 		let conviction = this.getConviction(), ampDmg = this.getAmp(), isUndead = (typeof unit === 'number' ? MonsterData[unit].Undead : MonsterData[unit.classid].Undead);
 		skillDamageInfo = skillDamageInfo || this.allSkillDamage();
 

@@ -1,2 +1,0 @@
-Names can now be used instead of classids. If you want to use classids, check NTItemAlias.dbl
-To see which NPC sells which items, check this link: http://members.iinet.net.au/~dcarson/shopcalc.html

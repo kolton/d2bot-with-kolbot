@@ -4,7 +4,7 @@
 *	@desc		kill the Smith
 */
 
-function Smith() {
+function Smith(Config) {
 	Town.doChores();
 	Pather.useWaypoint(27);
 	Precast.doPrecast(true);

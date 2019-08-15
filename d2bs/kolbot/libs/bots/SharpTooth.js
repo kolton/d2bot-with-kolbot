@@ -4,7 +4,7 @@
 *	@desc		kill Thresh Socket
 */
 
-function SharpTooth() {
+function SharpTooth(Config) {
 	Town.doChores();
 	Pather.useWaypoint(111);
 	Precast.doPrecast(true);

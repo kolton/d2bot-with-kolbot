@@ -5,6 +5,7 @@
 
 (function (module, require) {
 	const Promise = require('Promise');
+	const Config = require('Config');
 
 	// Cast burst of speed in town, fade before we leave town
 	const usePortal = Pather.usePortal, useWaypoint = Pather.useWaypoint;

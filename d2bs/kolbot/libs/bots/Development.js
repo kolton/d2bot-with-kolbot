@@ -13,7 +13,7 @@
 
 const Development = (function (global) {
 	const thisFilename = 'libs/bots/Development.js';
-
+	const Config = !isIncluded('GameData.js') && require('Config')() || require('Config'); // Either load the config file, or get the config
 	// If config is not set (can happen), create empty object
 	typeof Config === 'undefined' && (global.Config = {});
 	// In case it hasnt set the a variable Development
@@ -140,7 +140,7 @@ const Development = (function (global) {
 		return files;
 	}
 
-	return function () {
+	return function (Config) {
 		let restart = false;
 		if (!Config.Development) throw Error('Nothing to develop'); // Nothing to develop
 		addEventListener('scriptmsg', function (data) {

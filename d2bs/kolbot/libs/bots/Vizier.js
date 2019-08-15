@@ -4,7 +4,7 @@
 *	@desc		kill Grand Vizier of Chaos
 */
 
-function Vizier() {
+function Vizier(Config) {
 	var i, tick, seal;
 
 	this.openSeal = function (id) {

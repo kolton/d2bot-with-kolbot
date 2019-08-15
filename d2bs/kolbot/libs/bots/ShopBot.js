@@ -1,4 +1,4 @@
-function ShopBot() {
+function ShopBot(Config) {
 	var i, tickCount,
 		cycles = 0,
 		cyclesText = new Text("Cycles in last minute:", 50, 260, 2, 1),

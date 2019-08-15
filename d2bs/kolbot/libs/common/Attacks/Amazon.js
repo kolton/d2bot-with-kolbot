@@ -4,7 +4,7 @@
 *	@desc		Amazon attack sequence
 */
 
-var ClassAttack = (function () { // wrapper to not leak stuff to global scope
+var ClassAttack = (function (Config) { // wrapper to not leak stuff to global scope
 	let internalLightFuryTick = 0;
 	let mercHasInfinity = undefined;
 	let Java = {
@@ -337,4 +337,4 @@ var ClassAttack = (function () { // wrapper to not leak stuff to global scope
 			return 1;
 		}
 	};
-})();
+})(require('Config'));

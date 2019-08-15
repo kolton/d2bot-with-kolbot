@@ -4,7 +4,7 @@
 *	@desc		help the leading player in clearing Throne of Destruction and killing Baal
 */
 
-function BaalHelper() { // experi-mental
+function BaalHelper(Config) { // experi-mental
 	this.preattack = function () {
 		var check;
 

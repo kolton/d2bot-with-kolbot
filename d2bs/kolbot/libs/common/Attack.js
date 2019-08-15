@@ -5,18 +5,15 @@
 */
 
 var Attack = {
+	config: require('Config'),
 	classes: ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
 	infinity: false,
 
 	// Initialize attacks
 	init: function () {
-		if (Config.Wereform) {
-			include("common/Attacks/wereform.js");
-		} else {
-			include("common/Attacks/" + this.classes[me.classid] + ".js");
-		}
+		include("common/Attacks/" + this.classes[me.classid] + ".js");
 
-		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
+		if (Attack.config.AttackSkill[1] < 0 || Attack.config.AttackSkill[3] < 0) {
 			showConsole();
 			print("ÿc1Bad attack config. Don't expect your bot to attack.");
 		}
@@ -81,21 +78,21 @@ var Attack = {
 	},
 
 	getPrimarySlot: function () {
-		if (Config.PrimarySlot === -1) { // determine primary slot if not set
+		if (Attack.config.PrimarySlot === -1) { // determine primary slot if not set
 			if ((Precast.haveCTA > -1) || Precast.checkCTA()) { // have cta
 				if (this.checkSlot(Precast.haveCTA ^ 1)) { // have item on non-cta slot
-					Config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
+					Attack.config.PrimarySlot = Precast.haveCTA ^ 1; // set non-cta slot as primary
 				} else { // other slot is empty
-					Config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
+					Attack.config.PrimarySlot = Precast.haveCTA; // set cta as primary slot
 				}
 			} else if (!this.checkSlot(0) && this.checkSlot(1)) { // only slot II has items
-				Config.PrimarySlot = 1;
+				Attack.config.PrimarySlot = 1;
 			} else { // both slots have items, both are empty, or only slot I has items
-				Config.PrimarySlot = 0;
+				Attack.config.PrimarySlot = 0;
 			}
 		}
 
-		return Config.PrimarySlot;
+		return Attack.config.PrimarySlot;
 	},
 
 	getCustomAttack: function (unit) {
@@ -106,9 +103,9 @@ var Attack = {
 			return false;
 		}
 
-		for (i in Config.CustomAttack) {
-			if (Config.CustomAttack.hasOwnProperty(i) && unit.name.toLowerCase() === i.toLowerCase()) {
-				return Config.CustomAttack[i];
+		for (i in Attack.config.CustomAttack) {
+			if (Attack.config.CustomAttack.hasOwnProperty(i) && unit.name.toLowerCase() === i.toLowerCase()) {
+				return Attack.config.CustomAttack[i];
 			}
 		}
 
@@ -206,7 +203,7 @@ var Attack = {
 
 	// Kill a monster based on its classId, can pass a unit as well
 	kill: function (classId) {
-		if (Config.AttackSkill[1] < 0) {
+		if (Attack.config.AttackSkill[1] < 0) {
 			return false;
 		}
 
@@ -231,7 +228,7 @@ var Attack = {
 
 		gid = target.gid;
 
-		if (Config.MFLeader) {
+		if (Attack.config.MFLeader) {
 			Pather.makePortal();
 			say("kill " + classId);
 		}
@@ -247,15 +244,15 @@ var Attack = {
 				}
 			}
 
-			if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
-				this.deploy(target, Config.DodgeRange, 5, 9);
+			if (Attack.config.Dodge && me.hp * 100 / me.hpmax <= Attack.config.DodgeHP) {
+				this.deploy(target, Attack.config.DodgeRange, 5, 9);
 			}
 
-			if (Config.MFSwitchPercent && target.hp / 128 * 100 < Config.MFSwitchPercent) {
+			if (Attack.config.MFSwitchPercent && target.hp / 128 * 100 < Attack.config.MFSwitchPercent) {
 				this.weaponSwitch(this.getPrimarySlot() ^ 1);
 			}
 
-			if (attackCount > 0 && attackCount % 15 === 0 && Skill.getRange(Config.AttackSkill[1]) < 4) {
+			if (attackCount > 0 && attackCount % 15 === 0 && Skill.getRange(Attack.config.AttackSkill[1]) < 4) {
 				Packet.flash(me.gid);
 			}
 
@@ -284,7 +281,7 @@ var Attack = {
 			errorInfo = " (attackCount exceeded)";
 		}
 
-		if (Config.MFSwitchPercent) {
+		if (Attack.config.MFSwitchPercent) {
 			this.weaponSwitch(this.getPrimarySlot());
 		}
 
@@ -382,7 +379,7 @@ var Attack = {
 			delay(40);
 		}
 
-		if (Config.MFLeader && !!bossId) {
+		if (Attack.config.MFLeader && !!bossId) {
 			Pather.makePortal();
 			say("clear " + bossId);
 		}
@@ -416,7 +413,7 @@ var Attack = {
 			gidAttack = [],
 			attackCount = 0;
 
-		if (Config.AttackSkill[1] < 0 || Config.AttackSkill[3] < 0) {
+		if (Attack.config.AttackSkill[1] < 0 || Attack.config.AttackSkill[3] < 0) {
 			return false;
 		}
 
@@ -475,8 +472,8 @@ var Attack = {
 			target = copyUnit(monsterList[0]);
 
 			if (target.x !== undefined && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target)) {
-				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
-					this.deploy(target, Config.DodgeRange, 5, 9);
+				if (Attack.config.Dodge && me.hp * 100 / me.hpmax <= Attack.config.DodgeHP) {
+					this.deploy(target, Attack.config.DodgeRange, 5, 9);
 				}
 
 				Misc.townCheck(true);
@@ -507,7 +504,7 @@ var Attack = {
 					attackCount += 1;
 
 					// Desync/bad position handler
-					switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
+					switch (Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
 					case 112:
 						//print(gidAttack[i].name + " " + gidAttack[i].attacks);
 
@@ -521,7 +518,7 @@ var Attack = {
 						break;
 					default:
 						// Flash with melee skills
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
 							Packet.flash(me.gid);
 						}
 
@@ -534,7 +531,7 @@ var Attack = {
 						monsterList.shift();
 					}
 
-					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
+					if (target.mode === 0 || target.mode === 12 || Attack.config.FastPick === 2) {
 						Pickit.fastPick();
 					}
 				} else {
@@ -648,8 +645,8 @@ var Attack = {
 			target = copyUnit(monsterList[0]);
 
 			if (target.x !== undefined && this.checkMonster(target)) {
-				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
-					this.deploy(target, Config.DodgeRange, 5, 9);
+				if (Attack.config.Dodge && me.hp * 100 / me.hpmax <= Attack.config.DodgeHP) {
+					this.deploy(target, Attack.config.DodgeRange, 5, 9);
 				}
 
 				Misc.townCheck(true);
@@ -679,7 +676,7 @@ var Attack = {
 					gidAttack[i].attacks += 1;
 
 					// Desync/bad position handler
-					switch (Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
+					switch (Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
 					case 112:
 						// Tele in random direction with Blessed Hammer
 						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
@@ -690,7 +687,7 @@ var Attack = {
 						break;
 					default:
 						// Flash with melee skills
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
 							Packet.flash(me.gid);
 						}
 
@@ -705,7 +702,7 @@ var Attack = {
 
 					attackCount += 1;
 
-					if (target.mode === 0 || target.mode === 12 || Config.FastPick === 2) {
+					if (target.mode === 0 || target.mode === 12 || Attack.config.FastPick === 2) {
 						Pickit.fastPick();
 					}
 				} else {
@@ -856,7 +853,7 @@ var Attack = {
 
 	// Clear an entire area based on monster spectype
 	clearLevel: function (spectype) {
-		if (Config.MFLeader) {
+		if (Attack.config.MFLeader) {
 			Pather.makePortal();
 			say("clearlevel " + getArea().name);
 		}
@@ -927,17 +924,17 @@ var Attack = {
 	// Sort monsters based on distance, spectype and classId (summoners are attacked first)
 	sortMonsters: function (unitA, unitB) {
 		// No special sorting for were-form
-		if (Config.Wereform) {
+		if (Attack.config.Wereform) {
 			return getDistance(me, unitA) - getDistance(me, unitB);
 		}
 
 		// Barb optimization
 		if (me.classid === 4) {
-			if (!Attack.checkResist(unitA, Attack.getSkillElement(Config.AttackSkill[(unitA.spectype & 0x7) ? 1 : 3]))) {
+			if (!Attack.checkResist(unitA, Attack.getSkillElement(Attack.config.AttackSkill[(unitA.spectype & 0x7) ? 1 : 3]))) {
 				return 1;
 			}
 
-			if (!Attack.checkResist(unitB, Attack.getSkillElement(Config.AttackSkill[(unitB.spectype & 0x7) ? 1 : 3]))) {
+			if (!Attack.checkResist(unitB, Attack.getSkillElement(Attack.config.AttackSkill[(unitB.spectype & 0x7) ? 1 : 3]))) {
 				return -1;
 			}
 		}
@@ -969,7 +966,7 @@ var Attack = {
 			return 1;
 		}
 
-		if (Config.BossPriority) {
+		if (Attack.config.BossPriority) {
 			if ((unitA.spectype & 0x5) && (unitB.spectype & 0x5)) {
 				return getDistance(me, unitA) - getDistance(me, unitB);
 			}
@@ -1010,7 +1007,7 @@ var Attack = {
 
 	// Open chests when clearing
 	openChests: function (range, x, y) {
-		if (!Config.OpenChests) {
+		if (!Attack.config.OpenChests) {
 			return false;
 		}
 
@@ -1071,8 +1068,8 @@ var Attack = {
 			monList = [],
 			count = 999,
 			idealPos = {
-				x: Math.round(Math.cos(Math.atan2(me.y - unit.y, me.x - unit.x)) * Config.DodgeRange + unit.x),
-				y: Math.round(Math.sin(Math.atan2(me.y - unit.y, me.x - unit.x)) * Config.DodgeRange + unit.y)
+				x: Math.round(Math.cos(Math.atan2(me.y - unit.y, me.x - unit.x)) * Attack.config.DodgeRange + unit.x),
+				y: Math.round(Math.sin(Math.atan2(me.y - unit.y, me.x - unit.x)) * Attack.config.DodgeRange + unit.y)
 			};
 
 		monList = this.buildMonsterList();
@@ -1249,7 +1246,7 @@ var Attack = {
 			return true;
 		}
 
-		if ((unit.spectype & 0x7) && Config.SkipException && Config.SkipException.indexOf(unit.name) > -1) {
+		if ((unit.spectype & 0x7) && Attack.config.SkipException && Attack.config.SkipException.indexOf(unit.name) > -1) {
 			print("ÿc1Skip Exception: " + unit.name);
 			return true;
 		}
@@ -1258,8 +1255,8 @@ var Attack = {
 			tempArray = [];
 
 EnchantLoop: // Skip enchanted monsters
-		for (i = 0; i < Config.SkipEnchant.length; i += 1) {
-			tempArray = Config.SkipEnchant[i].toLowerCase().split(" and ");
+	for (i = 0; i < Attack.config.SkipEnchant.length; i += 1) {
+		tempArray = Attack.config.SkipEnchant[i].toLowerCase().split(" and ");
 
 			for (j = 0; j < tempArray.length; j += 1) {
 				switch (tempArray[j]) {
@@ -1328,8 +1325,8 @@ EnchantLoop: // Skip enchanted monsters
 		}
 
 ImmuneLoop: // Skip immune monsters
-		for (i = 0; i < Config.SkipImmune.length; i += 1) {
-			tempArray = Config.SkipImmune[i].toLowerCase().split(" and ");
+	for (i = 0; i < Attack.config.SkipImmune.length; i += 1) {
+		tempArray = Attack.config.SkipImmune[i].toLowerCase().split(" and ");
 
 			for (j = 0; j < tempArray.length; j += 1) {
 				if (this.checkResist(unit, tempArray[j])) { // Infinity calculations are built-in
@@ -1343,10 +1340,10 @@ ImmuneLoop: // Skip immune monsters
 		}
 
 AuraLoop: // Skip monsters with auras
-		for (i = 0; i < Config.SkipAura.length; i += 1) {
+	for (i = 0; i < Attack.config.SkipAura.length; i += 1) {
 			rval = true;
 
-			switch (Config.SkipAura[i].toLowerCase()) {
+		switch (Attack.config.SkipAura[i].toLowerCase()) {
 			case "fanaticism":
 				if (unit.getState(49)) {
 					rval = false;
@@ -1474,7 +1471,7 @@ AuraLoop: // Skip monsters with auras
 
 		// Static handler
 		if (val === 42 && this.getResist(unit, damageType) < 100) {
-			return (unit.hp * 100 / 128) > Config.CastStatic;
+			return (unit.hp * 100 / 128) > Attack.config.CastStatic;
 		}
 
 		if (this.infinity && ["fire", "lightning", "cold"].indexOf(damageType) > -1 && unit.getState) { // baal in throne room doesn't have getState
@@ -1492,17 +1489,17 @@ AuraLoop: // Skip monsters with auras
 	canAttack: function (unit) {
 		if (unit.type === 1) {
 			if (unit.spectype & 0x7) { // Unique/Champion
-				if (Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[1])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[2]))) {
+				if (Attack.checkResist(unit, this.getSkillElement(Attack.config.AttackSkill[1])) || Attack.checkResist(unit, this.getSkillElement(Attack.config.AttackSkill[2]))) {
 					return true;
 				}
 			} else {
-				if (Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[3])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[4]))) {
+				if (Attack.checkResist(unit, this.getSkillElement(Attack.config.AttackSkill[3])) || Attack.checkResist(unit, this.getSkillElement(Attack.config.AttackSkill[4]))) {
 					return true;
 				}
 			}
 
-			if (Config.AttackSkill.length === 7) {
-				return Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[5])) || Attack.checkResist(unit, this.getSkillElement(Config.AttackSkill[6]));
+			if (Attack.config.AttackSkill.length === 7) {
+				return Attack.checkResist(unit, this.getSkillElement(Attack.config.AttackSkill[5])) || Attack.checkResist(unit, this.getSkillElement(Attack.config.AttackSkill[6]));
 			}
 		}
 

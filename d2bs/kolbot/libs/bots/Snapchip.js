@@ -4,7 +4,7 @@
 *	@desc		kill Snapchip and optionally clear Icy Cellar
 */
 
-function Snapchip() {
+function Snapchip(Config) {
 	Town.doChores();
 	Pather.useWaypoint(118);
 	Precast.doPrecast(true);

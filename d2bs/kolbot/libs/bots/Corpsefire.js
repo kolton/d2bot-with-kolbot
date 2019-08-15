@@ -4,7 +4,7 @@
 *	@desc		kill Corpsefire and optionally clear Den of Evil
 */
 
-function Corpsefire() {
+function Corpsefire(Config) {
 	Town.doChores();
 	Pather.useWaypoint(3);
 	Precast.doPrecast(true);

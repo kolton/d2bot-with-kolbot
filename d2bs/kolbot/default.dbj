@@ -1,6 +1,7 @@
 // default.dbj gets executed upon gamejoin
 js_strict(true);
 
+include("require.js");
 include('sdk.js');
 include("NTItemParser.dbl");
 include("OOG.js");
@@ -15,7 +16,6 @@ include("common/Cubing.js");
 include("common/CollMap.js");
 include("common/Config.js");
 include("common/Loader.js");
-include("require.js");
 include("common/Misc.js");
 include("common/Pickit.js");
 include("common/Pather.js");
@@ -103,7 +103,7 @@ function main() {
 	};
 
 	// Initialize libs - load config variables, build pickit list, attacks, containers and cubing and runeword recipes
-	Config.init(true);
+	const Config = require('Config')();
 	Pickit.init(true);
 	Attack.init();
 	Storage.Init();
@@ -176,7 +176,7 @@ function main() {
 	}
 
 	// One time maintenance - get corpse, clear leftover items, pick items in case anything important was dropped
-	if (!Scripts.UserAddon && !Scripts.Test) {
+	if (!Config.Scripts.UserAddon && !Config.Scripts.Test) {
 		Town.getCorpse();
 		Town.clearBelt();
 		Town.clearInventory();

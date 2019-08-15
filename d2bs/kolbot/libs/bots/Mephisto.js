@@ -4,7 +4,7 @@
 *	@desc		kill Mephisto
 */
 
-function Mephisto() {
+function Mephisto(Config) {
 	this.killMephisto = function () {
 		var i, angle, angles,
 			pos = {},

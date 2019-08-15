@@ -4,7 +4,7 @@
 *	@desc		Open chests in configured areas
 */
 
-function ChestMania() {
+function ChestMania(Config) {
 	var prop, i;
 
 	Town.doChores();
