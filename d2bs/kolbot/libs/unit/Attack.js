@@ -125,16 +125,7 @@
 				// If the skill we gonna use is a left skill, we can use an aura with it
 				if (getBaseStat('skills', monsterEffort.skill, 'leftskill')) {
 
-					// First ask nishi's frame if it is Eligible for conviction, if so, we put conviction on, if we got it obv
-					if (GameData.convictionEligible[monsterEffort.type] && GameData.skillLevel(123)) {
-						me.getSkill(0) !== 123 && Skill.setSkill(123, 0);
-						hand = 1;
-					} else {
-						let aura = Skills.aura[monsterEffort.skill];
 
-						// Figure out aura on skill, and set it if we got it
-						aura && me.getSkill(aura, 1) && me.setSkill(aura, 0)
-					}
 				}
 
 				// Be a healer, check for party members around us that have a low health
@@ -149,9 +140,26 @@
 				break;
 
 		}
+
+
 		me.overhead(getSkillById(monsterEffort.skill) + ' @ ' + monsterEffort.effort.toFixed(2));
+
 		if (Skills.range[monsterEffort.skill] < this.distance) {
 			this.moveTo(); // Move to monster if its on a too high distance
+		}
+
+		// Paladins have aura's
+		if (Skills.hand[monsterEffort.skill] && me.classid === 3) { // Only for skills set on first hand, we can have an aura with it
+			// First ask nishi's frame if it is Eligible for conviction, if so, we put conviction on, if we got it obv
+			if (GameData.convictionEligible[monsterEffort.type] && GameData.skillLevel(123)) {
+				me.getSkill(0) !== 123 && Skill.setSkill(123, 0);
+				hand = 1;
+			} else {
+				let aura = Skills.aura[monsterEffort.skill];
+
+				// Figure out aura on skill, and set it if we got it
+				aura && me.getSkill(aura, 1) && me.setSkill(aura, 0)
+			}
 		}
 		let val = this.attackable && this.cast(monsterEffort.skill);
 		_delay(3); // legit delay
