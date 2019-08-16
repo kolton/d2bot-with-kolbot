@@ -870,6 +870,7 @@ ModeLoop:
 		check - force the waypoint menu
 	*/
 	useWaypoint: function useWaypoint(targetArea, check) {
+		const CollMap = require('CollMap');
 		switch (targetArea) {
 		case undefined:
 			throw new Error("useWaypoint: Invalid targetArea parameter: " + targetArea);
