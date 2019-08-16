@@ -6,7 +6,7 @@
 
 js_strict(true);
 
-include("json2.js");
+include('require.js');
 include("NTItemParser.dbl");
 include("OOG.js");
 include("AutoMule.js");
@@ -16,7 +16,6 @@ include("TorchSystem.js");
 include("MuleLogger.js");
 include("common/Attack.js");
 include("common/Cubing.js");
-include("common/CollMap.js");
 include("common/Config.js");
 include("common/Loader.js");
 include("common/Misc.js");
@@ -27,8 +26,9 @@ include("common/Prototypes.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");
+include("sdk.js ");
 function main() {
-	var i, mercHP, ironGolem, tick, merc, Config = require('Config');
+	var i, mercHP, ironGolem, tick, merc, Config = require('Config'),
 		debugInfo = {area: 0, currScript: "no entry"},
 		pingTimer = [],
 		quitFlag = false,
@@ -38,7 +38,7 @@ function main() {
 
 	print("ÿc3Start ToolsThread script");
 	D2Bot.init();
-	Config.init(false);
+	Config();
 	Pickit.init(false);
 	Attack.init();
 	Storage.Init();

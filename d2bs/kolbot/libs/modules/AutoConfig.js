@@ -4,7 +4,6 @@
  */
 (function (module, require) {
 	// Should be an module
-	include("GameData.js");
 	const Config = require('Config');
 	const Auto = {}, Skills = require('Skills');
 	Object.defineProperties(Auto, {
@@ -34,7 +33,7 @@
 	};
 
 	const AutoConfig = function () {
-		return Object.keys(AutoConfig)  // Run all AutoConfig modules
+		return me.ingame && (isIncluded('GameData.js') || include("GameData.js")) && Object.keys(AutoConfig)  // Run all AutoConfig modules
 			.map(x => AutoConfig[x])
 			.filter(x => typeof x === 'function')
 			.forEach(_ => _());

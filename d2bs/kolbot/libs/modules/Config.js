@@ -9,6 +9,11 @@
 		Object.keys(scripts)
 			.forEach(x => Config.Scripts[x] = scripts[x]);
 
+		if (me.ingame) {
+			Config.Silence && (global.say = print);
+
+			Pickit.init(getScript(true).name.toLowerCase() === 'default.dbj'); // only notify if we are the default thread
+		}
 		return Config;
 	}
 
@@ -288,7 +293,7 @@
 	Config.Baal = {
 		DollQuit: false,
 		SoulQuit: false,
-		KillBaal: false,
+		KillBaal: true,
 		HotTPMessage: "Hot TP!",
 		SafeTPMessage: "Safe TP!",
 		BaalMessage: "Baal!"
@@ -453,6 +458,9 @@
 		Follower: false,
 		Entrance: true,
 	};
+
+	Config.Silence = true;
+
 	Config.Development = '';
 
 	Config.Scripts = {};

@@ -929,7 +929,7 @@ var Misc = {
 		}
 
 		while (coords.length) {
-			coords.sort(Sort.units);
+			coords.sort((a, b) => a.distance - b.distance);
 			Pather.moveToUnit(coords[0], 1, 2);
 			this.openChests(20);
 
@@ -974,7 +974,7 @@ var Misc = {
 		}
 
 		while (unitList.length > 0) {
-			unitList.sort(Sort.units);
+			unitList.sort((a, b) => a.distance - b.distance);
 
 			unit = unitList.shift();
 
@@ -1125,7 +1125,7 @@ var Misc = {
 		}
 
 		while (shrineLocs.length > 0) {
-			shrineLocs.sort(Sort.points);
+			shrineLocs.sort((a, b) => a.distance - b.distance);
 
 			coords = shrineLocs.shift();
 
@@ -2017,27 +2017,6 @@ MainLoop:
 		}
 
 		return flags.length ? flags : null;
-	}
-};
-
-var Sort = {
-	// Sort units by comparing distance between the player
-	units: function (a, b) {
-		return Math.round(getDistance(me.x, me.y, a.x, a.y)) - Math.round(getDistance(me.x, me.y, b.x, b.y));
-	},
-
-	// Sort preset units by comparing distance between the player (using preset x/y calculations)
-	presetUnits: function (a, b) {
-		return getDistance(me, a.roomx * 5 + a.x, a.roomy * 5 + a.y) - getDistance(me, b.roomx * 5 + b.x, b.roomy * 5 + b.y);
-	},
-
-	// Sort arrays of x,y coords by comparing distance between the player
-	points: function (a, b) {
-		return getDistance(me, a[0], a[1]) - getDistance(me, b[0], b[1]);
-	},
-
-	numbers: function (a, b) {
-		return a - b;
 	}
 };
 

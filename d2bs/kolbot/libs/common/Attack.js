@@ -4,6 +4,8 @@
 *	@desc		handle player attacks
 */
 
+
+/** @deprecated Use now the new module for attacking */
 var Attack = {
 	config: require('Config'),
 	classes: ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"],
@@ -375,6 +377,7 @@ var Attack = {
 
 	// Clear monsters in a section based on range and spectype or clear monsters around a boss monster
 	clear: function (range, spectype, bossId, sortfunc, pickit) { // probably going to change to passing an object
+		const CollMap = require('CollMap');
 		while (!me.gameReady) {
 			delay(40);
 		}
@@ -447,7 +450,7 @@ var Attack = {
 				if ((!spectype || (target.spectype & spectype)) && this.checkMonster(target) && this.skipCheck(target)) {
 					// Speed optimization - don't go through monster list until there's at least one within clear range
 					if (!start && getDistance(target, orgx, orgy) <= range &&
-							(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+						(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
 						start = true;
 					}
 
@@ -505,24 +508,24 @@ var Attack = {
 
 					// Desync/bad position handler
 					switch (Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
-					case 112:
-						//print(gidAttack[i].name + " " + gidAttack[i].attacks);
+						case 112:
+							//print(gidAttack[i].name + " " + gidAttack[i].attacks);
 
-						// Tele in random direction with Blessed Hammer
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
-							//print("random move m8");
-							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 5);
-							Pather.moveTo(coord.x, coord.y);
-						}
+							// Tele in random direction with Blessed Hammer
+							if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 4 : 2) === 0) {
+								//print("random move m8");
+								coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 5);
+								Pather.moveTo(coord.x, coord.y);
+							}
 
-						break;
-					default:
-						// Flash with melee skills
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
-							Packet.flash(me.gid);
-						}
+							break;
+						default:
+							// Flash with melee skills
+							if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 15 : 5) === 0 && Skill.getRange(Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+								Packet.flash(me.gid);
+							}
 
-						break;
+							break;
 					}
 
 					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
@@ -571,31 +574,31 @@ var Attack = {
 		}
 
 		switch (typeof classid) {
-		case "number":
-		case "string":
-			monster = getUnit(1, classid);
+			case "number":
+			case "string":
+				monster = getUnit(1, classid);
 
-			if (monster) {
-				do {
-					if (getDistance(center.x, center.y, monster.x, monster.y) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
-						monsterList.push(copyUnit(monster));
-					}
-				} while (monster.getNext());
-			}
+				if (monster) {
+					do {
+						if (getDistance(center.x, center.y, monster.x, monster.y) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+							monsterList.push(copyUnit(monster));
+						}
+					} while (monster.getNext());
+				}
 
-			break;
-		case "object":
-			monster = getUnit(1);
+				break;
+			case "object":
+				monster = getUnit(1);
 
-			if (monster) {
-				do {
-					if (classid.indexOf(monster.classid) > -1 && getDistance(center.x, center.y, monster.x, monster.y) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
-						monsterList.push(copyUnit(monster));
-					}
-				} while (monster.getNext());
-			}
+				if (monster) {
+					do {
+						if (classid.indexOf(monster.classid) > -1 && getDistance(center.x, center.y, monster.x, monster.y) <= range && (!spectype || (monster.spectype & spectype)) && this.checkMonster(monster)) {
+							monsterList.push(copyUnit(monster));
+						}
+					} while (monster.getNext());
+				}
 
-			break;
+				break;
 		}
 
 		if (!monsterList.length) {
@@ -607,24 +610,25 @@ var Attack = {
 
 	// Clear an already formed array of monstas
 	clearList: function (mainArg, sortFunc, refresh) {
+		const CollMap = require('CollMap');
 		var i, target, result, monsterList, coord,
 			retry = 0,
 			gidAttack = [],
 			attackCount = 0;
 
 		switch (typeof mainArg) {
-		case "function":
-			monsterList = mainArg.call();
+			case "function":
+				monsterList = mainArg.call();
 
-			break;
-		case "object":
-			monsterList = mainArg.slice(0);
+				break;
+			case "object":
+				monsterList = mainArg.slice(0);
 
-			break;
-		case "boolean": // false from Attack.getMob()
-			return false;
-		default:
-			throw new Error("clearList: Invalid argument");
+				break;
+			case "boolean": // false from Attack.getMob()
+				return false;
+			default:
+				throw new Error("clearList: Invalid argument");
 		}
 
 		if (!sortFunc) {
@@ -677,21 +681,21 @@ var Attack = {
 
 					// Desync/bad position handler
 					switch (Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) {
-					case 112:
-						// Tele in random direction with Blessed Hammer
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
-							coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
-							Pather.moveTo(coord.x, coord.y);
-						}
+						case 112:
+							// Tele in random direction with Blessed Hammer
+							if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0) {
+								coord = CollMap.getRandCoordinate(me.x, -1, 1, me.y, -1, 1, 4);
+								Pather.moveTo(coord.x, coord.y);
+							}
 
-						break;
-					default:
-						// Flash with melee skills
-						if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
-							Packet.flash(me.gid);
-						}
+							break;
+						default:
+							// Flash with melee skills
+							if (gidAttack[i].attacks > 0 && gidAttack[i].attacks % ((target.spectype & 0x7) ? 5 : 15) === 0 && Skill.getRange(Attack.config.AttackSkill[(target.spectype & 0x7) ? 1 : 3]) < 4) {
+								Packet.flash(me.gid);
+							}
 
-						break;
+							break;
 					}
 
 					// Skip non-unique monsters after 15 attacks, except in Throne of Destruction
@@ -750,8 +754,8 @@ var Attack = {
 			if (monster) {
 				do {
 					if (getDistance(monster, x, y) <= range && this.checkMonster(monster) && this.canAttack(monster) &&
-							(!skipBlocked || !checkCollision(me, monster, skipBlocked)) &&
-							((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54) || !checkCollision(me, monster, 0x1))) {
+						(!skipBlocked || !checkCollision(me, monster, skipBlocked)) &&
+						((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54) || !checkCollision(me, monster, 0x1))) {
 						monList.push(copyUnit(monster));
 					}
 				} while (monster.getNext());
@@ -777,13 +781,13 @@ var Attack = {
 
 			if (special) {
 				switch (me.classid) {
-				case 3: // Paladin Redemption addon
-					if (me.getSkill(124, 1)) {
-						Skill.setSkill(124, 0);
-						delay(1000);
-					}
+					case 3: // Paladin Redemption addon
+						if (me.getSkill(124, 1)) {
+							Skill.setSkill(124, 0);
+							delay(1000);
+						}
 
-					break;
+						break;
 				}
 			}
 
@@ -897,7 +901,7 @@ var Attack = {
 			}
 
 			rooms.sort(RoomSort);
-			room = rooms.shift(); 
+			room = rooms.shift();
 
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
@@ -1059,6 +1063,7 @@ var Attack = {
 	},
 
 	deploy: function (unit, distance, spread, range) {
+		const CollMap = require('CollMap');
 		if (arguments.length < 4) {
 			throw new Error("deploy: Not enough arguments supplied");
 		}
@@ -1074,7 +1079,7 @@ var Attack = {
 
 		monList = this.buildMonsterList();
 
-		monList.sort(Sort.units);
+		monList.sort((a, b) => a.distance - b.distance);
 
 		if (this.getMonsterCount(me.x, me.y, 15, monList) === 0) {
 			return true;
@@ -1149,6 +1154,7 @@ var Attack = {
 	},
 
 	buildGrid: function (xmin, xmax, ymin, ymax, spread) {
+		const CollMap = require('CollMap');
 		if (xmin >= xmax || ymin >= ymax || spread < 1) {
 			throw new Error("buildGrid: Bad parameters");
 		}
@@ -1200,42 +1206,42 @@ var Attack = {
 		}
 
 		switch (unit.classid) {
-		case 179: // An evil force - cow (lol)
-			return false;
-		case 543: // Baal in Throne
-			if (me.area === 131) {
+			case 179: // An evil force - cow (lol)
 				return false;
-			}
+			case 543: // Baal in Throne
+				if (me.area === 131) {
+					return false;
+				}
 
-			break;
-		case 110: // Vultures
-		case 111:
-		case 112:
-		case 113:
-		case 114:
-		case 608:
-			if (unit.mode === 8) { // Flying
-				return false;
-			}
+				break;
+			case 110: // Vultures
+			case 111:
+			case 112:
+			case 113:
+			case 114:
+			case 608:
+				if (unit.mode === 8) { // Flying
+					return false;
+				}
 
-			break;
-		case 68: // Sand Maggots
-		case 69:
-		case 70:
-		case 71:
-		case 72:
-		case 679:
-		case 258: // Water Watchers
-		case 259:
-		case 260:
-		case 261:
-		case 262:
-		case 263:
-			if (unit.mode === 14) { // Submerged/Burrowed
-				return false;
-			}
+				break;
+			case 68: // Sand Maggots
+			case 69:
+			case 70:
+			case 71:
+			case 72:
+			case 679:
+			case 258: // Water Watchers
+			case 259:
+			case 260:
+			case 261:
+			case 262:
+			case 263:
+				if (unit.mode === 14) { // Submerged/Burrowed
+					return false;
+				}
 
-			break;
+				break;
 		}
 
 		return true;
@@ -1254,144 +1260,144 @@ var Attack = {
 		var i, j, rval,
 			tempArray = [];
 
-EnchantLoop: // Skip enchanted monsters
-	for (i = 0; i < Attack.config.SkipEnchant.length; i += 1) {
-		tempArray = Attack.config.SkipEnchant[i].toLowerCase().split(" and ");
+		EnchantLoop: // Skip enchanted monsters
+			for (i = 0; i < Attack.config.SkipEnchant.length; i += 1) {
+				tempArray = Attack.config.SkipEnchant[i].toLowerCase().split(" and ");
 
-			for (j = 0; j < tempArray.length; j += 1) {
-				switch (tempArray[j]) {
-				case "extra strong":
-					tempArray[j] = 5;
+				for (j = 0; j < tempArray.length; j += 1) {
+					switch (tempArray[j]) {
+						case "extra strong":
+							tempArray[j] = 5;
 
-					break;
-				case "extra fast":
-					tempArray[j] = 6;
+							break;
+						case "extra fast":
+							tempArray[j] = 6;
 
-					break;
-				case "cursed":
-					tempArray[j] = 7;
+							break;
+						case "cursed":
+							tempArray[j] = 7;
 
-					break;
-				case "magic resistant":
-					tempArray[j] = 8;
+							break;
+						case "magic resistant":
+							tempArray[j] = 8;
 
-					break;
-				case "fire enchanted":
-					tempArray[j] = 9;
+							break;
+						case "fire enchanted":
+							tempArray[j] = 9;
 
-					break;
-				case "lightning enchanted":
-					tempArray[j] = 17;
+							break;
+						case "lightning enchanted":
+							tempArray[j] = 17;
 
-					break;
-				case "cold enchanted":
-					tempArray[j] = 18;
+							break;
+						case "cold enchanted":
+							tempArray[j] = 18;
 
-					break;
-				case "mana burn":
-					tempArray[j] = 25;
+							break;
+						case "mana burn":
+							tempArray[j] = 25;
 
-					break;
-				case "teleportation":
-					tempArray[j] = 26;
+							break;
+						case "teleportation":
+							tempArray[j] = 26;
 
-					break;
-				case "spectral hit":
-					tempArray[j] = 27;
+							break;
+						case "spectral hit":
+							tempArray[j] = 27;
 
-					break;
-				case "stone skin":
-					tempArray[j] = 28;
+							break;
+						case "stone skin":
+							tempArray[j] = 28;
 
-					break;
-				case "multiple shots":
-					tempArray[j] = 29;
+							break;
+						case "multiple shots":
+							tempArray[j] = 29;
 
-					break;
+							break;
+					}
+				}
+
+				for (j = 0; j < tempArray.length; j += 1) {
+					if (!unit.getEnchant(tempArray[j])) {
+						break;
+					}
+				}
+
+				if (j === tempArray.length) {
+					//print("Skip Enchanted: " + unit.name);
+
+					return false;
 				}
 			}
 
-			for (j = 0; j < tempArray.length; j += 1) {
-				if (!unit.getEnchant(tempArray[j])) {
-					break;
+		ImmuneLoop: // Skip immune monsters
+			for (i = 0; i < Attack.config.SkipImmune.length; i += 1) {
+				tempArray = Attack.config.SkipImmune[i].toLowerCase().split(" and ");
+
+				for (j = 0; j < tempArray.length; j += 1) {
+					if (this.checkResist(unit, tempArray[j])) { // Infinity calculations are built-in
+						break;
+					}
+				}
+
+				if (j === tempArray.length) {
+					return false;
 				}
 			}
 
-			if (j === tempArray.length) {
-				//print("Skip Enchanted: " + unit.name);
+		AuraLoop: // Skip monsters with auras
+			for (i = 0; i < Attack.config.SkipAura.length; i += 1) {
+				rval = true;
 
-				return false;
-			}
-		}
+				switch (Attack.config.SkipAura[i].toLowerCase()) {
+					case "fanaticism":
+						if (unit.getState(49)) {
+							rval = false;
+						}
 
-ImmuneLoop: // Skip immune monsters
-	for (i = 0; i < Attack.config.SkipImmune.length; i += 1) {
-		tempArray = Attack.config.SkipImmune[i].toLowerCase().split(" and ");
+						break;
+					case "might":
+						if (unit.getState(33)) {
+							rval = false;
+						}
 
-			for (j = 0; j < tempArray.length; j += 1) {
-				if (this.checkResist(unit, tempArray[j])) { // Infinity calculations are built-in
-					break;
+						break;
+					case "holy fire":
+						if (unit.getState(35)) {
+							rval = false;
+						}
+
+						break;
+					case "blessed aim":
+						if (unit.getState(40)) {
+							rval = false;
+						}
+
+						break;
+					case "conviction":
+						if (unit.getState(28)) {
+							rval = false;
+						}
+
+						break;
+					case "holy freeze":
+						if (unit.getState(43)) {
+							rval = false;
+						}
+
+						break;
+					case "holy shock":
+						if (unit.getState(46)) {
+							rval = false;
+						}
+
+						break;
+				}
+
+				if (!rval) {
+					return false;
 				}
 			}
-
-			if (j === tempArray.length) {
-				return false;
-			}
-		}
-
-AuraLoop: // Skip monsters with auras
-	for (i = 0; i < Attack.config.SkipAura.length; i += 1) {
-			rval = true;
-
-		switch (Attack.config.SkipAura[i].toLowerCase()) {
-			case "fanaticism":
-				if (unit.getState(49)) {
-					rval = false;
-				}
-
-				break;
-			case "might":
-				if (unit.getState(33)) {
-					rval = false;
-				}
-
-				break;
-			case "holy fire":
-				if (unit.getState(35)) {
-					rval = false;
-				}
-
-				break;
-			case "blessed aim":
-				if (unit.getState(40)) {
-					rval = false;
-				}
-
-				break;
-			case "conviction":
-				if (unit.getState(28)) {
-					rval = false;
-				}
-
-				break;
-			case "holy freeze":
-				if (unit.getState(43)) {
-					rval = false;
-				}
-
-				break;
-			case "holy shock":
-				if (unit.getState(46)) {
-					rval = false;
-				}
-
-				break;
-			}
-
-			if (!rval) {
-				return false;
-			}
-		}
 
 		return true;
 	},
@@ -1401,14 +1407,14 @@ AuraLoop: // Skip monsters with auras
 		this.elements = ["physical", "fire", "lightning", "magic", "cold", "poison", "none"];
 
 		switch (skillId) {
-		case 74: // Corpse Explosion
-		case 144: // Concentrate
-		case 147: // Frenzy
-		case 273: // Minge Blast
-		case 500: // Summoner
-			return "physical";
-		case 101: // Holy Bolt
-			return "holybolt"; // no need to use this.elements array because it returns before going over the array
+			case 74: // Corpse Explosion
+			case 144: // Concentrate
+			case 147: // Frenzy
+			case 273: // Minge Blast
+			case 500: // Summoner
+				return "physical";
+			case 101: // Holy Bolt
+				return "holybolt"; // no need to use this.elements array because it returns before going over the array
 		}
 
 		var eType = getBaseStat("skills", skillId, "etype");
@@ -1431,26 +1437,26 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		switch (type) {
-		case "physical":
-			return unit.getStat(36);
-		case "fire":
-			return unit.getStat(39);
-		case "lightning":
-			return unit.getStat(41);
-		case "magic":
-			return unit.getStat(37);
-		case "cold":
-			return unit.getStat(43);
-		case "poison":
-			return unit.getStat(45);
-		case "none":
-			return 0;
-		case "holybolt": // check if a monster is undead
-			if (getBaseStat("monstats", unit.classid, "lUndead") || getBaseStat("monstats", unit.classid, "hUndead")) {
+			case "physical":
+				return unit.getStat(36);
+			case "fire":
+				return unit.getStat(39);
+			case "lightning":
+				return unit.getStat(41);
+			case "magic":
+				return unit.getStat(37);
+			case "cold":
+				return unit.getStat(43);
+			case "poison":
+				return unit.getStat(45);
+			case "none":
 				return 0;
-			}
+			case "holybolt": // check if a monster is undead
+				if (getBaseStat("monstats", unit.classid, "lUndead") || getBaseStat("monstats", unit.classid, "hUndead")) {
+					return 0;
+				}
 
-			return 100;
+				return 100;
 		}
 
 		return 100;
@@ -1516,11 +1522,11 @@ AuraLoop: // Skip monsters with auras
 			do {
 				if (item.bodylocation === 4 || item.bodylocation === 5) {
 					switch (item.itemType) {
-					case 27: // Bows
-					case 85: // Amazon Bows
-						return "bow";
-					case 35: // Crossbows
-						return "crossbow";
+						case 27: // Bows
+						case 85: // Amazon Bows
+							return "bow";
+						case 35: // Crossbows
+							return "crossbow";
 					}
 				}
 			} while (item.getNext());
@@ -1531,6 +1537,7 @@ AuraLoop: // Skip monsters with auras
 
 	// Find an optimal attack position and move or walk to it
 	getIntoPosition: function (unit, distance, coll, walk) {
+		const CollMap = require('CollMap');
 		if (!unit || !unit.x || !unit.y) {
 			return false;
 		}
@@ -1579,7 +1586,7 @@ AuraLoop: // Skip monsters with auras
 			//print("ÿc9potential spots: ÿc2" + coords.length);
 
 			if (coords.length > 0) {
-				coords.sort(Sort.units);
+				coords.sort((a, b) => a.distance - b.distance);
 
 				for (i = 0; i < coords.length; i += 1) {
 					// Valid position found
@@ -1587,22 +1594,22 @@ AuraLoop: // Skip monsters with auras
 						//print("ÿc9optimal pos build time: ÿc2" + (getTickCount() - t) + " ÿc9distance from target: ÿc2" + getDistance(cx, cy, unit.x, unit.y));
 
 						switch (walk) {
-						case 1:
-							Pather.walkTo(coords[i].x, coords[i].y, 2);
-
-							break;
-						case 2:
-							if (getDistance(me, coords[i]) < 6 && !CollMap.checkColl(me, coords[i], 0x5)) {
+							case 1:
 								Pather.walkTo(coords[i].x, coords[i].y, 2);
-							} else {
+
+								break;
+							case 2:
+								if (getDistance(me, coords[i]) < 6 && !CollMap.checkColl(me, coords[i], 0x5)) {
+									Pather.walkTo(coords[i].x, coords[i].y, 2);
+								} else {
+									Pather.moveTo(coords[i].x, coords[i].y, 1);
+								}
+
+								break;
+							default:
 								Pather.moveTo(coords[i].x, coords[i].y, 1);
-							}
 
-							break;
-						default:
-							Pather.moveTo(coords[i].x, coords[i].y, 1);
-
-							break;
+								break;
 						}
 
 						return true;
@@ -1612,6 +1619,7 @@ AuraLoop: // Skip monsters with auras
 		}
 
 		if (name) {
+			print((new Error).stack);
 			print("ÿc4Attackÿc0: No valid positions for: " + name);
 		}
 
