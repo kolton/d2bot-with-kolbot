@@ -1,7 +1,7 @@
 /**
- *	@filename  GameData.js
- *	@author    Nishimura-Katsuo
- *	@desc      game data library
+ *    @filename  GameData.js
+ *    @author    Nishimura-Katsuo
+ *    @desc      game data library
  */
 
 include('StringLib.js');
@@ -114,7 +114,10 @@ for (let i = 0; i < MonsterData.length; i++) {
 		Poison: getBaseStat('monstats', index, ["ResPo", "ResPo(N)", "ResPo(H)"][me.diff]),
 		Minions: ([getBaseStat('monstats', index, 'minion1'), getBaseStat('monstats', index, 'minion2')].filter(mon => mon !== 65535)),
 		GroupCount: ({Min: getBaseStat('monstats', index, 'MinGrp'), Max: getBaseStat('monstats', index, 'MaxGrp')}),
-		MinionCount: ({Min: getBaseStat('monstats', index, 'PartyMin'), Max: getBaseStat('monstats', index, 'PartyMax')}),
+		MinionCount: ({
+			Min: getBaseStat('monstats', index, 'PartyMin'),
+			Max: getBaseStat('monstats', index, 'PartyMax')
+		}),
 	});
 }
 
@@ -201,7 +204,10 @@ for (let i = 0; i < AreaData.length; i++) {
 		Index: index,
 		Act: getBaseStat('levels', index, 'Act'),
 		MonsterDensity: getBaseStat('levels', index, ['MonDen', 'MonDen(N)', 'MonDen(H)'][me.diff]),
-		ChampionPacks: ({Min: getBaseStat('levels', index, ['MonUMin', 'MonUMin(N)', 'MonUMin(H)'][me.diff]), Max: getBaseStat('levels', index, ['MonUMax', 'MonUMax(N)', 'MonUMax(H)'][me.diff])}),
+		ChampionPacks: ({
+			Min: getBaseStat('levels', index, ['MonUMin', 'MonUMin(N)', 'MonUMin(H)'][me.diff]),
+			Max: getBaseStat('levels', index, ['MonUMax', 'MonUMax(N)', 'MonUMax(H)'][me.diff])
+		}),
 		Waypoint: getBaseStat('levels', index, 'Waypoint'),
 		Level: getBaseStat('levels', index, ['MonLvl1Ex', 'MonLvl2Ex', 'MonLvl3Ex'][me.diff]),
 		Size: (() => {
@@ -251,15 +257,15 @@ AreaData.findByName = function (whatToFind) {
 
 (AreaData);
 
-function isAlive (unit) {
+function isAlive(unit) {
 	return Boolean(unit && unit.hp);
 }
 
-function isEnemy (unit) {
+function isEnemy(unit) {
 	return Boolean(unit && isAlive(unit) && unit.getStat(172) !== 2 && typeof unit.classid === 'number' && MonsterData[unit.classid].Killable);
 }
 
-function onGround (item) {
+function onGround(item) {
 	if (item.mode === 3 || item.mode === 5) {
 		return true;
 	}
@@ -267,7 +273,7 @@ function onGround (item) {
 	return false;
 }
 
-function itemTier (item) {
+function itemTier(item) {
 	if (getBaseStat(0, item.classid, 'code') === getBaseStat(0, item.classid, 'ubercode')) {
 		return 1;
 	}
@@ -376,7 +382,8 @@ var GameData = {
 		return level / total;
 	},
 	killExp: function (playerID, monsterID, areaID) {
-		let exp = this.monsterExp(monsterID, areaID), party = getParty(me), partyid = -1, level = 0, total = 0, gamesize = 0;
+		let exp = this.monsterExp(monsterID, areaID), party = getParty(me), partyid = -1, level = 0, total = 0,
+			gamesize = 0;
 
 		if (!party) {
 			return 0;
@@ -509,7 +516,7 @@ var GameData = {
 		31: [11, 0.12],	// freezing arrow
 		7: [16, 0.12],	// fire arrow
 		16: [7, 0.12],	// exploding arrow
-		27:	[16, 0.10],	// immolation arrow
+		27: [16, 0.10],	// immolation arrow
 
 		// amazon spear/javalin skills
 		14: [20, 0.10, 24, 0.10, 34, 0.10, 35, 0.10],	// power strike
@@ -521,16 +528,32 @@ var GameData = {
 		25: [15, 0.10],	// plague javalin
 	},
 	noMinSynergy: [14, 20, 24, 34, 35, 49, 53, 118, 256, 261, 271, 276],
-	skillMult: {15: 25, 25: 25, 41: 25, 46: 75, 51: 75, 73: 25, 83: 25, 92: 25, 222: 25, 225: 75, 230: 25, 238: 25, 272: 25 / 3},
+	skillMult: {
+		15: 25,
+		25: 25,
+		41: 25,
+		46: 75,
+		51: 75,
+		73: 25,
+		83: 25,
+		92: 25,
+		222: 25,
+		225: 75,
+		230: 25,
+		238: 25,
+		272: 25 / 3
+	},
 	baseSkillDamage: function (skillID) { // TODO: rework skill damage to use both damage fields
 		let l = this.skillLevel(skillID), m = this.skillMult[skillID] || 1;
 		let dmgFields = [['MinDam', 'MinLevDam1', 'MinLevDam2', 'MinLevDam3', 'MinLevDam4', 'MinLevDam5', 'MaxDam', 'MaxLevDam1', 'MaxLevDam2', 'MaxLevDam3', 'MaxLevDam4', 'MaxLevDam5'], ['EMin', 'EMinLev1', 'EMinLev2', 'EMinLev3', 'EMinLev4', 'EMinLev5', 'EMax', 'EMaxLev1', 'EMaxLev2', 'EMaxLev3', 'EMaxLev4', 'EMaxLev5']];
 
 		if (skillID === 70) {
-			return {type: "Physical",
+			return {
+				type: "Physical",
 				pmin: this.stagedDamage(l, getBaseStat('skills', skillID, dmgFields[1][0]), getBaseStat('skills', skillID, dmgFields[1][1]), getBaseStat('skills', skillID, dmgFields[1][2]), getBaseStat('skills', skillID, dmgFields[1][3]), getBaseStat('skills', skillID, dmgFields[1][4]), getBaseStat('skills', skillID, dmgFields[1][5]), getBaseStat('skills', skillID, 'HitShift'), m),
 				pmax: this.stagedDamage(l, getBaseStat('skills', skillID, dmgFields[1][0]), getBaseStat('skills', skillID, dmgFields[1][1]), getBaseStat('skills', skillID, dmgFields[1][2]), getBaseStat('skills', skillID, dmgFields[1][3]), getBaseStat('skills', skillID, dmgFields[1][4]), getBaseStat('skills', skillID, dmgFields[1][5]), getBaseStat('skills', skillID, 'HitShift'), m),
-				min: 0, max: 0};
+				min: 0, max: 0
+			};
 		} else {
 			let type = getBaseStat('skills', skillID, 'EType');
 
@@ -641,7 +664,8 @@ var GameData = {
 		return 0;
 	},
 	dmgModifier: function (skillID, target) {
-		let aps = (typeof target === 'number' ? this.averagePackSize(target) : 1), eliteBonus = (target.spectype && target.spectype & 0x7) ? 1 : 0, hitcap = 1;
+		let aps = (typeof target === 'number' ? this.averagePackSize(target) : 1),
+			eliteBonus = (target.spectype && target.spectype & 0x7) ? 1 : 0, hitcap = 1;
 
 		switch (skillID) { // charged bolt/strike excluded, it's so unreliably random
 			case 15: // poison javalin
@@ -722,7 +746,7 @@ var GameData = {
 
 		return aps;
 	},
-	skillDamage: function (skillID) {
+	skillDamage: function (skillID, unit) {
 		if (skillID === 0) {
 			return {type: "Physical", pmin: 2, pmax: 8, min: 0, max: 0}; // short sword, no reqs
 		}
@@ -883,6 +907,33 @@ var GameData = {
 				dmg.min *= 5;	// can have 5 traps out at a time
 				dmg.max *= 5;
 				break;
+
+			case sdk.skills.StaticField:
+				if (unit instanceof Unit) {
+					let staticCap = [50, 50, 60][me.diff], //ToDo; fill in actual numbers
+						[monsterId, areaId] = [unit.classid, unit.area],
+						percentLeft = (unit.hp * 100 / unit.hpmax);
+
+					if (staticCap > percentLeft) {
+						dmg.min = 0;
+						dmg.max = 0;
+					} else {
+						let maxReal = this.monsterMaxHP(monsterId, areaId, unit.charlvl - this.monsterLevel(monsterId, areaId)),
+							hpReal = maxReal / 100 * percentLeft,
+							potencialDmg = (maxReal / 100 * percentLeft) * .25,
+							ceiling = hpReal - (maxReal * ((100 - staticCap) / 100)); //ToDo; fix this propperly, as it is bugged now
+
+						// let presist = this.monsterResist(unit, "Lightning");
+						// presist = Math.max(-100, Math.min(100, presist));
+						// potencialDmg += potencialDmg * (100 - presist) / 100;
+
+						let avgDmg = Math.max(Math.min(potencialDmg, ceiling), 0);
+						dmg.min = avgDmg;
+						dmg.max = avgDmg;
+					}
+
+				}
+				break;
 		}
 
 		dmg.pmin |= 0;
@@ -892,14 +943,14 @@ var GameData = {
 
 		return dmg;
 	},
-	allSkillDamage: function () {
+	allSkillDamage: function (unit) {
 		let skills = {};
-		let self=this;
+		let self = this;
 		me.getSkill(4).forEach(function (skill) {
 			if (self.nonDamage.hasOwnProperty(skill[0])) {
 				return false; // Doesnt do damage
 			}
-			return skills[skill[0]] = self.skillDamage(skill[0]);
+			return skills[skill[0]] = self.skillDamage(skill[0], unit);
 		});
 
 		return skills;
@@ -1027,7 +1078,7 @@ var GameData = {
 		return stat ? (unit.getStat ? unit.getStat(stat) : MonsterData[unit][type]) : 0;
 	},
 	getConviction: function () {
-		let merc = me.getMerc(),sl = this.skillLevel(123); // conviction
+		let merc = me.getMerc(), sl = this.skillLevel(123); // conviction
 		if (( // Either me, or merc is wearing a conviction
 			merc && merc.getItems().filter(item => item.getPrefix(sdk.locale.items.Infinity)).first()
 			|| me.getItems().filter(item => item.getPrefix(sdk.locale.items.Infinity)).first())) {
@@ -1042,8 +1093,9 @@ var GameData = {
 		let eret = {effort: Infinity, skill: -1, type: "Physical"};
 		let useCooldown = (typeof unit === 'number' ? false : Boolean(me.getState(121))),
 			hp = this.monsterMaxHP(typeof unit.classid === 'number' ? unit.classid : unit, areaID);
-		let conviction = this.getConviction(), ampDmg = this.getAmp(), isUndead = (typeof unit === 'number' ? MonsterData[unit].Undead : MonsterData[unit.classid].Undead);
-		skillDamageInfo = skillDamageInfo || this.allSkillDamage();
+		let conviction = this.getConviction(), ampDmg = this.getAmp(),
+			isUndead = (typeof unit === 'number' ? MonsterData[unit].Undead : MonsterData[unit.classid].Undead);
+		skillDamageInfo = skillDamageInfo || this.allSkillDamage(unit);
 
 		let buffDmg = [], buffDamageInfo = {}, newSkillDamageInfo = {};
 
@@ -1061,6 +1113,9 @@ var GameData = {
 		skillDamageInfo = newSkillDamageInfo;
 
 		for (let sk in buffDamageInfo) {
+			// static field has a fix'd ceiling, calculated already
+			if ([sdk.skills.StaticField].indexOf(sk) !== -1) continue;
+
 			let avgPDmg = (buffDamageInfo[sk].pmin + buffDamageInfo[sk].pmax) / 2;
 			let avgDmg = (buffDamageInfo[sk].min + buffDamageInfo[sk].max) / 2;
 			let tmpDmg = 0;
@@ -1104,7 +1159,7 @@ var GameData = {
 				let avgPDmg = (skillDamageInfo[sk].pmin + skillDamageInfo[sk].pmax) / 2, totalDmg = buffDmg;
 				let avgDmg = (skillDamageInfo[sk].min + skillDamageInfo[sk].max) / 2;
 
-				if (avgPDmg > 0) {
+				if (avgPDmg > 0 && sk !== sdk.skills.StaticField) {
 					let presist = this.monsterResist(unit, "Physical");
 
 					presist -= (presist >= 100 ? ampDmg / 5 : ampDmg);
@@ -1126,7 +1181,10 @@ var GameData = {
 						resist = 100;
 					}
 
-					totalDmg += avgDmg * (100 - resist) / 100;
+					totalDmg += sk !== sdk.skills.StaticField
+						&& 0
+						|| avgDmg * (100 - resist) / 100;
+
 
 				}
 
@@ -1134,14 +1192,31 @@ var GameData = {
 
 				tmpEffort /= this.dmgModifier(sk | 0, parent || unit);
 
-				if (tmpEffort <= eret.effort) {
-					eret.effort = tmpEffort;
-					eret.skill = sk | 0;
-					eret.type = skillDamageInfo[eret.skill].type;
+				// care for mana
+				if (me.mp < Skill.getManaCost(sk)) {
+					tmpEffort *= 5; // More effort in a skill we dont have mana for
+				}
+
+				// Use less cool down spells, if something better is around
+				if (this.skillCooldown(sk | 0)) {
+					tmpEffort *= 5;
+				}
+				switch (true) {
+					case tmpEffort < 1 && eret.effort < 1 // Both is a instant kill
+					&& Skill.getManaCost(sk) < Skill.getManaCost(eret.skill): // but this skill costs less mana
+					case tmpEffort <= eret.effort
+					|| ( // or, both is a instant kill, but this one cost less mana
+						tmpEffort < 1 && eret.effort < 1
+						|| Skill.getManaCost(sk) < Skill.getManaCost(eret.skill)
+					): {
+						eret.effort = tmpEffort;
+						eret.skill = sk | 0;
+						eret.type = skillDamageInfo[eret.skill].type;
+						eret.name = getSkillById(eret.skill)
+					}
 				}
 			}
 		}
-
 		return eret.skill >= 0 ? eret : null;
 	},
 	areaEffort: function (areaID, skills) {

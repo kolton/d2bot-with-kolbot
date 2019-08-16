@@ -14,7 +14,7 @@
 			enumerable: false,
 		},
 		isWeak: {
-			get: () => (Auto.myResistance < 0 || Config.XPRun.Char.weak),
+			get: () => (Auto.myResistance < 0),
 		},
 		myResistance: {
 			get: () => [me.getStat(45), me.getStat(43), me.getStat(41), me.getStat(39)],
