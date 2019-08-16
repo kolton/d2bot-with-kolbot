@@ -30,10 +30,30 @@
 		if (positions.some(pos => pos.distance < 1)) return true;
 
 		// Either found and moved to a spot, or we failed
-		return !!positions.find(pos => Attack.validSpot(check.x, check.y) && !CollMap.checkColl(unit, check, 0x4, 0) && Paladin.reposition(positions[i][0], positions[i][1]));
+		for (i = 0; i < positions.length; i += 1) {
+			if (getDistance(me, positions[i][0], positions[i][1]) < 1) {
+				return true;
+			}
+		}
+
+		for (i = 0; i < positions.length; i += 1) {
+			check = {
+				x: positions[i][0],
+				y: positions[i][1]
+			};
+
+			if (Attack.validSpot(check.x, check.y) && !CollMap.checkColl(unit, check, 0x4, 0)) {
+				if (this.reposition(positions[i][0], positions[i][1])) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	};
 
 	Paladin.reposition = function (x, y) {
+
 		if ([x, y].distance > 0) {
 			if (Pather.teleport && !me.inTown && me.getStat(97, 54)) {
 				(getDistance(me, x, y) > 40 && Pather.moveTo || Pather.teleportTo).apply(Pather, [x, y, 3])

@@ -193,14 +193,14 @@
 							case 49: // Lightning
 							case 84: // Bone Spear
 							case 93: // Bone Spirit
-								return 40;
+								return 30;
 							case 47: // Fire Ball
 							case 51: // Fire Wall
 							case 53: // Chain Lightning
 							case 56: // Meteor
 							case 59: // Blizzard
 							case 273: // Mind Blast
-								return 40;
+								return 30;
 						}
 					}
 				});
@@ -211,7 +211,7 @@
 				return new Proxy({}, {
 					get: function (target, skillId) {
 						skillId = parseInt(skillId);
-						let reduce = ([
+						return ([
 							[
 								6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30,
 								31, 33, 34, 35, 36, 37, 38, 39, 41, 45, 47, 49, 53, 55, 61, 63, 64, 65, 67, 73, 79,
@@ -223,8 +223,6 @@
 								232, 233, 238, 239, 242, 248, 255, 260, 270
 							]
 						].findIndex(x => x.indexOf(skillId) > -1) || 0) + 1;
-						print(' for ' + skillId + '--' + reduce);
-						return reduce;
 					},
 				});
 			}

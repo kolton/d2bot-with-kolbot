@@ -1079,7 +1079,7 @@ var Attack = {
 
 		monList = this.buildMonsterList();
 
-		monList.sort(Sort.units);
+		monList.sort((a, b) => a.distance - b.distance);
 
 		if (this.getMonsterCount(me.x, me.y, 15, monList) === 0) {
 			return true;

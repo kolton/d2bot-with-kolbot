@@ -58,7 +58,7 @@
 		if (!unit) throw new Error("Attack.kill: Target not found");
 
 		return unit.kill();
-	}
+	};
 
 
 	module.exports = Attack;

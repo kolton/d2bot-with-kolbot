@@ -9,17 +9,15 @@
 			.sort((a, b) => GameData.monsterEffort(a, a.area).effort - GameData.monsterEffort(b, b.area).effort - ((b.distance - a.distance) / 5));
 
 		let units = getUnits_filted(), unit;
-
-		print('getting units');
 		if (units) for (; (units = getUnits_filted()) && units.length;) {
 			delay(20);
 			if (!(unit = units.first())) break; // shouldn't happen but to be sure
 			let done = false;
 			for (; !done && unit.attackable;) {
 				done = !unit.attack();
-				print(done);
 			}
 		}
+		return true;
 	};
 
 	Unit.prototype.__defineGetter__('attackable', function () {
@@ -70,6 +68,12 @@
 		if (!monsterEffort) return false; // dont know how to attack this
 		let hand = 0;
 
+		if (!Attack.validSpot(this.x, this.y)) {
+			print('INVALID SPOT -- ');
+			ignoreMonster.push(this.gid);
+			return false;
+		}
+
 		//ToDo; remove deprecated tag Attack
 		if (this.distance > Skills.range[monsterEffort.skill] || checkCollision(me, this, 0x4)) {
 			if (!Attack.getIntoPosition(this, Skills.range[monsterEffort.skill], 0x4)) {
@@ -77,6 +81,7 @@
 			}
 		}
 
+		print(JSON.stringify(this));
 		//@ToDo; Here some specific class stuff.
 		switch (true) {
 			case me.classid === 2: // necro
@@ -110,7 +115,6 @@
 				if (corpse) for (; corpse.getNext();) {
 					if (getDistance(this, corpse) <= range && this.checkCorpse(corpse)) {
 						Skill.cast(74, 0, corpse);
-						print('Explodeded ' + corpse.name);
 					}
 				}
 				break;
@@ -138,11 +142,11 @@
 				if (party) for (let unit; party.getNext();) {// If party member in same area, and can find the unit, that isnt dead, cast holy bolt on thje party member
 					party.hp < 60 && party.area === me.area && (unit = getUnits(1, party.name).filter(x => !x.dead).first()) && unit && unit.cast(sdk.skills.HolyBolt);
 				}
-				break;
 
 				if (monsterEffort.skill === sdk.skills.BlessedHammer) {
 					if (!require('Paladin').getHammerPosition(this)) return false;
 				}
+				break;
 
 		}
 		me.overhead(getSkillById(monsterEffort.skill) + ' @ ' + monsterEffort.effort.toFixed(2));
@@ -151,6 +155,7 @@
 		}
 		let val = this.attackable && this.cast(monsterEffort.skill);
 		_delay(3); // legit delay
+		Pickit.pickItems();
 		return val;
 	};
 
