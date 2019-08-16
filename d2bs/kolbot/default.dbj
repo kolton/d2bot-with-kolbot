@@ -22,6 +22,7 @@ include("common/Precast.js");
 include("common/Prototypes.js");
 include("unit/Attack.js");
 include("unit/Movement.js");
+include("unit/Me.js");
 include("common/Runewords.js");
 include("common/Storage.js");
 include("common/Town.js");

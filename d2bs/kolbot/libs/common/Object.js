@@ -32,8 +32,26 @@
             get: function() {
                 let useTeleport = Pather.useTeleport();
                 return getPath.apply(this, [typeof this.area !== 'undefined' ? this.area : me.area, me.x, me.y, ...coords.apply(this), useTeleport ? 1 : 0, useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : Pather.teleDistance) : Pather.walkDistance])
-            }
+            },
+            enumerable: false,
+        },
+        validSpot: {
+            get: function () {
+                let [x, y] = coords.apply(this), result;
+                if (!me.area || !x || !y) { // Just in case
+                    return false;
+                }
 
-        }
+                try { // Treat thrown errors as invalid spot
+                    result = getCollision(me.area, x, y);
+                } catch (e) {
+                    // Dont care
+                }
+
+                // Avoid non-walkable spots, objects
+                return !(result === undefined || (result & 0x1) || (result & 0x400));
+            },
+            enumerable: false,
+        },
     });
 })(typeof global !== 'undefined' ? global : this);

@@ -1,4 +1,5 @@
 (function (require, _delay) {
+	print('klasjdklafsdkjlfdaskljfsadkljasdfkljfasdkljfdsakljfsadlkjfsadkljasfd');
 	const Skills = require('Skills');
 	const ignoreMonster = [];
 
@@ -58,8 +59,114 @@
 
 	});
 
-	Unit.prototype.cast = function (skillId, hand) {
-		return Skill.cast(skillId, hand || Skills.hand[skillId], this);
+	Unit.prototype.cast = function (skillId, hand, x, y, item) {
+		// In case its called upon an item we own, redirect it to castChargedSkill
+		if (this.type === 4 && Object.keys(sdk.storage).map(x => sdk.storage[x]).indexOf(this.location) !== -1) return this.castChargedSkill(skillId, x, y);
+		//return Skill.cast(skillId, hand || Skills.hand[skillId], this);
+
+		const Config = require('Config');
+		// Some invalid crap
+
+		switch (true) {
+			case me.inTown && !this.townSkill(skillId): // cant cast this in town
+			case !item && Skills.manaCost[skillId] > me.mp: // dont have enough mana for this
+			case !item && !me.getSkill(skillId, 1): // Dont have this skill
+				return false;
+			case skillId === undefined:
+				throw new Error("Unit.cast: Must supply a skill ID");
+		}
+
+		var i, n, clickType, shift;
+
+		hand === undefined && (hand = Skills.hand[skillId]);
+
+		x === undefined && (x = me.x);
+		y === undefined && (y = me.y);
+
+		if (!me.setSkill(skillId, hand, item)) return false;
+
+		if (Config.PacketCasting > 1) {
+			switch (typeof x) {
+				case "number":
+					Packet.castSkill(hand, x, y);
+					delay(250);
+
+					break;
+				case "object":
+					Packet.unitCast(hand, x);
+					delay(250);
+
+					break;
+			}
+		} else {
+			switch (hand) {
+				case 0: // Right hand + No Shift
+					clickType = 3;
+					shift = 0;
+
+					break;
+				case 1: // Left hand + Shift
+					clickType = 0;
+					shift = 1;
+
+					break;
+				case 2: // Left hand + No Shift
+					clickType = 0;
+					shift = 0;
+
+					break;
+				case 3: // Right hand + Shift
+					clickType = 3;
+					shift = 1;
+
+					break;
+			}
+
+			MainLoop:
+				for (n = 0; n < 3; n += 1) {
+					if (this !== me) {
+						clickMap(clickType, shift, this);
+					} else {
+						clickMap(clickType, shift, x, y);
+					}
+
+					delay(20);
+
+					if (this !== me) {
+						clickMap(clickType + 2, shift, this);
+					} else {
+						clickMap(clickType + 2, shift, x, y);
+					}
+
+					for (i = 0; i < 8; i += 1) {
+						if (me.attacking) {
+							break MainLoop;
+						}
+
+						delay(20);
+					}
+				}
+
+			while (me.attacking) {
+				delay(10);
+			}
+		}
+
+		if (Skill.isTimed(skillId)) { // account for lag, state 121 doesn't kick in immediately
+			for (i = 0; i < 10; i += 1) {
+				if ([4, 9].indexOf(me.mode) > -1) {
+					break;
+				}
+
+				if (me.getState(121)) {
+					break;
+				}
+
+				delay(10);
+			}
+		}
+
+		return true;
 	};
 
 	Unit.prototype.attack = function () {
@@ -86,7 +193,7 @@
 		switch (true) {
 			case me.classid === 2: // necro
 				// recast bonearmor
-				!me.getState(sdk.states.BoneArmor) && Skill.cast(sdk.skills.BoneArmor) && Skill.cast(sdk.skills.BoneArmor);
+				!me.getState(sdk.states.BoneArmor) && me.cast(sdk.skills.BoneArmor) && me.cast(sdk.skills.BoneArmor);
 
 				// Take care of the curse
 				getUnits(1)
@@ -106,7 +213,7 @@
 						}
 
 						// cast lower res aura on the bastard
-						Skill.cast(91, 0, x, y); //ToDo; fix here something less specific as lower res curse
+						me.cast(91, 0, x, y); //ToDo; fix here something less specific as lower res curse
 					});
 
 				let corpse = getUnit(1, -1, 12),
@@ -114,7 +221,7 @@
 
 				if (corpse) for (; corpse.getNext();) {
 					if (getDistance(this, corpse) <= range && this.checkCorpse(corpse)) {
-						Skill.cast(74, 0, corpse);
+						me.cast(74, 0, corpse);
 					}
 				}
 				break;
@@ -152,7 +259,7 @@
 		if (Skills.hand[monsterEffort.skill] && me.classid === 3) { // Only for skills set on first hand, we can have an aura with it
 			// First ask nishi's frame if it is Eligible for conviction, if so, we put conviction on, if we got it obv
 			if (GameData.convictionEligible[monsterEffort.type] && GameData.skillLevel(123)) {
-				me.getSkill(0) !== 123 && Skill.setSkill(123, 0);
+				me.getSkill(0) !== 123 && me.setSkill(123, 0);
 				hand = 1;
 			} else {
 				let aura = Skills.aura[monsterEffort.skill];
@@ -168,6 +275,7 @@
 	};
 
 	Unit.prototype.kill = function () {
+		print('Killing ' + this.name);
 		let counter = 1;
 		while (counter < 3000 && counter++ && this.attackable) if (!this.attack()) break;
 		this.attackable && ignoreMonster.push(this.gid);

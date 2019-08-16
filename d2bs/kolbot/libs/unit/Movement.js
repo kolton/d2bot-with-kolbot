@@ -12,6 +12,7 @@
 	};
 
 	Unit.prototype.bestSpot = (unit, distance) => {
+		const CollMap = require('CollMap');
 		let n, i, coll = 0x04,
 			coords = [],
 			fullDistance = distance,

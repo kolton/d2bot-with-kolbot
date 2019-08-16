@@ -202,6 +202,7 @@
 							case 273: // Mind Blast
 								return 30;
 						}
+						return 20;
 					}
 				});
 			}
@@ -225,6 +226,31 @@
 						].findIndex(x => x.indexOf(skillId) > -1) || 0) + 1;
 					},
 				});
+			}
+		},
+		isTimed: {
+			get: function () {
+				return new Proxy({}, {
+					get: function (target, skillId) {
+						return [15, 25, 27, 51, 56, 59, 62, 64, 121, 225, 223, 228, 229, 234, 244, 247, 249, 250, 256, 268, 275, 277, 279].indexOf(parseInt(skillId)) > -1;
+					}
+				})
+			}
+		},
+		manaCost: {
+			get: function () {
+				return new Proxy({}, {
+					get: function (target, skillId) {
+						skillId = parseInt(skillId);
+						if (skillId < 6) return 0; // first skills dont use mana
+
+						let skillLvl = me.getSkill(skillId, 1),
+							effectiveShift = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024],
+							lvlmana = getBaseStat(3, skillId, "lvlmana") === 65535 ? -1 : getBaseStat(3, skillId, "lvlmana"); // Correction for skills that need less mana with levels (kolton)
+
+						return Math.max((getBaseStat(3, skillId, "mana") + lvlmana * (skillLvl - 1)) * (effectiveShift[getBaseStat(3, skillId, "manashift")] / 256), getBaseStat(3, skillId, "minmana"));
+					}
+				})
 			}
 		}
 	});

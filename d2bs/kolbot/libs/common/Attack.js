@@ -450,7 +450,7 @@ var Attack = {
 				if ((!spectype || (target.spectype & spectype)) && this.checkMonster(target) && this.skipCheck(target)) {
 					// Speed optimization - don't go through monster list until there's at least one within clear range
 					if (!start && getDistance(target, orgx, orgy) <= range &&
-						(me.getSkill(54, 1) || !Scripts.Follower || !checkCollision(me, target, 0x1))) {
+						(me.getSkill(54, 1) || !checkCollision(me, target, 0x1))) {
 						start = true;
 					}
 
