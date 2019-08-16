@@ -93,6 +93,7 @@ var ClassAttack = {
 	},
 
 	doCast: function (unit, attackSkill, aura) {
+		const CollMap = require('CollMap');
 		var i, walk;
 
 		if (attackSkill < 0) {
@@ -240,6 +241,7 @@ var ClassAttack = {
 	},
 
 	getHammerPosition: function (unit) {
+		const CollMap = require('CollMap');
 		var i, x, y, positions, check,
 			baseId = getBaseStat("monstats", unit.classid, "baseid"),
 			size = getBaseStat("monstats2", baseId, "sizex");

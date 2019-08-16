@@ -1627,6 +1627,7 @@ MainLoop:
 	},
 
 	getCorpse: function () {
+		const CollMap = require('CollMap');
 		var i, corpse, gid, coord,
 			corpseList = [],
 			timer = getTickCount();

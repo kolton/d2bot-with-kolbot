@@ -7,7 +7,6 @@
 function main() {
 	include('require.js');
 	include("oog.js");
-	include("json2.js");
 	include("common/misc.js");
 	D2Bot.init();
 	print("Heartbeat loaded");

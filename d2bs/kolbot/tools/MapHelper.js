@@ -7,7 +7,6 @@ include("TorchSystem.js");
 include("MuleLogger.js");
 include("common/Attack.js");
 include("common/Cubing.js");
-include("common/CollMap.js");
 include("common/Config.js");
 include("common/Loader.js");
 include("common/Misc.js");
@@ -21,7 +20,6 @@ include("common/Town.js");
 
 
 function main() {
-	include("json2.js");
 
 	var obj, action,
 		mapThread = getScript("tools/mapthread.js");

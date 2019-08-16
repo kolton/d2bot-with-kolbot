@@ -2,10 +2,11 @@
  * @description This is the new, simplified, unified, config file
  */
 (function (module, require, Config, AutoConfig, StarterConfig, Scripts = {}) {
+	// Override Misc.errorReport as i want stack info as well.
+	(_ => Misc.errorReport = new Function('return ' + _.toString().replace(/this\./gi, 'Misc.').replace('print(msg);', "print(msg);typeof error === 'object' && print(error.stack);"))())(Misc.errorReport);
 
 	// You can override here the settings of the entry script.
 	Config.Follow = ''; // which profile you want to follow? join games and such. Leave blank for non
-
 
 	// here you setup everything of the StarterConfig (what you did before in D2BotWhatever.dbj)
 	StarterConfig.JoinChannel = '';
@@ -25,7 +26,7 @@
 
 
 	// Here go your scripts as your used to. You can paste them from Scripts.txt.
-	Scripts.Baal = true;
+	Scripts.SpeedDiablo = true;
 
 
 	// Here go the pickit files

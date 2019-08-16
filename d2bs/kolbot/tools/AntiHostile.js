@@ -14,7 +14,6 @@ include("CraftingSystem.js");
 include("common/Attack.js");
 include("common/Cubing.js");
 include("common/Config.js");
-include("common/CollMap.js");
 include("common/Loader.js");
 include("common/Misc.js");
 include("common/Pickit.js");

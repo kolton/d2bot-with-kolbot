@@ -9,8 +9,11 @@
 		Object.keys(scripts)
 			.forEach(x => Config.Scripts[x] = scripts[x]);
 
-		Config.Silence && (global.say = print);
+		if (me.ingame) {
+			Config.Silence && (global.say = print);
 
+			Pickit.init(getScript(true).name.toLowerCase() === 'default.dbj'); // only notify if we are the default thread
+		}
 		return Config;
 	}
 

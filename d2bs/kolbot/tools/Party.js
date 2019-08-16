@@ -7,7 +7,6 @@
 function main() {
 	include('require.js');
 	include("OOG.js");
-	include("json2.js");
 	include("common/Config.js");
 	include("common/Cubing.js");
 	include("common/Runewords.js");

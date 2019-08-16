@@ -694,7 +694,6 @@ var Hooks = {
 
 function main() {
 	include('require.js');
-	include("json2.js");
 	include("common/attack.js");
 	include("common/pather.js");
 	load("tools/maphelper.js");

@@ -252,6 +252,7 @@ var ClassAttack = {
 	},
 
 	whirlwind: function (unit) {
+		const CollMap = require('CollMap');
 		if (!Attack.checkMonster(unit)) {
 			return true;
 		}

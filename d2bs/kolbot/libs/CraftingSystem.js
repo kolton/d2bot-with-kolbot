@@ -386,8 +386,8 @@ CraftingSystem.checkSet = function (set) {
 	CraftingSystem.neededItems = CraftingSystem.neededItems.concat(setNeeds);
 	CraftingSystem.validGids = CraftingSystem.validGids.concat(setHas);
 
-	CraftingSystem.neededItems.sort(Sort.numbers);
-	CraftingSystem.validGids.sort(Sort.numbers);
+	CraftingSystem.neededItems.sort();
+	CraftingSystem.validGids.sort();
 
 	return rval;
 };

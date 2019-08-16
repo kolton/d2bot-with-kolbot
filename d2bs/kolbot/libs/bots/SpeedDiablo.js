@@ -5,7 +5,8 @@
 function SpeedDiablo(Config) {
 	const Promise = require('Promise'),
 		TownPrecast = require('TownPrecast'),
-		Precast = require('precast');
+		Precast = require('Precast'),
+		Attack = require('Attack');
 
 	function openSeal(seal) {
 		for (let i = 0; i < 5; i += 1) {

@@ -665,6 +665,7 @@ ModeLoop:
 		area - the id of area to search for the room nearest to the player character
 	*/
 	getNearestRoom: function (area) {
+		const CollMap = require('CollMap');
 		var i, x, y, dist, room,
 			minDist = 10000;
 
@@ -747,6 +748,7 @@ ModeLoop:
 		id - id of the unit to open
 	*/
 	openUnit: function (type, id) {
+		const CollMap = require('CollMap');
 		var i, tick, unit, coord;
 
 		for (i = 0; i < 5; i += 1) {
@@ -1218,6 +1220,7 @@ MainLoop:
 		coll - collision flag to avoid
 	*/
 	getNearestWalkable: function (x, y, range, step, coll, size) {
+		const CollMap = require('CollMap');
 		if (!step) {
 			step = 1;
 		}
@@ -1266,6 +1269,7 @@ MainLoop:
 		cacheOnly - use only cached room data
 	*/
 	checkSpot: function (x, y, coll, cacheOnly, size) {
+		const CollMap = require('CollMap');
 		var dx, dy, value;
 
 		if (coll === undefined) {

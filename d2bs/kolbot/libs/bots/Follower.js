@@ -54,6 +54,8 @@ function Follower(Config) {
 		classes = ["amazon", "sorceress", "necromancer", "paladin", "barbarian", "druid", "assassin"],
 		action = "";
 
+	const CollMap = require('CollMap');
+
 	// Get leader's Party Unit
 	this.getLeader = function (name) {
 		var player = getParty();
