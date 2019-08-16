@@ -7,6 +7,10 @@
 		return this.distance > 5 && Pather.moveTo(this.x, this.y);
 	};
 
+	PresetUnit.prototype.moveTo = function () {
+		return Pather.moveTo(this.roomx * 5 + this.x, this.roomy * 5 + this.y);
+	};
+
 	Unit.prototype.bestSpot = (unit, distance) => {
 		let n, i, coll = 0x04,
 			coords = [],

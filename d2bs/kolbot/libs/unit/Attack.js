@@ -77,11 +77,11 @@
 		//ToDo; remove deprecated tag Attack
 		if (this.distance > Skills.range[monsterEffort.skill] || checkCollision(me, this, 0x4)) {
 			if (!Attack.getIntoPosition(this, Skills.range[monsterEffort.skill], 0x4)) {
+				ignoreMonster.push(this.gid);
 				return false;
 			}
 		}
 
-		print(JSON.stringify(this));
 		//@ToDo; Here some specific class stuff.
 		switch (true) {
 			case me.classid === 2: // necro

@@ -8,31 +8,6 @@ function SpeedDiablo(Config) {
 		Precast = require('Precast'),
 		Attack = require('Attack');
 
-	function openSeal(seal) {
-		for (let i = 0; i < 5; i += 1) {
-			if (seal.mode) return true;
-
-			if (seal.classid === 394) {
-				Misc.click(0, 0, seal);
-			} else {
-				seal.interact();
-			}
-
-			delay(seal.classid === 394 ? 1000 : 500);
-
-			if (seal.mode || i === 5) return i !== 5;
-
-			if (seal.classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
-				Pather.moveTo(seal.x + 15, seal.y);
-			} else {
-				Pather.moveTo(seal.x - 5, seal.y - 5);
-			}
-
-			delay(500);
-		}
-		return false; // cant come here, but still
-	}
-
 	let diaSort = function (a, b) {
 			// Entrance to Star / De Seis
 			if (me.y > 5325 || me.y < 5260) {
@@ -70,7 +45,7 @@ function SpeedDiablo(Config) {
 					!diaTick && Pather.moveTo(seal.roomx * 5 + seal.x + (seal.id === 394 ? 5 : 2), seal.roomy * 5 + seal.y + (seal.id === 394 ? 5 : 0));
 
 					// click on the seal.
-					!diaTick && openSeal(seal.unit);
+					!diaTick && SpeedDiablo.openSeal(seal.unit);
 
 
 					// Is it an active seal?
@@ -149,7 +124,7 @@ function SpeedDiablo(Config) {
 		star.path.forEach(node => node.moveTo() && Attack.clear(30));
 	}
 
-	const gamepacketHandler = bytes => bytes && bytes.hasOwnProperty(0) && bytes[0] === 0x89 && (diaTick = getTickCount()-(me.ping/2));
+	const gamepacketHandler = bytes => bytes && bytes.hasOwnProperty(0) && bytes[0] === 0x89 && (diaTick = getTickCount() - (me.ping / 2));
 
 	addEventListener('gamepacket', gamepacketHandler);
 	try {
@@ -165,4 +140,29 @@ function SpeedDiablo(Config) {
 	} finally { // Dont care for errors, just want to make sure the packet handler is removed after it
 		removeEventListener('gamepacket', gamepacketHandler);
 	}
+}
+
+SpeedDiablo.openSeal = function (seal) {
+	for (let i = 0; i < 5; i += 1) {
+		if (seal.mode) return true;
+
+		if (seal.classid === 394) {
+			Misc.click(0, 0, seal);
+		} else {
+			seal.interact();
+		}
+
+		delay(seal.classid === 394 ? 1000 : 500);
+
+		if (seal.mode || i === 5) return i !== 5;
+
+		if (seal.classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
+			Pather.moveTo(seal.x + 15, seal.y);
+		} else {
+			Pather.moveTo(seal.x - 5, seal.y - 5);
+		}
+
+		delay(500);
+	}
+	return false; // cant come here, but still
 }

@@ -1619,6 +1619,7 @@ var Attack = {
 		}
 
 		if (name) {
+			print((new Error).stack);
 			print("ÿc4Attackÿc0: No valid positions for: " + name);
 		}
 

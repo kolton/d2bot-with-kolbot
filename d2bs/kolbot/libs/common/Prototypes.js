@@ -1332,3 +1332,7 @@ if (!Array.prototype.findIndex) {
 		writable: true
 	});
 }
+
+PresetUnit.prototype.__defineGetter__('unit', function () {
+	return getUnits(this.type, this.id).first();
+});

@@ -26,7 +26,8 @@
 
 
 	// Here go your scripts as your used to. You can paste them from Scripts.txt.
-	Scripts.SpeedDiablo = true;
+	Scripts.AutoMagicFind = true
+	// Scripts.SpeedDiablo = true;
 
 
 	// Here go the pickit files
