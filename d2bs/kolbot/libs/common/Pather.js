@@ -21,23 +21,15 @@ var NodeAction = {
 	killMonsters: function (arg) {
 		var monList;
 
-		if (Pather.config.Countess.KillGhosts && [21, 22, 23, 24, 25].indexOf(me.area) > -1) {
-			monList = Attack.getMob(38, 0, 30);
-
-			if (monList) {
-				Attack.clearList(monList);
-			}
-		}
-
 		if ((typeof Pather.config.ClearPath === "number" || typeof Pather.config.ClearPath === "object") && arg.clearPath === false) {
 			switch (typeof Pather.config.ClearPath) {
 			case "number":
-				Attack.clear(30, Pather.config.ClearPath);
+				me.clear(30, Pather.config.ClearPath);
 
 				break;
 			case "object":
 				if (!Pather.config.ClearPath.hasOwnProperty("Areas") || Pather.config.ClearPath.Areas.length === 0 || Pather.config.ClearPath.Areas.indexOf(me.area) > -1) {
-					Attack.clear(Pather.config.ClearPath.Range, Pather.config.ClearPath.Spectype);
+					me.clear(Pather.config.ClearPath.Range, Pather.config.ClearPath.Spectype);
 				}
 
 				break;
@@ -45,7 +37,7 @@ var NodeAction = {
 		}
 
 		if (arg.clearPath !== false) {
-			Attack.clear(15, typeof arg.clearPath === "number" ? arg.clearPath : 0);
+			me.clear(15, typeof arg.clearPath === "number" ? arg.clearPath : 0);
 		}
 	},
 
@@ -171,20 +163,6 @@ var Pather = {
 
 		useTeleport = this.useTeleport();
 
-		/* Disabling getPath optimizations, they are causing desync -- noah
-		// Teleport without calling getPath if the spot is close enough
-		if (useTeleport && getDistance(me, x, y) <= this.teleDistance) {
-			//Misc.townCheck();
-
-			return this.teleportTo(x, y);
-		}
-
-		// Walk without calling getPath if the spot is close enough
-		if (!useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
-			return this.walkTo(x, y);
-		}
-		*/
-
 		path = getPath(me.area, x, y, me.x, me.y, useTeleport ? 1 : 0, useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
 
 		if (!path) {
@@ -200,7 +178,7 @@ var Pather = {
 		PathDebug.drawPath(path);
 
 		if (useTeleport && Pather.config.TeleSwitch && path.length > 5) {
-			Attack.weaponSwitch(Attack.getPrimarySlot() ^ 1);
+			me.weaponSwitch(me.primarySlot);
 		}
 
 		while (path.length > 0) {
@@ -250,13 +228,13 @@ var Pather = {
 					if (fail > 0 && !useTeleport && !me.inTown) {
 						// Don't go berserk on longer paths
 						if (!cleared) {
-							Attack.clear(5);
+							me.clear(5);
 
 							cleared = true;
 						}
 
 						if (fail > 1 && me.getSkill(143, 1)) {
-							Skill.cast(143, 0, node.x, node.y);
+							me.cast(143, 0, node.x, node.y);
 						}
 					}
 
@@ -291,7 +269,7 @@ var Pather = {
 		}
 
 		if (useTeleport && Pather.config.TeleSwitch) {
-			Attack.weaponSwitch(Attack.getPrimarySlot());
+			me.weaponSwitch(me.primarySlot);
 		}
 
 		PathDebug.removeHooks();
@@ -310,8 +288,6 @@ var Pather = {
 		if (maxRange === undefined) {
 			maxRange = 5;
 		}
-
-MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			if (Pather.config.PacketCasting) {
 				Skill.setSkill(54, 0);
@@ -394,7 +370,6 @@ MainLoop:
 			attemptCount += 1;
 			nTimer = getTickCount();
 
-ModeLoop:
 			while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
 				if (me.dead) {
 					return false;
@@ -417,7 +392,7 @@ ModeLoop:
 							y: Math.round(Math.sin(angle + angles[i]) * 5 + me.y)
 						};
 
-						if (Attack.validSpot(whereToClick.x, whereToClick.y)) {
+						if (whereToClick.validSpot) {
 							Misc.click(0, 0, whereToClick.x, whereToClick.y);
 
 							tick = getTickCount();
@@ -430,7 +405,7 @@ ModeLoop:
 						}
 					}
 
-					break ModeLoop;
+					break;
 				}
 
 				delay(10);
@@ -870,6 +845,7 @@ ModeLoop:
 		check - force the waypoint menu
 	*/
 	useWaypoint: function useWaypoint(targetArea, check) {
+		const CollMap = require('CollMap');
 		switch (targetArea) {
 		case undefined:
 			throw new Error("useWaypoint: Invalid targetArea parameter: " + targetArea);

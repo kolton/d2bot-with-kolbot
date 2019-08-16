@@ -19,7 +19,6 @@ function AutoMagicFind(Config) {
 
 
 	Town.doChores();
-	//ToDo; Prio lvl 85+ area's
 	areas.forEach((area, i) => i < 10 && print(area[0].LocaleString + ' -- ' + area[1]));
 
 	areas.forEach(area => {

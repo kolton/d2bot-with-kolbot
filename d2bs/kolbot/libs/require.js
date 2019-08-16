@@ -6,7 +6,9 @@
 if (typeof global === 'undefined') var global = this; // need a var here as a let would block the scope
 
 global['module'] = {exports: undefined};
-const require = (function (include,isIncluded) {
+const require = (function (include, isIncluded, print) {
+    !getScript(true).name.toString().endsWith('.dbj') && (print = () => {
+    }); // Only be verbose on main scripts
     let depth = 0;
     let packages = {};
     return (field, path) => {
@@ -45,4 +47,4 @@ const require = (function (include,isIncluded) {
         }
         throw Error('unexpected module error -- ' + field);
     }
-})(include,isIncluded);
+})(include, isIncluded, print);
