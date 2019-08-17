@@ -4,15 +4,16 @@
 *	@desc		kill Pindleskin and optionally Nihlathak
 */
 
-function Pindleskin(Config) {
-	var anya;
+function Pindleskin(Config, Attack, Pickit) {
+	let anya;
+	const Precast = require('Precast');
 
 	Town.goToTown(Config.Pindleskin.UseWaypoint ? undefined : 5);
 	Town.doChores();
 
 	if (Config.Pindleskin.UseWaypoint) {
 		Pather.useWaypoint(123);
-		Precast.doPrecast(true);
+		Precast();
 
 		if (!Pather.moveToExit([122, 121], true)) {
 			throw new Error("Failed to move to Nihlahak's Temple");
@@ -33,7 +34,7 @@ function Pindleskin(Config) {
 			throw new Error("Failed to use portal.");
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 	}
 
 	Pather.moveTo(10058, 13234);

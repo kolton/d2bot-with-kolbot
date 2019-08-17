@@ -4,17 +4,14 @@
 *	@desc		clear Tristram
 */
 
-function Tristram(Config) {
+function Tristram(Config, Attack, Pickit) {
 	var tree, scroll, akara, stones, gibbet;
 
 	if (!me.getQuest(4, 4) && !me.getItem(525)) {
 		if (!me.getItem(524)) {
 			// print("We need Scroll of Inifuss");
 			Town.doChores();
-			Pather.useWaypoint(5);
-			Precast.doPrecast(true);
-
-			if (!Pather.moveToPreset(me.area, 2, 30, 5, 5)) {
+			if (!me.journeyToPreset(sdk.areas.DarkWood, 2, 30, 5, 5)) {
 				throw new Error("Failed to move to Tree of Inifuss");
 			}
 
@@ -41,10 +38,7 @@ function Tristram(Config) {
 	Pather._teleport = Pather.teleport;
 
 	Town.doChores();
-	Pather.useWaypoint(4);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToPreset(me.area, 1, 737, 0, 0, false, true)) {
+	if (!me.journeyToPreset(sdk.areas.StonyField, 1, 737, 0, 0, false, true)) {
 		throw new Error("Failed to move to Rakanishu");
 	}
 
@@ -78,7 +72,7 @@ function Tristram(Config) {
 	gibbet = getUnit(2, 26);
 
 	if (!gibbet.mode) {
-		if (!Pather.moveToPreset(me.area, 2, 26, 0, 0, true, true)) {
+		if (!me.journeyToPreset(sdk.areas.Tristram, 2, 26, 0, 0, true, true)) {
 			throw new Error("Failed to move to Cain's Gibbet");
 		}
 
@@ -92,6 +86,4 @@ function Tristram(Config) {
 	}
 
 	Pather.teleport = Pather._teleport;
-
-	return true;
 }

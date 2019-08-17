@@ -1,12 +1,10 @@
-function OuterSteppes(Config) {
-	Town.goToTown(4);
+function OuterSteppes(Config, Attack) {
 	Town.doChores();
 
-	if (!Pather.moveToExit(104, true)) {
+	if (!Pather.journeyTo(104)) {
 		throw new Error("Failed to move to Outer Steppes");
 	}
 
-	Precast.doPrecast(true);
 	Attack.clearLevel(Config.ClearType);
 
 	return true;

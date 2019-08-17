@@ -4,7 +4,8 @@
 *	@desc		Do quests, only most popular ones for now
 */
 
-function Questing(Config) {
+function Questing(Config, Attack, Pickit) {
+	const Precast = require('Precast');
 	var i, j,
 		quests = [
 			[1, "clearDen"],
@@ -31,7 +32,7 @@ function Questing(Config) {
 			throw new Error();
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 		Attack.clearLevel();
 		Town.goToTown();
 		Town.move(NPC.Akara);
@@ -57,7 +58,7 @@ function Questing(Config) {
 			throw new Error();
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 
 		if (!Pather.moveToExit(49, true) || !Pather.moveToPreset(me.area, 2, 355)) {
 			throw new Error();
@@ -97,7 +98,7 @@ function Questing(Config) {
 			throw new Error();
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 
 		if (!Pather.moveToPreset(105, 1, 256)) {
 			return false;
@@ -132,7 +133,7 @@ function Questing(Config) {
 			throw new Error();
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 
 		if (!Pather.moveToExit(94, true) || !Pather.moveToPreset(me.area, 2, 193)) {
 			throw new Error();
@@ -172,7 +173,7 @@ function Questing(Config) {
 			throw new Error();
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 		Pather.moveTo(3883, 5113);
 		Attack.kill(getLocaleString(22435)); // Shenk the Overseer
 		Town.goToTown();
@@ -197,7 +198,7 @@ function Questing(Config) {
 			throw new Error();
 		}
 
-		Precast.doPrecast(true);
+		Precast();
 
 		if (!Pather.moveToExit(114, true) || !Pather.moveToPreset(me.area, 2, 460)) {
 			throw new Error();

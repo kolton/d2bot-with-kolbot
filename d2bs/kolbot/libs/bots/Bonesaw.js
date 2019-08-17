@@ -6,10 +6,7 @@
 
 function Bonesaw(Config) {
 	Town.doChores();
-	Pather.useWaypoint(115);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToPreset(115, 2, 455, 15, 15)) {
+	if (!me.journeyToPreset(115, 2, 455, 15, 15)) {
 		throw new Error("Failed to move to Bonesaw");
 	}
 

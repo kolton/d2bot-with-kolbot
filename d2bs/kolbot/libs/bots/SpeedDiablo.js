@@ -2,11 +2,10 @@
  * @author Jaenster
  * @description An improved version of a diablo run.
  */
-function SpeedDiablo(Config) {
+function SpeedDiablo(Config, Attack, Pickit) {
 	const Promise = require('Promise'),
 		TownPrecast = require('TownPrecast'),
-		Precast = require('Precast'),
-		Attack = require('Attack');
+		Precast = require('Precast');
 
 	let diaSort = function (a, b) {
 			// Entrance to Star / De Seis

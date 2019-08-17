@@ -4,14 +4,12 @@
 *	@desc		kill The Countess and optionally kill Ghosts along the way
 */
 
-function Countess(Config) {
+function Countess(Config, Attack) {
 	var i, poi;
 
 	Town.doChores();
-	Pather.useWaypoint(6);
-	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true)) {
+	if (!Pather.journeyTo(sdk.area.TowerCellarLvl5)) {
 		throw new Error("Failed to move to Countess");
 	}
 
@@ -35,6 +33,4 @@ function Countess(Config) {
 	if (Config.OpenChests) {
 		Misc.openChestsInArea();
 	}
-
-	return true;
 }

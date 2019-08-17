@@ -4,12 +4,10 @@
 *	@desc		clear Mausoleum
 */
 
-function Mausoleum(Config) {
+function Mausoleum(Config, Attack) {
 	Town.doChores();
-	Pather.useWaypoint(3);
-	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(17, true)) {
+	if (!Pather.journeyTo(17, true)) {
 		throw new Error("Failed to move to Burial Grounds");
 	}
 
@@ -33,6 +31,4 @@ function Mausoleum(Config) {
 
 		Attack.clearLevel(Config.ClearType);
 	}
-
-	return true;
 }

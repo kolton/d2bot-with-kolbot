@@ -4,7 +4,7 @@
 *	@desc		Rushee script that works with Rusher
 */
 
-function Rushee(Config) {
+function Rushee(Config, Attack, Pickit) {
 	var act, leader, target,
 		actions = [];
 

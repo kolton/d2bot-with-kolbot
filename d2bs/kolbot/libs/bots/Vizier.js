@@ -4,7 +4,8 @@
 *	@desc		kill Grand Vizier of Chaos
 */
 
-function Vizier(Config) {
+function Vizier(Config, Attack, Pickit) {
+	const Precast = require('Precast');
 	var i, tick, seal;
 
 	this.openSeal = function (id) {
@@ -33,7 +34,7 @@ function Vizier(Config) {
 
 	Town.doChores();
 	Pather.useWaypoint(107);
-	Precast.doPrecast(true);
+	Precast();
 
 	if (!this.openSeal(396) || !this.openSeal(395)) {
 		throw new Error("Failed to open seals");

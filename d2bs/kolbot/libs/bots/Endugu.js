@@ -4,12 +4,9 @@
 *	@desc		kill Witch Doctor Endugu
 */
 
-function Endugu(Config) {
+function Endugu(Config, Attack) {
 	Town.doChores();
-	Pather.useWaypoint(78);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToExit([88, 89, 91], true) || !Pather.moveToPreset(me.area, 2, 406)) {
+	if (!me.journeyToPreset(91, 2, 406)) {
 		throw new Error("Failed to move to Endugu");
 	}
 

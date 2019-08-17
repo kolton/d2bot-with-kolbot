@@ -4,7 +4,7 @@
 *	@desc		kill Duriel
 */
 
-function Duriel(Config) {
+function Duriel(Config, Attack) {
 	this.killDuriel = function () {
 		var i, target;
 
@@ -49,13 +49,9 @@ function Duriel(Config) {
 		Pather.useWaypoint(46);
 	}
 
-	Precast.doPrecast(true);
+	require('Precast')();
 
-	if (!Pather.moveToExit(getRoom().correcttomb, true)) {
-		throw new Error("Failed to move to Tal Rasha's Tomb");
-	}
-
-	if (!Pather.moveToPreset(me.area, 2, 152, -11, 3)) {
+	if (!me.journeyToPreset(getRoom().correcttomb, 2, 152, -11, 3)) {
 		throw new Error("Failed to move to Orifice");
 	}
 

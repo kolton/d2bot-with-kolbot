@@ -4,12 +4,11 @@
 *	@desc		clear Tal Rasha's Tombs
 */
 
-function Tombs(Config) {
+function Tombs(Config, Attack, Pickit) {
 	var i;
 
 	Town.doChores();
-	Pather.useWaypoint(46);
-	Precast.doPrecast(true);
+	Pather.journeyTo(46);
 
 	for (i = 66; i <= 72; i += 1) {
 		if (!Pather.moveToExit(i, true)) {
