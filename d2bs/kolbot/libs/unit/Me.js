@@ -1,7 +1,8 @@
 /** @typedef {Unit} me */
 
 (function () {
-	me.weaponSwitch = function (slot) {
+	const Events = new (require('Events'));
+	me.switchWeapons = function (slot) {
 		if (this.gametype === 0 || this.weaponswitch === slot && slot !== undefined) {
 			return true;
 		}
@@ -14,7 +15,7 @@
 		addEventListener('gamepacket', packetHandler);
 
 		for (i = 0; i < 10; i += 1) {
-			i > 0 && print('Switch weapons -- attempt #' + (i + 1));
+			print('Switch weapons -- attempt #' + (i + 1));
 
 			for (let j = 100; --j && me.idle;) {
 				delay(3); // wait max 300 ms to be idle
@@ -86,5 +87,11 @@
 			},
 			enumerable: false,
 		},
-	})
-});
+	});
+
+
+	me.on = Events.on;
+	me.off = Events.off;
+	me.once = Events.once;
+	me.trigger = Events.trigger;
+})();

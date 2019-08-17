@@ -1,6 +1,6 @@
 (function (require, _delay) {
-	print('klasjdklafsdkjlfdaskljfsadkljasdfkljfasdkljfdsakljfsadlkjfsadkljasfd');
 	const Skills = require('Skills');
+	const Precast = require('Precast');
 	const ignoreMonster = [];
 
 	Unit.prototype.clear = function (range) {
@@ -13,8 +13,7 @@
 		if (units) for (; (units = getUnits_filted()) && units.length;) {
 			delay(20);
 			if (!(unit = units.first())) break; // shouldn't happen but to be sure
-			let done = false;
-			for (; !done && unit.attackable;) {
+			for (let done = false; !done && unit.attackable;) {
 				done = !unit.attack();
 			}
 		}
@@ -152,7 +151,7 @@
 			}
 		}
 
-		if (Skill.isTimed(skillId)) { // account for lag, state 121 doesn't kick in immediately
+		if (Skills.isTimed[skillId]) { // account for lag, state 121 doesn't kick in immediately
 			for (i = 0; i < 10; i += 1) {
 				if ([4, 9].indexOf(me.mode) > -1) {
 					break;
@@ -188,6 +187,8 @@
 				return false;
 			}
 		}
+
+		Precast();
 
 		//@ToDo; Here some specific class stuff.
 		switch (true) {
