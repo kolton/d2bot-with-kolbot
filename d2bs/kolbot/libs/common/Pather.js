@@ -178,7 +178,7 @@ var Pather = {
 		PathDebug.drawPath(path);
 
 		if (useTeleport && Pather.config.TeleSwitch && path.length > 5) {
-			me.weaponSwitch(me.primarySlot);
+			me.switchWeapons(me.primarySlot);
 		}
 
 		while (path.length > 0) {
@@ -269,7 +269,7 @@ var Pather = {
 		}
 
 		if (useTeleport && Pather.config.TeleSwitch) {
-			me.weaponSwitch(me.primarySlot);
+			me.switchWeapons(me.primarySlot);
 		}
 
 		PathDebug.removeHooks();
@@ -1371,10 +1371,6 @@ MainLoop:
 		}
 
 		while (target.course.length) {
-			if (!me.inTown) {
-				Precast.doPrecast(false);
-			}
-
 			if (this.wpAreas.indexOf(me.area) > -1 && !getWaypoint(this.wpAreas.indexOf(me.area))) {
 				this.getWP(me.area);
 			}

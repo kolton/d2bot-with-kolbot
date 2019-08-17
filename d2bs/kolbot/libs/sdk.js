@@ -345,6 +345,7 @@ let sdk = {
         CycloneArmor: 235,
         HeartofWolverine: 236,
         SummonFenris: 237,
+        DireWolf: 237,
         Rabies: 238,
         FireClaws: 239,
         Twister: 240,

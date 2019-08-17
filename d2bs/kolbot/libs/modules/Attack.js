@@ -43,7 +43,7 @@
 				Pather.moveTo(result[0], result[1], 3, spectype);
 				previousArea = result;
 
-				if (!this.clear(40, spectype)) break;
+				if (!me.clear(40, spectype)) break;
 
 			} else if (currentArea !== getArea().id) { // Make sure bot does not get stuck in different area.
 				Pather.moveTo(previousArea[0], previousArea[1], 3, spectype);

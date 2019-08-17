@@ -1,6 +1,6 @@
 (function (require, _delay) {
-	print('klasjdklafsdkjlfdaskljfsadkljasdfkljfasdkljfdsakljfsadlkjfsadkljasfd');
 	const Skills = require('Skills');
+	const Precast = require('Precast');
 	const ignoreMonster = [];
 
 	Unit.prototype.clear = function (range) {
@@ -13,8 +13,7 @@
 		if (units) for (; (units = getUnits_filted()) && units.length;) {
 			delay(20);
 			if (!(unit = units.first())) break; // shouldn't happen but to be sure
-			let done = false;
-			for (; !done && unit.attackable;) {
+			for (let done = false; !done && unit.attackable;) {
 				done = !unit.attack();
 			}
 		}
@@ -152,7 +151,7 @@
 			}
 		}
 
-		if (Skill.isTimed(skillId)) { // account for lag, state 121 doesn't kick in immediately
+		if (Skills.isTimed[skillId]) { // account for lag, state 121 doesn't kick in immediately
 			for (i = 0; i < 10; i += 1) {
 				if ([4, 9].indexOf(me.mode) > -1) {
 					break;
@@ -168,7 +167,7 @@
 
 		return true;
 	};
-
+	let check = getTickCount();
 	Unit.prototype.attack = function () {
 		let monsterEffort = GameData.monsterEffort(this, this.area);
 
@@ -180,14 +179,8 @@
 			ignoreMonster.push(this.gid);
 			return false;
 		}
-
-		//ToDo; remove deprecated tag Attack
-		if (this.distance > Skills.range[monsterEffort.skill] || checkCollision(me, this, 0x4)) {
-			if (!Attack.getIntoPosition(this, Skills.range[monsterEffort.skill], 0x4)) {
-				ignoreMonster.push(this.gid);
-				return false;
-			}
-		}
+		//ToDo; every x seconds
+		getTickCount() - check > 1000 && !print(getTickCount() - check) && (check = getTickCount()) && Precast();
 
 		//@ToDo; Here some specific class stuff.
 		switch (true) {
@@ -251,10 +244,16 @@
 
 		me.overhead(getSkillById(monsterEffort.skill) + ' @ ' + monsterEffort.effort.toFixed(2));
 
-		if (Skills.range[monsterEffort.skill] < this.distance) {
-			this.moveTo(); // Move to monster if its on a too high distance
+		// if (Skills.range[monsterEf	fort.skill] < this.distance) {
+		// 	this.moveTo(); // Move to monster if its on a too high distance
+		// }
+		//ToDo; remove deprecated tag Attack
+		if (this.distance > Skills.range[monsterEffort.skill] || checkCollision(me, this, 0x4)) {
+			if (!this.getIntoPosition(Skills.range[monsterEffort.skill] / 3 * 2, 0x4)) {
+				ignoreMonster.push(this.gid);
+				return false;
+			}
 		}
-
 		// Paladins have aura's
 		if (Skills.hand[monsterEffort.skill] && me.classid === 3) { // Only for skills set on first hand, we can have an aura with it
 			// First ask nishi's frame if it is Eligible for conviction, if so, we put conviction on, if we got it obv
