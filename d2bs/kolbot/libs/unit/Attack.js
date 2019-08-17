@@ -167,7 +167,7 @@
 
 		return true;
 	};
-
+	let check = getTickCount();
 	Unit.prototype.attack = function () {
 		let monsterEffort = GameData.monsterEffort(this, this.area);
 
@@ -179,16 +179,8 @@
 			ignoreMonster.push(this.gid);
 			return false;
 		}
-
-		//ToDo; remove deprecated tag Attack
-		if (this.distance > Skills.range[monsterEffort.skill] || checkCollision(me, this, 0x4)) {
-			if (!Attack.getIntoPosition(this, Skills.range[monsterEffort.skill], 0x4)) {
-				ignoreMonster.push(this.gid);
-				return false;
-			}
-		}
-
-		Precast();
+		//ToDo; every x seconds
+		getTickCount() - check > 1000 && !print(getTickCount() - check) && (check = getTickCount()) && Precast();
 
 		//@ToDo; Here some specific class stuff.
 		switch (true) {
@@ -252,10 +244,16 @@
 
 		me.overhead(getSkillById(monsterEffort.skill) + ' @ ' + monsterEffort.effort.toFixed(2));
 
-		if (Skills.range[monsterEffort.skill] < this.distance) {
-			this.moveTo(); // Move to monster if its on a too high distance
+		// if (Skills.range[monsterEf	fort.skill] < this.distance) {
+		// 	this.moveTo(); // Move to monster if its on a too high distance
+		// }
+		//ToDo; remove deprecated tag Attack
+		if (this.distance > Skills.range[monsterEffort.skill] || checkCollision(me, this, 0x4)) {
+			if (!this.getIntoPosition(Skills.range[monsterEffort.skill] / 3 * 2, 0x4)) {
+				ignoreMonster.push(this.gid);
+				return false;
+			}
 		}
-
 		// Paladins have aura's
 		if (Skills.hand[monsterEffort.skill] && me.classid === 3) { // Only for skills set on first hand, we can have an aura with it
 			// First ask nishi's frame if it is Eligible for conviction, if so, we put conviction on, if we got it obv

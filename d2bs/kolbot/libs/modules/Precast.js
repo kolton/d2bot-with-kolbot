@@ -46,7 +46,6 @@
 			case !what.hasOwnProperty('skillId'):
 			// In case a function needs to be called to figure out if we need it
 			case what.hasOwnProperty('needed') && typeof what.needed === 'function' && !what.needed.apply(what):
-				print('typeof needed: ' + (typeof 'needed'));
 				// In case no function is given, see if we have the state
 				return undefined;
 

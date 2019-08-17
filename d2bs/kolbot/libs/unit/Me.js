@@ -13,36 +13,31 @@
 		let i, tick, switched = false,
 			packetHandler = (bytes) => bytes.length > 0 && bytes[0] === 0x97 && (switched = true) && false; // false to not block
 		addEventListener('gamepacket', packetHandler);
+		try {
+			for (i = 0; i < 10; i += 1) {
+				print('Switch weapons -- attempt #' + (i + 1));
 
-		for (i = 0; i < 10; i += 1) {
-			print('Switch weapons -- attempt #' + (i + 1));
-
-			for (let j = 100; --j && me.idle;) {
-				delay(3); // wait max 300 ms to be idle
-			}
-
-			i > 0 && delay(Math.min(1 + (me.ping * 1.5), 10));
-			!switched && sendPacket(1, 0x60); // Swap weapons
-
-			tick = getTickCount();
-
-			while (getTickCount() - tick < 500 + (me.ping * 5)) {
-				if (switched || originalSlot !== me.weaponswitch) {
-					while (!me.idle) {
-						delay(1);
-					}
-
-					removeEventListener('gamepacket', packetHandler);
-
-					return true;
+				for (let j = 10; --j && me.idle;) {
+					delay(3);
 				}
 
-				delay(3);
+				i > 0 && delay(Math.min(1 + (me.ping * 1.5), 10));
+				!switched && sendPacket(1, 0x60); // Swap weapons
+
+				tick = getTickCount();
+				while (getTickCount() - tick < 250 + (me.ping * 5)) {
+					if (switched || originalSlot !== me.weaponswitch) {
+						return true;
+					}
+
+					delay(3);
+				}
+				// Retry
 			}
-			// Retry
+		} finally {
+			removeEventListener('gamepacket', packetHandler);
 		}
 
-		removeEventListener('gamepacket', packetHandler);
 
 		return false;
 	};
