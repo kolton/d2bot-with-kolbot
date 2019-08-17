@@ -4,7 +4,7 @@
 *	@desc		kill seal bosses and Diablo
 */
 
-function FastDiablo(Config) {
+function FastDiablo(Config, Attack) {
 	this.getLayout = function (seal, value) {
 		var sealPreset = getPresetUnit(108, 2, seal);
 

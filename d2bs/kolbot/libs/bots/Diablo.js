@@ -4,7 +4,7 @@
 *	@desc		clear Chaos Sanctuary and kill Diablo
 */
 
-function Diablo(Config) {
+function Diablo(Config, Attack) {
 	// Sort function
 	this.sort = function (a, b) {
 		if (Config.BossPriority) {

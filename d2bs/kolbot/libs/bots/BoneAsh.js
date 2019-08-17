@@ -4,10 +4,9 @@
 *	@desc		kill Bone Ash
 */
 
-function BoneAsh(Config) {
+function BoneAsh(Config, Attack, Pickit) {
 	Town.doChores();
-	Pather.useWaypoint(32);
-	Precast.doPrecast(true);
+	Pather.journeyTo(sdk.areas.InnerCloister);
 
 	if (!Pather.moveTo(20047, 4898)) {
 		throw new Error("Failed to move to Bone Ash");

@@ -3,12 +3,12 @@
  * @author Jaenster
  */
 (function (require) {
-	Unit.prototype.moveTo = function () {
-		return this.distance > 5 && Pather.moveTo(this.x, this.y);
+	Unit.prototype.moveTo = function (offX, offY, clearPath, pop) {
+		return this.distance > 5 && Pather.moveTo(this.x + offX, this.y + offY, undefined, clearPath, pop);
 	};
 
-	PresetUnit.prototype.moveTo = function () {
-		return Pather.moveTo(this.roomx * 5 + this.x, this.roomy * 5 + this.y);
+	PresetUnit.prototype.moveTo = function (offX, offY, clearPath, pop) {
+		return Pather.moveTo(this.roomx * 5 + this.x + offX, this.roomy * 5 + this.y + offY, undefined, clearPath, pop);
 	};
 
 	Unit.prototype.bestSpot = (unit, distance) => {

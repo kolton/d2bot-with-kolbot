@@ -4,12 +4,9 @@
 *	@desc		kill Eyeback the Unleashed
 */
 
-function Eyeback(Config) {
+function Eyeback(Config, Attack) {
 	Town.doChores();
-	Pather.useWaypoint(112);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToPreset(111, 1, 784)) {
+	if (!me.journeyToPreset(111, 1, 784)) {
 		throw new Error("Failed to move to Eyeback the Unleashed");
 	}
 

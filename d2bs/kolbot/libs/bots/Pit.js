@@ -4,12 +4,10 @@
 *	@desc		clear Pit
 */
 
-function Pit(Config) {
+function Pit(Config, Attack, Pickit) {
 	Town.doChores();
-	Pather.useWaypoint(6);
-	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([7, 12], true)) {
+	if (!Pather.journeyTo(12)) {
 		throw new Error("Failed to move to Pit level 1");
 	}
 

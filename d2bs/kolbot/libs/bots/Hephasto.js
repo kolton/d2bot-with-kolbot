@@ -6,10 +6,8 @@
 
 function Hephasto(Config) {
 	Town.doChores();
-	Pather.useWaypoint(107);
-	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(me.area, 2, 376)) {
+	if (!me.journeyToPreset(107, 2, 376)) {
 		throw new Error("Failed to move to Hephasto");
 	}
 

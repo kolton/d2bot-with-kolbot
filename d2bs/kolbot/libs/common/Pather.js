@@ -1371,6 +1371,8 @@ MainLoop:
 		}
 
 		while (target.course.length) {
+			!me.inTown && require('Precast')();
+
 			if (this.wpAreas.indexOf(me.area) > -1 && !getWaypoint(this.wpAreas.indexOf(me.area))) {
 				this.getWP(me.area);
 			}

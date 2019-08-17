@@ -86,6 +86,8 @@ var Loader = {
 	loadScripts: function () {
 		const Config = require('Config');
 		const Scripts = Config.Scripts;
+		const Attack = require('Attack');
+		const Pickit = require('Pickit');
 		var s, script,
 			unmodifiedConfig = {};
 
@@ -126,7 +128,7 @@ var Loader = {
 						Messaging.sendToScript("tools/toolsthread.js", JSON.stringify({currScript: script}));
 
 						// Assign a new object to the config object
-						global[script](Object.assign(typeof Scripts[script] === 'object' && Scripts[script] || {}, Config));
+						global[script](Object.assign(typeof Scripts[script] === 'object' && Scripts[script] || {}, Config), Attack, Pickit);
 					}
 				} catch (error) {
 					Misc.errorReport(error, script);

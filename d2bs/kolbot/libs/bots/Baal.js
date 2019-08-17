@@ -4,7 +4,7 @@
  *	@desc		clear Throne of Destruction and kill Baal
  */
 
-function Baal(Config) {
+function Baal(Config, Attack, Pickit) {
 	var portal, tick;
 
 	this.preattack = function () {
@@ -197,14 +197,7 @@ function Baal(Config) {
 	};
 
 	Town.doChores();
-	Pather.useWaypoint(Config.RandomPrecast ? "random" : 129);
-	Precast.doPrecast(true);
-
-	if (me.area !== 129) {
-		Pather.useWaypoint(129);
-	}
-
-	if (!Pather.moveToExit([130, 131], true)) {
+	if (!Pather.journeyTo(131)) {
 		throw new Error("Failed to move to Throne of Destruction.");
 	}
 
@@ -236,7 +229,6 @@ function Baal(Config) {
 		Pather.moveTo(15118, 5045);
 		Pather.makePortal();
 		say(Config.Baal.SafeTPMessage);
-		Precast.doPrecast(true);
 	}
 
 	tick = getTickCount();
@@ -259,7 +251,6 @@ MainLoop:
 
 			tick = getTickCount();
 
-			Precast.doPrecast(true);
 
 			break;
 		case 2:
@@ -311,7 +302,6 @@ MainLoop:
 
 		Pather.moveTo(15090, 5008);
 		delay(5000);
-		Precast.doPrecast(true);
 
 		while (getUnit(1, 543)) {
 			delay(500);

@@ -13,6 +13,7 @@
 			Config.Silence && (global.say = print);
 
 			Pickit.init(getScript(true).name.toLowerCase() === 'default.dbj'); // only notify if we are the default thread
+			print(JSON.stringify(Config.Scripts));
 		}
 		return Config;
 	}

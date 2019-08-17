@@ -61,13 +61,14 @@
 	Unit.prototype.cast = function (skillId, hand, x, y, item) {
 		// In case its called upon an item we own, redirect it to castChargedSkill
 		if (this.type === 4 && Object.keys(sdk.storage).map(x => sdk.storage[x]).indexOf(this.location) !== -1) return this.castChargedSkill(skillId, x, y);
+
 		//return Skill.cast(skillId, hand || Skills.hand[skillId], this);
 
 		const Config = require('Config');
 		// Some invalid crap
 
 		switch (true) {
-			case me.inTown && !this.townSkill(skillId): // cant cast this in town
+			case me.inTown && !Skills.town[skillId]: // cant cast this in town
 			case !item && Skills.manaCost[skillId] > me.mp: // dont have enough mana for this
 			case !item && !me.getSkill(skillId, 1): // Dont have this skill
 				return false;
@@ -174,7 +175,7 @@
 		if (!monsterEffort) return false; // dont know how to attack this
 		let hand = 0;
 
-		if (!Attack.validSpot(this.x, this.y)) {
+		if (!this.validSpot) {
 			print('INVALID SPOT -- ');
 			ignoreMonster.push(this.gid);
 			return false;
@@ -190,7 +191,7 @@
 
 				// Take care of the curse
 				getUnits(1)
-					.filter(Attack.checkMonster)
+					.filter(x => x.attackable)
 					.filter(unit => !unit.getState(61))
 					.forEach(function (unit) {
 						let [x, y] = [unit.x, unit.y], spot;

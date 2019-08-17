@@ -4,12 +4,10 @@
 *	@desc		kill Corpsefire and optionally clear Den of Evil
 */
 
-function Corpsefire(Config) {
+function Corpsefire(Config, Attack) {
 	Town.doChores();
-	Pather.useWaypoint(3);
-	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([2, 8], true) || !Pather.moveToPreset(me.area, 1, 774, 0, 0, false, true)) {
+	if (!me.journeyToPreset(me.area, 1, 774, 0, 0, false, true)) {
 		throw new Error("Failed to move to Corpsefire");
 	}
 
@@ -18,6 +16,4 @@ function Corpsefire(Config) {
 	if (Config.Corpsefire.ClearDen) {
 		Attack.clearLevel();
 	}
-
-	return true;
 }

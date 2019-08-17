@@ -4,12 +4,9 @@
 *	@desc		kill the Smith
 */
 
-function Smith(Config) {
+function Smith(Config, Attack, Pickit) {
 	Town.doChores();
-	Pather.useWaypoint(27);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToPreset(28, 2, 108)) {
+	if (!me.journeyToPreset(28, 2, 108)) {
 		throw new Error("Failed to move to the Smith");
 	}
 

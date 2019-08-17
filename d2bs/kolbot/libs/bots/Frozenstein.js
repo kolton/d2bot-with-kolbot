@@ -4,12 +4,9 @@
 *	@desc		kill Frozensteinand optionally clear Frozen River
 */
 
-function Frozenstein(Config) {
+function Frozenstein(Config, Attack) {
 	Town.doChores();
-	Pather.useWaypoint(113);
-	Precast.doPrecast(true);
-
-	if (!Pather.moveToExit(114, true) || !Pather.moveToPreset(me.area, 2, 460, -5, -5)) {
+	if (!me.journeyToPreset(114, 2, 460, -5, -5)) {
 		throw new Error("Failed to move to Frozenstein");
 	}
 

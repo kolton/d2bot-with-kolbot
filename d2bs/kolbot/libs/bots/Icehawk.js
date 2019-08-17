@@ -6,10 +6,8 @@
 
 function Icehawk(Config) {
 	Town.doChores();
-	Pather.useWaypoint(80);
-	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([92, 93], false)) {
+	if (!Pather.journeyTo(93)) {
 		throw new Error("Failed to move to Icehawk");
 	}
 

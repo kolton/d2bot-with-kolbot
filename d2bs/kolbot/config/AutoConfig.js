@@ -2,8 +2,6 @@
  * @description This is the new, simplified, unified, config file
  */
 (function (module, require, Config, AutoConfig, StarterConfig, Scripts = {}) {
-	// Override Misc.errorReport as i want stack info as well.
-
 	// You can override here the settings of the entry script.
 	Config.Follow = ''; // which profile you want to follow? join games and such. Leave blank for non
 
@@ -29,7 +27,6 @@
 	Scripts.AutoMagicFind = true;
 
 	// Scripts.SpeedDiablo = true;
-
 
 	// Here go the pickit files
 	Config.PickitFiles.push("pots.nip");

@@ -4,7 +4,7 @@
 *	@desc		clear the Moo Moo Farm without killing the Cow King
 */
 
-function Cows(Config) {
+function Cows(Config, Attack) {
 	this.buildCowRooms = function () {
 		var i, j, room, kingPreset, badRooms, badRooms2,
 			finalRooms = [],
@@ -85,9 +85,7 @@ function Cows(Config) {
 			return me.getItem(88);
 		}
 
-		Pather.useWaypoint(4);
-		Precast.doPrecast(true);
-		Pather.moveToPreset(me.area, 1, 737, 8, 8);
+		me.journeyToPreset(sdk.areas.StonyField, 1, 737, 8, 8);
 
 		for (i = 0; i < 6; i += 1) {
 			portal = Pather.getPortal(38);

@@ -84,6 +84,12 @@
 		},
 	});
 
+	me.journeyToPreset = function (area, unitType, unitId, offX, offY, clearPath, pop) {
+		if (me.area !== area) Pather.journeyTo(area);
+
+		let presetUnit = getPresetUnit(area, unitType, unitId);
+		presetUnit && presetUnit.moveTo(offX, offY);
+	};
 
 	me.on = Events.on;
 	me.off = Events.off;

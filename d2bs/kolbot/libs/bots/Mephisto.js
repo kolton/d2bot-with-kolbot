@@ -4,9 +4,7 @@
 *	@desc		kill Mephisto
 */
 
-function Mephisto(Config) {
-	const Attack = require('Attack');
-	const Precast = require('Precast');
+function Mephisto(Config, Attack) {
 	const TownPrecast = require('TownPrecast');
 	this.killMephisto = function () {
 		var i, angle, angles,
@@ -23,15 +21,11 @@ function Mephisto(Config) {
 		return (meph.mode === 0 || meph.mode === 12);
 	};
 
-
 	TownPrecast();
-	Town.doChores();
-	Pather.useWaypoint(101);
-	Precast();
-
-	if (!Pather.moveToExit(102, true)) {
+	if (!Pather.journeyTo(102)) {
 		throw new Error("Failed to move to Durance Level 3");
 	}
+	print(JSON.stringify(me.getStat(-1)));
 
 	Pather.moveTo(17566, 8069);
 	this.killMephisto();
@@ -52,5 +46,4 @@ function Mephisto(Config) {
 		Pather.moveTo(17601, 8070);
 		Pather.usePortal(null);
 	}
-	return true;
 }

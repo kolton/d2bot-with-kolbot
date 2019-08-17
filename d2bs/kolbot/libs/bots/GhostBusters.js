@@ -4,7 +4,7 @@
 *	@desc		who you gonna call?
 */
 
-function GhostBusters() {
+function GhostBusters(Config, Attack) {
 	this.clearGhosts = function () {
 		var room, result, rooms, monster, monList;
 
