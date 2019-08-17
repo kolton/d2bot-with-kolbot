@@ -25,30 +25,25 @@ function AutoMagicFind(Config) {
 		let Area = area[0];
 		print('Going to clear ' + area[0].LocaleString);
 		print(Area.Index);
-		if (Pather.wpAreas.indexOf(Area.Index) !== -1) {
-			Town.goToTown();
-			Pather.useWaypoint(Area.Index);
-		} else {
-			Pather.journeyTo(Area.Index);
+		Pather.journeyTo(Area.Index);
+		switch (Area.Index) {
+			case sdk.areas.ChaosSanctuary: //If we are in chaos, simply open all seals
+				const star = {x: 7792, y: 5292};
+				new Promise(resolve => star.distance < 40 && resolve()).then(function () {
+					include('bots/SpeedDiablo.js');
+					// Once close to the star, just quickly open all seals
+					[sdk.units.DiabloSealVizierInactive, sdk.units.DiabloSealVizierActive,
+						sdk.units.DiabloSealSeizActive, sdk.units.DiabloSealInfectorInActive,
+						sdk.units.DiabloSealInfectorActive].forEach(seal => {
+						let ps = getPresetUnits(108, 2, seal).first();
+						print(JSON.stringify(ps));
+						ps && ps.moveTo() && ps.unit && SpeedDiablo.openSeal(ps.unit);
+					});
 
-			switch (Area.Index) {
-				case sdk.areas.ChaosSanctuary: //If we are in chaos, simply open all seals
-					const star = {x: 7792, y: 5292};
-					new Promise(resolve => star.distance < 40 && resolve()).then(function () {
-						include('bots/SpeedDiablo.js');
-						// Once close to the star, just quickly open all seals
-						[sdk.units.DiabloSealVizierInactive, sdk.units.DiabloSealVizierActive,
-							sdk.units.DiabloSealSeizActive, sdk.units.DiabloSealInfectorInActive,
-							sdk.units.DiabloSealInfectorActive].forEach(seal => {
-							let ps = getPresetUnits(108, 2, seal).first();
-							print(JSON.stringify(ps));
-							ps && ps.moveTo() && ps.unit && SpeedDiablo.openSeal(ps.unit);
-						});
+					star.moveTo(); // move to the center again
+				})
 
-						star.moveTo(); // move to the center again
-					})
 
-			}
 		}
 
 		//Pather.journeyTo(area[0].Index);
