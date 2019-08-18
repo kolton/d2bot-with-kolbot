@@ -87,7 +87,6 @@ var Loader = {
 		const Config = require('Config');
 		const Scripts = Config.Scripts;
 		const Attack = require('Attack');
-		const Pickit = require('Pickit');
 		var s, script,
 			unmodifiedConfig = {};
 
