@@ -19,14 +19,13 @@ var StarterConfig = {
 include("json2.js");
 include("OOG.js");
 include("MuleLogger.js");
-include("gambling.js");
 include("common/misc.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var handle, gameInfo, gameStart, ingame, firstLogin, connectFail, chatActionsDone, currAcc, charList, nextAcc,
+var handle, gameInfo, gameStart, ingame, connectFail, currAcc, charList,
 	lastGameStatus = "ready",
 	gameCount = DataFile.getStats().runs + 1,
 	accounts = [],
@@ -262,13 +261,6 @@ MainSwitch:
 	case 8: // Main Menu
 	case 9: // Login
 	case 18: // D2 Splash
-		if (nextAcc) {
-			accounts.shift();
-			chars.shift();
-
-			nextAcc = false;
-		}
-
 		if (!accounts.length) {
 			FileTools.remove("logs/MuleLog.json");
 			D2Bot.printToConsole("Done logging mules!");
@@ -303,6 +295,7 @@ MainSwitch:
 		FileTools.writeText("logs/MuleLog.json", JSON.stringify(obj));
 		MuleLogger.save(md5(currAcc[2].toLowerCase() + currAcc[0].toLowerCase()), currAcc[1]);
 		ControlAction.loginAccount({account: currAcc[0], password: currAcc[1], realm: currAcc[2]});
+		accounts.shift(); // remove current account from the list
 
 		break;
 	case 10: // Login Error
@@ -447,7 +440,8 @@ MainSwitch:
 
 		// last char in acc = trigger next acc
 		if (!charList.length) {
-			nextAcc = true;
+			accounts.shift(); // remove current account from the list
+			chars.shift();
 
 			break;
 		}
@@ -624,7 +618,8 @@ MainSwitch:
 		}
 
 		if (!locationTimeout(5000, location)) {
-			nextAcc = true; // Go to next account
+			accounts.shift(); // remove current account from the list
+			chars.shift();
 
 			ControlAction.click(6, 33, 572, 128, 35);
 		}
