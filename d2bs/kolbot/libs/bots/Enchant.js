@@ -584,7 +584,7 @@ MainLoop:
 			Pather.moveTo(spot.x, spot.y);
 		}
 
-		if (command && !this.floodCheck(command)) {
+		if (command && !this.floodCheck(command) && command[1] ) {
 			switch (command[0].toLowerCase()) {
 			case "help":
 				this.checkHostiles();
