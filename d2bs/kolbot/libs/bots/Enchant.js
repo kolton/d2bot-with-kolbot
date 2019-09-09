@@ -493,6 +493,10 @@ MainLoop:
 	this.floodCheck = function (command) {
 		var cmd = command[0],
 			nick = command[1];
+			
+		if (!nick) {	// ignore overhead messages
+				return true;
+		}
 
 		if ([	"help", "timeleft",
 				Config.Enchant.Triggers[0].toLowerCase(),
@@ -584,7 +588,7 @@ MainLoop:
 			Pather.moveTo(spot.x, spot.y);
 		}
 
-		if (command && !this.floodCheck(command) && command[1] ) {
+		if (command && !this.floodCheck(command)) {
 			switch (command[0].toLowerCase()) {
 			case "help":
 				this.checkHostiles();
