@@ -495,7 +495,7 @@ MainLoop:
 			nick = command[1];
 			
 		if (!nick) {	// ignore overhead messages
-				return true;
+			return true;
 		}
 
 		if ([	"help", "timeleft",
