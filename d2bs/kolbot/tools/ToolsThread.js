@@ -429,11 +429,11 @@ function main() {
 
 				if (typeof Config.QuitListDelay !== 'undefined' && typeof quitListDelayTime === 'undefined' && Config.QuitListDelay.length > 0) {
 					Config.QuitListDelay.sort(function(a, b){return a-b});
-					quitListDelayTime = getTickCount() + (rand(Config.QuitListDelay[0], Config.QuitListDelay[1]) * 1000);
+					quitListDelayTime = getTickCount() + rand(Config.QuitListDelay[0] * 1e3, Config.QuitListDelay[1] * 1e3);
 				} else {
 					quitListDelayTime = getTickCount();
 				}
-				
+
 				quitFlag = true;
 			}
 
