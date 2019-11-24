@@ -415,7 +415,10 @@ var Config = {
 	BattleOrders: {
 		Mode: 0,
 		Getters: [],
-		Wait: false
+		Wait: false,
+		QuitOnFailedGive: false,
+		QuitOnFailedGet: false,
+		SkipIfTardy: true
 	},
 	Enchant: {
 		Triggers: ["chant", "cows", "wps"],
