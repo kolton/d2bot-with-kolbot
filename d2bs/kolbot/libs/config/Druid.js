@@ -19,8 +19,11 @@ function LoadConfig() {
 	// Battle orders script - Use this for 2+ characters (for example BO barb + sorc)
 	Scripts.BattleOrders = false;
 		Config.BattleOrders.Mode = 0; // 0 = give BO, 1 = get BO
-		Config.BattleOrders.Wait = false; // Idle until the player that received BO leaves.
+		Config.BattleOrders.Idle = false; // Idle until the player that received BO leaves.
 		Config.BattleOrders.Getters = []; // List of players to wait for before casting Battle Orders (mode 0). All players must be in the same area as the BOer.
+		Config.BattleOrders.QuitOnFailure = false;  // Quit the game if BO fails
+		Config.BattleOrders.SkipIfTardy = true;  // Proceed with scripts if other players already moved on from BO spot
+		Config.BattleOrders.Wait = 10;  // Duration to wait for players to join game in seconds (default: 10)tleOrders.Getters = []; // List of players to wait for before casting Battle Orders (mode 0). All players must be in the same area as the BOer.
 
 	// Team MF system
 	Config.MFLeader = false; // Set to true if you have one or more MFHelpers. Opens TP and gives commands when doing normal MF runs.
