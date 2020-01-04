@@ -415,10 +415,10 @@ var Config = {
 	BattleOrders: {
 		Mode: 0,
 		Getters: [],
-		Wait: false,
-		QuitOnFailedGive: false,
-		QuitOnFailedGet: false,
-		SkipIfTardy: true
+		Idle: false,  // Idle until player receiving BO leaves
+		QuitOnFailure: false,  // Quit the game if BO fails
+		SkipIfTardy: true,  // Proceed with scripts if other players already moved on from BO spot
+		Wait: 10,  // Duration to wait for players to join game
 	},
 	Enchant: {
 		Triggers: ["chant", "cows", "wps"],
