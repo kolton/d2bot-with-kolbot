@@ -1,8 +1,8 @@
 /**
 *	@filename	BattleOrders.js
-*	@author		kolton
+*	@author		kolton, jmichelsen
 *	@desc		give or receive Battle Orders buff
-*   @return {boolean}
+*	@return {boolean}
 */
 
 function BattleOrders() {
