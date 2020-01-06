@@ -170,6 +170,7 @@ var Config = {
 	Leader: "",
 	QuitList: [],
 	QuitListMode: 0,
+	QuitListDelay: [],
 	HPBuffer: 0,
 	MPBuffer: 0,
 	RejuvBuffer: 0,
