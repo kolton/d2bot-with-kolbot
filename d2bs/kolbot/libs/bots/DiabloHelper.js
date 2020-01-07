@@ -2,6 +2,7 @@
 *	@filename	DiabloHelper.js
 *	@author		kolton
 *	@desc		help leading player in clearing Chaos Sanctuary and killing Diablo
+*   @return {boolean}
 */
 
 function DiabloHelper() {
@@ -72,6 +73,43 @@ function DiabloHelper() {
 		this.infLayout = this.getLayout(392, 7893); // 1 = "I", 2 = "J"
 	};
 
+	this.openSeal = function (classid) {
+		let i,
+			seal;
+
+		for (i = 0; i < 5; i += 1) {
+			Pather.moveToPreset(108, 2, classid, classid === 394 ? 5 : 2, classid === 394 ? 5 : 0);
+
+			seal = getUnit(2, classid);
+
+			if (!seal) {
+				return false;
+			}
+
+			if (classid === 394) {
+				Misc.click(0, 0, seal);
+			} else {
+				seal.interact();
+			}
+
+			delay(classid === 394 ? 1000 : 500);
+
+			if (!seal.mode) {
+				if (classid === 394 && Attack.validSpot(seal.x + 15, seal.y)) { // de seis optimization
+					Pather.moveTo(seal.x + 15, seal.y);
+				} else {
+					Pather.moveTo(seal.x - 5, seal.y - 5);
+				}
+
+				delay(500);
+			} else {
+				return true;
+			}
+		}
+
+		return false;
+	};
+
 	this.getBoss = function (name) {
 		var i, boss, glow;
 
@@ -103,6 +141,12 @@ function DiabloHelper() {
 	this.vizierSeal = function () {
 		this.followPath(this.vizLayout === 1 ? this.starToVizA : this.starToVizB, this.sort);
 
+		if (Config.DiabloHelper.OpenSeals) {
+			if (!this.openSeal(395) || !this.openSeal(396)) {
+				throw new Error("Failed to open Vizier seals.");
+			}
+		}
+
 		if (this.vizLayout === 1) {
 			Pather.moveTo(7691, 5292);
 		} else {
@@ -123,6 +167,12 @@ function DiabloHelper() {
 	this.seisSeal = function () {
 		this.followPath(this.seisLayout === 1 ? this.starToSeisA : this.starToSeisB, this.sort);
 
+		if (Config.DiabloHelper.OpenSeals) {
+			if (!this.openSeal(394)) {
+				throw new Error("Failed to open de Seis seal.");
+			}
+		}
+
 		if (this.seisLayout === 1) {
 			Pather.moveTo(7771, 5196);
 		} else {
@@ -141,7 +191,14 @@ function DiabloHelper() {
 	};
 
 	this.infectorSeal = function () {
+		Precast.doPrecast(true);
 		this.followPath(this.infLayout === 1 ? this.starToInfA : this.starToInfB, this.sort);
+
+		if (Config.DiabloHelper.OpenSeals) {
+			if (!this.openSeal(392)) {
+				throw new Error("Failed to open Infector seals.");
+			}
+		}
 
 		if (this.infLayout === 1) {
 			delay(1);
@@ -153,6 +210,12 @@ function DiabloHelper() {
 			throw new Error("Failed to kill Infector");
 		}
 
+		if (Config.DiabloHelper.OpenSeals) {
+			if (!this.openSeal(393)) {
+				throw new Error("Failed to open Infector seals.");
+			}
+		}
+
 		if (Config.FieldID) {
 			Town.fieldID();
 		}
@@ -160,9 +223,33 @@ function DiabloHelper() {
 		return true;
 	};
 
+	const clearSeals = (sealOrder) => {
+		print("seal order: " + sealOrder);
+		let seals = {
+			1: () => this.vizierSeal(),
+			2: () => this.seisSeal(),
+			3: () => this.infectorSeal(),
+			"vizier": () => this.vizierSeal(),
+			"seis": () => this.seisSeal(),
+			"infector": () => this.infectorSeal(),
+		};
+		sealOrder.forEach(seal => {seals[seal]()});
+	};
+
 	this.diabloPrep = function () {
 		var trapCheck,
 			tick = getTickCount();
+
+		switch (me.classid) {
+			case 1:
+				Pather.moveTo(7793, 5291);
+
+				break;
+			default:
+				Pather.moveTo(7788, 5292);
+
+				break;
+		}
 
 		while (getTickCount() - tick < 30000) {
 			if (getTickCount() - tick >= 8000) {
@@ -393,8 +480,10 @@ AreaInfoLoop:
 		}
 	}
 
-	Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
-	Precast.doPrecast(true);
+	if (Config.DiabloHelper.SafePrecast) {
+		Pather.useWaypoint(Config.RandomPrecast ? "random" : 107);
+		Precast.doPrecast(true);
+	}
 
 	if (Config.DiabloHelper.SkipTP) {
 		if (me.area !== 107) {
@@ -457,23 +546,19 @@ CSLoop:
 
 	Pather.moveTo(7774, 5305);
 	Attack.clear(35, 0, false, this.sort);
-	this.vizierSeal();
-	this.seisSeal();
-	Precast.doPrecast(true);
-	this.infectorSeal();
+	clearSeals(Config.DiabloHelper.SealOrder);
 
-	switch (me.classid) {
-	case 1:
-		Pather.moveTo(7793, 5291);
-
-		break;
-	default:
-		Pather.moveTo(7788, 5292);
-
-		break;
+	try {
+		print("Attempting to find Diablo");
+		this.diabloPrep();
+	} catch (error) {
+		print("Diablo wasn't found. Checking seals.");
+		this.vizierSeal();
+		this.seisSeal();
+		this.infectorSeal();
+		this.diabloPrep();
 	}
 
-	this.diabloPrep();
 	Attack.kill(243); // Diablo
 	Pickit.pickItems();
 

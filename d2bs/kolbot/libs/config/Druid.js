@@ -19,8 +19,11 @@ function LoadConfig() {
 	// Battle orders script - Use this for 2+ characters (for example BO barb + sorc)
 	Scripts.BattleOrders = false;
 		Config.BattleOrders.Mode = 0; // 0 = give BO, 1 = get BO
-		Config.BattleOrders.Wait = false; // Idle until the player that received BO leaves.
+		Config.BattleOrders.Idle = false; // Idle until the player that received BO leaves.
 		Config.BattleOrders.Getters = []; // List of players to wait for before casting Battle Orders (mode 0). All players must be in the same area as the BOer.
+		Config.BattleOrders.QuitOnFailure = false;  // Quit the game if BO fails
+		Config.BattleOrders.SkipIfTardy = true;  // Proceed with scripts if other players already moved on from BO spot
+		Config.BattleOrders.Wait = 10;  // Duration to wait for players to join game in seconds (default: 10)tleOrders.Getters = []; // List of players to wait for before casting Battle Orders (mode 0). All players must be in the same area as the BOer.
 
 	// Team MF system
 	Config.MFLeader = false; // Set to true if you have one or more MFHelpers. Opens TP and gives commands when doing normal MF runs.
@@ -88,6 +91,7 @@ function LoadConfig() {
 		Config.Diablo.EntranceTP = "Entrance TP up";
 		Config.Diablo.StarTP = "Star TP up";
 		Config.Diablo.DiabloMsg = "Diablo";
+		Config.Diablo.SealOrder = ["vizier", "seis", "infector"]; // the order in which to clear the seals. If seals are excluded, they won't be checked unless diablo fails to appear
 	Scripts.SealLeader = false; // Clear a safe spot around seals and invite leechers in. Leechers should run SealLeecher script. Don't run with Diablo or FastDiablo.
 
 	// *** act 5 ***
@@ -141,6 +145,9 @@ function LoadConfig() {
 		Config.DiabloHelper.Entrance = true; // Start from entrance. Set to false to start from star.
 		Config.DiabloHelper.SkipTP = false; // Don't wait for town portal and directly head to chaos. It will clear monsters around chaos entrance and wait for the runner.
 		Config.DiabloHelper.SkipIfBaal = false; // End script if there are party members in a Baal run.
+		Config.DiabloHelper.OpenSeals = false; // Open seals as the helper
+		Config.DiabloHelper.SafePrecast = true; // take random WP to safely precast
+		Config.DiabloHelper.SealOrder = ["vizier", "seis", "infector"]; // the order in which to clear the seals. If seals are excluded, they won't be checked unless diablo fails to appear
 	Scripts.AutoBaal = false; // Baal leecher with auto leader assignment
 		Config.AutoBaal.FindShrine = false; // false = disabled, 1 = search after hot tp message, 2 = search as soon as leader is found
 		Config.AutoBaal.LeechSpot = [15115, 5050]; // X, Y coords of Throne Room leech spot

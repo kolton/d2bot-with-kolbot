@@ -405,18 +405,25 @@ var Config = {
 		EntranceTP: "Entrance TP up",
 		StarTP: "Star TP up",
 		DiabloMsg: "Diablo",
-		WalkClear: false
+		WalkClear: false,
+		SealOrder: ["vizier", "seis", "infector"],
 	},
 	DiabloHelper: {
 		Wait: 120,
 		Entrance: false,
 		SkipIfBaal: false,
-		SkipTP: false
+		SkipTP: false,
+		OpenSeals: false,
+		SafePrecast: true,
+		SealOrder: ["vizier", "seis", "infector"],
 	},
 	BattleOrders: {
 		Mode: 0,
 		Getters: [],
-		Wait: false
+		Idle: false,  // Idle until player receiving BO leaves
+		QuitOnFailure: false,  // Quit the game if BO fails
+		SkipIfTardy: true,  // Proceed with scripts if other players already moved on from BO spot
+		Wait: 10,  // Duration to wait for players to join game
 	},
 	Enchant: {
 		Triggers: ["chant", "cows", "wps"],
