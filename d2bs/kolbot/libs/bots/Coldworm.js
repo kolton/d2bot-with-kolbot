@@ -13,7 +13,7 @@ function Coldworm() {
 
 	// Beetleburst, added by 13ack.Stab
 	if (Config.Coldworm.KillBeetleburst) {
-		if (!Pather.moveToPreset(me.area, 1, 747)) {
+		if (!Pather.moveToPreset(me.area, 1, 747, 0, 0, Config.ClearPath)) {
 			throw new Error("Failed to move to Beetleburst");
 		}
 
@@ -21,7 +21,7 @@ function Coldworm() {
 	}
 
 	for (i = 62; i <= 64; i += 1) {
-		if (!Pather.moveToExit(i, true)) {
+		if (!Pather.moveToExit(i, true, Config.ClearPath)) {
 			throw new Error("Failed to move to Coldworm");
 		}
 
@@ -31,7 +31,7 @@ function Coldworm() {
 	}
 
 	if (!Config.Coldworm.ClearMaggotLair) {
-		if (!Pather.moveToPreset(me.area, 2, 356)) {
+		if (!Pather.moveToPreset(me.area, 2, 356, 0, 0, Config.ClearPath)) {
 			throw new Error("Failed to move to Coldworm");
 		}
 

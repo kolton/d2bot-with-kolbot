@@ -21,7 +21,7 @@ function Summoner () {
 		}
 	}
 
-	if (!Pather.moveToPreset(me.area, 2, 357, -3, -3)) {
+	if (!Pather.moveToPreset(me.area, 2, 357, -3, -3, Config.ClearPath)) {
 		throw new Error("Failed to move to Summoner");
 	}
 

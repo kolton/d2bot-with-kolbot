@@ -9,13 +9,13 @@ function Bonesaw() {
 	Pather.useWaypoint(115);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(115, 2, 455, 15, 15)) {
+	if (!Pather.moveToPreset(115, 2, 455, 15, 15, Config.ClearPath)) {
 		throw new Error("Failed to move to Bonesaw");
 	}
 
 	Attack.clear(15, 0, getLocaleString(22502)); // Bonesaw Breaker
 
-	if (Config.Bonesaw.ClearDrifterCavern && Pather.moveToExit(116, true)) {
+	if (Config.Bonesaw.ClearDrifterCavern && Pather.moveToExit(116, true, Config.ClearPath)) {
 		Attack.clearLevel(Config.ClearType);
 	}
 

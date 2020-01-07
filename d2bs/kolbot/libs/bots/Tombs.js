@@ -12,7 +12,7 @@ function Tombs() {
 	Precast.doPrecast(true);
 
 	for (i = 66; i <= 72; i += 1) {
-		if (!Pather.moveToExit(i, true)) {
+		if (!Pather.moveToExit(i, true, Config.ClearPath)) {
 			throw new Error("Failed to move to tomb");
 		}
 
@@ -22,7 +22,7 @@ function Tombs() {
 			Precast.doPrecast(true);
 		}
 
-		if (!Pather.moveToExit(46, true)) {
+		if (!Pather.moveToExit(46, true, Config.ClearPath)) {
 			throw new Error("Failed to move to Canyon");
 		}
 	}

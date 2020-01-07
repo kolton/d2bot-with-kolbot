@@ -9,7 +9,7 @@ function Pit() {
 	Pather.useWaypoint(6);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([7, 12], true)) {
+	if (!Pather.moveToExit([7, 12], true, Config.ClearPath)) {
 		throw new Error("Failed to move to Pit level 1");
 	}
 
@@ -17,7 +17,7 @@ function Pit() {
 		Attack.clearLevel(Config.ClearType);
 	}
 
-	if (!Pather.moveToExit(16, true, Config.Pit.ClearPath)) {
+	if (!Pather.moveToExit(16, true, Config.Pit.ClearPath || Config.ClearPath)) {
 		throw new Error("Failed to move to Pit level 2");
 	}
 

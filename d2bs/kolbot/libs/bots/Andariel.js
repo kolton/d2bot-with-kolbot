@@ -37,7 +37,7 @@ function Andariel () {
 	Pather.useWaypoint(35);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([36, 37], true)) {
+	if (!Pather.moveToExit([36, 37], true, Config.ClearPath)) {
 		throw new Error("Failed to move to Catacombs Level 4");
 	}
 

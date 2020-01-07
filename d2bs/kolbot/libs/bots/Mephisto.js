@@ -134,7 +134,7 @@ function Mephisto() {
 	Pather.useWaypoint(101);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(102, true)) {
+	if (!Pather.moveToExit(102, true, Config.ClearPath)) {
 		throw new Error("Failed to move to Durance Level 3");
 	}
 

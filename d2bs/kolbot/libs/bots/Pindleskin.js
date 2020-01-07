@@ -14,7 +14,7 @@ function Pindleskin() {
 		Pather.useWaypoint(123);
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit([122, 121], true)) {
+		if (!Pather.moveToExit([122, 121], true, Config.ClearPath)) {
 			throw new Error("Failed to move to Nihlahak's Temple");
 		}
 	} else {
@@ -45,11 +45,11 @@ function Pindleskin() {
 	}
 
 	if (Config.Pindleskin.KillNihlathak) {
-		if (!Pather.moveToExit([122, 123, 124], true)) {
+		if (!Pather.moveToExit([122, 123, 124], true, Config.ClearPath)) {
 			throw new Error("Failed to move to Halls of Vaught");
 		}
 
-		Pather.moveToPreset(me.area, 2, 462, 10, 10);
+		Pather.moveToPreset(me.area, 2, 462, 10, 10, Config.ClearPath);
 
 		if (Config.Pindleskin.ViperQuit && getUnit(1, 597)) {
 			print("Tomb Vipers found.");

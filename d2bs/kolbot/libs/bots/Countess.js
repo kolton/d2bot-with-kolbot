@@ -11,7 +11,7 @@ function Countess() {
 	Pather.useWaypoint(6);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true)) {
+	if (!Pather.moveToExit([20, 21, 22, 23, 24, 25], true, Config.ClearPath)) {
 		throw new Error("Failed to move to Countess");
 	}
 
@@ -23,10 +23,10 @@ function Countess() {
 
 	switch (poi.roomx * 5 + poi.x) {
 	case 12565:
-		Pather.moveTo(12578, 11043);
+		Pather.moveTo(12578, 11043, 3, Config.ClearPath);
 		break;
 	case 12526:
-		Pather.moveTo(12548, 11083);
+		Pather.moveTo(12548, 11083, 3, Config.ClearPath);
 		break;
 	}
 

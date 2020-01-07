@@ -9,7 +9,7 @@ function Smith() {
 	Pather.useWaypoint(27);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(28, 2, 108)) {
+	if (!Pather.moveToPreset(28, 2, 108, 0, 0, Config.ClearPath)) {
 		throw new Error("Failed to move to the Smith");
 	}
 

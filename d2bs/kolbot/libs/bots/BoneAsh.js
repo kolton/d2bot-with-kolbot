@@ -9,7 +9,7 @@ function BoneAsh() {
 	Pather.useWaypoint(32);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveTo(20047, 4898)) {
+	if (!Pather.moveTo(20047, 4898, 3, Config.ClearPath)) {
 		throw new Error("Failed to move to Bone Ash");
 	}
 

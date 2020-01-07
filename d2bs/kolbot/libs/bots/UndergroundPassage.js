@@ -9,7 +9,7 @@ function UndergroundPassage() {
 	Pather.useWaypoint(4);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([10, 14], true)) {
+	if (!Pather.moveToExit([10, 14], true, Config.ClearPath)) {
 		throw new Error("Failed to move to Underground passage level 2");
 	}
 

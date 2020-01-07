@@ -9,7 +9,7 @@ function Rakanishu() {
 	Pather.useWaypoint(4);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(me.area, 1, 737, 0, 0, false, true)) {
+	if (!Pather.moveToPreset(me.area, 1, 737, 0, 0, Config.ClearPath, true)) {
 		throw new Error("Failed to move to Rakanishu");
 	}
 

@@ -9,7 +9,7 @@ function Icehawk() {
 	Pather.useWaypoint(80);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit([92, 93], false)) {
+	if (!Pather.moveToExit([92, 93], false, Config.ClearPath)) {
 		throw new Error("Failed to move to Icehawk");
 	}
 

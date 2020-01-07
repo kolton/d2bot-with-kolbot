@@ -9,7 +9,7 @@ function Hephasto() {
 	Pather.useWaypoint(107);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToPreset(me.area, 2, 376)) {
+	if (!Pather.moveToPreset(me.area, 2, 376, 0, 0, Config.ClearPath)) {
 		throw new Error("Failed to move to Hephasto");
 	}
 

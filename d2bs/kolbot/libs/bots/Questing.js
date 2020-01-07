@@ -59,7 +59,7 @@ function Questing() {
 
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit(49, true) || !Pather.moveToPreset(me.area, 2, 355)) {
+		if (!Pather.moveToExit(49, true, Config.ClearPath) || !Pather.moveToPreset(me.area, 2, 355, 0, 0, Config.ClearPath)) {
 			throw new Error();
 		}
 
@@ -99,7 +99,7 @@ function Questing() {
 
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToPreset(105, 1, 256)) {
+		if (!Pather.moveToPreset(105, 1, 256, 0, 0, Config.ClearPath)) {
 			return false;
 		}
 
@@ -134,7 +134,7 @@ function Questing() {
 
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit(94, true) || !Pather.moveToPreset(me.area, 2, 193)) {
+		if (!Pather.moveToExit(94, true, Config.ClearPath) || !Pather.moveToPreset(me.area, 2, 193, 0, 0, Config.ClearPath)) {
 			throw new Error();
 		}
 
@@ -173,7 +173,7 @@ function Questing() {
 		}
 
 		Precast.doPrecast(true);
-		Pather.moveTo(3883, 5113);
+		Pather.moveTo(3883, 5113, 3, Config.ClearPath);
 		Attack.kill(getLocaleString(22435)); // Shenk the Overseer
 		Town.goToTown();
 
@@ -199,7 +199,7 @@ function Questing() {
 
 		Precast.doPrecast(true);
 
-		if (!Pather.moveToExit(114, true) || !Pather.moveToPreset(me.area, 2, 460)) {
+		if (!Pather.moveToExit(114, true, Config.ClearPath) || !Pather.moveToPreset(me.area, 2, 460, 0, 0, Config.ClearPath)) {
 			throw new Error();
 		}
 

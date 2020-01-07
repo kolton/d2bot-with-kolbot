@@ -9,11 +9,11 @@ function Coldcrow() {
 	Pather.useWaypoint(3);
 	Precast.doPrecast(true);
 
-	if (!Pather.moveToExit(9, true, false)) {
+	if (!Pather.moveToExit(9, true, Config.ClearPath)) {
 		throw new Error("Failed to move to Cave");
 	}
 
-	if (!Pather.moveToPreset(me.area, 1, 736, 0, 0, false)) {
+	if (!Pather.moveToPreset(me.area, 1, 736, 0, 0, Config.ClearPath)) {
 		throw new Error("Failed to move to Coldcrow");
 	}
 
