@@ -223,7 +223,7 @@ function DiabloHelper() {
 		return true;
 	};
 
-	const openSeals = (sealOrder) => {
+	const clearSeals = (sealOrder) => {
 		print("seal order: " + sealOrder);
 		let seals = {
 			1: () => this.vizierSeal(),
@@ -546,7 +546,7 @@ CSLoop:
 
 	Pather.moveTo(7774, 5305);
 	Attack.clear(35, 0, false, this.sort);
-	openSeals(Config.DiabloHelper.SealOrder);
+	clearSeals(Config.DiabloHelper.SealOrder);
 
 	try {
 		print("Attempting to find Diablo");
