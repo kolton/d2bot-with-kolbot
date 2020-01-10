@@ -589,7 +589,7 @@ NTIP.ParseLineInt = function (input, info) {
 		tmp = p_result[i];
 		if (p_result[i].length) {
 			try {
-				p_result[i] = (new Function('return item =>' + p_result[i] + ';')).call(null); // generate function out of
+				p_result[i] = (new Function('return function(item) { return ' + p_result[i] + ';}')).call(null); // generate function out of
 			} catch(e) {
 				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + info.line + " ÿc1Entry: ÿc0" + info.string + " (" + info.file + ") Error message: " + e.message);
 
