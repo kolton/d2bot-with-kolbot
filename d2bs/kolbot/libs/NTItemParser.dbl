@@ -208,21 +208,24 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 
 	identified = item.getFlag(0x10);
 
-	for (i = 0; i < list.length; i += 1) {
+	for (i = 0; i < list.length; i++) {
 		try {
-			if (list[i][0].length > 0) {
-				if (eval(list[i][0])) {
-					if (list[i][1].length > 0) {
-						if (eval(list[i][1])) {
-							if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
-								num = NTIP.CheckQuantityOwned(list[i][0], list[i][1]);
+			// Get the values in separated variables (its faster)
+			const [type, stat, wanted] = list[i];
 
-								if (num < list[i][2].MaxQuantity) {
+			if (typeof type === 'function') {
+				if (type(item)) {
+					if (typeof stat === 'function') {
+						if (stat(item)) {
+							if (wanted && wanted.MaxQuantity && !isNaN(wanted.MaxQuantity)) {
+								num = NTIP.CheckQuantityOwned(type, stat);
+
+								if (num < wanted.MaxQuantity) {
 									result = 1;
 
 									break;
 								} else {
-									if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2].MaxQuantity) { // attempt at inv fix for maxquantity
+									if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === wanted.MaxQuantity) { // attempt at inv fix for maxquantity
 										result = 1;
 
 										break;
@@ -241,15 +244,15 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 							}
 						}
 					} else {
-						if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
-							num = NTIP.CheckQuantityOwned(list[i][0], null);
+						if (wanted && wanted.MaxQuantity && !isNaN(wanted.MaxQuantity)) {
+							num = NTIP.CheckQuantityOwned(type, null);
 
-							if (num < list[i][2].MaxQuantity) {
+							if (num < wanted.MaxQuantity) {
 								result = 1;
 
 								break;
 							} else {
-								if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2].MaxQuantity) { // attempt at inv fix for maxquantity
+								if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === wanted.MaxQuantity) { // attempt at inv fix for maxquantity
 									result = 1;
 
 									break;
@@ -262,17 +265,17 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 						}
 					}
 				}
-			} else if (list[i][1].length > 0) {
-				if (eval(list[i][1])) {
-					if (list[i][2] && list[i][2].MaxQuantity && !isNaN(list[i][2].MaxQuantity)) {
-						num = NTIP.CheckQuantityOwned(null, list[i][1]);
+			} else if (typeof stat === 'function') {
+				if (stat(item)) {
+					if (wanted && wanted.MaxQuantity && !isNaN(wanted.MaxQuantity)) {
+						num = NTIP.CheckQuantityOwned(null, stat);
 
-						if (num < list[i][2].MaxQuantity) {
+						if (num < wanted.MaxQuantity) {
 							result = 1;
 
 							break;
 						} else {
-							if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === list[i][2].MaxQuantity) { // attempt at inv fix for maxquantity
+							if (item.getParent() && item.getParent().name === me.name && item.mode === 0 && num === wanted.MaxQuantity) { // attempt at inv fix for maxquantity
 								result = 1;
 
 								break;
@@ -297,7 +300,7 @@ NTIP.CheckItem = function (item, entryList, verbose) {
 			if (!entryList) {
 				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + stringArray[i].line + " ÿc1Entry: ÿc0" + stringArray[i].string + " (" + stringArray[i].file + ") Error message: " + pickError.message + " Trigger item: " + item.fname.split("\n").reverse().join(" "));
 
-				NTIP_CheckList[i] = ["", "", ""]; // make the bad entry blank
+				NTIP_CheckList.splice(i,1); // Remove the element from the list
 			} else {
 				Misc.errorReport("ÿc1Pickit error in runeword config!");
 			}
@@ -581,6 +584,21 @@ NTIP.ParseLineInt = function (input, info) {
 			}
 		}
 	}
+	// Compile the line, to 1) remove the eval lines, and 2) increase the speed
+	for (let i = 0,tmp; i < 2; i++) {
+		tmp = p_result[i];
+		if (p_result[i].length) {
+			try {
+				p_result[i] = (new Function('return item =>' + p_result[i] + ';')).call(null); // generate function out of
+			} catch(e) {
+				Misc.errorReport("ÿc1Pickit error! Line # ÿc2" + info.line + " ÿc1Entry: ÿc0" + info.string + " (" + info.file + ") Error message: " + e.message);
 
+				return null ; // failed load this line so return false
+			}
+		} else {
+			p_result[i] = undefined;
+		}
+
+	}
 	return p_result;
 };
