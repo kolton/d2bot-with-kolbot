@@ -164,7 +164,9 @@ NTIP.generateTierFunc = function (type) {
 		var i,
 			tier = -1;
 
-		if (NTIP_QuestItems.indexOf(item.classid) > -1) return 0;
+		if (NTIP_QuestItems.indexOf(item.classid) > -1) {
+			return 0;
+		}
 
 		// Go through ALL lines that describe the item
 		for (i = 0; i < NTIP_CheckList.length; i += 1) {
