@@ -157,27 +157,54 @@ NTIP.Clear = function () {
 	stringArray = [];
 };
 
-NTIP.GetTier = function (item) {
-	let i, tier = 0;
 
-	return NTIP_CheckList
-		.filter(check => check.length === 3
-			&& check[2].hasOwnProperty('Tier')
-			&& !isNaN(check[2])
-		) // Only the valid ones
-		.reduce(function (acc,check) {
-			try {
-				for (let i = 0; i < 2; i++) {
-					// If check[i] has a length, call it, if tier is higher as current tier
-					if (typeof check[i] === 'function' && check[i](item) && check[2].Tier > acc) {
-						return check[2].Tier; // set the highest current tier
-					}
-				}
-			} catch (e) {
-				// Dont care
+/** @return {function({Unit} item)} */
+NTIP.generateTierFunc = function (type) {
+	return function (item) {
+		var i,
+			tier = -1;
+
+		if (NTIP_QuestItems.indexOf(item.classid) > -1) return 0;
+
+		// Go through ALL lines that describe the item
+		for (i = 0; i < NTIP_CheckList.length; i += 1) {
+
+			if (NTIP_CheckList[i].length !== 3) {
+				continue;
 			}
-		},0);
+
+			let [type,stat,wanted] = NTIP_CheckList[i];
+			if (wanted.hasOwnProperty(type) && wanted[type]) {
+
+				try {
+					if (typeof wanted === 'function') {
+						if (wanted(item)) {
+							if (typeof stat === 'function') {
+								if (stat(item)) {
+									tier = wanted[type];
+								}
+							} else {
+								tier = wanted[type];
+							}
+						}
+					} else if (typeof stat === 'function') {
+						if (stat(item)) {
+							tier = wanted[type];
+						}
+					}
+				} catch (e) {
+
+				}
+			}
+		}
+
+		return tier;
+	};
 };
+
+/**@function
+ * @param item */
+NTIP.GetTier = NTIP.generateTierFunc('Tier');
 
 NTIP.CheckItem = function (item, entryList, verbose) {
 	var i, list, identified, num,
