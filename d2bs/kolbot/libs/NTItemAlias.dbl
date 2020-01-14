@@ -1457,4 +1457,7 @@ NTIPAliasStat["passivemagmastery"] = 357;
 NTIPAliasStat["passivemagpierce"] = 358;
 
 // Doesnt really exists, but is calculated in getStatEx
-NTIPAliasStat["allres"] = 555;
+NTIPAliasStat["anyres"] = [555,1];
+NTIPAliasStat["dualres"] = [555,2];
+NTIPAliasStat["tripleres"] = [555,3];
+NTIPAliasStat["allres"] = [555,4];

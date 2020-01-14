@@ -557,17 +557,25 @@ Unit.prototype.getStatEx = function (id, subid) {
 		// Get all res
 		let allres = [this.getStatEx(39), this.getStatEx(41), this.getStatEx(43), this.getStatEx(45)];
 
-		// What is the minimum of the 4?
-		let min = Math.min.apply(null, allres);
+		// Remove the elements that are not give any resistance
+		let	res = allres.filter(res => res > 0);
 
-		// Cap all res to the minimum about of res
-		allres = allres.map(res => res > min ? min : res);
+		// If found more res as asked
+		if (res.length > subid) {
+			res.sort((a,b) => b-a); // Sort from big to small
 
-		// Get it in local variables, its more easy to read
-		let [fire, cold, light, psn] = allres;
+			// So the third res, if 2 asked, are removed in the minimum
+			res.length = subid; // strip the extra elements
+		}
 
-		return fire === cold === light === psn ? fire : 0;
+		// If we has much resistance as asked
+		if (res.length === subid) {
+			// Return the minimum amount of resistances
+			return Math.min.apply(null,res);
+		}
+		return 0; // Not found any
 	}
+
 	case 20: // toblock
 		switch (this.classid) {
 		case 328: // buckler
