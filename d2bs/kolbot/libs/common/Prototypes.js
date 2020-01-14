@@ -552,6 +552,22 @@ Unit.prototype.getStatEx = function (id, subid) {
 	var i, temp, rval, regex;
 
 	switch (id) {
+	case 555: //calculates all res, doesnt exists trough
+	{ // Block scope due to the variable declaration
+		// Get all res
+		let allres = [this.getStatEx(39), this.getStatEx(41), this.getStatEx(43), this.getStatEx(45)];
+
+		// What is the minimum of the 4?
+		let min = Math.min.apply(null, allres);
+
+		// Cap all res to the minimum about of res
+		allres = allres.map(res => res > min ? min : res);
+
+		// Get it in local variables, its more easy to read
+		let [fire, cold, light, psn] = allres;
+
+		return fire === cold === light === psn ? fire : 0;
+	}
 	case 20: // toblock
 		switch (this.classid) {
 		case 328: // buckler

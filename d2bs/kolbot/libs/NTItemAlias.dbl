@@ -1455,3 +1455,6 @@ NTIPAliasStat["shortparam1"] = 355;
 NTIPAliasStat["questitemdifficulty"] = 356;
 NTIPAliasStat["passivemagmastery"] = 357;
 NTIPAliasStat["passivemagpierce"] = 358;
+
+// Doesnt really exists, but is calculated in getStatEx
+NTIPAliasStat["allres"] = 555;
