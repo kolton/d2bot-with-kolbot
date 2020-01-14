@@ -183,15 +183,21 @@ NTIP.generateTierFunc = function (type) {
 						if (wanted(item)) {
 							if (typeof stat === 'function') {
 								if (stat(item)) {
-									tier = wanted[type];
+									if (wanted[type] > tier) {
+										tier = wanted[type];
+									}
 								}
 							} else {
-								tier = wanted[type];
+								if (wanted[type] > tier) {
+									tier = wanted[type];
+								}
 							}
 						}
 					} else if (typeof stat === 'function') {
 						if (stat(item)) {
-							tier = wanted[type];
+							if (wanted[type] > tier) {
+								tier = wanted[type];
+							}
 						}
 					}
 				} catch (e) {
