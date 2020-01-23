@@ -2,7 +2,7 @@
 *	@filename	Diablo.js
 *	@author		kolton
 *	@desc		clear Chaos Sanctuary and kill Diablo
-*   @return {boolean}
+*	@return		{boolean}
 */
 
 function Diablo() {
@@ -457,7 +457,7 @@ function Diablo() {
 		Pather.useWaypoint(107);
 	}
 
-	if (!Pather.moveTo(7790, 5544, 5, Config.ClearPath)) {
+	if (!Pather.moveTo(7790, 5544)) {
 		throw new Error("Failed to move to Chaos Sanctuary");
 	}
 
@@ -465,7 +465,7 @@ function Diablo() {
 
 	if (Config.Diablo.Entrance) {
 		Attack.clear(30, 0, false, this.sort);
-		Pather.moveTo(7790, 5544, 3, Config.ClearPath);
+		Pather.moveTo(7790, 5544);
 
 		if (Config.PublicMode) {
 			Pather.makePortal();
@@ -473,7 +473,7 @@ function Diablo() {
 			Pather.teleport = !Config.Diablo.WalkClear && Pather._teleport;
 		}
 
-		Pather.moveTo(7790, 5544, 5, Config.ClearPath);
+		Pather.moveTo(7790, 5544);
 		Precast.doPrecast(true);
 		Attack.clear(30, 0, false, this.sort);
 		this.followPath(this.entranceToStar);
@@ -482,7 +482,7 @@ function Diablo() {
 		Attack.clear(15, 0, false, this.sort);
 	}
 
-	Pather.moveTo(7791, 5293, 5, Config.ClearPath);
+	Pather.moveTo(7791, 5293);
 
 	if (Config.PublicMode) {
 		Pather.makePortal();

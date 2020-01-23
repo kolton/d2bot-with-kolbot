@@ -2,7 +2,7 @@
 *	@filename	DiabloHelper.js
 *	@author		kolton
 *	@desc		help leading player in clearing Chaos Sanctuary and killing Diablo
-*   @return {boolean}
+*	@return		{boolean}
 */
 
 function DiabloHelper() {
@@ -552,11 +552,14 @@ CSLoop:
 		print("Attempting to find Diablo");
 		this.diabloPrep();
 	} catch (error) {
-		print("Diablo wasn't found. Checking seals.");
-		this.vizierSeal();
-		this.seisSeal();
-		this.infectorSeal();
-		this.diabloPrep();
+		print("Diablo wasn't found");
+		if (Config.DiabloHelper.RecheckSeals) {
+			print("Rechecking seals");
+			this.vizierSeal();
+			this.seisSeal();
+			this.infectorSeal();
+			this.diabloPrep();
+		}
 	}
 
 	Attack.kill(243); // Diablo

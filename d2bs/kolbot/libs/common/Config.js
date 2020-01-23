@@ -416,6 +416,7 @@ var Config = {
 		OpenSeals: false,
 		SafePrecast: true,
 		SealOrder: ["vizier", "seis", "infector"],
+		RecheckSeals: false,
 	},
 	BattleOrders: {
 		Mode: 0,
