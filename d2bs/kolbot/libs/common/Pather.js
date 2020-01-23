@@ -118,7 +118,7 @@ var Pather = {
 	recursion: true,
 
 	useTeleport: function () {
-		return this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
+		return this.teleport && !Config.NoTele && !me.getState(139) && !me.getState(140) && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 	},
 
 	/*
