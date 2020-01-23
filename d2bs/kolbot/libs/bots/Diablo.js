@@ -478,7 +478,7 @@ function Diablo() {
 		Attack.clear(30, 0, false, this.sort);
 		this.followPath(this.entranceToStar);
 	} else {
-		Pather.moveTo(7774, 5305, 5, Config.ClearPath);
+		Pather.moveTo(7774, 5305);
 		Attack.clear(15, 0, false, this.sort);
 	}
 
