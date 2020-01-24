@@ -231,6 +231,7 @@ function LoadConfig() {
 	Config.HealStatus = false; // Go to a healer if poisoned or cursed
 	Config.UseMerc = true; // Use merc. This is ignored and always false in d2classic.
 	Config.MercWatch = false; // Instant merc revive during battle.
+	Config.ChantRequestAttempts = 0; // How many times to request chant when entering a new game
 
 	// Potion settings
 	Config.UseHP = 75; // Drink a healing potion if life is under designated percent.

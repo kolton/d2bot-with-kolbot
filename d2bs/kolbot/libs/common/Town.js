@@ -76,6 +76,7 @@ var Town = {
 
 		Attack.weaponSwitch(Attack.getPrimarySlot());
 
+		this.requestChant();
 		this.heal();
 		this.identify();
 		this.shopItems();
@@ -1058,7 +1059,26 @@ CursorLoop:
 
 		return false;
 	},
+	requestChant: function () {
+		if (!Config.ChantRequestAttempts) {
+			return true;
+		}
 
+		if (me.act !== 1) {
+			this.goToTown(1);
+		}
+		this.move(this.tasks[me.act - 1]["CainID"]);
+
+		delay(2000);
+		let count = 0;
+		while (count < Config.ChantRequestAttempts) {
+			say('chant');
+			delay(5000);
+			count++;
+		}
+		delay(2000);
+		return true;
+	},
 	buyKeys: function () {
 		if (!this.wantKeys()) {
 			return true;
