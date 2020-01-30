@@ -169,10 +169,24 @@ function OrgTorch() {
 
 	// Do mini ubers or Tristram based on area we're already in
 	this.pandemoniumRun = function () {
-		var i, findLoc, skillBackup;
+		let i, findLoc, skillBackup;
 
 		switch (me.area) {
 		case 133: // Matron's Den
+			if (Config.OrgTorch.AntidotesToChug) {
+				Town.goToTown();
+				Town.buyAntidotes(Config.OrgTorch.AntidotesToChug);
+				for (i = 0; i < Config.OrgTorch.AntidotesToChug; i++) {
+					delay(500);
+					print("glug glug");
+					let antidote = me.getItem(514);
+					if (antidote) {
+						antidote.interact();
+					}
+				}
+				Town.move("stash");
+				Pather.usePortal(133);
+			}
 			Precast.doPrecast(true);
 			Pather.moveToPreset(133, 2, 397, 2, 2);
 			Attack.kill(707);

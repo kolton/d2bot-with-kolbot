@@ -458,7 +458,8 @@ var Config = {
 		WaitTimeout: false,
 		UseSalvation: false,
 		GetFade: false,
-		MakeTorch: true
+		MakeTorch: true,
+		AntidotesToChug: 0,
 	},
 	Synch: {
 		WaitFor: []
