@@ -173,20 +173,6 @@ function OrgTorch() {
 
 		switch (me.area) {
 		case 133: // Matron's Den
-			if (Config.OrgTorch.AntidotesToChug) {
-				Town.goToTown();
-				Town.buyAntidotes(Config.OrgTorch.AntidotesToChug);
-				for (i = 0; i < Config.OrgTorch.AntidotesToChug; i++) {
-					delay(500);
-					print("glug glug");
-					let antidote = me.getItem(514);
-					if (antidote) {
-						antidote.interact();
-					}
-				}
-				Town.move("stash");
-				Pather.usePortal(133);
-			}
 			Precast.doPrecast(true);
 			Pather.moveToPreset(133, 2, 397, 2, 2);
 			Attack.kill(707);
@@ -437,6 +423,18 @@ function OrgTorch() {
 			portal = this.openPortal(0);
 
 			if (portal) {
+				if (portal.objtype === 133 && Config.OrgTorch.AntidotesToChug) {
+					Town.buyAntidotes(Config.OrgTorch.AntidotesToChug);
+					for (i = 0; i < Config.OrgTorch.AntidotesToChug; i++) {
+						delay(500);
+						print("glug glug");
+						let antidote = me.getItem(514);
+						if (antidote) {
+							antidote.interact();
+						}
+					}
+					Town.move("stash");
+				}
 				Pather.usePortal(null, null, portal);
 			}
 
