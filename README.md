@@ -31,7 +31,7 @@ If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask ar
 
 [**Join the Discord Channel!**](https://discord.gg/FuBG8N2)
 
-[**Documentation Repo**](https://github.com/blizzhackers/documentation)
+[**Documentation Repo**](https://github.com/blizzhackers/documentation#diablo-2-botting-system-d2bs)
 
 ## Install dependencies - do this first!
 - [Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-us/download/details.aspx?id=5555)
@@ -52,7 +52,7 @@ If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask ar
 ## LimeDrop web based item manager and dropper
 
 - Limedrop is available by default on the master(trunk) branch.
-- [limedrop install and usage](https://github.com/blizzhackers/documentation/blob/master/limedrop/readme.md)
+- [limedrop install and usage](https://github.com/blizzhackers/documentation/tree/master/limedrop#limedrop-guide
 
 
 ![limedrop-general](https://github.com/blizzhackers/documentation/blob/master/limedrop/assets/limedrop-general.png)
