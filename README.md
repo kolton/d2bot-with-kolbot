@@ -52,7 +52,7 @@ If you want to contribute to d2bs/d2bot#, come to irc.synirc.net/d2bs and ask ar
 ## LimeDrop web based item manager and dropper
 
 - Limedrop is available by default on the master(trunk) branch.
-- [limedrop install and usage](https://github.com/blizzhackers/documentation/tree/master/limedrop#limedrop-guide
+- [limedrop install and usage](https://github.com/blizzhackers/documentation/tree/master/limedrop#limedrop-guide)
 
 
 ![limedrop-general](https://github.com/blizzhackers/documentation/blob/master/limedrop/assets/limedrop-general.png)
