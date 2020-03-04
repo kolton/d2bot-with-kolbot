@@ -281,7 +281,7 @@ function OrgTorch() {
 	};
 
 	// Start
-	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer, busy, busyTick,
+	let i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer, busy, busyTick, chugs,
 		neededItems = {pk1: 0, pk2: 0, pk3: 0, rv: 0};
 
 	// Do town chores and quit if MakeTorch is true and we have a torch.
@@ -425,7 +425,7 @@ function OrgTorch() {
 			if (portal) {
 				if (portal.objtype === 133 && Config.OrgTorch.AntidotesToChug) {
 					Town.buyAntidotes(Config.OrgTorch.AntidotesToChug);
-					for (i = 0; i < Config.OrgTorch.AntidotesToChug; i++) {
+					for (chugs = 0; chugs < Config.OrgTorch.AntidotesToChug; chugs++) {
 						delay(500);
 						print("glug glug");
 						let antidote = me.getItem(514);
