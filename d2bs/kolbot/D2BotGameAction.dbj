@@ -26,7 +26,8 @@ if (!FileTools.exists("data/" + me.profile + ".json")) {
 var handle, tag, gameInfo, gameStart, ingame, connectFail, charList,
 	ftj = 0,
 	lastGameStatus = "ready",
-	gameCount = DataFile.getStats().runs + 1;
+	gameCount = DataFile.getStats().runs + 1,
+	creatingActions = ["doMule"];
 
 function ReceiveCopyData(mode, msg) {
 	switch (msg) {
@@ -92,7 +93,7 @@ function updateCount() {
 	ControlAction.click(6, 33, 572, 128, 35);
 }
 
-function main() {
+function main () {
 	addEventListener('copydata', ReceiveCopyData);
 
 	while (!handle) {
@@ -189,6 +190,12 @@ MainSwitch:
 		}
 
 		if (GameAction.gameInfo() !== null) { // a game name was specified
+			if (++ftj > 5) {
+				GameAction.update("done", "GameAction failed to join game!");
+				D2Bot.stop();
+				break;
+			}
+			
 			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create screen to check if character is dead or not
 				break;
 			}
@@ -212,6 +219,12 @@ MainSwitch:
 				}
 			}
 		} else {
+			if (++ftj > 5) {
+				GameAction.update("done", "GameAction failed to create game!");
+				D2Bot.stop();
+				break;
+			}
+			
 			if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
 				break;
 			}
@@ -240,6 +253,12 @@ MainSwitch:
 
 		break;
 	case 4: // Create Game
+		if (creatingActions.indexOf(JSON.parse(tag).action) < 0) {
+			GameAction.update("done", "GameAction failed to create game!");
+			D2Bot.stop();
+			break;
+		}
+	
 		D2Bot.updateStatus("Creating Game");
 
 		control = getControl(1, 657, 342, 27, 20);
@@ -265,7 +284,7 @@ MainSwitch:
 		locationTimeout(5000, location);
 
 		lastGameStatus = "pending";
-
+		
 		break;
 	case 5: // Join Game
 		D2Bot.updateStatus("Join Game");
@@ -414,6 +433,9 @@ MainSwitch:
 
 		break;
 	case 12: // Character Select
+		// Reset ftj counter
+		ftj = 0;
+		
 		// Single Player screen fix
 		if (getLocation() === 12 && !getControl(4, 626, 100, 151, 44)) {
 			ControlAction.click(6, 33, 572, 128, 35);
@@ -563,6 +585,12 @@ MainSwitch:
 
 		break;
 	case 26: // Lobby - Game Name Exists
+		if (++ftj > 5) {
+			GameAction.update("done", "GameAction failed to create game!");
+			D2Bot.stop();
+			break;
+		}
+		ControlAction.timeoutDelay("Game Already Exists", 5e3);
 		ControlAction.click(6, 533, 469, 120, 20);
 
 		break;
@@ -570,16 +598,14 @@ MainSwitch:
 		ControlAction.click(6, 436, 538, 96, 32);
 
 		break;
-	case 28: // Lobby - Game Does Not Exist
-		ftj++;
-
-		if (ftj > 4) {
+	case 28: // Lobby - Game Does Not Exist		
+		if (++ftj > 5) {
 			GameAction.update("done", "GameAction failed to join game!");
 			D2Bot.stop();
+			break;
 		}
-
-		ControlAction.timeoutDelay("Game Doesn't Exist", 5000);
-		ControlAction.click(6, 533, 469, 120, 20);
+		ControlAction.timeoutDelay("Game Doesn't Exist", 5e3);
+		ControlAction.click(6, 652, 469, 120, 20);
 
 		break;
 	case 38: // Game is full
