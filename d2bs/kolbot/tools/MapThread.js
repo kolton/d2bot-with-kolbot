@@ -243,14 +243,35 @@ var Hooks = {
 			if (me.area !== this.currArea) {
 				this.flush();
 
-				var i, exits, wp, poi;
+				var i, exits, wp, poi,
+					nextAreas = [];
+
+				// Specific area override
+				nextAreas[7] = 26;
+				nextAreas[76] = 78;
+				nextAreas[77] = 78;
+				nextAreas[113] = 115;
+				nextAreas[115] = 117;
+				nextAreas[118] = 120;
 
 				this.currArea = me.area;
 				exits = getArea().exits;
 
 				if (exits) {
 					for (i = 0; i < exits.length; i += 1) {
-						this.add(exits[i].x, exits[i].y, me.area === 46 && exits[i].target === getRoom().correcttomb ? 0x69 : 0x99);
+						if (me.area === 46) {
+							this.add(exits[i].x, exits[i].y, exits[i].target === getRoom().correcttomb ? 0x69 : 0x99);
+						} else if (exits[i].target === nextAreas[me.area] && nextAreas[me.area]) {
+							this.add(exits[i].x, exits[i].y, 0x1F);
+						} else if (exits[i].target === Hooks.tele.prevAreas.indexOf(me.area) && nextAreas[me.area]) {
+							this.add(exits[i].x, exits[i].y, 0x99);
+						} else if (exits[i].target === Hooks.tele.prevAreas.indexOf(me.area)) {
+							this.add(exits[i].x, exits[i].y, 0x1F);
+						} else if (exits[i].target === Hooks.tele.prevAreas[me.area]) {
+							this.add(exits[i].x, exits[i].y, 0x0A);
+						} else {
+							this.add(exits[i].x, exits[i].y, 0x99);
+						}
 					}
 				}
 
@@ -518,31 +539,87 @@ var Hooks = {
 			case 2: // Blood Moor
 				this.hooks.push({
 					name: "Side Area",
-					destination: 8,
+					destination: 8, // Den of Evil
 					hook: new Text("Num 4: " + Pather.getAreaName(8), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 3: // Cold Plains
+				this.hooks.push({
+					name: "Side Area",
+					destination: 17, // Burial Grounds
+					hook: new Text("Num 4: " + Pather.getAreaName(17), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
 			case 6: // Black Marsh
 				this.hooks.push({
 					name: "Side Area",
-					destination: 20,
+					destination: 20, // Forgotten Tower
 					hook: new Text("Num 4: " + Pather.getAreaName(20), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 7: // Tamoe Highlands
+				this.hooks.push({
+					name: "Side Area",
+					destination: 12, // Pit Level 1
+					hook: new Text("Num 4: " + Pather.getAreaName(12), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 10: // Underground Passage Level 1
+				this.hooks.push({
+					name: "Side Area",
+					destination: 14, // Underground Passage Level 2
+					hook: new Text("Num 4: " + Pather.getAreaName(14), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 17: // Burial Grounds
+				this.hooks.push({
+					name: "Side Area",
+					destination: 19, // Mausoleum
+					hook: new Text("Num 4: " + Pather.getAreaName(19), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 41: // Rocky Waste
+				this.hooks.push({
+					name: "Side Area",
+					destination: 55, // Stony Tomb Level 1
+					hook: new Text("Num 4: " + Pather.getAreaName(55), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 42: // Dry Hills
+				this.hooks.push({
+					name: "Side Area",
+					destination: 56, // Halls of the Dead Level 1
+					hook: new Text("Num 4: " + Pather.getAreaName(56), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
 			case 43: // Far Oasis
 				this.hooks.push({
 					name: "Side Area",
-					destination: 62,
+					destination: 62, // Maggot Lair Level 1
 					hook: new Text("Num 4: " + Pather.getAreaName(62), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 44: // Lost City
+				this.hooks.push({
+					name: "Side Area",
+					destination: 65, // Ancient Tunnels
+					hook: new Text("Num 4: " + Pather.getAreaName(65), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
 			case 76: // Spider Forest
 				this.hooks.push({
 					name: "Side Area",
-					destination: 85,
+					destination: 85, // Spider Cavern
 					hook: new Text("Num 4: " + Pather.getAreaName(85), 150, 525 - (this.hooks.length * 10))
 				});
 
@@ -550,7 +627,7 @@ var Hooks = {
 			case 78: // Flayer Jungle
 				this.hooks.push({
 					name: "Side Area",
-					destination: 88,
+					destination: 88, // Flayer Dungeon Level 1
 					hook: new Text("Num 4: " + Pather.getAreaName(88), 150, 525 - (this.hooks.length * 10))
 				});
 
@@ -558,7 +635,7 @@ var Hooks = {
 			case 80: // Kurast Bazaar
 				this.hooks.push({
 					name: "Side Area",
-					destination: 94,
+					destination: 94, // Ruined Temple
 					hook: new Text("Num 4: " + Pather.getAreaName(94), 150, 525 - (this.hooks.length * 10))
 				});
 
@@ -566,16 +643,40 @@ var Hooks = {
 			case 81: // Upper Kurast
 				this.hooks.push({
 					name: "Side Area",
-					destination: 92,
+					destination: 92, // Sewers Level 1
 					hook: new Text("Num 4: " + Pather.getAreaName(92), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 92: // Sewers Level 1
+				this.hooks.push({
+					name: "Side Area",
+					destination: 80, // Kurast Bazaar
+					hook: new Text("Num 4: " + Pather.getAreaName(80), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
 			case 113: // Crystalline Passage
 				this.hooks.push({
 					name: "Side Area",
-					destination: 114,
+					destination: 114, // Frozen River
 					hook: new Text("Num 4: " + Pather.getAreaName(114), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 115: // Glacial Trail
+				this.hooks.push({
+					name: "Side Area",
+					destination: 116, // Drifter Cavern
+					hook: new Text("Num 4: " + Pather.getAreaName(116), 150, 525 - (this.hooks.length * 10))
+				});
+
+				break;
+			case 118: // Ancient's Way
+				this.hooks.push({
+					name: "Side Area",
+					destination: 119, // Icy Cellar
+					hook: new Text("Num 4: " + Pather.getAreaName(119), 150, 525 - (this.hooks.length * 10))
 				});
 
 				break;
@@ -697,7 +798,7 @@ function main() {
 	include("common/attack.js");
 	include("common/pather.js");
 	load("tools/maphelper.js");
-	print("ÿc9Map Thread Loaded");
+	print("ÿc9Map Thread Loaded.");
 
 	this.revealArea = function (area) {
 		if (!this.revealedAreas) {
@@ -737,7 +838,7 @@ function main() {
 	};
 
 	var i,
-		hideFlags = [0x09, 0x0C, 0x0D, 0x01, 0x02, 0x0F, 0x18, 0x19, 0x21];
+		hideFlags = [0x09, 0x0C, 0x0D, 0x01, 0x02, 0x0F, 0x18, 0x19, 0x1A, 0x21];
 
 	addEventListener("keyup", this.keyEvent);
 

@@ -241,7 +241,7 @@ MainLoop:
 				break;
 			}
 
-			if (failCount >= 60) {
+			if (failCount >= 260) {
 				D2Bot.printToConsole("No response from mule profile.", 9);
 
 				break;
@@ -259,7 +259,7 @@ MainLoop:
 		this.torchAnniCheck = false;
 
 		// No response - stop mule profile
-		if (failCount >= 60) {
+		if (failCount >= 260) {
 			D2Bot.stop(muleObj.muleProfile, true);
 			delay(1000);
 		}

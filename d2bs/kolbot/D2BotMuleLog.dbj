@@ -175,6 +175,8 @@ function locationAction(location) {
 MainSwitch:
 	switch (location) {
 	case 0:
+		ControlAction.click();
+
 		break;
 	case 1:	// Lobby
 	case 3: // Lobby Chat

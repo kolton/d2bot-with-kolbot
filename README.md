@@ -1,7 +1,7 @@
-# In order to continue the d2bot-with-kolbot project, with more github members involved, the main kolbot repository will be https://github.com/blizzhackers/kolbot
+# This repo will remain for stable releases new development will continue at https://github.com/blizzhackers/
 
-* please join the github team https://github.com/blizzhackers/
-* you'll find all necessary repositories there
+* This repository will get periodic updates, security fixes, and accept critical pull requests only
+* All new kolbot development and feature requests can be made to: https://github.com/blizzhackers/kolbot
 
 ## Rules
 
