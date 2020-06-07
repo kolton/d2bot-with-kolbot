@@ -504,6 +504,7 @@ function LoadConfig() {
 		//"Monster Name": [-1, -1]
 	};
 
+	Config.NoTele = false; // Restrict char from teleporting. Useful for low level/low mana chars
 	Config.Dodge = false; // Move away from monsters that get too close. Don't use with short-ranged attacks like Poison Dagger.
 	Config.DodgeRange = 15; // Distance to keep from monsters.
 	Config.DodgeHP = 100; // Dodge only if HP percent is less than or equal to Config.DodgeHP. 100 = always dodge.
