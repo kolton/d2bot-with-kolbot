@@ -52,6 +52,7 @@ function LoadConfig() {
 
 	// *** act 2 ***
 	Scripts.Radament = false;
+	Scripts.CreepingFeature = false;
 	Scripts.Coldworm = false;
 		Config.Coldworm.KillBeetleburst = false;
 		Config.Coldworm.ClearMaggotLair = false; // Clear all 3 levels
@@ -149,6 +150,7 @@ function LoadConfig() {
 		Config.BaalHelper.Wait = 120; // Seconds to wait for a runner to be in Throne
 		Config.BaalHelper.KillNihlathak = false; // Kill Nihlathak before going to Throne
 		Config.BaalHelper.FastChaos = false; // Kill Diablo before going to Throne
+		Config.BaalHelper.SoulQuit = false; // End script if Souls (Burning Souls) are found.
 		Config.BaalHelper.DollQuit = false;  // End script if Dolls (Undead Soul Killers) are found.
 		Config.BaalHelper.KillBaal = true; // Kill Baal. If set to false, you must configure Config.QuitList or the bot will wait indefinitely.
 		Config.BaalHelper.SkipTP = false; // Don't wait for a TP, go to WSK3 and wait for someone to go to throne. Anti PK measure.
