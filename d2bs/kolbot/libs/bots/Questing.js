@@ -140,7 +140,7 @@ function Questing() {
 
 		stand = getUnit(2, 193);
 
-		Misc.openChest(stand);
+		Chest.openChest(stand);
 		delay(300);
 
 		book = getUnit(4, 548);

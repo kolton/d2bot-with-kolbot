@@ -21,7 +21,7 @@ function Eldritch() {
 
 			chest = getUnit(2, 455);
 
-			if (Misc.openChest(chest)) {
+			if (Chest.openChest(chest)) {
 				Pickit.pickItems();
 			}
 		}

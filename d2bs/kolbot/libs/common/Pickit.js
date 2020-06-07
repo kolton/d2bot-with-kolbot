@@ -254,8 +254,11 @@ MainLoop:
 			if (me.dead) {
 				return false;
 			}
+			
+			//print("Picking item");
 
 			while (!me.idle) {
+				//print("Pickit:  Waiting");
 				delay(40);
 			}
 
@@ -269,7 +272,7 @@ MainLoop:
 				if (getDistance(me, item) > (Config.FastPick === 2 && i < 1 ? 6 : 4) || checkCollision(me, item, 0x1)) {
 					if (Pather.useTeleport()) {
 						Pather.moveToUnit(item);
-					} else if (!Pather.moveTo(item.x, item.y, 0)) {
+					} else if (!Pather.moveTo(item.x, item.y, 0, false)) {
 						continue MainLoop;
 					}
 				}

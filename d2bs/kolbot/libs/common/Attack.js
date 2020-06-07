@@ -551,7 +551,6 @@ var Attack = {
 		}
 
 		ClassAttack.afterAttack(pickit);
-		this.openChests(range, orgx, orgy);
 
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
@@ -722,7 +721,6 @@ var Attack = {
 		}
 
 		ClassAttack.afterAttack(true);
-		this.openChests(30);
 
 		if (attackCount > 0) {
 			Pickit.pickItems();
@@ -863,7 +861,7 @@ var Attack = {
 
 		var room, result, rooms, myRoom, currentArea, previousArea;
 
-		function RoomSort(a, b) {
+		function RoomSort (a, b) {
 			return getDistance(myRoom[0], myRoom[1], a[0], a[1]) - getDistance(myRoom[0], myRoom[1], b[0], b[1]);
 		}
 
@@ -905,7 +903,7 @@ var Attack = {
 			result = Pather.getNearestWalkable(room[0], room[1], 18, 3);
 
 			if (result) {
-				Pather.moveTo(result[0], result[1], 3, spectype);
+				Pather.moveTo(result[0], result[1], 3, spectype, true);
 				previousArea = result;
 				//this.countUniques();
 
@@ -1008,42 +1006,6 @@ var Attack = {
 		return true;
 	},
 
-	// Open chests when clearing
-	openChests: function (range, x, y) {
-		if (!Config.OpenChests) {
-			return false;
-		}
-
-		if (x === undefined || y === undefined) {
-			x = me.x;
-			y = me.y;
-		}
-
-		var i, unit,
-			list = [],
-			ids = ["chest", "chest3", "weaponrack", "armorstand"];
-
-		unit = getUnit(2);
-
-		if (unit) {
-			do {
-				if (unit.name && getDistance(unit, x, y) <= range && ids.indexOf(unit.name.toLowerCase()) > -1) {
-					list.push(copyUnit(unit));
-				}
-			} while (unit.getNext());
-		}
-
-		while (list.length) {
-			list.sort(Sort.units);
-
-			if (Misc.openChest(list.shift())) {
-				Pickit.pickItems();
-			}
-		}
-
-		return true;
-	},
-
 	buildMonsterList: function () {
 		var monster,
 			monList = [];
@@ -1093,7 +1055,7 @@ var Attack = {
 			return false;
 		}
 
-		function sortGrid(a, b) {
+		function sortGrid (a, b) {
 			//return getDistance(a.x, a.y, idealPos.x, idealPos.y) - getDistance(b.x, b.y, idealPos.x, idealPos.y);
 			return getDistance(b.x, b.y, unit.x, unit.y) - getDistance(a.x, a.y, unit.x, unit.y);
 		}
@@ -1120,7 +1082,7 @@ var Attack = {
 		if (typeof index === "number") {
 			//print("Dodge build time: " + (getTickCount() - tick));
 
-			return Pather.moveTo(grid[index].x, grid[index].y, 0);
+			return Pather.moveTo(grid[index].x, grid[index].y, 0, false);
 		}
 
 		return false;
@@ -1251,13 +1213,14 @@ var Attack = {
 
 		if ((unit.spectype & 0x7) && Config.SkipException && Config.SkipException.indexOf(unit.name) > -1) {
 			print("ÿc1Skip Exception: " + unit.name);
+
 			return true;
 		}
 
 		var i, j, rval,
 			tempArray = [];
 
-EnchantLoop: // Skip enchanted monsters
+		EnchantLoop: // Skip enchanted monsters
 		for (i = 0; i < Config.SkipEnchant.length; i += 1) {
 			tempArray = Config.SkipEnchant[i].toLowerCase().split(" and ");
 
@@ -1327,7 +1290,7 @@ EnchantLoop: // Skip enchanted monsters
 			}
 		}
 
-ImmuneLoop: // Skip immune monsters
+		ImmuneLoop: // Skip immune monsters
 		for (i = 0; i < Config.SkipImmune.length; i += 1) {
 			tempArray = Config.SkipImmune[i].toLowerCase().split(" and ");
 
@@ -1342,7 +1305,7 @@ ImmuneLoop: // Skip immune monsters
 			}
 		}
 
-AuraLoop: // Skip monsters with auras
+		AuraLoop: // Skip monsters with auras
 		for (i = 0; i < Config.SkipAura.length; i += 1) {
 			rval = true;
 
@@ -1550,7 +1513,7 @@ AuraLoop: // Skip monsters with auras
 					Pather.walkTo(unit.x, unit.y, 3);
 				}
 			} else {
-				Pather.moveTo(unit.x, unit.y, 0);
+				Pather.moveTo(unit.x, unit.y, 0, false);
 			}
 
 			return !CollMap.checkColl(me, unit, coll);
@@ -1598,12 +1561,12 @@ AuraLoop: // Skip monsters with auras
 							if (getDistance(me, coords[i]) < 6 && !CollMap.checkColl(me, coords[i], 0x5)) {
 								Pather.walkTo(coords[i].x, coords[i].y, 2);
 							} else {
-								Pather.moveTo(coords[i].x, coords[i].y, 1);
+								Pather.moveTo(coords[i].x, coords[i].y, 1, false);
 							}
 
 							break;
 						default:
-							Pather.moveTo(coords[i].x, coords[i].y, 1);
+							Pather.moveTo(coords[i].x, coords[i].y, 1, false);
 
 							break;
 						}

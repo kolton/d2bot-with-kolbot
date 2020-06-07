@@ -160,7 +160,7 @@ var Cubing = {
 			chest = getUnit(2, 354);
 
 			if (chest) {
-				Misc.openChest(chest);
+				Chest.openChest(chest);
 
 				for (i = 0; i < 5; i += 1) {
 					cube = getUnit(4, 549);

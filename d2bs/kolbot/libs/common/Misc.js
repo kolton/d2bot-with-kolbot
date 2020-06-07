@@ -726,6 +726,351 @@ var Item = {
 
 		return true;
 	}
+	
+}
+
+var Chest = {
+	chestList: [],
+	allowScan: true,
+	openingChests: false,
+	currentChestGid: null,
+	containers_limited: [
+		"chest", "chest3", "armorstand", "weaponrack"
+	],
+	containers_all: [
+		"chest", "loose rock", "hidden stash", "loose boulder", "corpseonstick", "casket", "armorstand", "weaponrack", "barrel", "holeanim", "tomb2",
+		"tomb3", "roguecorpse", "ratnest", "corpse", "goo pile", "largeurn", "urn", "chest3", "jug", "skeleton", "guardcorpse", "sarcophagus", "object2",
+		"cocoon", "basket", "stash", "hollow log", "hungskeleton", "pillar", "skullpile", "skull pile", "jar3", "jar2", "jar1", "bonechest", "woodchestl",
+		"woodchestr", "barrel wilderness", "burialchestr", "burialchestl", "explodingchest", "chestl", "chestr", "groundtomb", "icecavejar1", "icecavejar2",
+		"icecavejar3", "icecavejar4", "deadperson", "deadperson2", "evilurn", "tomb1l", "tomb3l", "groundtombl"
+	],
+	
+	scan: function(range) {		
+		var containers = [],
+			unit,
+			scanned = 0;
+		
+		if (!range)
+			range = 15;
+		
+		if (Config.OpenChests === 2)
+			containers = this.containers_all;
+		else
+			containers = this.containers_limited;
+		
+		unit = getUnit(2, null, 0);
+		
+		if (unit) {
+			do {
+				if (containers.indexOf(unit.name.toLowerCase()) > -1
+					&& getDistance(me.x, me.y, unit.x, unit.y) <= range) {
+					this.addChest(unit);
+					scanned++;
+				}
+				
+			} while (unit.getNext());
+			
+		}
+		
+		this.clean();
+		
+		//print("scanned/total chests: " + scanned + " - " + this.chestList.length);
+		
+	},
+	
+	isValid: function(unit) {
+		if (unit === undefined || typeof unit !== "object")
+			return false;
+		
+		//Don't add chests that aren't in the same area
+		if (me.area !== unit.area) {
+			//print("Chest.isValid: Not in the same area (" + me.area + ":" + unit.area + ")");
+			return false;
+			
+		}
+		
+		if (this.containers_all.indexOf(unit.name.toLowerCase()) <= -1) {
+			//print("Chest.isValid: Not a typical chest - " + unit.name);
+			return false;
+			
+		}
+		
+		//Don't add chests that are already open or are disappeared
+		if (unit.mode === undefined || unit.mode === null || unit.mode >= 1) {
+			//print("Chest.isValid:  Mode is " + unit.mode + "(" + unit.name + ")");
+			return false;
+			
+		}
+		
+		if (unit.x === undefined || unit.x === null) {
+			//print("Chest.isValid: Unit.x is undefined");
+			return false;
+			
+		}
+		
+		return true;
+		
+	},
+	
+	addChests: function(units) {
+		if (units === undefined || !Array.isArray(units))
+			throw new Error("Chest.addChests: Invalid parameter supplied");
+		
+		for (var i = 0; i < units.length; i++) {
+			this.addChest(units[i]);
+			
+		}
+		
+		this.clean();
+		
+	},
+	
+	addChest: function(unit) {		
+		if (!this.isValid(unit) || this.chestListContains(unit))
+			return;
+		
+		this.chestList.push(copyUnit(unit));
+		//print("Added chest #" + this.chestList.length + " GID " + unit.gid);
+		
+	},
+	
+	chestListContains: function(unit) {
+		if (!unit)
+			throw new Error("Unit is required");
+		
+		for (var i = 0; i < this.chestList.length; i++) {
+			if (this.chestList[i].gid === unit.gid)
+				return true;
+			
+		}
+		
+		return false;
+		
+	},
+	
+	clean: function() {
+		
+		if (this.chestList.length === 0) {
+			this.openingChests = false;
+			return;
+			
+		}
+		
+		for (var i = this.chestList.length - 1; i >= 0; i--) {
+			if (!this.isValid(this.chestList[i])) {
+				//print("Splicing out chest " + this.chestList[i].gid);
+				this.chestList.splice(i, 1);
+			
+			}		
+			
+		}
+		
+		if (this.chestList.length === 0)
+			this.openingChests = false;
+		
+	},
+	
+	// Open a chest Unit
+	openChest: function (unit) {
+		// Skip invalid and Countess chests
+		if (!unit || unit.x === 12526 || unit.x === 12565) {
+			return false;
+		}
+		
+		//Don't bother if the chest is in a wierd spot
+		if (!Attack.validSpot(unit.x + 1, unit.y + 2)) {
+			return false;
+		}
+
+		// locked chest, no keys
+		if (me.classid !== 6 && unit.islocked && !me.findItem(543, 0, 3)) {
+			return false;
+		}
+
+		var i, tick;
+		var clearPath = !Pather.useTeleport() || !!Config.ClearPath;
+
+		for (i = 0; i < 3; i += 1) {
+			// already open
+			if (!unit || unit.gid === undefined || unit.mode) {
+				//print("chest already open: " + unit);
+				return true;
+			}
+			
+			if (Pather.moveTo(unit.x + 1, unit.y + 2, 0, clearPath) && getDistance(me, unit.x + 1, unit.y + 2) < 5) {
+				
+				//Misc.click(0, 0, unit);
+				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
+				
+			}
+			else
+				delay(40);	//Wait a bit
+			
+			PathDebug.drawPath([{x: unit.x, y: unit.y}], 0xFF);
+
+			tick = getTickCount();
+			
+			while (getTickCount() - tick < 3000) {
+				if (unit.gid === undefined || unit.mode > 1) {
+					
+					return true;
+				}
+
+				delay(10);
+			}
+		}
+
+		if (!me.idle) {
+			Misc.click(0, 0, me.x, me.y); // Click to stop walking in case we got stuck
+		}
+
+		return false;
+	},
+
+	openChests: function(scanDistance) {
+		if (scanDistance !== undefined) {
+			this.scan(scanDistance);
+		}
+
+		if (this.chestList.length === 0) {
+			this.openingChests = false;
+			return;
+			
+		}
+		if (this.openingChests)
+			return;
+		
+		this.openingChests = true;
+		
+		var chestsToOpen = this.chestList.slice();
+		
+		chestsToOpen.sort(Sort.units);
+		
+		for (var i = 0; i < chestsToOpen.length; i++) {
+			var chest = getUnit(2, null, 0, chestsToOpen[i].gid);
+			if (chest === undefined) {
+				Chest.removeChest(chestsToOpen[i].gid);
+				continue;
+			} else
+				chestsToOpen[i] = chest;
+			
+			if (this.isValid(chestsToOpen[i])/* && (Pather.useTeleport() || !checkCollision(me, chestsToOpen[i], 0x4))*/) {
+				//print("opening Chest " + chestsToOpen[i].name + " - " + chestsToOpen[i].gid + " mode: " + chestsToOpen[i].mode);
+
+				if (Chest.openChest(chestsToOpen[i])) {
+					Pickit.pickItems();
+					
+				}
+				
+			}
+			
+			//During opening chests we might find more chests to open.  If so, then basically
+			//start over by openening the chests starting from the closest one to the bot
+			if (chestsToOpen.length < this.chestList.length) {
+				Chest.removeChest(chestsToOpen[i].gid);
+				chestsToOpen = this.chestList.slice();
+				i = -1;	//Start over (will be incremented to 0)
+				chestsToOpen.sort(Sort.units);
+				
+			}
+			else
+				Chest.removeChest(chestsToOpen[i].gid);
+			
+		}
+		
+		this.openingChests = false;
+		
+	},
+	
+	// Open all chests that have preset units in an area
+	openChestsInArea: function (area, chestIds) {
+		var i, coords, presetUnits;
+
+		if (!area) {
+			area = me.area;
+		}
+
+		// testing
+		if (area !== me.area) {
+			Pather.journeyTo(area);
+		}
+
+		coords = [];
+		presetUnits = getPresetUnits(area, 2);
+
+		if (!chestIds) {
+			chestIds = [
+				5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241,
+				242, 243, 329, 330, 331, 332, 333, 334, 335, 336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405,
+				406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581
+			];
+		}
+
+		if (!presetUnits) {
+			return false;
+		}
+
+		while (presetUnits.length > 0) {
+			if (chestIds.indexOf(presetUnits[0].id) > -1) {
+				coords.push({
+					x: presetUnits[0].roomx * 5 + presetUnits[0].x,
+					y: presetUnits[0].roomy * 5 + presetUnits[0].y
+				});
+			}
+
+			presetUnits.shift();
+		}
+
+		while (coords.length) {
+			coords.sort(Sort.units);
+			Pather.moveToUnit(coords[0], 1, 2);
+			this.openChests(20);
+
+			for (i = 0; i < coords.length; i += 1) {
+				if (getDistance(coords[i].x, coords[i].y, coords[0].x, coords[0].y) < 20) {
+					coords.shift();
+				}
+			}
+		}
+
+		return true;
+	},
+	
+	getNext: function() {
+		if (this.chestList.length === 0)
+			return null;
+		
+		return this.chestList[0];
+		
+	},
+	
+	removeChest: function(gid) {
+		if (this.chestList.length === 0)
+			return;
+			
+		for (var i = 0; i < this.chestList.length; i++) {
+			if (this.chestList[i].gid === gid) {
+				this.chestList.splice(i, 1);
+				return;
+				
+			}
+		}
+		
+	},
+	
+	debugPrintChests: function() {
+		var str = "Chest.chestList: [";
+		
+		for (var i = 0; i < this.chestList.length; i++) {
+			str += "{" + this.chestList[i].gid + ", " + this.chestList[i].mode + ", " + this.chestList[i].name + "}";
+		}
+		
+		str += "]";
+		
+		print(str);
+		
+	}
+	
 };
 
 var Misc = {
@@ -843,146 +1188,6 @@ var Misc = {
 		}
 
 		return count;
-	},
-
-	// Open a chest Unit
-	openChest: function (unit) {
-		// Skip invalid and Countess chests
-		if (!unit || unit.x === 12526 || unit.x === 12565) {
-			return false;
-		}
-
-		// already open
-		if (unit.mode) {
-			return true;
-		}
-
-		// locked chest, no keys
-		if (me.classid !== 6 && unit.islocked && !me.findItem(543, 0, 3)) {
-			return false;
-		}
-
-		var i, tick;
-
-		for (i = 0; i < 3; i += 1) {
-			if (Pather.moveTo(unit.x + 1, unit.y + 2, 3) && getDistance(me, unit.x + 1, unit.y + 2) < 5) {
-				//Misc.click(0, 0, unit);
-				sendPacket(1, 0x13, 4, unit.type, 4, unit.gid);
-			}
-
-			tick = getTickCount();
-
-			while (getTickCount() - tick < 1000) {
-				if (unit.mode) {
-					return true;
-				}
-
-				delay(10);
-			}
-		}
-
-		if (!me.idle) {
-			Misc.click(0, 0, me.x, me.y); // Click to stop walking in case we got stuck
-		}
-
-		return false;
-	},
-
-	// Open all chests that have preset units in an area
-	openChestsInArea: function (area, chestIds) {
-		var i, coords, presetUnits;
-
-		if (!area) {
-			area = me.area;
-		}
-
-		// testing
-		if (area !== me.area) {
-			Pather.journeyTo(area);
-		}
-
-		coords = [];
-		presetUnits = getPresetUnits(area, 2);
-
-		if (!chestIds) {
-			chestIds = [
-				5, 6, 87, 104, 105, 106, 107, 143, 140, 141, 144, 146, 147, 148, 176, 177, 181, 183, 198, 240, 241,
-				242, 243, 329, 330, 331, 332, 333, 334, 335, 336, 354, 355, 356, 371, 387, 389, 390, 391, 397, 405,
-				406, 407, 413, 420, 424, 425, 430, 431, 432, 433, 454, 455, 501, 502, 504, 505, 580, 581
-			];
-		}
-
-		if (!presetUnits) {
-			return false;
-		}
-
-		while (presetUnits.length > 0) {
-			if (chestIds.indexOf(presetUnits[0].id) > -1) {
-				coords.push({
-					x: presetUnits[0].roomx * 5 + presetUnits[0].x,
-					y: presetUnits[0].roomy * 5 + presetUnits[0].y
-				});
-			}
-
-			presetUnits.shift();
-		}
-
-		while (coords.length) {
-			coords.sort(Sort.units);
-			Pather.moveToUnit(coords[0], 1, 2);
-			this.openChests(20);
-
-			for (i = 0; i < coords.length; i += 1) {
-				if (getDistance(coords[i].x, coords[i].y, coords[0].x, coords[0].y) < 20) {
-					coords.shift();
-				}
-			}
-		}
-
-		return true;
-	},
-
-	openChests: function (range) {
-		var unit,
-			unitList = [],
-			containers = ["chest", "chest3", "armorstand", "weaponrack"];
-
-		if (!range) {
-			range = 15;
-		}
-
-		// Testing all container code
-		if (Config.OpenChests === 2) {
-			containers = [
-				"chest", "loose rock", "hidden stash", "loose boulder", "corpseonstick", "casket", "armorstand", "weaponrack", "barrel", "holeanim", "tomb2",
-				"tomb3", "roguecorpse", "ratnest", "corpse", "goo pile", "largeurn", "urn", "chest3", "jug", "skeleton", "guardcorpse", "sarcophagus", "object2",
-				"cocoon", "basket", "stash", "hollow log", "hungskeleton", "pillar", "skullpile", "skull pile", "jar3", "jar2", "jar1", "bonechest", "woodchestl",
-				"woodchestr", "barrel wilderness", "burialchestr", "burialchestl", "explodingchest", "chestl", "chestr", "groundtomb", "icecavejar1", "icecavejar2",
-				"icecavejar3", "icecavejar4", "deadperson", "deadperson2", "evilurn", "tomb1l", "tomb3l", "groundtombl"
-			];
-		}
-
-		unit = getUnit(2);
-
-		if (unit) {
-			do {
-				if (unit.name && unit.mode === 0 && getDistance(me.x, me.y, unit.x, unit.y) <= range && containers.indexOf(unit.name.toLowerCase()) > -1) {
-					unitList.push(copyUnit(unit));
-				}
-			} while (unit.getNext());
-		}
-
-		while (unitList.length > 0) {
-			unitList.sort(Sort.units);
-
-			unit = unitList.shift();
-
-			if (unit && (Pather.useTeleport() || !checkCollision(me, unit, 0x4)) && this.openChest(unit)) {
-				Pickit.pickItems();
-			}
-		}
-
-		return true;
 	},
 
 	shrineStates: false,

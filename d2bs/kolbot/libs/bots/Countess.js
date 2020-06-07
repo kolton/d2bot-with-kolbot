@@ -33,7 +33,7 @@ function Countess() {
 	Attack.clear(20, 0, getLocaleString(2875)); // The Countess
 
 	if (Config.OpenChests) {
-		Misc.openChestsInArea();
+		Chest.openChestsInArea();
 	}
 
 	return true;

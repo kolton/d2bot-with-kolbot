@@ -7,12 +7,28 @@
 // Perform certain actions after moving to each node
 var NodeAction = {
 	// Run all the functions within NodeAction (except for itself)
-	go: function (arg) {
-		var i;
+	go: function (actions) {
+		var i, arg = { clearPath: false };
 
-		for (i in this) {
-			if (this.hasOwnProperty(i) && typeof this[i] === "function" && i !== "go") {
-				this[i](arg);
+		if (typeof actions === "number") {
+			arg = { clearPath: actions };	//Assign to arg.clearpath the spectype that was assigned to actions
+			actions = true;	//Do all actions
+		}
+
+		if (typeof actions === "boolean" && actions) {
+			//Do all actions
+			for (i in this) {
+				if (this.hasOwnProperty(i) && typeof this[i] === "function" && i !== "go") {
+					this[i](arg);
+				}
+			}
+		}
+		else if (typeof actions === "object") {
+			//Do only named actions
+			for (var j = 0; j < actions.length; j++) {
+				if (this.hasOwnProperty(actions[j]) && actions[j] !== "go") {
+					this[actions[j]](arg);
+				}
 			}
 		}
 	},
@@ -47,42 +63,76 @@ var NodeAction = {
 		if (arg.clearPath !== false) {
 			Attack.clear(15, typeof arg.clearPath === "number" ? arg.clearPath : 0);
 		}
+
 	},
 
 	// Open chests while pathing
-	popChests: function () {
-		if (!!Config.OpenChests) {
-			Misc.openChests(20);
+	popChests: function (arg) {
+		if (Config.OpenChests) {
+			Chest.scan(Config.PickRange);
+
+			if (!arg.maneuvering) {
+				Chest.openChests();
+
+			}
+
 		}
+
 	},
 
 	// Scan shrines while pathing
-	getShrines: function () {
-		if (!!Config.ScanShrines && Config.ScanShrines.length > 0) {
+	getShrines: function (arg) {
+		if (!!Config.ScanShrines && Config.ScanShrines.length > 0 && !arg.maneuvering) {
 			Misc.scanShrines();
+
 		}
+
 	}
+
 };
 
 var PathDebug = {
 	hooks: [],
 	enableHooks: false,
 
-	drawPath: function (path) {
+	drawPath: function (path, color, clear) {
 		if (!this.enableHooks) {
 			return;
 		}
 
-		this.removeHooks();
+		if (!path || path.length === 0) {
+			return;
+		}
+
+		if (color === null) {
+			color = 0x84;
+		}
+
+		if (clear === null) {
+			clear = true;
+		}
+
+		if (clear) {
+			this.removeHooks();
+		}
 
 		var i;
+
+		//Draw X on start location
+		this.hooks.push(new Line(path[0].x - 5, path[0].y, path[0].x + 5, path[0].y, 0x68, true));
+		this.hooks.push(new Line(path[0].x, path[0].y - 5, path[0].x, path[0].y + 5, 0x68, true));
+
+		//Draw X on end location
+		var end = path.length - 1;
+		this.hooks.push(new Line(path[end].x - 5, path[end].y, path[end].x + 5, path[end].y, 0x68, true));
+		this.hooks.push(new Line(path[end].x, path[end].y - 5, path[end].x, path[end].y + 5, 0x68, true));
 
 		if (path.length < 2) {
 			return;
 		}
 
 		for (i = 0; i < path.length - 1; i += 1) {
-			this.hooks.push(new Line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y, 0x84, true));
+			this.hooks.push(new Line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y, color, true));
 		}
 	},
 
@@ -111,86 +161,59 @@ var PathDebug = {
 
 var Pather = {
 	teleport: true,
-	walkDistance: 5,
+	walkDistance: 2,
 	teleDistance: 40,
 	cancelFlags: [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f, 0x17, 0x19, 0x1A],
 	wpAreas: [1, 3, 4, 5, 6, 27, 29, 32, 35, 40, 48, 42, 57, 43, 44, 52, 74, 46, 75, 76, 77, 78, 79, 80, 81, 83, 101, 103, 106, 107, 109, 111, 112, 113, 115, 123, 117, 118, 129],
-	recursion: true,
 
 	useTeleport: function () {
 		return this.teleport && !me.getState(139) && !me.getState(140) && !me.inTown && ((me.classid === 1 && me.getSkill(54, 1)) || me.getStat(97, 54));
 	},
 
 	/*
-		Pather.moveTo(x, y, retry, clearPath, pop);
-		x - the x coord to move to
-		y - the y coord to move to
-		retry - number of attempts before aborting
-		clearPath - kill monsters while moving
-		pop - remove last node
+		Pather.moveTo(x, y, retry, clearPath, pop, actions);
+		x - the x coord to path to
+		y - the y coord to path to
+		retry - the number of times to retry before aborting
+		actions - if an array, directs pather to perform specified node actions (see NodeAction object).
+		set to false to perform no node actions (move directly to destination).  Defaults to true - perform all actions
+		pop - removes the first path node before pathing
+
 	*/
-	moveTo: function (x, y, retry, clearPath, pop) {
-		if (me.dead) { // Abort if dead
+	moveTo: function (x, y, retry, actions, pop) {
+		//Validate Arguments
+		if (getDistance(me, x, y) < 2) {
+			return true;	//Don't bother if the distance is really close
+		}
+
+		if (me.dead) {
 			return false;
 		}
 
-		var i, path, adjustedNode, cleared, useTeleport,
-			node = {x: x, y: y},
-			fail = 0;
-
-		for (i = 0; i < this.cancelFlags.length; i += 1) {
-			if (getUIFlag(this.cancelFlags[i])) {
-				me.cancel();
-			}
-		}
-
-		if (getDistance(me, x, y) < 2) {
-			return true;
-		}
-
-		if (x === undefined || y === undefined) {
-			throw new Error("moveTo: Function must be called with at least 2 arguments.");
+		if (x === undefined || y === undefined)	{
+			throw new Error("Pather.moveTo: Function must be called with at least 2 arguments.");
 		}
 
 		if (typeof x !== "number" || typeof y !== "number") {
-			throw new Error("moveTo: Coords must be numbers");
+			throw new Error("Pather.moveTo: Coords must be numbers");
 		}
 
-		if (retry === undefined) {
-			retry = 3;
+		var destination = {x: x, y: y},
+			useTeleport = this.useTeleport(),
+			//How far apart to make the pathing nodes.  Note this has no effect when walking.
+			nodeDist = useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance,
+			path = [],
+			curNode, fail = 0;
+
+		if (actions === undefined || actions === null) {
+			actions = !useTeleport || !!Config.ClearPath;
 		}
 
-		if (clearPath === undefined) {
-			clearPath = false;
-		}
-
-		if (pop === undefined) {
+		if (pop === undefined || pop === null) {
 			pop = false;
 		}
 
-		useTeleport = this.useTeleport();
-
-		/* Disabling getPath optimizations, they are causing desync -- noah
-		// Teleport without calling getPath if the spot is close enough
-		if (useTeleport && getDistance(me, x, y) <= this.teleDistance) {
-			//Misc.townCheck();
-
-			return this.teleportTo(x, y);
-		}
-
-		// Walk without calling getPath if the spot is close enough
-		if (!useTeleport && (getDistance(me, x, y) <= 5 || (getDistance(me, x, y) <= 25 && !CollMap.checkColl(me, {x: x, y: y}, 0x1)))) {
-			return this.walkTo(x, y);
-		}
-		*/
-
-		path = getPath(me.area, x, y, me.x, me.y, useTeleport ? 1 : 0, useTeleport ? ([62, 63, 64].indexOf(me.area) > -1 ? 30 : this.teleDistance) : this.walkDistance);
-
-		if (!path) {
-			throw new Error("moveTo: Failed to generate path.");
-		}
-
-		path.reverse();
+		path = this.generatePath(me.area, destination.x, destination.y, me.x, me.y, useTeleport ? 1 : 0, nodeDist);
 
 		if (pop) {
 			path.pop();
@@ -203,99 +226,131 @@ var Pather = {
 		}
 
 		while (path.length > 0) {
-			if (me.dead) { // Abort if dead
-				return false;
+			this.closeUi();
+
+			curNode = path.shift();
+
+			if (getDistance(me, curNode) < 2) {
+				continue;
+
 			}
 
-			for (i = 0; i < this.cancelFlags.length; i += 1) {
-				if (getUIFlag(this.cancelFlags[i])) {
-					me.cancel();
+			//Special case for the Maggot lair
+			if ([62, 63, 64].indexOf(me.area) > -1) {
+				var adjustedNode = this.getNearestWalkable(curNode.x, curNode.y, 15, 3, 0x1 | 0x4 | 0x800 | 0x1000);
+
+				if (adjustedNode) {
+					curNode.x = adjustedNode[0];
+					curNode.y = adjustedNode[1];
 				}
+
 			}
 
-			node = path.shift();
+			if (useTeleport ? this.teleportTo(curNode.x, curNode.y) : this.walkTo(curNode.x, curNode.y, (fail > 0 || me.inTown) ? 2 : 1)) {
+				//Navigated successfully to the node
+				//Don't attempt to perform node actions in town
+				if (!me.inTown) {
+					NodeAction.go(actions);
 
-			/* Right now getPath's first node is our own position so it's not necessary to take it into account
-				This will be removed if getPath changes
-			*/
-			if (getDistance(me, node) > 2) {
-				// Make life in Maggot Lair easier
-				if ([62, 63, 64].indexOf(me.area) > -1) {
-					adjustedNode = this.getNearestWalkable(node.x, node.y, 15, 3, 0x1 | 0x4 | 0x800 | 0x1000);
+					//print("returning from nodeactions");
 
-					if (adjustedNode) {
-						node.x = adjustedNode[0];
-						node.y = adjustedNode[1];
+					//Returning from performing node actions.  Regenerate the path if we've gone
+					//far away from the next node
+					if (getDistance(me, curNode.x, curNode.y) > 5) {
+						path = this.generatePath(me.area, destination.x, destination.y, me.x, me.y, useTeleport ? 1 : 0, nodeDist);
+
+						if (pop) {
+							path.pop();
+						}
+						//	print("Moving back to node");
+
 					}
+
+					if (path.length > 0) {
+						PathDebug.drawPath(path);
+					}
+					else {
+						break;
+					}
+
 				}
 
-				if (useTeleport ? this.teleportTo(node.x, node.y) : this.walkTo(node.x, node.y, (fail > 0 || me.inTown) ? 2 : 4)) {
-					if (!me.inTown) {
-						if (this.recursion) {
-							this.recursion = false;
+				Misc.townCheck();
 
-							NodeAction.go({clearPath: clearPath});
+			}
+			else {
+				fail++;
 
-							if (getDistance(me, node.x, node.y) > 5) {
-								this.moveTo(node.x, node.y);
-							}
+				//Failed to nagivate to node, try again
+				if (!useTeleport && !me.inTown) {
+					Attack.clear(5);
 
-							this.recursion = true;
-						}
-
-						Misc.townCheck();
-					}
-				} else {
-					if (fail > 0 && !useTeleport && !me.inTown) {
-						// Don't go berserk on longer paths
-						if (!cleared) {
-							Attack.clear(5);
-
-							cleared = true;
-						}
-
-						if (fail > 1 && me.getSkill(143, 1)) {
-							Skill.cast(143, 0, node.x, node.y);
-						}
+					//Attempt to leap if a barb
+					if (fail > 1 && me.getSkill(143, 1)) {
+						Skill.cast(143, 0, curNode.x, curNode.y);
 					}
 
-					// Reduce node distance in new path
-					path = getPath(me.area, x, y, me.x, me.y, useTeleport ? 1 : 0, useTeleport ? rand(25, 35) : rand(10, 15));
-					fail += 1;
 
-					if (!path) {
-						throw new Error("moveTo: Failed to generate path.");
-					}
-
-					path.reverse();
-					PathDebug.drawPath(path);
-
-					if (pop) {
-						path.pop();
-					}
-
-					print("move retry " + fail);
-
-					if (fail > 0) {
-						Packet.flash(me.gid);
-
-						if (fail >= retry) {
-							break;
-						}
-					}
 				}
+
+				path = this.generatePath(me.area, destination.x, destination.y, me.x, me.y, useTeleport ? 1 : 0, useTeleport ? rand(25, 35) : rand(10, 15));
+
+				if (pop) {
+					path.pop();
+				}
+
+				PathDebug.drawPath(path, 0x99);
+
+				//print("path retry " + fail);
+
+				if (fail > 0) {
+					Packet.flash(me.gid);
+
+					if (fail >= retry) {
+						//print("couldn't move to path");
+						break;
+					}
+
+				}
+
 			}
 
 			delay(5);
+
 		}
 
+		//Reached our destination
 		if (useTeleport && Config.TeleSwitch) {
 			Attack.weaponSwitch(Attack.getPrimarySlot());
 		}
 
 		PathDebug.removeHooks();
 
-		return getDistance(me, node.x, node.y) < 5;
+		return getDistance(me, destination.x, destination.y) < 5;
+
+	},
+
+	closeUi: function () {
+		for (var i = 0; i < this.cancelFlags.length; i++) {
+			if (getUIFlag(this.cancelFlags[i])) {
+				me.cancel();
+
+			}
+		}
+
+	},
+
+	generatePath: function (area, destX, destY, curX, curY, useTeleport, nodeDistance) {
+		var path = getPath(area, destX, destY, curX, curY, useTeleport, nodeDistance);
+
+		if (!path) {
+			throw new Error("generatePath: Failed to generate path.");
+		}
+
+		path.reverse();
+
+		return path;
+
 	},
 
 	/*
@@ -310,7 +365,7 @@ var Pather = {
 			maxRange = 5;
 		}
 
-MainLoop:
+		MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			if (Config.PacketCasting) {
 				Skill.setSkill(54, 0);
@@ -393,7 +448,7 @@ MainLoop:
 			attemptCount += 1;
 			nTimer = getTickCount();
 
-ModeLoop:
+			ModeLoop:
 			while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6) {
 				if (me.dead) {
 					return false;
@@ -510,7 +565,7 @@ ModeLoop:
 		}
 
 		if (clearPath === undefined) {
-			clearPath = false;
+			clearPath = !this.useTeleport();
 		}
 
 		if (pop === undefined) {
@@ -557,7 +612,7 @@ ModeLoop:
 		}
 
 		if (clearPath === undefined) {
-			clearPath = false;
+			clearPath = !this.useTeleport();
 		}
 
 		if (pop === undefined) {
@@ -587,6 +642,10 @@ ModeLoop:
 			areas = targetArea;
 		} else {
 			areas.push(targetArea);
+		}
+
+		if (clearPath === undefined) {
+			clearPath = !this.useTeleport();
 		}
 
 		for (i = 0; i < areas.length; i += 1) {
@@ -712,6 +771,7 @@ ModeLoop:
 			if (me.area === 40 && getDistance(me, 5218, 5180) < 20) {
 				break;
 			}
+
 		case 65:
 			return this.useUnit(2, 74, targetArea);
 		case 93:
@@ -862,11 +922,11 @@ ModeLoop:
 	},
 
 	/*
-		Pather.moveTo(targetArea, check);
+		Pather.useWaypoint(targetArea, check);
 		targetArea - id of the area to enter
 		check - force the waypoint menu
 	*/
-	useWaypoint: function useWaypoint(targetArea, check) {
+	useWaypoint: function useWaypoint (targetArea, check) {
 		switch (targetArea) {
 		case undefined:
 			throw new Error("useWaypoint: Invalid targetArea parameter: " + targetArea);
@@ -952,6 +1012,28 @@ ModeLoop:
 								return true;
 							}
 
+							//If we're trying to switch acts, then we might want to make sure we can actually
+							//go to the given act
+							var targetAct = this.getAct(targetArea);
+
+							if (targetAct !== me.act) {
+								if (!this.accessToAct(targetAct)) {
+									//Try using the NPC to go to next act
+									if (targetAct === me.act + 1) {
+										if (!this.goToNextAct()) {
+											throw new Error("Pather.useWaypoint: Couldn't go to next act (" + targetAct + ") via NPC");
+
+										}
+
+									} else {
+										throw new Error("Pather.useWaypoint: I don't have access to act " + targetAct);
+
+									}
+
+								}
+
+							}
+
 							if (!getWaypoint(this.wpAreas.indexOf(targetArea))) {
 								me.cancel();
 								me.overhead("Trying to get the waypoint");
@@ -971,9 +1053,9 @@ ModeLoop:
 
 					if (!getUIFlag(0x14)) {
 						print("waypoint retry " + (i + 1));
-						retry = Math.min(i + 1, 5)
+						retry = Math.min(i + 1, 5);
 						coord = CollMap.getRandCoordinate(me.x, -5 * retry, 5 * retry, me.y, -5 * retry, 5 * retry);
-						this.moveTo(coord.x, coord.y);
+						this.moveTo(coord.x, coord.y, 3, false);
 						delay(200 + me.ping);
 
 						Packet.flash(me.gid);
@@ -1062,7 +1144,7 @@ ModeLoop:
 
 			tick = getTickCount();
 
-MainLoop:
+			MainLoop:
 			while (getTickCount() - tick < Math.max(500 + i * 100, me.ping * 2 + 100)) {
 				portal = getUnit(2, "portal");
 
@@ -1209,12 +1291,13 @@ MainLoop:
 	},
 
 	/*
-		Pather.moveTo(x, y, range, step, coll);
+		Pather.getNearestWalkable(x, y, range, step, coll);
 		x - the starting x coord
 		y - the starting y coord
 		range - maximum allowed range from the starting coords
 		step - distance between each checked dot on the grid
 		coll - collision flag to avoid
+		size -
 	*/
 	getNearestWalkable: function (x, y, range, step, coll, size) {
 		if (!step) {
@@ -1234,7 +1317,7 @@ MainLoop:
 			result = [x, y];
 		}
 
-MainLoop:
+		MainLoop:
 		while (!result && distance < range) {
 			for (i = -distance; i <= distance; i += 1) {
 				for (j = -distance; j <= distance; j += 1) {
@@ -1258,11 +1341,12 @@ MainLoop:
 	},
 
 	/*
-		Pather.moveTo(x, y, coll, cacheOnly);
+		Pather.checkSpot(x, y, coll, cacheOnly);
 		x - the x coord to check
 		y - the y coord to check
 		coll - collision flag to search for
 		cacheOnly - use only cached room data
+		size -
 	*/
 	checkSpot: function (x, y, coll, cacheOnly, size) {
 		var dx, dy, value;
@@ -1314,6 +1398,119 @@ MainLoop:
 	},
 
 	/*
+		Pather.goToNextAct();
+		Used when attempting to travel to the next act (via NPC)
+		Especially when completing an act (i.e. after defeating act boss)
+		act - the act to change to
+	*/
+	goToNextAct: function () {
+		if (me.act === 5) {
+			return true;
+		}
+
+		var preArea = me.area, npc = null;
+
+		switch (me.act) {
+
+		case 1:
+			Town.move("warriv");
+
+			npc = getUnit(1, "warriv");
+			delay(me.ping * 2 + 250);
+
+			if (!npc || !npc.openMenu()) {
+				return false;
+			}
+
+			delay(me.ping * 2 + 250);
+
+			Misc.useMenu(0x0D36);
+
+			delay(me.ping * 2 + 250);
+
+			break;
+
+		case 2:
+			var jerhyn, meshif;
+
+			if (!me.getQuest(14, 0)) {
+				Town.move("palace");
+				jerhyn = getUnit(1, "jerhyn");
+
+				if (!jerhyn || !jerhyn.openMenu()) {
+					return false;
+				}
+
+				me.cancel();
+
+			}
+
+			Town.move("meshif");
+			meshif = getUnit(1, "meshif");
+
+			if (!meshif || !meshif.openMenu()) {
+				return false;
+			}
+
+			Misc.useMenu(0x0D38);
+
+			break;
+
+		default:
+			throw new Error("Pather.goToNextAct: Act transition from act " + me.act + "->" + (me.act + 1) + " not yet supported.");
+
+		}
+
+		delay(1000 + me.ping * 2);
+
+		while (!me.area) {
+			delay(500);
+		}
+
+		//Check and make sure that we actually made the transition
+		if (me.area === preArea) {
+			me.cancel();
+			Town.move("portalspot");
+
+			print("Pather.goToNextAct: Change to act " + (me.act + 1) + " failed.");
+
+			return false;
+
+		}
+
+		return true;
+
+	},
+
+	/*
+		Returns the act which corresponds to the given area
+	*/
+	getAct: function (area) {
+		if (area >= 1 && area <= 39) {
+			return 1;
+		}
+
+		if (area >= 40 && area <= 74) {
+			return 2;
+		}
+
+		if (area >= 75 && area <= 102) {
+			return 3;
+		}
+
+		if (area >= 103 && area <= 108) {
+			return 4;
+		}
+
+		if (area >= 109 && area <= 136) {
+			return 5;
+		}
+
+		throw new Error("Pather.getAct: Unknown area " + area);
+
+	},
+
+	/*
 		Pather.getWP(area);
 		area - the id of area to get the waypoint in
 		clearPath - clear path
@@ -1321,6 +1518,10 @@ MainLoop:
 	getWP: function (area, clearPath) {
 		var i, j, wp, preset,
 			wpIDs = [119, 145, 156, 157, 237, 238, 288, 323, 324, 398, 402, 429, 494, 496, 511, 539];
+
+		if (clearPath === undefined) {
+			clearPath = !this.useTeleport();
+		}
 
 		if (area !== me.area) {
 			this.journeyTo(area);
@@ -1518,7 +1719,7 @@ MainLoop:
 							((src !== previousAreas[dest] && dest !== previousAreas[src]) && // check wp if areas aren't linked
 								previousAreas[src] !== previousAreas[dest])) && // check wp if areas aren't linked with a common area
 								Pather.wpAreas.indexOf(node.from) > 0 && getWaypoint(Pather.wpAreas.indexOf(node.from))
-							) {
+					) {
 						if (node.from !== src) {
 							useWP = true;
 						}

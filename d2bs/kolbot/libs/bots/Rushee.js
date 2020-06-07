@@ -78,7 +78,7 @@ function Rushee() {
 			return false;
 		}
 
-		Misc.openChest(chest);
+		Chest.openChest(chest);
 
 		item = getUnit(4, classid);
 
@@ -170,7 +170,7 @@ function Rushee() {
 			return false;
 		}
 
-		Misc.openChest(orifice);
+		Chest.openChest(orifice);
 
 		staff = me.getItem(91);
 
@@ -515,7 +515,7 @@ function Rushee() {
 
 						target = getUnit(2, 193);
 
-						Misc.openChest(target);
+						Chest.openChest(target);
 						delay(300);
 
 						target = getUnit(4, 548);
