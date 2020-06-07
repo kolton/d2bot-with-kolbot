@@ -405,13 +405,18 @@ var Config = {
 		EntranceTP: "Entrance TP up",
 		StarTP: "Star TP up",
 		DiabloMsg: "Diablo",
-		WalkClear: false
+		WalkClear: false,
+		SealOrder: ["vizier", "seis", "infector"],
 	},
 	DiabloHelper: {
 		Wait: 120,
 		Entrance: false,
 		SkipIfBaal: false,
-		SkipTP: false
+		SkipTP: false,
+		OpenSeals: false,
+		SafePrecast: true,
+		SealOrder: ["vizier", "seis", "infector"],
+		RecheckSeals: false,
 	},
 	BattleOrders: {
 		Mode: 0,
