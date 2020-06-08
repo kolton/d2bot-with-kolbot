@@ -169,7 +169,7 @@ function OrgTorch() {
 
 	// Do mini ubers or Tristram based on area we're already in
 	this.pandemoniumRun = function () {
-		var i, findLoc, skillBackup;
+		let i, findLoc, skillBackup;
 
 		switch (me.area) {
 		case 133: // Matron's Den
@@ -281,7 +281,7 @@ function OrgTorch() {
 	};
 
 	// Start
-	var i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer, busy, busyTick,
+	let i, portal, tkeys, hkeys, dkeys, brains, eyes, horns, timer, farmer, busy, busyTick, chugs,
 		neededItems = {pk1: 0, pk2: 0, pk3: 0, rv: 0};
 
 	// Do town chores and quit if MakeTorch is true and we have a torch.
@@ -423,6 +423,18 @@ function OrgTorch() {
 			portal = this.openPortal(0);
 
 			if (portal) {
+				if (portal.objtype === 133 && Config.OrgTorch.AntidotesToChug) {
+					Town.buyAntidotes(Config.OrgTorch.AntidotesToChug);
+					for (chugs = 0; chugs < Config.OrgTorch.AntidotesToChug; chugs++) {
+						delay(500);
+						print("glug glug");
+						let antidote = me.getItem(514);
+						if (antidote) {
+							antidote.interact();
+						}
+					}
+					Town.move("stash");
+				}
 				Pather.usePortal(null, null, portal);
 			}
 
