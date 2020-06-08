@@ -801,6 +801,37 @@ NTIPAliasColor["darkgold"] = 16;
 NTIPAliasColor["darkgreen"] = 11;
 NTIPAliasColor["darkblue"] = 5;
 
+var NTIPAliasSkin = {};
+// rings
+NTIPAliasSkin["coral"] = "rin1"; NTIPAliasSkin["chain"] = "rin1";
+NTIPAliasSkin["smallblue"] = "rin2"; NTIPAliasSkin["sloop"] = "rin2";
+NTIPAliasSkin["bigblue"] = "rin3"; NTIPAliasSkin["bband"] = "rin3";
+NTIPAliasSkin["orangestone"] = "rin4"; NTIPAliasSkin["orangering"] = "rin4";
+NTIPAliasSkin["crown"] = "rin5"; NTIPAliasSkin["eturn"] = "rin5";
+// amulets
+NTIPAliasSkin["dot"] = "amu1"; NTIPAliasSkin["cross"] = "amu1";
+NTIPAliasSkin["sun"] = "amu2";
+NTIPAliasSkin["penta"] = "amu3"; NTIPAliasSkin["star"] = "amu3";
+// jewels
+NTIPAliasSkin["pink"] = "jew1";
+NTIPAliasSkin["blue"] = "jew2";
+NTIPAliasSkin["orange"] = "jew3"; NTIPAliasSkin["peach"] = "jew3";
+NTIPAliasSkin["green"] = "jew4";
+NTIPAliasSkin["red"] = "jew5";
+NTIPAliasSkin["white"] = "jew6";
+// small charms
+NTIPAliasSkin["brown"] = "cm11"; NTIPAliasSkin["football"] = "cm11";
+NTIPAliasSkin["bear"] = "cm12"; NTIPAliasSkin["bearfoot"] = "cm12"; NTIPAliasSkin["bearclaw"] = "cm12";
+NTIPAliasSkin["m"] = "cm13"; NTIPAliasSkin["coin"] = "cm13";
+// large charms
+NTIPAliasSkin["paw"] = "cm21"; NTIPAliasSkin["paper"] = "cm21";
+NTIPAliasSkin["horn"] = "cm22";
+NTIPAliasSkin["tower"] = "cm23"; NTIPAliasSkin["obelisk"] = "cm23";
+// grand charms
+NTIPAliasSkin["eye"] = "cm31";
+NTIPAliasSkin["dna"] = "cm32"; NTIPAliasSkin["lace"] = "cm32"; NTIPAliasSkin["spaghetti"] = "cm32";
+NTIPAliasSkin["dragon"] = "cm33"; NTIPAliasSkin["monster"] = "cm33";
+
 var NTIPAliasStat = {};
 NTIPAliasStat["strength"] = 0;
 NTIPAliasStat["energy"] = 1;
