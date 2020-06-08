@@ -1,12 +1,63 @@
 /**
 *	@filename	BattleOrders.js
-*	@author		kolton
+*	@author		kolton, jmichelsen
 *	@desc		give or receive Battle Orders buff
+*	@return {boolean}
 */
 
-function BattleOrders() {
+function BattleOrders () {
+	this.checkForPlayers = function () {
+		if (Misc.getPlayerCount() <= 1) {
+			throw new Error("Empty game"); // Alone in game
+		}
+	};
+
+	this.amTardy = function () {
+		let party = getParty();
+
+		AreaInfoLoop:
+		while (true) {
+			try {
+				this.checkForPlayers();
+			} catch (e) {
+				if (Config.BattleOrders.Wait) {
+					print("Waiting " + Config.BattleOrders.Wait + " seconds for other players...");
+
+					while (getTickCount() - tick < Config.BattleOrders.Wait * 1000) {
+						me.overhead("Waiting " + Math.round(((tick + (Config.BattleOrders.Wait * 1000)) - getTickCount()) / 1000) + " Seconds for other players");
+						delay(1000);
+					}
+
+					this.checkForPlayers();
+				}
+			}
+
+			if (party) {
+				do {
+					if (party.name !== me.name && party.area) {
+						break AreaInfoLoop; // Can read player area
+					}
+				} while (party.getNext());
+			}
+		}
+
+		if (party) {
+			do {
+				if (party.area === 131 || party.area === 132 || party.area === 108 || party.area === 39) {
+					// Player is in Throne of Destruction, Worldstone Chamber, Chaos Sanctuary, or Cows
+					print("ÿc1I'm late to BOs. Moving on...");
+
+					return true;
+				}
+			} while (party.getNext());
+		}
+
+		return false; // Not late; wait.
+	};
+
 	this.giveBO = function (list) {
-		var i, unit,
+		let i,
+			unit,
 			failTimer = 60,
 			tick = getTickCount();
 
@@ -18,7 +69,12 @@ function BattleOrders() {
 					if (getTickCount() - tick >= failTimer * 1000) {
 						showConsole();
 						print("ÿc1BO timeout fail.");
-						quit();
+
+						if (Config.BattleOrders.QuitOnFailure) {
+							quit();
+						}
+
+						break;
 					}
 
 					Precast.doPrecast(true);
@@ -37,17 +93,26 @@ function BattleOrders() {
 	} catch (wperror) {
 		showConsole();
 		print("ÿc1Failed to take waypoint.");
-		quit();
+
+		if (Config.BattleOrders.QuitOnFailure) {
+			quit();
+		}
+
+		return false;
 	}
 
 	Pather.moveTo(me.x + 6, me.y + 6);
 
-	var i,
+	let i,
 		tick = getTickCount(),
 		failTimer = 60;
 
-MainLoop:
+	MainLoop:
 	while (true) {
+		if (Config.BattleOrders.SkipIfTardy && this.amTardy()) {
+			break;
+		}
+
 		switch (Config.BattleOrders.Mode) {
 		case 0: // Give BO
 			for (i = 0; i < Config.BattleOrders.Getters.length; i += 1) {
@@ -55,7 +120,12 @@ MainLoop:
 					if (getTickCount() - tick >= failTimer * 1000) {
 						showConsole();
 						print("ÿc1BO timeout fail.");
-						quit();
+
+						if (Config.BattleOrders.QuitOnFailure) {
+							quit();
+						}
+
+						break MainLoop;
 					}
 
 					delay(500);
@@ -77,7 +147,12 @@ MainLoop:
 			if (getTickCount() - tick >= failTimer * 1000) {
 				showConsole();
 				print("ÿc1BO timeout fail.");
-				quit();
+
+				if (Config.BattleOrders.QuitOnFailure) {
+					quit();
+				}
+
+				break MainLoop;
 			}
 
 			break;
@@ -88,7 +163,7 @@ MainLoop:
 
 	Pather.useWaypoint(1);
 
-	if (Config.BattleOrders.Mode === 0 && Config.BattleOrders.Wait) {
+	if (Config.BattleOrders.Mode === 0 && Config.BattleOrders.Idle) {
 		for (i = 0; i < Config.BattleOrders.Getters.length; i += 1) {
 			while (Misc.inMyParty(Config.BattleOrders.Getters[i])) {
 				delay(500);
