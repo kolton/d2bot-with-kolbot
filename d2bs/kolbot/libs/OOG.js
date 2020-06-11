@@ -1215,6 +1215,100 @@ MainLoop:
 		}
 
 		return false;
+	},
+
+	// Click a game in the games list, by scrolling automatically if needed.
+	// Returns true if the game has been clicked, false otherwise.
+	clickGame: function(gameName) {
+		if (!gameName || gameName.length == 0) {
+			return false;
+		}
+
+		var gameListControl = getControl(4, 432, 393, 160, 173);
+		if (!gameListControl) {
+			return false;
+		}
+
+		var text = gameListControl.getText();
+		if (!text) {
+			return false;
+		}
+
+		var gamesPerPage = 9; // number of visible games in scroll list
+		var gameEntryHeight = Math.round(gameListControl.ysize/gamesPerPage); // height of a game entry control in scroll list
+		for (var i = 0; i < text.length; i++) {
+			if (text[i][0] == gameName) {
+				var topListY = gameListControl.y - gameListControl.ysize; // top of list Y coord
+				var midX = gameListControl.x + Math.round(gameListControl.xsize/2); // middle list X coord
+				if (i >= gameListControl.selectstart && i <= gameListControl.selectstart+gamesPerPage-1) {
+					// game is in the current scroll page, click it
+					var positionInPage = i-gameListControl.selectstart;
+					var y = Math.round(topListY + positionInPage*gameEntryHeight + gameEntryHeight/2);
+					gameListControl.click(midX, y);
+					return true;
+				}
+				else {
+					var scrollX = gameListControl.x + gameListControl.xsize + 5; // scrollbar X coord
+					var topScrollY = topListY+15; // scrollbar top Y coord, click at this Y coord to scroll up
+					var bottomScrollY = gameListControl.y-15; // scrollbar bottom Y coord, click at this Y coord to scroll down
+					if (i > gameListControl.selectstart+gamesPerPage-1) {
+						// game is lower in list, let scroll bottom
+						gameListControl.click(scrollX, bottomScrollY);
+						return this.clickGame(gameName);
+					}
+					else {
+						// game is upper in list, let scroll top
+						gameListControl.click(scrollX, topScrollY);
+						return this.clickGame(gameName);
+					}
+				}
+			}
+		}
+		return false;
+	},
+
+	// Returns the elapsed time of the game in seconds, by looking at elapsed time info.
+	// Returns -1 if the elapsed time could not be found.
+	// gameName : The game name to look for, if not set, will look at current selected game info.
+	getGameElapsedTime: function(gameName) {
+
+		if (gameName && !this.clickGame(gameName)) {
+			return -1;
+		}
+
+		var gameInfoControl = getControl(4, 609, 393, 143, 194);
+
+		for (var i = 0; !gameInfoControl && i < 30; i++) {
+			delay(100);
+			gameInfoControl = getControl(4, 609, 393, 143, 194);
+		}
+
+		if (!gameInfoControl) {
+			return -1;
+		}
+
+		var text = gameInfoControl.getText();
+
+		for (var i = 0; !text && i < 30; i++) {
+			delay(100);
+			text = gameInfoControl.getText();
+		}
+
+		if (!text) {
+			return -1;
+		}
+
+		var timeRegExp = /\d+:\d{2}:\d{2}/i;
+		for (var i = 0; i < text.length; i++) {
+			var match = text[i].match(timeRegExp);
+			if (match) {
+				var values = match[0].split(":");
+				var date = new Date(0, 0, 0, values[0], values[1], values[2], 0);
+				return date.getHours()*3600 + date.getMinutes()*60 + date.getSeconds();
+			}
+		}
+
+		return -1;
 	}
 };
 
