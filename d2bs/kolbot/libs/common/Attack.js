@@ -233,6 +233,8 @@ var Attack = {
 
 		if (Config.MFLeader) {
 			Pather.makePortal();
+			Pather.TeamCheck(1);    //add by WhyY0416
+			delay(1000);
 			say("kill " + classId);
 		}
 
@@ -298,6 +300,10 @@ var Attack = {
 			throw new Error("Failed to kill " + target.name + errorInfo);
 		}
 
+		if (Config.MFLeader) {
+		    Pather.TeamCheck(2);
+		}
+		
 		return true;
 	},
 
@@ -384,6 +390,8 @@ var Attack = {
 
 		if (Config.MFLeader && !!bossId) {
 			Pather.makePortal();
+			Pather.TeamCheck(1);    //add by WhyY0416
+			delay(1000);
 			say("clear " + bossId);
 		}
 
@@ -555,6 +563,10 @@ var Attack = {
 
 		if (attackCount > 0 && pickit) {
 			Pickit.pickItems();
+		}
+		
+		if (Config.MFLeader && !!bossId) {
+		    Pather.TeamCheck(2);
 		}
 
 		return true;
@@ -858,7 +870,9 @@ var Attack = {
 	clearLevel: function (spectype) {
 		if (Config.MFLeader) {
 			Pather.makePortal();
-			say("clearlevel " + getArea().name);
+			Pather.TeamCheck(1);    //add by WhyY0416
+			delay(1000);
+			say("clearlevel"); //dhd enable unique name for tombs		
 		}
 
 		var room, result, rooms, myRoom, currentArea, previousArea;
@@ -920,6 +934,9 @@ var Attack = {
 		}
 
 		//this.storeStatistics(Pather.getAreaName(me.area));
+		if (Config.MFLeader) {
+		    Pather.TeamCheck(2);
+		}
 
 		return true;
 	},

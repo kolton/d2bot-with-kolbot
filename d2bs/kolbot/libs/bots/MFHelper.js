@@ -5,14 +5,14 @@
 */
 
 function MFHelper() {
-	var i, player, playerAct, split,
+	var i, player, playerAct, split, LeaderArea,
 		oldCommand = "",
 		command = "";
 
 	function ChatEvent(name, msg) {
 		if (!player) {
 			var i,
-				match = ["kill", "clearlevel", "clear", "quit", "cows", "council"];
+				match = ["kill", "clearlevel", "clear", "quit", "cows", "council", "TeamCheck","FinishCheck"];
 
 			if (msg) {
 				for (i = 0; i < match.length; i += 1) {
@@ -26,6 +26,9 @@ function MFHelper() {
 		}
 
 		if (player && name === player.name) {
+			if (msg.match("Position ")){
+				LeaderArea = msg.split("Position ")[1];
+			}
 			command = msg;
 		}
 	}
@@ -184,8 +187,9 @@ MainLoop:
 
 					split = command.split("kill ")[1];
 
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
+					for (i = 0; i < 30; i += 1) {
+						if (Pather.usePortal(LeaderArea, player.name)) {
+							delay(500);
 							break;
 						}
 
@@ -217,8 +221,9 @@ MainLoop:
 				} else if (command.indexOf("clearlevel") > -1) {
 					print("ÿc4MFHelperÿc0: Clear Level");
 
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
+					for (i = 0; i < 30; i += 1) {
+						if (Pather.usePortal(LeaderArea, player.name)) {
+							delay(500);
 							break;
 						}
 
@@ -241,8 +246,9 @@ MainLoop:
 
 					split = command.split("clear ")[1];
 
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
+					for (i = 0; i < 30; i += 1) {
+						if (Pather.usePortal(LeaderArea, player.name)) {
+							delay(500);
 							break;
 						}
 
@@ -275,8 +281,9 @@ MainLoop:
 				} else if (command.indexOf("cows") > -1) {
 					print("ÿc4MFHelperÿc0: Clear Cows");
 
-					for (i = 0; i < 5; i += 1) {
+					for (i = 0; i < 30; i += 1) {
 						if (Town.goToTown(1) && Pather.usePortal(39)) {
+							delay(500);
 							break;
 						}
 
@@ -297,8 +304,9 @@ MainLoop:
 				} else if (command.indexOf("council") > -1) {
 					print("ÿc4MFHelperÿc0: Kill Council");
 
-					for (i = 0; i < 5; i += 1) {
+					for (i = 0; i < 30; i += 1) {
 						if (Pather.usePortal(player.area, player.name)) {
+							delay(500);
 							break;
 						}
 
@@ -314,6 +322,18 @@ MainLoop:
 						}
 					} else {
 						print("Failed to use portal.");
+					}
+				} else if (command.indexOf("TeamCheck") > -1 ) {
+					say("Ready");
+					delay(1000);
+					if (!me.inTown){
+						Town.goToTown;
+					}
+				}  else if (command.indexOf("FinishCheck") > -1){
+					say("Finished");
+					delay(1000);
+					if (!me.inTown){
+						Town.goToTown;
 					}
 				}
 			}
