@@ -6,7 +6,7 @@
 
 var ClassAttack = {
 	doAttack: function (unit, preattack) {
-		if (Config.MercWatch && Town.needMerc()) {
+		if (Config.MercWatch && Mercenary.needMerc()) {
 			print("mercwatch");
 			Town.visitTown();
 		}
@@ -61,7 +61,7 @@ var ClassAttack = {
 
 		if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc()) {
 			while (Attack.checkMonster(unit)) {
-				if (Town.needMerc()) {
+				if (Mercenary.needMerc()) {
 					if (Config.MercWatch && mercRevive++ < 1) {
 						Town.visitTown();
 					} else {

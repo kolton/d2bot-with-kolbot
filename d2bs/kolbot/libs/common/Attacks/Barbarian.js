@@ -8,7 +8,7 @@ var ClassAttack = {
 	doAttack: function (unit, preattack) {
 		var needRepair = Town.needRepair();
 
-		if ((Config.MercWatch && Town.needMerc()) || needRepair.length > 0) {
+		if ((Config.MercWatch && Mercenary.needMerc()) || needRepair.length > 0) {
 			Town.visitTown(!!needRepair.length);
 		}
 

@@ -373,7 +373,7 @@ var MuleLogger = {
 
 		if (this.LogMerc) {
 			for (i = 0; i < 3; i += 1) {
-				merc = me.getMerc();
+				merc = Mercenary.getMerc();
 
 				if (merc) {
 					break;

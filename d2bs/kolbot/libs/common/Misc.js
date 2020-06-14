@@ -2016,6 +2016,13 @@ MainLoop:
 		}
 
 		return flags.length ? flags : null;
+	},
+
+	checkQuest: function (id, state) {
+		sendPacket(1, 0x40);
+		delay(500);
+
+		return me.getQuest(id, state);
 	}
 };
 

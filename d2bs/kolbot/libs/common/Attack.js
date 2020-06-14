@@ -164,7 +164,7 @@ var Attack = {
 		var i, merc, item;
 
 		for (i = 0; i < 3; i += 1) {
-			merc = me.getMerc();
+			merc = Mercenary.getMerc();
 
 			if (merc) {
 				break;
