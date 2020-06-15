@@ -164,12 +164,20 @@ MainLoop:
 				delay(100);
 			}
 
+			// Go to town if I'm not fighting with leader anymore.
+			// This may happens with kurast temples script for example, where leader changes temples without going to town.
+			if (player.area != me.area) {
+				if (!me.inTown && !Pather.usePortal(null, player.name)) {
+					Town.goToTown();
+				}
+			}
+
 			playerAct = this.getPlayerAct(player);
 
 			if (playerAct && playerAct !== me.act) {
 				Town.goToTown(playerAct);
-				Town.move("portalspot");
 			}
+			Town.move("portalspot");
 
 			// Finish if leader is in chaos or throne
 			if ([108, 131].indexOf(player.area) > -1) {
@@ -179,21 +187,30 @@ MainLoop:
 			if (command !== oldCommand) {
 				oldCommand = command;
 
-				if (command.indexOf("kill") > -1) {
-					print("ÿc4MFHelperÿc0: Kill");
+				// Finish on quit command
+				if (command.indexOf("quit") > -1) {
+					break MainLoop;
+				}
 
-					split = command.split("kill ")[1];
+				// common for all commands, take the leader's tp.
+				// do not care about portal area, if leader has sent a command, he also just has made a tp.
+				// if, at worst case, the portal leads to wrong area, the command will not be executed and helper will go back to town at next loop.
+				delay(me.ping);
+				Pather.usePortal(null, player.name)
+				while (!me.area) {
+					delay(100);
+				}
+				delay(me.ping);
 
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
-							break;
-						}
+				if (me.area === player.area) {
 
-						delay(1000);
-					}
+					// common for all commands, precast.
+					Precast.doPrecast(false);
 
-					if (me.area === player.area) {
-						Precast.doPrecast(false);
+					if (command.indexOf("kill") > -1) {
+						print("ÿc4MFHelperÿc0: Kill");
+
+						split = command.split("kill ")[1];
 
 						try {
 							if (!!parseInt(split, 10)) {
@@ -205,52 +222,14 @@ MainLoop:
 						} catch (killerror) {
 							print(killerror);
 						}
+					} else if (command.indexOf("clearlevel") > -1) {
+						print("ÿc4MFHelperÿc0: Clear Level");
 
-						delay(1000);
-
-						if (!me.inTown && !Pather.usePortal(null, player.name)) {
-							Town.goToTown();
-						}
-					} else {
-						print("Failed to use portal.");
-					}
-				} else if (command.indexOf("clearlevel") > -1) {
-					print("ÿc4MFHelperÿc0: Clear Level");
-
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
-							break;
-						}
-
-						delay(1000);
-					}
-
-					if (me.area === player.area) {
-						Precast.doPrecast(false);
 						Attack.clearLevel(Config.ClearType);
-						Precast.doPrecast(true);
+					} else if (command.indexOf("clear") > -1) {
+						print("ÿc4MFHelperÿc0: Clear");
 
-						if (!Pather.usePortal(null, player.name)) {
-							Town.goToTown();
-						}
-					} else {
-						print("Failed to use portal.");
-					}
-				} else if (command.indexOf("clear") > -1) {
-					print("ÿc4MFHelperÿc0: Clear");
-
-					split = command.split("clear ")[1];
-
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
-							break;
-						}
-
-						delay(1000);
-					}
-
-					if (me.area === player.area) {
-						Precast.doPrecast(false);
+						split = command.split("clear ")[1];
 
 						try {
 							if (!!parseInt(split, 10)) {
@@ -261,60 +240,29 @@ MainLoop:
 						} catch (killerror2) {
 							print(killerror2);
 						}
+					} else if (command.indexOf("cows") > -1) {
+						print("ÿc4MFHelperÿc0: Clear Cows");
 
-						delay(1000);
-
-						if (!me.inTown && !Pather.usePortal(null, player.name)) {
-							Town.goToTown();
-						}
-					} else {
-						print("Failed to use portal.");
-					}
-				} else if (command.indexOf("quit") > -1) {
-					break MainLoop;
-				} else if (command.indexOf("cows") > -1) {
-					print("ÿc4MFHelperÿc0: Clear Cows");
-
-					for (i = 0; i < 5; i += 1) {
-						if (Town.goToTown(1) && Pather.usePortal(39)) {
-							break;
+						if (me.area != 39) {
+							Town.goToTown(1);
+							Town.move("stash");
+							Pather.usePortal(39);
 						}
 
-						delay(1000);
-					}
-
-					if (me.area === 39) {
-						Precast.doPrecast(false);
 						this.clearCowLevel();
-						delay(1000);
+					} else if (command.indexOf("council") > -1) {
+						print("ÿc4MFHelperÿc0: Kill Council");
 
-						if (!Pather.usePortal(null, player.name)) {
-							Town.goToTown();
-						}
-					} else {
-						print("Failed to use portal.");
-					}
-				} else if (command.indexOf("council") > -1) {
-					print("ÿc4MFHelperÿc0: Kill Council");
-
-					for (i = 0; i < 5; i += 1) {
-						if (Pather.usePortal(player.area, player.name)) {
-							break;
-						}
-
-						delay(1000);
-					}
-
-					if (me.area === player.area) {
-						Precast.doPrecast(false);
 						Attack.clearList(Attack.getMob([345, 346, 347], 0, 40));
-
-						if (!Pather.usePortal(null, player.name)) {
-							Town.goToTown();
-						}
-					} else {
-						print("Failed to use portal.");
 					}
+
+					// common for all commands, go back to town after executing command.
+					delay(1000);
+					if (!Pather.usePortal(null, player.name)) {
+						Town.goToTown();
+					}
+				} else {
+					print("Failed to use portal.");
 				}
 			}
 		}
