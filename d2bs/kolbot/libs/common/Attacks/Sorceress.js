@@ -111,7 +111,19 @@ var ClassAttack = {
 		}
 
 		result = this.doCast(unit, timedSkill, untimedSkill);
-
+		
+		//build the list and count the monsters
+		var monList = Attack.buildMonsterList();
+		//is sorting strictly required?
+		var sortfunc = Attack.sortMonsters;
+		monList.sort(sortfunc);
+		var monCount = Attack.getMonsterCount(me.x, me.y, 15, monList);
+		//if there are 3 or more monsters in the area around me, I won't telestomp
+		if(monCount > 2 && Config.TeleStomp) {
+			return -1; 
+		}
+		
+		//now thare are only 2 monsters, we think it's safe to telestomp
 		if (result === 2 && Config.TeleStomp && Attack.checkResist(unit, "physical") && !!me.getMerc() && Attack.validSpot(unit.x, unit.y)) {
 			while (Attack.checkMonster(unit)) {
 				if (Town.needMerc()) {

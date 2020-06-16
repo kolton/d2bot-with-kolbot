@@ -458,6 +458,9 @@ var Attack = {
 				}
 			} while (target.getNext());
 		}
+		
+		//possible to move sort here so we sort once?
+		monsterList.sort(sortfunc);
 
 		while (start && monsterList.length > 0 && attackCount < 300) {
 			if (boss) {
@@ -469,11 +472,8 @@ var Attack = {
 				return false;
 			}
 
-			//monsterList.sort(Sort.units);
-			monsterList.sort(sortfunc);
-
 			target = copyUnit(monsterList[0]);
-
+			
 			if (target.x !== undefined && (getDistance(target, orgx, orgy) <= range || (this.getScarinessLevel(target) > 7 && getDistance(me, target) <= range)) && this.checkMonster(target)) {
 				if (Config.Dodge && me.hp * 100 / me.hpmax <= Config.DodgeHP) {
 					this.deploy(target, Config.DodgeRange, 5, 9);
@@ -483,8 +483,13 @@ var Attack = {
 				//me.overhead("attacking " + target.name + " spectype " + target.spectype + " id " + target.classid);
 
 				result = ClassAttack.doAttack(target, attackCount % 15 === 0);
-
-				if (result) {
+				
+				if (result == -1) {
+					//if we reached here, it means there was a mob around the telestomp target
+					monsterList.shift();
+					//shift and reappend the target at end, telestomp after we have killed other monsters in list
+					monsterList.push(target);
+				} else if (result) {
 					retry = 0;
 
 					if (result === 2) {
