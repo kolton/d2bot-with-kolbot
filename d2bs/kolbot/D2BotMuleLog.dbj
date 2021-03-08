@@ -1,5 +1,7 @@
 var StarterConfig = {
-	MinGameTime: rand(150, 180), // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
+	GameName: "yourgamename",
+    	GamePass: "yourgamepass",
+	MinGameTime: rand(30, 60), // Minimum game length in seconds. If a game is ended too soon, the rest of the time is waited in the lobby
 	CreateGameDelay: rand(5, 15), // Seconds to wait before creating a new game
 
 	SwitchKeyDelay: 0, // Seconds to wait before switching a used/banned key or after realm down
@@ -200,9 +202,13 @@ MainSwitch:
 			break;
 		}
 
-		if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
-			break;
-		}
+        if (StarterConfig.GameName && !ControlAction.click(6, 652, 469, 120, 20)) { // Join
+            break;
+        }
+
+        // if (!ControlAction.click(6, 533, 469, 120, 20)) { // Create
+        //     break;
+        // }
 
 		if (getControl(6, 533, 469, 120, 20) && getControl(6, 533, 469, 120, 20).disabled === 4) { // dead HC character
 			ControlAction.click(6, 693, 490, 80, 20); // Quit from Lobby
@@ -227,35 +233,21 @@ MainSwitch:
 
 		break;
 	case 4: // Create Game
-		D2Bot.updateStatus("Creating Game");
-
-		control = getControl(1, 657, 342, 27, 20);
-
-		if (control && control.disabled === 5) {
-			ControlAction.click(6, 431, 341, 15, 16); // remove level restriction
-		}
-
-		if (gameCount >= 99) {
-			gameCount = 1;
-
-			DataFile.updateStats("runs", gameCount);
-		}
-
-		if (lastGameStatus === "pending") {
-			D2Bot.printToConsole("Failed to create game");
-
-			gameCount += 1;
-		}
-
-		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
-		createGame(MuleLogger.LogGame[0] + gameCount, MuleLogger.LogGame[1], 0);
-		locationTimeout(5000, location);
-
-		lastGameStatus = "pending";
+        if (StarterConfig.GameName) {
+            createGame(StarterConfig.GameName, StarterConfig.GamePass, 0);
+        } else {
+            createGame(MuleLogger.LogGame[0] + gameCount, MuleLogger.LogGame[1], 0);
+        }
 
 		break;
-	case 5: // Join Game
-		break;
+    case 5: // Join Game
+        D2Bot.updateStatus("Join Game");
+
+        joinGame(StarterConfig.GameName, StarterConfig.GamePass);
+
+        locationTimeout(5000, location);
+
+        break;
 	case 6: // Ladder
 		break;
 	case 7: // Channel List
