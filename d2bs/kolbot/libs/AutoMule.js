@@ -57,7 +57,8 @@ var AutoMule = {
 			enabledProfiles: [""],
 
 			// Stop a profile prior to muling. Useful when running 8 bots without proxies.
-			stopProfile: ""
+			stopProfile: "",
+			stopProfileKeyRelease: false
 		}
 //##########################################################################################
 	},
