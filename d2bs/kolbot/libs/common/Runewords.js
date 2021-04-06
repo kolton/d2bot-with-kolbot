@@ -71,7 +71,7 @@ var Runeword = {
 	Grief: me.ladder ? [614, 612, 637, 632, 617] : false, // Eth + Tir + Lo + Mal + Ral
 	Harmony: me.ladder ? [612, 615, 621, 627] : false, // Tir + Ith + Sol + Ko
 	Ice: me.ladder ? [620, 622, 640, 637] : false, // Amn + Shael + Jah + Lo
-	"Infinity": me.ladder ? [639, 632, 639, 633] : false, // Ber + Mal + Ber + Ist
+	Infinity: me.ladder ? [639, 632, 639, 633] : false, // Ber + Mal + Ber + Ist
 	Insight: me.ladder ? [617, 612, 616, 621] : false, // Ral + Tir + Tal + Sol
 	LastWish: me.ladder ? [640, 632, 640, 638, 640, 639] : false, // Jah + Mal + Jah + Sur + Jah + Ber
 	Lawbringer: me.ladder ? [620, 629, 627] : false, // Amn + Lem + Ko
